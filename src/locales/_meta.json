@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-04-28T09:26:59.128Z",
+  "sources": [
+    {
+      "gid": "1236962912",
+      "label": "In-game UI terms",
+      "namespace": "ingame"
+    },
+    {
+      "gid": "2001059420",
+      "label": "Pokémon names",
+      "namespace": "pokemon"
+    }
+  ],
+  "counts": {
+    "ingameKeysUnion": 114,
+    "pokemonNames": 1153
+  },
+  "missingTranslationsCount": {
+    "en": 0,
+    "de": 0,
+    "es": 0,
+    "fr": 0,
+    "zh-TW": 0,
+    "hi": 0,
+    "ja": 0
+  },
+  "warnings": []
+}
