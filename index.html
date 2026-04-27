@@ -6,6 +6,14 @@
     <meta name="theme-color" content="#0F1419" />
     <title>pogo.filter.workshop</title>
     <meta name="description" content="Pokémon GO Suchstring-Generator: hundo-aware Trash & Trade Filter, regionale Karte, Tausch-Buddies." />
+    <script>
+      // Set document lang from saved locale preference before React mounts so
+      // returning visitors don't see a flash of the wrong language attribute.
+      try {
+        var saved = localStorage.getItem("pogo_filter_locale");
+        if (saved) document.documentElement.lang = saved;
+      } catch (e) {}
+    </script>
   </head>
   <body class="bg-[#0F1419]">
     <div id="root"></div>
