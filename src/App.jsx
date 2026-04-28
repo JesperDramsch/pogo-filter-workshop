@@ -1122,14 +1122,14 @@ export default function App() {
             >
               <div className="space-y-6">
                 <FilterBox
-                  label="trash"
+                  label={t("app.filter.trash_label")}
                   accent="#E74C3C"
                   filterStr={trash}
                   copied={copied.trash}
                   onCopy={() => copyToClipboard("trash", trash)}
                 />
                 <FilterBox
-                  label="trade"
+                  label={t("app.filter.trade_label")}
                   accent="#5EAFC5"
                   filterStr={trade}
                   copied={copied.trade}
@@ -1137,7 +1137,7 @@ export default function App() {
                 />
                 {sort && (
                   <FilterBox
-                    label="hundo-sort"
+                    label={t("app.filter.sort_label")}
                     accent="#F5B82E"
                     filterStr={sort}
                     copied={copied.sort}
@@ -1146,7 +1146,7 @@ export default function App() {
                 )}
                 {prestaged && (
                   <FilterBox
-                    label="vorbereitete Tausche"
+                    label={t("app.filter.prestaged_label")}
                     accent="#9B59B6"
                     filterStr={prestaged}
                     copied={copied.prestaged}
@@ -1155,7 +1155,7 @@ export default function App() {
                 )}
                 {gift && (
                   <FilterBox
-                    label="Ferne Freunde"
+                    label={t("app.filter.gift_label")}
                     accent="#27AE60"
                     filterStr={gift}
                     copied={copied.gift}
@@ -1172,17 +1172,17 @@ export default function App() {
 
                 {/* Summary stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mono text-xs">
-                  <StatBox label="Standort" value={homeLocation ? `${homeLocation[1].toFixed(1)}°,${homeLocation[0].toFixed(1)}°` : "—"} />
-                  <StatBox label="Hundos" value={hundos.length} />
-                  <StatBox label="trash" value={`${trash.length}c`} />
-                  <StatBox label="trade" value={`${trade.length}c`} />
+                  <StatBox label={t("app.stats.location")} value={homeLocation ? `${homeLocation[1].toFixed(1)}°,${homeLocation[0].toFixed(1)}°` : "—"} />
+                  <StatBox label={t("app.stats.hundos")} value={hundos.length} />
+                  <StatBox label={t("app.filter.trash_label")} value={`${trash.length}c`} />
+                  <StatBox label={t("app.filter.trade_label")} value={`${trade.length}c`} />
                 </div>
 
                 {/* Collapsibles */}
                 <div className="space-y-3 pt-2">
                   <Collapsible
                     icon="∑"
-                    label="set-theoretischer Aufbau"
+                    label={t("app.collapsible.set_theory")}
                     open={showSetTheory}
                     onToggle={() => setShowSetTheory(s => !s)}>
                     <SetTheory hundos={hundos} TE_full={TE_full} TE_trim={TE_trim} cfg={effectiveConfig} />
@@ -1190,7 +1190,7 @@ export default function App() {
 
                   <Collapsible
                     icon="≡"
-                    label="rohe Filter-Klauseln · was woher kommt"
+                    label={t("app.collapsible.raw_clauses")}
                     open={showRawClauses}
                     onToggle={() => setShowRawClauses(s => !s)}>
                     <RawClausesPanel trashClauses={trashClauses} tradeClauses={tradeClauses} sortClauses={sortClauses} prestagedClauses={prestagedClauses} giftClauses={giftClauses} buddyCatchFilters={buddyCatchFilters} />
@@ -1198,7 +1198,7 @@ export default function App() {
 
                   <Collapsible
                     icon="✓"
-                    label="Pokémon prüfen"
+                    label={t("app.collapsible.verify")}
                     open={showVerify}
                     onToggle={() => setShowVerify(s => !s)}>
                     <VerifyPanel trash={trash} trade={trade} hundos={hundos} TE_families={TRADE_EVO_FAMILIES} outputLocale={outputLocale} />
@@ -1232,6 +1232,7 @@ export default function App() {
 // ── Stepper-internal subcomponents ─────────────────────────────────────────
 
 function StepWrapper({ title, hint, children, onBack, onNext, nextLabel }) {
+  const { t } = useTranslation();
   return (
     <section className="space-y-5">
       <div>
@@ -1243,14 +1244,14 @@ function StepWrapper({ title, hint, children, onBack, onNext, nextLabel }) {
         {onBack && (
           <button onClick={onBack}
             className="mono text-sm bg-[#1F2933] hover:bg-[#2D3A47] text-[#E6EDF3] px-4 py-2 rounded transition">
-            ← Zurück
+            {t("app.step.back_button")}
           </button>
         )}
         <div className="flex-1" />
         {onNext && (
           <button onClick={onNext}
             className="mono text-sm bg-[#E74C3C] hover:bg-[#FF5A4A] text-white px-4 py-2 rounded transition">
-            {nextLabel || "Weiter →"}
+            {nextLabel || t("app.step.next_default")}
           </button>
         )}
       </div>
@@ -1268,18 +1269,19 @@ function StatBox({ label, value }) {
 }
 
 function BuddyCatchSection({ buddyCatchFilters, copied, onCopy }) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-3">
       <div className="mono text-[10.5px] uppercase tracking-wider text-[#E67E22] flex items-baseline gap-2">
-        <span>für Buddies fangen</span>
-        <span className="text-[#8090A0] normal-case">· trashbare Pokémon der Wunsch-Spezies</span>
+        <span>{t("app.buddy_catch.section_title")}</span>
+        <span className="text-[#8090A0] normal-case">· {t("app.buddy_catch.section_subtitle")}</span>
       </div>
       {buddyCatchFilters.map(b => {
         const key = `buddyCatch:${b.prefix}`;
         return (
           <FilterBox
             key={b.prefix}
-            label={`fangen für ${b.buddyName}`}
+            label={t("app.buddy_catch.filter_label", { params: { name: b.buddyName } })}
             accent="#E67E22"
             filterStr={b.filter}
             copied={copied[key]}
@@ -1292,6 +1294,7 @@ function BuddyCatchSection({ buddyCatchFilters, copied, onCopy }) {
 }
 
 function HundosEditor({ hundos, setHundos, newHundo, setNewHundo, addHundo, removeHundo }) {
+  const { t } = useTranslation();
   // Live preview of what's about to be added: parse the input, resolve each token,
   // show a green chip for each resolved one + a red marker for unresolved tokens.
   const previewTokens = useMemo(() => {
@@ -1301,15 +1304,15 @@ function HundosEditor({ hundos, setHundos, newHundo, setNewHundo, addHundo, remo
     });
   }, [newHundo]);
 
-  const resolved = previewTokens.filter(t => t.info);
-  const unresolved = previewTokens.filter(t => !t.info);
-  const newResolved = resolved.filter(t => !hundos.includes(t.info.names.de.toLowerCase()));
-  const dupes = resolved.filter(t => hundos.includes(t.info.names.de.toLowerCase()));
+  const resolved = previewTokens.filter(p => p.info);
+  const unresolved = previewTokens.filter(p => !p.info);
+  const newResolved = resolved.filter(p => !hundos.includes(p.info.names.de.toLowerCase()));
+  const dupes = resolved.filter(p => hundos.includes(p.info.names.de.toLowerCase()));
 
   return (
     <div className="space-y-4">
       <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0]">
-        |H| = {hundos.length} Familien
+        {t("app.hundos.count", { params: { count: hundos.length } })}
       </div>
 
       <div className="flex flex-wrap gap-1.5">
@@ -1324,7 +1327,7 @@ function HundosEditor({ hundos, setHundos, newHundo, setNewHundo, addHundo, remo
           </span>
         ))}
         {hundos.length === 0 && (
-          <span className="mono text-xs text-[#8B98A5] italic">noch keine hundos — füge einen hinzu</span>
+          <span className="mono text-xs text-[#8B98A5] italic">{t("app.hundos.empty")}</span>
         )}
       </div>
 
@@ -1334,13 +1337,13 @@ function HundosEditor({ hundos, setHundos, newHundo, setNewHundo, addHundo, remo
           value={newHundo}
           onChange={e => setNewHundo(e.target.value)}
           onKeyDown={e => e.key === "Enter" && addHundo()}
-          placeholder="Nummer, EN oder DE — z.B. 1, Pikachu, Bisasam, 666"
+          placeholder={t("app.hundos.input_placeholder")}
           className="mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]" />
         <button
           onClick={addHundo}
           disabled={previewTokens.length === 0 || newResolved.length === 0}
           className="mono text-sm bg-[#E74C3C] hover:bg-[#FF5A4A] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded transition flex items-center gap-1.5">
-          <Plus size={14} /> hinzufügen
+          <Plus size={14} /> {t("app.hundos.add_button")}
         </button>
       </div>
 
@@ -1348,19 +1351,19 @@ function HundosEditor({ hundos, setHundos, newHundo, setNewHundo, addHundo, remo
       {previewTokens.length > 0 && (
         <div className="border border-[#1F2933] rounded p-2.5 bg-[#0B0F14] space-y-1.5">
           <div className="mono text-[10px] uppercase tracking-wider text-[#8090A0]">
-            Vorschau · {newResolved.length} neu, {dupes.length} schon vorhanden, {unresolved.length} unbekannt
+            {t("app.hundos.preview_summary", { params: { new: newResolved.length, dupes: dupes.length, unresolved: unresolved.length } })}
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {previewTokens.map((t, i) => {
-              if (!t.info) {
+            {previewTokens.map((tok, i) => {
+              if (!tok.info) {
                 return (
                   <span key={i} className="mono text-[11px] bg-[#E74C3C]/15 text-[#E74C3C] px-2 py-0.5 rounded"
-                        title="nicht gefunden — vielleicht Tippfehler?">
-                    ✗ {t.input}
+                        title={t("app.hundos.unresolved_title")}>
+                    ✗ {tok.input}
                   </span>
                 );
               }
-              const isDupe = hundos.includes(t.info.names.de.toLowerCase());
+              const isDupe = hundos.includes(tok.info.names.de.toLowerCase());
               const labelByType = { number: "#", en: "EN", de: "DE", es: "ES", fr: "FR", "zh-TW": "ZH", hi: "HI", ja: "JA" };
               return (
                 <span key={i}
@@ -1369,9 +1372,9 @@ function HundosEditor({ hundos, setHundos, newHundo, setNewHundo, addHundo, remo
                       ? "bg-[#8090A0]/15 text-[#8B98A5]"
                       : "bg-[#27AE60]/15 text-[#27AE60]"
                   }`}
-                  title={`#${t.info.names.dex} · EN: ${t.info.names.en} · DE: ${t.info.names.de}${isDupe ? " (schon dabei)" : ""}`}>
-                  <span className="text-[9px] opacity-60">{labelByType[t.info.inputLocale]}</span>
-                  {t.info.names.de}
+                  title={`#${tok.info.dex} · EN: ${tok.info.names.en} · DE: ${tok.info.names.de}${isDupe ? ` (${t("app.hundos.dupe_marker")})` : ""}`}>
+                  <span className="text-[9px] opacity-60">{labelByType[tok.info.inputLocale]}</span>
+                  {tok.info.names.de}
                   {isDupe && <span className="opacity-60">✓</span>}
                 </span>
               );
@@ -1381,14 +1384,18 @@ function HundosEditor({ hundos, setHundos, newHundo, setNewHundo, addHundo, remo
       )}
 
       <p className="mono text-xs text-[#8090A0]">
-        Akzeptiert <span className="text-[#5EAFC5]">Nummern</span>, <span className="text-[#5EAFC5]">englische</span>, oder <span className="text-[#5EAFC5]">deutsche</span> Namen.
-        Mehrere auf einmal trennen mit Komma, Leerzeichen oder Semikolon.
+        {t("app.hundos.input_help", { params: {
+          numbers: t("app.hundos.input_help_numbers"),
+          english: t("app.hundos.input_help_english"),
+          german:  t("app.hundos.input_help_german"),
+        } })}
       </p>
     </div>
   );
 }
 
 function CustomCollectiblesEditor({ list, onChange }) {
+  const { t } = useTranslation();
   const [input, setInput] = useState("");
 
   // Live preview using same resolver as hundo input
@@ -1398,10 +1405,10 @@ function CustomCollectiblesEditor({ list, onChange }) {
       info: resolveSpeciesInfo(tok),
     }));
   }, [input]);
-  const resolved = previewTokens.filter(t => t.info);
-  const newResolved = resolved.filter(t => !list.includes(t.info.names.de.toLowerCase()));
-  const dupes = resolved.filter(t => list.includes(t.info.names.de.toLowerCase()));
-  const unresolved = previewTokens.filter(t => !t.info);
+  const resolved = previewTokens.filter(p => p.info);
+  const newResolved = resolved.filter(p => !list.includes(p.info.names.de.toLowerCase()));
+  const dupes = resolved.filter(p => list.includes(p.info.names.de.toLowerCase()));
+  const unresolved = previewTokens.filter(p => !p.info);
 
   function addAll() {
     const tokens = input.split(/[,;\s]+/).filter(Boolean);
@@ -1423,10 +1430,10 @@ function CustomCollectiblesEditor({ list, onChange }) {
   return (
     <div>
       <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
-        Eigene Sammler-Pokémon · zusätzlich zum Trash-Schutz
+        {t("app.collectibles.title")}
       </div>
       <p className="mono text-xs text-[#8090A0] mb-3 leading-relaxed">
-        Spezies, die du sammelst und nie wegwerfen willst — z.B. dein Lieblings-Pokémon, Form-Sammlungen, etc.
+        {t("app.collectibles.description")}
       </p>
 
       {list.length > 0 && (
@@ -1450,29 +1457,29 @@ function CustomCollectiblesEditor({ list, onChange }) {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === "Enter" && addAll()}
-          placeholder="Nummer, EN oder DE — z.B. Glurak, 6, Rayquaza"
+          placeholder={t("app.collectibles.input_placeholder")}
           className="mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]" />
         <button
           onClick={addAll}
           disabled={previewTokens.length === 0 || newResolved.length === 0}
           className="mono text-sm bg-[#27AE60] hover:bg-[#3FCF80] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded transition flex items-center gap-1.5">
-          <Plus size={14} /> hinzufügen
+          <Plus size={14} /> {t("app.collectibles.add_button")}
         </button>
       </div>
 
       {previewTokens.length > 0 && (
         <div className="border border-[#1F2933] rounded p-2.5 bg-[#0B0F14] mt-2 space-y-1.5">
           <div className="mono text-[10px] uppercase tracking-wider text-[#8090A0]">
-            Vorschau · {newResolved.length} neu, {dupes.length} schon dabei, {unresolved.length} unbekannt
+            {t("app.collectibles.preview_summary", { params: { new: newResolved.length, dupes: dupes.length, unresolved: unresolved.length } })}
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {previewTokens.map((t, i) => {
-              if (!t.info) return (
+            {previewTokens.map((tok, i) => {
+              if (!tok.info) return (
                 <span key={i} className="mono text-[11px] bg-[#FF6B5B]/15 text-[#FF6B5B] px-2 py-0.5 rounded">
-                  ✗ {t.input}
+                  ✗ {tok.input}
                 </span>
               );
-              const isDupe = list.includes(t.info.names.de.toLowerCase());
+              const isDupe = list.includes(tok.info.names.de.toLowerCase());
               const labelByType = { number: "#", en: "EN", de: "DE", es: "ES", fr: "FR", "zh-TW": "ZH", hi: "HI", ja: "JA" };
               return (
                 <span key={i}
@@ -1481,8 +1488,8 @@ function CustomCollectiblesEditor({ list, onChange }) {
                       ? "bg-[#5C6975]/15 text-[#8090A0]"
                       : "bg-[#27AE60]/15 text-[#27AE60]"
                   }`}>
-                  <span className="text-[9px] opacity-60">{labelByType[t.info.inputLocale]}</span>
-                  {t.info.names.de}
+                  <span className="text-[9px] opacity-60">{labelByType[tok.info.inputLocale]}</span>
+                  {tok.info.names.de}
                   {isDupe && <span className="opacity-60">✓</span>}
                 </span>
               );
@@ -1497,6 +1504,7 @@ function CustomCollectiblesEditor({ list, onChange }) {
 // ─── SUBCOMPONENTS ────────────────────────────────────────────────────────
 
 function FilterBox({ label, accent, filterStr, copied, onCopy }) {
+  const { t } = useTranslation();
   const len = filterStr.length;
   const pct = Math.min(100, (len / 5000) * 100);
   const codeRef = useRef(null);
@@ -1515,9 +1523,9 @@ function FilterBox({ label, accent, filterStr, copied, onCopy }) {
 
   // copied tri-state: false | "ok" | "err"
   const buttonLabel =
-    copied === "ok"  ? <><Check size={12} /> kopiert</> :
-    copied === "err" ? <><X size={12} /> nicht erlaubt — tippe Text an</> :
-    <><Copy size={12} /> kopieren</>;
+    copied === "ok"  ? <><Check size={12} /> {t("app.filterbox.copied")}</> :
+    copied === "err" ? <><X size={12} /> {t("app.filterbox.copy_error")}</> :
+    <><Copy size={12} /> {t("app.filterbox.copy_button")}</>;
   const buttonColor =
     copied === "ok"  ? "#27AE60" :
     copied === "err" ? "#FF6B5B" :
@@ -1531,7 +1539,7 @@ function FilterBox({ label, accent, filterStr, copied, onCopy }) {
             {label}
           </span>
           <span className="mono text-xs text-[#8090A0]">
-            {len.toLocaleString()} / 5000 chars
+            {t("app.filterbox.length_label", { params: { len: len.toLocaleString() } })}
           </span>
           <div className="w-24 h-1 bg-[#1F2933] rounded-full overflow-hidden">
             <div className="h-full transition-all" style={{ width: `${pct}%`, background: accent }} />
@@ -1550,7 +1558,7 @@ function FilterBox({ label, accent, filterStr, copied, onCopy }) {
           onClick={selectAll}
           className="mono text-xs text-[#E6EDF3] break-all leading-relaxed cursor-text select-all block"
           style={{ userSelect: "all", WebkitUserSelect: "all" }}
-          title="Tippen markiert alles — dann kopieren über das System-Menü">
+          title={t("app.filterbox.select_all_hint")}>
           {filterStr}
         </code>
       </div>
@@ -1603,35 +1611,37 @@ function SetTheory({ hundos, TE_full, TE_trim, cfg }) {
 }
 
 function RawClausesPanel({ trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses, buddyCatchFilters }) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-5 mono text-xs">
       <div className="text-[#8090A0] leading-relaxed">
-        Jede Klausel im finalen Filter, mit Erklärung warum sie da ist. Alle Klauseln werden mit <code className="text-[#E6EDF3]">&amp;</code> kombiniert — jede muss erfüllt sein, damit ein Pokémon im Filter auftaucht.
+        {t("app.clauses.intro")}
       </div>
 
-      <ClauseList title="Trash-Filter" accent="#E74C3C" clauses={trashClauses} />
-      <ClauseList title="Trade-Filter" accent="#5EAFC5" clauses={tradeClauses} />
+      <ClauseList title={t("app.clauses.trash_title")} accent="#E74C3C" clauses={trashClauses} />
+      <ClauseList title={t("app.clauses.trade_title")} accent="#5EAFC5" clauses={tradeClauses} />
       {sortClauses && sortClauses.length > 0 && (
-        <ClauseList title="Hundo-Sort-Filter" accent="#F5B82E" clauses={sortClauses} />
+        <ClauseList title={t("app.clauses.sort_title")} accent="#F5B82E" clauses={sortClauses} />
       )}
       {prestagedClauses && prestagedClauses.length > 0 && (
-        <ClauseList title="Vorbereitete Tausche" accent="#9B59B6" clauses={prestagedClauses} />
+        <ClauseList title={t("app.clauses.prestaged_title")} accent="#9B59B6" clauses={prestagedClauses} />
       )}
       {giftClauses && giftClauses.length > 0 && (
-        <ClauseList title="Ferne Freunde" accent="#27AE60" clauses={giftClauses} />
+        <ClauseList title={t("app.clauses.gift_title")} accent="#27AE60" clauses={giftClauses} />
       )}
       {buddyCatchFilters && buddyCatchFilters.length > 0 && buddyCatchFilters.map(b => (
-        <ClauseList key={`catch:${b.prefix}`} title={`fangen für ${b.buddyName}`} accent="#E67E22" clauses={b.clauses} />
+        <ClauseList key={`catch:${b.prefix}`} title={t("app.buddy_catch.filter_label", { params: { name: b.buddyName } })} accent="#E67E22" clauses={b.clauses} />
       ))}
     </div>
   );
 }
 
 function ClauseList({ title, accent, clauses }) {
+  const { t } = useTranslation();
   return (
     <div>
       <div className="mono text-[10.5px] uppercase tracking-wider mb-2" style={{ color: accent }}>
-        {title} · {clauses.length} Klauseln
+        {title} · {t("app.clauses.count_suffix", { params: { count: clauses.length } })}
       </div>
       <div className="border border-[#1F2933] rounded divide-y divide-[#1F2933]">
         {clauses.map((c, i) => (

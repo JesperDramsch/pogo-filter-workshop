@@ -23,5 +23,57 @@
   "app.step.filter.label": "Your filter",
   "app.step.filter.desc": "Trash + trade — ready to copy",
   "app.step.filter.title": "Your filter",
-  "app.step.filter.hint": "Done — copy the filter strings and paste them into PoGo's search box."
+  "app.step.filter.hint": "Done — copy the filter strings and paste them into PoGo's search box.",
+
+  "app.step.next_default": "Next →",
+  "app.step.back_button": "← Back",
+
+  "app.hundos.count": "|H| = {count} families",
+  "app.hundos.empty": "no hundos yet — add one",
+  "app.hundos.input_placeholder": "Number or name — e.g. 1, Pikachu, Bulbasaur, 666",
+  "app.hundos.add_button": "add",
+  "app.hundos.preview_summary": "Preview · {new} new, {dupes} already added, {unresolved} unknown",
+  "app.hundos.unresolved_title": "not found — typo maybe?",
+  "app.hundos.dupe_marker": "already added",
+  "app.hundos.input_help": "Accepts {numbers}, {english}, or {german} names. Separate multiple with comma, space, or semicolon.",
+  "app.hundos.input_help_numbers": "numbers",
+  "app.hundos.input_help_english": "English",
+  "app.hundos.input_help_german": "German",
+
+  "app.collectibles.title": "Your custom collectibles · added to trash protection",
+  "app.collectibles.description": "Species you collect and never want to throw away — favorites, form collections, etc.",
+  "app.collectibles.input_placeholder": "Number or name — e.g. Charizard, 6, Rayquaza",
+  "app.collectibles.add_button": "add",
+  "app.collectibles.preview_summary": "Preview · {new} new, {dupes} already added, {unresolved} unknown",
+
+  "app.filterbox.copied": "copied",
+  "app.filterbox.copy_error": "blocked — tap the text instead",
+  "app.filterbox.copy_button": "copy",
+  "app.filterbox.select_all_hint": "Tap to select all — then copy via the system menu",
+  "app.filterbox.length_label": "{len} / 5000 chars",
+
+  "app.clauses.intro": "Every clause in the final filter, with the reason it's there. Clauses are joined with & — every clause must match for a Pokémon to appear.",
+  "app.clauses.trash_title": "Trash filter",
+  "app.clauses.trade_title": "Trade filter",
+  "app.clauses.sort_title": "Hundo-sort filter",
+  "app.clauses.prestaged_title": "Pre-staged trades",
+  "app.clauses.gift_title": "Distant friends",
+  "app.clauses.count_suffix": "{count} clauses",
+
+  "app.buddy_catch.section_title": "catch for buddies",
+  "app.buddy_catch.section_subtitle": "trashable Pokémon of the wish list species",
+  "app.buddy_catch.filter_label": "catch for {name}",
+
+  "app.filter.trash_label": "trash",
+  "app.filter.trade_label": "trade",
+  "app.filter.sort_label": "hundo-sort",
+  "app.filter.prestaged_label": "pre-staged trades",
+  "app.filter.gift_label": "distant friends",
+
+  "app.stats.location": "Location",
+  "app.stats.hundos": "Hundos",
+
+  "app.collapsible.set_theory": "set-theory breakdown",
+  "app.collapsible.raw_clauses": "raw filter clauses · what comes from where",
+  "app.collapsible.verify": "check a Pokémon"
 }

@@ -23,5 +23,57 @@
   "app.step.filter.label": "Dein Filter",
   "app.step.filter.desc": "Trash + Tausch — zum Kopieren",
   "app.step.filter.title": "Dein Filter",
-  "app.step.filter.hint": "Fertig — kopiere die Filter-Strings und füge sie ins PoGo-Suchfeld ein."
+  "app.step.filter.hint": "Fertig — kopiere die Filter-Strings und füge sie ins PoGo-Suchfeld ein.",
+
+  "app.step.next_default": "Weiter →",
+  "app.step.back_button": "← Zurück",
+
+  "app.hundos.count": "|H| = {count} Familien",
+  "app.hundos.empty": "noch keine hundos — füge einen hinzu",
+  "app.hundos.input_placeholder": "Nummer, EN oder DE — z.B. 1, Pikachu, Bisasam, 666",
+  "app.hundos.add_button": "hinzufügen",
+  "app.hundos.preview_summary": "Vorschau · {new} neu, {dupes} schon vorhanden, {unresolved} unbekannt",
+  "app.hundos.unresolved_title": "nicht gefunden — vielleicht Tippfehler?",
+  "app.hundos.dupe_marker": "schon dabei",
+  "app.hundos.input_help": "Akzeptiert {numbers}, {english}, oder {german} Namen. Mehrere auf einmal trennen mit Komma, Leerzeichen oder Semikolon.",
+  "app.hundos.input_help_numbers": "Nummern",
+  "app.hundos.input_help_english": "englische",
+  "app.hundos.input_help_german": "deutsche",
+
+  "app.collectibles.title": "Eigene Sammler-Pokémon · zusätzlich zum Trash-Schutz",
+  "app.collectibles.description": "Spezies, die du sammelst und nie wegwerfen willst — z.B. dein Lieblings-Pokémon, Form-Sammlungen, etc.",
+  "app.collectibles.input_placeholder": "Nummer, EN oder DE — z.B. Glurak, 6, Rayquaza",
+  "app.collectibles.add_button": "hinzufügen",
+  "app.collectibles.preview_summary": "Vorschau · {new} neu, {dupes} schon dabei, {unresolved} unbekannt",
+
+  "app.filterbox.copied": "kopiert",
+  "app.filterbox.copy_error": "nicht erlaubt — tippe Text an",
+  "app.filterbox.copy_button": "kopieren",
+  "app.filterbox.select_all_hint": "Tippen markiert alles — dann kopieren über das System-Menü",
+  "app.filterbox.length_label": "{len} / 5000 chars",
+
+  "app.clauses.intro": "Jede Klausel im finalen Filter, mit Erklärung warum sie da ist. Alle Klauseln werden mit & kombiniert — jede muss erfüllt sein, damit ein Pokémon im Filter auftaucht.",
+  "app.clauses.trash_title": "Trash-Filter",
+  "app.clauses.trade_title": "Trade-Filter",
+  "app.clauses.sort_title": "Hundo-Sort-Filter",
+  "app.clauses.prestaged_title": "Vorbereitete Tausche",
+  "app.clauses.gift_title": "Ferne Freunde",
+  "app.clauses.count_suffix": "{count} Klauseln",
+
+  "app.buddy_catch.section_title": "für Buddies fangen",
+  "app.buddy_catch.section_subtitle": "trashbare Pokémon der Wunsch-Spezies",
+  "app.buddy_catch.filter_label": "fangen für {name}",
+
+  "app.filter.trash_label": "trash",
+  "app.filter.trade_label": "trade",
+  "app.filter.sort_label": "hundo-sort",
+  "app.filter.prestaged_label": "vorbereitete Tausche",
+  "app.filter.gift_label": "Ferne Freunde",
+
+  "app.stats.location": "Standort",
+  "app.stats.hundos": "Hundos",
+
+  "app.collapsible.set_theory": "set-theoretischer Aufbau",
+  "app.collapsible.raw_clauses": "rohe Filter-Klauseln · was woher kommt",
+  "app.collapsible.verify": "Pokémon prüfen"
 }
