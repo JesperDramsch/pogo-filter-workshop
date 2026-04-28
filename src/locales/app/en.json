@@ -147,5 +147,44 @@
   "app.protect.dynamax.label": "Dynamax-capable",
   "app.protect.dynamax.why": "Pokémon with Dynamax unlocked",
   "app.protect.buddies_protect.label": "Was a buddy",
-  "app.protect.buddies_protect.why": "Sentimental protection — no one wants to trade away their old buddies"
+  "app.protect.buddies_protect.why": "Sentimental protection — no one wants to trade away their old buddies",
+
+  "app.modal.settings.title": "Settings",
+  "app.modal.settings.close_aria": "Close",
+  "app.modal.settings.mode_label": "Mode: {mode}",
+  "app.modal.settings.mode_expert": "Expert",
+  "app.modal.settings.mode_normal": "Normal",
+  "app.modal.settings.mode_expert_help": "All options visible",
+  "app.modal.settings.mode_normal_help": "Sensible defaults — Expert for fine control",
+  "app.modal.settings.mode_to_normal": "→ Normal",
+  "app.modal.settings.mode_to_expert": "→ Expert",
+
+  "app.modal.tags.section_title": "Trade tags · protected in the filter",
+  "app.modal.tags.basar_label": "Bulk-trade tag (default: Trade)",
+  "app.modal.tags.basar_placeholder": "e.g. Trade, Basar, give-away",
+  "app.modal.tags.basar_clause": "→ Filter clause:",
+  "app.modal.tags.fern_label": "Niantic long-distance trade tag",
+  "app.modal.tags.fern_placeholder": "Long Distance Trade (default name)",
+  "app.modal.tags.fern_help": "official PoGo tag (December 2025)",
+
+  "app.modal.custom_tags.section_title": "Custom tags · additional #tags to protect",
+  "app.modal.custom_tags.placeholder": "e.g. pvpiv, keep, pokegenie (comma-separated)",
+  "app.modal.custom_tags.help": "e.g. if you use PvPIV or PokeGenie",
+
+  "app.modal.league.section_title": "League tags · your naming convention",
+  "app.modal.league.placeholder": "e.g. ⓤ,ⓖ,ⓛ — comma-separated",
+  "app.modal.league.help": "embedded in the nickname — e.g. \"ⓤ Rattata\" for Ultra League",
+
+  "app.modal.safety.section_title": "Safety nets · limit filter output",
+  "app.modal.safety.cp_label": "CP cap",
+  "app.modal.safety.cp_hint": "shows only Pokémon with CP ≤ value (default: 2000)",
+  "app.modal.safety.age_label": "Caught within last (days, max)",
+  "app.modal.safety.age_hint": "shows only Pokémon from the last X days",
+  "app.modal.safety.distance_label": "Distance protection (km)",
+  "app.modal.safety.distance_hint": "protects ≥X km caught (Jet Setter medal)",
+
+  "app.modal.danger.section_title": "Danger zone",
+  "app.modal.danger.reset_armed": "really? click to confirm",
+  "app.modal.danger.reset_button": "Reset everything",
+  "app.modal.danger.reset_help": "Resets the hundo list, all protections, tags, home location and trash list to defaults."
 }

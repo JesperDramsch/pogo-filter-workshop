@@ -2785,15 +2785,17 @@ function NumField({ label, value, onChange, text, hint }) {
 // safety nets, and the dangerous reset. Reachable via gear icon in header.
 
 function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArmed }) {
+  const { t } = useTranslation();
   if (!open) return null;
   function set(k, v) { setConfig({ ...config, [k]: v }); }
   const expert = !!config.expertMode;
+  const modeLabel = expert ? t("app.modal.settings.mode_expert") : t("app.modal.settings.mode_normal");
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Einstellungen"
+      aria-label={t("app.modal.settings.title")}
       onClick={onClose}
       style={{ backgroundColor: "rgba(0, 0, 0, 0.75)" }}
       className="fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4">
@@ -2804,10 +2806,10 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
         <div
           style={{ backgroundColor: "#0F1419" }}
           className="sticky top-0 border-b border-[#1F2933] px-5 py-3 flex items-center justify-between">
-          <h2 className="mono text-base font-semibold text-[#E6EDF3]">Einstellungen</h2>
+          <h2 className="mono text-base font-semibold text-[#E6EDF3]">{t("app.modal.settings.title")}</h2>
           <button
             onClick={onClose}
-            aria-label="Schließen"
+            aria-label={t("app.modal.settings.close_aria")}
             className="text-[#8090A0] hover:text-[#E6EDF3] transition p-1">
             <X size={18} />
           </button>
@@ -2817,11 +2819,9 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
           {/* Mode toggle */}
           <div className="flex items-center justify-between border border-[#2D3A47] rounded p-3">
             <div>
-              <div className="mono text-sm text-[#E6EDF3]">Modus: {expert ? "Experte" : "Normal"}</div>
+              <div className="mono text-sm text-[#E6EDF3]">{t("app.modal.settings.mode_label", { params: { mode: modeLabel } })}</div>
               <div className="mono text-[11px] text-[#8090A0] mt-0.5">
-                {expert
-                  ? "Alle Optionen sichtbar"
-                  : "Vernünftige Defaults — Experte für Feinkontrolle"}
+                {expert ? t("app.modal.settings.mode_expert_help") : t("app.modal.settings.mode_normal_help")}
               </div>
             </div>
             <button
@@ -2829,41 +2829,41 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
               className={`mono text-xs px-3 py-1.5 rounded transition ${
                 expert ? "bg-[#F5B82E] text-[#0F1419]" : "bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47]"
               }`}>
-              {expert ? "→ Normal" : "→ Experte"}
+              {expert ? t("app.modal.settings.mode_to_normal") : t("app.modal.settings.mode_to_expert")}
             </button>
           </div>
 
           {/* Trade tags */}
           <div>
             <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
-              Tausch-Tags · werden im Filter geschützt
+              {t("app.modal.tags.section_title")}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label className="mono text-[10.5px] text-[#8090A0] block mb-1">
-                  Massentausch-Tag (Standard: Trade)
+                  {t("app.modal.tags.basar_label")}
                 </label>
                 <input
                   type="text"
                   value={config.basarTagName || ""}
                   onChange={e => set("basarTagName", e.target.value)}
-                  placeholder="z.B. Trade, Basar, give-away"
+                  placeholder={t("app.modal.tags.basar_placeholder")}
                   className="mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]" />
                 <div className="mono text-[10px] text-[#8090A0] mt-1">
-                  → Filter-Klausel: <code className="text-[#5EAFC5]">!#{config.basarTagName || "?"}</code>
+                  {t("app.modal.tags.basar_clause")} <code className="text-[#5EAFC5]">!#{config.basarTagName || "?"}</code>
                 </div>
               </div>
               <div>
                 <label className="mono text-[10.5px] text-[#8090A0] block mb-1">
-                  Niantic Fern-Tausch-Tag
+                  {t("app.modal.tags.fern_label")}
                 </label>
                 <input
                   type="text"
                   value={config.fernTauschTagName || ""}
                   onChange={e => set("fernTauschTagName", e.target.value)}
-                  placeholder="Fern-Tausch (Standardname)"
+                  placeholder={t("app.modal.tags.fern_placeholder")}
                   className="mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]" />
-                <div className="mono text-[10px] text-[#8090A0] mt-1">offizielles PoGo-Tag (Dezember 2025)</div>
+                <div className="mono text-[10px] text-[#8090A0] mt-1">{t("app.modal.tags.fern_help")}</div>
               </div>
             </div>
           </div>
@@ -2873,56 +2873,56 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
               {/* Custom tags */}
               <div>
                 <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
-                  Custom-Tags · zusätzliche #tags zum Schützen
+                  {t("app.modal.custom_tags.section_title")}
                 </div>
                 <input
                   type="text"
                   value={config.customProtectedTags || ""}
                   onChange={e => set("customProtectedTags", e.target.value)}
-                  placeholder="z.B. pvpiv, keep, pokegenie (kommasepariert)"
+                  placeholder={t("app.modal.custom_tags.placeholder")}
                   className="mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]" />
                 <div className="mono text-[10px] text-[#8090A0] mt-1">
-                  z.B. wenn du PvPIV oder PokeGenie nutzt
+                  {t("app.modal.custom_tags.help")}
                 </div>
               </div>
 
               {/* League tags */}
               <div>
                 <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
-                  Liga-Tags · deine Naming-Convention
+                  {t("app.modal.league.section_title")}
                 </div>
                 <input
                   type="text"
                   value={config.leagueTags || ""}
                   onChange={e => set("leagueTags", e.target.value)}
-                  placeholder="z.B. ⓤ,ⓖ,ⓛ — kommasepariert"
+                  placeholder={t("app.modal.league.placeholder")}
                   className="mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]" />
                 <div className="mono text-[10px] text-[#8090A0] mt-1">
-                  direkt im Spitznamen — z.B. „ⓤ Mauzwerg" für Ultraliga
+                  {t("app.modal.league.help")}
                 </div>
               </div>
 
               {/* Safety nets */}
               <div>
                 <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
-                  Sicherheitsnetze · begrenzen die Filterausgabe
+                  {t("app.modal.safety.section_title")}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <NumField
-                    label="WP-Obergrenze"
+                    label={t("app.modal.safety.cp_label")}
                     value={config.cpCap}
                     onChange={v => set("cpCap", +v || 0)}
-                    hint="zeigt nur Pokémon mit WP ≤ Wert (Standard: 2000)" />
+                    hint={t("app.modal.safety.cp_hint")} />
                   <NumField
-                    label="Vor wie vielen Tagen gefangen (max)"
+                    label={t("app.modal.safety.age_label")}
                     value={config.ageScopeDays}
                     onChange={v => set("ageScopeDays", +v || 0)}
-                    hint="zeigt nur Pokémon der letzten X Tage" />
+                    hint={t("app.modal.safety.age_hint")} />
                   <NumField
-                    label="Distanz-Schutz (km)"
+                    label={t("app.modal.safety.distance_label")}
                     value={config.distanceProtect}
                     onChange={v => set("distanceProtect", +v || 0)}
-                    hint="schützt ≥X km gefangene (Pilot-Medaille)" />
+                    hint={t("app.modal.safety.distance_hint")} />
                 </div>
               </div>
             </>
@@ -2937,7 +2937,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
           {/* Danger zone */}
           <div className="pt-4 border-t border-[#1F2933]">
             <div className="mono text-[10.5px] uppercase tracking-wider text-[#FF6B5B] mb-2">
-              Gefahrenzone
+              {t("app.modal.danger.section_title")}
             </div>
             <button
               onClick={onResetAll}
@@ -2947,10 +2947,10 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
                   : "bg-[#1F2933] text-[#FF6B5B] hover:bg-[#2D3A47]"
               }`}>
               <RotateCcw size={11} />
-              {resetArmed ? "wirklich? klick zur Bestätigung" : "Alles zurücksetzen"}
+              {resetArmed ? t("app.modal.danger.reset_armed") : t("app.modal.danger.reset_button")}
             </button>
             <div className="mono text-[10px] text-[#8090A0] mt-1.5">
-              Setzt Hundo-Liste, alle Schutzmaßnahmen, Tags, Heimat-Standort und Trash-Liste auf Standard zurück.
+              {t("app.modal.danger.reset_help")}
             </div>
           </div>
         </div>

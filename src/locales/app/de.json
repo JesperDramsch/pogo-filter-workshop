@@ -147,5 +147,44 @@
   "app.protect.dynamax.label": "Dynamax-fähige",
   "app.protect.dynamax.why": "Pokémon mit freigeschaltetem Dynamax",
   "app.protect.buddies_protect.label": "Schon mal Kumpel gewesen",
-  "app.protect.buddies_protect.why": "Sentimentaler Schutz — niemand will alte Kumpel tauschen"
+  "app.protect.buddies_protect.why": "Sentimentaler Schutz — niemand will alte Kumpel tauschen",
+
+  "app.modal.settings.title": "Einstellungen",
+  "app.modal.settings.close_aria": "Schließen",
+  "app.modal.settings.mode_label": "Modus: {mode}",
+  "app.modal.settings.mode_expert": "Experte",
+  "app.modal.settings.mode_normal": "Normal",
+  "app.modal.settings.mode_expert_help": "Alle Optionen sichtbar",
+  "app.modal.settings.mode_normal_help": "Vernünftige Defaults — Experte für Feinkontrolle",
+  "app.modal.settings.mode_to_normal": "→ Normal",
+  "app.modal.settings.mode_to_expert": "→ Experte",
+
+  "app.modal.tags.section_title": "Tausch-Tags · werden im Filter geschützt",
+  "app.modal.tags.basar_label": "Massentausch-Tag (Standard: Trade)",
+  "app.modal.tags.basar_placeholder": "z.B. Trade, Basar, give-away",
+  "app.modal.tags.basar_clause": "→ Filter-Klausel:",
+  "app.modal.tags.fern_label": "Niantic Fern-Tausch-Tag",
+  "app.modal.tags.fern_placeholder": "Fern-Tausch (Standardname)",
+  "app.modal.tags.fern_help": "offizielles PoGo-Tag (Dezember 2025)",
+
+  "app.modal.custom_tags.section_title": "Custom-Tags · zusätzliche #tags zum Schützen",
+  "app.modal.custom_tags.placeholder": "z.B. pvpiv, keep, pokegenie (kommasepariert)",
+  "app.modal.custom_tags.help": "z.B. wenn du PvPIV oder PokeGenie nutzt",
+
+  "app.modal.league.section_title": "Liga-Tags · deine Naming-Convention",
+  "app.modal.league.placeholder": "z.B. ⓤ,ⓖ,ⓛ — kommasepariert",
+  "app.modal.league.help": "direkt im Spitznamen — z.B. „ⓤ Mauzwerg\" für Ultraliga",
+
+  "app.modal.safety.section_title": "Sicherheitsnetze · begrenzen die Filterausgabe",
+  "app.modal.safety.cp_label": "WP-Obergrenze",
+  "app.modal.safety.cp_hint": "zeigt nur Pokémon mit WP ≤ Wert (Standard: 2000)",
+  "app.modal.safety.age_label": "Vor wie vielen Tagen gefangen (max)",
+  "app.modal.safety.age_hint": "zeigt nur Pokémon der letzten X Tage",
+  "app.modal.safety.distance_label": "Distanz-Schutz (km)",
+  "app.modal.safety.distance_hint": "schützt ≥X km gefangene (Pilot-Medaille)",
+
+  "app.modal.danger.section_title": "Gefahrenzone",
+  "app.modal.danger.reset_armed": "wirklich? klick zur Bestätigung",
+  "app.modal.danger.reset_button": "Alles zurücksetzen",
+  "app.modal.danger.reset_help": "Setzt Hundo-Liste, alle Schutzmaßnahmen, Tags, Heimat-Standort und Trash-Liste auf Standard zurück."
 }
