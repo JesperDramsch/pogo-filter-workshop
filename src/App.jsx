@@ -792,7 +792,7 @@ function decodeTopo(topology, objectName) {
 // ─── UI ───────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const { t, outputLocale } = useTranslation();
+  const { t, locale, outputLocale } = useTranslation();
   const [hundos, setHundos] = useState(DEFAULT_HUNDOS);
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [newHundo, setNewHundo] = useState("");
@@ -897,10 +897,14 @@ export default function App() {
     return { ...config, regionalGroups: newGroups };
   }, [config, homeLocals]);
 
+  // Output locale: follows UI locale unless expert mode is on and the user
+  // explicitly picked a different one (e.g. their PoGo client is set to a
+  // different language than their browser).
+  const effectiveOutputLocale = effectiveConfig.expertMode ? outputLocale : locale;
   const { trash, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
           trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses } = useMemo(
-    () => buildFilters(hundos, effectiveConfig, homeLocals, outputLocale, t),
-    [hundos, effectiveConfig, homeLocals, outputLocale, t]
+    () => buildFilters(hundos, effectiveConfig, homeLocals, effectiveOutputLocale, t),
+    [hundos, effectiveConfig, homeLocals, effectiveOutputLocale, t]
   );
 
   function addHundo() {
@@ -1208,7 +1212,7 @@ export default function App() {
                     label={t("app.collapsible.verify")}
                     open={showVerify}
                     onToggle={() => setShowVerify(s => !s)}>
-                    <VerifyPanel trash={trash} trade={trade} hundos={hundos} TE_families={TRADE_EVO_FAMILIES} outputLocale={outputLocale} />
+                    <VerifyPanel trash={trash} trade={trade} hundos={hundos} TE_families={TRADE_EVO_FAMILIES} outputLocale={effectiveOutputLocale} />
                   </Collapsible>
                 </div>
               </div>
@@ -2816,7 +2820,9 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
   function set(k, v) { setConfig({ ...config, [k]: v }); }
   const expert = !!config.expertMode;
   const modeLabel = expert ? t("app.modal.settings.mode_expert") : t("app.modal.settings.mode_normal");
-  const localeMismatch = outputLocale !== locale;
+  // Only relevant when the user is in expert mode — otherwise the output
+  // locale auto-follows the UI locale and there's no mismatch to surface.
+  const localeMismatch = expert && outputLocale !== locale;
 
   return (
     <div
