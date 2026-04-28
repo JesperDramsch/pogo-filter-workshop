@@ -195,7 +195,7 @@
   "app.modal.danger.reset_button": "Reset everything",
   "app.modal.danger.reset_help": "Resets the hundo list, all protections, tags, home location and trash list to defaults.",
 
-  "app.buddy.section_title": "Trade buddies · one tag prefix per buddy (e.g. #Anna)",
+  "app.buddy.section_title": "Trade buddies · one tag prefix per buddy (e.g. #Auri)",
   "app.buddy.section_help": "In the game you'd tag things like {tag1} or {tag2}. PoGo's substring match protects all sub-tags automatically.",
   "app.buddy.active_title": "active — tags are protected",
   "app.buddy.inactive_title": "inactive — no effect",
@@ -204,7 +204,7 @@
   "app.buddy.delete_title": "delete buddy",
   "app.buddy.clause_label": "Filter clause:",
   "app.buddy.clause_match": "— matches {a}, {b}, etc.",
-  "app.buddy.add_placeholder": "Buddy name (e.g. Anna)",
+  "app.buddy.add_placeholder": "Buddy name (e.g. Auri)",
   "app.buddy.add_button": "add",
 
   "app.buddy_events.section_title": "Trade buddies · wish list species",

@@ -91,7 +91,7 @@ export const DEFAULT_CONFIG = {
   enabledTradeEvos: [],
   customCollectibles: [],      // user-added species to protect (lowercase German names)
   // Trade buddies — list of { id, name, tagPrefix, events: [event-names] }
-  // tagPrefix matches any sub-tag (e.g. #Anna matches #Anna:hat-pika via PoGo prefix match).
+  // tagPrefix matches any sub-tag (e.g. #Auri matches #Auri:hat-pika via PoGo prefix match).
   buddies: [],
 
   // Scope safety
@@ -3068,9 +3068,9 @@ function BuddyManager({ buddies, onChange }) {
         {t("app.buddy.section_title")}
       </div>
       <p className="mono text-[11px] text-[#8090A0] mb-3 leading-relaxed">
-        {t("app.buddy.section_help", { params: { tag1: "#Anna:hat-pika", tag2: "#Anna:meltan" } })
-          .split(/(#Anna:[a-zA-Z0-9-]+)/)
-          .map((part, i) => /^#Anna:/.test(part)
+        {t("app.buddy.section_help", { params: { tag1: "#Auri:hat-pika", tag2: "#Auri:meltan" } })
+          .split(/(#Auri:[a-zA-Z0-9-]+)/)
+          .map((part, i) => /^#Auri:/.test(part)
             ? <code key={i} className="text-[#E6EDF3]">{part}</code>
             : <React.Fragment key={i}>{part}</React.Fragment>
           )}
