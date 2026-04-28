@@ -1,0 +1,27 @@
+{
+  "app.header.tagline": "Trash- und Tausch-Filter für Pokémon GO. Schützt deine Schätze, mistet den Rest.",
+  "app.header.settings_button": "Einstellungen",
+
+  "app.step.where.label": "Wo spielst du?",
+  "app.step.where.desc": "Heimatort und lokale Pokémon",
+  "app.step.where.title": "Wo spielst du?",
+  "app.step.where.hint": "Setze deinen Heimat-Standort und entdecke, welche Pokémon bei dir lokal spawnen — die schützen wir automatisch.",
+  "app.step.where.next_label": "Weiter zu Schutz-Optionen",
+
+  "app.step.what.label": "Was willst du behalten?",
+  "app.step.what.desc": "Schutz für deine Schätze",
+  "app.step.what.title": "Was willst du behalten?",
+  "app.step.what.hint": "Wähle ein Preset als Startpunkt, dann fein-tunen — Favoriten, Schillernde, Legendäre und mehr.",
+  "app.step.what.next_label": "Weiter zu deiner Sammlung",
+
+  "app.step.have.label": "Was hast du schon?",
+  "app.step.have.desc": "Deine 4★-Pokémon (Hundos)",
+  "app.step.have.title": "Was hast du schon?",
+  "app.step.have.hint": "Deine 4★-Sammlung (Hundos) — diese werden im Trash-Filter widengeöffnet, damit du Spares mistet kannst.",
+  "app.step.have.next_label": "Filter generieren",
+
+  "app.step.filter.label": "Dein Filter",
+  "app.step.filter.desc": "Trash + Tausch — zum Kopieren",
+  "app.step.filter.title": "Dein Filter",
+  "app.step.filter.hint": "Fertig — kopiere die Filter-Strings und füge sie ins PoGo-Suchfeld ein."
+}

@@ -1,0 +1,27 @@
+{
+  "app.header.tagline": "Trash & trade filters for Pokémon GO. Protect what matters, sweep the rest.",
+  "app.header.settings_button": "Settings",
+
+  "app.step.where.label": "Where do you play?",
+  "app.step.where.desc": "Home location and local Pokémon",
+  "app.step.where.title": "Where do you play?",
+  "app.step.where.hint": "Pin your home location and discover which Pokémon are regional to you — we protect those automatically.",
+  "app.step.where.next_label": "Continue to protections",
+
+  "app.step.what.label": "What do you want to keep?",
+  "app.step.what.desc": "Protect your treasures",
+  "app.step.what.title": "What do you want to keep?",
+  "app.step.what.hint": "Pick a preset as a starting point, then fine-tune — favorites, shinies, legendaries, and more.",
+  "app.step.what.next_label": "Continue to your collection",
+
+  "app.step.have.label": "What's in your collection?",
+  "app.step.have.desc": "Your 4★ Pokémon (hundos)",
+  "app.step.have.title": "What's in your collection?",
+  "app.step.have.hint": "Your 4★ collection (hundos) — these widen the trash filter so you can clean up spares.",
+  "app.step.have.next_label": "Generate filters",
+
+  "app.step.filter.label": "Your filter",
+  "app.step.filter.desc": "Trash + trade — ready to copy",
+  "app.step.filter.title": "Your filter",
+  "app.step.filter.hint": "Done — copy the filter strings and paste them into PoGo's search box."
+}

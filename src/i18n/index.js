@@ -9,14 +9,25 @@ import zhTW from "../locales/zh-TW.json";
 import hi from "../locales/hi.json";
 import ja from "../locales/ja.json";
 
+// App-UI strings live in a separate per-locale file so the spreadsheet-driven
+// fetch script can overwrite the in-game/Pokémon JSONs without stomping our
+// hand-maintained UI translations. Merged at module load.
+import appEn from "../locales/app/en.json";
+import appDe from "../locales/app/de.json";
+import appEs from "../locales/app/es.json";
+import appFr from "../locales/app/fr.json";
+import appZhTW from "../locales/app/zh-TW.json";
+import appHi from "../locales/app/hi.json";
+import appJa from "../locales/app/ja.json";
+
 export const LOCALES = {
-  en: { messages: en, label: "English" },
-  de: { messages: de, label: "Deutsch" },
-  es: { messages: es, label: "Español" },
-  fr: { messages: fr, label: "Français" },
-  "zh-TW": { messages: zhTW, label: "繁體中文" },
-  hi: { messages: hi, label: "हिन्दी" },
-  ja: { messages: ja, label: "日本語" },
+  en: { messages: { ...en, ...appEn }, label: "English" },
+  de: { messages: { ...de, ...appDe }, label: "Deutsch" },
+  es: { messages: { ...es, ...appEs }, label: "Español" },
+  fr: { messages: { ...fr, ...appFr }, label: "Français" },
+  "zh-TW": { messages: { ...zhTW, ...appZhTW }, label: "繁體中文" },
+  hi: { messages: { ...hi, ...appHi }, label: "हिन्दी" },
+  ja: { messages: { ...ja, ...appJa }, label: "日本語" },
 };
 
 export const SUPPORTED_LOCALES = Object.keys(LOCALES);

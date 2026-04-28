@@ -789,7 +789,7 @@ function decodeTopo(topology, objectName) {
 // ─── UI ───────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const { outputLocale } = useTranslation();
+  const { t, outputLocale } = useTranslation();
   const [hundos, setHundos] = useState(DEFAULT_HUNDOS);
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [newHundo, setNewHundo] = useState("");
@@ -976,12 +976,12 @@ export default function App() {
     setShowSettings(false);
   }
 
-  // Step navigation helpers
+  // Step navigation helpers — labels/descs translated at render time
   const steps = [
-    { n: 1, key: "where", label: "Wo bist du?",       desc: "Heimat-Standort + Sub-Regionen erkunden" },
-    { n: 2, key: "what",  label: "Was schützt du?",    desc: "Sammler-Ziele + Schutz-Optionen" },
-    { n: 3, key: "have",  label: "Was hast du?",       desc: "Deine 4★-Sammlung" },
-    { n: 4, key: "filter", label: "Dein Filter",       desc: "trash + trade · zum Kopieren" },
+    { n: 1, key: "where",  label: t("app.step.where.label"),  desc: t("app.step.where.desc") },
+    { n: 2, key: "what",   label: t("app.step.what.label"),   desc: t("app.step.what.desc") },
+    { n: 3, key: "have",   label: t("app.step.have.label"),   desc: t("app.step.have.desc") },
+    { n: 4, key: "filter", label: t("app.step.filter.label"), desc: t("app.step.filter.desc") },
   ];
   function gotoStep(n) { setCurrentStep(n); }
 
@@ -1012,17 +1012,15 @@ export default function App() {
               <h1 className="mono text-3xl font-bold tracking-tight text-[#E6EDF3]">
                 pogo<span className="text-[#E74C3C]">.</span>filter<span className="text-[#5EAFC5]">.workshop</span>
               </h1>
-              <span className="mono text-xs text-[#8B98A5]">v2 · stepper</span>
               <button
                 onClick={() => setShowSettings(true)}
                 className="ml-auto mono text-xs text-[#8B98A5] hover:text-[#E6EDF3] transition flex items-center gap-1.5"
-                aria-label="Einstellungen öffnen">
-                <Settings size={12} /> Einstellungen
+                aria-label={t("app.header.settings_button")}>
+                <Settings size={12} /> {t("app.header.settings_button")}
               </button>
             </div>
             <p className="mt-3 text-sm text-[#8B98A5] max-w-2xl leading-relaxed">
-              Wo → Was → Was du hast → Dein Filter.
-              <span className="text-[#5EAFC5]"> Toss = (S012 ∪ (H ∩ ¬K)) ∩ ¬P ∩ ¬Prot</span>
+              {t("app.header.tagline")}
             </p>
           </header>
 
@@ -1064,10 +1062,10 @@ export default function App() {
           {/* STEP 1 — WHERE */}
           {currentStep === 1 && (
             <StepWrapper
-              title="Wo bist du?"
-              hint="Setze deinen Heimat-Standort. Lokale Regionale werden automatisch aus dem Sammler-Schutz entfernt (du fängst sie ja eh) und stattdessen für den Tausch vorgeschlagen."
+              title={t("app.step.where.title")}
+              hint={t("app.step.where.hint")}
               onNext={() => gotoStep(2)}
-              nextLabel="Weiter zu Schutz-Optionen"
+              nextLabel={t("app.step.where.next_label")}
             >
               <RegionalMap
                 lastPin={lastPin}
@@ -1085,11 +1083,11 @@ export default function App() {
           {/* STEP 2 — WHAT */}
           {currentStep === 2 && (
             <StepWrapper
-              title="Was willst du schützen?"
-              hint="Presets als Startpunkt, dann fein-tunen. Form-Schutz unterscheidet zwischen regulären und regionalen/Hisui-Formen."
+              title={t("app.step.what.title")}
+              hint={t("app.step.what.hint")}
               onBack={() => gotoStep(1)}
               onNext={() => gotoStep(3)}
-              nextLabel="Weiter zu deiner Sammlung"
+              nextLabel={t("app.step.what.next_label")}
             >
               <ConfigPanel config={config} setConfig={setConfig} homeLocals={homeLocals} />
             </StepWrapper>
@@ -1098,11 +1096,11 @@ export default function App() {
           {/* STEP 3 — HAVE */}
           {currentStep === 3 && (
             <StepWrapper
-              title="Was hast du schon?"
-              hint="Deine 4★-Sammlung. Für jede Spezies werden alle Nicht-Keeper-IVs (außer PvP) automatisch tossable — egal welche Sterne."
+              title={t("app.step.have.title")}
+              hint={t("app.step.have.hint")}
               onBack={() => gotoStep(2)}
               onNext={() => gotoStep(4)}
-              nextLabel="Filter generieren"
+              nextLabel={t("app.step.have.next_label")}
             >
               <HundosEditor
                 hundos={hundos}
@@ -1118,8 +1116,8 @@ export default function App() {
           {/* STEP 4 — FILTER */}
           {currentStep === 4 && (
             <StepWrapper
-              title="Dein Filter"
-              hint="Live aus deinen Eingaben generiert. trash für Willow, trade für Freunde."
+              title={t("app.step.filter.title")}
+              hint={t("app.step.filter.hint")}
               onBack={() => gotoStep(3)}
             >
               <div className="space-y-6">
