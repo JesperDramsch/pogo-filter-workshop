@@ -7,31 +7,42 @@ import {
   resolveSpeciesInfo,
   pokemonNameFor,
 } from "./data/species.js";
+import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from "./i18n/pogo-keywords.js";
+import { useTranslation } from "./i18n/I18nProvider.jsx";
 
 // ─── DATA ──────────────────────────────────────────────────────────────────
 
 const DEFAULT_HUNDOS = [];
 
-// Trade-evo families: base name → all family members (lowercase) for dedup detection
+// Trade-evo families: dex-keyed identity, German base name as the user-facing
+// config key (kept stable so persisted localStorage state ["abra", "machollo"]
+// keeps working across locale changes). `baseDex` is the family head for
+// `+Family` rendering; `memberDex` is the full evolution line for hundo-overlap
+// detection.
 const TRADE_EVO_FAMILIES = {
-  abra:       ["abra","kadabra","simsala"],
-  machollo:   ["machollo","maschock","machomei"],
-  kleinstein: ["kleinstein","georok","geowaz"],
-  nebulak:    ["nebulak","alpollo","gengar"],
-  kiesling:   ["kiesling","sedimantur","brockoloss"],
-  praktibalk: ["praktibalk","strepoli","meistagrif"],
-  laukaps:    ["laukaps","cavalanzas"],
-  schnuthelm: ["schnuthelm","hydragil"],
-  paragoni:   ["paragoni","trombork"],
-  irrbis:     ["irrbis","pumpdjinn"],
+  abra:       { baseDex: 63,  memberDex: [63, 64, 65] },
+  machollo:   { baseDex: 66,  memberDex: [66, 67, 68] },
+  kleinstein: { baseDex: 74,  memberDex: [74, 75, 76] },
+  nebulak:    { baseDex: 92,  memberDex: [92, 93, 94] },
+  kiesling:   { baseDex: 524, memberDex: [524, 525, 526] },
+  praktibalk: { baseDex: 532, memberDex: [532, 533, 534] },
+  laukaps:    { baseDex: 588, memberDex: [588, 589] },
+  schnuthelm: { baseDex: 616, memberDex: [616, 617] },
+  paragoni:   { baseDex: 708, memberDex: [708, 709] },
+  irrbis:     { baseDex: 710, memberDex: [710, 711] },
 };
 
-// Display names with PoGo's typical capitalization
-const TE_DISPLAY = {
-  abra: "Abra", machollo: "Machollo", kleinstein: "Kleinstein", nebulak: "Nebulak",
-  kiesling: "Kiesling", praktibalk: "Praktibalk", laukaps: "Laukaps",
-  schnuthelm: "Schnuthelm", paragoni: "Paragoni", irrbis: "Irrbis",
-};
+// Capitalized base species name in the user's PoGo *output* language —
+// used in `+Family` filter syntax. Falls back to the German config key if
+// the locale dictionary is missing the entry.
+function teDisplay(baseKey, outputLocale = "de") {
+  const family = TRADE_EVO_FAMILIES[baseKey];
+  const fallback = baseKey.charAt(0).toUpperCase() + baseKey.slice(1);
+  if (!family) return fallback;
+  const name = pokemonNameFor(String(family.baseDex), outputLocale);
+  if (!name) return fallback;
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
 
 const DEFAULT_CONFIG = {
   // Mode
@@ -102,14 +113,14 @@ const REGIONAL_GROUPS = {
     label: "Alola-Formen",
     description: "Generation 7 — alolanische Formen",
     typeChecks: [
-      { species: "Raichu",     type: "psycho",  note: "Alola Raichu (Elektro/Psycho) — der reguläre Raichu ist nicht Psycho" },
-      { species: "Sandan",     type: "eis",     note: "Alola Sandan (Eis/Stahl)" },
-      { species: "Vulpix",     type: "eis",     note: "Alola Vulpix (Eis)" },
-      { species: "Digda",      type: "stahl",   note: "Alola Digda (Boden/Stahl)" },
-      { species: "Mauzi",      type: "unlicht", note: "Alola Mauzi (Unlicht)" },
-      { species: "Kleinstein", type: "elektro", note: "Alola Kleinstein (Gestein/Elektro)" },
-      { species: "Kokowei",    type: "drache",  note: "Alola Kokowei (Pflanze/Drache)" },
-      { species: "Knogga",     type: "geist",   note: "Alola Knogga (Boden/Geist)" },
+      { species: "Raichu",     type: "psychic",  note: "Alola Raichu (Elektro/Psycho) — der reguläre Raichu ist nicht Psycho" },
+      { species: "Sandan",     type: "ice",     note: "Alola Sandan (Eis/Stahl)" },
+      { species: "Vulpix",     type: "ice",     note: "Alola Vulpix (Eis)" },
+      { species: "Digda",      type: "steel",   note: "Alola Digda (Boden/Stahl)" },
+      { species: "Mauzi",      type: "dark", note: "Alola Mauzi (Unlicht)" },
+      { species: "Kleinstein", type: "electric", note: "Alola Kleinstein (Gestein/Elektro)" },
+      { species: "Kokowei",    type: "dragon",  note: "Alola Kokowei (Pflanze/Drache)" },
+      { species: "Knogga",     type: "ghost",   note: "Alola Knogga (Boden/Geist)" },
     ],
     collectors: [],
   },
@@ -117,11 +128,11 @@ const REGIONAL_GROUPS = {
     label: "Galar-Formen",
     description: "Generation 8 — galarische Formen",
     typeChecks: [
-      { species: "Smogmog",  type: "fee",   note: "Galar Smogmog (Gift/Fee)" },
-      { species: "Pantimos", type: "eis",   note: "Galar Pantimos (Eis/Psycho)" },
-      { species: "Makabaja", type: "boden", note: "Galar Makabaja (Boden/Geist)" },
-      { species: "Porenta",  type: "kampf", note: "Galar Porenta (Kampf)" },
-      { species: "Corasonn", type: "geist", note: "Galar Corasonn (Geist) — reguläres ist Wasser/Gestein" },
+      { species: "Smogmog",  type: "fairy",   note: "Galar Smogmog (Gift/Fee)" },
+      { species: "Pantimos", type: "ice",   note: "Galar Pantimos (Eis/Psycho)" },
+      { species: "Makabaja", type: "ground", note: "Galar Makabaja (Boden/Geist)" },
+      { species: "Porenta",  type: "fighting", note: "Galar Porenta (Kampf)" },
+      { species: "Corasonn", type: "ghost", note: "Galar Corasonn (Geist) — reguläres ist Wasser/Gestein" },
     ],
     collectors: [],
   },
@@ -129,14 +140,14 @@ const REGIONAL_GROUPS = {
     label: "Hisui-Formen",
     description: "Pokémon Legends: Arceus — hisuische Formen",
     typeChecks: [
-      { species: "Tornupto",  type: "geist",   note: "Hisui Tornupto (Feuer/Geist)" },
-      { species: "Admurai",   type: "unlicht", note: "Hisui Admurai (Wasser/Unlicht)" },
-      { species: "Dressella", type: "kampf",   note: "Hisui Dressella (Pflanze/Kampf)" },
-      { species: "Arktilas",  type: "gestein", note: "Hisui Arktilas (Eis/Gestein)" },
-      { species: "Silvarro",  type: "kampf",   note: "Hisui Silvarro (Pflanze/Kampf)" },
-      { species: "Voltobal",  type: "pflanze", note: "Hisui Voltobal (Elektro/Pflanze)" },
-      { species: "Lektrobal", type: "pflanze", note: "Hisui Lektrobal (Elektro/Pflanze)" },
-      { species: "Sichlor",   type: "gestein", note: "Hisui Sichlor (Käfer/Gestein) → Axantor" },
+      { species: "Tornupto",  type: "ghost",   note: "Hisui Tornupto (Feuer/Geist)" },
+      { species: "Admurai",   type: "dark", note: "Hisui Admurai (Wasser/Unlicht)" },
+      { species: "Dressella", type: "fighting",   note: "Hisui Dressella (Pflanze/Kampf)" },
+      { species: "Arktilas",  type: "rock", note: "Hisui Arktilas (Eis/Gestein)" },
+      { species: "Silvarro",  type: "fighting",   note: "Hisui Silvarro (Pflanze/Kampf)" },
+      { species: "Voltobal",  type: "grass", note: "Hisui Voltobal (Elektro/Pflanze)" },
+      { species: "Lektrobal", type: "grass", note: "Hisui Lektrobal (Elektro/Pflanze)" },
+      { species: "Sichlor",   type: "rock", note: "Hisui Sichlor (Käfer/Gestein) → Axantor" },
     ],
     collectors: [],
   },
@@ -144,9 +155,9 @@ const REGIONAL_GROUPS = {
     label: "Paldea-Formen",
     description: "Generation 9 — Paldean Tauros (3 Rassen)",
     typeChecks: [
-      { species: "Tauros", type: "kampf",  note: "Paldean Tauros (Kampfrasse) — Iberische Halbinsel" },
-      { species: "Tauros", type: "feuer",  note: "Paldean Tauros (Flammenrasse) — westliche Hemisphäre" },
-      { species: "Tauros", type: "wasser", note: "Paldean Tauros (Aquarasse) — östliche Hemisphäre" },
+      { species: "Tauros", type: "fighting",  note: "Paldean Tauros (Kampfrasse) — Iberische Halbinsel" },
+      { species: "Tauros", type: "fire",  note: "Paldean Tauros (Flammenrasse) — westliche Hemisphäre" },
+      { species: "Tauros", type: "water", note: "Paldean Tauros (Aquarasse) — östliche Hemisphäre" },
     ],
     collectors: [],
   },
@@ -219,14 +230,22 @@ function defaultRegionalToggles() {
 // ─── FILTER GENERATION (set-theoretic) ────────────────────────────────────
 
 function deduppedTradeEvos(hundos, enabled) {
-  const hundoSet = new Set(hundos.map(h => h.toLowerCase()));
+  // Locale-independent overlap detection: convert each hundo to its dex# (via
+  // multi-locale resolver) and check intersection with each family's memberDex.
+  // This way the function works regardless of which language the hundos are
+  // stored in.
+  const hundoDex = new Set();
+  for (const h of hundos) {
+    const info = resolveSpeciesInfo(h);
+    if (info) hundoDex.add(info.dex);
+  }
   const trimmed = [];
   const full = [];
   for (const base of enabled) {
     const family = TRADE_EVO_FAMILIES[base];
     if (!family) continue;
     full.push(base);
-    const overlapsH = family.some(m => hundoSet.has(m));
+    const overlapsH = family.memberDex.some(d => hundoDex.has(d));
     if (!overlapsH) trimmed.push(base);
   }
   return { full, trimmed };
@@ -253,22 +272,47 @@ function collapseFamilies(speciesList, familyCollapses) {
   return out;
 }
 
-function buildFilters(hundos, cfg, homeLocals = []) {
-  const H = hundos.map(h => `+${h}`).join(",");
+// Resolves a species name (in any locale) to its lowercase form in the output
+// locale, ready for filter syntax. Falls back to the input lowercased if no
+// match — keeps user-typed names working even if the dictionary is incomplete.
+function speciesForOutput(name, outputLocale) {
+  const resolved = resolveSpecies(name, outputLocale);
+  if (resolved) return resolved;
+  return String(name).toLowerCase();
+}
+
+// Capitalizes for + filter syntax (PoGo accepts case-insensitive but
+// capitalized reads better in copy-pasted filters).
+function capFirst(s) {
+  if (!s) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de") {
+  const kw = pogoKeywords(outputLocale);
+
+  // Hundos are stored in the user's output-locale lowercase form. Re-render in
+  // case the locale changed since they were typed (resolveSpecies normalizes).
+  const hundosOut = hundos.map(h => speciesForOutput(h, outputLocale));
+  const H = hundosOut.map(h => `+${h}`).join(",");
+
   const { full: TE_full, trimmed: TE_trim } = deduppedTradeEvos(hundos, cfg.enabledTradeEvos);
-  const TE_full_str = TE_full.map(b => `+${TE_DISPLAY[b]}`).join(",");
-  const TE_trim_str = TE_trim.map(b => `+${TE_DISPLAY[b]}`).join(",");
+  const TE_full_str = TE_full.map(b => `+${teDisplay(b, outputLocale)}`).join(",");
+  const TE_trim_str = TE_trim.map(b => `+${teDisplay(b, outputLocale)}`).join(",");
 
-  // PoGo's IV-bucket filter accepts ranges like `0-2angriffs-wert` (works alone),
-  // but SILENTLY IGNORES `!N` negation on IV tokens — `!4angriffs-wert` is a no-op.
-  // So we encode "atk ≠ 4" as the positive range `0-3angriffs-wert` instead.
-  //
+  // PoGo's IV-bucket filter accepts ranges like `0-2{atk}` but SILENTLY
+  // IGNORES `!N` negation on IV tokens — so `!4{atk}` is a no-op. We encode
+  // "atk ≠ 4" as the positive range `0-3{atk}` instead.
   // Buckets: 0 = 0 IV, 1 = 1-5, 2 = 6-10, 3 = 11-14, 4 = 15
+  const ivK1Bad = `0-3${kw.iv.atk},0-3${kw.iv.def},0-2${kw.iv.hp}`;
+  const ivK2Bad = `0-3${kw.iv.atk},0-2${kw.iv.def},0-3${kw.iv.hp}`;
+  const ivK3Bad = `0-2${kw.iv.atk},0-3${kw.iv.def},0-3${kw.iv.hp}`;
+  const ivPvPLoose  = `2-4${kw.iv.atk},0-2${kw.iv.def},0-2${kw.iv.hp}`;
+  const ivPvPStrict = `1-4${kw.iv.atk},0-2${kw.iv.def},0-2${kw.iv.hp}`;
 
-  // ¬P clause depending on PvP mode
-  const notP = cfg.pvpMode === "loose"  ? "2-4angriffs-wert,0-2verteidigungs-wert,0-2kp"
-            : cfg.pvpMode === "strict" ? "1-4angriffs-wert,0-2verteidigungs-wert,0-2kp"
-            : null; // none → no PvP keep
+  const notP = cfg.pvpMode === "loose"  ? ivPvPLoose
+            : cfg.pvpMode === "strict" ? ivPvPStrict
+            : null;
 
   const S012 = "0*,1*,2*";
 
@@ -278,46 +322,30 @@ function buildFilters(hundos, cfg, homeLocals = []) {
   const basarTag = (cfg.basarTagName || "").trim();
   const fernTauschTag = (cfg.fernTauschTagName || "").trim();
 
-  // Each clause is { clause: string, why: string } so the UI can explain attribution.
   const trashClauses = [];
   const tradeClauses = [];
   const push = (arr, clause, why) => arr.push({ clause, why });
 
   // ── TRASH ──────────────────────────────────────────────────────────────
-  // ¬K1 = ¬(4atk ∧ 4def ∧ ≥3hp) = (atk≤3) ∨ (def≤3) ∨ (hp≤2)
-  // ¬K2 = ¬(4atk ∧ ≥3def ∧ 4hp) = (atk≤3) ∨ (def≤2) ∨ (hp≤3)
-  // ¬K3 = ¬(≥3atk ∧ 4def ∧ 4hp) = (atk≤2) ∨ (def≤3) ∨ (hp≤3)
-  // Trade-evo escape: when on, protect trade-evolution candidates from trash —
-  // BUT only if they haven't already been traded (a traded one gets no free evo).
-  //
-  // Set theory: Trash = T ∩ ¬(F ∩ ¬G) = T ∩ (¬F ∪ G), where F = TE families, G = getauscht.
-  // ¬F = ⋂ ¬Familyᵢ. By distribution: (⋂ ¬Familyᵢ) ∪ G = ⋂ (¬Familyᵢ ∪ G).
-  // → one filter clause per TE family: `!+Family,getauscht`.
   push(trashClauses, [S012, H].filter(Boolean).join(","), "Set H ∪ S012 — Spezies-Filter");
-  push(trashClauses, `${S012},0-3angriffs-wert,0-3verteidigungs-wert,0-2kp`, "¬K1 — Keeper-Schutz (4,4,3-4)");
-  push(trashClauses, `${S012},0-3angriffs-wert,0-2verteidigungs-wert,0-3kp`, "¬K2 — Keeper-Schutz (4,3-4,4)");
-  push(trashClauses, `${S012},0-2angriffs-wert,0-3verteidigungs-wert,0-3kp`, "¬K3 — Keeper-Schutz (3-4,4,4)");
+  push(trashClauses, `${S012},${ivK1Bad}`, "¬K1 — Keeper-Schutz (4,4,3-4)");
+  push(trashClauses, `${S012},${ivK2Bad}`, "¬K2 — Keeper-Schutz (4,3-4,4)");
+  push(trashClauses, `${S012},${ivK3Bad}`, "¬K3 — Keeper-Schutz (3-4,4,4)");
   if (notP) push(trashClauses, notP, `¬P — PvP-Schutz (${cfg.pvpMode})`);
 
   if (cfg.protectTradeEvos && TE_full.length > 0) {
     for (const base of TE_full) {
-      const display = TE_DISPLAY[base];
-      push(trashClauses, `!+${display},getauscht`,
+      const display = teDisplay(base, outputLocale);
+      push(trashClauses, `!+${display},${kw.flag.traded}`,
         `Tausch-Evo: +${display}-Familie (außer schon getauscht — dann ist die Gratis-Evo verbraucht)`);
     }
   }
 
-  // Regel 1: niemals 4★ tossen. Default-on, expert-mode kann deaktivieren.
-  // Note: technisch redundant da ¬K1/¬K2/¬K3 alle 4★ schon ausschließen — aber
-  // explizit ist ein zusätzlicher Sicherheitsgürtel falls jemand die IV-Klauseln
-  // versehentlich entfernt oder modifiziert.
   if (cfg.protectFourStar) {
     push(trashClauses, "!4*", "Regel 1: niemals 4★ Pokémon tossen (Sicherheitsgürtel)");
   }
 
-  // Tag protections.
-  // If the catch-all `!#` (any tag) is on, individual tag clauses are redundant
-  // (any of {Basar, Fern-Tausch, custom, buddy-prefixes} would already match `!#`), so skip them.
+  // Tag protections
   const activeBuddies = (cfg.buddies || []).filter(b => b.active !== false && b.tagPrefix);
   if (cfg.protectAnyTag) {
     push(trashClauses, "!#", "irgendein Tag — egal welches, geschützt");
@@ -332,52 +360,54 @@ function buildFilters(hundos, cfg, homeLocals = []) {
   }
 
   // Universal protections
-  if (cfg.protectFavorites)    push(trashClauses, "!favorit", "Favoriten");
-  if (cfg.protectShinies)      push(trashClauses, "!schillernd", "Schillernde");
-  if (cfg.protectLegendaries)  push(trashClauses, "!legendär", "Legendäre");
+  if (cfg.protectFavorites)    push(trashClauses, `!${kw.flag.favorite}`, "Favoriten");
+  if (cfg.protectShinies)      push(trashClauses, `!${kw.flag.shiny}`, "Schillernde");
+  if (cfg.protectLegendaries)  push(trashClauses, `!${kw.flag.legendary}`, "Legendäre");
   if (cfg.protectMythicals) {
     const carve = (cfg.mythTooManyOf || "").trim();
     push(trashClauses,
-      carve ? `!mysteriös,${carve}` : "!mysteriös",
+      carve ? `!${kw.flag.mythical},${carve}` : `!${kw.flag.mythical}`,
       carve
         ? `Mysteriöse außer Spezies ${carve} (du hast Spares von denen)`
         : "Mysteriöse Pokémon");
   }
-  if (cfg.protectUltraBeasts)  push(trashClauses, "!ultrabestien", "Ultrabestien");
-  if (cfg.protectShadows)      push(trashClauses, "!crypto", "Crypto-Pokémon");
-  if (cfg.protectCostumes)     push(trashClauses, "!kostümiert", "Kostümierte (Event-Forms)");
-  if (cfg.protectLuckies)      push(trashClauses, "!glücks", "Glücks-Pokémon");
-  if (cfg.protectBackgrounds)  push(trashClauses, "!hintergrund", "Pokémon mit Hintergrund");
-  if (cfg.protectDynamax)      push(trashClauses, "!dynaattacke1-", "Dynamax-fähige");
-  if (cfg.protectNewEvolutions) push(trashClauses, "!neueentwicklung,mega0", "Neue Evolutionen (Trick: nur falls noch nicht mega'd — sonst hast du genug Mega-Energie)");
-  if (cfg.protectLegacyMoves)  push(trashClauses, "!@spezial", "Legacy-Attacken");
-  if (cfg.protectBabies)       push(trashClauses, "!nurauseiern", "Baby-Pokémon (nur aus Eiern)");
+  if (cfg.protectUltraBeasts)  push(trashClauses, `!${kw.flag.ultra_beast}`, "Ultrabestien");
+  if (cfg.protectShadows)      push(trashClauses, `!${kw.flag.shadow}`, "Crypto-Pokémon");
+  if (cfg.protectCostumes)     push(trashClauses, `!${kw.flag.costume}`, "Kostümierte (Event-Forms)");
+  if (cfg.protectLuckies)      push(trashClauses, `!${kw.flag.lucky}`, "Glücks-Pokémon");
+  if (cfg.protectBackgrounds)  push(trashClauses, `!${kw.flag.background}`, "Pokémon mit Hintergrund");
+  if (cfg.protectDynamax)      push(trashClauses, `!${kw.flag.dynamax_move}1-`, "Dynamax-fähige");
+  if (cfg.protectNewEvolutions) push(trashClauses, `!${kw.flag.new_evo},${kw.flag.mega}0`, "Neue Evolutionen (Trick: nur falls noch nicht mega'd — sonst hast du genug Mega-Energie)");
+  if (cfg.protectLegacyMoves)  push(trashClauses, `!@${kw.flag.special_move}`, "Legacy-Attacken");
+  if (cfg.protectBabies)       push(trashClauses, `!${kw.flag.baby}`, "Baby-Pokémon (nur aus Eiern)");
   if (cfg.distanceProtect && cfg.distanceProtect > 0)
-    push(trashClauses, `!entfernung${cfg.distanceProtect}-,getauscht`, `Distanz ≥${cfg.distanceProtect}km — Pilot-Medaillen-Schutz`);
-  if (cfg.protectXXL)          push(trashClauses, "!xxl", "XXL Pokémon (Größe)");
-  if (cfg.protectXL)           push(trashClauses, "!xl",  "XL Pokémon (Größe)");
-  if (cfg.protectXXS)          push(trashClauses, "!xxs", "XXS Pokémon (Größe)");
+    push(trashClauses, `!${kw.numeric.distance}${cfg.distanceProtect}-,${kw.flag.traded}`, `Distanz ≥${cfg.distanceProtect}km — Pilot-Medaillen-Schutz`);
+  if (cfg.protectXXL)          push(trashClauses, `!${kw.flag.xxl}`, "XXL Pokémon (Größe)");
+  if (cfg.protectXL)           push(trashClauses, `!${kw.flag.xl}`,  "XL Pokémon (Größe)");
+  if (cfg.protectXXS)          push(trashClauses, `!${kw.flag.xxs}`, "XXS Pokémon (Größe)");
   for (const t of leagueTags)  push(trashClauses, `!${t}`, `dein Liga-Tag ${t}`);
-  if (cfg.protectBuddies)      push(trashClauses, "!kumpel1-", "Schon mal Kumpel gewesen");
+  if (cfg.protectBuddies)      push(trashClauses, `!${kw.numeric.buddy}1-`, "Schon mal Kumpel gewesen");
   if (cfg.protectDoubleMoved)  push(trashClauses, "@3move", "Zweiter Charge-Move freigeschaltet (@3move ist invertiert!)");
 
   // Regional groups
   const groups = cfg.regionalGroups || {};
-  const hundoLower = new Set(hundos.map(s => s.toLowerCase()));
+  const hundoOutSet = new Set(hundosOut);
   for (const [key, group] of Object.entries(REGIONAL_GROUPS)) {
     const state = groups[key];
     if (!state || !state.enabled) continue;
     for (const tc of group.typeChecks) {
       if (state.typeChecksEnabled !== null && !state.typeChecksEnabled.includes(tc.species)) continue;
-      push(trashClauses, `!${tc.species},!${tc.type}`, `${group.label}: ${tc.note}`);
+      const speciesOut = speciesForOutput(tc.species, outputLocale);
+      const speciesDisplay = capFirst(speciesOut);
+      const typeOut = kw.type[tc.type] || tc.type;
+      push(trashClauses, `!${speciesDisplay},!${typeOut}`, `${group.label}: ${tc.note}`);
     }
-    // Collectors — collapse to +Family where complete
-    const enabledCollectors = group.collectors.filter(sp => {
-      if (state.collectorsEnabled !== null && !state.collectorsEnabled.includes(sp)) return false;
-      if (hundoLower.has(sp.toLowerCase())) return false;  // skip hundo overlaps
-      return true;
-    });
-    const collapsed = collapseFamilies(enabledCollectors, FAMILY_COLLAPSES);
+    // Collectors — resolve each to outputLocale, then collapse families
+    const enabledCollectorsOut = group.collectors
+      .filter(sp => state.collectorsEnabled === null || state.collectorsEnabled.includes(sp))
+      .map(sp => speciesForOutput(sp, outputLocale))
+      .filter(sp => !hundoOutSet.has(sp));
+    const collapsed = collapseFamilies(enabledCollectorsOut, FAMILY_COLLAPSES);
     for (const entry of collapsed) {
       push(trashClauses, `!${entry}`,
         entry.startsWith("+")
@@ -385,42 +415,39 @@ function buildFilters(hundos, cfg, homeLocals = []) {
           : `${group.label}: ${entry}`);
     }
   }
-  // Custom collectibles — user-added species to protect.
-  // Skip ones in hundo list (would conflict with H widening) and ones already
-  // covered by regional groups (avoid duplicate clauses).
-  const allRegionalCollectors = new Set(
-    Object.values(REGIONAL_GROUPS).flatMap(g => g.collectors).map(s => s.toLowerCase())
+  // Custom collectibles
+  const allRegionalCollectorsOut = new Set(
+    Object.values(REGIONAL_GROUPS)
+      .flatMap(g => g.collectors)
+      .map(sp => speciesForOutput(sp, outputLocale))
   );
   for (const sp of (cfg.customCollectibles || [])) {
-    const lower = sp.toLowerCase();
-    if (hundoLower.has(lower)) continue;
-    if (allRegionalCollectors.has(lower)) continue;
-    // Capitalize first letter for the filter (PoGo names are usually capitalized)
-    const display = sp.charAt(0).toUpperCase() + sp.slice(1);
+    const lower = speciesForOutput(sp, outputLocale);
+    if (hundoOutSet.has(lower)) continue;
+    if (allRegionalCollectorsOut.has(lower)) continue;
+    const display = capFirst(lower);
     push(trashClauses, `!${display}`, `Eigene Sammler-Pokémon: ${display}`);
   }
   if (cfg.cpCap && cfg.cpCap > 0)
-    push(trashClauses, `wp-${cfg.cpCap}`, `Sicherheitsnetz: WP ≤ ${cfg.cpCap}`);
+    push(trashClauses, `${kw.numeric.cp}-${cfg.cpCap}`, `Sicherheitsnetz: WP ≤ ${cfg.cpCap}`);
   if (cfg.ageScopeDays && cfg.ageScopeDays > 0)
-    push(trashClauses, `alter-${cfg.ageScopeDays},getauscht`, `Sicherheitsnetz: vor ≤${cfg.ageScopeDays} Tagen gefangen ODER getauscht`);
+    push(trashClauses, `${kw.numeric.age}-${cfg.ageScopeDays},${kw.flag.traded}`, `Sicherheitsnetz: vor ≤${cfg.ageScopeDays} Tagen gefangen ODER getauscht`);
 
   const trash = trashClauses.map(c => c.clause).join("&");
 
   // ── TRADE ──────────────────────────────────────────────────────────────
   push(tradeClauses, [S012, TE_trim_str, H].filter(Boolean).join(","), "Set H ∪ S012 ∪ TE — Spezies (TE-trimmed)");
-  push(tradeClauses, [S012, TE_full_str, "0-3angriffs-wert,0-3verteidigungs-wert,0-2kp"].filter(Boolean).join(","), "¬K1 mit TE-Escape");
-  push(tradeClauses, [S012, TE_full_str, "0-3angriffs-wert,0-2verteidigungs-wert,0-3kp"].filter(Boolean).join(","), "¬K2 mit TE-Escape");
-  push(tradeClauses, [S012, TE_full_str, "0-2angriffs-wert,0-3verteidigungs-wert,0-3kp"].filter(Boolean).join(","), "¬K3 mit TE-Escape");
+  push(tradeClauses, [S012, TE_full_str, ivK1Bad].filter(Boolean).join(","), "¬K1 mit TE-Escape");
+  push(tradeClauses, [S012, TE_full_str, ivK2Bad].filter(Boolean).join(","), "¬K2 mit TE-Escape");
+  push(tradeClauses, [S012, TE_full_str, ivK3Bad].filter(Boolean).join(","), "¬K3 mit TE-Escape");
   if (notP) push(tradeClauses, notP, `¬P — PvP-Schutz (${cfg.pvpMode})`);
 
-  // Mandatory: cannot re-trade, cannot trade Crypto/Lucky/Mythical (except Meltan/Melmetal #808/#809).
-  // These are physical game constraints, not user preferences — they always apply.
-  push(tradeClauses, "!getauscht", "PFLICHT: schon getauschte Pokémon können nicht erneut getauscht werden");
-  push(tradeClauses, "!crypto", "PFLICHT: Crypto-Pokémon können nicht getauscht werden");
-  push(tradeClauses, "!glücks", "PFLICHT: Glücks-Pokémon können nicht erneut getauscht werden (waren schon ein Tausch)");
-  // Mythicals: untradable EXCEPT Meltan (808) and Melmetal (809) — special trade only
-  push(tradeClauses, "!mysteriös,808,809", "PFLICHT: Mysteriöse nicht tauschbar (außer Meltan/Melmetal via Spezial-Tausch)");
-  // Tag protections — same catch-all-vs-specific pattern as trash
+  // Mandatory trade constraints (physical game rules — always apply)
+  push(tradeClauses, `!${kw.flag.traded}`, "PFLICHT: schon getauschte Pokémon können nicht erneut getauscht werden");
+  push(tradeClauses, `!${kw.flag.shadow}`, "PFLICHT: Crypto-Pokémon können nicht getauscht werden");
+  push(tradeClauses, `!${kw.flag.lucky}`, "PFLICHT: Glücks-Pokémon können nicht erneut getauscht werden (waren schon ein Tausch)");
+  push(tradeClauses, `!${kw.flag.mythical},808,809`, "PFLICHT: Mysteriöse nicht tauschbar (außer Meltan/Melmetal via Spezial-Tausch)");
+
   if (cfg.protectAnyTag) {
     push(tradeClauses, "!#", "irgendein Tag — egal welches, nicht für Massen-Tausch");
   } else {
@@ -430,59 +457,52 @@ function buildFilters(hundos, cfg, homeLocals = []) {
     for (const t of customTags) push(tradeClauses, `!#${t}`, `dein Custom-Tag #${t}`);
   }
 
-  if (cfg.protectLegendaries)  push(tradeClauses, "!legendär", "Legendäre");
-  if (cfg.protectUltraBeasts)  push(tradeClauses, "!ultrabestien", "Ultrabestien");
-  if (cfg.protectShinies)      push(tradeClauses, "!schillernd", "Schillernde (zu wertvoll für Massentausch)");
-  if (cfg.protectCostumes)     push(tradeClauses, "!kostümiert", "Kostümierte");
-  if (cfg.protectPurified)     push(tradeClauses, "!erlöst", "Erlöste (= ehemals Crypto, verlieren Bonus beim Tausch)");
-  if (cfg.protectBackgrounds)  push(tradeClauses, "!hintergrund", "Mit Hintergrund");
-  if (cfg.protectFavorites)    push(tradeClauses, "!favorit", "Favoriten");
+  if (cfg.protectLegendaries)  push(tradeClauses, `!${kw.flag.legendary}`, "Legendäre");
+  if (cfg.protectUltraBeasts)  push(tradeClauses, `!${kw.flag.ultra_beast}`, "Ultrabestien");
+  if (cfg.protectShinies)      push(tradeClauses, `!${kw.flag.shiny}`, "Schillernde (zu wertvoll für Massentausch)");
+  if (cfg.protectCostumes)     push(tradeClauses, `!${kw.flag.costume}`, "Kostümierte");
+  if (cfg.protectPurified)     push(tradeClauses, `!${kw.flag.purified}`, "Erlöste (= ehemals Crypto, verlieren Bonus beim Tausch)");
+  if (cfg.protectBackgrounds)  push(tradeClauses, `!${kw.flag.background}`, "Mit Hintergrund");
+  if (cfg.protectFavorites)    push(tradeClauses, `!${kw.flag.favorite}`, "Favoriten");
   push(tradeClauses, "!4*", "Regel 1 explizit: niemals 4★ tauschen");
   for (const t of leagueTags)  push(tradeClauses, `!${t}`, `dein Liga-Tag ${t}`);
   if (cfg.protectDoubleMoved)  push(tradeClauses, "@3move", "Zweiter Charge-Move freigeschaltet");
-  if (cfg.protectDynamax)      push(tradeClauses, "!dynaattacke1-", "Dynamax-fähige");
-  if (cfg.protectXXL)          push(tradeClauses, "!xxl", "XXL Größe");
-  if (cfg.protectXL)           push(tradeClauses, "!xl",  "XL Größe");
-  // XXS not in original trade filter — too small a category to bother
-  if (cfg.protectLegacyMoves)  push(tradeClauses, "!@spezial", "Legacy-Attacken");
+  if (cfg.protectDynamax)      push(tradeClauses, `!${kw.flag.dynamax_move}1-`, "Dynamax-fähige");
+  if (cfg.protectXXL)          push(tradeClauses, `!${kw.flag.xxl}`, "XXL Größe");
+  if (cfg.protectXL)           push(tradeClauses, `!${kw.flag.xl}`,  "XL Größe");
+  if (cfg.protectLegacyMoves)  push(tradeClauses, `!@${kw.flag.special_move}`, "Legacy-Attacken");
   if (cfg.ageScopeDays && cfg.ageScopeDays > 0)
-    push(tradeClauses, `alter-${cfg.ageScopeDays}`, `Sicherheitsnetz: ≤${cfg.ageScopeDays} Tage alt`);
-  push(tradeClauses, "entfernung0-", "Sicherheitsnetz: Entfernung > 0km (= war mal woanders)");
+    push(tradeClauses, `${kw.numeric.age}-${cfg.ageScopeDays}`, `Sicherheitsnetz: ≤${cfg.ageScopeDays} Tage alt`);
+  push(tradeClauses, `${kw.numeric.distance}0-`, "Sicherheitsnetz: Entfernung > 0km (= war mal woanders)");
 
   const trade = tradeClauses.map(c => c.clause).join("&");
 
   // ── PRE-STAGED TRADES ──────────────────────────────────────────────────
-  // Just shows what's already tagged for trade — no IV/protection logic.
-  // Useful for visiting your "ready to trade" pile.
   const prestagedClauses = [];
   const tagList = [];
   if (basarTag)      tagList.push(`#${basarTag}`);
   if (fernTauschTag) tagList.push(`#${fernTauschTag}`);
   if (tagList.length > 0) {
     push(prestagedClauses, tagList.join(","), `bereits markiert (#${basarTag}${fernTauschTag ? ` oder #${fernTauschTag}` : ""})`);
-    push(prestagedClauses, "!getauscht", "PFLICHT: schon getauscht");
-    push(prestagedClauses, "!crypto", "PFLICHT: Crypto nicht tauschbar");
-    push(prestagedClauses, "!glücks", "PFLICHT: Glücks-Pokémon nicht erneut tauschbar");
-    push(prestagedClauses, "!mysteriös,808,809", "PFLICHT: Mysteriöse nicht tauschbar (außer Meltan/Melmetal)");
+    push(prestagedClauses, `!${kw.flag.traded}`, "PFLICHT: schon getauscht");
+    push(prestagedClauses, `!${kw.flag.shadow}`, "PFLICHT: Crypto nicht tauschbar");
+    push(prestagedClauses, `!${kw.flag.lucky}`, "PFLICHT: Glücks-Pokémon nicht erneut tauschbar");
+    push(prestagedClauses, `!${kw.flag.mythical},808,809`, "PFLICHT: Mysteriöse nicht tauschbar (außer Meltan/Melmetal)");
   }
   const prestaged = prestagedClauses.map(c => c.clause).join("&");
 
   // ── BUDDY FILTERS ──────────────────────────────────────────────────────
-  // For each buddy with target species (or trade-evo opt-in), generate a
-  // "catch for buddy" filter: trashable (0-2★) Pokémon of the species the
-  // buddy wants, not yet tagged. The point is to find candidates to tag —
-  // not to look up what's already tagged (a single `#Anna` search does that).
-  const buddyCatchFilters = []; // [{ buddyName, prefix, filter, clauses }]
+  const buddyCatchFilters = [];
   for (const b of activeBuddies) {
     const prefix = b.tagPrefix.replace(/^#/, "");
-    const targets = (b.targetSpecies || []).filter(Boolean);
+    const targets = (b.targetSpecies || []).filter(Boolean).map(s => speciesForOutput(s, outputLocale));
     const wantsTE = !!b.wantsTradeEvos && TE_full.length > 0;
     if (targets.length === 0 && !wantsTE) continue;
 
     const catchClauses = [];
     const speciesParts = [
       ...targets.map(s => `+${s}`),
-      ...(wantsTE ? TE_full.map(base => `+${TE_DISPLAY[base]}`) : []),
+      ...(wantsTE ? TE_full.map(base => `+${teDisplay(base, outputLocale)}`) : []),
     ];
     const why = [
       targets.length > 0 ? `${targets.length} Wunsch-Spezies` : null,
@@ -491,13 +511,13 @@ function buildFilters(hundos, cfg, homeLocals = []) {
     push(catchClauses, speciesParts.join(","), `${b.name}: ${why}`);
     push(catchClauses, "0*,1*,2*", "nur trashbare Sterne (0-2★) — 3★+ behältst du selbst");
     push(catchClauses, "!#", "nicht schon irgendwie getaggt");
-    push(catchClauses, "!favorit", "Favoriten geschützt");
-    push(catchClauses, "!getauscht", "PFLICHT: schon getauscht");
-    push(catchClauses, "!crypto", "PFLICHT: Crypto nicht tauschbar");
-    push(catchClauses, "!glücks", "PFLICHT: Glücks-Pokémon nicht erneut tauschbar");
-    push(catchClauses, "!mysteriös,808,809", "PFLICHT: Mysteriöse nicht tauschbar (außer Meltan/Melmetal)");
-    push(catchClauses, "!schillernd", "Schillernde behältst du selbst");
-    push(catchClauses, "!legendär", "Legendäre behältst du selbst");
+    push(catchClauses, `!${kw.flag.favorite}`, "Favoriten geschützt");
+    push(catchClauses, `!${kw.flag.traded}`, "PFLICHT: schon getauscht");
+    push(catchClauses, `!${kw.flag.shadow}`, "PFLICHT: Crypto nicht tauschbar");
+    push(catchClauses, `!${kw.flag.lucky}`, "PFLICHT: Glücks-Pokémon nicht erneut tauschbar");
+    push(catchClauses, `!${kw.flag.mythical},808,809`, "PFLICHT: Mysteriöse nicht tauschbar (außer Meltan/Melmetal)");
+    push(catchClauses, `!${kw.flag.shiny}`, "Schillernde behältst du selbst");
+    push(catchClauses, `!${kw.flag.legendary}`, "Legendäre behältst du selbst");
     buddyCatchFilters.push({
       buddyName: b.name,
       prefix,
@@ -507,44 +527,32 @@ function buildFilters(hundos, cfg, homeLocals = []) {
   }
 
   // ── HUNDO-SORT ─────────────────────────────────────────────────────────
-  // A quick "show me everything in my hundo families that isn't already protected"
-  // filter — useful for sorting/managing your hundo lines. Only meaningful when
-  // hundos exist; returns "" otherwise.
   const sortClauses = [];
   if (hundos.length > 0) {
     push(sortClauses, H, "alle Hundo-Familien (Sortierung)");
     if (cfg.protectAnyTag)   push(sortClauses, "!#", "alle Tags geschützt");
-    if (cfg.protectFavorites) push(sortClauses, "!favorit", "Favoriten geschützt");
-    if (cfg.protectShinies)  push(sortClauses, "!schillernd", "Schillernde geschützt");
-    if (cfg.protectLuckies)  push(sortClauses, "!glücks", "Glücks geschützt");
+    if (cfg.protectFavorites) push(sortClauses, `!${kw.flag.favorite}`, "Favoriten geschützt");
+    if (cfg.protectShinies)  push(sortClauses, `!${kw.flag.shiny}`, "Schillernde geschützt");
+    if (cfg.protectLuckies)  push(sortClauses, `!${kw.flag.lucky}`, "Glücks geschützt");
   }
   const sort = sortClauses.map(c => c.clause).join("&");
 
   // ── GIFT FILTER ────────────────────────────────────────────────────────
-  // High-value Pokémon worth gifting to far-away friends — flips trash logic.
-  // SHOW: shinies ∪ legendaries ∪ ultrabeasts ∪ costumes ∪ backgrounds ∪ home-locals
-  // STRIP (untradeable / dangerous): mythicals, luckies, crypto, legacy moves
-  // STRIP (you keep): 4★ hundos, favorites, traded
-  // STRIP (other tags): everything tagged with NON-trade tags (preserve user's tag intent)
   const giftClauses = [];
-  const valuables = ["schillernd", "legendär", "ultrabestien", "kostümiert", "hintergrund"];
-  const homeLocalsList = (homeLocals || []).map(n => n).filter(Boolean);
-  // Clause 1: any valuable property OR is a local regional
+  const valuables = [kw.flag.shiny, kw.flag.legendary, kw.flag.ultra_beast, kw.flag.costume, kw.flag.background];
+  const homeLocalsList = (homeLocals || []).map(n => speciesForOutput(n, outputLocale)).filter(Boolean);
   const valueParts = [...valuables, ...homeLocalsList];
   if (valueParts.length > 0) {
     push(giftClauses, valueParts.join(","),
       `Wertsachen: schillernd, legendär, Ultrabestie, Kostüm, Hintergrund${homeLocalsList.length ? ` + lokale Regionale (${homeLocalsList.length})` : ""}`);
   }
-  // Hard untradeable
-  push(giftClauses, "!getauscht", "PFLICHT: nicht erneut tauschbar");
-  push(giftClauses, "!crypto", "PFLICHT: Crypto kann nicht getauscht werden");
-  push(giftClauses, "!mysteriös,808,809", "PFLICHT: Mysteriöse nicht tauschbar (außer Meltan/Melmetal)");
-  push(giftClauses, "!glücks", "PFLICHT: Glücks-Pokémon sind nicht tauschbar");
-  // Don't accidentally give away top stuff
+  push(giftClauses, `!${kw.flag.traded}`, "PFLICHT: nicht erneut tauschbar");
+  push(giftClauses, `!${kw.flag.shadow}`, "PFLICHT: Crypto kann nicht getauscht werden");
+  push(giftClauses, `!${kw.flag.mythical},808,809`, "PFLICHT: Mysteriöse nicht tauschbar (außer Meltan/Melmetal)");
+  push(giftClauses, `!${kw.flag.lucky}`, "PFLICHT: Glücks-Pokémon sind nicht tauschbar");
   push(giftClauses, "!4*", "niemals 4★ verschenken");
-  push(giftClauses, "!favorit", "Favoriten geschützt");
-  push(giftClauses, "!@spezial", "Legacy-Attacken nicht verschenken");
-  // Tag handling: exclude any non-trade tags but allow trade tags through
+  push(giftClauses, `!${kw.flag.favorite}`, "Favoriten geschützt");
+  push(giftClauses, `!@${kw.flag.special_move}`, "Legacy-Attacken nicht verschenken");
   const tagAllowList = [];
   if (basarTag)      tagAllowList.push(`#${basarTag}`);
   if (fernTauschTag) tagAllowList.push(`#${fernTauschTag}`);
@@ -561,64 +569,100 @@ function buildFilters(hundos, cfg, homeLocals = []) {
 }
 
 // ─── PARSER (for verification panel) ──────────────────────────────────────
+//
+// Locale-aware: parses filter syntax in whatever language the filter was
+// generated in (matches the user's PoGo output locale).
 
-function evalFilter(filterStr, mon) {
-  const clauses = filterStr.split("&");
-  return clauses.every(c => evalClause(c, mon));
+function escapeRegex(s) {
+  return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
-function evalClause(c, mon) {
+
+// Maps a semantic flag key (kw.flag.*) → the property on `mon.flags`.
+const FLAG_TO_MON = {
+  favorite: "favorite", shiny: "shiny", lucky: "lucky",
+  legendary: "legendary", mythical: "mythical", ultra_beast: "ultrabeast",
+  shadow: "shadow", purified: "purified", costume: "costume",
+  background: "background", traded: "traded", hatched: "hatched",
+  baby: "eggOnly", new_evo: "newDexEvo", special_move: "legacyMove",
+  xxl: "xxl", xl: "xl", xxs: "xxs",
+};
+
+export function evalFilter(filterStr, mon, outputLocale = "de") {
+  const kw = pogoKeywords(outputLocale);
+  const clauses = filterStr.split("&");
+  return clauses.every(c => evalClause(c, mon, kw, outputLocale));
+}
+function evalClause(c, mon, kw, outputLocale) {
   for (const raw of c.split(",")) {
     const t = raw.trim();
     const negated = t.startsWith("!");
     const term = negated ? t.slice(1) : t;
-    const v = evalTerm(term, mon);
+    const v = evalTerm(term, mon, kw, outputLocale);
     if (v === null) continue;
     if ((negated ? !v : v)) return true;
   }
   return false;
 }
-function evalTerm(t, mon) {
+function evalTerm(t, mon, kw, outputLocale) {
   if (t.startsWith("+")) {
     const name = t.slice(1).toLowerCase();
     return mon.families.includes(name);
   }
+  // Universal: stars, year, dex#
   let m = t.match(/^(\d+)(?:-(\d+))?\*$/);
   if (m) { const lo=+m[1], hi=m[2]?+m[2]:lo; return mon.star>=lo && mon.star<=hi; }
-  m = t.match(/^(\d+)(?:-(\d+))?angriffs-wert$/);
+
+  // Locale-driven IV ranges
+  const ivAtkRe = new RegExp(`^(\\d+)(?:-(\\d+))?${escapeRegex(kw.iv.atk)}$`);
+  m = t.match(ivAtkRe);
   if (m) { const lo=+m[1], hi=m[2]?+m[2]:lo; return mon.atk>=lo && mon.atk<=hi; }
-  m = t.match(/^(\d+)(?:-(\d+))?verteidigungs-wert$/);
+  const ivDefRe = new RegExp(`^(\\d+)(?:-(\\d+))?${escapeRegex(kw.iv.def)}$`);
+  m = t.match(ivDefRe);
   if (m) { const lo=+m[1], hi=m[2]?+m[2]:lo; return mon.def>=lo && mon.def<=hi; }
-  m = t.match(/^(\d+)?(-)?(\d+)?kp$/);
+  const ivHpRe = new RegExp(`^(\\d+)?(-)?(\\d+)?${escapeRegex(kw.iv.hp)}$`);
+  m = t.match(ivHpRe);
   if (m && (m[1]||m[3])) {
     const lo = m[1]?+m[1]:0; const hi = m[3]?+m[3]:(m[2]?99:lo);
     return mon.hp>=lo && mon.hp<=hi;
   }
-  m = t.match(/^entfernung(\d+)-?$/); if (m) return (mon.distance||0) >= +m[1];
-  m = t.match(/^wp-?(\d+)$/);          if (m) return (mon.wp||9999) <= +m[1];
-  m = t.match(/^alter-(\d+)$/);        if (m) return (mon.ageDays||9999) <= +m[1];
-  m = t.match(/^jahr(\d+)-$/);         if (m) return (mon.year||0) >= 2000 + +m[1];
+
+  // Locale-driven numeric (distance, age, year, cp, buddy, mega, dynamax move)
+  const distRe = new RegExp(`^${escapeRegex(kw.numeric.distance)}(\\d+)-?$`);
+  m = t.match(distRe);  if (m) return (mon.distance||0) >= +m[1];
+  const cpRe = new RegExp(`^${escapeRegex(kw.numeric.cp)}-?(\\d+)$`);
+  m = t.match(cpRe);    if (m) return (mon.wp||9999) <= +m[1];
+  const ageRe = new RegExp(`^${escapeRegex(kw.numeric.age)}-(\\d+)$`);
+  m = t.match(ageRe);   if (m) return (mon.ageDays||9999) <= +m[1];
+  const yearRe = new RegExp(`^${escapeRegex(kw.numeric.year)}(\\d+)-$`);
+  m = t.match(yearRe);  if (m) return (mon.year||0) >= 2000 + +m[1];
   m = t.match(/^(\d+)$/);              if (m) return mon.dex === +m[1];
-  if (t === "kumpel1-")     return mon.flags?.buddy;
-  if (t === "mega1-")       return mon.flags?.megaEvolved;
-  if (t === "mega0")        return !mon.flags?.megaEvolved;
-  if (t === "dynaattacke1-")return mon.flags?.dynamaxCapable;
-  if (t === "#")            return mon.flags?.tagged;
-  if (t === "@3move")       return !mon.flags?.doubleMoved;  // INVERTED per game
-  const flagMap = {
-    favorit:"favorite", schillernd:"shiny", glücks:"lucky", legendär:"legendary",
-    mysteriös:"mythical", ultrabestien:"ultrabeast", crypto:"shadow",
-    erlöst:"purified", kostümiert:"costume", hintergrund:"background",
-    "@spezial":"legacyMove", nurauseiern:"eggOnly", xxl:"xxl", xl:"xl", xxs:"xxs",
-    "ⓤ":"leagueU", "ⓖ":"leagueG", "ⓛ":"leagueL",
-    neueentwicklung:"newDexEvo", getauscht:"traded",
-    psycho:false, fee:false, eis:false, geist:false, unlicht:false,
-    kampf:false, boden:false, gestein:false,  // type checks — for now treated as not-matching unless mon.types
-  };
-  if (t in flagMap) {
-    const v = flagMap[t];
-    if (v === false) return (mon.types || []).includes(t);
-    return !!mon.flags?.[v];
+
+  // Locale-driven keyword tokens
+  if (t === `${kw.numeric.buddy}1-`)        return !!mon.flags?.buddy;
+  if (t === `${kw.flag.mega}1-`)            return !!mon.flags?.megaEvolved;
+  if (t === `${kw.flag.mega}0`)             return !mon.flags?.megaEvolved;
+  if (t === `${kw.flag.dynamax_move}1-`)    return !!mon.flags?.dynamaxCapable;
+  if (t === "#")                            return !!mon.flags?.tagged;
+  if (t === "@3move")                       return !mon.flags?.doubleMoved; // INVERTED per game
+  if (t === `@${kw.flag.special_move}`)     return !!mon.flags?.legacyMove;
+
+  // Universal league tags
+  if (t === "ⓤ") return !!mon.flags?.leagueU;
+  if (t === "ⓖ") return !!mon.flags?.leagueG;
+  if (t === "ⓛ") return !!mon.flags?.leagueL;
+
+  // Locale-driven flag tokens (favorite, shiny, lucky, legendary, mythical, ...)
+  const flagKey = flagKeyFromKeyword(t, outputLocale);
+  if (flagKey && FLAG_TO_MON[flagKey]) {
+    return !!mon.flags?.[FLAG_TO_MON[flagKey]];
   }
+
+  // Locale-driven type checks (psychic, ice, dark, ...)
+  const typeKey = typeKeyFromKeyword(t, outputLocale);
+  if (typeKey) {
+    return (mon.types || []).includes(typeKey);
+  }
+
   return null;
 }
 
@@ -745,6 +789,7 @@ function decodeTopo(topology, objectName) {
 // ─── UI ───────────────────────────────────────────────────────────────────
 
 export default function App() {
+  const { outputLocale } = useTranslation();
   const [hundos, setHundos] = useState(DEFAULT_HUNDOS);
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [newHundo, setNewHundo] = useState("");
@@ -851,8 +896,8 @@ export default function App() {
 
   const { trash, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
           trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses } = useMemo(
-    () => buildFilters(hundos, effectiveConfig, homeLocals),
-    [hundos, effectiveConfig, homeLocals]
+    () => buildFilters(hundos, effectiveConfig, homeLocals, outputLocale),
+    [hundos, effectiveConfig, homeLocals, outputLocale]
   );
 
   function addHundo() {
@@ -1158,7 +1203,7 @@ export default function App() {
                     label="Pokémon prüfen"
                     open={showVerify}
                     onToggle={() => setShowVerify(s => !s)}>
-                    <VerifyPanel trash={trash} trade={trade} hundos={hundos} TE_families={TRADE_EVO_FAMILIES} />
+                    <VerifyPanel trash={trash} trade={trade} hundos={hundos} TE_families={TRADE_EVO_FAMILIES} outputLocale={outputLocale} />
                   </Collapsible>
                 </div>
               </div>
@@ -1607,30 +1652,40 @@ function ClauseList({ title, accent, clauses }) {
   );
 }
 
-function VerifyPanel({ trash, trade, hundos, TE_families }) {
+function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = "de" }) {
   const [m, setM] = useState({
     family: "", star: 2, atk: 1, def: 1, hp: 1,
     flags: {}, types: [], dex: 0,
   });
   function setFlag(k, v) { setM({ ...m, flags: { ...m.flags, [k]: v } }); }
 
-  // Build mon for parser
+  // Build mon for parser. Family expansion uses the multi-locale resolver so
+  // the user can type a family in any language.
   const mon = useMemo(() => {
     const fam = m.family.trim().toLowerCase().replace(/^\+/, "");
     let families = fam ? [fam] : [];
-    // expand to known families
-    for (const [, members] of Object.entries(TE_families)) {
-      if (members.includes(fam)) families = [...new Set([...families, ...members])];
+    if (fam) {
+      const info = resolveSpeciesInfo(fam);
+      if (info) {
+        for (const [, family] of Object.entries(TE_families)) {
+          if (family.memberDex && family.memberDex.includes(info.dex)) {
+            const memberNames = family.memberDex
+              .map(d => pokemonNameFor(String(d), outputLocale))
+              .filter(Boolean);
+            families = [...new Set([...families, ...memberNames])];
+          }
+        }
+      }
     }
     return {
       ...m, families, dex: m.dex || 0,
       wp: 1500, ageDays: 5, distance: m.flags.farDistance ? 200 : 0,
       year: 2025,
     };
-  }, [m, TE_families]);
+  }, [m, TE_families, outputLocale]);
 
-  const inTrash = useMemo(() => evalFilter(trash, mon), [trash, mon]);
-  const inTrade = useMemo(() => evalFilter(trade, mon), [trade, mon]);
+  const inTrash = useMemo(() => evalFilter(trash, mon, outputLocale), [trash, mon, outputLocale]);
+  const inTrade = useMemo(() => evalFilter(trade, mon, outputLocale), [trade, mon, outputLocale]);
   const inH = hundos.includes(mon.families[0] || "");
 
   const flagToggles = [
@@ -1819,6 +1874,7 @@ const EXPERT_ONLY_KEYS = new Set([
 ]);
 
 function ConfigPanel({ config, setConfig, homeLocals = [] }) {
+  const { outputLocale } = useTranslation();
   function set(k, v) { setConfig({ ...config, [k]: v }); }
   function setGroup(groupKey, partial) {
     const groups = { ...(config.regionalGroups || {}) };
@@ -2023,11 +2079,11 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
                   on
                     ? (config.enabledTradeEvos || []).filter(x => x !== b)
                     : [...(config.enabledTradeEvos || []), b])}
-                title={`+${TE_DISPLAY[b]} — wenn aktiv, werden alle Familienmitglieder (Vor- und Nachevolutionen) im Tausch-Filter geschützt`}
+                title={`+${teDisplay(b, outputLocale)} — wenn aktiv, werden alle Familienmitglieder (Vor- und Nachevolutionen) im Tausch-Filter geschützt`}
                 className={`mono text-xs px-2.5 py-1 rounded transition ${
                   on ? "bg-[#5EAFC5] text-[#0F1419]" : "bg-[#1F2933] text-[#8090A0] hover:bg-[#2D3A47]"
                 }`}>
-                +{TE_DISPLAY[b]}
+                +{teDisplay(b, outputLocale)}
               </button>
             );
           })}
