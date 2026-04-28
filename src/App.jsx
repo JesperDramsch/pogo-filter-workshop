@@ -1784,8 +1784,8 @@ function FieldNum({ label, value, onChange, min, max }) {
 
 const PRESETS = {
   casual: {
-    label: "Casual",
-    description: "Alle wichtigen Schutzmaßnahmen aktiv, lockerer PvP-Schutz",
+    labelKey: "app.preset.casual.label",
+    descriptionKey: "app.preset.casual.description",
     apply: (cfg) => ({
       ...cfg,
       pvpMode: "loose",
@@ -1801,8 +1801,8 @@ const PRESETS = {
     }),
   },
   collector: {
-    label: "Sammler",
-    description: "Empfohlen für Dex-Komplettierer — schützt alle Formen",
+    labelKey: "app.preset.collector.label",
+    descriptionKey: "app.preset.collector.description",
     apply: (cfg) => {
       const groups = defaultRegionalToggles();
       for (const k of Object.keys(groups)) groups[k].enabled = true;
@@ -1821,8 +1821,8 @@ const PRESETS = {
     },
   },
   aggressive: {
-    label: "Aggressiv",
-    description: "Schnelles Ausmisten — kein Form-Schutz, strenger PvP",
+    labelKey: "app.preset.aggressive.label",
+    descriptionKey: "app.preset.aggressive.description",
     apply: (cfg) => {
       const groups = defaultRegionalToggles();
       for (const k of Object.keys(groups)) groups[k].enabled = false;
@@ -1841,8 +1841,8 @@ const PRESETS = {
     },
   },
   pvpFocus: {
-    label: "PvP-Fokus",
-    description: "Strenge PvP-IVs, schützt Liga-Tags, sonst aggressiv",
+    labelKey: "app.preset.pvpFocus.label",
+    descriptionKey: "app.preset.pvpFocus.description",
     apply: (cfg) => {
       const groups = defaultRegionalToggles();
       groups.alolan.enabled = false;
@@ -1896,32 +1896,34 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
   const expert = !!config.expertMode;
 
   // Universal protections — shown in all modes (these are the "obviously yes" ones)
+  // [configKey, translationKeyBase, extra?] — labels & whys resolve via t() at
+  // render time. Translation keys live in src/locales/app/{locale}.json.
   const alwaysOn = [
-    ["protectFavorites",     "Favoriten",                 "Pokémon mit Stern markiert"],
-    ["protectAnyTag",        "Markierte Pokémon (alle Tags)", "egal welches Tag — alles Markierte ist sicher"],
-    ["protectTradeEvos",     "Tausch-Evolutionen",        "Schützt Familien wo Tausch eine Gratis-Evo gibt (Abra, Machollo, Nebulak, ...) — außer schon getauschte (dann ist die Gratis-Evo verbraucht)"],
-    ["protectShinies",       "Schillernde",               "Glitzer-Pokémon (selten)"],
-    ["protectLuckies",       "Glücks-Pokémon",            "Halbierter Stardust beim Power-up"],
-    ["protectLegendaries",   "Legendäre",                 "Mewtu, Lugia, etc — eh nicht tauschbar in Massentausch"],
-    ["protectShadows",       "Crypto-Pokémon",            "Schutz im Trash. Tausch ist eh blockiert (Crypto unhandelbar)"],
-    ["protectCostumes",      "Kostümierte",               "Event-Forms wie Sonnenbrille-Pikachu"],
-    ["protectBackgrounds",   "Mit Hintergrund",           "Spezielle Backgrounds (Pokémon-Day, etc)"],
-    ["protectLegacyMoves",   "Legacy-Attacken",           "@spezial — Pokémon mit alten Event-Moves"],
-    ["protectBabies",        "Baby-Pokémon",              "Pokémon die nur aus Eiern schlüpfen können"],
-    ["protectXXL",           "XXL Größe",                 "Sehr große Pokémon (Größenrekord-Wert)"],
-    ["protectXL",            "XL Größe",                  "Große Pokémon"],
-    ["protectXXS",           "XXS Größe",                 "Sehr kleine Pokémon (Größenrekord-Wert)"],
-    ["protectNewEvolutions", "Neue Evolutionen",          "Pokémon, deren Evolution ein neuer Dex-Eintrag wäre"],
-    ["protectDoubleMoved",   "Zweiter Charge-Move",       "Pokémon, bei denen der zweite Charge-Move freigeschaltet ist"],
+    ["protectFavorites",     "app.protect.favorites"],
+    ["protectAnyTag",        "app.protect.any_tag"],
+    ["protectTradeEvos",     "app.protect.trade_evos"],
+    ["protectShinies",       "app.protect.shinies"],
+    ["protectLuckies",       "app.protect.luckies"],
+    ["protectLegendaries",   "app.protect.legendaries"],
+    ["protectShadows",       "app.protect.shadows"],
+    ["protectCostumes",      "app.protect.costumes"],
+    ["protectBackgrounds",   "app.protect.backgrounds"],
+    ["protectLegacyMoves",   "app.protect.legacy_moves"],
+    ["protectBabies",        "app.protect.babies"],
+    ["protectXXL",           "app.protect.xxl"],
+    ["protectXL",            "app.protect.xl"],
+    ["protectXXS",           "app.protect.xxs"],
+    ["protectNewEvolutions", "app.protect.new_evolutions"],
+    ["protectDoubleMoved",   "app.protect.double_moved"],
   ];
 
   const expertOnly = [
-    ["protectFourStar",      "4★ Hundos schützen",        "Sicherheitsgürtel: niemals 4★ Pokémon tossen — Regel 1. AUSSCHALTEN AUF EIGENE GEFAHR.", { requireConfirmOff: true }],
-    ["protectMythicals",     "Mysteriöse",                "Mew, Celebi, etc — sind nicht tauschbar"],
-    ["protectUltraBeasts",   "Ultrabestien",              "Necrozma, Buzzwole, etc"],
-    ["protectPurified",      "Erlöste",                   "Ehemals Crypto, verlieren Bonus beim Tausch"],
-    ["protectDynamax",       "Dynamax-fähige",            "Pokémon mit freigeschaltetem Dynamax"],
-    ["protectBuddies",       "Schon mal Kumpel gewesen",  "Sentimentaler Schutz — niemand will alte Kumpel tauschen"],
+    ["protectFourStar",      "app.protect.four_star",       { requireConfirmOff: true }],
+    ["protectMythicals",     "app.protect.mythicals"],
+    ["protectUltraBeasts",   "app.protect.ultra_beasts"],
+    ["protectPurified",      "app.protect.purified"],
+    ["protectDynamax",       "app.protect.dynamax"],
+    ["protectBuddies",       "app.protect.buddies_protect"],
   ];
 
   return (
@@ -1931,16 +1933,17 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
         // Find all collector lists across all groups, intersect with homeLocals
         const allCollectors = Object.values(REGIONAL_GROUPS).flatMap(g => g.collectors);
         const autoRemoved = homeLocals.filter(l => allCollectors.includes(l));
+        const removedNames = autoRemoved.length > 0 ? autoRemoved.join(", ") : t("app.protect.home_locals.none");
         return (
           <div className="border border-[#27AE60]/40 bg-[#27AE60]/5 rounded p-3 mono text-xs">
             <div className="flex items-baseline gap-2">
               <span className="text-[#27AE60]">⌂</span>
               <div className="flex-1">
                 <div className="text-[#E6EDF3]">
-                  Aus dem Schutz automatisch entfernt: <span className="text-[#27AE60]">{autoRemoved.join(", ") || "keine"}</span>
+                  {t("app.protect.home_locals.title_prefix")} <span className="text-[#27AE60]">{removedNames}</span>
                 </div>
                 <div className="text-[10.5px] text-[#8090A0] mt-1">
-                  Diese spawnen bei dir lokal — Schutz wäre unnötig, würde aber Regel 3 (toss aus H ∩ ¬K) blockieren.
+                  {t("app.protect.home_locals.note")}
                 </div>
               </div>
             </div>
@@ -1950,19 +1953,19 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
 
       {/* PRESETS */}
       <div>
-        <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">Presets</div>
+        <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">{t("app.preset.section_title")}</div>
         <div className="flex flex-wrap gap-1.5">
           {Object.entries(PRESETS).map(([key, preset]) => (
             <button key={key}
               onClick={() => applyPreset(key)}
-              title={preset.description}
+              title={t(preset.descriptionKey)}
               className="mono text-xs px-3 py-1.5 rounded bg-[#1F2933] text-[#E6EDF3] hover:bg-[#5EAFC5] hover:text-[#0F1419] transition">
-              {preset.label}
+              {t(preset.labelKey)}
             </button>
           ))}
         </div>
         <div className="mono text-[10.5px] text-[#8090A0] mt-1.5">
-          Presets überschreiben alle Einstellungen unten. Danach Details fein-tunen.
+          {t("app.preset.section_hint")}
         </div>
       </div>
 
@@ -1996,15 +1999,15 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
       {/* PROTECTIONS */}
       <div>
         <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
-          Schutzmaßnahmen · was nie weggeworfen werden soll
+          {t("app.protect.section_title")}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
-          {alwaysOn.map(([k, label, why, extra]) => (
-            <ToggleRow key={k} k={k} label={label} why={why}
+          {alwaysOn.map(([k, keyBase, extra]) => (
+            <ToggleRow key={k} k={k} label={t(`${keyBase}.label`)} why={t(`${keyBase}.why`)}
               checked={!!config[k]} onChange={v => set(k, v)} {...(extra || {})} />
           ))}
-          {expert && expertOnly.map(([k, label, why, extra]) => (
-            <ToggleRow key={k} k={k} label={label} why={why} expertBadge
+          {expert && expertOnly.map(([k, keyBase, extra]) => (
+            <ToggleRow key={k} k={k} label={t(`${keyBase}.label`)} why={t(`${keyBase}.why`)} expertBadge
               checked={!!config[k]} onChange={v => set(k, v)} {...(extra || {})} />
           ))}
         </div>
@@ -2014,16 +2017,16 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
       {expert && config.protectMythicals && (
         <div>
           <label className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-1 block">
-            Mysteriöse, von denen du Spares hast (Dex-Nummern, kommasepariert)
+            {t("app.protect.myth_carve.label")}
           </label>
           <input
             type="text"
             value={config.mythTooManyOf || ""}
             onChange={e => set("mythTooManyOf", e.target.value)}
-            placeholder="z.B. 808,649 für Meltan + Genesect"
+            placeholder={t("app.protect.myth_carve.placeholder")}
             className="mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]" />
           <div className="mono text-[10px] text-[#8090A0] mt-1">
-            Diese werden vom Mysteriös-Schutz ausgenommen — z.B. Meltan, von dem man oft hunderte hat
+            {t("app.protect.myth_carve.help")}
           </div>
         </div>
       )}
@@ -2033,7 +2036,7 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
       {/* REGIONAL GROUPS */}
       <div>
         <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
-          Regionale Formen &amp; Sammler-Pokémon
+          {t("app.protect.regional_section_title")}
         </div>
         <div className="space-y-2">
           {Object.entries(REGIONAL_GROUPS).map(([key, group]) =>
@@ -2076,7 +2079,7 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
       {/* TRADE-EVO FAMILIES */}
       <div>
         <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
-          Tausch-Entwicklungs-Familien · gratis Evo durch Tausch
+          {t("app.protect.te_section_title")}
         </div>
         <div className="flex flex-wrap gap-1.5">
           {Object.keys(TRADE_EVO_FAMILIES).map(b => {
@@ -2087,7 +2090,7 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
                   on
                     ? (config.enabledTradeEvos || []).filter(x => x !== b)
                     : [...(config.enabledTradeEvos || []), b])}
-                title={`+${teDisplay(b, outputLocale)} — wenn aktiv, werden alle Familienmitglieder (Vor- und Nachevolutionen) im Tausch-Filter geschützt`}
+                title={t("app.protect.te_button_title", { params: { name: teDisplay(b, outputLocale) } })}
                 className={`mono text-xs px-2.5 py-1 rounded transition ${
                   on ? "bg-[#5EAFC5] text-[#0F1419]" : "bg-[#1F2933] text-[#8090A0] hover:bg-[#2D3A47]"
                 }`}>
@@ -2102,13 +2105,14 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
 }
 
 function ToggleRow({ k, label, why, checked, onChange, expertBadge, requireConfirmOff }) {
+  const { t } = useTranslation();
   // For dangerous toggles (e.g. "always protect 4★"), turning them OFF requires
   // a two-click confirmation. Turning them back ON is unrestricted.
   const [armed, setArmed] = useState(false);
   useEffect(() => {
     if (!armed) return;
-    const t = setTimeout(() => setArmed(false), 3000);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setArmed(false), 3000);
+    return () => clearTimeout(timer);
   }, [armed]);
 
   function handleChange(e) {
@@ -2144,10 +2148,10 @@ function ToggleRow({ k, label, why, checked, onChange, expertBadge, requireConfi
       <div className="flex-1">
         <div className="flex items-baseline gap-1.5 flex-wrap">
           <span className="text-[#E6EDF3]">{label}</span>
-          {expertBadge && <span className="text-[9px] text-[#F5B82E]">EXPERT</span>}
+          {expertBadge && <span className="text-[9px] text-[#F5B82E]">{t("app.protect.expert_badge")}</span>}
           {armed && (
             <span className="text-[10px] text-[#FF6B5B] font-semibold">
-              wirklich? klick zur Bestätigung
+              {t("app.protect.confirm_off")}
             </span>
           )}
         </div>
