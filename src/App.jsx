@@ -2962,6 +2962,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 // ─── BUDDY MANAGER ──────────────────────────────────────────────────────────
 
 function BuddyManager({ buddies, onChange }) {
+  const { t } = useTranslation();
   const [newName, setNewName] = useState("");
 
   function addBuddy() {
@@ -2987,10 +2988,15 @@ function BuddyManager({ buddies, onChange }) {
   return (
     <div className="pt-4 border-t border-[#1F2933]">
       <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
-        Tausch-Buddies · pro Buddy ein Tag-Präfix (z.B. #Anna)
+        {t("app.buddy.section_title")}
       </div>
       <p className="mono text-[11px] text-[#8090A0] mb-3 leading-relaxed">
-        Im Spiel taggst du dann z.B. <code className="text-[#E6EDF3]">#Anna:hat-pika</code> oder <code className="text-[#E6EDF3]">#Anna:meltan</code>. PoGo's Substring-Match schützt alle Sub-Tags automatisch.
+        {t("app.buddy.section_help", { params: { tag1: "#Anna:hat-pika", tag2: "#Anna:meltan" } })
+          .split(/(#Anna:[a-zA-Z0-9-]+)/)
+          .map((part, i) => /^#Anna:/.test(part)
+            ? <code key={i} className="text-[#E6EDF3]">{part}</code>
+            : <React.Fragment key={i}>{part}</React.Fragment>
+          )}
       </p>
 
       {buddies.length > 0 && (
@@ -3003,30 +3009,35 @@ function BuddyManager({ buddies, onChange }) {
                   checked={b.active !== false}
                   onChange={e => update(b.id, { active: e.target.checked })}
                   className="accent-[#E67E22]"
-                  title={b.active !== false ? "aktiv — Tags werden geschützt" : "inaktiv — keine Wirkung"} />
+                  title={b.active !== false ? t("app.buddy.active_title") : t("app.buddy.inactive_title")} />
                 <input
                   type="text"
                   value={b.name}
                   onChange={e => update(b.id, { name: e.target.value })}
-                  placeholder="Name"
+                  placeholder={t("app.buddy.name_placeholder")}
                   className="mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1 rounded text-[#E6EDF3]" />
                 <span className="mono text-[11px] text-[#8090A0]">#</span>
                 <input
                   type="text"
                   value={b.tagPrefix}
                   onChange={e => update(b.id, { tagPrefix: e.target.value })}
-                  placeholder="TagPräfix"
+                  placeholder={t("app.buddy.prefix_placeholder")}
                   className="mono text-sm w-32 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1 rounded text-[#E6EDF3]" />
                 <button
                   onClick={() => remove(b.id)}
                   className="text-[#8090A0] hover:text-[#FF6B5B] transition p-1"
-                  title="Buddy löschen">
+                  title={t("app.buddy.delete_title")}>
                   <X size={14} />
                 </button>
               </div>
               <div className="mono text-[10px] text-[#8090A0]">
-                Filter-Klausel: <code className="text-[#E67E22]">!#{b.tagPrefix}</code>
-                {" "}— matcht <code className="text-[#E6EDF3]">#{b.tagPrefix}</code>, <code className="text-[#E6EDF3]">#{b.tagPrefix}:event1</code>, etc.
+                {t("app.buddy.clause_label")} <code className="text-[#E67E22]">!#{b.tagPrefix}</code>
+                {" "}{t("app.buddy.clause_match", { params: { a: `#${b.tagPrefix}`, b: `#${b.tagPrefix}:event1` } })
+                  .split(/(#[A-Za-zäöüÄÖÜß0-9:-]+)/)
+                  .map((part, i) => /^#[A-Za-zäöüÄÖÜß0-9]/.test(part)
+                    ? <code key={i} className="text-[#E6EDF3]">{part}</code>
+                    : <React.Fragment key={i}>{part}</React.Fragment>
+                  )}
               </div>
             </div>
           ))}
@@ -3039,13 +3050,13 @@ function BuddyManager({ buddies, onChange }) {
           value={newName}
           onChange={e => setNewName(e.target.value)}
           onKeyDown={e => e.key === "Enter" && addBuddy()}
-          placeholder="Buddy-Name (z.B. Anna)"
+          placeholder={t("app.buddy.add_placeholder")}
           className="mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-1.5 rounded text-[#E6EDF3]" />
         <button
           onClick={addBuddy}
           disabled={!newName.trim()}
           className="mono text-sm bg-[#E67E22] hover:bg-[#FF9544] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-3 py-1.5 rounded transition flex items-center gap-1.5">
-          <Plus size={14} /> hinzufügen
+          <Plus size={14} /> {t("app.buddy.add_button")}
         </button>
       </div>
     </div>
@@ -3055,13 +3066,20 @@ function BuddyManager({ buddies, onChange }) {
 // ─── BUDDY EVENTS EDITOR (in Step 2) ───────────────────────────────────────
 
 function BuddyEventsEditor({ buddies, onUpdateBuddy }) {
+  const { t } = useTranslation();
+  const filterName = t("app.buddy_events.section_help_filter_name");
   return (
     <div>
       <div className="mono text-[10.5px] uppercase tracking-wider text-[#E67E22] mb-2">
-        Tausch-Buddies · Wunsch-Spezies
+        {t("app.buddy_events.section_title")}
       </div>
       <p className="mono text-xs text-[#8090A0] mb-3 leading-relaxed">
-        Welche Spezies sammelst du gerade für deine Buddies? Tritt im „<span className="text-[#E67E22]">für Buddy fangen</span>" Filter auf — zeigt nur trashbare (0–2★) Pokémon dieser Arten, die du noch nicht getaggt hast.
+        {t("app.buddy_events.section_help", { params: { filter_name: filterName } })
+          .split(filterName)
+          .flatMap((part, i) => i === 0
+            ? [<React.Fragment key={i}>{part}</React.Fragment>]
+            : [<span key={`f${i}`} className="text-[#E67E22]">{filterName}</span>, <React.Fragment key={`p${i}`}>{part}</React.Fragment>]
+          )}
       </p>
 
       <div className="space-y-2">
@@ -3078,6 +3096,7 @@ function BuddyEventsEditor({ buddies, onUpdateBuddy }) {
 }
 
 function BuddyTargetsRow({ buddy, onChange }) {
+  const { t } = useTranslation();
   const [input, setInput] = useState("");
   const targets = buddy.targetSpecies || [];
 
@@ -3087,10 +3106,10 @@ function BuddyTargetsRow({ buddy, onChange }) {
       info: resolveSpeciesInfo(tok),
     }));
   }, [input]);
-  const resolved = previewTokens.filter(t => t.info);
-  const newResolved = resolved.filter(t => !targets.includes(t.info.names.de.toLowerCase()));
-  const dupes = resolved.filter(t => targets.includes(t.info.names.de.toLowerCase()));
-  const unresolved = previewTokens.filter(t => !t.info);
+  const resolved = previewTokens.filter(p => p.info);
+  const newResolved = resolved.filter(p => !targets.includes(p.info.names.de.toLowerCase()));
+  const dupes = resolved.filter(p => targets.includes(p.info.names.de.toLowerCase()));
+  const unresolved = previewTokens.filter(p => !p.info);
 
   function addAll() {
     const tokens = input.split(/[,;\s]+/).filter(Boolean);
@@ -3114,22 +3133,22 @@ function BuddyTargetsRow({ buddy, onChange }) {
       <div className="flex items-baseline gap-2 flex-wrap">
         <span className="mono text-sm text-[#E6EDF3] font-semibold">{buddy.name}</span>
         <span className="mono text-[10.5px] text-[#8090A0]">
-          Präfix: <code className="text-[#E67E22]">#{buddy.tagPrefix}</code>
+          {t("app.buddy_targets.prefix_label")} <code className="text-[#E67E22]">#{buddy.tagPrefix}</code>
         </span>
         <span className="mono text-[10.5px] text-[#8090A0] ml-auto">
-          {targets.length} Wunsch-Spezies
+          {t("app.buddy_targets.count_label", { params: { count: targets.length } })}
         </span>
       </div>
 
       <label className="mono text-[11px] flex items-center gap-2 cursor-pointer text-[#E6EDF3] hover:bg-[#E67E22]/5 rounded px-1 py-0.5 transition w-fit"
-        title="Fügt Tausch-Evolutions-Familien (Abra, Machollo, Nebulak, ...) zum Fang-Filter hinzu — nützlich wenn der Buddy Gratis-Evos sammelt">
+        title={t("app.buddy_targets.te_toggle_title")}>
         <input
           type="checkbox"
           checked={!!buddy.wantsTradeEvos}
           onChange={e => onChange({ wantsTradeEvos: e.target.checked })}
           className="accent-[#E67E22]" />
-        <span>braucht Tausch-Evolutionen</span>
-        <span className="text-[10px] text-[#8090A0]">(Abra, Machollo, Nebulak, ...)</span>
+        <span>{t("app.buddy_targets.te_toggle_label")}</span>
+        <span className="text-[10px] text-[#8090A0]">{t("app.buddy_targets.te_toggle_examples")}</span>
       </label>
 
       {targets.length > 0 && (
@@ -3153,37 +3172,37 @@ function BuddyTargetsRow({ buddy, onChange }) {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === "Enter" && addAll()}
-          placeholder="Spezies (Nummer/EN/DE) — z.B. Pikachu, 132, melmetal"
+          placeholder={t("app.buddy_targets.input_placeholder")}
           className="mono text-xs flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1 rounded text-[#E6EDF3] placeholder:text-[#8090A0]" />
         <button
           onClick={addAll}
           disabled={previewTokens.length === 0 || newResolved.length === 0}
           className="mono text-xs bg-[#E67E22]/20 hover:bg-[#E67E22]/30 disabled:bg-[#1F2933] disabled:text-[#8090A0] text-[#E67E22] px-2.5 py-1 rounded transition flex items-center gap-1">
-          <Plus size={11} /> hinzufügen
+          <Plus size={11} /> {t("app.buddy_targets.add_button")}
         </button>
       </div>
 
       {previewTokens.length > 0 && (
         <div className="border border-[#1F2933] rounded p-2 bg-[#0B0F14] space-y-1.5">
           <div className="mono text-[10px] uppercase tracking-wider text-[#8090A0]">
-            Vorschau · {newResolved.length} neu, {dupes.length} schon dabei, {unresolved.length} unbekannt
+            {t("app.buddy_targets.preview_summary", { params: { new: newResolved.length, dupes: dupes.length, unresolved: unresolved.length } })}
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {previewTokens.map((t, i) => {
-              if (!t.info) return (
+            {previewTokens.map((tok, i) => {
+              if (!tok.info) return (
                 <span key={i} className="mono text-[11px] bg-[#FF6B5B]/15 text-[#FF6B5B] px-2 py-0.5 rounded">
-                  ✗ {t.input}
+                  ✗ {tok.input}
                 </span>
               );
-              const isDupe = targets.includes(t.info.names.de.toLowerCase());
+              const isDupe = targets.includes(tok.info.names.de.toLowerCase());
               const labelByType = { number: "#", en: "EN", de: "DE", es: "ES", fr: "FR", "zh-TW": "ZH", hi: "HI", ja: "JA" };
               return (
                 <span key={i}
                   className={`mono text-[11px] px-2 py-0.5 rounded flex items-center gap-1 ${
                     isDupe ? "bg-[#5C6975]/15 text-[#8090A0]" : "bg-[#E67E22]/15 text-[#E67E22]"
                   }`}>
-                  <span className="text-[9px] opacity-60">{labelByType[t.info.inputLocale]}</span>
-                  {t.info.names.de}
+                  <span className="text-[9px] opacity-60">{labelByType[tok.info.inputLocale]}</span>
+                  {tok.info.names.de}
                   {isDupe && <span className="opacity-60">✓</span>}
                 </span>
               );

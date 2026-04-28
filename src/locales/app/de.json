@@ -186,5 +186,30 @@
   "app.modal.danger.section_title": "Gefahrenzone",
   "app.modal.danger.reset_armed": "wirklich? klick zur Bestätigung",
   "app.modal.danger.reset_button": "Alles zurücksetzen",
-  "app.modal.danger.reset_help": "Setzt Hundo-Liste, alle Schutzmaßnahmen, Tags, Heimat-Standort und Trash-Liste auf Standard zurück."
+  "app.modal.danger.reset_help": "Setzt Hundo-Liste, alle Schutzmaßnahmen, Tags, Heimat-Standort und Trash-Liste auf Standard zurück.",
+
+  "app.buddy.section_title": "Tausch-Buddies · pro Buddy ein Tag-Präfix (z.B. #Anna)",
+  "app.buddy.section_help": "Im Spiel taggst du dann z.B. {tag1} oder {tag2}. PoGo's Substring-Match schützt alle Sub-Tags automatisch.",
+  "app.buddy.active_title": "aktiv — Tags werden geschützt",
+  "app.buddy.inactive_title": "inaktiv — keine Wirkung",
+  "app.buddy.name_placeholder": "Name",
+  "app.buddy.prefix_placeholder": "TagPräfix",
+  "app.buddy.delete_title": "Buddy löschen",
+  "app.buddy.clause_label": "Filter-Klausel:",
+  "app.buddy.clause_match": "— matcht {a}, {b}, etc.",
+  "app.buddy.add_placeholder": "Buddy-Name (z.B. Anna)",
+  "app.buddy.add_button": "hinzufügen",
+
+  "app.buddy_events.section_title": "Tausch-Buddies · Wunsch-Spezies",
+  "app.buddy_events.section_help": "Welche Spezies sammelst du gerade für deine Buddies? Tritt im „{filter_name}\" Filter auf — zeigt nur trashbare (0–2★) Pokémon dieser Arten, die du noch nicht getaggt hast.",
+  "app.buddy_events.section_help_filter_name": "für Buddy fangen",
+
+  "app.buddy_targets.prefix_label": "Präfix:",
+  "app.buddy_targets.count_label": "{count} Wunsch-Spezies",
+  "app.buddy_targets.te_toggle_title": "Fügt Tausch-Evolutions-Familien (Abra, Machollo, Nebulak, ...) zum Fang-Filter hinzu — nützlich wenn der Buddy Gratis-Evos sammelt",
+  "app.buddy_targets.te_toggle_label": "braucht Tausch-Evolutionen",
+  "app.buddy_targets.te_toggle_examples": "(Abra, Machollo, Nebulak, ...)",
+  "app.buddy_targets.input_placeholder": "Spezies (Nummer/EN/DE) — z.B. Pikachu, 132, melmetal",
+  "app.buddy_targets.add_button": "hinzufügen",
+  "app.buddy_targets.preview_summary": "Vorschau · {new} neu, {dupes} schon dabei, {unresolved} unbekannt"
 }
