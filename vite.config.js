@@ -1,13 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// IMPORTANT: set base to "/<repo-name>/" for GitHub Pages.
-// E.g. if your repo is github.com/jesper/pogo-filter-workshop,
-//   base: "/pogo-filter-workshop/"
-// For a custom domain or username.github.io repo, use "/" instead.
+// Served from custom domain pogo.amplt.de, so base is "/".
 export default defineConfig({
   plugins: [react()],
-  base: "/pogo-filter-workshop/",
+  base: "/",
   build: {
     outDir: "dist",
     sourcemap: false,
