@@ -1894,7 +1894,7 @@ const EXPERT_ONLY_KEYS = new Set([
 ]);
 
 function ConfigPanel({ config, setConfig, homeLocals = [] }) {
-  const { outputLocale } = useTranslation();
+  const { t, outputLocale } = useTranslation();
   function set(k, v) { setConfig({ ...config, [k]: v }); }
   function setGroup(groupKey, partial) {
     const groups = { ...(config.regionalGroups || {}) };
