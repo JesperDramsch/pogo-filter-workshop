@@ -303,8 +303,11 @@ async function main() {
 
   const warnings = detectWarnings(pokemonNames, ingameByLocale);
 
+  // Deliberately no `generatedAt` — a fresh timestamp on every run made the
+  // scheduled sync workflow open a spurious PR every morning even when the
+  // sheet hadn't changed. The remaining fields are all content-derived, so
+  // a no-op sync produces a zero-diff write.
   const meta = {
-    generatedAt: new Date().toISOString(),
     sources: SOURCES.map((s) => ({ gid: s.gid, label: s.label, namespace: s.namespace })),
     counts: {
       ingameKeysUnion: allIngameKeys.size,
