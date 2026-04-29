@@ -15,7 +15,13 @@ import Regional from "./explain/Regional.jsx";
 import Trade from "./explain/Trade.jsx";
 import Rules from "./explain/Rules.jsx";
 import Algebra from "./explain/Algebra.jsx";
-import { AppCredit } from "./explain/Shell.jsx";
+import {
+  AppCredit,
+  WorkshopNav,
+  WORKSHOP_STEPS,
+  STEP_KEY_BY_NUMBER,
+  STEP_NUMBER_BY_KEY,
+} from "./explain/Shell.jsx";
 
 // Hash-driven routing.
 //   ""                    → landing  (the marketing front door)
@@ -46,9 +52,19 @@ const HASH_BY_VIEW = {
   rules: "#rules",
   algebra: "#explain/algebra",
 };
+// Step-keyed workshop hashes (#workshop/where, #workshop/what, ...) all map
+// to the workshop view; the specific step is parsed by `stepFromHash`.
 function viewFromHash() {
   if (typeof window === "undefined") return "landing";
-  return VIEW_BY_HASH[window.location.hash] || "landing";
+  const hash = window.location.hash;
+  if (hash.startsWith("#workshop/")) return "workshop";
+  return VIEW_BY_HASH[hash] || "landing";
+}
+function stepFromHash() {
+  if (typeof window === "undefined") return null;
+  const m = window.location.hash.match(/^#workshop\/(\w+)$/);
+  if (!m) return null;
+  return STEP_NUMBER_BY_KEY[m[1]] ?? null;
 }
 function navigateView(target) {
   if (typeof window === "undefined") return;
@@ -855,10 +871,17 @@ export default function App() {
   const [showRawClauses, setShowRawClauses] = useState(false);
   const [showVerify, setShowVerify] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [view, setView] = useState(viewFromHash); // "workshop" | "about" | "rules"
+  const [view, setView] = useState(viewFromHash);
   useEffect(() => {
-    const onHashChange = () => setView(viewFromHash());
+    const onHashChange = () => {
+      setView(viewFromHash());
+      // If the hash points at a specific workshop step, sync currentStep.
+      const step = stepFromHash();
+      if (step !== null) setCurrentStep(step);
+    };
     window.addEventListener("hashchange", onHashChange);
+    // Run once on mount so #workshop/<key> on initial load picks up the step.
+    onHashChange();
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
   const [homeLocation, setHomeLocation] = useState(null);   // [lon, lat] — drives defaults
@@ -1050,7 +1073,20 @@ export default function App() {
     { n: 3, key: "have",   label: t("app.step.have.label"),   desc: t("app.step.have.desc") },
     { n: 4, key: "filter", label: t("app.step.filter.label"), desc: t("app.step.filter.desc") },
   ];
-  function gotoStep(n) { setCurrentStep(n); }
+  function gotoStep(n) {
+    setCurrentStep(n);
+    // When in the workshop view, push the step-specific hash so the URL
+    // is shareable. Other views (e.g. landing) just update internal state.
+    if (view === "workshop") {
+      const key = STEP_KEY_BY_NUMBER[n];
+      if (key) {
+        const desired = `#workshop/${key}`;
+        if (typeof window !== "undefined" && window.location.hash !== desired) {
+          window.location.hash = desired;
+        }
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#0F1419] text-[#E6EDF3]"
@@ -1083,68 +1119,21 @@ export default function App() {
 
       {view === "workshop" && (
       <div className="grid-bg min-h-screen">
-        <div className="max-w-5xl mx-auto px-6 py-10">
+        {/* Container matches the explainer's ChapterShell (max-w-4xl,
+            px-4 sm:px-6, py-6 sm:py-8) so the brand mark + nav-bar sit at
+            the same X/Y across landing, every chapter, and the workshop. */}
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
 
-          {/* HEADER */}
-          <header className="mb-8 border-b border-[#1F2933] pb-6">
-            <div className="flex items-baseline gap-4 flex-wrap">
-              <h1 className="mono text-3xl font-bold tracking-tight text-[#E6EDF3]">
-                pogo<span className="text-[#E74C3C]">.</span>filter<span className="text-[#5EAFC5]">.workshop</span>
-              </h1>
-              <div className="ml-auto flex items-center gap-3">
-                <button
-                  onClick={() => navigateView("landing")}
-                  className="mono text-xs text-[#8B98A5] hover:text-[#E6EDF3] transition flex items-center gap-1.5"
-                  aria-label={t("app.explain.nav.landing")}>
-                  <ArrowLeft size={12} /> {t("app.explain.nav.landing")}
-                </button>
-                <button
-                  onClick={() => setShowSettings(true)}
-                  className="mono text-xs text-[#8B98A5] hover:text-[#E6EDF3] transition flex items-center gap-1.5"
-                  aria-label={t("app.header.settings_button")}>
-                  <Settings size={12} /> {t("app.header.settings_button")}
-                </button>
-              </div>
-            </div>
-            <p className="mt-3 text-sm text-[#8B98A5] max-w-2xl leading-relaxed">
-              {t("app.header.tagline")}
-            </p>
-          </header>
-
-          {/* STEP HEADERS — clickable progress bar */}
-          <div className="mb-8">
-            <div className="flex items-stretch gap-1.5">
-              {steps.map((s, i) => {
-                const active = currentStep === s.n;
-                const done = currentStep > s.n;
-                return (
-                  <button key={s.n}
-                    onClick={() => gotoStep(s.n)}
-                    className={`flex-1 min-w-0 group rounded transition-all px-3 py-2 text-left ${
-                      active
-                        ? "bg-[#E74C3C] text-white"
-                        : done
-                          ? "bg-[#5EAFC5]/15 text-[#5EAFC5] hover:bg-[#5EAFC5]/25"
-                          : "bg-[#1F2933] text-[#8090A0] hover:bg-[#2D3A47]"
-                    }`}>
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className={`mono text-[10px] inline-flex items-center justify-center rounded-full w-4 h-4 flex-shrink-0 ${
-                        active ? "bg-white text-[#E74C3C]"
-                          : done ? "bg-[#5EAFC5] text-[#0F1419]"
-                          : "bg-[#2D3A47] text-[#8090A0]"
-                      }`}>
-                        {done ? "✓" : s.n}
-                      </span>
-                      <span className="mono text-xs font-semibold truncate" title={s.label}>{s.label}</span>
-                    </div>
-                    <div className={`mono text-[10px] mt-0.5 truncate ${active ? "text-white/80" : "text-[#8090A0]"}`} title={s.desc}>
-                      {s.desc}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          {/* HEADER — same brand mark as the explainer chapters, but tabs
+              are workshop steps and the primary action returns to the
+              explainer landing. */}
+          <WorkshopNav
+            currentStepKey={STEP_KEY_BY_NUMBER[currentStep]}
+            onStepClick={(key) => gotoStep(STEP_NUMBER_BY_KEY[key])}
+            onSettingsClick={() => setShowSettings(true)}
+            onNavigate={navigateView}
+          />
+          <div className="mb-6" />
 
           {/* STEP 1 — WHERE */}
           {currentStep === 1 && (

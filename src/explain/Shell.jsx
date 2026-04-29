@@ -1,9 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Filter, MapPin, Settings, Shield, Sparkles } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { useTranslation } from "../i18n/I18nProvider.jsx";
 import { C } from "./colors.js";
 import { CHAPTERS, neighbours } from "./chapters.js";
+
+// Workshop step manifest — keeps step keys, hashes, icons and i18n labels
+// next to each other so adding a step is a single-line change. Hash format
+// `workshop/<key>` mirrors the explainer chapter scheme.
+export const WORKSHOP_STEPS = [
+  { key: "where",  step: 1, hash: "workshop/where",  icon: MapPin,  titleKey: "app.step.where.tab"  },
+  { key: "what",   step: 2, hash: "workshop/what",   icon: Shield,  titleKey: "app.step.what.tab"   },
+  { key: "have",   step: 3, hash: "workshop/have",   icon: Sparkles, titleKey: "app.step.have.tab"  },
+  { key: "filter", step: 4, hash: "workshop/filter", icon: Filter,  titleKey: "app.step.filter.tab" },
+];
+
+export const STEP_KEY_BY_NUMBER = WORKSHOP_STEPS.reduce(
+  (acc, s) => ({ ...acc, [s.step]: s.key }),
+  {}
+);
+export const STEP_NUMBER_BY_KEY = WORKSHOP_STEPS.reduce(
+  (acc, s) => ({ ...acc, [s.key]: s.step }),
+  {}
+);
 
 // Words the slot machine cycles through. Adding a new top-level URL? Drop a
 // word in here and that's it. The longest word ("workshop") sets the slot
@@ -173,20 +192,32 @@ export function HomeLogo({ size = 36 }) {
   );
 }
 
-// Header row: brand mark on the left, chapter pills + workshop CTA on the
-// right. Wraps on mobile to two stacked rows.
-export function ChapterNav({ currentKey, onNavigate }) {
-  const { t } = useTranslation();
-  const homeActive = currentKey === "landing";
+// Brand mark + tabs + primary action layout. Used in three places: explainer
+// landing/chapters (ChapterNav wrapper), the workshop (WorkshopNav wrapper).
+//
+// `tabs` is an array of { key, icon, label }. `currentKey` highlights the
+// active one. `homeActive` decides whether the brand mark on the left
+// renders as the "current" page (only true on the landing). `extras` slots
+// in additional buttons (e.g. Settings) just before the primary action.
+export function AppNav({
+  tabs,
+  currentKey,
+  homeActive,
+  onHomeClick,
+  homeLabel,
+  primaryAction,   // { icon, label, onClick }
+  extras,          // optional ReactNode rendered before the primary action
+  onTabClick,
+}) {
   return (
     <nav className="flex items-center justify-between gap-4 flex-wrap py-2">
       <button
-        onClick={() => onNavigate("landing")}
+        onClick={onHomeClick}
         className="flex items-center gap-2.5 transition group"
         style={{ color: homeActive ? C.text : C.dim }}
         onMouseEnter={(e) => { if (!homeActive) e.currentTarget.style.color = C.text; }}
         onMouseLeave={(e) => { e.currentTarget.style.color = homeActive ? C.text : C.dim; }}
-        aria-label={t("app.explain.nav.landing")}
+        aria-label={homeLabel}
       >
         <HomeLogo size={36} />
         <span className="mono text-base font-bold tracking-tight">
@@ -194,29 +225,96 @@ export function ChapterNav({ currentKey, onNavigate }) {
         </span>
       </button>
       <div className="flex items-center gap-1.5 flex-wrap">
-        {CHAPTERS.map((c) => {
-          const Icon = c.icon;
-          const active = c.key === currentKey;
-          return (
-            <NavChip
-              key={c.key}
-              icon={Icon}
-              label={t(c.titleKey)}
-              onClick={() => onNavigate(c.key)}
-              tone={active ? "active" : "default"}
-            />
-          );
-        })}
+        {tabs.map((tab) => (
+          <NavChip
+            key={tab.key}
+            icon={tab.icon}
+            label={tab.label}
+            onClick={() => onTabClick(tab.key)}
+            tone={tab.key === currentKey ? "active" : "default"}
+          />
+        ))}
+        {extras}
         <span className="mx-1 hidden sm:inline" style={{ color: C.borderHi }}>·</span>
         <NavChip
-          icon={ArrowRight}
+          icon={primaryAction.icon}
           iconRight
-          label={t("app.explain.nav.workshop")}
-          onClick={() => onNavigate("workshop")}
+          label={primaryAction.label}
+          onClick={primaryAction.onClick}
           tone="primary"
         />
       </div>
     </nav>
+  );
+}
+
+// WorkshopNav: same brand mark, but tabs are the workshop steps. Settings
+// gear sits as an extra icon-button before the primary action, which now
+// points BACK to the explainer (landing).
+export function WorkshopNav({ currentStepKey, onStepClick, onSettingsClick, onNavigate }) {
+  const { t } = useTranslation();
+  const tabs = WORKSHOP_STEPS.map((s) => ({
+    key: s.key,
+    icon: s.icon,
+    label: t(s.titleKey),
+  }));
+  return (
+    <AppNav
+      tabs={tabs}
+      currentKey={currentStepKey}
+      homeActive={false}
+      onHomeClick={() => onNavigate("landing")}
+      homeLabel={t("app.explain.nav.landing")}
+      primaryAction={{
+        icon: ArrowLeft,
+        label: t("app.explain.nav.explainer"),
+        onClick: () => onNavigate("landing"),
+      }}
+      onTabClick={onStepClick}
+      extras={
+        <button
+          onClick={onSettingsClick}
+          className="mono text-xs flex items-center gap-1.5 px-2.5 py-1.5 rounded transition"
+          style={{
+            backgroundColor: "transparent",
+            color: C.dim,
+            border: `1px solid ${C.border}`,
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = C.text)}
+          onMouseLeave={(e) => (e.currentTarget.style.color = C.dim)}
+          aria-label={t("app.header.settings_button")}
+          title={t("app.header.settings_button")}
+        >
+          <Settings size={12} />
+        </button>
+      }
+    />
+  );
+}
+
+// ChapterNav: brand mark links to landing; tabs are the explainer chapters;
+// primary action returns to the workshop. Used on landing + every chapter.
+export function ChapterNav({ currentKey, onNavigate }) {
+  const { t } = useTranslation();
+  const tabs = CHAPTERS.map((c) => ({
+    key: c.key,
+    icon: c.icon,
+    label: t(c.titleKey),
+  }));
+  return (
+    <AppNav
+      tabs={tabs}
+      currentKey={currentKey}
+      homeActive={currentKey === "landing"}
+      onHomeClick={() => onNavigate("landing")}
+      homeLabel={t("app.explain.nav.landing")}
+      primaryAction={{
+        icon: ArrowRight,
+        label: t("app.explain.nav.workshop"),
+        onClick: () => onNavigate("workshop"),
+      }}
+      onTabClick={onNavigate}
+    />
   );
 }
 
