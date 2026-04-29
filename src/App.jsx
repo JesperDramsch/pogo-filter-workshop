@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import * as d3 from "d3";
-import { X, Plus, Copy, Check, ChevronDown, ChevronRight, RotateCcw, Sparkles, Settings } from "lucide-react";
+import { X, Plus, Copy, Check, ChevronDown, ChevronRight, RotateCcw, Sparkles, Settings, ArrowLeft } from "lucide-react";
 import {
   POKEMON_NAMES_DICT,
   resolveSpecies,
@@ -9,6 +9,55 @@ import {
 } from "./data/species.js";
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from "./i18n/pogo-keywords.js";
 import { useTranslation } from "./i18n/I18nProvider.jsx";
+import Landing from "./Landing.jsx";
+import General from "./explain/General.jsx";
+import Regional from "./explain/Regional.jsx";
+import Trade from "./explain/Trade.jsx";
+import Rules from "./explain/Rules.jsx";
+
+// Hash-driven routing.
+//   ""                    → landing  (the marketing front door)
+//   "#workshop"           → workshop (the actual tool)
+//   "#explain/general"    → General  (storage triage chapter)
+//   "#explain/regional"   → Regional
+//   "#explain/trade"      → Trade
+//   "#rules"              → Rules
+// Hash routing avoids the GitHub Pages 404-on-direct-load problem real paths
+// would have without a 404.html shim. Everything is shareable/bookmarkable
+// and the browser back/forward buttons work for free.
+const VIEW_BY_HASH = {
+  "": "landing",
+  "#workshop": "workshop",
+  "#explain/general": "general",
+  "#explain/regional": "regional",
+  "#explain/trade": "trade",
+  "#rules": "rules",
+};
+const HASH_BY_VIEW = {
+  landing: "",
+  workshop: "#workshop",
+  general: "#explain/general",
+  regional: "#explain/regional",
+  trade: "#explain/trade",
+  rules: "#rules",
+};
+function viewFromHash() {
+  if (typeof window === "undefined") return "landing";
+  return VIEW_BY_HASH[window.location.hash] || "landing";
+}
+function navigateView(target) {
+  if (typeof window === "undefined") return;
+  const hash = HASH_BY_VIEW[target] ?? "";
+  if (hash === "") {
+    if (window.location.hash) {
+      window.history.pushState(null, "", window.location.pathname + window.location.search);
+      // pushState doesn't fire hashchange, so dispatch a popstate-equivalent.
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    }
+  } else if (window.location.hash !== hash) {
+    window.location.hash = hash;
+  }
+}
 
 // ─── DATA ──────────────────────────────────────────────────────────────────
 
@@ -801,6 +850,12 @@ export default function App() {
   const [showRawClauses, setShowRawClauses] = useState(false);
   const [showVerify, setShowVerify] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [view, setView] = useState(viewFromHash); // "workshop" | "about" | "rules"
+  useEffect(() => {
+    const onHashChange = () => setView(viewFromHash());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
   const [homeLocation, setHomeLocation] = useState(null);   // [lon, lat] — drives defaults
   const [lastPin, setLastPin] = useState(null);             // [lon, lat] — inspector
   const [bazaarTags, setBazaarTags] = useState([]);
@@ -1014,6 +1069,13 @@ export default function App() {
         @keyframes chipIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
       `}</style>
 
+      {view === "landing"  && <Landing  onNavigate={navigateView} />}
+      {view === "general"  && <General  onNavigate={navigateView} />}
+      {view === "regional" && <Regional onNavigate={navigateView} />}
+      {view === "trade"    && <Trade    onNavigate={navigateView} />}
+      {view === "rules"    && <Rules    onNavigate={navigateView} />}
+
+      {view === "workshop" && (
       <div className="grid-bg min-h-screen">
         <div className="max-w-5xl mx-auto px-6 py-10">
 
@@ -1023,12 +1085,20 @@ export default function App() {
               <h1 className="mono text-3xl font-bold tracking-tight text-[#E6EDF3]">
                 pogo<span className="text-[#E74C3C]">.</span>filter<span className="text-[#5EAFC5]">.workshop</span>
               </h1>
-              <button
-                onClick={() => setShowSettings(true)}
-                className="ml-auto mono text-xs text-[#8B98A5] hover:text-[#E6EDF3] transition flex items-center gap-1.5"
-                aria-label={t("app.header.settings_button")}>
-                <Settings size={12} /> {t("app.header.settings_button")}
-              </button>
+              <div className="ml-auto flex items-center gap-3">
+                <button
+                  onClick={() => navigateView("landing")}
+                  className="mono text-xs text-[#8B98A5] hover:text-[#E6EDF3] transition flex items-center gap-1.5"
+                  aria-label={t("app.explain.nav.landing")}>
+                  <ArrowLeft size={12} /> {t("app.explain.nav.landing")}
+                </button>
+                <button
+                  onClick={() => setShowSettings(true)}
+                  className="mono text-xs text-[#8B98A5] hover:text-[#E6EDF3] transition flex items-center gap-1.5"
+                  aria-label={t("app.header.settings_button")}>
+                  <Settings size={12} /> {t("app.header.settings_button")}
+                </button>
+              </div>
             </div>
             <p className="mt-3 text-sm text-[#8B98A5] max-w-2xl leading-relaxed">
               {t("app.header.tagline")}
@@ -1227,6 +1297,7 @@ export default function App() {
           </footer>
         </div>
       </div>
+      )}
 
       <SettingsModal
         open={showSettings}
