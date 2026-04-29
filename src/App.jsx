@@ -989,11 +989,15 @@ export default function App() {
   function gotoStep(n) { setCurrentStep(n); }
 
   return (
-    <div className="min-h-screen bg-[#0F1419] text-[#E6EDF3] font-['IBM_Plex_Sans',sans-serif]">
+    <div className="min-h-screen bg-[#0F1419] text-[#E6EDF3]"
+         style={{ fontFamily: "'IBM Plex Sans', 'IBM Plex Sans Devanagari', 'IBM Plex Sans JP', 'Noto Sans TC', sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
-        body { font-family: 'IBM Plex Sans', sans-serif; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Devanagari:wght@400;500;600&family=IBM+Plex+Sans+JP:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
+        /* Browser glyph fallback walks the family list until it finds one with
+           the requested codepoint. Latin text stays in IBM Plex Sans; HI/JA/
+           zh-TW fall through to the script-specific Plex/Noto faces. */
+        body { font-family: 'IBM Plex Sans', 'IBM Plex Sans Devanagari', 'IBM Plex Sans JP', 'Noto Sans TC', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', 'IBM Plex Sans Devanagari', 'IBM Plex Sans JP', 'Noto Sans TC', monospace; }
         .grid-bg {
           background-image:
             linear-gradient(rgba(94,175,197,0.04) 1px, transparent 1px),
@@ -1036,24 +1040,24 @@ export default function App() {
                 return (
                   <button key={s.n}
                     onClick={() => gotoStep(s.n)}
-                    className={`flex-1 group rounded transition-all px-3 py-2 text-left ${
+                    className={`flex-1 min-w-0 group rounded transition-all px-3 py-2 text-left ${
                       active
                         ? "bg-[#E74C3C] text-white"
                         : done
                           ? "bg-[#5EAFC5]/15 text-[#5EAFC5] hover:bg-[#5EAFC5]/25"
                           : "bg-[#1F2933] text-[#8090A0] hover:bg-[#2D3A47]"
                     }`}>
-                    <div className="flex items-center gap-2">
-                      <span className={`mono text-[10px] inline-flex items-center justify-center rounded-full w-4 h-4 ${
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`mono text-[10px] inline-flex items-center justify-center rounded-full w-4 h-4 flex-shrink-0 ${
                         active ? "bg-white text-[#E74C3C]"
                           : done ? "bg-[#5EAFC5] text-[#0F1419]"
                           : "bg-[#2D3A47] text-[#8090A0]"
                       }`}>
                         {done ? "✓" : s.n}
                       </span>
-                      <span className="mono text-xs font-semibold">{s.label}</span>
+                      <span className="mono text-xs font-semibold truncate" title={s.label}>{s.label}</span>
                     </div>
-                    <div className={`mono text-[10px] mt-0.5 ${active ? "text-white/80" : "text-[#8090A0]"}`}>
+                    <div className={`mono text-[10px] mt-0.5 truncate ${active ? "text-white/80" : "text-[#8090A0]"}`} title={s.desc}>
                       {s.desc}
                     </div>
                   </button>
