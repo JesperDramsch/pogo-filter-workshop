@@ -327,67 +327,67 @@ function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", tFn = (
   const push = (arr, clause, why) => arr.push({ clause, why });
 
   // ── TRASH ──────────────────────────────────────────────────────────────
-  push(trashClauses, [S012, H].filter(Boolean).join(","), "Set H ∪ S012 — Spezies-Filter");
-  push(trashClauses, `${S012},${ivK1Bad}`, "¬K1 — Keeper-Schutz (4,4,3-4)");
-  push(trashClauses, `${S012},${ivK2Bad}`, "¬K2 — Keeper-Schutz (4,3-4,4)");
-  push(trashClauses, `${S012},${ivK3Bad}`, "¬K3 — Keeper-Schutz (3-4,4,4)");
-  if (notP) push(trashClauses, notP, `¬P — PvP-Schutz (${cfg.pvpMode})`);
+  push(trashClauses, [S012, H].filter(Boolean).join(","), tFn("app.clause_why.h_union_s012"));
+  push(trashClauses, `${S012},${ivK1Bad}`, tFn("app.clause_why.not_k1"));
+  push(trashClauses, `${S012},${ivK2Bad}`, tFn("app.clause_why.not_k2"));
+  push(trashClauses, `${S012},${ivK3Bad}`, tFn("app.clause_why.not_k3"));
+  if (notP) push(trashClauses, notP, tFn("app.clause_why.not_p", { params: { mode: cfg.pvpMode } }));
 
   if (cfg.protectTradeEvos && TE_full.length > 0) {
     for (const base of TE_full) {
       const display = teDisplay(base, outputLocale);
       push(trashClauses, `!+${display},${kw.flag.traded}`,
-        `Tausch-Evo: +${display}-Familie (außer schon getauscht — dann ist die Gratis-Evo verbraucht)`);
+        tFn("app.clause_why.trade_evo_family", { params: { name: display } }));
     }
   }
 
   if (cfg.protectFourStar) {
-    push(trashClauses, "!4*", "Regel 1: niemals 4★ Pokémon tossen (Sicherheitsgürtel)");
+    push(trashClauses, "!4*", tFn("app.clause_why.rule1_no_4star"));
   }
 
   // Tag protections
   const activeBuddies = (cfg.buddies || []).filter(b => b.active !== false && b.tagPrefix);
   if (cfg.protectAnyTag) {
-    push(trashClauses, "!#", "irgendein Tag — egal welches, geschützt");
+    push(trashClauses, "!#", tFn("app.clause_why.any_tag_trash"));
   } else {
-    if (basarTag) push(trashClauses, `!#${basarTag}`, `dein Tausch-Sammeltag #${basarTag}`);
-    if (fernTauschTag) push(trashClauses, `!#${fernTauschTag}`, `Niantic-Tag #${fernTauschTag} (Fern-Tausche)`);
-    for (const t of customTags) push(trashClauses, `!#${t}`, `dein Custom-Tag #${t}`);
+    if (basarTag) push(trashClauses, `!#${basarTag}`, tFn("app.clause_why.bazaar_tag", { params: { tag: basarTag } }));
+    if (fernTauschTag) push(trashClauses, `!#${fernTauschTag}`, tFn("app.clause_why.fern_tausch_tag", { params: { tag: fernTauschTag } }));
+    for (const t of customTags) push(trashClauses, `!#${t}`, tFn("app.clause_why.custom_tag", { params: { tag: t } }));
     for (const b of activeBuddies) {
       const prefix = b.tagPrefix.replace(/^#/, "");
-      push(trashClauses, `!#${prefix}`, `Tausch-Buddy ${b.name}: alles mit #${prefix}-Präfix (Substring-Match)`);
+      push(trashClauses, `!#${prefix}`, tFn("app.clause_why.buddy_tag", { params: { name: b.name, prefix } }));
     }
   }
 
   // Universal protections
-  if (cfg.protectFavorites)    push(trashClauses, `!${kw.flag.favorite}`, "Favoriten");
-  if (cfg.protectShinies)      push(trashClauses, `!${kw.flag.shiny}`, "Schillernde");
-  if (cfg.protectLegendaries)  push(trashClauses, `!${kw.flag.legendary}`, "Legendäre");
+  if (cfg.protectFavorites)    push(trashClauses, `!${kw.flag.favorite}`, tFn("app.clause_why.favorites"));
+  if (cfg.protectShinies)      push(trashClauses, `!${kw.flag.shiny}`, tFn("app.clause_why.shinies"));
+  if (cfg.protectLegendaries)  push(trashClauses, `!${kw.flag.legendary}`, tFn("app.clause_why.legendaries"));
   if (cfg.protectMythicals) {
     const carve = (cfg.mythTooManyOf || "").trim();
     push(trashClauses,
       carve ? `!${kw.flag.mythical},${carve}` : `!${kw.flag.mythical}`,
       carve
-        ? `Mysteriöse außer Spezies ${carve} (du hast Spares von denen)`
-        : "Mysteriöse Pokémon");
+        ? tFn("app.clause_why.mythicals_carved", { params: { carve } })
+        : tFn("app.clause_why.mythicals"));
   }
-  if (cfg.protectUltraBeasts)  push(trashClauses, `!${kw.flag.ultra_beast}`, "Ultrabestien");
-  if (cfg.protectShadows)      push(trashClauses, `!${kw.flag.shadow}`, "Crypto-Pokémon");
-  if (cfg.protectCostumes)     push(trashClauses, `!${kw.flag.costume}`, "Kostümierte (Event-Forms)");
-  if (cfg.protectLuckies)      push(trashClauses, `!${kw.flag.lucky}`, "Glücks-Pokémon");
-  if (cfg.protectBackgrounds)  push(trashClauses, `!${kw.flag.background}`, "Pokémon mit Hintergrund");
-  if (cfg.protectDynamax)      push(trashClauses, `!${kw.flag.dynamax_move}1-`, "Dynamax-fähige");
-  if (cfg.protectNewEvolutions) push(trashClauses, `!${kw.flag.new_evo},${kw.flag.mega}0`, "Neue Evolutionen (Trick: nur falls noch nicht mega'd — sonst hast du genug Mega-Energie)");
-  if (cfg.protectLegacyMoves)  push(trashClauses, `!@${kw.flag.special_move}`, "Legacy-Attacken");
-  if (cfg.protectBabies)       push(trashClauses, `!${kw.flag.baby}`, "Baby-Pokémon (nur aus Eiern)");
+  if (cfg.protectUltraBeasts)  push(trashClauses, `!${kw.flag.ultra_beast}`, tFn("app.clause_why.ultra_beasts"));
+  if (cfg.protectShadows)      push(trashClauses, `!${kw.flag.shadow}`, tFn("app.clause_why.shadows"));
+  if (cfg.protectCostumes)     push(trashClauses, `!${kw.flag.costume}`, tFn("app.clause_why.costumes"));
+  if (cfg.protectLuckies)      push(trashClauses, `!${kw.flag.lucky}`, tFn("app.clause_why.luckies"));
+  if (cfg.protectBackgrounds)  push(trashClauses, `!${kw.flag.background}`, tFn("app.clause_why.backgrounds"));
+  if (cfg.protectDynamax)      push(trashClauses, `!${kw.flag.dynamax_move}1-`, tFn("app.clause_why.dynamax"));
+  if (cfg.protectNewEvolutions) push(trashClauses, `!${kw.flag.new_evo},${kw.flag.mega}0`, tFn("app.clause_why.new_evolutions"));
+  if (cfg.protectLegacyMoves)  push(trashClauses, `!@${kw.flag.special_move}`, tFn("app.clause_why.legacy_moves"));
+  if (cfg.protectBabies)       push(trashClauses, `!${kw.flag.baby}`, tFn("app.clause_why.babies"));
   if (cfg.distanceProtect && cfg.distanceProtect > 0)
-    push(trashClauses, `!${kw.numeric.distance}${cfg.distanceProtect}-,${kw.flag.traded}`, `Distanz ≥${cfg.distanceProtect}km — Pilot-Medaillen-Schutz`);
-  if (cfg.protectXXL)          push(trashClauses, `!${kw.flag.xxl}`, "XXL Pokémon (Größe)");
-  if (cfg.protectXL)           push(trashClauses, `!${kw.flag.xl}`,  "XL Pokémon (Größe)");
-  if (cfg.protectXXS)          push(trashClauses, `!${kw.flag.xxs}`, "XXS Pokémon (Größe)");
-  for (const t of leagueTags)  push(trashClauses, `!${t}`, `dein Liga-Tag ${t}`);
-  if (cfg.protectBuddies)      push(trashClauses, `!${kw.numeric.buddy}1-`, "Schon mal Kumpel gewesen");
-  if (cfg.protectDoubleMoved)  push(trashClauses, "@3move", "Zweiter Charge-Move freigeschaltet (@3move ist invertiert!)");
+    push(trashClauses, `!${kw.numeric.distance}${cfg.distanceProtect}-,${kw.flag.traded}`, tFn("app.clause_why.distance", { params: { km: cfg.distanceProtect } }));
+  if (cfg.protectXXL)          push(trashClauses, `!${kw.flag.xxl}`, tFn("app.clause_why.xxl"));
+  if (cfg.protectXL)           push(trashClauses, `!${kw.flag.xl}`,  tFn("app.clause_why.xl"));
+  if (cfg.protectXXS)          push(trashClauses, `!${kw.flag.xxs}`, tFn("app.clause_why.xxs"));
+  for (const t of leagueTags)  push(trashClauses, `!${t}`, tFn("app.clause_why.league_tag", { params: { tag: t } }));
+  if (cfg.protectBuddies)      push(trashClauses, `!${kw.numeric.buddy}1-`, tFn("app.clause_why.buddies_were"));
+  if (cfg.protectDoubleMoved)  push(trashClauses, "@3move", tFn("app.clause_why.double_moved_trash"));
 
   // Regional groups
   const groups = cfg.regionalGroups || {};
@@ -427,54 +427,54 @@ function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", tFn = (
     if (hundoOutSet.has(lower)) continue;
     if (allRegionalCollectorsOut.has(lower)) continue;
     const display = capFirst(lower);
-    push(trashClauses, `!${display}`, `Eigene Sammler-Pokémon: ${display}`);
+    push(trashClauses, `!${display}`, tFn("app.clause_why.custom_collectible", { params: { name: display } }));
   }
   if (cfg.cpCap && cfg.cpCap > 0)
-    push(trashClauses, `${kw.numeric.cp}-${cfg.cpCap}`, `Sicherheitsnetz: WP ≤ ${cfg.cpCap}`);
+    push(trashClauses, `${kw.numeric.cp}-${cfg.cpCap}`, tFn("app.clause_why.cp_cap", { params: { cp: cfg.cpCap } }));
   if (cfg.ageScopeDays && cfg.ageScopeDays > 0)
-    push(trashClauses, `${kw.numeric.age}-${cfg.ageScopeDays},${kw.flag.traded}`, `Sicherheitsnetz: vor ≤${cfg.ageScopeDays} Tagen gefangen ODER getauscht`);
+    push(trashClauses, `${kw.numeric.age}-${cfg.ageScopeDays},${kw.flag.traded}`, tFn("app.clause_why.age_traded", { params: { days: cfg.ageScopeDays } }));
 
   const trash = trashClauses.map(c => c.clause).join("&");
 
   // ── TRADE ──────────────────────────────────────────────────────────────
-  push(tradeClauses, [S012, TE_trim_str, H].filter(Boolean).join(","), "Set H ∪ S012 ∪ TE — Spezies (TE-trimmed)");
-  push(tradeClauses, [S012, TE_full_str, ivK1Bad].filter(Boolean).join(","), "¬K1 mit TE-Escape");
-  push(tradeClauses, [S012, TE_full_str, ivK2Bad].filter(Boolean).join(","), "¬K2 mit TE-Escape");
-  push(tradeClauses, [S012, TE_full_str, ivK3Bad].filter(Boolean).join(","), "¬K3 mit TE-Escape");
-  if (notP) push(tradeClauses, notP, `¬P — PvP-Schutz (${cfg.pvpMode})`);
+  push(tradeClauses, [S012, TE_trim_str, H].filter(Boolean).join(","), tFn("app.clause_why.h_s012_te"));
+  push(tradeClauses, [S012, TE_full_str, ivK1Bad].filter(Boolean).join(","), tFn("app.clause_why.not_k1_te"));
+  push(tradeClauses, [S012, TE_full_str, ivK2Bad].filter(Boolean).join(","), tFn("app.clause_why.not_k2_te"));
+  push(tradeClauses, [S012, TE_full_str, ivK3Bad].filter(Boolean).join(","), tFn("app.clause_why.not_k3_te"));
+  if (notP) push(tradeClauses, notP, tFn("app.clause_why.not_p", { params: { mode: cfg.pvpMode } }));
 
   // Mandatory trade constraints (physical game rules — always apply)
-  push(tradeClauses, `!${kw.flag.traded}`, "PFLICHT: schon getauschte Pokémon können nicht erneut getauscht werden");
-  push(tradeClauses, `!${kw.flag.shadow}`, "PFLICHT: Crypto-Pokémon können nicht getauscht werden");
-  push(tradeClauses, `!${kw.flag.lucky}`, "PFLICHT: Glücks-Pokémon können nicht erneut getauscht werden (waren schon ein Tausch)");
-  push(tradeClauses, `!${kw.flag.mythical},808,809`, "PFLICHT: Mysteriöse nicht tauschbar (außer Meltan/Melmetal via Spezial-Tausch)");
+  push(tradeClauses, `!${kw.flag.traded}`, tFn("app.clause_why.must_traded"));
+  push(tradeClauses, `!${kw.flag.shadow}`, tFn("app.clause_why.must_shadow"));
+  push(tradeClauses, `!${kw.flag.lucky}`, tFn("app.clause_why.must_lucky_long"));
+  push(tradeClauses, `!${kw.flag.mythical},808,809`, tFn("app.clause_why.must_mythical_long"));
 
   if (cfg.protectAnyTag) {
-    push(tradeClauses, "!#", "irgendein Tag — egal welches, nicht für Massen-Tausch");
+    push(tradeClauses, "!#", tFn("app.clause_why.any_tag_trade"));
   } else {
     if (basarTag) push(tradeClauses, `!#${basarTag}`,
-      `dein Tausch-Sammeltag #${basarTag} (zeigt nur das, was du noch NICHT zum Tausch markiert hast — getauscht-Listen-Verwaltung)`);
-    if (fernTauschTag) push(tradeClauses, `!#${fernTauschTag}`, `Niantic-Tag #${fernTauschTag}`);
-    for (const t of customTags) push(tradeClauses, `!#${t}`, `dein Custom-Tag #${t}`);
+      tFn("app.clause_why.bazaar_tag_trade", { params: { tag: basarTag } }));
+    if (fernTauschTag) push(tradeClauses, `!#${fernTauschTag}`, tFn("app.clause_why.fern_tausch_tag_trade", { params: { tag: fernTauschTag } }));
+    for (const t of customTags) push(tradeClauses, `!#${t}`, tFn("app.clause_why.custom_tag", { params: { tag: t } }));
   }
 
-  if (cfg.protectLegendaries)  push(tradeClauses, `!${kw.flag.legendary}`, "Legendäre");
-  if (cfg.protectUltraBeasts)  push(tradeClauses, `!${kw.flag.ultra_beast}`, "Ultrabestien");
-  if (cfg.protectShinies)      push(tradeClauses, `!${kw.flag.shiny}`, "Schillernde (zu wertvoll für Massentausch)");
-  if (cfg.protectCostumes)     push(tradeClauses, `!${kw.flag.costume}`, "Kostümierte");
-  if (cfg.protectPurified)     push(tradeClauses, `!${kw.flag.purified}`, "Erlöste (= ehemals Crypto, verlieren Bonus beim Tausch)");
-  if (cfg.protectBackgrounds)  push(tradeClauses, `!${kw.flag.background}`, "Mit Hintergrund");
-  if (cfg.protectFavorites)    push(tradeClauses, `!${kw.flag.favorite}`, "Favoriten");
-  push(tradeClauses, "!4*", "Regel 1 explizit: niemals 4★ tauschen");
-  for (const t of leagueTags)  push(tradeClauses, `!${t}`, `dein Liga-Tag ${t}`);
-  if (cfg.protectDoubleMoved)  push(tradeClauses, "@3move", "Zweiter Charge-Move freigeschaltet");
-  if (cfg.protectDynamax)      push(tradeClauses, `!${kw.flag.dynamax_move}1-`, "Dynamax-fähige");
-  if (cfg.protectXXL)          push(tradeClauses, `!${kw.flag.xxl}`, "XXL Größe");
-  if (cfg.protectXL)           push(tradeClauses, `!${kw.flag.xl}`,  "XL Größe");
-  if (cfg.protectLegacyMoves)  push(tradeClauses, `!@${kw.flag.special_move}`, "Legacy-Attacken");
+  if (cfg.protectLegendaries)  push(tradeClauses, `!${kw.flag.legendary}`, tFn("app.clause_why.legendaries"));
+  if (cfg.protectUltraBeasts)  push(tradeClauses, `!${kw.flag.ultra_beast}`, tFn("app.clause_why.ultra_beasts"));
+  if (cfg.protectShinies)      push(tradeClauses, `!${kw.flag.shiny}`, tFn("app.clause_why.shinies_trade"));
+  if (cfg.protectCostumes)     push(tradeClauses, `!${kw.flag.costume}`, tFn("app.clause_why.costumes_trade"));
+  if (cfg.protectPurified)     push(tradeClauses, `!${kw.flag.purified}`, tFn("app.clause_why.purified"));
+  if (cfg.protectBackgrounds)  push(tradeClauses, `!${kw.flag.background}`, tFn("app.clause_why.backgrounds_trade"));
+  if (cfg.protectFavorites)    push(tradeClauses, `!${kw.flag.favorite}`, tFn("app.clause_why.favorites"));
+  push(tradeClauses, "!4*", tFn("app.clause_why.rule1_no_4star_trade"));
+  for (const t of leagueTags)  push(tradeClauses, `!${t}`, tFn("app.clause_why.league_tag", { params: { tag: t } }));
+  if (cfg.protectDoubleMoved)  push(tradeClauses, "@3move", tFn("app.clause_why.double_moved_trade"));
+  if (cfg.protectDynamax)      push(tradeClauses, `!${kw.flag.dynamax_move}1-`, tFn("app.clause_why.dynamax"));
+  if (cfg.protectXXL)          push(tradeClauses, `!${kw.flag.xxl}`, tFn("app.clause_why.xxl_trade"));
+  if (cfg.protectXL)           push(tradeClauses, `!${kw.flag.xl}`,  tFn("app.clause_why.xl_trade"));
+  if (cfg.protectLegacyMoves)  push(tradeClauses, `!@${kw.flag.special_move}`, tFn("app.clause_why.legacy_moves"));
   if (cfg.ageScopeDays && cfg.ageScopeDays > 0)
-    push(tradeClauses, `${kw.numeric.age}-${cfg.ageScopeDays}`, `Sicherheitsnetz: ≤${cfg.ageScopeDays} Tage alt`);
-  push(tradeClauses, `${kw.numeric.distance}0-`, "Sicherheitsnetz: Entfernung > 0km (= war mal woanders)");
+    push(tradeClauses, `${kw.numeric.age}-${cfg.ageScopeDays}`, tFn("app.clause_why.age_only", { params: { days: cfg.ageScopeDays } }));
+  push(tradeClauses, `${kw.numeric.distance}0-`, tFn("app.clause_why.distance_zero"));
 
   const trade = tradeClauses.map(c => c.clause).join("&");
 
@@ -484,11 +484,11 @@ function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", tFn = (
   if (basarTag)      tagList.push(`#${basarTag}`);
   if (fernTauschTag) tagList.push(`#${fernTauschTag}`);
   if (tagList.length > 0) {
-    push(prestagedClauses, tagList.join(","), `bereits markiert (#${basarTag}${fernTauschTag ? ` oder #${fernTauschTag}` : ""})`);
-    push(prestagedClauses, `!${kw.flag.traded}`, "PFLICHT: schon getauscht");
-    push(prestagedClauses, `!${kw.flag.shadow}`, "PFLICHT: Crypto nicht tauschbar");
-    push(prestagedClauses, `!${kw.flag.lucky}`, "PFLICHT: Glücks-Pokémon nicht erneut tauschbar");
-    push(prestagedClauses, `!${kw.flag.mythical},808,809`, "PFLICHT: Mysteriöse nicht tauschbar (außer Meltan/Melmetal)");
+    push(prestagedClauses, tagList.join(","), tFn("app.clause_why.prestaged_marked", { params: { tags: `#${basarTag}${fernTauschTag ? ` oder #${fernTauschTag}` : ""}` } }));
+    push(prestagedClauses, `!${kw.flag.traded}`, tFn("app.clause_why.must_traded_short"));
+    push(prestagedClauses, `!${kw.flag.shadow}`, tFn("app.clause_why.must_shadow_short"));
+    push(prestagedClauses, `!${kw.flag.lucky}`, tFn("app.clause_why.must_lucky_short"));
+    push(prestagedClauses, `!${kw.flag.mythical},808,809`, tFn("app.clause_why.must_mythical_short"));
   }
   const prestaged = prestagedClauses.map(c => c.clause).join("&");
 
@@ -506,19 +506,19 @@ function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", tFn = (
       ...(wantsTE ? TE_full.map(base => `+${teDisplay(base, outputLocale)}`) : []),
     ];
     const why = [
-      targets.length > 0 ? `${targets.length} Wunsch-Spezies` : null,
-      wantsTE ? `${TE_full.length} Tausch-Evo-Familien` : null,
+      targets.length > 0 ? tFn("app.clause_why.buddy_targets_count", { params: { count: targets.length } }) : null,
+      wantsTE ? tFn("app.clause_why.buddy_te_count", { params: { count: TE_full.length } }) : null,
     ].filter(Boolean).join(" + ");
     push(catchClauses, speciesParts.join(","), `${b.name}: ${why}`);
-    push(catchClauses, "0*,1*,2*", "nur trashbare Sterne (0-2★) — 3★+ behältst du selbst");
-    push(catchClauses, "!#", "nicht schon irgendwie getaggt");
-    push(catchClauses, `!${kw.flag.favorite}`, "Favoriten geschützt");
-    push(catchClauses, `!${kw.flag.traded}`, "PFLICHT: schon getauscht");
-    push(catchClauses, `!${kw.flag.shadow}`, "PFLICHT: Crypto nicht tauschbar");
-    push(catchClauses, `!${kw.flag.lucky}`, "PFLICHT: Glücks-Pokémon nicht erneut tauschbar");
-    push(catchClauses, `!${kw.flag.mythical},808,809`, "PFLICHT: Mysteriöse nicht tauschbar (außer Meltan/Melmetal)");
-    push(catchClauses, `!${kw.flag.shiny}`, "Schillernde behältst du selbst");
-    push(catchClauses, `!${kw.flag.legendary}`, "Legendäre behältst du selbst");
+    push(catchClauses, "0*,1*,2*", tFn("app.clause_why.trashable_stars"));
+    push(catchClauses, "!#", tFn("app.clause_why.not_tagged"));
+    push(catchClauses, `!${kw.flag.favorite}`, tFn("app.clause_why.favorites_protected"));
+    push(catchClauses, `!${kw.flag.traded}`, tFn("app.clause_why.must_traded_short"));
+    push(catchClauses, `!${kw.flag.shadow}`, tFn("app.clause_why.must_shadow_short"));
+    push(catchClauses, `!${kw.flag.lucky}`, tFn("app.clause_why.must_lucky_short"));
+    push(catchClauses, `!${kw.flag.mythical},808,809`, tFn("app.clause_why.must_mythical_short"));
+    push(catchClauses, `!${kw.flag.shiny}`, tFn("app.clause_why.shinies_keep"));
+    push(catchClauses, `!${kw.flag.legendary}`, tFn("app.clause_why.legendaries_keep"));
     buddyCatchFilters.push({
       buddyName: b.name,
       prefix,
@@ -530,11 +530,11 @@ function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", tFn = (
   // ── HUNDO-SORT ─────────────────────────────────────────────────────────
   const sortClauses = [];
   if (hundos.length > 0) {
-    push(sortClauses, H, "alle Hundo-Familien (Sortierung)");
-    if (cfg.protectAnyTag)   push(sortClauses, "!#", "alle Tags geschützt");
-    if (cfg.protectFavorites) push(sortClauses, `!${kw.flag.favorite}`, "Favoriten geschützt");
-    if (cfg.protectShinies)  push(sortClauses, `!${kw.flag.shiny}`, "Schillernde geschützt");
-    if (cfg.protectLuckies)  push(sortClauses, `!${kw.flag.lucky}`, "Glücks geschützt");
+    push(sortClauses, H, tFn("app.clause_why.all_hundo_families"));
+    if (cfg.protectAnyTag)   push(sortClauses, "!#", tFn("app.clause_why.all_tags_protected"));
+    if (cfg.protectFavorites) push(sortClauses, `!${kw.flag.favorite}`, tFn("app.clause_why.favorites_protected"));
+    if (cfg.protectShinies)  push(sortClauses, `!${kw.flag.shiny}`, tFn("app.clause_why.shinies_protected"));
+    if (cfg.protectLuckies)  push(sortClauses, `!${kw.flag.lucky}`, tFn("app.clause_why.luckies_protected"));
   }
   const sort = sortClauses.map(c => c.clause).join("&");
 
@@ -544,24 +544,26 @@ function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", tFn = (
   const homeLocalsList = (homeLocals || []).map(n => speciesForOutput(n, outputLocale)).filter(Boolean);
   const valueParts = [...valuables, ...homeLocalsList];
   if (valueParts.length > 0) {
-    push(giftClauses, valueParts.join(","),
-      `Wertsachen: schillernd, legendär, Ultrabestie, Kostüm, Hintergrund${homeLocalsList.length ? ` + lokale Regionale (${homeLocalsList.length})` : ""}`);
+    const valueWhy = homeLocalsList.length > 0
+      ? tFn("app.clause_why.valuables_with_locals", { params: { count: homeLocalsList.length } })
+      : tFn("app.clause_why.valuables_no_locals");
+    push(giftClauses, valueParts.join(","), valueWhy);
   }
-  push(giftClauses, `!${kw.flag.traded}`, "PFLICHT: nicht erneut tauschbar");
-  push(giftClauses, `!${kw.flag.shadow}`, "PFLICHT: Crypto kann nicht getauscht werden");
-  push(giftClauses, `!${kw.flag.mythical},808,809`, "PFLICHT: Mysteriöse nicht tauschbar (außer Meltan/Melmetal)");
-  push(giftClauses, `!${kw.flag.lucky}`, "PFLICHT: Glücks-Pokémon sind nicht tauschbar");
-  push(giftClauses, "!4*", "niemals 4★ verschenken");
-  push(giftClauses, `!${kw.flag.favorite}`, "Favoriten geschützt");
-  push(giftClauses, `!@${kw.flag.special_move}`, "Legacy-Attacken nicht verschenken");
+  push(giftClauses, `!${kw.flag.traded}`, tFn("app.clause_why.gift_must_traded"));
+  push(giftClauses, `!${kw.flag.shadow}`, tFn("app.clause_why.gift_must_shadow"));
+  push(giftClauses, `!${kw.flag.mythical},808,809`, tFn("app.clause_why.must_mythical_short"));
+  push(giftClauses, `!${kw.flag.lucky}`, tFn("app.clause_why.gift_must_lucky"));
+  push(giftClauses, "!4*", tFn("app.clause_why.never_gift_4star"));
+  push(giftClauses, `!${kw.flag.favorite}`, tFn("app.clause_why.favorites_protected"));
+  push(giftClauses, `!@${kw.flag.special_move}`, tFn("app.clause_why.never_gift_legacy"));
   const tagAllowList = [];
   if (basarTag)      tagAllowList.push(`#${basarTag}`);
   if (fernTauschTag) tagAllowList.push(`#${fernTauschTag}`);
   if (tagAllowList.length > 0) {
     push(giftClauses, `!#,${tagAllowList.join(",")}`,
-      `untagged ODER schon zum Tausch markiert (${tagAllowList.join(", ")}) — andere Tags geschützt`);
+      tFn("app.clause_why.untagged_or_marked", { params: { tags: tagAllowList.join(", ") } }));
   } else {
-    push(giftClauses, "!#", "andere Tags geschützt");
+    push(giftClauses, "!#", tFn("app.clause_why.other_tags_protected"));
   }
   const gift = giftClauses.map(c => c.clause).join("&");
 
@@ -2301,6 +2303,7 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
 }
 
 function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocation, setHomeLocation, homeLocals, tradeTagName = "Trade" }) {
+  const { t } = useTranslation();
   const [worldData, setWorldData] = useState(null);
   const [loadStatus, setLoadStatus] = useState("loading"); // loading | ready | error
 
@@ -2529,7 +2532,7 @@ function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocat
             <g>
               <rect width={VIEW_W} height={VIEW_H} fill="#0B0F14" opacity="0.85" />
               <text x={VIEW_W / 2} y={VIEW_H / 2} textAnchor="middle" className="mono" fontSize="14" fill="#5EAFC5">
-                {loadStatus === "loading" ? "loading world topology…" : "couldn't load map data"}
+                {loadStatus === "loading" ? t("app.map.loading") : t("app.map.load_error")}
               </text>
             </g>
           )}
@@ -2542,18 +2545,18 @@ function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocat
           <span className="text-[#27AE60]">⌂</span>
           <div className="flex-1">
             <div className="text-[#E6EDF3]">
-              Heimat: {homeLocation[1].toFixed(2)}°{homeLocation[1] >= 0 ? "N" : "S"}
+              {t("app.map.home_label")} {homeLocation[1].toFixed(2)}°{homeLocation[1] >= 0 ? "N" : "S"}
               , {homeLocation[0].toFixed(2)}°{homeLocation[0] >= 0 ? "E" : "W"}
             </div>
             {homeLocals.length > 0 && (
               <div className="text-[10.5px] text-[#8090A0] mt-1">
-                Lokale Regionale ({homeLocals.length}): <span className="text-[#27AE60]">{homeLocals.join(" · ")}</span>
+                {t("app.map.local_regionals_label", { params: { count: homeLocals.length } })} <span className="text-[#27AE60]">{homeLocals.join(" · ")}</span>
               </div>
             )}
           </div>
           <button onClick={() => setHomeLocation(null)}
             className="text-[#8090A0] hover:text-[#E74C3C] transition">
-            entfernen
+            {t("app.map.remove_home")}
           </button>
         </div>
       )}
@@ -2562,17 +2565,17 @@ function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocat
       {hoverPin && previewMatches !== null && (
         <div className="border border-[#E74C3C]/30 rounded p-2.5 bg-[#E74C3C]/5">
           <div className="flex items-baseline gap-3 mono text-[11px]">
-            <span className="text-[#8090A0]">vorschau:</span>
+            <span className="text-[#8090A0]">{t("app.map.preview_label")}</span>
             <span className="text-[#E6EDF3]">
               {hoverPin[1].toFixed(1)}°{hoverPin[1] >= 0 ? "N" : "S"},
               {" "}{hoverPin[0].toFixed(1)}°{hoverPin[0] >= 0 ? "E" : "W"}
             </span>
             <span className="text-[#8090A0] flex-1" />
-            <span className="text-[10.5px] text-[#8090A0]">click zum festsetzen</span>
+            <span className="text-[10.5px] text-[#8090A0]">{t("app.map.click_to_pin")}</span>
           </div>
           {previewMatches.length === 0 ? (
             <div className="mono text-[10.5px] text-[#8090A0] mt-1">
-              keine Regionalen hier
+              {t("app.map.no_regionals_here")}
             </div>
           ) : (() => {
               const all = [...new Set(previewMatches.flatMap(m => m.german))];
@@ -2587,7 +2590,7 @@ function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocat
                     <span className="text-[#8090A0]"> · </span>
                   )}
                   {local.length > 0 && (
-                    <span className="text-[#8090A0]" title="schon zu Hause — Freunde haben die via dir">
+                    <span className="text-[#8090A0]" title={t("app.map.local_already_title")}>
                       {local.join(" · ")}
                     </span>
                   )}
@@ -2601,15 +2604,15 @@ function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocat
       {!lastPin && !hoverPin && (
         <div className="mono text-xs text-[#8090A0] text-center py-2">
           {homeLocation
-            ? "fahre über die Karte für eine Vorschau, klicke zum Festsetzen"
-            : "fahre über die Karte, klicke deinen Standort an, dann „Als Heimat setzen"}
+            ? t("app.map.hint_with_home")
+            : t("app.map.hint_no_home")}
         </div>
       )}
 
       {lastPin && (
         <div className="space-y-3">
           <div className="flex items-baseline gap-3 mono text-[11px]">
-            <span className="text-[#8090A0]">pin:</span>
+            <span className="text-[#8090A0]">{t("app.map.pin_label")}</span>
             <span className="text-[#E6EDF3]">
               {lastPin[1].toFixed(2)}°{lastPin[1] >= 0 ? "N" : "S"},
               {" "}{lastPin[0].toFixed(2)}°{lastPin[0] >= 0 ? "E" : "W"}
@@ -2618,23 +2621,25 @@ function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocat
             <button
               onClick={() => setHomeLocation([lastPin[0], lastPin[1]])}
               className="mono text-[11px] bg-[#27AE60]/15 hover:bg-[#27AE60]/25 text-[#27AE60] px-2 py-0.5 rounded transition">
-              ⌂ als Heimat setzen
+              {t("app.map.set_as_home")}
             </button>
             <button onClick={clearPin} className="text-[#8090A0] hover:text-[#E74C3C] transition">
-              löschen
+              {t("app.map.clear_pin")}
             </button>
           </div>
 
           {/* Matched regions */}
           {matches.length === 0 ? (
             <div className="mono text-xs text-[#8090A0] py-2">
-              hier spawnen keine regionalen Pokémon
-              <span className="text-[#8090A0]/60"> (Ozean oder nicht-regionale Zone)</span>
+              {t("app.map.no_regionals_pin")}
+              <span className="text-[#8090A0]/60"> {t("app.map.no_regionals_pin_note")}</span>
             </div>
           ) : (
             <div>
               <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
-                {matches.length} Region{matches.length === 1 ? "" : "en"} hier
+                {matches.length === 1
+                  ? t("app.map.region_count_singular", { params: { count: matches.length } })
+                  : t("app.map.region_count_plural", { params: { count: matches.length } })}
               </div>
               <div className="space-y-1.5">
                 {matches.map((m, i) => (
@@ -2658,8 +2663,8 @@ function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocat
                 <div>
                   <div className="mono text-[10.5px] uppercase tracking-wider text-[#27AE60] mb-1.5">
                     {homeLocals.length > 0
-                      ? `mitnehmen · ${pokemonWanted.length}`
-                      : `gefunden · ${pokemonWanted.length}`}
+                      ? t("app.map.bring_along", { params: { count: pokemonWanted.length } })
+                      : t("app.map.found", { params: { count: pokemonWanted.length } })}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {pokemonWanted.map(name => {
@@ -2682,8 +2687,8 @@ function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocat
               {pokemonAlreadyLocal.length > 0 && (
                 <div>
                   <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-1.5">
-                    schon zu Hause · {pokemonAlreadyLocal.length}
-                    <span className="text-[#8090A0]/70 normal-case font-normal"> · Freunde haben die schon (via dir)</span>
+                    {t("app.map.already_home", { params: { count: pokemonAlreadyLocal.length } })}
+                    <span className="text-[#8090A0]/70 normal-case font-normal"> · {t("app.map.already_home_note")}</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {pokemonAlreadyLocal.map(name => {
@@ -2691,7 +2696,7 @@ function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocat
                       return (
                         <button key={name}
                           onClick={() => tagged ? removeFromBazaar(name) : addOneToBazaar(name)}
-                          title="Du fängst das eh schon — Tag nur falls du es trotzdem markieren willst"
+                          title={t("app.map.already_have_title")}
                           className={`mono text-[11px] px-2 py-1 rounded transition opacity-60 hover:opacity-100 ${
                             tagged
                               ? "bg-[#5EAFC5] text-[#0F1419]"
@@ -2707,10 +2712,10 @@ function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocat
               {pokemonWanted.length > 0 && (
                 <button onClick={addAllToBazaar}
                   className="mono text-[11px] text-[#27AE60] hover:text-[#5DD380] transition">
-                  alle zur #{tradeTagName}-Liste hinzufügen →
+                  {t("app.map.add_all_to_bazaar", { params: { tag: tradeTagName } })}
                   {homeLocals.length > 0 && (
                     <span className="text-[#8090A0] ml-1">
-                      ({pokemonWanted.length} mitnehmenswerte, lokale werden ignoriert)
+                      {t("app.map.add_all_extra", { params: { count: pokemonWanted.length } })}
                     </span>
                   )}
                 </button>
@@ -2724,7 +2729,7 @@ function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocat
       <div className="border border-[#5EAFC5]/40 rounded p-3 bg-[#5EAFC5]/5">
         <div className="flex items-baseline gap-2 mb-2">
           <div className="mono text-[10.5px] uppercase tracking-wider text-[#5EAFC5] flex-1">
-            zum Tausch markieren · {bazaarTags.length} Pokémon
+            {t("app.map.bazaar_section_title", { params: { count: bazaarTags.length } })}
           </div>
           {bazaarTags.length > 0 && (
             <button onClick={clearBazaar}
@@ -2733,13 +2738,17 @@ function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocat
                   ? "text-[#E74C3C] font-semibold"
                   : "text-[#8090A0] hover:text-[#E74C3C]"
               }`}>
-              {bazaarClearArmed ? "wirklich? klick zur Bestätigung" : "löschen"}
+              {bazaarClearArmed ? t("app.map.clear_armed") : t("app.map.clear_button")}
             </button>
           )}
         </div>
         {bazaarTags.length === 0 ? (
           <div className="mono text-[11px] text-[#8090A0]">
-            Tippe auf die Karte um regionale Pokémon zu finden, dann markiere sie mit deinem Tausch-Tag <code className="text-[#E6EDF3]">#{tradeTagName}</code> in PoGo. Der Trash-Filter schützt sie automatisch.
+            {t("app.map.bazaar_empty_help", { params: { tag: `#${tradeTagName}` } })
+              .split(`#${tradeTagName}`)
+              .flatMap((part, i) => i === 0
+                ? [<React.Fragment key={i}>{part}</React.Fragment>]
+                : [<code key={`c${i}`} className="text-[#E6EDF3]">{`#${tradeTagName}`}</code>, <React.Fragment key={`p${i}`}>{part}</React.Fragment>])}
           </div>
         ) : (
           <>
@@ -2756,7 +2765,11 @@ function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocat
               ))}
             </div>
             <div className="mono text-[10.5px] text-[#8090A0] mt-2">
-              markiere diese mit <code className="text-[#E6EDF3]">#{tradeTagName}</code> in PoGo
+              {t("app.map.bazaar_marked_help", { params: { tag: `#${tradeTagName}` } })
+                .split(`#${tradeTagName}`)
+                .flatMap((part, i) => i === 0
+                  ? [<React.Fragment key={i}>{part}</React.Fragment>]
+                  : [<code key={`c${i}`} className="text-[#E6EDF3]">{`#${tradeTagName}`}</code>, <React.Fragment key={`p${i}`}>{part}</React.Fragment>])}
             </div>
           </>
         )}
@@ -2764,7 +2777,7 @@ function RegionalMap({ lastPin, setLastPin, bazaarTags, setBazaarTags, homeLocat
 
       {/* Attribution */}
       <div className="mono text-[10px] text-[#8090A0] pt-1">
-        regional polygon data: u/zoglandboy / u/Mattman243 / pokemoncalendar.com
+        {t("app.map.attribution")}
       </div>
     </div>
   );
