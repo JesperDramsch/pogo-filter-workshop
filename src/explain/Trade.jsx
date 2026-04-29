@@ -103,9 +103,11 @@ function EvoFlow() {
 
 function BuddyRoster() {
   const buddies = [
-    { name: "Anna", tag: "#anna", staged: "Bagon · Beldum · Gible", color: C.purple },
-    { name: "Bo",   tag: "#bo",   staged: "Deino",                    color: C.green  },
-    { name: "Cara", tag: "#cara", staged: "Larvitar · Goomy",         color: C.amber  },
+    { name: "Auri",  tag: "#auri",  staged: "Bagon · Beldum · Gible", color: C.purple   },
+    { name: "Julia", tag: "#julia", staged: "Dratini · Deino",        color: C.green    },
+    { name: "Mei",   tag: "#mei",   staged: "Larvitar · Jangmo-o",    color: C.amber    },
+    { name: "Tine",  tag: "#tine",  staged: "Kubfu · Frigibax",       color: C.cyan     },
+    { name: "Mateo", tag: "#mateo", staged: "Goomy · Riolu",          color: "#E67E22"  },
   ];
   return (
     <div className="mt-2 space-y-2">
