@@ -110,60 +110,60 @@ const DEFAULT_CONFIG = {
 
 const REGIONAL_GROUPS = {
   alolan: {
-    label: "Alola-Formen",
-    description: "Generation 7 — alolanische Formen",
+    labelKey: "app.regional.alolan.label",
+    descriptionKey: "app.regional.alolan.description",
     typeChecks: [
-      { species: "Raichu",     type: "psychic",  note: "Alola Raichu (Elektro/Psycho) — der reguläre Raichu ist nicht Psycho" },
-      { species: "Sandan",     type: "ice",     note: "Alola Sandan (Eis/Stahl)" },
-      { species: "Vulpix",     type: "ice",     note: "Alola Vulpix (Eis)" },
-      { species: "Digda",      type: "steel",   note: "Alola Digda (Boden/Stahl)" },
-      { species: "Mauzi",      type: "dark", note: "Alola Mauzi (Unlicht)" },
-      { species: "Kleinstein", type: "electric", note: "Alola Kleinstein (Gestein/Elektro)" },
-      { species: "Kokowei",    type: "dragon",  note: "Alola Kokowei (Pflanze/Drache)" },
-      { species: "Knogga",     type: "ghost",   note: "Alola Knogga (Boden/Geist)" },
+      { species: "Raichu",     type: "psychic",  noteKey: "app.regional.alolan.notes.raichu_psychic" },
+      { species: "Sandan",     type: "ice",      noteKey: "app.regional.alolan.notes.sandan_ice" },
+      { species: "Vulpix",     type: "ice",      noteKey: "app.regional.alolan.notes.vulpix_ice" },
+      { species: "Digda",      type: "steel",    noteKey: "app.regional.alolan.notes.digda_steel" },
+      { species: "Mauzi",      type: "dark",     noteKey: "app.regional.alolan.notes.mauzi_dark" },
+      { species: "Kleinstein", type: "electric", noteKey: "app.regional.alolan.notes.kleinstein_electric" },
+      { species: "Kokowei",    type: "dragon",   noteKey: "app.regional.alolan.notes.kokowei_dragon" },
+      { species: "Knogga",     type: "ghost",    noteKey: "app.regional.alolan.notes.knogga_ghost" },
     ],
     collectors: [],
   },
   galarian: {
-    label: "Galar-Formen",
-    description: "Generation 8 — galarische Formen",
+    labelKey: "app.regional.galarian.label",
+    descriptionKey: "app.regional.galarian.description",
     typeChecks: [
-      { species: "Smogmog",  type: "fairy",   note: "Galar Smogmog (Gift/Fee)" },
-      { species: "Pantimos", type: "ice",   note: "Galar Pantimos (Eis/Psycho)" },
-      { species: "Makabaja", type: "ground", note: "Galar Makabaja (Boden/Geist)" },
-      { species: "Porenta",  type: "fighting", note: "Galar Porenta (Kampf)" },
-      { species: "Corasonn", type: "ghost", note: "Galar Corasonn (Geist) — reguläres ist Wasser/Gestein" },
+      { species: "Smogmog",  type: "fairy",    noteKey: "app.regional.galarian.notes.smogmog_fairy" },
+      { species: "Pantimos", type: "ice",      noteKey: "app.regional.galarian.notes.pantimos_ice" },
+      { species: "Makabaja", type: "ground",   noteKey: "app.regional.galarian.notes.makabaja_ground" },
+      { species: "Porenta",  type: "fighting", noteKey: "app.regional.galarian.notes.porenta_fighting" },
+      { species: "Corasonn", type: "ghost",    noteKey: "app.regional.galarian.notes.corasonn_ghost" },
     ],
     collectors: [],
   },
   hisuian: {
-    label: "Hisui-Formen",
-    description: "Pokémon Legends: Arceus — hisuische Formen",
+    labelKey: "app.regional.hisuian.label",
+    descriptionKey: "app.regional.hisuian.description",
     typeChecks: [
-      { species: "Tornupto",  type: "ghost",   note: "Hisui Tornupto (Feuer/Geist)" },
-      { species: "Admurai",   type: "dark", note: "Hisui Admurai (Wasser/Unlicht)" },
-      { species: "Dressella", type: "fighting",   note: "Hisui Dressella (Pflanze/Kampf)" },
-      { species: "Arktilas",  type: "rock", note: "Hisui Arktilas (Eis/Gestein)" },
-      { species: "Silvarro",  type: "fighting",   note: "Hisui Silvarro (Pflanze/Kampf)" },
-      { species: "Voltobal",  type: "grass", note: "Hisui Voltobal (Elektro/Pflanze)" },
-      { species: "Lektrobal", type: "grass", note: "Hisui Lektrobal (Elektro/Pflanze)" },
-      { species: "Sichlor",   type: "rock", note: "Hisui Sichlor (Käfer/Gestein) → Axantor" },
+      { species: "Tornupto",  type: "ghost",    noteKey: "app.regional.hisuian.notes.tornupto_ghost" },
+      { species: "Admurai",   type: "dark",     noteKey: "app.regional.hisuian.notes.admurai_dark" },
+      { species: "Dressella", type: "fighting", noteKey: "app.regional.hisuian.notes.dressella_fighting" },
+      { species: "Arktilas",  type: "rock",     noteKey: "app.regional.hisuian.notes.arktilas_rock" },
+      { species: "Silvarro",  type: "fighting", noteKey: "app.regional.hisuian.notes.silvarro_fighting" },
+      { species: "Voltobal",  type: "grass",    noteKey: "app.regional.hisuian.notes.voltobal_grass" },
+      { species: "Lektrobal", type: "grass",    noteKey: "app.regional.hisuian.notes.lektrobal_grass" },
+      { species: "Sichlor",   type: "rock",     noteKey: "app.regional.hisuian.notes.sichlor_rock" },
     ],
     collectors: [],
   },
   paldean: {
-    label: "Paldea-Formen",
-    description: "Generation 9 — Paldean Tauros (3 Rassen)",
+    labelKey: "app.regional.paldean.label",
+    descriptionKey: "app.regional.paldean.description",
     typeChecks: [
-      { species: "Tauros", type: "fighting",  note: "Paldean Tauros (Kampfrasse) — Iberische Halbinsel" },
-      { species: "Tauros", type: "fire",  note: "Paldean Tauros (Flammenrasse) — westliche Hemisphäre" },
-      { species: "Tauros", type: "water", note: "Paldean Tauros (Aquarasse) — östliche Hemisphäre" },
+      { species: "Tauros", type: "fighting", noteKey: "app.regional.paldean.notes.tauros_fighting" },
+      { species: "Tauros", type: "fire",     noteKey: "app.regional.paldean.notes.tauros_fire" },
+      { species: "Tauros", type: "water",    noteKey: "app.regional.paldean.notes.tauros_water" },
     ],
     collectors: [],
   },
   regionals: {
-    label: "Regionale Pokémon",
-    description: "Kontinent-exklusive Spezies — alle paired/hemispheric/trio Regionalen",
+    labelKey: "app.regional.regionals.label",
+    descriptionKey: "app.regional.regionals.description",
     typeChecks: [],
     collectors: [
       // Kontinent-exklusiv (Type 1 polygons in KMZ)
@@ -183,8 +183,8 @@ const REGIONAL_GROUPS = {
     ],
   },
   collectibles: {
-    label: "Sammler-Pokémon",
-    description: "Multi-Form / Muster-Sammlungen — Formen sind in PoGo nicht separat suchbar",
+    labelKey: "app.regional.collectibles.label",
+    descriptionKey: "app.regional.collectibles.description",
     typeChecks: [],
     collectors: [
       // Vivillon-line — flat collectors; collapses to +Purmel if all 3 selected
@@ -288,7 +288,7 @@ function capFirst(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de") {
+function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", tFn = (k) => k) {
   const kw = pogoKeywords(outputLocale);
 
   // Hundos are stored in the user's output-locale lowercase form. Re-render in
@@ -400,7 +400,7 @@ function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de") {
       const speciesOut = speciesForOutput(tc.species, outputLocale);
       const speciesDisplay = capFirst(speciesOut);
       const typeOut = kw.type[tc.type] || tc.type;
-      push(trashClauses, `!${speciesDisplay},!${typeOut}`, `${group.label}: ${tc.note}`);
+      push(trashClauses, `!${speciesDisplay},!${typeOut}`, `${tFn(group.labelKey)}: ${tFn(tc.noteKey)}`);
     }
     // Collectors — resolve each to outputLocale, then collapse families
     const enabledCollectorsOut = group.collectors
@@ -409,10 +409,11 @@ function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de") {
       .filter(sp => !hundoOutSet.has(sp));
     const collapsed = collapseFamilies(enabledCollectorsOut, FAMILY_COLLAPSES);
     for (const entry of collapsed) {
+      const groupLabel = tFn(group.labelKey);
       push(trashClauses, `!${entry}`,
         entry.startsWith("+")
-          ? `${group.label}: ${entry} (alle Familien-Mitglieder)`
-          : `${group.label}: ${entry}`);
+          ? `${groupLabel}: ${entry} (${tFn("app.regional_editor.all_family_members")})`
+          : `${groupLabel}: ${entry}`);
     }
   }
   // Custom collectibles
@@ -896,8 +897,8 @@ export default function App() {
 
   const { trash, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
           trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses } = useMemo(
-    () => buildFilters(hundos, effectiveConfig, homeLocals, outputLocale),
-    [hundos, effectiveConfig, homeLocals, outputLocale]
+    () => buildFilters(hundos, effectiveConfig, homeLocals, outputLocale, t),
+    [hundos, effectiveConfig, homeLocals, outputLocale, t]
   );
 
   function addHundo() {
@@ -2163,8 +2164,9 @@ function ToggleRow({ k, label, why, checked, onChange, expertBadge, requireConfi
 
 
 function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = [] }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
-  const allTC = group.typeChecks.map(t => t.species);
+  const allTC = group.typeChecks.map(tc => tc.species);
   const allCol = group.collectors;
   const tcEnabled = state.typeChecksEnabled === null ? allTC : state.typeChecksEnabled;
   const colEnabled = state.collectorsEnabled === null ? allCol : state.collectorsEnabled;
@@ -2208,12 +2210,14 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
           {expanded
             ? <ChevronDown size={12} className="text-[#5EAFC5]" />
             : <ChevronRight size={12} className="text-[#8090A0]" />}
-          <span className="mono text-sm text-[#E6EDF3]">{group.label}</span>
+          <span className="mono text-sm text-[#E6EDF3]">{t(group.labelKey)}</span>
           <span className="mono text-[10px] text-[#8090A0]">
-            {state.enabled ? `${enabledCount}/${totalEffective} aktiv` : "deaktiviert"}
+            {state.enabled
+              ? t("app.regional_editor.active_count", { params: { count: enabledCount, total: totalEffective } })
+              : t("app.regional_editor.disabled")}
             {droppedByHome > 0 && state.enabled && (
               <span className="text-[#27AE60] ml-1">
-                (+{droppedByHome} via ⌂)
+                {t("app.regional_editor.home_extra", { params: { count: droppedByHome } })}
               </span>
             )}
           </span>
@@ -2221,28 +2225,28 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
       </div>
       {expanded && (
         <div className="px-3 pb-3 pt-1 space-y-2 border-t border-[#1F2933]">
-          <div className="mono text-[11px] text-[#8090A0] mb-1">{group.description}</div>
+          <div className="mono text-[11px] text-[#8090A0] mb-1">{t(group.descriptionKey)}</div>
           <div className="flex gap-2">
             <button onClick={selectAll} className="mono text-[10px] text-[#5EAFC5] hover:text-[#7FCFE5] transition">
-              alle auswählen
+              {t("app.regional_editor.select_all")}
             </button>
             <span className="text-[#8090A0]">·</span>
             <button onClick={selectNone} className="mono text-[10px] text-[#8090A0] hover:text-[#E74C3C] transition">
-              keine
+              {t("app.regional_editor.select_none")}
             </button>
           </div>
           {group.typeChecks.length > 0 && (
             <div>
               <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-1">
-                Form-Schutz (Type-Check)
+                {t("app.regional_editor.type_check_label")}
               </div>
               <div className="flex flex-wrap gap-1">
                 {group.typeChecks.map(tc => {
                   const on = tcEnabled.includes(tc.species);
                   return (
-                    <button key={tc.species}
+                    <button key={`${tc.species}_${tc.type}`}
                       onClick={() => toggleTC(tc.species)}
-                      title={tc.note}
+                      title={t(tc.noteKey)}
                       disabled={!state.enabled}
                       className={`mono text-[11px] px-2 py-0.5 rounded transition ${
                         on
@@ -2259,7 +2263,7 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
           {group.collectors.length > 0 && (
             <div>
               <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-1">
-                Sammler (Spezies-Schutz)
+                {t("app.regional_editor.collectors_label")}
               </div>
               <div className="flex flex-wrap gap-1">
                 {group.collectors.map(sp => {
@@ -2273,7 +2277,7 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
                       onClick={() => toggleCol(sp)}
                       disabled={!state.enabled || isHomeLocal}
                       title={isHomeLocal
-                        ? "automatisch deaktiviert — diese Spezies spawnt bei dir lokal (Heimat)"
+                        ? t("app.regional_editor.home_local_title")
                         : undefined}
                       className={`mono text-[11px] px-2 py-0.5 rounded transition ${
                         effectivelyOn

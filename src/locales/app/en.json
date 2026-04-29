@@ -211,5 +211,57 @@
   "app.buddy_targets.te_toggle_examples": "(Abra, Machop, Gastly, ...)",
   "app.buddy_targets.input_placeholder": "Species (number or name) — e.g. Pikachu, 132, melmetal",
   "app.buddy_targets.add_button": "add",
-  "app.buddy_targets.preview_summary": "Preview · {new} new, {dupes} already added, {unresolved} unknown"
+  "app.buddy_targets.preview_summary": "Preview · {new} new, {dupes} already added, {unresolved} unknown",
+
+  "app.regional_editor.active_count": "{count}/{total} active",
+  "app.regional_editor.disabled": "disabled",
+  "app.regional_editor.home_extra": "(+{count} via ⌂)",
+  "app.regional_editor.select_all": "select all",
+  "app.regional_editor.select_none": "none",
+  "app.regional_editor.type_check_label": "Form protection (type-check)",
+  "app.regional_editor.collectors_label": "Collectors (species protection)",
+  "app.regional_editor.home_local_title": "automatically disabled — this species spawns locally for you (home)",
+  "app.regional_editor.all_family_members": "all family members",
+
+  "app.regional.alolan.label": "Alolan forms",
+  "app.regional.alolan.description": "Generation 7 — Alolan regional forms",
+  "app.regional.alolan.notes.raichu_psychic": "Alolan Raichu (Electric/Psychic) — regular Raichu isn't Psychic",
+  "app.regional.alolan.notes.sandan_ice": "Alolan Sandshrew (Ice/Steel)",
+  "app.regional.alolan.notes.vulpix_ice": "Alolan Vulpix (Ice)",
+  "app.regional.alolan.notes.digda_steel": "Alolan Diglett (Ground/Steel)",
+  "app.regional.alolan.notes.mauzi_dark": "Alolan Meowth (Dark)",
+  "app.regional.alolan.notes.kleinstein_electric": "Alolan Geodude (Rock/Electric)",
+  "app.regional.alolan.notes.kokowei_dragon": "Alolan Exeggutor (Grass/Dragon)",
+  "app.regional.alolan.notes.knogga_ghost": "Alolan Marowak (Ground/Ghost)",
+
+  "app.regional.galarian.label": "Galarian forms",
+  "app.regional.galarian.description": "Generation 8 — Galarian regional forms",
+  "app.regional.galarian.notes.smogmog_fairy": "Galarian Weezing (Poison/Fairy)",
+  "app.regional.galarian.notes.pantimos_ice": "Galarian Mr. Mime (Ice/Psychic)",
+  "app.regional.galarian.notes.makabaja_ground": "Galarian Yamask (Ground/Ghost)",
+  "app.regional.galarian.notes.porenta_fighting": "Galarian Farfetch'd (Fighting)",
+  "app.regional.galarian.notes.corasonn_ghost": "Galarian Corsola (Ghost) — regular is Water/Rock",
+
+  "app.regional.hisuian.label": "Hisuian forms",
+  "app.regional.hisuian.description": "Pokémon Legends: Arceus — Hisuian regional forms",
+  "app.regional.hisuian.notes.tornupto_ghost": "Hisuian Typhlosion (Fire/Ghost)",
+  "app.regional.hisuian.notes.admurai_dark": "Hisuian Samurott (Water/Dark)",
+  "app.regional.hisuian.notes.dressella_fighting": "Hisuian Lilligant (Grass/Fighting)",
+  "app.regional.hisuian.notes.arktilas_rock": "Hisuian Avalugg (Ice/Rock)",
+  "app.regional.hisuian.notes.silvarro_fighting": "Hisuian Decidueye (Grass/Fighting)",
+  "app.regional.hisuian.notes.voltobal_grass": "Hisuian Voltorb (Electric/Grass)",
+  "app.regional.hisuian.notes.lektrobal_grass": "Hisuian Electrode (Electric/Grass)",
+  "app.regional.hisuian.notes.sichlor_rock": "Hisuian Scyther (Bug/Rock) → Kleavor",
+
+  "app.regional.paldean.label": "Paldean forms",
+  "app.regional.paldean.description": "Generation 9 — Paldean Tauros (3 breeds)",
+  "app.regional.paldean.notes.tauros_fighting": "Paldean Tauros (Combat) — Iberian Peninsula",
+  "app.regional.paldean.notes.tauros_fire": "Paldean Tauros (Blaze) — western hemisphere",
+  "app.regional.paldean.notes.tauros_water": "Paldean Tauros (Aqua) — eastern hemisphere",
+
+  "app.regional.regionals.label": "Regional Pokémon",
+  "app.regional.regionals.description": "Continent-exclusive species — all paired/hemispheric/trio regionals",
+
+  "app.regional.collectibles.label": "Collectibles",
+  "app.regional.collectibles.description": "Multi-form / pattern collections — forms aren't separately searchable in PoGo"
 }

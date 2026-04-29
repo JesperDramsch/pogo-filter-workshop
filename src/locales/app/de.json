@@ -211,5 +211,57 @@
   "app.buddy_targets.te_toggle_examples": "(Abra, Machollo, Nebulak, ...)",
   "app.buddy_targets.input_placeholder": "Spezies (Nummer/EN/DE) — z.B. Pikachu, 132, melmetal",
   "app.buddy_targets.add_button": "hinzufügen",
-  "app.buddy_targets.preview_summary": "Vorschau · {new} neu, {dupes} schon dabei, {unresolved} unbekannt"
+  "app.buddy_targets.preview_summary": "Vorschau · {new} neu, {dupes} schon dabei, {unresolved} unbekannt",
+
+  "app.regional_editor.active_count": "{count}/{total} aktiv",
+  "app.regional_editor.disabled": "deaktiviert",
+  "app.regional_editor.home_extra": "(+{count} via ⌂)",
+  "app.regional_editor.select_all": "alle auswählen",
+  "app.regional_editor.select_none": "keine",
+  "app.regional_editor.type_check_label": "Form-Schutz (Type-Check)",
+  "app.regional_editor.collectors_label": "Sammler (Spezies-Schutz)",
+  "app.regional_editor.home_local_title": "automatisch deaktiviert — diese Spezies spawnt bei dir lokal (Heimat)",
+  "app.regional_editor.all_family_members": "alle Familien-Mitglieder",
+
+  "app.regional.alolan.label": "Alola-Formen",
+  "app.regional.alolan.description": "Generation 7 — alolanische Formen",
+  "app.regional.alolan.notes.raichu_psychic": "Alola Raichu (Elektro/Psycho) — der reguläre Raichu ist nicht Psycho",
+  "app.regional.alolan.notes.sandan_ice": "Alola Sandan (Eis/Stahl)",
+  "app.regional.alolan.notes.vulpix_ice": "Alola Vulpix (Eis)",
+  "app.regional.alolan.notes.digda_steel": "Alola Digda (Boden/Stahl)",
+  "app.regional.alolan.notes.mauzi_dark": "Alola Mauzi (Unlicht)",
+  "app.regional.alolan.notes.kleinstein_electric": "Alola Kleinstein (Gestein/Elektro)",
+  "app.regional.alolan.notes.kokowei_dragon": "Alola Kokowei (Pflanze/Drache)",
+  "app.regional.alolan.notes.knogga_ghost": "Alola Knogga (Boden/Geist)",
+
+  "app.regional.galarian.label": "Galar-Formen",
+  "app.regional.galarian.description": "Generation 8 — galarische Formen",
+  "app.regional.galarian.notes.smogmog_fairy": "Galar Smogmog (Gift/Fee)",
+  "app.regional.galarian.notes.pantimos_ice": "Galar Pantimos (Eis/Psycho)",
+  "app.regional.galarian.notes.makabaja_ground": "Galar Makabaja (Boden/Geist)",
+  "app.regional.galarian.notes.porenta_fighting": "Galar Porenta (Kampf)",
+  "app.regional.galarian.notes.corasonn_ghost": "Galar Corasonn (Geist) — reguläres ist Wasser/Gestein",
+
+  "app.regional.hisuian.label": "Hisui-Formen",
+  "app.regional.hisuian.description": "Pokémon Legends: Arceus — hisuische Formen",
+  "app.regional.hisuian.notes.tornupto_ghost": "Hisui Tornupto (Feuer/Geist)",
+  "app.regional.hisuian.notes.admurai_dark": "Hisui Admurai (Wasser/Unlicht)",
+  "app.regional.hisuian.notes.dressella_fighting": "Hisui Dressella (Pflanze/Kampf)",
+  "app.regional.hisuian.notes.arktilas_rock": "Hisui Arktilas (Eis/Gestein)",
+  "app.regional.hisuian.notes.silvarro_fighting": "Hisui Silvarro (Pflanze/Kampf)",
+  "app.regional.hisuian.notes.voltobal_grass": "Hisui Voltobal (Elektro/Pflanze)",
+  "app.regional.hisuian.notes.lektrobal_grass": "Hisui Lektrobal (Elektro/Pflanze)",
+  "app.regional.hisuian.notes.sichlor_rock": "Hisui Sichlor (Käfer/Gestein) → Axantor",
+
+  "app.regional.paldean.label": "Paldea-Formen",
+  "app.regional.paldean.description": "Generation 9 — Paldean Tauros (3 Rassen)",
+  "app.regional.paldean.notes.tauros_fighting": "Paldean Tauros (Kampfrasse) — Iberische Halbinsel",
+  "app.regional.paldean.notes.tauros_fire": "Paldean Tauros (Flammenrasse) — westliche Hemisphäre",
+  "app.regional.paldean.notes.tauros_water": "Paldean Tauros (Aquarasse) — östliche Hemisphäre",
+
+  "app.regional.regionals.label": "Regionale Pokémon",
+  "app.regional.regionals.description": "Kontinent-exklusive Spezies — alle paired/hemispheric/trio Regionalen",
+
+  "app.regional.collectibles.label": "Sammler-Pokémon",
+  "app.regional.collectibles.description": "Multi-Form / Muster-Sammlungen — Formen sind in PoGo nicht separat suchbar"
 }
