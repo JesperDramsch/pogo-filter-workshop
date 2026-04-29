@@ -15,20 +15,22 @@ const REGIONAL_PALETTE = {
 const REGIONAL_KEYS = ["na", "eu", "sa", "asia", "au"];
 
 // 12 storage items — biased toward NA (the default home in act 2) so the
-// auto-drop is visible. `souvenir` marks a background-tagged catch.
+// auto-drop is visible. `favorited` marks a Pokémon the user manually
+// favorited or tagged — those keep their protection across home changes
+// because the favorite/tag rules apply globally, regardless of region.
 const REGIONAL_STORAGE = [
-  { region: "na",   souvenir: false },
-  { region: "na",   souvenir: false },
-  { region: "na",   souvenir: true  },
-  { region: "eu",   souvenir: true  },
-  { region: "sa",   souvenir: true  },
-  { region: "na",   souvenir: false },
-  { region: "asia", souvenir: true  },
-  { region: "na",   souvenir: false },
-  { region: "au",   souvenir: true  },
-  { region: "eu",   souvenir: true  },
-  { region: "na",   souvenir: false },
-  { region: "sa",   souvenir: true  },
+  { region: "na",   favorited: false },
+  { region: "na",   favorited: false },
+  { region: "na",   favorited: true  },
+  { region: "eu",   favorited: true  },
+  { region: "sa",   favorited: true  },
+  { region: "na",   favorited: false },
+  { region: "asia", favorited: true  },
+  { region: "na",   favorited: false },
+  { region: "au",   favorited: true  },
+  { region: "eu",   favorited: true  },
+  { region: "na",   favorited: false },
+  { region: "sa",   favorited: true  },
 ];
 const HOME_REGION = "na";
 
@@ -136,16 +138,16 @@ function RegionalStorageStrip({ act }) {
       {REGIONAL_STORAGE.map((item, i) => {
         const color = REGIONAL_PALETTE[item.region];
         const dropped =
-          act === 2 && item.region === HOME_REGION && !item.souvenir;
+          act === 2 && item.region === HOME_REGION && !item.favorited;
         return (
           <span
             key={i}
             className="block aspect-square rounded-full transition-all duration-700"
             style={{
               backgroundColor: color,
-              opacity: dropped ? 0.18 : item.souvenir ? 1 : 0.85,
+              opacity: dropped ? 0.18 : item.favorited ? 1 : 0.85,
               boxShadow:
-                item.souvenir && !dropped
+                item.favorited && !dropped
                   ? `0 0 8px ${C.amber}cc, 0 0 0 2px ${C.amber}`
                   : "none",
             }}

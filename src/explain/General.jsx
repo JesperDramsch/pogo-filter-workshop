@@ -47,8 +47,8 @@ const ATTR_HUNDO_FAMILY = new Set([
   ix(3, 0), ix(3, 1), ix(3, 2), ix(3, 5), ix(3, 7), ix(3, 9), ix(3, 10),
   ix(4, 0), ix(4, 2), ix(4, 5), ix(4, 8),
 ]);
-// 3★ Pokémon with two perfect bars (atk + def both 15) — kept even when a
-// hundo of the family exists, since they're still PvP-relevant.
+// 3★ Pokémon with two stats at 15 — kept even when a hundo of the family
+// exists, since they're still PvP-relevant.
 const ATTR_TWO_BAR_PERFECT = new Set([ix(3, 5), ix(3, 9)]);
 
 const STORY_DOTS = Array.from({ length: TOTAL }, (_, i) => {
@@ -287,125 +287,10 @@ function IdeaSection({ t }) {
   );
 }
 
-// ─── Nerd capstone ─────────────────────────────────────────────────────────
-
-function VennDiagram({ reducedMotion, t }) {
-  const cx = 230;
-  const cy = 110;
-  const o = 28;
-  const subs = [
-    { color: C.cyan,   pos: { cx: cx - o, cy: cy - o }, label: t("app.landing.story.legend.iv"),       lpos: { x: -56, y: -52 } },
-    { color: C.green,  pos: { cx: cx + o, cy: cy - o }, label: t("app.landing.story.legend.valuable"), lpos: { x: 56,  y: -52 } },
-    { color: C.purple, pos: { cx: cx - o, cy: cy + o }, label: t("app.landing.story.legend.tagged"),   lpos: { x: -56, y: 60  } },
-    { color: C.amber,  pos: { cx: cx + o, cy: cy + o }, label: t("app.landing.story.legend.pvp"),      lpos: { x: 56,  y: 60  } },
-  ];
-  return (
-    <svg viewBox="0 0 460 220" className="w-full max-w-md mx-auto">
-      <rect x="2" y="2" width="456" height="216" fill="none" stroke={C.borderHi} strokeDasharray="3 3" rx="6" />
-      <text x="14" y="22" fill={C.red} fontFamily="JetBrains Mono, monospace" fontSize="12" fontWeight="bold">
-        T = ¬K
-      </text>
-      <text x="14" y="38" fill={C.red} fontFamily="JetBrains Mono, monospace" fontSize="10" opacity="0.8">
-        → trash
-      </text>
-      <motion.circle
-        initial={{ scale: 0.7, opacity: 0 }}
-        whileInView={{ scale: 1, opacity: 1 }}
-        viewport={{ once: true, margin: "-40px" }}
-        transition={{ duration: reducedMotion ? 0 : 0.6, ease: "easeOut" }}
-        cx={cx} cy={cy} r="78" fill={`${C.text}06`} stroke={C.text} strokeWidth="1.5"
-      />
-      <text x={cx} y={cy - 84} fill={C.text} fontFamily="JetBrains Mono, monospace" fontSize="13" fontWeight="bold" textAnchor="middle">
-        K (keepers)
-      </text>
-      {subs.map((s, i) => (
-        <motion.circle
-          key={i}
-          initial={{ scale: 0, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 1 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: reducedMotion ? 0 : 0.45, delay: reducedMotion ? 0 : 0.35 + i * 0.1, ease: "easeOut" }}
-          cx={s.pos.cx} cy={s.pos.cy} r="34" fill={`${s.color}30`} stroke={s.color} strokeWidth="2"
-        />
-      ))}
-      {subs.map((s, i) => (
-        <motion.text
-          key={`l-${i}`}
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: reducedMotion ? 0 : 0.3, delay: reducedMotion ? 0 : 0.7 + i * 0.08 }}
-          x={cx + s.lpos.x} y={cy + s.lpos.y}
-          fill={s.color} fontFamily="JetBrains Mono, monospace" fontSize="10" textAnchor="middle"
-        >
-          {s.label}
-        </motion.text>
-      ))}
-    </svg>
-  );
-}
-
-function NerdSection({ t, reducedMotion }) {
-  const [open, setOpen] = useState(false);
-  const defs = [
-    { key: "k", icon: "K",        label: t("app.landing.nerd.k_def"),            color: C.text },
-    { key: "t", icon: "T",        label: t("app.landing.nerd.t_def"),            color: C.red },
-    { key: "h", icon: "H ∪ S012", label: t("app.landing.nerd.species_def"),       color: C.cyan },
-    { key: "i", icon: "&",        label: t("app.landing.nerd.intersection_def"), color: C.dim },
-    { key: "s", icon: "↔",        label: t("app.landing.nerd.symmetry"),         color: C.dim },
-    { key: "r", icon: "4★",       label: t("app.landing.nerd.rule1"),            color: C.amber },
-  ];
-  return (
-    <section id="nerd" className="rounded-lg border" style={{ backgroundColor: C.panel, borderColor: C.border }}>
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="w-full text-left p-6 sm:p-8 flex items-center justify-between gap-4 transition hover:bg-[#10151B]"
-        aria-expanded={open}
-      >
-        <span className="mono text-base font-bold tracking-tight" style={{ color: C.text }}>
-          {open ? t("app.landing.nerd.toggle_close") : t("app.landing.nerd.toggle_open")}
-        </span>
-        <span className="mono text-xs px-2 py-1 rounded" style={{ backgroundColor: C.border, color: C.dim }}>
-          {open ? "−" : "+"}
-        </span>
-      </button>
-      <motion.div
-        initial={false}
-        animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
-        transition={{ duration: reducedMotion ? 0 : 0.35, ease: "easeOut" }}
-        style={{ overflow: "hidden" }}
-      >
-        <div className="px-6 sm:px-8 pb-8 space-y-6">
-          <p className="text-sm leading-relaxed" style={{ color: C.text }}>
-            {t("app.landing.nerd.intro")}
-          </p>
-          <VennDiagram reducedMotion={reducedMotion} t={t} />
-          <ul className="space-y-3">
-            {defs.map((d) => (
-              <li key={d.key} className="flex gap-3 items-start">
-                <span
-                  className="mono text-xs font-bold px-2 py-1 rounded shrink-0 min-w-[3rem] text-center"
-                  style={{
-                    backgroundColor: `${d.color}20`,
-                    color: d.color,
-                    border: `1px solid ${d.color}40`,
-                  }}
-                >
-                  {d.icon}
-                </span>
-                <span className="text-sm leading-relaxed" style={{ color: C.text }}>
-                  {d.label}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </motion.div>
-    </section>
-  );
-}
-
 // ─── Page ───────────────────────────────────────────────────────────────────
+// The Venn + nerd capstone moved out of this chapter into the dedicated
+// `Algebra` chapter (`#explain/algebra`). General now ends with the finisher;
+// readers who want the math click through to that chapter from the nav.
 
 export default function General({ onNavigate }) {
   const { t } = useTranslation();
@@ -461,7 +346,6 @@ export default function General({ onNavigate }) {
           ))}
         </section>
         <FinisherSection t={t} reducedMotion={reducedMotion} />
-        <NerdSection t={t} reducedMotion={reducedMotion} />
       </div>
     </ChapterShell>
   );

@@ -252,6 +252,46 @@ function NavChip({ icon: Icon, label, onClick, tone, iconRight = false }) {
   );
 }
 
+// Sign-off used on every page (landing, chapters, workshop). Two compact
+// lines: the personal credit + the author's other projects (all linked).
+const CREDIT_PROJECTS = [
+  { label: "ML.recipes",             url: "https://ml.recipes"          },
+  { label: "data-science-gui.de",    url: "https://data-science-gui.de" },
+  { label: "python-deadlin.es",      url: "https://python-deadlin.es"   },
+  { label: "Late to the Party 🎉",   url: "https://late.email"          },
+  { label: "Latent Space Community", url: "https://latent.club"         },
+];
+
+export function AppCredit() {
+  const { t } = useTranslation();
+  const linkStyle = {
+    color: C.dim,
+    textDecoration: "underline",
+    textDecorationColor: `${C.dim}55`,
+    textUnderlineOffset: "2px",
+  };
+  return (
+    <div className="text-center mt-10 mb-2 space-y-1">
+      <div className="mono text-[11px]" style={{ color: C.dim }}>
+        Made with{" "}
+        <span style={{ color: C.red, fontWeight: "bold" }}>{"<3"}</span>{" "}
+        by Jesper Dramsch
+      </div>
+      <div className="mono text-[10px]" style={{ color: C.dim, opacity: 0.8 }}>
+        {t("app.credit.also")}{" "}
+        {CREDIT_PROJECTS.map((p, i) => (
+          <React.Fragment key={p.url}>
+            {i > 0 && " · "}
+            <a href={p.url} target="_blank" rel="noreferrer" style={linkStyle}>
+              {p.label}
+            </a>
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // Page wrapper for every explain chapter. Provides the persistent nav strip
 // at the top, full-bleed grid background, and a prev/next footer with one
 // more workshop CTA so the offer doesn't disappear when users hit bottom.
@@ -315,6 +355,7 @@ export function ChapterShell({ currentKey, onNavigate, children }) {
               {t("app.landing.cta_workshop")} <ArrowRight size={14} />
             </button>
           </div>
+          <AppCredit />
         </footer>
       </div>
     </div>

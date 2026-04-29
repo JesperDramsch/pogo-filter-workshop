@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { ArrowRight, BookOpen } from "lucide-react";
 import { useTranslation } from "./i18n/I18nProvider.jsx";
 import { C } from "./explain/colors.js";
-import { ChapterNav, HeroPill } from "./explain/Shell.jsx";
+import { ChapterNav, HeroPill, AppCredit } from "./explain/Shell.jsx";
 
 // ─── Looping demo ───────────────────────────────────────────────────────────
 // 8×6 grid of 48 dots. A few dots are pre-assigned a "role" (favorite, shiny,
@@ -270,6 +270,7 @@ export default function Landing({ onNavigate }) {
               <BookOpen size={14} /> {t("app.landing.cta_explain")} <ArrowRight size={14} />
             </button>
           </div>
+          <AppCredit />
         </main>
       </div>
     </div>

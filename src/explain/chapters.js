@@ -1,4 +1,4 @@
-import { Sparkles, MapPin, Users, ScrollText } from "lucide-react";
+import { Sparkles, MapPin, Users, ScrollText, Sigma } from "lucide-react";
 
 // Single source of truth for the explainer story chain. Order matters — drives
 // the chapter tabs at the top of every explain page and the prev/next footer.
@@ -33,6 +33,12 @@ export const CHAPTERS = [
     hash: "rules",
     icon: ScrollText,
     titleKey: "app.explain.chapter.rules",
+  },
+  {
+    key: "algebra",
+    hash: "explain/algebra",
+    icon: Sigma,
+    titleKey: "app.explain.chapter.algebra",
   },
 ];
 

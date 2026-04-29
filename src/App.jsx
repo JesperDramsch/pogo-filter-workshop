@@ -14,6 +14,8 @@ import General from "./explain/General.jsx";
 import Regional from "./explain/Regional.jsx";
 import Trade from "./explain/Trade.jsx";
 import Rules from "./explain/Rules.jsx";
+import Algebra from "./explain/Algebra.jsx";
+import { AppCredit } from "./explain/Shell.jsx";
 
 // Hash-driven routing.
 //   ""                    → landing  (the marketing front door)
@@ -22,6 +24,7 @@ import Rules from "./explain/Rules.jsx";
 //   "#explain/regional"   → Regional
 //   "#explain/trade"      → Trade
 //   "#rules"              → Rules
+//   "#explain/algebra"    → Algebra  (set-theory deep dive)
 // Hash routing avoids the GitHub Pages 404-on-direct-load problem real paths
 // would have without a 404.html shim. Everything is shareable/bookmarkable
 // and the browser back/forward buttons work for free.
@@ -32,6 +35,7 @@ const VIEW_BY_HASH = {
   "#explain/regional": "regional",
   "#explain/trade": "trade",
   "#rules": "rules",
+  "#explain/algebra": "algebra",
 };
 const HASH_BY_VIEW = {
   landing: "",
@@ -40,6 +44,7 @@ const HASH_BY_VIEW = {
   regional: "#explain/regional",
   trade: "#explain/trade",
   rules: "#rules",
+  algebra: "#explain/algebra",
 };
 function viewFromHash() {
   if (typeof window === "undefined") return "landing";
@@ -1074,6 +1079,7 @@ export default function App() {
       {view === "regional" && <Regional onNavigate={navigateView} />}
       {view === "trade"    && <Trade    onNavigate={navigateView} />}
       {view === "rules"    && <Rules    onNavigate={navigateView} />}
+      {view === "algebra"  && <Algebra  onNavigate={navigateView} />}
 
       {view === "workshop" && (
       <div className="grid-bg min-h-screen">
@@ -1295,6 +1301,7 @@ export default function App() {
             persistiert lokal · {hundos.length} hundos · trash {trash.length}c · trade {trade.length}c
             {homeLocation && <span> · home {homeLocation[1].toFixed(1)}°,{homeLocation[0].toFixed(1)}°</span>}
           </footer>
+          <AppCredit />
         </div>
       </div>
       )}
