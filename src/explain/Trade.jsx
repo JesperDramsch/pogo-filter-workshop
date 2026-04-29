@@ -6,14 +6,17 @@ import { C } from "./colors.js";
 import { ChapterShell, HeroPill } from "./Shell.jsx";
 
 function DistanceGauge({ t, reducedMotion }) {
+  // Distance threshold in the workshop is `distanceProtect: 100km` — the
+  // Pilot medal cutoff for long-distance trades. NOT a stardust discount;
+  // dust costs depend on friendship level, not distance.
   return (
     <div className="mt-2">
       <div className="flex justify-between mb-1.5">
-        <span className="mono text-[11px]" style={{ color: C.red }}>
-          40,000 dust
+        <span className="mono text-[11px]" style={{ color: C.dim }}>
+          Standard trade
         </span>
-        <span className="mono text-[11px]" style={{ color: C.green }}>
-          800 dust
+        <span className="mono text-[11px] font-bold" style={{ color: C.cyan }}>
+          🏅 Pilot medal
         </span>
       </div>
       <motion.div
@@ -23,7 +26,7 @@ function DistanceGauge({ t, reducedMotion }) {
         viewport={{ once: true, margin: "-40px" }}
         transition={{ duration: reducedMotion ? 0 : 0.7, ease: "easeOut" }}
         style={{
-          background: `linear-gradient(to right, ${C.red}, ${C.amber} 40%, ${C.green})`,
+          background: `linear-gradient(to right, ${C.borderHi}, ${C.cyan})`,
           transformOrigin: "left",
         }}
       >
@@ -51,10 +54,12 @@ function DistanceGauge({ t, reducedMotion }) {
 }
 
 function EvoFlow() {
+  // Trade evolutions in PoGo happen at the SECOND form, not the first —
+  // see TRADE_EVO_FAMILIES in src/App.jsx for the authoritative list.
   const pairs = [
-    { from: "Abra 1★",    to: "Alakazam" },
-    { from: "Machop 0★",  to: "Machamp"  },
-    { from: "Geodude 2★", to: "Golem"    },
+    { from: "Kadabra 1★",  to: "Alakazam" },
+    { from: "Machoke 0★",  to: "Machamp"  },
+    { from: "Graveler 2★", to: "Golem"    },
   ];
   return (
     <div className="mt-2 space-y-2">
