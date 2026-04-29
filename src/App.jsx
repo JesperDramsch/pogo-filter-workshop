@@ -1584,30 +1584,33 @@ function Collapsible({ icon, label, open, onToggle, children }) {
 }
 
 function SetTheory({ hundos, TE_full, TE_trim, cfg }) {
+  const { t } = useTranslation();
   const Pdesc = cfg.pvpMode === "loose" ? "(0-1, 3-4, 3-4)"
-            : cfg.pvpMode === "strict" ? "(0, 3-4, 3-4)" : "∅ (disabled)";
+            : cfg.pvpMode === "strict" ? "(0, 3-4, 3-4)" : t("app.set_theory.p_disabled");
+  // Rule-1 help splits around the bold {auto} marker so we keep it styled as <em>.
+  const autoMarker = t("app.set_theory.rule1_help_auto");
+  const ruleParts = t("app.set_theory.rule1_help", { params: { auto: autoMarker } }).split(autoMarker);
   return (
     <div className="mono text-xs text-[#A8B3BD] leading-relaxed space-y-3">
       <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
         <span className="text-[#5EAFC5]">H</span>
-        <span>= {`{${hundos.length} families}`} → expanded via <code className="text-[#E6EDF3]">+species</code></span>
+        <span>= {`{${t("app.set_theory.h_value", { params: { count: hundos.length } })}}`} → {t("app.set_theory.h_note")} <code className="text-[#E6EDF3]">+species</code></span>
         <span className="text-[#5EAFC5]">K</span>
-        <span>= (4,4,3-4) ∪ (4,3-4,4) ∪ (3-4,4,4) <span className="text-[#8090A0]">— two perfect bars + third ≥ 11 IV</span></span>
+        <span>= (4,4,3-4) ∪ (4,3-4,4) ∪ (3-4,4,4) <span className="text-[#8090A0]">— {t("app.set_theory.k_note")}</span></span>
         <span className="text-[#5EAFC5]">P</span>
-        <span>= {Pdesc} <span className="text-[#8090A0]">— PvP keep set</span></span>
+        <span>= {Pdesc} <span className="text-[#8090A0]">— {t("app.set_theory.p_note")}</span></span>
         <span className="text-[#5EAFC5]">S012</span>
         <span>= 0★ ∪ 1★ ∪ 2★</span>
         <span className="text-[#5EAFC5]">TE</span>
-        <span>= {`{${TE_full.length} trade-evo families}`} ({TE_trim.length} after H-overlap dedup in clause 1)</span>
+        <span>= {`{${t("app.set_theory.te_value", { params: { count: TE_full.length } })}}`} {t("app.set_theory.te_note", { params: { count: TE_trim.length } })}</span>
       </div>
       <hr className="border-[#1F2933]" />
       <div className="space-y-1.5">
-        <div className="text-[#E74C3C]">Trash<span className="text-[#8090A0]"> = (S012 ∪ (H ∩ ¬K)) ∩ ¬P ∩ ¬Prot</span></div>
-        <div className="text-[#5EAFC5]">Trade<span className="text-[#8090A0]"> = (S012 ∪ TE ∪ (H ∩ ¬K)) ∩ ¬P ∩ ¬S4 ∩ ¬Prot ∩ ¬Traded</span></div>
+        <div className="text-[#E74C3C]">{t("app.set_theory.trash_label")}<span className="text-[#8090A0]"> = (S012 ∪ (H ∩ ¬K)) ∩ ¬P ∩ ¬Prot</span></div>
+        <div className="text-[#5EAFC5]">{t("app.set_theory.trade_label")}<span className="text-[#8090A0]"> = (S012 ∪ TE ∪ (H ∩ ¬K)) ∩ ¬P ∩ ¬S4 ∩ ¬Prot ∩ ¬Traded</span></div>
       </div>
       <div className="text-[#8090A0] text-[10.5px] leading-relaxed pt-2">
-        <span className="text-[#F5B82E]">▲</span> Rule 1 (never toss 4★) is <em>automatic</em> — any 4★ hundo trivially matches K, so ¬K excludes them.
-        K and P are disjoint (atk≥3 vs atk≤1), so they don't overlap.
+        <span className="text-[#F5B82E]">▲</span> {ruleParts[0]}<em>{autoMarker}</em>{ruleParts[1] || ""}
       </div>
     </div>
   );
@@ -1664,6 +1667,7 @@ function ClauseList({ title, accent, clauses }) {
 }
 
 function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = "de" }) {
+  const { t } = useTranslation();
   const [m, setM] = useState({
     family: "", star: 2, atk: 1, def: 1, hp: 1,
     flags: {}, types: [], dex: 0,
@@ -1700,24 +1704,24 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = "de" })
   const inH = hundos.includes(mon.families[0] || "");
 
   const flagToggles = [
-    ["favorite","fav"],["tagged","tag"],["shiny","shiny"],["lucky","lucky"],
-    ["legendary","legend"],["mythical","myth"],["shadow","crypto"],["legacyMove","spezial"],
-    ["megaEvolved","mega'd"],["dynamaxCapable","dyna"],["doubleMoved","2nd-move"],
-    ["xxl","xxl"],["xl","xl"],["xxs","xxs"],["leagueU","ⓤ"],["buddy","buddy"],
+    ["favorite","app.verify.flag_fav"],["tagged","app.verify.flag_tag"],["shiny","app.verify.flag_shiny"],["lucky","app.verify.flag_lucky"],
+    ["legendary","app.verify.flag_legend"],["mythical","app.verify.flag_myth"],["shadow","app.verify.flag_crypto"],["legacyMove","app.verify.flag_legacy"],
+    ["megaEvolved","app.verify.flag_mega"],["dynamaxCapable","app.verify.flag_dyna"],["doubleMoved","app.verify.flag_double_move"],
+    ["xxl","app.verify.flag_xxl"],["xl","app.verify.flag_xl"],["xxs","app.verify.flag_xxs"],["leagueU","app.verify.flag_league_u"],["buddy","app.verify.flag_buddy"],
   ];
 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <FieldText label="family" value={m.family} onChange={v => setM({ ...m, family: v })} placeholder="e.g. bisasam" />
-        <FieldNum label="star" value={m.star} onChange={v => setM({ ...m, star: +v })} min={0} max={4} />
-        <FieldNum label="atk IV" value={m.atk} onChange={v => setM({ ...m, atk: +v })} min={0} max={4} />
-        <FieldNum label="def IV" value={m.def} onChange={v => setM({ ...m, def: +v })} min={0} max={4} />
-        <FieldNum label="hp IV" value={m.hp} onChange={v => setM({ ...m, hp: +v })} min={0} max={4} />
+        <FieldText label={t("app.verify.field_family")} value={m.family} onChange={v => setM({ ...m, family: v })} placeholder={t("app.verify.placeholder_family")} />
+        <FieldNum label={t("app.verify.field_star")} value={m.star} onChange={v => setM({ ...m, star: +v })} min={0} max={4} />
+        <FieldNum label={t("app.verify.field_atk")} value={m.atk} onChange={v => setM({ ...m, atk: +v })} min={0} max={4} />
+        <FieldNum label={t("app.verify.field_def")} value={m.def} onChange={v => setM({ ...m, def: +v })} min={0} max={4} />
+        <FieldNum label={t("app.verify.field_hp")} value={m.hp} onChange={v => setM({ ...m, hp: +v })} min={0} max={4} />
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        {flagToggles.map(([k, label]) => (
+        {flagToggles.map(([k, labelKey]) => (
           <button key={k}
             onClick={() => setFlag(k, !m.flags[k])}
             className={`mono text-[11px] px-2 py-1 rounded transition ${
@@ -1725,40 +1729,41 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = "de" })
                 ? "bg-[#5EAFC5] text-[#0F1419]"
                 : "bg-[#1F2933] text-[#8B98A5] hover:bg-[#2D3A47]"
             }`}>
-            {label}
+            {t(labelKey)}
           </button>
         ))}
       </div>
 
       <div className="grid grid-cols-2 gap-3 mt-2">
-        <ResultBox label="trash" verdict={inTrash} accent="#E74C3C" />
-        <ResultBox label="trade" verdict={inTrade} accent="#5EAFC5" />
+        <ResultBox label={t("app.filter.trash_label")} verdict={inTrash} accent="#E74C3C" />
+        <ResultBox label={t("app.filter.trade_label")} verdict={inTrade} accent="#5EAFC5" />
       </div>
       <div className="mono text-[11px] text-[#8090A0]">
-        family in H: <span className={inH ? "text-[#5EAFC5]" : "text-[#8090A0]"}>{inH ? "yes" : "no"}</span>
+        {t("app.verify.family_in_h")} <span className={inH ? "text-[#5EAFC5]" : "text-[#8090A0]"}>{inH ? t("app.verify.yes") : t("app.verify.no")}</span>
         <span className="mx-2">·</span>
-        IV class: {classifyIV(m.atk, m.def, m.hp)}
+        {t("app.verify.iv_class")} {classifyIV(m.atk, m.def, m.hp, t)}
       </div>
     </div>
   );
 }
 
-function classifyIV(a, d, h) {
+function classifyIV(a, d, h, t) {
   const isP = a <= 1 && d >= 3 && h >= 3;
   const k1 = a === 4 && d === 4 && h >= 3;
   const k2 = a === 4 && d >= 3 && h === 4;
   const k3 = a >= 3 && d === 4 && h === 4;
-  if (k1 || k2 || k3) return <span className="text-[#5EAFC5]">K (keeper)</span>;
-  if (isP) return <span className="text-[#F5B82E]">P (PvP)</span>;
-  return <span className="text-[#8090A0]">neither</span>;
+  if (k1 || k2 || k3) return <span className="text-[#5EAFC5]">{t("app.verify.k_keeper")}</span>;
+  if (isP) return <span className="text-[#F5B82E]">{t("app.verify.p_pvp")}</span>;
+  return <span className="text-[#8090A0]">{t("app.verify.neither")}</span>;
 }
 
 function ResultBox({ label, verdict, accent }) {
+  const { t } = useTranslation();
   return (
     <div className="border rounded p-3" style={{ borderColor: verdict ? accent : "#1F2933" }}>
       <div className="mono text-[11px] uppercase tracking-wider text-[#8090A0]">{label}</div>
       <div className="mono text-lg font-bold mt-1" style={{ color: verdict ? accent : "#8090A0" }}>
-        {verdict ? "✓ visible" : "— hidden"}
+        {verdict ? t("app.verify.visible") : t("app.verify.hidden")}
       </div>
     </div>
   );
@@ -1976,22 +1981,22 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
 
       {/* PvP MODE */}
       <div>
-        <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">PvP-Modus · was als Keeper gilt</div>
+        <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">{t("app.pvp.section_title")}</div>
         <div className="flex flex-wrap gap-1.5">
           {[
-            ["loose",  "Loose",  "(0-1, 3-4, 3-4) — schützt auch 1-Atk Spreads"],
-            ["strict", "Strict", "(0, 3-4, 3-4) — nur klassische Nundo-PvP"],
-            ["none",   "Aus",    "kein PvP-Schutz"],
-          ].map(([m, label, desc]) => (
+            ["loose",  "app.pvp.loose_label",  "app.pvp.loose_desc"],
+            ["strict", "app.pvp.strict_label", "app.pvp.strict_desc"],
+            ["none",   "app.pvp.none_label",   "app.pvp.none_desc"],
+          ].map(([m, labelKey, descKey]) => (
             <button key={m}
               onClick={() => set("pvpMode", m)}
-              title={desc}
+              title={t(descKey)}
               className={`mono text-xs px-3 py-1.5 rounded transition ${
                 config.pvpMode === m
                   ? "bg-[#5EAFC5] text-[#0F1419]"
                   : "bg-[#1F2933] text-[#8B98A5] hover:bg-[#2D3A47]"
               }`}>
-              {label}
+              {t(labelKey)}
             </button>
           ))}
         </div>
