@@ -1,0 +1,65 @@
+{
+  "en": {
+    "trash": "0*,1*,2*&0*,1*,2*,0-3attack,0-3defense,0-2hp&0*,1*,2*,0-3attack,0-2defense,0-3hp&0*,1*,2*,0-2attack,0-3defense,0-3hp&2-4attack,0-2defense,0-2hp&!4*&!#&!favorite&!shiny&!legendary&!mythical,808,649&!ultrabeast&!shadow&!costume&!lucky&!background&!maxmove1-&!evolvenew,mega0&!@special&!eggsonly&!distance100-,traded&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&age-30,traded",
+    "trade": "0*,1*,2*&0*,1*,2*,0-3attack,0-3defense,0-2hp&0*,1*,2*,0-3attack,0-2defense,0-3hp&0*,1*,2*,0-2attack,0-3defense,0-3hp&2-4attack,0-2defense,0-2hp&!traded&!shadow&!lucky&!mythical,808,809&!#&!legendary&!ultrabeast&!shiny&!costume&!purified&!background&!favorite&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!maxmove1-&!xxl&!xl&!@special&age-30&distance0-",
+    "sort": "",
+    "prestaged": "#Trade,#Fern-Tausch&!traded&!shadow&!lucky&!mythical,808,809",
+    "gift": "shiny,legendary,ultrabeast,costume,background&!traded&!shadow&!mythical,808,809&!lucky&!4*&!favorite&!@special&!#,#Trade,#Fern-Tausch",
+    "trashClauseCount": 30,
+    "tradeClauseCount": 28
+  },
+  "de": {
+    "trash": "0*,1*,2*&0*,1*,2*,0-3angriffs-wert,0-3verteidigungs-wert,0-2kp&0*,1*,2*,0-3angriffs-wert,0-2verteidigungs-wert,0-3kp&0*,1*,2*,0-2angriffs-wert,0-3verteidigungs-wert,0-3kp&2-4angriffs-wert,0-2verteidigungs-wert,0-2kp&!4*&!#&!favorit&!schillernd&!legendär&!mysteriös,808,649&!ultrabestie&!crypto&!kostümiert&!glücks&!hintergrund&!dynaattacke1-&!neueentwicklung,mega0&!@spezial&!nurauseiern&!entfernung100-,getauscht&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&wp-2000&alter-30,getauscht",
+    "trade": "0*,1*,2*&0*,1*,2*,0-3angriffs-wert,0-3verteidigungs-wert,0-2kp&0*,1*,2*,0-3angriffs-wert,0-2verteidigungs-wert,0-3kp&0*,1*,2*,0-2angriffs-wert,0-3verteidigungs-wert,0-3kp&2-4angriffs-wert,0-2verteidigungs-wert,0-2kp&!getauscht&!crypto&!glücks&!mysteriös,808,809&!#&!legendär&!ultrabestie&!schillernd&!kostümiert&!erlöst&!hintergrund&!favorit&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!dynaattacke1-&!xxl&!xl&!@spezial&alter-30&entfernung0-",
+    "sort": "",
+    "prestaged": "#Trade,#Fern-Tausch&!getauscht&!crypto&!glücks&!mysteriös,808,809",
+    "gift": "schillernd,legendär,ultrabestie,kostümiert,hintergrund&!getauscht&!crypto&!mysteriös,808,809&!glücks&!4*&!favorit&!@spezial&!#,#Trade,#Fern-Tausch",
+    "trashClauseCount": 30,
+    "tradeClauseCount": 28
+  },
+  "es": {
+    "trash": "0*,1*,2*&0*,1*,2*,0-3ataque,0-3defensa,0-2ps&0*,1*,2*,0-3ataque,0-2defensa,0-3ps&0*,1*,2*,0-2ataque,0-3defensa,0-3ps&2-4ataque,0-2defensa,0-2ps&!4*&!#&!favoritos&!variocolor&!legendario&!singular,808,649&!ultraente&!oscuro&!disfraz&!suerte&!fondo&!movimientomax1-&!nuevaevolución,mega0&!@especial&!huevosolo&!distancia100-,intercambiados&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&pc-2000&edad-30,intercambiados",
+    "trade": "0*,1*,2*&0*,1*,2*,0-3ataque,0-3defensa,0-2ps&0*,1*,2*,0-3ataque,0-2defensa,0-3ps&0*,1*,2*,0-2ataque,0-3defensa,0-3ps&2-4ataque,0-2defensa,0-2ps&!intercambiados&!oscuro&!suerte&!singular,808,809&!#&!legendario&!ultraente&!variocolor&!disfraz&!purificado&!fondo&!favoritos&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!movimientomax1-&!xxl&!xl&!@especial&edad-30&distancia0-",
+    "sort": "",
+    "prestaged": "#Trade,#Fern-Tausch&!intercambiados&!oscuro&!suerte&!singular,808,809",
+    "gift": "variocolor,legendario,ultraente,disfraz,fondo&!intercambiados&!oscuro&!singular,808,809&!suerte&!4*&!favoritos&!@especial&!#,#Trade,#Fern-Tausch",
+    "trashClauseCount": 30,
+    "tradeClauseCount": 28
+  },
+  "fr": {
+    "trash": "0*,1*,2*&0*,1*,2*,0-3attaque,0-3défense,0-2pv&0*,1*,2*,0-3attaque,0-2défense,0-3pv&0*,1*,2*,0-2attaque,0-3défense,0-3pv&2-4attaque,0-2défense,0-2pv&!4*&!#&!favoris&!chromatique&!légendaire&!fabuleux,808,649&!ultra-chimère&!obscur&!costume&!chanceux&!fond&!capacitédynamax1-&!nouvelleévolution,méga0&!@spécial&!oeufseulement&!distance100-,échangé&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&pc-2000&âge-30,échangé",
+    "trade": "0*,1*,2*&0*,1*,2*,0-3attaque,0-3défense,0-2pv&0*,1*,2*,0-3attaque,0-2défense,0-3pv&0*,1*,2*,0-2attaque,0-3défense,0-3pv&2-4attaque,0-2défense,0-2pv&!échangé&!obscur&!chanceux&!fabuleux,808,809&!#&!légendaire&!ultra-chimère&!chromatique&!costume&!purifié&!fond&!favoris&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!capacitédynamax1-&!xxl&!xl&!@spécial&âge-30&distance0-",
+    "sort": "",
+    "prestaged": "#Trade,#Fern-Tausch&!échangé&!obscur&!chanceux&!fabuleux,808,809",
+    "gift": "chromatique,légendaire,ultra-chimère,costume,fond&!échangé&!obscur&!fabuleux,808,809&!chanceux&!4*&!favoris&!@spécial&!#,#Trade,#Fern-Tausch",
+    "trashClauseCount": 30,
+    "tradeClauseCount": 28
+  },
+  "zh-TW": {
+    "trash": "0*,1*,2*&0*,1*,2*,0-3攻擊,0-3防禦,0-2hp&0*,1*,2*,0-3攻擊,0-2防禦,0-3hp&0*,1*,2*,0-2攻擊,0-3防禦,0-3hp&2-4攻擊,0-2防禦,0-2hp&!4*&!#&!我的最愛&!異色&!傳說的寶可夢&!幻,808,649&!究極異獸&!暗影&!特殊&!亮晶晶&!背卡&!極巨招式1-&!未登錄,超級0&!@特別&!只限蛋&!距離100-,交換&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&日數-30,交換",
+    "trade": "0*,1*,2*&0*,1*,2*,0-3攻擊,0-3防禦,0-2hp&0*,1*,2*,0-3攻擊,0-2防禦,0-3hp&0*,1*,2*,0-2攻擊,0-3防禦,0-3hp&2-4攻擊,0-2防禦,0-2hp&!交換&!暗影&!亮晶晶&!幻,808,809&!#&!傳說的寶可夢&!究極異獸&!異色&!特殊&!淨化&!背卡&!我的最愛&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!極巨招式1-&!xxl&!xl&!@特別&日數-30&距離0-",
+    "sort": "",
+    "prestaged": "#Trade,#Fern-Tausch&!交換&!暗影&!亮晶晶&!幻,808,809",
+    "gift": "異色,傳說的寶可夢,究極異獸,特殊,背卡&!交換&!暗影&!幻,808,809&!亮晶晶&!4*&!我的最愛&!@特別&!#,#Trade,#Fern-Tausch",
+    "trashClauseCount": 30,
+    "tradeClauseCount": 28
+  },
+  "hi": {
+    "trash": "0*,1*,2*&0*,1*,2*,0-3अटैक,0-3डफ़ेंस,0-2hp&0*,1*,2*,0-3अटैक,0-2डफ़ेंस,0-3hp&0*,1*,2*,0-2अटैक,0-3डफ़ेंस,0-3hp&2-4अटैक,0-2डफ़ेंस,0-2hp&!4*&!#&!पसंदीदा&!शाइनी&!लजेंडर&!मथकल,808,649&!अटाबीट&!शैडो&!कॉट्यूम&!लक&!बैकाउंड&!मैसमूव1-&!नया वकास करं,मेगा0&!@पेशल&!सफ़ अंडे&!दूर100-,टड कये गए&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&उ-30,टड कये गए",
+    "trade": "0*,1*,2*&0*,1*,2*,0-3अटैक,0-3डफ़ेंस,0-2hp&0*,1*,2*,0-3अटैक,0-2डफ़ेंस,0-3hp&0*,1*,2*,0-2अटैक,0-3डफ़ेंस,0-3hp&2-4अटैक,0-2डफ़ेंस,0-2hp&!टड कये गए&!शैडो&!लक&!मथकल,808,809&!#&!लजेंडर&!अटाबीट&!शाइनी&!कॉट्यूम&!शु&!बैकाउंड&!पसंदीदा&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!मैसमूव1-&!xxl&!xl&!@पेशल&उ-30&दूर0-",
+    "sort": "",
+    "prestaged": "#Trade,#Fern-Tausch&!टड कये गए&!शैडो&!लक&!मथकल,808,809",
+    "gift": "शाइनी,लजेंडर,अटाबीट,कॉट्यूम,बैकाउंड&!टड कये गए&!शैडो&!मथकल,808,809&!लक&!4*&!पसंदीदा&!@पेशल&!#,#Trade,#Fern-Tausch",
+    "trashClauseCount": 30,
+    "tradeClauseCount": 28
+  },
+  "ja": {
+    "trash": "0*,1*,2*&0*,1*,2*,0-3こうげき,0-3ぼうぎょ,0-2hp&0*,1*,2*,0-3こうげき,0-2ぼうぎょ,0-3hp&0*,1*,2*,0-2こうげき,0-3ぼうぎょ,0-3hp&2-4こうげき,0-2ぼうぎょ,0-2hp&!4*&!#&!お気に入り&!色違い&!伝説のポケモン&!まぼろし,808,649&!ウルトラビースト&!しゃどう&!とくべつ&!キラ&!はいけい&!まっくすわざ1-&!みとうろく,メガ0&!@わざ&!たまごのみ&!きょり100-,こうかん&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&日数-30,こうかん",
+    "trade": "0*,1*,2*&0*,1*,2*,0-3こうげき,0-3ぼうぎょ,0-2hp&0*,1*,2*,0-3こうげき,0-2ぼうぎょ,0-3hp&0*,1*,2*,0-2こうげき,0-3ぼうぎょ,0-3hp&2-4こうげき,0-2ぼうぎょ,0-2hp&!こうかん&!しゃどう&!キラ&!まぼろし,808,809&!#&!伝説のポケモン&!ウルトラビースト&!色違い&!とくべつ&!らいと&!はいけい&!お気に入り&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!まっくすわざ1-&!xxl&!xl&!@わざ&日数-30&きょり0-",
+    "sort": "",
+    "prestaged": "#Trade,#Fern-Tausch&!こうかん&!しゃどう&!キラ&!まぼろし,808,809",
+    "gift": "色違い,伝説のポケモン,ウルトラビースト,とくべつ,はいけい&!こうかん&!しゃどう&!まぼろし,808,809&!キラ&!4*&!お気に入り&!@わざ&!#,#Trade,#Fern-Tausch",
+    "trashClauseCount": 30,
+    "tradeClauseCount": 28
+  }
+}

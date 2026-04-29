@@ -8,6 +8,8 @@
     "fetch-translations": "node scripts/fetch-translations.mjs",
     "prebuild": "node scripts/fetch-translations.mjs --offline-ok",
     "build": "vite build",
+    "test:fixtures": "vite-node scripts/check-fixtures.mjs",
+    "fixtures:update": "vite-node scripts/generate-fixtures.mjs",
     "preview": "vite preview",
     "deploy": "npm run build && gh-pages -d dist"
   },
@@ -23,6 +25,7 @@
     "@vitejs/plugin-react": "^4.3.3",
     "autoprefixer": "^10.4.20",
     "csv-parse": "^6.2.1",
+    "vite-node": "^6.0.0",
     "gh-pages": "^6.2.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",

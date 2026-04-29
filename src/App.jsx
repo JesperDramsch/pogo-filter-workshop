@@ -12,7 +12,7 @@ import { useTranslation } from "./i18n/I18nProvider.jsx";
 
 // ─── DATA ──────────────────────────────────────────────────────────────────
 
-const DEFAULT_HUNDOS = [];
+export const DEFAULT_HUNDOS = [];
 
 // Trade-evo families: dex-keyed identity, German base name as the user-facing
 // config key (kept stable so persisted localStorage state ["abra", "machollo"]
@@ -44,7 +44,7 @@ function teDisplay(baseKey, outputLocale = "de") {
   return name.charAt(0).toUpperCase() + name.slice(1);
 }
 
-const DEFAULT_CONFIG = {
+export const DEFAULT_CONFIG = {
   // Mode
   expertMode: false,           // hides niche toggles in normal mode
 
@@ -288,7 +288,7 @@ function capFirst(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", tFn = (k) => k) {
+export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", tFn = (k) => k) {
   const kw = pogoKeywords(outputLocale);
 
   // Hundos are stored in the user's output-locale lowercase form. Re-render in
