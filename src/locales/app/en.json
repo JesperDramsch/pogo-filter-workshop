@@ -151,6 +151,13 @@
 
   "app.modal.settings.title": "Settings",
   "app.modal.settings.close_aria": "Close",
+  "app.modal.language.section_title": "Language",
+  "app.modal.language.ui_label": "Display language",
+  "app.modal.language.ui_help": "Language of the user interface",
+  "app.modal.language.output_label": "PoGo search-syntax language",
+  "app.modal.language.output_help": "Language of your PoGo app — determines what language the filter output uses",
+  "app.modal.language.output_mismatch": "⚠ Note: Filters output in {output} while the UI is in {ui}. Set both the same if your PoGo app matches your browser's language.",
+
   "app.modal.settings.mode_label": "Mode: {mode}",
   "app.modal.settings.mode_expert": "Expert",
   "app.modal.settings.mode_normal": "Normal",

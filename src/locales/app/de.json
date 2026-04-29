@@ -151,6 +151,13 @@
 
   "app.modal.settings.title": "Einstellungen",
   "app.modal.settings.close_aria": "Schließen",
+  "app.modal.language.section_title": "Sprache",
+  "app.modal.language.ui_label": "Anzeige-Sprache",
+  "app.modal.language.ui_help": "Sprache der Bedienoberfläche",
+  "app.modal.language.output_label": "PoGo-Suchsyntax-Sprache",
+  "app.modal.language.output_help": "Sprache deiner PoGo-App — bestimmt, in welcher Sprache der Filter ausgegeben wird",
+  "app.modal.language.output_mismatch": "⚠ Hinweis: Filter werden in {output} ausgegeben, während die Oberfläche in {ui} angezeigt wird. Setze beides gleich, falls deine PoGo-App die gleiche Sprache wie dein Browser hat.",
+
   "app.modal.settings.mode_label": "Modus: {mode}",
   "app.modal.settings.mode_expert": "Experte",
   "app.modal.settings.mode_normal": "Normal",

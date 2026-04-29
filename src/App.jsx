@@ -2807,11 +2807,12 @@ function NumField({ label, value, onChange, text, hint }) {
 // safety nets, and the dangerous reset. Reachable via gear icon in header.
 
 function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArmed }) {
-  const { t } = useTranslation();
+  const { t, locale, setLocale, outputLocale, setOutputLocale, locales } = useTranslation();
   if (!open) return null;
   function set(k, v) { setConfig({ ...config, [k]: v }); }
   const expert = !!config.expertMode;
   const modeLabel = expert ? t("app.modal.settings.mode_expert") : t("app.modal.settings.mode_normal");
+  const localeMismatch = outputLocale !== locale;
 
   return (
     <div
@@ -2838,6 +2839,50 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
         </div>
 
         <div className="p-5 space-y-6">
+          {/* Language */}
+          <div>
+            <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
+              {t("app.modal.language.section_title")}
+            </div>
+            <div className={`grid gap-3 ${expert ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"}`}>
+              <div>
+                <label className="mono text-[10.5px] text-[#8090A0] block mb-1">
+                  {t("app.modal.language.ui_label")}
+                </label>
+                <select
+                  value={locale}
+                  onChange={e => setLocale(e.target.value)}
+                  className="mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]">
+                  {Object.entries(locales).map(([code, info]) => (
+                    <option key={code} value={code}>{info.label}</option>
+                  ))}
+                </select>
+                <div className="mono text-[10px] text-[#8090A0] mt-1">{t("app.modal.language.ui_help")}</div>
+              </div>
+              {expert && (
+                <div>
+                  <label className="mono text-[10.5px] text-[#8090A0] block mb-1">
+                    {t("app.modal.language.output_label")}
+                  </label>
+                  <select
+                    value={outputLocale}
+                    onChange={e => setOutputLocale(e.target.value)}
+                    className="mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]">
+                    {Object.entries(locales).map(([code, info]) => (
+                      <option key={code} value={code}>{info.label}</option>
+                    ))}
+                  </select>
+                  <div className="mono text-[10px] text-[#8090A0] mt-1">{t("app.modal.language.output_help")}</div>
+                </div>
+              )}
+            </div>
+            {localeMismatch && (
+              <div className="mono text-[10.5px] text-[#F5B82E] mt-2 leading-relaxed">
+                {t("app.modal.language.output_mismatch", { params: { ui: locales[locale]?.label || locale, output: locales[outputLocale]?.label || outputLocale } })}
+              </div>
+            )}
+          </div>
+
           {/* Mode toggle */}
           <div className="flex items-center justify-between border border-[#2D3A47] rounded p-3">
             <div>
