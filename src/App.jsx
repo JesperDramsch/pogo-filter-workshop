@@ -137,6 +137,11 @@ export const DEFAULT_CONFIG = {
   protectCostumes: true,
   protectBackgrounds: true,
   protectLegacyMoves: true,
+  // Smeargle's Sketched moveset always carries the @special flag — without
+  // a carve-out, every single Smeargle gets auto-protected. False (default)
+  // adds `,smeargle` to the legacy-moves trash clause so regular Smeargles
+  // still go in the bin. Expert users can flip this on to revert.
+  protectSmeargleLegacy: false,
   protectBabies: true,
   protectXXL: true,
   protectXL: true,
@@ -448,7 +453,17 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   if (cfg.protectBackgrounds)  push(trashClauses, `!${kw.flag.background}`, tFn("app.clause_why.backgrounds"));
   if (cfg.protectDynamax)      push(trashClauses, `!${kw.flag.dynamax_move}1-`, tFn("app.clause_why.dynamax"));
   if (cfg.protectNewEvolutions) push(trashClauses, `!${kw.flag.new_evo},${kw.flag.mega}0`, tFn("app.clause_why.new_evolutions"));
-  if (cfg.protectLegacyMoves)  push(trashClauses, `!@${kw.flag.special_move}`, tFn("app.clause_why.legacy_moves"));
+  if (cfg.protectLegacyMoves) {
+    // Carve out Smeargle by default: every Smeargle has @special-flagged
+    // Sketched moves, so without ',smeargle' the clause would protect them
+    // all. With OR-binding-tighter precedence, `!@special,smeargle` parses
+    // as (!@special ∪ smeargle) — i.e. keep is "@special AND NOT smeargle".
+    const smeargleName = pokemonNameFor("235", outputLocale)?.toLowerCase() || "smeargle";
+    const clause = cfg.protectSmeargleLegacy
+      ? `!@${kw.flag.special_move}`
+      : `!@${kw.flag.special_move},${smeargleName}`;
+    push(trashClauses, clause, tFn("app.clause_why.legacy_moves"));
+  }
   if (cfg.protectBabies)       push(trashClauses, `!${kw.flag.baby}`, tFn("app.clause_why.babies"));
   if (cfg.distanceProtect && cfg.distanceProtect > 0)
     push(trashClauses, `!${kw.numeric.distance}${cfg.distanceProtect}-,${kw.flag.traded}`, tFn("app.clause_why.distance", { params: { km: cfg.distanceProtect } }));
@@ -2001,12 +2016,13 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
   ];
 
   const expertOnly = [
-    ["protectFourStar",      "app.protect.four_star",       { requireConfirmOff: true }],
-    ["protectMythicals",     "app.protect.mythicals"],
-    ["protectUltraBeasts",   "app.protect.ultra_beasts"],
-    ["protectPurified",      "app.protect.purified"],
-    ["protectDynamax",       "app.protect.dynamax"],
-    ["protectBuddies",       "app.protect.buddies_protect"],
+    ["protectFourStar",        "app.protect.four_star",       { requireConfirmOff: true }],
+    ["protectMythicals",       "app.protect.mythicals"],
+    ["protectUltraBeasts",     "app.protect.ultra_beasts"],
+    ["protectPurified",        "app.protect.purified"],
+    ["protectDynamax",         "app.protect.dynamax"],
+    ["protectBuddies",         "app.protect.buddies_protect"],
+    ["protectSmeargleLegacy",  "app.protect.smeargle_legacy"],
   ];
 
   return (
