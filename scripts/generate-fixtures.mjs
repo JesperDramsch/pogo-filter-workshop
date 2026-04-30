@@ -58,6 +58,25 @@ for (const locale of Object.keys(LOCALES)) {
     // from the raid-bosses.json artifact in src/data/.
     raidFilters: flattenBossMap(result.raidFilters),
     maxBattleFilters: flattenBossMap(result.maxBattleFilters),
+    // Universal Max-Battle charger filter (single clause across all 0.5s
+    // fast moves + dynamax-eligibility). Locale-sensitive: emits localized
+    // move names per the move-name dictionary.
+    maxTank: result.maxTank?.clause || "",
+    // Team Rocket counters: leaders flatten to {leaderName: {phase: clause}};
+    // grunts flatten to {trainerName: clause}.
+    rocketLeaders: Object.fromEntries(
+      (result.rocketLeaders || []).map(l => [l.name,
+        Object.fromEntries(l.phases.map(p => [String(p.slot), p.clause || ""]))])
+    ),
+    rocketTypedGrunts: Object.fromEntries(
+      (result.rocketTypedGrunts || []).map(g => [g.name, g.clause])
+    ),
+    rocketGenericGrunts: Object.fromEntries(
+      (result.rocketGenericGrunts || []).map(g => [g.name, g.clause])
+    ),
+    pvpFilters: Object.fromEntries(
+      Object.entries(result.pvpFilters || {}).map(([k, v]) => [k, v.clause || ""])
+    ),
     trashClauseCount: result.trashClauses.length,
     tradeClauseCount: result.tradeClauses.length,
   };

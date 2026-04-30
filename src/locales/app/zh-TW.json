@@ -99,10 +99,6 @@
   "app.protect.home_locals.none": "無",
   "app.protect.home_locals.note": "這些在你當地會出現 — 保護牠們是多餘的,還會縮小你 100% 的垃圾篩選器。",
 
-  "app.protect.myth_carve.label": "你有多餘的幻獸寶可夢(圖鑑編號,以逗號分隔)",
-  "app.protect.myth_carve.placeholder": "例如 808,649 代表美錄坦 + 蓋諾賽克特",
-  "app.protect.myth_carve.help": "這些會從幻獸保護中排除 — 例如美錄坦,大多數玩家都有上百隻。",
-
   "app.protect.favorites.label": "最愛",
   "app.protect.favorites.why": "標記星號的寶可夢",
   "app.protect.any_tag.label": "已標記寶可夢(任何標籤)",

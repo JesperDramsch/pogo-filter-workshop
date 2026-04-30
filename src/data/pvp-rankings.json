@@ -1,0 +1,381 @@
+{
+  "fetchedAt": "2026-04-30T16:22:45.960Z",
+  "topN": 30,
+  "leagues": {
+    "great": {
+      "cpCap": 1500,
+      "species": [
+        {
+          "dex": 195,
+          "name": "Quagsire"
+        },
+        {
+          "dex": 959,
+          "name": "Tinkaton"
+        },
+        {
+          "dex": 823,
+          "name": "Corviknight"
+        },
+        {
+          "dex": 593,
+          "name": "Jellicent"
+        },
+        {
+          "dex": 395,
+          "name": "Empoleon"
+        },
+        {
+          "dex": 205,
+          "name": "Forretress"
+        },
+        {
+          "dex": 334,
+          "name": "Altaria"
+        },
+        {
+          "dex": 184,
+          "name": "Azumarill"
+        },
+        {
+          "dex": 40,
+          "name": "Wigglytuff"
+        },
+        {
+          "dex": 160,
+          "name": "Feraligatr"
+        },
+        {
+          "dex": 463,
+          "name": "Lickilicky"
+        },
+        {
+          "dex": 308,
+          "name": "Medicham"
+        },
+        {
+          "dex": 222,
+          "name": "Corsola (Galarian)"
+        },
+        {
+          "dex": 663,
+          "name": "Talonflame"
+        },
+        {
+          "dex": 131,
+          "name": "Lapras"
+        },
+        {
+          "dex": 364,
+          "name": "Sealeo"
+        },
+        {
+          "dex": 687,
+          "name": "Malamar"
+        },
+        {
+          "dex": 980,
+          "name": "Clodsire"
+        },
+        {
+          "dex": 356,
+          "name": "Dusclops"
+        },
+        {
+          "dex": 618,
+          "name": "Stunfisk"
+        },
+        {
+          "dex": 36,
+          "name": "Clefable"
+        },
+        {
+          "dex": 452,
+          "name": "Drapion (Shadow)"
+        },
+        {
+          "dex": 979,
+          "name": "Annihilape"
+        },
+        {
+          "dex": 9,
+          "name": "Blastoise"
+        },
+        {
+          "dex": 671,
+          "name": "Florges"
+        },
+        {
+          "dex": 346,
+          "name": "Cradily"
+        },
+        {
+          "dex": 186,
+          "name": "Politoed (Shadow)"
+        },
+        {
+          "dex": 681,
+          "name": "Aegislash (Blade)"
+        },
+        {
+          "dex": 737,
+          "name": "Charjabug"
+        },
+        {
+          "dex": 820,
+          "name": "Greedent"
+        }
+      ]
+    },
+    "ultra": {
+      "cpCap": 2500,
+      "species": [
+        {
+          "dex": 593,
+          "name": "Jellicent"
+        },
+        {
+          "dex": 823,
+          "name": "Corviknight"
+        },
+        {
+          "dex": 131,
+          "name": "Lapras"
+        },
+        {
+          "dex": 959,
+          "name": "Tinkaton"
+        },
+        {
+          "dex": 395,
+          "name": "Empoleon"
+        },
+        {
+          "dex": 146,
+          "name": "Moltres (Galarian)"
+        },
+        {
+          "dex": 160,
+          "name": "Feraligatr (Shadow)"
+        },
+        {
+          "dex": 687,
+          "name": "Malamar (Shadow)"
+        },
+        {
+          "dex": 671,
+          "name": "Florges"
+        },
+        {
+          "dex": 977,
+          "name": "Dondozo"
+        },
+        {
+          "dex": 640,
+          "name": "Virizion"
+        },
+        {
+          "dex": 895,
+          "name": "Regidrago"
+        },
+        {
+          "dex": 463,
+          "name": "Lickilicky"
+        },
+        {
+          "dex": 272,
+          "name": "Ludicolo"
+        },
+        {
+          "dex": 36,
+          "name": "Clefable"
+        },
+        {
+          "dex": 9,
+          "name": "Blastoise"
+        },
+        {
+          "dex": 765,
+          "name": "Oranguru"
+        },
+        {
+          "dex": 718,
+          "name": "Zygarde (Complete Forme)"
+        },
+        {
+          "dex": 477,
+          "name": "Dusknoir (Shadow)"
+        },
+        {
+          "dex": 38,
+          "name": "Ninetales (Alolan)"
+        },
+        {
+          "dex": 365,
+          "name": "Walrein"
+        },
+        {
+          "dex": 776,
+          "name": "Turtonator"
+        },
+        {
+          "dex": 452,
+          "name": "Drapion"
+        },
+        {
+          "dex": 979,
+          "name": "Annihilape (Shadow)"
+        },
+        {
+          "dex": 230,
+          "name": "Kingdra"
+        },
+        {
+          "dex": 487,
+          "name": "Giratina (Altered)"
+        },
+        {
+          "dex": 939,
+          "name": "Bellibolt"
+        },
+        {
+          "dex": 488,
+          "name": "Cresselia"
+        },
+        {
+          "dex": 205,
+          "name": "Forretress"
+        },
+        {
+          "dex": 468,
+          "name": "Togekiss"
+        }
+      ]
+    },
+    "master": {
+      "cpCap": null,
+      "species": [
+        {
+          "dex": 888,
+          "name": "Zacian (Crowned Sword)"
+        },
+        {
+          "dex": 484,
+          "name": "Palkia (Origin)"
+        },
+        {
+          "dex": 376,
+          "name": "Metagross"
+        },
+        {
+          "dex": 716,
+          "name": "Xerneas"
+        },
+        {
+          "dex": 889,
+          "name": "Zamazenta (Crowned Shield)"
+        },
+        {
+          "dex": 646,
+          "name": "Kyurem (White)"
+        },
+        {
+          "dex": 483,
+          "name": "Dialga (Origin)"
+        },
+        {
+          "dex": 792,
+          "name": "Lunala"
+        },
+        {
+          "dex": 643,
+          "name": "Reshiram"
+        },
+        {
+          "dex": 644,
+          "name": "Zekrom"
+        },
+        {
+          "dex": 802,
+          "name": "Marshadow"
+        },
+        {
+          "dex": 382,
+          "name": "Kyogre"
+        },
+        {
+          "dex": 249,
+          "name": "Lugia"
+        },
+        {
+          "dex": 890,
+          "name": "Eternatus"
+        },
+        {
+          "dex": 800,
+          "name": "Necrozma (Dawn Wings)"
+        },
+        {
+          "dex": 717,
+          "name": "Yveltal"
+        },
+        {
+          "dex": 250,
+          "name": "Ho-Oh"
+        },
+        {
+          "dex": 445,
+          "name": "Garchomp"
+        },
+        {
+          "dex": 383,
+          "name": "Groudon"
+        },
+        {
+          "dex": 648,
+          "name": "Meloetta (Aria)"
+        },
+        {
+          "dex": 381,
+          "name": "Latios (Shadow)"
+        },
+        {
+          "dex": 1000,
+          "name": "Gholdengo"
+        },
+        {
+          "dex": 791,
+          "name": "Solgaleo"
+        },
+        {
+          "dex": 671,
+          "name": "Florges"
+        },
+        {
+          "dex": 130,
+          "name": "Gyarados (Shadow)"
+        },
+        {
+          "dex": 150,
+          "name": "Mewtwo (Shadow)"
+        },
+        {
+          "dex": 385,
+          "name": "Jirachi"
+        },
+        {
+          "dex": 647,
+          "name": "Keldeo (Resolute)"
+        },
+        {
+          "dex": 718,
+          "name": "Zygarde (Complete Forme)"
+        },
+        {
+          "dex": 380,
+          "name": "Latias (Shadow)"
+        }
+      ]
+    }
+  }
+}

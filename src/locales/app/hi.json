@@ -99,10 +99,6 @@
   "app.protect.home_locals.none": "कोई नहीं",
   "app.protect.home_locals.note": "ये आपके पास लोकल स्पॉन होते हैं — इन्हें सुरक्षित करना बेमतलब होगा और आपके हंडोज़ के लिए ट्रैश फिल्टर छोटा हो जाएगा।",
 
-  "app.protect.myth_carve.label": "जिन मिथिकल के एक्स्ट्रा हैं (डेक्स नंबर, कॉमा से अलग करें)",
-  "app.protect.myth_carve.placeholder": "जैसे Meltan + Genesect के लिए 808,649",
-  "app.protect.myth_carve.help": "ये मिथिकल प्रोटेक्शन से अलग रहते हैं — जैसे Meltan, जिसके अधिकांश खिलाड़ियों के पास सैकड़ों होते हैं।",
-
   "app.protect.favorites.label": "फेवरिट",
   "app.protect.favorites.why": "स्टार से चिह्नित Pokémon",
   "app.protect.any_tag.label": "टैग किए गए Pokémon (कोई भी टैग)",

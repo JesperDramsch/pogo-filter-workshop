@@ -99,10 +99,6 @@
   "app.protect.home_locals.none": "なし",
   "app.protect.home_locals.note": "あなたの地元で出現するため、保護すると重複となり 100% のためのゴミ箱フィルターが小さくなります。",
 
-  "app.protect.myth_carve.label": "余分のある幻のポケモン (図鑑番号、カンマ区切り)",
-  "app.protect.myth_carve.placeholder": "例: メルタン + ゲノセクト の場合 808,649",
-  "app.protect.myth_carve.help": "幻保護から除外されます — 例: 多くのプレイヤーが何百匹も持つメルタンなど。",
-
   "app.protect.favorites.label": "お気に入り",
   "app.protect.favorites.why": "星でマークされたポケモン",
   "app.protect.any_tag.label": "タグ付きポケモン (任意のタグ)",

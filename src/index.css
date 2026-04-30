@@ -14,3 +14,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Hide the default <details> disclosure marker — TrainerAccordion uses its
+   own ChevronRight icon and rotates it via .details-arrow when [open]. */
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+details[open] > summary .details-arrow { transform: rotate(90deg); }
+.details-arrow { transition: transform 120ms ease; }

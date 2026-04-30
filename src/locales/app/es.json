@@ -99,10 +99,6 @@
   "app.protect.home_locals.none": "ninguno",
   "app.protect.home_locals.note": "Aparecen localmente para ti — protegerlos sería redundante y reduciría el filtro de basura para tus 100%.",
 
-  "app.protect.myth_carve.label": "Singulares de los que tienes repetidos (números de Pokédex, separados por comas)",
-  "app.protect.myth_carve.placeholder": "ej. 808,649 para Meltan + Genesect",
-  "app.protect.myth_carve.help": "Quedan exentos de la protección de singulares — ej. Meltan, del que la mayoría tiene cientos.",
-
   "app.protect.favorites.label": "Favoritos",
   "app.protect.favorites.why": "Pokémon marcados con la estrella",
   "app.protect.any_tag.label": "Pokémon etiquetados (cualquier etiqueta)",

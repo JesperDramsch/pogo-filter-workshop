@@ -1,33 +1,56 @@
 {
-  "fetchedAt": "2026-04-30T11:47:45.780Z",
+  "fetchedAt": "2026-04-30T13:03:52.257Z",
   "raids": {
-    "lvl5": [
+    "mega": [
       {
-        "id": "TAPU_KOKO",
+        "id": "BANETTE",
         "names": {
-          "en": "Tapu Koko",
-          "de": "Kapu-Riki",
-          "fr": "Tokorico",
-          "it": "Tapu Koko",
-          "ja": "カプ・コケコ",
-          "ko": "카푸꼬꼬꼭",
-          "es": "Tapu Koko"
+          "en": "Mega Banette",
+          "de": "Mega-Banette",
+          "fr": "Méga-Branette",
+          "it": "MegaBanette",
+          "ja": "メガジュペッタ",
+          "ko": "메가다크펫",
+          "es": "Mega-Banette"
         },
         "types": [
-          "electric",
+          "ghost"
+        ],
+        "resistorTypes": [
+          "normal",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "ghost"
+        ]
+      }
+    ],
+    "lvl5": [
+      {
+        "id": "TAPU_LELE",
+        "names": {
+          "en": "Tapu Lele",
+          "de": "Kapu-Fala",
+          "fr": "Tokopiyon",
+          "it": "Tapu Lele",
+          "ja": "カプ・テテフ",
+          "ko": "카푸나비나",
+          "es": "Tapu Lele"
+        },
+        "types": [
+          "psychic",
           "fairy"
         ],
         "resistorTypes": [
-          "poison",
-          "ground",
           "steel",
           "fire",
-          "grass",
-          "electric"
+          "psychic"
         ],
         "seMoveTypes": [
-          "ground",
-          "poison"
+          "ghost",
+          "poison",
+          "steel"
         ]
       }
     ],

@@ -9,6 +9,9 @@ import {
 } from "./data/species.js";
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from "./i18n/pogo-keywords.js";
 import RAID_BOSSES from "./data/raid-bosses.json";
+import ROCKET_LINEUPS from "./data/rocket-lineups.json";
+import PVP_RANKINGS from "./data/pvp-rankings.json";
+import META_RANKINGS from "./data/meta-rankings.json";
 import { useTranslation } from "./i18n/I18nProvider.jsx";
 import Landing from "./Landing.jsx";
 import General from "./explain/General.jsx";
@@ -84,6 +87,29 @@ function navigateView(target) {
 // ─── DATA ──────────────────────────────────────────────────────────────────
 
 export const DEFAULT_HUNDOS = [];
+// Personal "top raid attackers" — species the user trusts to bring to a raid
+// regardless of typing. Used as an OR-allowlist alongside the type-resistor /
+// SE-move clauses, so e.g. Mewtwo always surfaces even when its Psychic
+// typing isn't a strict resistor for the boss. Stored as lowercase species
+// names; canonicalized to the user's locale on load via `resolveSpecies`.
+// Forms (Shadow / Mega / Primal) fold into the base species via family
+// search — `mewtwo` covers Shadow Mewtwo and Mega Mewtwo Y both.
+//
+// Seed source: `src/data/meta-rankings.json` (regenerated daily by
+// scripts/fetch-meta-rankings.mjs from pogoapi.net stats + moves). Score
+// per (species, type) = base_attack × max charged-move power of that type;
+// top-8 per type, deduped union, sorted by best-score-across-types. Killing
+// the prior hand-curated tier-list constant: meta drifts every move
+// rebalance, so a daily-refreshed data feed beats periodic manual updates.
+export const DEFAULT_TOP_ATTACKERS = META_RANKINGS.topAttackers;
+
+// Personal "top Max Battle attackers" — same idea but only relevant to
+// Dynamax/Gigantamax encounters. Seed source: same meta-rankings.json,
+// filtered through the Dynamax-eligibility seed in fetch-meta-rankings.mjs
+// (pogoapi has no Dynamax flag, so the eligibility set is hand-maintained;
+// ranking within it is data-driven). Forms fold into base species —
+// `charizard` covers Gigantamax Charizard.
+export const DEFAULT_TOP_MAX_ATTACKERS = META_RANKINGS.topMaxAttackers;
 
 // Trade-evo families: dex-keyed identity, German base name as the user-facing
 // config key (kept stable so persisted localStorage state ["abra", "machollo"]
@@ -131,7 +157,7 @@ export const DEFAULT_CONFIG = {
   protectLuckies: true,
   protectLegendaries: true,
   protectMythicals: true,
-  mythTooManyOf: "808,649",    // species you have spares of (Meltan, Genesect, ...)
+  mythTooManyOf: ["meltan", "genesect"], // species you have spares of (canonicalized on load)
   protectUltraBeasts: true,
   protectShadows: true,        // Crypto in trash; trade ALWAYS excludes (untradeable)
   protectPurified: true,
@@ -179,7 +205,22 @@ export const DEFAULT_CONFIG = {
   // base-form names (lowercase). Used by the shadow-safe-purify auxiliary
   // filter; resolved via `resolveSpecies` so users can type in any locale.
   // Default: ~20 widely-acknowledged top non-legendary raid attackers.
-  shadowKeeperSpecies: "mamoswine,salamence,dragonite,metagross,machamp,mewtwo,swampert,moltres,raikou,electivire,magnezone,tyranitar,weavile,ho-oh,entei,blaziken,gardevoir,hariyama,zapdos,latios,charizard,luxray,tangrowth,sceptile,venusaur,feraligatr,gyarados,pinsir,scizor,lugia,honchkrow,staraptor,houndoom,typhlosion,arcanine,magmortar,torterra,golurk,alakazam,aerodactyl,aggron,gallade,exeggutor,granbull,latias",
+  // Species whose shadow form is S / A+ / A tier per the latest community
+  // raid-attacker tier list. Used family-wide (+species) by the safe-purify
+  // filter so accidental purification of a top-tier shadow is impossible.
+  shadowKeeperSpecies: [
+    // S tier shadows
+    "dialga","palkia","heatran","groudon","rampardos","salamence","mewtwo",
+    // A+ tier shadows
+    "greninja","hydreigon","darkrai","toucannon","vikavolt","tyrantrum","conkeldurr",
+    "darmanitan","chandelure","excadrill","regigigas","gigalith","kyogre","mamoswine",
+    "electivire","magnezone","garchomp","rhyperior","metagross","tyranitar","blaziken",
+    "ho-oh","raikou","gardevoir","swampert","dragonite","moltres","gengar","machamp",
+    // A tier shadows
+    "landorus","kingler","delphox","chesnaught","giratina","emboar","honchkrow","latios",
+    "staraptor","weavile","crawdaunt","absol","hariyama","sceptile","entei","aerodactyl",
+    "zapdos",
+  ],
 
   // Optional tag bookkeepers can use to manually flag a non-keeper shadow
   // for Frustration removal during a take-over (e.g. a high-IV gem they
@@ -394,6 +435,18 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   const hundosOut = hundos.map(h => speciesForOutput(h, outputLocale));
   const H = hundosOut.map(h => `+${h}`).join(",");
 
+  // Personal allowlists for the two PvE-counter contexts. Different rosters
+  // because most raid meta attackers (Mewtwo, Rayquaza, Garchomp, …) aren't
+  // Dynamax-capable, so a separate Max-Battle list avoids polluting the
+  // Max filter with species that get filtered out by `dynaattacke1-`
+  // anyway. Both emit bare-name OR-prefixes into each counter clause.
+  const topAttackersList = (cfg.topAttackers || [])
+    .map(s => speciesForOutput(s, outputLocale))
+    .filter(Boolean);
+  const topMaxAttackersList = (cfg.topMaxAttackers || [])
+    .map(s => speciesForOutput(s, outputLocale))
+    .filter(Boolean);
+
   const { full: TE_full, trimmed: TE_trim } = deduppedTradeEvos(hundos, cfg.enabledTradeEvos);
   const TE_full_str = TE_full.map(b => `+${teDisplay(b, outputLocale)}`).join(",");
   const TE_trim_str = TE_trim.map(b => `+${teDisplay(b, outputLocale)}`).join(",");
@@ -462,7 +515,10 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   if (cfg.protectShinies)      push(trashClauses, `!${kw.flag.shiny}`, tFn("app.clause_why.shinies"));
   if (cfg.protectLegendaries)  push(trashClauses, `!${kw.flag.legendary}`, tFn("app.clause_why.legendaries"));
   if (cfg.protectMythicals) {
-    const carve = (cfg.mythTooManyOf || "").trim();
+    const carve = (cfg.mythTooManyOf || [])
+      .map(s => speciesForOutput(s, outputLocale))
+      .filter(Boolean)
+      .join(",");
     push(trashClauses,
       carve ? `!${kw.flag.mythical},${carve}` : `!${kw.flag.mythical}`,
       carve
@@ -688,7 +744,8 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   push(shadowCheapClauses, kw.flag.shadow,                          tFn("app.clause_why.shadow_cheap_pool"));
   push(shadowCheapClauses, `${kw.numeric.candy_km}1`,               tFn("app.clause_why.shadow_cheap_common"));
   push(shadowCheapClauses, `!${kw.flag.shiny}`,                     tFn("app.clause_why.shinies_protected"));
-  push(shadowCheapClauses, `!${kw.flag.lucky}`,                     tFn("app.clause_why.luckies_protected"));
+  // No `!lucky` clause: Shadows are untradeable and Lucky is set at trade
+  // time, so a shadow can never be lucky — the AND would be dead.
   push(shadowCheapClauses, `!@${kw.flag.special_move}`,             tFn("app.clause_why.legacy_moves"));
   push(shadowCheapClauses, "!#",                                    tFn("app.clause_why.tags_protected_short"));
   const shadowCheap = shadowCheapClauses.map(c => c.clause).join("&");
@@ -697,11 +754,7 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   // Excludes legendaries / mythicals / UBs / 4★ / shinies / lucky /
   // costumes / legacy-move shadows, plus a user-curated list of top
   // raid-attacker species (`shadowKeeperSpecies`) family-wide via `+`.
-  const keeperRaw = (cfg.shadowKeeperSpecies || "")
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean);
-  const keeperResolved = keeperRaw
+  const keeperResolved = (cfg.shadowKeeperSpecies || [])
     .map((s) => speciesForOutput(s, outputLocale))
     .filter(Boolean);
   const shadowSafeClauses = [];
@@ -711,7 +764,7 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   push(shadowSafeClauses, `!${kw.flag.ultra_beast}`,                tFn("app.clause_why.ultra_beasts"));
   push(shadowSafeClauses, "!4*",                                    tFn("app.clause_why.never_4star"));
   push(shadowSafeClauses, `!${kw.flag.shiny}`,                      tFn("app.clause_why.shinies_protected"));
-  push(shadowSafeClauses, `!${kw.flag.lucky}`,                      tFn("app.clause_why.luckies_protected"));
+  // No `!lucky` clause: shadows can never be lucky (game mechanic).
   push(shadowSafeClauses, `!${kw.flag.costume}`,                    tFn("app.clause_why.costumes"));
   push(shadowSafeClauses, `!@${kw.flag.special_move}`,              tFn("app.clause_why.legacy_moves"));
   for (const sp of keeperResolved) {
@@ -812,6 +865,38 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   // `@<type>` syntax matches Pokémon with a move of that type — distinct
   // from `@<move-name>`. No IV gate — raid DPS is dominated by level +
   // moveset, so an IV cut would hide already-built workhorses.
+  // Per-slot SE-move clauses. PoGo's `@1`/`@2`/`@3` prefixes target the
+  // fast / first-charge / second-charge move slots respectively. `,` binds
+  // tighter than `&` so we can drop the parens — the join order is what
+  // matters. Result e.g. `@1ground,@1poison & @2ground,@2poison,@3ground,@3poison`
+  // = "fast move is one of [ground/poison] AND at least one charge move
+  // (slot 2 or 3) is one of [ground/poison]".
+  const fastMoveClause = (typeKws) => typeKws.map(t => `@1${t}`).join(",");
+  const chargeMoveClause = (typeKws) =>
+    [...typeKws.map(t => `@2${t}`), ...typeKws.map(t => `@3${t}`)].join(",");
+  // `,` binds tighter than `&`, so prepending the personal-attacker list to
+  // a clause makes it an OR-allowlist alongside the existing terms.
+  const prependList = (list, clause) =>
+    list.length > 0 ? `${list.join(",")},${clause}` : clause;
+  const withAllowlist    = (c) => prependList(topAttackersList, c);
+  const withMaxAllowlist = (c) => prependList(topMaxAttackersList, c);
+
+  // `!<TYPE` matches "not weak to TYPE attacks" — De Morgan'd into one
+  // `&`-joined clause per boss-STAB type so an attacker can't sneak through
+  // the allowlist with a chassis that takes SE from what the boss throws.
+  // Returns "" when bossTypes is empty so callers can skip the push().
+  const weaknessGuard = (bossTypes) =>
+    (bossTypes || [])
+      .map(t => kw.type[t])
+      .filter(Boolean)
+      .map(t => `!<${t}`)
+      .join("&");
+  const unionTypesOf = (pokemons) => {
+    const set = new Set();
+    for (const p of (pokemons || [])) for (const t of (p.types || [])) set.add(t);
+    return [...set];
+  };
+
   const buildBossEntry = (boss, { requiresDynamax = false } = {}) => {
     const resistorList = (boss.resistorTypes || [])
       .map(t => kw.type[t]).filter(Boolean);
@@ -821,11 +906,13 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
       return { id: boss.id, name: boss.names?.[outputLocale] || boss.names?.en || boss.id,
                clause: "", clauses: [], skipped: true };
     }
-    const resistorClause = `(${resistorList.join(",")})`;
-    const seClause = `(${seMoveList.map(t => `@${t}`).join(",")})`;
+    // Per-context allowlist — different rosters for raids vs Max Battles.
+    // (Rocket has its own builder and skips allowlists entirely.)
+    const wrap = requiresDynamax ? withMaxAllowlist : withAllowlist;
     const clauses = [];
-    push(clauses, resistorClause, tFn("app.clause_why.raid_resistor_types"));
-    push(clauses, seClause,       tFn("app.clause_why.raid_se_moves"));
+    push(clauses, wrap(resistorList.join(",")),       tFn("app.clause_why.raid_resistor_types"));
+    push(clauses, wrap(fastMoveClause(seMoveList)),   tFn("app.clause_why.raid_se_fast"));
+    push(clauses, wrap(chargeMoveClause(seMoveList)), tFn("app.clause_why.raid_se_charge"));
     // Max battles only let you bring Dynamax-capable Pokémon, so narrow to
     // species that have at least one Max move unlocked. PoGo's keyword is
     // `<dynamax-move>1-` — locale-aware via kw.flag.dynamax_move.
@@ -835,6 +922,10 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     if (cfg.raidRequireSecondMove) {
       push(clauses, `!@${kw.flag.three_move}`, tFn("app.clause_why.raid_second_move"));
     }
+    // Boss-STAB weakness guardrail — applies to allowlisted top attackers
+    // too (a Mewtwo shouldn't be raid-recommended into a fairy boss).
+    const wGuard = weaknessGuard(boss.types);
+    if (wGuard) push(clauses, wGuard, tFn("app.clause_why.raid_not_weak_to_boss"));
     return {
       id: boss.id,
       name: boss.names?.[outputLocale] || boss.names?.en || boss.id,
@@ -854,6 +945,203 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   const maxBattleFilters = buildBossTiers(RAID_BOSSES.maxBattles, { requiresDynamax: true });
   const raidBossesFetchedAt = RAID_BOSSES.fetchedAt || null;
 
+  // -- MAX BATTLE TANKS / CHARGERS · universal 0.5s-fast-move filter ---
+  // Max Battle meta hinges on Max Meter charging speed: only the 0.5s-tier
+  // fast moves fill the meter optimally (per Pokémon GO Hub's per-attack
+  // rounding floor — every fast-move tick generates 1 Max Energy regardless
+  // of damage, so faster ticks win). This filter surfaces every Max-eligible
+  // Pokémon that carries a 0.5s fast move, irrespective of typing — the user
+  // can layer their own type/CP filter on top in-game. Move names are pulled
+  // from META_RANKINGS.chargerMoves (data-derived from pogoapi fast_moves
+  // duration ≤ 500ms) and localized via the move-name dictionary that the
+  // existing fetch-translations sheet already populates.
+  const localizedChargers = (META_RANKINGS.chargerMoves || []).map(m => {
+    // Sheet keys use the move's canonical lowercase EN name; pogoapi
+    // sometimes drops the hyphen ("Lock On" vs "Lock-On") — try the
+    // hyphenated variant first since that's what the sheet usually has.
+    const lower = m.name.toLowerCase();
+    const hyphen = lower.replace(/\s+/g, "-");
+    const localized = tFn(`move.${hyphen}`, {
+      fallback: tFn(`move.${lower}`, { fallback: m.name }),
+    });
+    // PoGo's search treats spaces as token boundaries; collapse whitespace
+    // so a multi-word move like "Mud Shot" matches as the substring
+    // `@1mudshot`. Lowercase + leave hyphens (`@1lock-on` is valid).
+    return localized.toLowerCase().replace(/\s+/g, "");
+  }).filter(Boolean);
+  const maxTankClauses = [];
+  if (localizedChargers.length > 0) {
+    push(maxTankClauses,
+      localizedChargers.map(n => `@1${n}`).join(","),
+      tFn("app.clause_why.max_tank_chargers"));
+    if (kw.flag.dynamax_move) {
+      push(maxTankClauses, `${kw.flag.dynamax_move}1-`,
+        tFn("app.clause_why.max_battle_dynamax_only"));
+    }
+  }
+  const maxTank = {
+    clause: maxTankClauses.map(c => c.clause).join("&"),
+    clauses: maxTankClauses,
+    moveCount: localizedChargers.length,
+  };
+
+  // -- TEAM ROCKET · per-trainer counter filters -----------------------
+  // Three trainer kinds, each with its own filter shape:
+  //   leader        → 3 phase clauses (you swap Pokémon between phases)
+  //   typed_grunt   → 1 aggregated clause across the whole lineup
+  //   generic_grunt → offensive-only clause (top-3 SE move types) plus a
+  //                   lineup hint, since the lineup is too varied for a
+  //                   universal resistor.
+
+  // ScrapedDuck stores Pokémon names in EN ("Persian", "Kangaskhan"); the
+  // teaser/hint render layer surfaces these directly. Resolve to the user's
+  // outputLocale via the existing species dictionary so a DE user sees
+  // "Snobilikat, Kangama" instead of "Persian, Kangaskhan". Falls back to
+  // the EN name if the dictionary doesn't have the entry. Capitalized for
+  // display (resolveSpecies returns lowercase per the filter convention).
+  const localizePokemonName = (name) => {
+    const lower = resolveSpecies(name, outputLocale);
+    if (!lower) return name;
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+  };
+  const localizePokemons = (list) =>
+    (list || []).map(pk => ({ ...pk, name: localizePokemonName(pk.name) }));
+  const localizePhases = (phases) =>
+    (phases || []).map(p => ({ ...p, pokemons: localizePokemons(p.pokemons) }));
+
+  const buildSecondMoveAndAppraise = () => {
+    if (!cfg.raidRequireSecondMove) return null;
+    return { clause: `!@${kw.flag.three_move}`, why: tFn("app.clause_why.raid_second_move") };
+  };
+  const buildLeaderPhase = (phase) => {
+    const resistorList = (phase.resistorTypes || []).map(t => kw.type[t]).filter(Boolean);
+    const seMoveList = (phase.seMoveTypes || []).map(t => kw.type[t]).filter(Boolean);
+    const localizedPokemons = localizePokemons(phase.pokemons);
+    if (resistorList.length === 0 || seMoveList.length === 0) {
+      return { slot: phase.slot, pokemons: localizedPokemons, clause: "", clauses: [], skipped: true };
+    }
+    const clauses = [];
+    push(clauses, resistorList.join(","),       tFn("app.clause_why.rocket_resistor_types"));
+    push(clauses, fastMoveClause(seMoveList),   tFn("app.clause_why.rocket_se_fast"));
+    push(clauses, chargeMoveClause(seMoveList), tFn("app.clause_why.rocket_se_charge"));
+    const second = buildSecondMoveAndAppraise();
+    if (second) push(clauses, second.clause, second.why);
+    // Per-phase weakness guard from the union of types across the phase's
+    // possible Pokémon — covers secondary types like flying on Charizard.
+    const wGuard = weaknessGuard(unionTypesOf(phase.pokemons));
+    if (wGuard) push(clauses, wGuard, tFn("app.clause_why.rocket_not_weak_to_lineup"));
+    return { slot: phase.slot, pokemons: localizedPokemons,
+             clause: clauses.map(c => c.clause).join("&"), clauses, skipped: false };
+  };
+  // Localize the EN ScrapedDuck name "Fire-type Female Grunt" via existing
+  // type-name i18n. Gender stays as a symbol (♂/♀) since it's universal.
+  // Falls back to the raw EN name if either token is missing.
+  const localizedGruntName = (trainer) => {
+    const typeKw = kw.type[trainer.type];
+    if (!typeKw) return trainer.name;
+    const typeCap = typeKw.charAt(0).toUpperCase() + typeKw.slice(1);
+    const isFemale = /female/i.test(trainer.name);
+    const key = isFemale ? "app.filter.rocket_grunt_female" : "app.filter.rocket_grunt_male";
+    return tFn(key, { params: { type: typeCap }, fallback: trainer.name });
+  };
+  const buildTypedGrunt = (trainer) => {
+    const resistorList = (trainer.resistorTypes || []).map(t => kw.type[t]).filter(Boolean);
+    const seMoveList = (trainer.seMoveTypes || []).map(t => kw.type[t]).filter(Boolean);
+    const displayName = localizedGruntName(trainer);
+    const localizedPhases = localizePhases(trainer.phases);
+    if (resistorList.length === 0 || seMoveList.length === 0) {
+      return { name: displayName, type: trainer.type, phases: localizedPhases,
+               clause: "", clauses: [], skipped: true };
+    }
+    const clauses = [];
+    push(clauses, resistorList.join(","),       tFn("app.clause_why.rocket_resistor_types"));
+    push(clauses, fastMoveClause(seMoveList),   tFn("app.clause_why.rocket_se_fast"));
+    push(clauses, chargeMoveClause(seMoveList), tFn("app.clause_why.rocket_se_charge"));
+    const second = buildSecondMoveAndAppraise();
+    if (second) push(clauses, second.clause, second.why);
+    // Whole-lineup weakness guard. Includes secondary types from any
+    // phase's roster (e.g. flying on a Fire grunt's Charizard).
+    const allLineup = (trainer.phases || []).flatMap(p => p.pokemons || []);
+    const wGuard = weaknessGuard(unionTypesOf(allLineup));
+    if (wGuard) push(clauses, wGuard, tFn("app.clause_why.rocket_not_weak_to_lineup"));
+    return { name: displayName, type: trainer.type, phases: localizedPhases,
+             clause: clauses.map(c => c.clause).join("&"), clauses, skipped: false };
+  };
+  // Capitalized localized type name for display ("Feuer", "Wasser"). The
+  // raw kw.type value is lowercase since filter syntax wants it that way.
+  const localizedTypeDisplay = (typeKey) => {
+    const v = kw.type[typeKey];
+    if (!v) return typeKey;
+    return v.charAt(0).toUpperCase() + v.slice(1);
+  };
+  const buildGenericGrunt = (trainer) => {
+    const seMoveList = (trainer.topOffensiveTypes || []).map(t => kw.type[t]).filter(Boolean);
+    const localizedPhases = localizePhases(trainer.phases);
+    // Attach localizedType so render-side teaser/hint helpers (which don't
+    // see kw) can show "Kampf, Elektro" in DE instead of raw "fighting,
+    // electric". Original h.type is preserved for keys / data lookups.
+    const localizedTopHits = (trainer.topHits || []).map(h => ({
+      ...h,
+      localizedType: localizedTypeDisplay(h.type),
+    }));
+    if (seMoveList.length === 0) {
+      return { name: trainer.name, phases: localizedPhases, topHits: localizedTopHits,
+               clause: "", clauses: [], skipped: true };
+    }
+    const clauses = [];
+    push(clauses, fastMoveClause(seMoveList),   tFn("app.clause_why.rocket_top_offensive_fast"));
+    push(clauses, chargeMoveClause(seMoveList), tFn("app.clause_why.rocket_top_offensive_charge"));
+    const second = buildSecondMoveAndAppraise();
+    if (second) push(clauses, second.clause, second.why);
+    return { name: trainer.name, phases: localizedPhases, topHits: localizedTopHits,
+             clause: clauses.map(c => c.clause).join("&"), clauses, skipped: false };
+  };
+  const rocketLeaders = [];
+  const rocketTypedGrunts = [];
+  const rocketGenericGrunts = [];
+  for (const trainer of (ROCKET_LINEUPS.trainers || [])) {
+    if (trainer.kind === "leader") {
+      rocketLeaders.push({
+        name: trainer.name,
+        phases: (trainer.phases || []).map(buildLeaderPhase),
+      });
+    } else if (trainer.kind === "typed_grunt") {
+      rocketTypedGrunts.push(buildTypedGrunt(trainer));
+    } else if (trainer.kind === "generic_grunt") {
+      rocketGenericGrunts.push(buildGenericGrunt(trainer));
+    }
+  }
+  const rocketLineupsFetchedAt = ROCKET_LINEUPS.fetchedAt || null;
+
+  // -- PVP · per-league meta filters ------------------------------------
+  // For each league: family-search the top-N meta picks (deduped by base
+  // dex), AND the league's CP cap, AND the loose PvP rank-1 IV pattern
+  // (atk 0-1 OR'd, def 3-4, HP 3-4). Loose mirrors the pvpMode `loose`
+  // semantic — wider than strict so the user keeps an attack-IV-1 candidate
+  // they might still prefer for the bait power.
+  const buildLeagueFilter = (league) => {
+    const speciesList = (league?.species || [])
+      .map(s => pokemonNameFor(String(s.dex), outputLocale) || s.name?.toLowerCase())
+      .filter(Boolean);
+    if (speciesList.length === 0) return { clause: "", clauses: [], skipped: true };
+    const familyPool = speciesList.map(n => `+${n}`).join(",");
+    const clauses = [];
+    push(clauses, familyPool, tFn("app.clause_why.pvp_meta_pool"));
+    if (league.cpCap) {
+      push(clauses, `${kw.numeric.cp}-${league.cpCap}`,
+           tFn("app.clause_why.pvp_cp_cap", { params: { cap: league.cpCap } }));
+    }
+    push(clauses, `0-1${kw.iv.atk}`, tFn("app.clause_why.pvp_loose_atk"));
+    push(clauses, `3-4${kw.iv.def}`, tFn("app.clause_why.pvp_loose_def"));
+    push(clauses, `3-4${kw.iv.hp}`,  tFn("app.clause_why.pvp_loose_hp"));
+    return { clause: clauses.map(c => c.clause).join("&"), clauses, skipped: false };
+  };
+  const pvpFilters = {};
+  for (const [key, league] of Object.entries(PVP_RANKINGS.leagues || {})) {
+    pvpFilters[key] = buildLeagueFilter(league);
+  }
+  const pvpRankingsFetchedAt = PVP_RANKINGS.fetchedAt || null;
+
   return { trash, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
            trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses,
            // Aux pro-tools
@@ -862,7 +1150,11 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
            shadowCheapClauses, shadowSafeClauses, shadowHundoClauses, shadowFrustrationClauses,
            cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
            // Per-boss raid + max-battle counters
-           raidFilters, maxBattleFilters, raidBossesFetchedAt };
+           raidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
+           // Team Rocket counters (leaders / typed grunts / generic grunts)
+           rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
+           // PvP league meta filters
+           pvpFilters, pvpRankingsFetchedAt };
 }
 
 // ─── PARSER (for verification panel) ──────────────────────────────────────
@@ -966,6 +1258,8 @@ function evalTerm(t, mon, kw, outputLocale) {
 // ─── STORAGE ──────────────────────────────────────────────────────────────
 
 const KEY_HUNDOS = "pogo:hundos";
+const KEY_TOP_ATTACKERS = "pogo:topAttackers";
+const KEY_TOP_MAX_ATTACKERS = "pogo:topMaxAttackers";
 const KEY_CONFIG = "pogo:config";
 
 // Storage shim: was window.storage in the Claude.ai artifact runtime.
@@ -1088,8 +1382,14 @@ function decodeTopo(topology, objectName) {
 export default function App() {
   const { t, locale, outputLocale } = useTranslation();
   const [hundos, setHundos] = useState(DEFAULT_HUNDOS);
+  const [topAttackers, setTopAttackers] = useState(DEFAULT_TOP_ATTACKERS);
+  const [topMaxAttackers, setTopMaxAttackers] = useState(DEFAULT_TOP_MAX_ATTACKERS);
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [newHundo, setNewHundo] = useState("");
+  const [newTopAttacker, setNewTopAttacker] = useState("");
+  const [newTopMaxAttacker, setNewTopMaxAttacker] = useState("");
+  const [newMyth, setNewMyth] = useState("");
+  const [newKeeper, setNewKeeper] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [showSetTheory, setShowSetTheory] = useState(false);
   const [showAuxShadows, setShowAuxShadows] = useState(false);
@@ -1098,6 +1398,8 @@ export default function App() {
   const [showAuxMegas, setShowAuxMegas] = useState(false);
   const [showAuxRaids, setShowAuxRaids] = useState(false);
   const [showAuxMaxBattles, setShowAuxMaxBattles] = useState(false);
+  const [showAuxRocket, setShowAuxRocket] = useState(false);
+  const [showAuxPvp, setShowAuxPvp] = useState(false);
   const [showRawClauses, setShowRawClauses] = useState(false);
   const [showVerify, setShowVerify] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -1135,6 +1437,8 @@ export default function App() {
   useEffect(() => {
     (async () => {
       const h = await loadJSON(KEY_HUNDOS, DEFAULT_HUNDOS);
+      const ta = await loadJSON(KEY_TOP_ATTACKERS, DEFAULT_TOP_ATTACKERS);
+      const tma = await loadJSON(KEY_TOP_MAX_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS);
       const c = await loadJSON(KEY_CONFIG, DEFAULT_CONFIG);
       const home = await loadJSON(KEY_HOME, null);
       const p = await loadJSON(KEY_LASTPIN, null);
@@ -1164,7 +1468,14 @@ export default function App() {
         merged.protectAnyTag = c.protectTagged;
       }
       delete merged.protectTagged;
+      // Canonicalize seeded defaults to the storage locale so chips render
+      // consistently. Idempotent on already-canonical user input.
+      const canonicalize = (arr) => arr.map(s => resolveSpecies(s) || s);
+      merged.mythTooManyOf = canonicalize(merged.mythTooManyOf);
+      merged.shadowKeeperSpecies = canonicalize(merged.shadowKeeperSpecies);
       setConfig(merged);
+      setTopAttackers(canonicalize(ta));
+      setTopMaxAttackers(canonicalize(tma));
       setHomeLocation(home);
       setLastPin(p);
       setBazaarTags(b);
@@ -1175,6 +1486,8 @@ export default function App() {
 
   // Persist on change
   useEffect(() => { if (loaded) saveJSON(KEY_HUNDOS, hundos); }, [hundos, loaded]);
+  useEffect(() => { if (loaded) saveJSON(KEY_TOP_ATTACKERS, topAttackers); }, [topAttackers, loaded]);
+  useEffect(() => { if (loaded) saveJSON(KEY_TOP_MAX_ATTACKERS, topMaxAttackers); }, [topMaxAttackers, loaded]);
   useEffect(() => { if (loaded) saveJSON(KEY_CONFIG, config); }, [config, loaded]);
   useEffect(() => { if (loaded) saveJSON(KEY_HOME, homeLocation); }, [homeLocation, loaded]);
   useEffect(() => { if (loaded) saveJSON(KEY_LASTPIN, lastPin); }, [lastPin, loaded]);
@@ -1225,9 +1538,11 @@ export default function App() {
           cheapEvolve, dexPlus, megaEvolve, pilotLong,
           shadowCheapClauses, shadowSafeClauses, shadowHundoClauses, shadowFrustrationClauses,
           cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
-          raidFilters, maxBattleFilters, raidBossesFetchedAt } = useMemo(
-    () => buildFilters(hundos, effectiveConfig, homeLocals, effectiveOutputLocale, t),
-    [hundos, effectiveConfig, homeLocals, effectiveOutputLocale, t]
+          raidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
+          rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
+          pvpFilters, pvpRankingsFetchedAt } = useMemo(
+    () => buildFilters(hundos, { ...effectiveConfig, topAttackers, topMaxAttackers }, homeLocals, effectiveOutputLocale, t),
+    [hundos, effectiveConfig, homeLocals, effectiveOutputLocale, topAttackers, topMaxAttackers, t]
   );
 
   function addHundo() {
@@ -1257,6 +1572,56 @@ export default function App() {
     }
   }
   function removeHundo(h) { setHundos(hundos.filter(x => x !== h)); }
+  function addTopAttacker() {
+    // Same parser as addHundo: comma/space/semicolon-split, multi-locale
+    // species resolution, dupes silently ignored, unresolved tokens kept
+    // in the input so the user can fix typos.
+    const tokens = newTopAttacker.split(/[,;\s]+/).filter(Boolean);
+    if (tokens.length === 0) return;
+    const set = new Set(topAttackers);
+    const unresolved = [];
+    for (const tok of tokens) {
+      const resolved = resolveSpecies(tok);
+      if (resolved) set.add(resolved);
+      else unresolved.push(tok);
+    }
+    setTopAttackers([...set].sort());
+    setNewTopAttacker(unresolved.length > 0 ? unresolved.join(", ") : "");
+  }
+  function removeTopAttacker(s) { setTopAttackers(topAttackers.filter(x => x !== s)); }
+  function addTopMaxAttacker() {
+    const tokens = newTopMaxAttacker.split(/[,;\s]+/).filter(Boolean);
+    if (tokens.length === 0) return;
+    const set = new Set(topMaxAttackers);
+    const unresolved = [];
+    for (const tok of tokens) {
+      const resolved = resolveSpecies(tok);
+      if (resolved) set.add(resolved);
+      else unresolved.push(tok);
+    }
+    setTopMaxAttackers([...set].sort());
+    setNewTopMaxAttacker(unresolved.length > 0 ? unresolved.join(", ") : "");
+  }
+  function removeTopMaxAttacker(s) { setTopMaxAttackers(topMaxAttackers.filter(x => x !== s)); }
+  // Generic add/remove for config-held species lists (mythTooManyOf,
+  // shadowKeeperSpecies). Mirrors addHundo/addTopAttacker but writes back
+  // through setConfig so the value persists alongside other config.
+  function addToConfigList(fieldKey, raw, setRaw) {
+    const tokens = raw.split(/[,;\s]+/).filter(Boolean);
+    if (tokens.length === 0) return;
+    const next = new Set(config[fieldKey] || []);
+    const unresolved = [];
+    for (const tok of tokens) {
+      const r = resolveSpecies(tok);
+      if (r) next.add(r);
+      else unresolved.push(tok);
+    }
+    setConfig({ ...config, [fieldKey]: [...next].sort() });
+    setRaw(unresolved.length > 0 ? unresolved.join(", ") : "");
+  }
+  function removeFromConfigList(fieldKey, item) {
+    setConfig({ ...config, [fieldKey]: (config[fieldKey] || []).filter(x => x !== item) });
+  }
   function copyToClipboard(which, text) {
     // Robust copy: try modern clipboard API, fall back to legacy execCommand,
     // surface errors so user knows to manually select.
@@ -1298,6 +1663,8 @@ export default function App() {
       return;
     }
     setHundos(DEFAULT_HUNDOS);
+    setTopAttackers(DEFAULT_TOP_ATTACKERS);
+    setTopMaxAttackers(DEFAULT_TOP_MAX_ATTACKERS);
     setConfig(DEFAULT_CONFIG);
     setHomeLocation(null);
     setLastPin(null);
@@ -1426,6 +1793,54 @@ export default function App() {
                 addHundo={addHundo}
                 removeHundo={removeHundo}
               />
+              {effectiveConfig.expertMode && (
+                <>
+                  {effectiveConfig.protectMythicals && (
+                    <>
+                      <hr className="my-8 border-[#1F2933]" />
+                      <SpeciesListEditor
+                        items={config.mythTooManyOf || []}
+                        newItem={newMyth}
+                        setNewItem={setNewMyth}
+                        addItem={() => addToConfigList("mythTooManyOf", newMyth, setNewMyth)}
+                        removeItem={(s) => removeFromConfigList("mythTooManyOf", s)}
+                        titleKey="app.protect.myth_carve"
+                        accent="#E91E63"
+                      />
+                    </>
+                  )}
+                  <hr className="my-8 border-[#1F2933]" />
+                  <SpeciesListEditor
+                    items={config.shadowKeeperSpecies || []}
+                    newItem={newKeeper}
+                    setNewItem={setNewKeeper}
+                    addItem={() => addToConfigList("shadowKeeperSpecies", newKeeper, setNewKeeper)}
+                    removeItem={(s) => removeFromConfigList("shadowKeeperSpecies", s)}
+                    titleKey="app.protect.shadow_keepers"
+                    accent="#9B59B6"
+                  />
+                  <hr className="my-8 border-[#1F2933]" />
+                  <SpeciesListEditor
+                    items={topAttackers}
+                    newItem={newTopAttacker}
+                    setNewItem={setNewTopAttacker}
+                    addItem={addTopAttacker}
+                    removeItem={removeTopAttacker}
+                    titleKey="app.top_attackers"
+                    accent="#5EAFC5"
+                  />
+                  <hr className="my-8 border-[#1F2933]" />
+                  <SpeciesListEditor
+                    items={topMaxAttackers}
+                    newItem={newTopMaxAttacker}
+                    setNewItem={setNewTopMaxAttacker}
+                    addItem={addTopMaxAttacker}
+                    removeItem={removeTopMaxAttacker}
+                    titleKey="app.top_max_attackers"
+                    accent="#F39C12"
+                  />
+                </>
+              )}
             </StepWrapper>
           )}
 
@@ -1480,9 +1895,111 @@ export default function App() {
                 </div>
 
                 {/* Aux pro-tools — task-oriented filters grouped by game aspect.
-                    Collapsed by default; sit above the deeper internals (set
-                    theory / raw clauses / verify). */}
+                    Order: solo workflows (trades / evos / megas) first, then
+                    PvE encounters grouped by source. Within each PvE group
+                    the more frequently-used surface sits on top. */}
                 <div className="space-y-3 pt-2">
+                  <Collapsible
+                    icon="🛬"
+                    label={t("app.collapsible.aux_trades")}
+                    open={showAuxTrades}
+                    onToggle={() => setShowAuxTrades((s) => !s)}>
+                    <div className="space-y-4">
+                      {prestaged && (
+                        <FilterBox
+                          label={t("app.filter.prestaged_label")}
+                          accent="#9B59B6"
+                          filterStr={prestaged}
+                          copied={copied.prestaged}
+                          onCopy={() => copyToClipboard("prestaged", prestaged)}
+                          hint={t("app.filter.prestaged_hint", { params: { tags: [effectiveConfig.basarTagName, effectiveConfig.fernTauschTagName].filter(Boolean).map(tag => `#${tag}`).join(", ") } })}
+                        />
+                      )}
+                      {gift && (
+                        <FilterBox
+                          label={t("app.filter.gift_label")}
+                          accent="#27AE60"
+                          filterStr={gift}
+                          copied={copied.gift}
+                          onCopy={() => copyToClipboard("gift", gift)}
+                          hint={t("app.filter.gift_hint")}
+                        />
+                      )}
+                      <FilterBox
+                        label={t("app.filter.pilot_long_label")}
+                        accent="#5EAFC5"
+                        filterStr={pilotLong}
+                        copied={copied.pilotLong}
+                        onCopy={() => copyToClipboard("pilotLong", pilotLong)}
+                        hint={t("app.filter.pilot_long_hint")}
+                      />
+                    </div>
+                  </Collapsible>
+
+                  <Collapsible
+                    icon="🥚"
+                    label={t("app.collapsible.aux_evos")}
+                    open={showAuxEvos}
+                    onToggle={() => setShowAuxEvos((s) => !s)}>
+                    <div className="space-y-4">
+                      {cheapEvolve ? (
+                        <FilterBox
+                          label={t("app.filter.cheap_evolve_label")}
+                          accent="#27AE60"
+                          filterStr={cheapEvolve}
+                          copied={copied.cheapEvolve}
+                          onCopy={() => copyToClipboard("cheapEvolve", cheapEvolve)}
+                          hint={t("app.filter.cheap_evolve_hint")}
+                        />
+                      ) : (
+                        <p className="text-xs italic text-[#8B98A5]">
+                          {t("app.filter.cheap_evolve_empty")}
+                        </p>
+                      )}
+                      <FilterBox
+                        label={t("app.filter.dex_plus_label")}
+                        accent="#27AE60"
+                        filterStr={dexPlus}
+                        copied={copied.dexPlus}
+                        onCopy={() => copyToClipboard("dexPlus", dexPlus)}
+                        hint={t("app.filter.dex_plus_hint")}
+                      />
+                    </div>
+                  </Collapsible>
+
+                  <Collapsible
+                    icon="⚡"
+                    label={t("app.collapsible.aux_megas")}
+                    open={showAuxMegas}
+                    onToggle={() => setShowAuxMegas((s) => !s)}>
+                    <FilterBox
+                      label={t("app.filter.mega_evolve_label")}
+                      accent="#E91E63"
+                      filterStr={megaEvolve}
+                      copied={copied.megaEvolve}
+                      onCopy={() => copyToClipboard("megaEvolve", megaEvolve)}
+                      hint={t("app.filter.mega_evolve_hint")}
+                    />
+                  </Collapsible>
+                </div>
+
+                {/* Team Rocket section — encounters & their post-fight cleanup */}
+                <div className="space-y-3 pt-4">
+                  <h3 className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0]">
+                    {t("app.collapsible.aux_section_team_rocket")}
+                  </h3>
+                  <RocketCollapsible
+                    fetchedAt={rocketLineupsFetchedAt}
+                    leaders={rocketLeaders}
+                    typedGrunts={rocketTypedGrunts}
+                    genericGrunts={rocketGenericGrunts}
+                    open={showAuxRocket}
+                    onToggle={() => setShowAuxRocket((s) => !s)}
+                    copied={copied}
+                    copyToClipboard={copyToClipboard}
+                    t={t}
+                    outputLocale={effectiveOutputLocale}
+                  />
                   <Collapsible
                     icon="🌑"
                     label={t("app.collapsible.aux_shadows")}
@@ -1525,99 +2042,20 @@ export default function App() {
                       )}
                     </div>
                   </Collapsible>
+                </div>
 
-                  <Collapsible
-                    icon="🥚"
-                    label={t("app.collapsible.aux_evos")}
-                    open={showAuxEvos}
-                    onToggle={() => setShowAuxEvos((s) => !s)}>
-                    <div className="space-y-4">
-                      {cheapEvolve ? (
-                        <FilterBox
-                          label={t("app.filter.cheap_evolve_label")}
-                          accent="#27AE60"
-                          filterStr={cheapEvolve}
-                          copied={copied.cheapEvolve}
-                          onCopy={() => copyToClipboard("cheapEvolve", cheapEvolve)}
-                          hint={t("app.filter.cheap_evolve_hint")}
-                        />
-                      ) : (
-                        <p className="text-xs italic text-[#8B98A5]">
-                          {t("app.filter.cheap_evolve_empty")}
-                        </p>
-                      )}
-                      <FilterBox
-                        label={t("app.filter.dex_plus_label")}
-                        accent="#27AE60"
-                        filterStr={dexPlus}
-                        copied={copied.dexPlus}
-                        onCopy={() => copyToClipboard("dexPlus", dexPlus)}
-                        hint={t("app.filter.dex_plus_hint")}
-                      />
-                    </div>
-                  </Collapsible>
-
-                  <Collapsible
-                    icon="🛬"
-                    label={t("app.collapsible.aux_trades")}
-                    open={showAuxTrades}
-                    onToggle={() => setShowAuxTrades((s) => !s)}>
-                    <div className="space-y-4">
-                      {prestaged && (
-                        <FilterBox
-                          label={t("app.filter.prestaged_label")}
-                          accent="#9B59B6"
-                          filterStr={prestaged}
-                          copied={copied.prestaged}
-                          onCopy={() => copyToClipboard("prestaged", prestaged)}
-                          hint={t("app.filter.prestaged_hint", { params: { tags: [effectiveConfig.basarTagName, effectiveConfig.fernTauschTagName].filter(Boolean).map(tag => `#${tag}`).join(", ") } })}
-                        />
-                      )}
-                      {gift && (
-                        <FilterBox
-                          label={t("app.filter.gift_label")}
-                          accent="#27AE60"
-                          filterStr={gift}
-                          copied={copied.gift}
-                          onCopy={() => copyToClipboard("gift", gift)}
-                          hint={t("app.filter.gift_hint")}
-                        />
-                      )}
-                      <FilterBox
-                        label={t("app.filter.pilot_long_label")}
-                        accent="#5EAFC5"
-                        filterStr={pilotLong}
-                        copied={copied.pilotLong}
-                        onCopy={() => copyToClipboard("pilotLong", pilotLong)}
-                        hint={t("app.filter.pilot_long_hint")}
-                      />
-                    </div>
-                  </Collapsible>
-
-                  <Collapsible
-                    icon="⚡"
-                    label={t("app.collapsible.aux_megas")}
-                    open={showAuxMegas}
-                    onToggle={() => setShowAuxMegas((s) => !s)}>
-                    <FilterBox
-                      label={t("app.filter.mega_evolve_label")}
-                      accent="#E91E63"
-                      filterStr={megaEvolve}
-                      copied={copied.megaEvolve}
-                      onCopy={() => copyToClipboard("megaEvolve", megaEvolve)}
-                      hint={t("app.filter.mega_evolve_hint")}
-                    />
-                  </Collapsible>
-
-                  {/* Raids — one FilterBox per current 5★/3★/1★ boss (and
-                      their shadow variants). Bosses pulled from lily-dex-api;
-                      run `npm run fetch-raid-bosses` to refresh the snapshot. */}
+                {/* Raids section — current bosses pulled from lily-dex-api;
+                    run `npm run fetch-raid-bosses` to refresh the snapshot. */}
+                <div className="space-y-3 pt-4">
+                  <h3 className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0]">
+                    {t("app.collapsible.aux_section_raids")}
+                  </h3>
                   <BossCollapsible
                     icon="⚔️"
                     titleKey="app.collapsible.aux_raids"
                     fetchedAt={raidBossesFetchedAt}
                     bossesByTier={raidFilters}
-                    tierOrder={["lvl5", "shadow_lvl5", "lvl3", "shadow_lvl3", "lvl1", "shadow_lvl1"]}
+                    tierOrder={["mega", "lvl5", "shadow_lvl5", "lvl3", "shadow_lvl3", "lvl1", "shadow_lvl1"]}
                     accent="#E74C3C"
                     open={showAuxRaids}
                     onToggle={() => setShowAuxRaids((s) => !s)}
@@ -1627,10 +2065,9 @@ export default function App() {
                     t={t}
                   />
 
-                  <BossCollapsible
-                    icon="💥"
-                    titleKey="app.collapsible.aux_max_battles"
+                  <MaxBattleCollapsible
                     fetchedAt={raidBossesFetchedAt}
+                    maxTank={maxTank}
                     bossesByTier={maxBattleFilters}
                     tierOrder={["tier_3", "tier_2", "tier_1"]}
                     accent="#F39C12"
@@ -1638,13 +2075,33 @@ export default function App() {
                     onToggle={() => setShowAuxMaxBattles((s) => !s)}
                     copied={copied}
                     copyToClipboard={copyToClipboard}
-                    keyPrefix="max"
+                    t={t}
+                  />
+                </div>
+
+                {/* PvP section — top-30 meta picks per league with loose
+                    PvP rank-1 IVs. Rankings pulled from lily-dex-api;
+                    daily sync via .github/workflows/sync-pvp-rankings.yml. */}
+                <div className="space-y-3 pt-4">
+                  <h3 className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0]">
+                    {t("app.collapsible.aux_section_pvp")}
+                  </h3>
+                  <PvpCollapsible
+                    fetchedAt={pvpRankingsFetchedAt}
+                    leagues={pvpFilters}
+                    open={showAuxPvp}
+                    onToggle={() => setShowAuxPvp((s) => !s)}
+                    copied={copied}
+                    copyToClipboard={copyToClipboard}
                     t={t}
                   />
                 </div>
 
                 {/* Internals — set theory / raw clauses / verify */}
-                <div className="space-y-3 pt-2">
+                <div className="space-y-3 pt-4">
+                  <h3 className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0]">
+                    {t("app.collapsible.aux_section_nerd_stuff")}
+                  </h3>
                   <Collapsible
                     icon="∑"
                     label={t("app.collapsible.set_theory")}
@@ -1855,6 +2312,108 @@ function HundosEditor({ hundos, setHundos, newHundo, setNewHundo, addHundo, remo
           numbers: t("app.hundos.input_help_numbers"),
           english: t("app.hundos.input_help_english"),
           german:  t("app.hundos.input_help_german"),
+        } })}
+      </p>
+    </div>
+  );
+}
+
+// Generic species-list editor — same multi-locale chip + preview UX as the
+// hundos editor, but parameterized by `titleKey` so the i18n strings live
+// under any namespace (e.g. `app.top_attackers.*`). Used for personal
+// roster lists. Accent color drives the add-button hue.
+function SpeciesListEditor({ items, newItem, setNewItem, addItem, removeItem, titleKey, accent }) {
+  const { t } = useTranslation();
+  const previewTokens = useMemo(() => {
+    return newItem.split(/[,;\s]+/).filter(Boolean).map(tok => ({
+      input: tok, info: resolveSpeciesInfo(tok),
+    }));
+  }, [newItem]);
+
+  const resolved = previewTokens.filter(p => p.info);
+  const unresolved = previewTokens.filter(p => !p.info);
+  const newResolved = resolved.filter(p => !items.includes(p.info.names.de.toLowerCase()));
+  const dupes = resolved.filter(p => items.includes(p.info.names.de.toLowerCase()));
+
+  return (
+    <div className="space-y-4">
+      <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0]">
+        {t(`${titleKey}.count`, { params: { count: items.length } })}
+      </div>
+
+      <div className="flex flex-wrap gap-1.5">
+        {items.map(s => (
+          <span key={s}
+            className="chip-enter mono text-xs bg-[#1F2933] hover:bg-[#2D3A47] text-[#E6EDF3] pl-2.5 pr-1.5 py-1 rounded flex items-center gap-1.5 transition group">
+            <span style={{ color: accent }}>+</span>{s}
+            <button onClick={() => removeItem(s)}
+              className="opacity-40 group-hover:opacity-100 hover:text-[#E74C3C] transition">
+              <X size={12} />
+            </button>
+          </span>
+        ))}
+        {items.length === 0 && (
+          <span className="mono text-xs text-[#8B98A5] italic">{t(`${titleKey}.empty`)}</span>
+        )}
+      </div>
+
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={newItem}
+          onChange={e => setNewItem(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && addItem()}
+          placeholder={t(`${titleKey}.input_placeholder`)}
+          className="mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]" />
+        <button
+          onClick={addItem}
+          disabled={previewTokens.length === 0 || newResolved.length === 0}
+          style={{ backgroundColor: previewTokens.length === 0 || newResolved.length === 0 ? undefined : accent }}
+          className="mono text-sm hover:brightness-110 disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded transition flex items-center gap-1.5">
+          <Plus size={14} /> {t(`${titleKey}.add_button`)}
+        </button>
+      </div>
+
+      {previewTokens.length > 0 && (
+        <div className="border border-[#1F2933] rounded p-2.5 bg-[#0B0F14] space-y-1.5">
+          <div className="mono text-[10px] uppercase tracking-wider text-[#8090A0]">
+            {t(`${titleKey}.preview_summary`, { params: { new: newResolved.length, dupes: dupes.length, unresolved: unresolved.length } })}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {previewTokens.map((tok, i) => {
+              if (!tok.info) {
+                return (
+                  <span key={i} className="mono text-[11px] bg-[#E74C3C]/15 text-[#E74C3C] px-2 py-0.5 rounded"
+                        title={t(`${titleKey}.unresolved_title`)}>
+                    ✗ {tok.input}
+                  </span>
+                );
+              }
+              const isDupe = items.includes(tok.info.names.de.toLowerCase());
+              const labelByType = { number: "#", en: "EN", de: "DE", es: "ES", fr: "FR", "zh-TW": "ZH", hi: "HI", ja: "JA" };
+              return (
+                <span key={i}
+                  className={`mono text-[11px] px-2 py-0.5 rounded flex items-center gap-1 ${
+                    isDupe
+                      ? "bg-[#8090A0]/15 text-[#8B98A5]"
+                      : "bg-[#27AE60]/15 text-[#27AE60]"
+                  }`}
+                  title={`#${tok.info.dex} · EN: ${tok.info.names.en} · DE: ${tok.info.names.de}${isDupe ? ` (${t(`${titleKey}.dupe_marker`)})` : ""}`}>
+                  <span className="text-[9px] opacity-60">{labelByType[tok.info.inputLocale]}</span>
+                  {tok.info.names.de}
+                  {isDupe && <span className="opacity-60">✓</span>}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <p className="mono text-xs text-[#8090A0]">
+        {t(`${titleKey}.input_help`, { params: {
+          numbers: t(`${titleKey}.input_help_numbers`),
+          english: t(`${titleKey}.input_help_english`),
+          german:  t(`${titleKey}.input_help_german`),
         } })}
       </p>
     </div>
@@ -2076,7 +2635,11 @@ function BossCollapsible({
   const allBosses = tierOrder.flatMap((tier) => bossesByTier?.[tier] || []);
   const totalBosses = allBosses.length;
   const age = formatSyncAge(fetchedAt, t);
-  const headerLabel = t(titleKey, { params: { count: totalBosses, age: age || "" } });
+  const headerLabel = t(titleKey);
+  const countLabel = t("app.collapsible.aux_raids_count", { params: { count: totalBosses } });
+  const footerLabel = age
+    ? t("app.collapsible.aux_footer", { params: { count: countLabel, age } })
+    : t("app.collapsible.aux_footer_no_age", { params: { count: countLabel } });
   if (totalBosses === 0) {
     return (
       <Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
@@ -2086,7 +2649,7 @@ function BossCollapsible({
   }
   return (
     <Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
-      <div className="space-y-5">
+      <div className="space-y-5">{/* tiers below; footer rendered at end */}
         {tierOrder.map((tier) => {
           const list = bossesByTier?.[tier];
           if (!list || list.length === 0) return null;
@@ -2120,6 +2683,331 @@ function BossCollapsible({
           );
         })}
       </div>
+      <p className="mono text-[10.5px] text-[#8090A0] mt-4 pt-3 border-t border-[#1F2933]">
+        {footerLabel}
+      </p>
+    </Collapsible>
+  );
+}
+
+function lineupHint(phases, t) {
+  if (!phases || phases.length === 0) return "";
+  return phases
+    .filter(p => (p.pokemons || []).length > 0)
+    .map(p => {
+      const names = p.pokemons.map(pk => pk.name).join(t("app.filter.rocket_lineup_or"));
+      return t("app.filter.rocket_lineup_phase", { params: { slot: p.slot, names } });
+    })
+    .join(" ");
+}
+
+function topHitsHint(topHits, t) {
+  if (!topHits || topHits.length === 0) return "";
+  return topHits
+    .map(h => t("app.filter.rocket_top_hit", {
+      params: { type: h.localizedType || h.type, hits: h.hits, total: h.total },
+    }))
+    .join(" · ");
+}
+
+// Uncontrolled per-trainer accordion row. Native <details> handles its own
+// open/close state — no React state plumbing needed, and multiple trainers
+// can stay open if the user wants to compare. Mirrors the visual rhythm of
+// the parent Collapsible but a half-step smaller.
+function TrainerAccordion({ name, teaser, accent, children }) {
+  return (
+    <details className="border border-[#1F2933] rounded bg-[#0E141A]">
+      <summary className="px-3 py-2 cursor-pointer flex items-center gap-3 hover:bg-[#141A21] transition list-none">
+        <ChevronRight size={12} className="text-[#8090A0] details-arrow shrink-0" />
+        <span className="mono text-sm font-medium" style={{ color: accent || "#E6EDF3" }}>{name}</span>
+        {teaser && <span className="mono text-[11px] text-[#8090A0] truncate">· {teaser}</span>}
+      </summary>
+      <div className="px-3 pb-3 pt-2 border-t border-[#1F2933] space-y-3">{children}</div>
+    </details>
+  );
+}
+
+// Compact teaser strings for the closed accordion state. Keep these short —
+// they share a row with the trainer name and ellipsize.
+function leaderTeaser(leader, t) {
+  const phases = (leader.phases || []).filter(p => !p.skipped);
+  return t("app.filter.rocket_teaser_leader", { params: { count: phases.length } });
+}
+function typedGruntTeaser(g, t) {
+  const allNames = (g.phases || []).flatMap(p => (p.pokemons || []).map(pk => pk.name));
+  const sample = [...new Set(allNames)].slice(0, 3).join(", ");
+  return sample;
+}
+function genericGruntTeaser(g, t) {
+  if (!g.topHits || g.topHits.length === 0) return "";
+  return t("app.filter.rocket_teaser_generic", {
+    params: { types: g.topHits.map(h => h.localizedType || h.type).join(", ") },
+  });
+}
+
+// Combines the universal charger filter and the per-boss Max Battle counters
+// into one collapsible. The charger filter (0.5s fast moves & dynamax-eligible)
+// applies regardless of boss, so it sits at the top above the per-tier boss
+// fan-out. Footer shows the boss-snapshot age since that's what rotates;
+// the charger move list is essentially static.
+function MaxBattleCollapsible({
+  fetchedAt, maxTank, bossesByTier, tierOrder, accent,
+  open, onToggle, copied, copyToClipboard, t,
+}) {
+  const allBosses = tierOrder.flatMap(tier => bossesByTier?.[tier] || []);
+  const totalBosses = allBosses.length;
+  const hasCharger = !!maxTank?.clause;
+  const filterCount = totalBosses + (hasCharger ? 1 : 0);
+  const age = formatSyncAge(fetchedAt, t);
+  const headerLabel = t("app.collapsible.aux_max_battles");
+  const countLabel = t("app.collapsible.aux_max_battles_count", { params: { count: filterCount } });
+  const footerLabel = age
+    ? t("app.collapsible.aux_footer", { params: { count: countLabel, age } })
+    : t("app.collapsible.aux_footer_no_age", { params: { count: countLabel } });
+  if (filterCount === 0) {
+    return (
+      <Collapsible icon="💥" label={headerLabel} open={open} onToggle={onToggle}>
+        <p className="text-xs italic text-[#8B98A5]">{t("app.filter.aux_bosses_empty")}</p>
+      </Collapsible>
+    );
+  }
+  const hasBosses = totalBosses > 0;
+  return (
+    <Collapsible icon="💥" label={headerLabel} open={open} onToggle={onToggle}>
+      <div className="space-y-5">
+        {hasCharger && (
+          <div className="space-y-3">
+            <h4 className="mono text-xs uppercase tracking-wide text-[#8090A0]">
+              {t("app.collapsible.aux_max_tank")}
+            </h4>
+            <FilterBox
+              label={t("app.filter.max_tank_label")}
+              accent="#1ABC9C"
+              filterStr={maxTank.clause}
+              copied={copied.max_tank}
+              onCopy={() => copyToClipboard("max_tank", maxTank.clause)}
+              hint={t("app.filter.max_tank_hint")}
+            />
+          </div>
+        )}
+        {hasBosses && (
+          <div className="space-y-4">
+            <h4 className="mono text-xs uppercase tracking-wide text-[#8090A0]">
+              {t("app.collapsible.aux_max_attacker")}
+            </h4>
+            {tierOrder.map((tier) => {
+              const list = bossesByTier?.[tier];
+              if (!list || list.length === 0) return null;
+              return (
+                <div key={tier} className="space-y-3">
+                  <h5 className="mono text-[10.5px] tracking-wide text-[#8090A0]">
+                    {t(`app.collapsible.aux_boss_tier.${tier}`)}
+                  </h5>
+                  {list.map((boss) => {
+                    if (boss.skipped) {
+                      return (
+                        <p key={boss.id} className="text-xs italic text-[#8B98A5] pl-2">
+                          {t("app.filter.boss_no_clean_counter", { params: { boss: boss.name } })}
+                        </p>
+                      );
+                    }
+                    const copyKey = `max_${boss.id}`;
+                    return (
+                      <FilterBox
+                        key={boss.id}
+                        label={t("app.filter.raid_counter_label", { params: { boss: boss.name } })}
+                        accent={accent}
+                        filterStr={boss.clause}
+                        copied={copied[copyKey]}
+                        onCopy={() => copyToClipboard(copyKey, boss.clause)}
+                        hint={t("app.filter.raid_counter_hint", { params: { boss: boss.name } })}
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <p className="mono text-[10.5px] text-[#8090A0] mt-4 pt-3 border-t border-[#1F2933]">
+        {footerLabel}
+      </p>
+    </Collapsible>
+  );
+}
+
+// One filter per league (Great / Ultra / Master). Simpler than the boss /
+// rocket collapsibles since each league is a single FilterBox — no
+// nested accordion, no per-phase fan-out.
+function PvpCollapsible({ fetchedAt, leagues, open, onToggle, copied, copyToClipboard, t }) {
+  const order = ["great", "ultra", "master"];
+  const accentByLeague = { great: "#3498DB", ultra: "#9B59B6", master: "#F1C40F" };
+  const populated = order.filter(k => leagues?.[k] && !leagues[k].skipped);
+  const age = formatSyncAge(fetchedAt, t);
+  const headerLabel = t("app.collapsible.aux_pvp");
+  const countLabel = t("app.collapsible.aux_pvp_count", { params: { count: populated.length } });
+  const footerLabel = age
+    ? t("app.collapsible.aux_footer", { params: { count: countLabel, age } })
+    : t("app.collapsible.aux_footer_no_age", { params: { count: countLabel } });
+  if (populated.length === 0) {
+    return (
+      <Collapsible icon="🥊" label={headerLabel} open={open} onToggle={onToggle}>
+        <p className="text-xs italic text-[#8B98A5]">{t("app.filter.aux_pvp_empty")}</p>
+      </Collapsible>
+    );
+  }
+  return (
+    <Collapsible icon="🥊" label={headerLabel} open={open} onToggle={onToggle}>
+      <div className="space-y-4">
+        {populated.map((key) => {
+          const league = leagues[key];
+          const copyKey = `pvp_${key}`;
+          return (
+            <FilterBox
+              key={copyKey}
+              label={t(`app.filter.pvp_${key}_label`)}
+              accent={accentByLeague[key]}
+              filterStr={league.clause}
+              copied={copied[copyKey]}
+              onCopy={() => copyToClipboard(copyKey, league.clause)}
+              hint={t(`app.filter.pvp_${key}_hint`)}
+            />
+          );
+        })}
+      </div>
+      <p className="mono text-[10.5px] text-[#8090A0] mt-4 pt-3 border-t border-[#1F2933]">
+        {footerLabel}
+      </p>
+    </Collapsible>
+  );
+}
+
+function RocketCollapsible({
+  fetchedAt, leaders, typedGrunts, genericGrunts,
+  open, onToggle, copied, copyToClipboard, t, outputLocale,
+}) {
+  const totalFilters =
+    leaders.reduce((a, l) => a + l.phases.filter(p => !p.skipped).length, 0) +
+    typedGrunts.filter(g => !g.skipped).length +
+    genericGrunts.filter(g => !g.skipped).length;
+  const age = formatSyncAge(fetchedAt, t);
+  const headerLabel = t("app.collapsible.aux_rocket");
+  const countLabel = t("app.collapsible.aux_rocket_count", { params: { count: totalFilters } });
+  const footerLabel = age
+    ? t("app.collapsible.aux_footer", { params: { count: countLabel, age } })
+    : t("app.collapsible.aux_footer_no_age", { params: { count: countLabel } });
+  if (totalFilters === 0) {
+    return (
+      <Collapsible icon="🚀" label={headerLabel} open={open} onToggle={onToggle}>
+        <p className="text-xs italic text-[#8B98A5]">{t("app.filter.aux_rocket_empty")}</p>
+      </Collapsible>
+    );
+  }
+  return (
+    <Collapsible icon="🚀" label={headerLabel} open={open} onToggle={onToggle}>
+      <div className="space-y-5">
+        {leaders.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0]">
+              {t("app.collapsible.aux_rocket_leaders")}
+            </h4>
+            <div className="space-y-1.5">
+              {leaders.map(leader => (
+                <TrainerAccordion
+                  key={leader.name}
+                  name={leader.name}
+                  teaser={leaderTeaser(leader, t)}
+                  accent="#C0392B"
+                >
+                  {leader.phases.map(phase => {
+                    if (phase.skipped) return null;
+                    const copyKey = `rocket_${leader.name}_${phase.slot}`;
+                    return (
+                      <FilterBox
+                        key={copyKey}
+                        label={t("app.filter.rocket_phase_label", { params: { slot: phase.slot } })}
+                        accent="#C0392B"
+                        filterStr={phase.clause}
+                        copied={copied[copyKey]}
+                        onCopy={() => copyToClipboard(copyKey, phase.clause)}
+                        hint={t("app.filter.rocket_phase_hint", {
+                          params: { names: phase.pokemons.map(p => p.name).join(t("app.filter.rocket_lineup_or")) },
+                        })}
+                      />
+                    );
+                  })}
+                </TrainerAccordion>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {typedGrunts.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0]">
+              {t("app.collapsible.aux_rocket_typed_grunts")}
+            </h4>
+            <div className="space-y-1.5">
+              {typedGrunts.map(g => {
+                if (g.skipped) return null;
+                const copyKey = `rocket_typed_${g.type}`;
+                return (
+                  <TrainerAccordion
+                    key={copyKey}
+                    name={g.name}
+                    teaser={typedGruntTeaser(g, t)}
+                    accent="#9B59B6"
+                  >
+                    <FilterBox
+                      label={t("app.filter.rocket_grunt_filter_label")}
+                      accent="#9B59B6"
+                      filterStr={g.clause}
+                      copied={copied[copyKey]}
+                      onCopy={() => copyToClipboard(copyKey, g.clause)}
+                      hint={lineupHint(g.phases, t)}
+                    />
+                  </TrainerAccordion>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {genericGrunts.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0]">
+              {t("app.collapsible.aux_rocket_generic_grunts")}
+            </h4>
+            <div className="space-y-1.5">
+              {genericGrunts.map(g => {
+                if (g.skipped) return null;
+                const copyKey = `rocket_generic_${g.name}`;
+                return (
+                  <TrainerAccordion
+                    key={copyKey}
+                    name={g.name}
+                    teaser={genericGruntTeaser(g, t)}
+                    accent="#16A085"
+                  >
+                    <FilterBox
+                      label={t("app.filter.rocket_grunt_filter_label")}
+                      accent="#16A085"
+                      filterStr={g.clause}
+                      copied={copied[copyKey]}
+                      onCopy={() => copyToClipboard(copyKey, g.clause)}
+                      hint={`${topHitsHint(g.topHits, t)} — ${lineupHint(g.phases, t)}`}
+                    />
+                  </TrainerAccordion>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+      <p className="mono text-[10.5px] text-[#8090A0] mt-4 pt-3 border-t border-[#1F2933]">
+        {footerLabel}
+      </p>
     </Collapsible>
   );
 }
@@ -2576,42 +3464,6 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
           })}
         </div>
       </div>
-
-      {/* MYTHICAL CARVE-OUT (only when mythicals protected and expert mode) */}
-      {expert && config.protectMythicals && (
-        <div>
-          <label className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-1 block">
-            {t("app.protect.myth_carve.label")}
-          </label>
-          <input
-            type="text"
-            value={config.mythTooManyOf || ""}
-            onChange={e => set("mythTooManyOf", e.target.value)}
-            placeholder={t("app.protect.myth_carve.placeholder")}
-            className="mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]" />
-          <div className="mono text-[10px] text-[#8090A0] mt-1">
-            {t("app.protect.myth_carve.help")}
-          </div>
-        </div>
-      )}
-
-      {/* SHADOW KEEPER SPECIES (expert) — drives the "safe purify" aux filter */}
-      {expert && (
-        <div>
-          <label className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-1 block">
-            {t("app.protect.shadow_keepers.label")}
-          </label>
-          <textarea
-            value={config.shadowKeeperSpecies || ""}
-            onChange={e => set("shadowKeeperSpecies", e.target.value)}
-            placeholder={t("app.protect.shadow_keepers.placeholder")}
-            rows={3}
-            className="mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3] resize-y" />
-          <div className="mono text-[10px] text-[#8090A0] mt-1">
-            {t("app.protect.shadow_keepers.help")}
-          </div>
-        </div>
-      )}
 
       {/* RAID FILTERS (expert) — narrows per-boss counter filters */}
       {expert && (

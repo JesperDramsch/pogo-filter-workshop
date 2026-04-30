@@ -1,0 +1,35 @@
+name: Sync PvP rankings
+
+on:
+  schedule:
+    - cron: "29 8 * * *" # daily at 08:29 UTC (offset from other syncs)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Fetch Great / Ultra / Master rankings from lily-dex-api
+        run: npm run fetch-pvp-rankings
+      - name: Regenerate fixture snapshot
+        run: npx vite-node scripts/generate-fixtures.mjs
+      - name: Commit + push if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- src/data/pvp-rankings.json src/__fixtures__/default-filter-output.json; then
+            echo "No PvP ranking changes — skipping commit."
+            exit 0
+          fi
+          git add src/data/pvp-rankings.json src/__fixtures__/default-filter-output.json
+          git commit -m "chore(pvp): sync ranking snapshot from lily-dex-api"
+          git push

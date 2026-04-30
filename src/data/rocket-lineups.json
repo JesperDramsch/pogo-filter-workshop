@@ -1,0 +1,2447 @@
+{
+  "fetchedAt": "2026-04-30T12:59:03.860Z",
+  "trainers": [
+    {
+      "name": "Giovanni",
+      "kind": "leader",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Persian",
+              "types": [
+                "normal"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "rock",
+            "ghost",
+            "steel"
+          ],
+          "seMoveTypes": [
+            "fighting"
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Kangaskhan",
+              "types": [
+                "normal"
+              ]
+            },
+            {
+              "name": "Nidoking",
+              "types": [
+                "poison",
+                "ground"
+              ]
+            },
+            {
+              "name": "Rhyperior",
+              "types": [
+                "ground",
+                "rock"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "fighting",
+            "ground",
+            "ghost"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "ground",
+            "steel",
+            "water",
+            "grass",
+            "psychic",
+            "ice"
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Landorus (Incarnate)",
+              "types": [
+                "ground",
+                "flying"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "flying"
+          ],
+          "seMoveTypes": [
+            "water",
+            "ice"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cliff",
+      "kind": "leader",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "rock",
+            "ghost",
+            "steel"
+          ],
+          "seMoveTypes": [
+            "fighting"
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Gardevoir",
+              "types": [
+                "psychic",
+                "fairy"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "steel",
+            "fire",
+            "psychic"
+          ],
+          "seMoveTypes": [
+            "poison",
+            "ghost",
+            "steel"
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Tyranitar",
+              "types": [
+                "rock",
+                "dark"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "fighting",
+            "ground",
+            "steel",
+            "dark",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "ground",
+            "bug",
+            "steel",
+            "water",
+            "grass",
+            "fairy"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arlo",
+      "kind": "leader",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Pineco",
+              "types": [
+                "bug"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "fighting",
+            "flying",
+            "poison",
+            "ghost",
+            "steel",
+            "fire",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "rock",
+            "fire"
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Steelix",
+              "types": [
+                "steel",
+                "ground"
+              ]
+            },
+            {
+              "name": "Gigalith",
+              "types": [
+                "rock"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "fighting",
+            "ground",
+            "water",
+            "grass"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "ground",
+            "steel",
+            "fire",
+            "water",
+            "grass"
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Scizor",
+              "types": [
+                "bug",
+                "steel"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "fighting",
+            "flying",
+            "poison",
+            "ghost",
+            "steel",
+            "fire",
+            "water",
+            "electric"
+          ],
+          "seMoveTypes": [
+            "fire"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sierra",
+      "kind": "leader",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Duskull",
+              "types": [
+                "ghost"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "normal",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "ghost",
+            "dark"
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Ferrothorn",
+              "types": [
+                "grass",
+                "steel"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "flying",
+            "poison",
+            "bug",
+            "steel",
+            "fire",
+            "grass",
+            "electric",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "fire"
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Houndoom",
+              "types": [
+                "dark",
+                "fire"
+              ]
+            },
+            {
+              "name": "Steelix",
+              "types": [
+                "steel",
+                "ground"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "fighting",
+            "flying",
+            "water",
+            "dragon",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "ground",
+            "rock",
+            "fire",
+            "water"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Normal-type Male Grunt",
+      "kind": "typed_grunt",
+      "type": "normal",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Stufful",
+              "types": [
+                "normal",
+                "fighting"
+              ]
+            },
+            {
+              "name": "Meowth",
+              "types": [
+                "normal"
+              ]
+            },
+            {
+              "name": "Swablu",
+              "types": [
+                "normal",
+                "flying"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Loudred",
+              "types": [
+                "normal"
+              ]
+            },
+            {
+              "name": "Starly",
+              "types": [
+                "normal",
+                "flying"
+              ]
+            },
+            {
+              "name": "Rattata",
+              "types": [
+                "normal"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Swellow",
+              "types": [
+                "normal",
+                "flying"
+              ]
+            },
+            {
+              "name": "Kangaskhan",
+              "types": [
+                "normal"
+              ]
+            },
+            {
+              "name": "Ursaring",
+              "types": [
+                "normal"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "flying",
+        "poison",
+        "ghost",
+        "electric",
+        "psychic",
+        "fairy"
+      ],
+      "seMoveTypes": [
+        "fighting",
+        "flying",
+        "rock",
+        "electric",
+        "psychic",
+        "ice",
+        "fairy"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Fire-type Female Grunt",
+      "kind": "typed_grunt",
+      "type": "fire",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Vulpix",
+              "types": [
+                "fire"
+              ]
+            },
+            {
+              "name": "Litwick",
+              "types": [
+                "ghost",
+                "fire"
+              ]
+            },
+            {
+              "name": "Fennekin",
+              "types": [
+                "fire"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Magmar",
+              "types": [
+                "fire"
+              ]
+            },
+            {
+              "name": "Camerupt",
+              "types": [
+                "fire",
+                "ground"
+              ]
+            },
+            {
+              "name": "Braixen",
+              "types": [
+                "fire"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Magmortar",
+              "types": [
+                "fire"
+              ]
+            },
+            {
+              "name": "Darmanitan",
+              "types": [
+                "fire"
+              ]
+            },
+            {
+              "name": "Delphox",
+              "types": [
+                "fire",
+                "psychic"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "normal",
+        "flying",
+        "water",
+        "dragon",
+        "dark"
+      ],
+      "seMoveTypes": [
+        "ground",
+        "rock",
+        "ghost",
+        "water",
+        "dark"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Water-type Female Grunt",
+      "kind": "typed_grunt",
+      "type": "water",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Froakie",
+              "types": [
+                "water"
+              ]
+            },
+            {
+              "name": "Krabby",
+              "types": [
+                "water"
+              ]
+            },
+            {
+              "name": "Dewpider",
+              "types": [
+                "water",
+                "bug"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Sharpedo",
+              "types": [
+                "water",
+                "dark"
+              ]
+            },
+            {
+              "name": "Frogadier",
+              "types": [
+                "water"
+              ]
+            },
+            {
+              "name": "Tentacruel",
+              "types": [
+                "water",
+                "poison"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Greninja",
+              "types": [
+                "water",
+                "dark"
+              ]
+            },
+            {
+              "name": "Walrein",
+              "types": [
+                "ice",
+                "water"
+              ]
+            },
+            {
+              "name": "Tentacruel",
+              "types": [
+                "water",
+                "poison"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "fighting",
+        "poison",
+        "steel",
+        "water",
+        "ice"
+      ],
+      "seMoveTypes": [
+        "fighting",
+        "flying",
+        "ground",
+        "rock",
+        "bug",
+        "grass",
+        "electric",
+        "psychic",
+        "fairy"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Water-type Male Grunt",
+      "kind": "typed_grunt",
+      "type": "water",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Magikarp",
+              "types": [
+                "water"
+              ]
+            },
+            {
+              "name": "Feebas",
+              "types": [
+                "water"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Magikarp",
+              "types": [
+                "water"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Magikarp",
+              "types": [
+                "water"
+              ]
+            },
+            {
+              "name": "Gyarados",
+              "types": [
+                "water",
+                "flying"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "steel",
+        "water",
+        "electric",
+        "dragon"
+      ],
+      "seMoveTypes": [
+        "rock",
+        "grass",
+        "electric"
+      ],
+      "lineupSize": 5
+    },
+    {
+      "name": "Electric-type Female Grunt",
+      "kind": "typed_grunt",
+      "type": "electric",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Helioptile",
+              "types": [
+                "electric",
+                "normal"
+              ]
+            },
+            {
+              "name": "Voltorb",
+              "types": [
+                "electric"
+              ]
+            },
+            {
+              "name": "Shinx",
+              "types": [
+                "electric"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Electabuzz",
+              "types": [
+                "electric"
+              ]
+            },
+            {
+              "name": "Voltorb",
+              "types": [
+                "electric"
+              ]
+            },
+            {
+              "name": "Alolan Geodude",
+              "types": [
+                "rock",
+                "electric"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Luxray",
+              "types": [
+                "electric"
+              ]
+            },
+            {
+              "name": "Galvantula",
+              "types": [
+                "bug",
+                "electric"
+              ]
+            },
+            {
+              "name": "Ampharos",
+              "types": [
+                "electric"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "fighting",
+        "poison",
+        "ground",
+        "rock",
+        "ghost",
+        "steel",
+        "electric",
+        "dragon",
+        "fairy"
+      ],
+      "seMoveTypes": [
+        "fighting",
+        "ground",
+        "rock",
+        "fire",
+        "water",
+        "grass"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Grass-type Male Grunt",
+      "kind": "typed_grunt",
+      "type": "grass",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Chespin",
+              "types": [
+                "grass"
+              ]
+            },
+            {
+              "name": "Morelull",
+              "types": [
+                "grass",
+                "fairy"
+              ]
+            },
+            {
+              "name": "Cacnea",
+              "types": [
+                "grass"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Ferrothorn",
+              "types": [
+                "grass",
+                "steel"
+              ]
+            },
+            {
+              "name": "Lileep",
+              "types": [
+                "rock",
+                "grass"
+              ]
+            },
+            {
+              "name": "Quilladin",
+              "types": [
+                "grass"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Chesnaught",
+              "types": [
+                "grass",
+                "fighting"
+              ]
+            },
+            {
+              "name": "Cradily",
+              "types": [
+                "rock",
+                "grass"
+              ]
+            },
+            {
+              "name": "Trevenant",
+              "types": [
+                "ghost",
+                "grass"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "poison",
+        "grass",
+        "electric"
+      ],
+      "seMoveTypes": [
+        "fighting",
+        "flying",
+        "poison",
+        "bug",
+        "ghost",
+        "steel",
+        "fire",
+        "psychic",
+        "ice",
+        "dark",
+        "fairy"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Ice-type Female Grunt",
+      "kind": "typed_grunt",
+      "type": "ice",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Spheal",
+              "types": [
+                "ice",
+                "water"
+              ]
+            },
+            {
+              "name": "Swinub",
+              "types": [
+                "ice",
+                "ground"
+              ]
+            },
+            {
+              "name": "Sneasel",
+              "types": [
+                "dark",
+                "ice"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Froslass",
+              "types": [
+                "ice",
+                "ghost"
+              ]
+            },
+            {
+              "name": "Alolan Ninetales",
+              "types": [
+                "ice",
+                "fairy"
+              ]
+            },
+            {
+              "name": "Sealeo",
+              "types": [
+                "ice",
+                "water"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Glalie",
+              "types": [
+                "ice"
+              ]
+            },
+            {
+              "name": "Aurorus",
+              "types": [
+                "rock",
+                "ice"
+              ]
+            },
+            {
+              "name": "Froslass",
+              "types": [
+                "ice",
+                "ghost"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "normal",
+        "water",
+        "fairy"
+      ],
+      "seMoveTypes": [
+        "fighting",
+        "poison",
+        "ground",
+        "rock",
+        "bug",
+        "ghost",
+        "steel",
+        "fire",
+        "water",
+        "grass",
+        "electric",
+        "dark",
+        "fairy"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Fighting-type Female Grunt",
+      "kind": "typed_grunt",
+      "type": "fighting",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Timburr",
+              "types": [
+                "fighting"
+              ]
+            },
+            {
+              "name": "Machop",
+              "types": [
+                "fighting"
+              ]
+            },
+            {
+              "name": "Mankey",
+              "types": [
+                "fighting"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Hitmontop",
+              "types": [
+                "fighting"
+              ]
+            },
+            {
+              "name": "Hitmonlee",
+              "types": [
+                "fighting"
+              ]
+            },
+            {
+              "name": "Hitmonchan",
+              "types": [
+                "fighting"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Annihilape",
+              "types": [
+                "fighting",
+                "ghost"
+              ]
+            },
+            {
+              "name": "Conkeldurr",
+              "types": [
+                "fighting"
+              ]
+            },
+            {
+              "name": "Infernape",
+              "types": [
+                "fire",
+                "fighting"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "flying",
+        "poison",
+        "fire",
+        "water",
+        "dragon",
+        "fairy"
+      ],
+      "seMoveTypes": [
+        "flying",
+        "ground",
+        "ghost",
+        "water",
+        "psychic",
+        "fairy"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Poison-type Female Grunt",
+      "kind": "typed_grunt",
+      "type": "poison",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Oddish",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            },
+            {
+              "name": "Zubat",
+              "types": [
+                "poison",
+                "flying"
+              ]
+            },
+            {
+              "name": "Qwilfish",
+              "types": [
+                "water",
+                "poison"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Nidorina",
+              "types": [
+                "poison"
+              ]
+            },
+            {
+              "name": "Nidorino",
+              "types": [
+                "poison"
+              ]
+            },
+            {
+              "name": "Galarian Weezing",
+              "types": [
+                "poison",
+                "fairy"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Amoonguss",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            },
+            {
+              "name": "Toxicroak",
+              "types": [
+                "poison",
+                "fighting"
+              ]
+            },
+            {
+              "name": "Weezing",
+              "types": [
+                "poison"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "flying",
+        "poison",
+        "ghost",
+        "electric",
+        "psychic"
+      ],
+      "seMoveTypes": [
+        "flying",
+        "ground",
+        "rock",
+        "steel",
+        "fire",
+        "electric",
+        "psychic",
+        "ice"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Ground-type Male Grunt",
+      "kind": "typed_grunt",
+      "type": "ground",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Sandshrew",
+              "types": [
+                "ground"
+              ]
+            },
+            {
+              "name": "Trapinch",
+              "types": [
+                "ground"
+              ]
+            },
+            {
+              "name": "Gligar",
+              "types": [
+                "ground",
+                "flying"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Claydol",
+              "types": [
+                "ground",
+                "psychic"
+              ]
+            },
+            {
+              "name": "Vibrava",
+              "types": [
+                "ground",
+                "dragon"
+              ]
+            },
+            {
+              "name": "Gligar",
+              "types": [
+                "ground",
+                "flying"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Golurk",
+              "types": [
+                "ground",
+                "ghost"
+              ]
+            },
+            {
+              "name": "Flygon",
+              "types": [
+                "ground",
+                "dragon"
+              ]
+            },
+            {
+              "name": "Hippowdon",
+              "types": [
+                "ground"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "normal",
+        "flying",
+        "dark",
+        "fairy"
+      ],
+      "seMoveTypes": [
+        "bug",
+        "ghost",
+        "water",
+        "grass",
+        "ice",
+        "dragon",
+        "dark",
+        "fairy"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Flying-type Female Grunt",
+      "kind": "typed_grunt",
+      "type": "flying",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Swablu",
+              "types": [
+                "normal",
+                "flying"
+              ]
+            },
+            {
+              "name": "Pidgey",
+              "types": [
+                "normal",
+                "flying"
+              ]
+            },
+            {
+              "name": "Taillow",
+              "types": [
+                "normal",
+                "flying"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Zubat",
+              "types": [
+                "poison",
+                "flying"
+              ]
+            },
+            {
+              "name": "Gligar",
+              "types": [
+                "ground",
+                "flying"
+              ]
+            },
+            {
+              "name": "Scyther",
+              "types": [
+                "bug",
+                "flying"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Dragonite",
+              "types": [
+                "dragon",
+                "flying"
+              ]
+            },
+            {
+              "name": "Swanna",
+              "types": [
+                "water",
+                "flying"
+              ]
+            },
+            {
+              "name": "Toucannon",
+              "types": [
+                "normal",
+                "flying"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "flying",
+        "ghost",
+        "water"
+      ],
+      "seMoveTypes": [
+        "flying",
+        "rock",
+        "fire",
+        "water",
+        "electric",
+        "psychic",
+        "ice",
+        "dragon",
+        "fairy"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Psychic-type Male Grunt",
+      "kind": "typed_grunt",
+      "type": "psychic",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Ralts",
+              "types": [
+                "psychic",
+                "fairy"
+              ]
+            },
+            {
+              "name": "Drowzee",
+              "types": [
+                "psychic"
+              ]
+            },
+            {
+              "name": "Wobbuffet",
+              "types": [
+                "psychic"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Duosion",
+              "types": [
+                "psychic"
+              ]
+            },
+            {
+              "name": "Drowzee",
+              "types": [
+                "psychic"
+              ]
+            },
+            {
+              "name": "Wobbuffet",
+              "types": [
+                "psychic"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Reuniclus",
+              "types": [
+                "psychic"
+              ]
+            },
+            {
+              "name": "Gallade",
+              "types": [
+                "psychic",
+                "fighting"
+              ]
+            },
+            {
+              "name": "Malamar",
+              "types": [
+                "dark",
+                "psychic"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "flying",
+        "bug",
+        "fire",
+        "fairy"
+      ],
+      "seMoveTypes": [
+        "flying",
+        "poison",
+        "bug",
+        "ghost",
+        "steel",
+        "dark",
+        "fairy"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Bug-type Male Grunt",
+      "kind": "typed_grunt",
+      "type": "bug",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Venonat",
+              "types": [
+                "bug",
+                "poison"
+              ]
+            },
+            {
+              "name": "Shelmet",
+              "types": [
+                "bug"
+              ]
+            },
+            {
+              "name": "Karrablast",
+              "types": [
+                "bug"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Pinsir",
+              "types": [
+                "bug"
+              ]
+            },
+            {
+              "name": "Shuckle",
+              "types": [
+                "bug",
+                "rock"
+              ]
+            },
+            {
+              "name": "Anorith",
+              "types": [
+                "rock",
+                "bug"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Vikavolt",
+              "types": [
+                "bug",
+                "electric"
+              ]
+            },
+            {
+              "name": "Scizor",
+              "types": [
+                "bug",
+                "steel"
+              ]
+            },
+            {
+              "name": "Scolipede",
+              "types": [
+                "bug",
+                "poison"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "fighting",
+        "poison",
+        "ground",
+        "ghost",
+        "steel",
+        "electric",
+        "dragon"
+      ],
+      "seMoveTypes": [
+        "flying",
+        "rock",
+        "steel",
+        "fire",
+        "water",
+        "psychic"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Rock-type Male Grunt",
+      "kind": "typed_grunt",
+      "type": "rock",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Shuckle",
+              "types": [
+                "bug",
+                "rock"
+              ]
+            },
+            {
+              "name": "Omanyte",
+              "types": [
+                "rock",
+                "water"
+              ]
+            },
+            {
+              "name": "Cranidos",
+              "types": [
+                "rock"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Graveler",
+              "types": [
+                "rock",
+                "ground"
+              ]
+            },
+            {
+              "name": "Shieldon",
+              "types": [
+                "rock",
+                "steel"
+              ]
+            },
+            {
+              "name": "Cranidos",
+              "types": [
+                "rock"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Aurorus",
+              "types": [
+                "rock",
+                "ice"
+              ]
+            },
+            {
+              "name": "Tyrantrum",
+              "types": [
+                "rock",
+                "dragon"
+              ]
+            },
+            {
+              "name": "Golem",
+              "types": [
+                "rock",
+                "ground"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "fighting",
+        "ghost",
+        "water"
+      ],
+      "seMoveTypes": [
+        "fighting",
+        "ground",
+        "rock",
+        "steel",
+        "water",
+        "grass",
+        "electric",
+        "ice",
+        "dragon",
+        "fairy"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Ghost-type Male Grunt",
+      "kind": "typed_grunt",
+      "type": "ghost",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Gastly",
+              "types": [
+                "ghost",
+                "poison"
+              ]
+            },
+            {
+              "name": "Yamask",
+              "types": [
+                "ghost"
+              ]
+            },
+            {
+              "name": "Duskull",
+              "types": [
+                "ghost"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Dusclops",
+              "types": [
+                "ghost"
+              ]
+            },
+            {
+              "name": "Sableye",
+              "types": [
+                "dark",
+                "ghost"
+              ]
+            },
+            {
+              "name": "Cofagrigus",
+              "types": [
+                "ghost"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Cofagrigus",
+              "types": [
+                "ghost"
+              ]
+            },
+            {
+              "name": "Gengar",
+              "types": [
+                "ghost",
+                "poison"
+              ]
+            },
+            {
+              "name": "Froslass",
+              "types": [
+                "ice",
+                "ghost"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "normal",
+        "fighting",
+        "poison",
+        "rock",
+        "steel",
+        "fire",
+        "water",
+        "ice",
+        "dark"
+      ],
+      "seMoveTypes": [
+        "ground",
+        "rock",
+        "ghost",
+        "steel",
+        "fire",
+        "psychic",
+        "dark",
+        "fairy"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Dragon-type Female Grunt",
+      "kind": "typed_grunt",
+      "type": "dragon",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Dratini",
+              "types": [
+                "dragon"
+              ]
+            },
+            {
+              "name": "Bagon",
+              "types": [
+                "dragon"
+              ]
+            },
+            {
+              "name": "Deino",
+              "types": [
+                "dark",
+                "dragon"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Alolan Exeggutor",
+              "types": [
+                "grass",
+                "dragon"
+              ]
+            },
+            {
+              "name": "Dragonair",
+              "types": [
+                "dragon"
+              ]
+            },
+            {
+              "name": "Gabite",
+              "types": [
+                "dragon",
+                "ground"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Salamence",
+              "types": [
+                "dragon",
+                "flying"
+              ]
+            },
+            {
+              "name": "Dragonite",
+              "types": [
+                "dragon",
+                "flying"
+              ]
+            },
+            {
+              "name": "Garchomp",
+              "types": [
+                "dragon",
+                "ground"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "flying",
+        "dark",
+        "fairy"
+      ],
+      "seMoveTypes": [
+        "fighting",
+        "flying",
+        "poison",
+        "rock",
+        "bug",
+        "ice",
+        "dragon",
+        "fairy"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Dark-type Female Grunt",
+      "kind": "typed_grunt",
+      "type": "dark",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Alolan Rattata",
+              "types": [
+                "dark",
+                "normal"
+              ]
+            },
+            {
+              "name": "Poochyena",
+              "types": [
+                "dark"
+              ]
+            },
+            {
+              "name": "Carvanha",
+              "types": [
+                "water",
+                "dark"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Alolan Raticate",
+              "types": [
+                "dark",
+                "normal"
+              ]
+            },
+            {
+              "name": "Mightyena",
+              "types": [
+                "dark"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Liepard",
+              "types": [
+                "dark"
+              ]
+            },
+            {
+              "name": "Hydreigon",
+              "types": [
+                "dark",
+                "dragon"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "fighting",
+        "steel",
+        "water",
+        "grass",
+        "dark",
+        "fairy"
+      ],
+      "seMoveTypes": [
+        "fighting",
+        "bug",
+        "grass",
+        "electric",
+        "ice",
+        "dragon",
+        "fairy"
+      ],
+      "lineupSize": 7
+    },
+    {
+      "name": "Steel-type Male Grunt",
+      "kind": "typed_grunt",
+      "type": "steel",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Alolan Sandshrew",
+              "types": [
+                "ice",
+                "steel"
+              ]
+            },
+            {
+              "name": "Beldum",
+              "types": [
+                "steel",
+                "psychic"
+              ]
+            },
+            {
+              "name": "Aron",
+              "types": [
+                "steel",
+                "rock"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Skarmory",
+              "types": [
+                "steel",
+                "flying"
+              ]
+            },
+            {
+              "name": "Metang",
+              "types": [
+                "steel",
+                "psychic"
+              ]
+            },
+            {
+              "name": "Lairon",
+              "types": [
+                "steel",
+                "rock"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Alolan Sandslash",
+              "types": [
+                "ice",
+                "steel"
+              ]
+            },
+            {
+              "name": "Probopass",
+              "types": [
+                "rock",
+                "steel"
+              ]
+            },
+            {
+              "name": "Aggron",
+              "types": [
+                "steel",
+                "rock"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "steel",
+        "water",
+        "electric",
+        "psychic",
+        "dark"
+      ],
+      "seMoveTypes": [
+        "fighting",
+        "ground",
+        "ghost",
+        "fire",
+        "water",
+        "electric",
+        "dark"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Fairy-type Female Grunt",
+      "kind": "typed_grunt",
+      "type": "fairy",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Snubbull",
+              "types": [
+                "fairy"
+              ]
+            },
+            {
+              "name": "Alolan Vulpix",
+              "types": [
+                "ice"
+              ]
+            },
+            {
+              "name": "Ralts",
+              "types": [
+                "psychic",
+                "fairy"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Kirlia",
+              "types": [
+                "psychic",
+                "fairy"
+              ]
+            },
+            {
+              "name": "Snubbull",
+              "types": [
+                "fairy"
+              ]
+            },
+            {
+              "name": "Galarian Weezing",
+              "types": [
+                "poison",
+                "fairy"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Alolan Ninetales",
+              "types": [
+                "ice",
+                "fairy"
+              ]
+            },
+            {
+              "name": "Granbull",
+              "types": [
+                "fairy"
+              ]
+            },
+            {
+              "name": "Galarian Weezing",
+              "types": [
+                "poison",
+                "fairy"
+              ]
+            }
+          ]
+        }
+      ],
+      "resistorTypes": [
+        "rock",
+        "ghost",
+        "steel",
+        "fire",
+        "water",
+        "psychic",
+        "ice"
+      ],
+      "seMoveTypes": [
+        "fighting",
+        "poison",
+        "ground",
+        "rock",
+        "ghost",
+        "steel",
+        "fire",
+        "psychic"
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Male Grunt",
+      "kind": "generic_grunt",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Bulbasaur",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            },
+            {
+              "name": "Charmander",
+              "types": [
+                "fire"
+              ]
+            },
+            {
+              "name": "Squirtle",
+              "types": [
+                "water"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Ivysaur",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            },
+            {
+              "name": "Charmeleon",
+              "types": [
+                "fire"
+              ]
+            },
+            {
+              "name": "Wartortle",
+              "types": [
+                "water"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Venusaur",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            },
+            {
+              "name": "Charizard",
+              "types": [
+                "fire",
+                "flying"
+              ]
+            },
+            {
+              "name": "Blastoise",
+              "types": [
+                "water"
+              ]
+            }
+          ]
+        }
+      ],
+      "topOffensiveTypes": [
+        "electric",
+        "fire",
+        "flying"
+      ],
+      "topHits": [
+        {
+          "type": "electric",
+          "hits": 4,
+          "total": 9
+        },
+        {
+          "type": "fire",
+          "hits": 3,
+          "total": 9
+        },
+        {
+          "type": "flying",
+          "hits": 3,
+          "total": 9
+        }
+      ],
+      "lineupSize": 9
+    },
+    {
+      "name": "Female Grunt",
+      "kind": "generic_grunt",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Poliwrath",
+              "types": [
+                "water",
+                "fighting"
+              ]
+            },
+            {
+              "name": "Gardevoir",
+              "types": [
+                "psychic",
+                "fairy"
+              ]
+            },
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Gyarados",
+              "types": [
+                "water",
+                "flying"
+              ]
+            },
+            {
+              "name": "Dragonite",
+              "types": [
+                "dragon",
+                "flying"
+              ]
+            },
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ]
+        }
+      ],
+      "topOffensiveTypes": [
+        "fighting",
+        "electric",
+        "fairy"
+      ],
+      "topHits": [
+        {
+          "type": "fighting",
+          "hits": 3,
+          "total": 7
+        },
+        {
+          "type": "electric",
+          "hits": 2,
+          "total": 7
+        },
+        {
+          "type": "fairy",
+          "hits": 2,
+          "total": 7
+        }
+      ],
+      "lineupSize": 7
+    },
+    {
+      "name": "Decoy Female Grunt",
+      "kind": "generic_grunt",
+      "phases": [
+        {
+          "slot": 1,
+          "pokemons": [
+            {
+              "name": "Bellsprout",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Raticate",
+              "types": [
+                "normal"
+              ]
+            },
+            {
+              "name": "Weepinbell",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Raticate",
+              "types": [
+                "normal"
+              ]
+            },
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ]
+        }
+      ],
+      "topOffensiveTypes": [
+        "fighting",
+        "fire",
+        "flying"
+      ],
+      "topHits": [
+        {
+          "type": "fighting",
+          "hits": 3,
+          "total": 5
+        },
+        {
+          "type": "fire",
+          "hits": 2,
+          "total": 5
+        },
+        {
+          "type": "flying",
+          "hits": 2,
+          "total": 5
+        }
+      ],
+      "lineupSize": 5
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+name: Sync rocket lineups
+
+on:
+  schedule:
+    - cron: "13 8 * * *" # daily at 08:13 UTC (offset from translation + raid syncs)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Fetch Team Rocket lineups from ScrapedDuck + lily-dex-api types
+        run: npm run fetch-rocket-lineups
+      - name: Regenerate fixture snapshot
+        run: npx vite-node scripts/generate-fixtures.mjs
+      - name: Commit + push if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- src/data/rocket-lineups.json src/__fixtures__/default-filter-output.json; then
+            echo "No Rocket lineup changes — skipping commit."
+            exit 0
+          fi
+          git add src/data/rocket-lineups.json src/__fixtures__/default-filter-output.json
+          git commit -m "chore(rocket): sync lineup snapshot from ScrapedDuck"
+          git push

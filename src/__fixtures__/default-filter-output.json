@@ -1,644 +1,1043 @@
 {
   "en": {
-    "trash": "0*,1*,2*&0*,1*,2*,0-3attack,0-3defense,0-2hp&0*,1*,2*,0-3attack,0-2defense,0-3hp&0*,1*,2*,0-2attack,0-3defense,0-3hp&1-4attack,0-2defense,0-2hp&!4*&!#&!favorite&!shiny&!legendary&!mythical,808,649&!ultrabeast&!shadow&!costume&!lucky&!background&!maxmove1-&!evolvenew,mega0&!@special,smeargle&!eggsonly&!distance100-,traded&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&age-30,traded",
+    "trash": "0*,1*,2*&0*,1*,2*,0-3attack,0-3defense,0-2hp&0*,1*,2*,0-3attack,0-2defense,0-3hp&0*,1*,2*,0-2attack,0-3defense,0-3hp&1-4attack,0-2defense,0-2hp&!4*&!#&!favorite&!shiny&!legendary&!mythical,meltan,genesect&!ultrabeast&!shadow&!costume&!lucky&!background&!maxmove1-&!evolvenew,mega0&!@special,smeargle&!eggsonly&!distance100-,traded&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&age-30,traded",
     "trade": "0*,1*,2*&0*,1*,2*,0-3attack,0-3defense,0-2hp&0*,1*,2*,0-3attack,0-2defense,0-3hp&0*,1*,2*,0-2attack,0-3defense,0-3hp&1-4attack,0-2defense,0-2hp&!traded&!shadow&!lucky&!mythical,808,809&!#&!legendary&!ultrabeast&!shiny&!costume&!purified&!background&!favorite&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!maxmove1-&!xxl&!xl&!@special&age-30&distance0-",
     "sort": "",
     "prestaged": "#Trade,#Fern-Tausch&!traded&!shadow&!lucky&!mythical,808,809",
     "gift": "shiny,legendary,ultrabeast,costume,background&!traded&!shadow&!mythical,808,809&!lucky&!4*&!favorite&!@special&!#,#Trade,#Fern-Tausch",
-    "shadowCheap": "shadow&candykm1&!shiny&!lucky&!@special&!#",
-    "shadowSafe": "shadow&!legendary&!mythical&!ultrabeast&!4*&!shiny&!lucky&!costume&!@special&!+mamoswine&!+salamence&!+dragonite&!+metagross&!+machamp&!+mewtwo&!+swampert&!+moltres&!+raikou&!+electivire&!+magnezone&!+tyranitar&!+weavile&!+ho-oh&!+entei&!+blaziken&!+gardevoir&!+hariyama&!+zapdos&!+latios&!+charizard&!+luxray&!+tangrowth&!+sceptile&!+venusaur&!+feraligatr&!+gyarados&!+pinsir&!+scizor&!+lugia&!+honchkrow&!+staraptor&!+houndoom&!+typhlosion&!+arcanine&!+magmortar&!+torterra&!+golurk&!+alakazam&!+aerodactyl&!+aggron&!+gallade&!+exeggutor&!+granbull&!+latias",
+    "shadowCheap": "shadow&candykm1&!shiny&!@special&!#",
+    "shadowSafe": "shadow&!legendary&!mythical&!ultrabeast&!4*&!shiny&!costume&!@special&!+dialga&!+palkia&!+heatran&!+groudon&!+rampardos&!+salamence&!+mewtwo&!+greninja&!+hydreigon&!+darkrai&!+toucannon&!+vikavolt&!+tyrantrum&!+conkeldurr&!+darmanitan&!+chandelure&!+excadrill&!+regigigas&!+gigalith&!+kyogre&!+mamoswine&!+electivire&!+magnezone&!+garchomp&!+rhyperior&!+metagross&!+tyranitar&!+blaziken&!+ho-oh&!+raikou&!+gardevoir&!+swampert&!+dragonite&!+moltres&!+gengar&!+machamp&!+landorus&!+kingler&!+delphox&!+chesnaught&!+giratina&!+emboar&!+honchkrow&!+latios&!+staraptor&!+weavile&!+crawdaunt&!+absol&!+hariyama&!+sceptile&!+entei&!+aerodactyl&!+zapdos",
     "shadowHundoCandidates": "shadow&3-4attack&3-4defense&3-4hp&!4*",
-    "shadowFrustration": "shadow&@frustration&+mamoswine,+salamence,+dragonite,+metagross,+machamp,+mewtwo,+swampert,+moltres,+raikou,+electivire,+magnezone,+tyranitar,+weavile,+ho-oh,+entei,+blaziken,+gardevoir,+hariyama,+zapdos,+latios,+charizard,+luxray,+tangrowth,+sceptile,+venusaur,+feraligatr,+gyarados,+pinsir,+scizor,+lugia,+honchkrow,+staraptor,+houndoom,+typhlosion,+arcanine,+magmortar,+torterra,+golurk,+alakazam,+aerodactyl,+aggron,+gallade,+exeggutor,+granbull,+latias",
+    "shadowFrustration": "shadow&@frustration&+dialga,+palkia,+heatran,+groudon,+rampardos,+salamence,+mewtwo,+greninja,+hydreigon,+darkrai,+toucannon,+vikavolt,+tyrantrum,+conkeldurr,+darmanitan,+chandelure,+excadrill,+regigigas,+gigalith,+kyogre,+mamoswine,+electivire,+magnezone,+garchomp,+rhyperior,+metagross,+tyranitar,+blaziken,+ho-oh,+raikou,+gardevoir,+swampert,+dragonite,+moltres,+gengar,+machamp,+landorus,+kingler,+delphox,+chesnaught,+giratina,+emboar,+honchkrow,+latios,+staraptor,+weavile,+crawdaunt,+absol,+hariyama,+sceptile,+entei,+aerodactyl,+zapdos",
     "cheapEvolve": "caterpie,weedle,pidgey,wurmple,whismur,pidove,abra,kadabra,machop,machoke,geodude,graveler,gastly,haunter,roggenrola,boldore,timburr,gurdurr,karrablast,shelmet,phantump,pumpkaboo&caterpie,weedle,pidgey,wurmple,whismur,pidove,traded&0*,1*,2*&!shiny&!costume&!@special&!#",
     "dexPlus": "evolve&evolvenew&!evolvequest",
     "megaEvolve": "megaevolve&mega1-2,evolvenew",
     "pilotLong": "distance1000-&!traded&!4*&!legendary&!mythical&!shiny",
     "raidFilters": {
+      "mega": {
+        "BANETTE": "normal,dark&@1dark,@1ghost&@2dark,@2ghost,@3dark,@3ghost&!<ghost"
+      },
       "lvl5": {
-        "TAPU_KOKO": "(poison,ground,steel,fire,grass,electric)&(@ground,@poison)"
+        "TAPU_LELE": "steel,fire,psychic&@1ghost,@1poison,@1steel&@2ghost,@2poison,@2steel,@3ghost,@3poison,@3steel&!<psychic&!<fairy"
       },
       "lvl3": {
-        "ORTHWORM": "(steel,fire,water,electric)&(@fighting,@fire,@ground)"
+        "ORTHWORM": "steel,fire,water,electric&@1fighting,@1fire,@1ground&@2fighting,@2fire,@2ground,@3fighting,@3fire,@3ground&!<steel"
       },
       "lvl1": {
-        "BELDUM": "(steel,fire,water,electric,psychic,dark)&(@dark,@fire,@ghost,@ground)",
-        "SHIELDON": "(fighting,ground,steel,water,electric)&(@fighting,@ground,@water)",
-        "HONEDGE": "(normal,steel,fire,water,electric,dark)&(@dark,@fire,@ghost,@ground)"
+        "BELDUM": "steel,fire,water,electric,psychic,dark&@1dark,@1fire,@1ghost,@1ground&@2dark,@2fire,@2ghost,@2ground,@3dark,@3fire,@3ghost,@3ground&!<steel&!<psychic",
+        "SHIELDON": "fighting,ground,steel,water,electric&@1fighting,@1ground,@1water&@2fighting,@2ground,@2water,@3fighting,@3ground,@3water&!<rock&!<steel",
+        "HONEDGE": "normal,steel,fire,water,electric,dark&@1dark,@1fire,@1ghost,@1ground&@2dark,@2fire,@2ghost,@2ground,@3dark,@3fire,@3ghost,@3ground&!<steel&!<ghost"
       },
       "shadow_lvl5": {
-        "LATIOS": "(steel,psychic,dark,fairy)&(@bug,@dark,@dragon,@fairy,@ghost,@ice)"
+        "LATIOS": "steel,psychic,dark,fairy&@1bug,@1dark,@1dragon,@1fairy,@1ghost,@1ice&@2bug,@2dark,@2dragon,@2fairy,@2ghost,@2ice,@3bug,@3dark,@3dragon,@3fairy,@3ghost,@3ice&!<dragon&!<psychic"
       },
       "shadow_lvl3": {
-        "MAROWAK": "(normal,rock,fire,water,dragon,dark)&(@dark,@ghost,@ground,@rock,@water)",
-        "LAPRAS": "(steel,water,ice)&(@electric,@fighting,@grass,@rock)",
-        "STANTLER": "(rock,ghost,steel)&(@fighting)"
+        "MAROWAK": "normal,rock,fire,water,dragon,dark&@1dark,@1ghost,@1ground,@1rock,@1water&@2dark,@2ghost,@2ground,@2rock,@2water,@3dark,@3ghost,@3ground,@3rock,@3water&!<fire&!<ghost",
+        "LAPRAS": "steel,water,ice&@1electric,@1fighting,@1grass,@1rock&@2electric,@2fighting,@2grass,@2rock,@3electric,@3fighting,@3grass,@3rock&!<water&!<ice",
+        "STANTLER": "rock,ghost,steel&@1fighting&@2fighting,@3fighting&!<normal"
       },
       "shadow_lvl1": {
-        "DRATINI": "(steel,fairy)&(@dragon,@fairy,@ice)",
-        "GLIGAR": "(flying)&(@ice,@water)",
-        "CACNEA": "(flying,poison,bug,steel,fire,grass,dragon)&(@bug,@fire,@flying,@ice,@poison)",
-        "JOLTIK": "(fighting,poison,ground,ghost,steel,fire,electric,dragon,fairy)&(@fire,@rock)"
+        "DRATINI": "steel,fairy&@1dragon,@1fairy,@1ice&@2dragon,@2fairy,@2ice,@3dragon,@3fairy,@3ice&!<dragon",
+        "GLIGAR": "flying&@1ice,@1water&@2ice,@2water,@3ice,@3water&!<ground&!<flying",
+        "CACNEA": "flying,poison,bug,steel,fire,grass,dragon&@1bug,@1fire,@1flying,@1ice,@1poison&@2bug,@2fire,@2flying,@2ice,@2poison,@3bug,@3fire,@3flying,@3ice,@3poison&!<grass",
+        "JOLTIK": "fighting,poison,ground,ghost,steel,fire,electric,dragon,fairy&@1fire,@1rock&@2fire,@2rock,@3fire,@3rock&!<bug&!<electric"
       }
     },
     "maxBattleFilters": {
       "tier_1": {
-        "BULBASAUR": "(flying,poison,bug,ghost,steel,fire,dragon)&(@flying,@fire,@psychic,@ice)&maxmove1-",
-        "CHARMANDER": "(rock,fire,water,dragon)&(@ground,@rock,@water)&maxmove1-",
-        "SQUIRTLE": "(water,grass,dragon)&(@grass,@electric)&maxmove1-",
-        "CATERPIE": "(fighting,flying,poison,ghost,steel,fire,fairy)&(@flying,@rock,@fire)&maxmove1-",
-        "GROWLITHE": "(rock,fire,water,dragon)&(@ground,@rock,@water)&maxmove1-",
-        "ABRA": "(steel,psychic,dark)&(@bug,@ghost,@dark)&maxmove1-",
-        "GASTLY": "(normal,poison,ground,rock,steel,dark)&(@ground,@ghost,@psychic,@dark)&maxmove1-",
-        "KRABBY": "(water,grass,dragon)&(@grass,@electric)&maxmove1-",
-        "OMANYTE": "(fighting,steel,water,grass,dragon)&(@fighting,@ground,@grass,@electric)&maxmove1-",
-        "KABUTO": "(fighting,steel,water,grass,dragon)&(@fighting,@ground,@grass,@electric)&maxmove1-",
-        "RALTS": "(steel,fire,psychic)&(@poison,@ghost,@steel)&maxmove1-",
-        "SPHEAL": "(steel,water,ice)&(@fighting,@rock,@grass,@electric)&maxmove1-",
-        "PIDOVE": "(rock,ghost,steel,electric)&(@rock,@electric,@ice)&maxmove1-",
-        "ROGGENROLA": "(fighting,ground,steel)&(@fighting,@ground,@steel,@water,@grass)&maxmove1-",
-        "WOOBAT": "(rock,steel,electric,psychic,dark)&(@rock,@ghost,@electric,@ice,@dark)&maxmove1-",
-        "DRILBUR": "(flying,bug,grass)&(@water,@grass,@ice)&maxmove1-",
-        "TRUBBISH": "(poison,ground,rock,ghost,steel)&(@ground,@psychic)&maxmove1-",
-        "INKAY": "(steel,dark,fairy)&(@bug,@fairy)&maxmove1-",
-        "BOUNSWEET": "(flying,poison,bug,steel,fire,grass,dragon)&(@flying,@poison,@bug,@fire,@ice)&maxmove1-",
-        "GROOKEY": "(flying,poison,bug,steel,fire,grass,dragon)&(@flying,@poison,@bug,@fire,@ice)&maxmove1-",
-        "SCORBUNNY": "(rock,fire,water,dragon)&(@ground,@rock,@water)&maxmove1-",
-        "SOBBLE": "(water,grass,dragon)&(@grass,@electric)&maxmove1-",
-        "SKWOVET": "(rock,ghost,steel)&(@fighting)&maxmove1-",
-        "ROOKIDEE": "(rock,steel,electric)&(@rock,@electric,@ice)&maxmove1-",
-        "WOOLOO": "(rock,ghost,steel)&(@fighting)&maxmove1-",
-        "HATENNA": "(steel,psychic,dark)&(@bug,@ghost,@dark)&maxmove1-"
+        "BULBASAUR": "flying,poison,bug,ghost,steel,fire,dragon&@1flying,@1fire,@1psychic,@1ice&@2flying,@2fire,@2psychic,@2ice,@3flying,@3fire,@3psychic,@3ice&maxmove1-&!<grass&!<poison",
+        "CHARMANDER": "rock,fire,water,dragon&@1ground,@1rock,@1water&@2ground,@2rock,@2water,@3ground,@3rock,@3water&maxmove1-&!<fire",
+        "SQUIRTLE": "water,grass,dragon&@1grass,@1electric&@2grass,@2electric,@3grass,@3electric&maxmove1-&!<water",
+        "CATERPIE": "fighting,flying,poison,ghost,steel,fire,fairy&@1flying,@1rock,@1fire&@2flying,@2rock,@2fire,@3flying,@3rock,@3fire&maxmove1-&!<bug",
+        "GROWLITHE": "rock,fire,water,dragon&@1ground,@1rock,@1water&@2ground,@2rock,@2water,@3ground,@3rock,@3water&maxmove1-&!<fire",
+        "ABRA": "steel,psychic,dark&@1bug,@1ghost,@1dark&@2bug,@2ghost,@2dark,@3bug,@3ghost,@3dark&maxmove1-&!<psychic",
+        "GASTLY": "normal,poison,ground,rock,steel,dark&@1ground,@1ghost,@1psychic,@1dark&@2ground,@2ghost,@2psychic,@2dark,@3ground,@3ghost,@3psychic,@3dark&maxmove1-&!<ghost&!<poison",
+        "KRABBY": "water,grass,dragon&@1grass,@1electric&@2grass,@2electric,@3grass,@3electric&maxmove1-&!<water",
+        "OMANYTE": "fighting,steel,water,grass,dragon&@1fighting,@1ground,@1grass,@1electric&@2fighting,@2ground,@2grass,@2electric,@3fighting,@3ground,@3grass,@3electric&maxmove1-&!<rock&!<water",
+        "KABUTO": "fighting,steel,water,grass,dragon&@1fighting,@1ground,@1grass,@1electric&@2fighting,@2ground,@2grass,@2electric,@3fighting,@3ground,@3grass,@3electric&maxmove1-&!<rock&!<water",
+        "RALTS": "steel,fire,psychic&@1poison,@1ghost,@1steel&@2poison,@2ghost,@2steel,@3poison,@3ghost,@3steel&maxmove1-&!<psychic&!<fairy",
+        "SPHEAL": "steel,water,ice&@1fighting,@1rock,@1grass,@1electric&@2fighting,@2rock,@2grass,@2electric,@3fighting,@3rock,@3grass,@3electric&maxmove1-&!<ice&!<water",
+        "PIDOVE": "rock,ghost,steel,electric&@1rock,@1electric,@1ice&@2rock,@2electric,@2ice,@3rock,@3electric,@3ice&maxmove1-&!<normal&!<flying",
+        "ROGGENROLA": "fighting,ground,steel&@1fighting,@1ground,@1steel,@1water,@1grass&@2fighting,@2ground,@2steel,@2water,@2grass,@3fighting,@3ground,@3steel,@3water,@3grass&maxmove1-&!<rock",
+        "WOOBAT": "rock,steel,electric,psychic,dark&@1rock,@1ghost,@1electric,@1ice,@1dark&@2rock,@2ghost,@2electric,@2ice,@2dark,@3rock,@3ghost,@3electric,@3ice,@3dark&maxmove1-&!<psychic&!<flying",
+        "DRILBUR": "flying,bug,grass&@1water,@1grass,@1ice&@2water,@2grass,@2ice,@3water,@3grass,@3ice&maxmove1-&!<ground",
+        "TRUBBISH": "poison,ground,rock,ghost,steel&@1ground,@1psychic&@2ground,@2psychic,@3ground,@3psychic&maxmove1-&!<poison",
+        "INKAY": "steel,dark,fairy&@1bug,@1fairy&@2bug,@2fairy,@3bug,@3fairy&maxmove1-&!<dark&!<psychic",
+        "BOUNSWEET": "flying,poison,bug,steel,fire,grass,dragon&@1flying,@1poison,@1bug,@1fire,@1ice&@2flying,@2poison,@2bug,@2fire,@2ice,@3flying,@3poison,@3bug,@3fire,@3ice&maxmove1-&!<grass",
+        "GROOKEY": "flying,poison,bug,steel,fire,grass,dragon&@1flying,@1poison,@1bug,@1fire,@1ice&@2flying,@2poison,@2bug,@2fire,@2ice,@3flying,@3poison,@3bug,@3fire,@3ice&maxmove1-&!<grass",
+        "SCORBUNNY": "rock,fire,water,dragon&@1ground,@1rock,@1water&@2ground,@2rock,@2water,@3ground,@3rock,@3water&maxmove1-&!<fire",
+        "SOBBLE": "water,grass,dragon&@1grass,@1electric&@2grass,@2electric,@3grass,@3electric&maxmove1-&!<water",
+        "SKWOVET": "rock,ghost,steel&@1fighting&@2fighting,@3fighting&maxmove1-&!<normal",
+        "ROOKIDEE": "rock,steel,electric&@1rock,@1electric,@1ice&@2rock,@2electric,@2ice,@3rock,@3electric,@3ice&maxmove1-&!<flying",
+        "WOOLOO": "rock,ghost,steel&@1fighting&@2fighting,@3fighting&maxmove1-&!<normal",
+        "HATENNA": "steel,psychic,dark&@1bug,@1ghost,@1dark&@2bug,@2ghost,@2dark,@3bug,@3ghost,@3dark&maxmove1-&!<psychic"
       },
       "tier_2": {
-        "MACHOP": "(flying,poison,bug,ghost,psychic,fairy)&(@flying,@psychic,@fairy)&maxmove1-",
-        "EEVEE": "(rock,ghost,steel)&(@fighting)&maxmove1-",
-        "SHUCKLE": "(fighting,poison,ground,ghost,steel,fairy)&(@rock,@steel,@water)&maxmove1-",
-        "WAILMER": "(water,grass,dragon)&(@grass,@electric)&maxmove1-",
-        "DARUMAKA": "(rock,fire,water,dragon)&(@ground,@rock,@water)&maxmove1-"
+        "MACHOP": "flying,poison,bug,ghost,psychic,fairy&@1flying,@1psychic,@1fairy&@2flying,@2psychic,@2fairy,@3flying,@3psychic,@3fairy&maxmove1-&!<fighting",
+        "EEVEE": "rock,ghost,steel&@1fighting&@2fighting,@3fighting&maxmove1-&!<normal",
+        "SHUCKLE": "fighting,poison,ground,ghost,steel,fairy&@1rock,@1steel,@1water&@2rock,@2steel,@2water,@3rock,@3steel,@3water&maxmove1-&!<bug&!<rock",
+        "WAILMER": "water,grass,dragon&@1grass,@1electric&@2grass,@2electric,@3grass,@3electric&maxmove1-&!<water",
+        "DARUMAKA": "rock,fire,water,dragon&@1ground,@1rock,@1water&@2ground,@2rock,@2water,@3ground,@3rock,@3water&maxmove1-&!<fire"
       },
       "tier_3": {
-        "HITMONLEE": "(flying,poison,bug,ghost,psychic,fairy)&(@flying,@psychic,@fairy)&maxmove1-",
-        "HITMONCHAN": "(flying,poison,bug,ghost,psychic,fairy)&(@flying,@psychic,@fairy)&maxmove1-",
-        "CHANSEY": "(rock,ghost,steel)&(@fighting)&maxmove1-",
-        "SABLEYE": "(normal,fighting,dark,fairy)&(@fairy)&maxmove1-",
-        "BELDUM": "(steel,fire,water,electric,psychic,dark)&(@ground,@ghost,@fire,@dark)&maxmove1-",
-        "CRYOGONAL": "(steel,fire,water,ice)&(@fighting,@rock,@steel,@fire)&maxmove1-",
-        "PASSIMIAN": "(flying,poison,bug,ghost,psychic,fairy)&(@flying,@psychic,@fairy)&maxmove1-",
-        "DRAMPA": "(rock,ghost,steel,fairy)&(@fighting,@ice,@dragon,@fairy)&maxmove1-",
-        "FALINKS": "(flying,poison,bug,ghost,psychic,fairy)&(@flying,@psychic,@fairy)&maxmove1-"
+        "HITMONLEE": "flying,poison,bug,ghost,psychic,fairy&@1flying,@1psychic,@1fairy&@2flying,@2psychic,@2fairy,@3flying,@3psychic,@3fairy&maxmove1-&!<fighting",
+        "HITMONCHAN": "flying,poison,bug,ghost,psychic,fairy&@1flying,@1psychic,@1fairy&@2flying,@2psychic,@2fairy,@3flying,@3psychic,@3fairy&maxmove1-&!<fighting",
+        "CHANSEY": "rock,ghost,steel&@1fighting&@2fighting,@3fighting&maxmove1-&!<normal",
+        "SABLEYE": "normal,fighting,dark,fairy&@1fairy&@2fairy,@3fairy&maxmove1-&!<dark&!<ghost",
+        "BELDUM": "steel,fire,water,electric,psychic,dark&@1ground,@1ghost,@1fire,@1dark&@2ground,@2ghost,@2fire,@2dark,@3ground,@3ghost,@3fire,@3dark&maxmove1-&!<steel&!<psychic",
+        "CRYOGONAL": "steel,fire,water,ice&@1fighting,@1rock,@1steel,@1fire&@2fighting,@2rock,@2steel,@2fire,@3fighting,@3rock,@3steel,@3fire&maxmove1-&!<ice",
+        "PASSIMIAN": "flying,poison,bug,ghost,psychic,fairy&@1flying,@1psychic,@1fairy&@2flying,@2psychic,@2fairy,@3flying,@3psychic,@3fairy&maxmove1-&!<fighting",
+        "DRAMPA": "rock,ghost,steel,fairy&@1fighting,@1ice,@1dragon,@1fairy&@2fighting,@2ice,@2dragon,@2fairy,@3fighting,@3ice,@3dragon,@3fairy&maxmove1-&!<normal&!<dragon",
+        "FALINKS": "flying,poison,bug,ghost,psychic,fairy&@1flying,@1psychic,@1fairy&@2flying,@2psychic,@2fairy,@3flying,@3psychic,@3fairy&maxmove1-&!<fighting"
       }
+    },
+    "maxTank": "@1bite,@1bugbite,@1cut,@1dragonbreath,@1furycutter,@1leafage,@1lick,@1lock-on,@1lowkick,@1metalclaw,@1mudshot,@1poisonsting,@1pound,@1psychocut,@1scratch,@1shadowclaw,@1spark,@1suckerpunch,@1tackle,@1thundershock,@1vinewhip,@1watergun&maxmove1-",
+    "rocketLeaders": {
+      "Giovanni": {
+        "1": "rock,ghost,steel&@1fighting&@2fighting,@3fighting&!<normal",
+        "2": "fighting,ground,ghost&@1fighting,@1ground,@1steel,@1water,@1grass,@1psychic,@1ice&@2fighting,@2ground,@2steel,@2water,@2grass,@2psychic,@2ice,@3fighting,@3ground,@3steel,@3water,@3grass,@3psychic,@3ice&!<normal&!<poison&!<ground&!<rock",
+        "3": "flying&@1water,@1ice&@2water,@2ice,@3water,@3ice&!<ground&!<flying"
+      },
+      "Cliff": {
+        "1": "rock,ghost,steel&@1fighting&@2fighting,@3fighting&!<normal",
+        "2": "steel,fire,psychic&@1poison,@1ghost,@1steel&@2poison,@2ghost,@2steel,@3poison,@3ghost,@3steel&!<psychic&!<fairy",
+        "3": "fighting,ground,steel,dark,fairy&@1fighting,@1ground,@1bug,@1steel,@1water,@1grass,@1fairy&@2fighting,@2ground,@2bug,@2steel,@2water,@2grass,@2fairy,@3fighting,@3ground,@3bug,@3steel,@3water,@3grass,@3fairy&!<rock&!<dark"
+      },
+      "Arlo": {
+        "1": "fighting,flying,poison,ghost,steel,fire,fairy&@1flying,@1rock,@1fire&@2flying,@2rock,@2fire,@3flying,@3rock,@3fire&!<bug",
+        "2": "fighting,ground,water,grass&@1fighting,@1ground,@1steel,@1fire,@1water,@1grass&@2fighting,@2ground,@2steel,@2fire,@2water,@2grass,@3fighting,@3ground,@3steel,@3fire,@3water,@3grass&!<steel&!<ground&!<rock",
+        "3": "fighting,flying,poison,ghost,steel,fire,water,electric&@1fire&@2fire,@3fire&!<bug&!<steel"
+      },
+      "Sierra": {
+        "1": "normal,dark&@1ghost,@1dark&@2ghost,@2dark,@3ghost,@3dark&!<ghost",
+        "2": "flying,poison,bug,steel,fire,grass,electric,dragon&@1fighting,@1fire&@2fighting,@2fire,@3fighting,@3fire&!<grass&!<steel",
+        "3": "fighting,flying,water,dragon,dark&@1fighting,@1ground,@1rock,@1fire,@1water&@2fighting,@2ground,@2rock,@2fire,@2water,@3fighting,@3ground,@3rock,@3fire,@3water&!<dark&!<fire&!<steel&!<ground"
+      }
+    },
+    "rocketTypedGrunts": {
+      "Normal-type Male Grunt": "flying,poison,ghost,electric,psychic,fairy&@1fighting,@1flying,@1rock,@1electric,@1psychic,@1ice,@1fairy&@2fighting,@2flying,@2rock,@2electric,@2psychic,@2ice,@2fairy,@3fighting,@3flying,@3rock,@3electric,@3psychic,@3ice,@3fairy&!<normal&!<fighting&!<flying",
+      "Fire-type Female Grunt": "normal,flying,water,dragon,dark&@1ground,@1rock,@1ghost,@1water,@1dark&@2ground,@2rock,@2ghost,@2water,@2dark,@3ground,@3rock,@3ghost,@3water,@3dark&!<fire&!<ghost&!<ground&!<psychic",
+      "Water-type Female Grunt": "fighting,poison,steel,water,ice&@1fighting,@1flying,@1ground,@1rock,@1bug,@1grass,@1electric,@1psychic,@1fairy&@2fighting,@2flying,@2ground,@2rock,@2bug,@2grass,@2electric,@2psychic,@2fairy,@3fighting,@3flying,@3ground,@3rock,@3bug,@3grass,@3electric,@3psychic,@3fairy&!<water&!<bug&!<dark&!<poison&!<ice",
+      "Water-type Male Grunt": "steel,water,electric,dragon&@1rock,@1grass,@1electric&@2rock,@2grass,@2electric,@3rock,@3grass,@3electric&!<water&!<flying",
+      "Electric-type Female Grunt": "fighting,poison,ground,rock,ghost,steel,electric,dragon,fairy&@1fighting,@1ground,@1rock,@1fire,@1water,@1grass&@2fighting,@2ground,@2rock,@2fire,@2water,@2grass,@3fighting,@3ground,@3rock,@3fire,@3water,@3grass&!<electric&!<normal&!<rock&!<bug",
+      "Grass-type Male Grunt": "poison,grass,electric&@1fighting,@1flying,@1poison,@1bug,@1ghost,@1steel,@1fire,@1psychic,@1ice,@1dark,@1fairy&@2fighting,@2flying,@2poison,@2bug,@2ghost,@2steel,@2fire,@2psychic,@2ice,@2dark,@2fairy,@3fighting,@3flying,@3poison,@3bug,@3ghost,@3steel,@3fire,@3psychic,@3ice,@3dark,@3fairy&!<grass&!<fairy&!<steel&!<rock&!<fighting&!<ghost",
+      "Ice-type Female Grunt": "normal,water,fairy&@1fighting,@1poison,@1ground,@1rock,@1bug,@1ghost,@1steel,@1fire,@1water,@1grass,@1electric,@1dark,@1fairy&@2fighting,@2poison,@2ground,@2rock,@2bug,@2ghost,@2steel,@2fire,@2water,@2grass,@2electric,@2dark,@2fairy,@3fighting,@3poison,@3ground,@3rock,@3bug,@3ghost,@3steel,@3fire,@3water,@3grass,@3electric,@3dark,@3fairy&!<ice&!<water&!<ground&!<dark&!<ghost&!<fairy&!<rock",
+      "Fighting-type Female Grunt": "flying,poison,fire,water,dragon,fairy&@1flying,@1ground,@1ghost,@1water,@1psychic,@1fairy&@2flying,@2ground,@2ghost,@2water,@2psychic,@2fairy,@3flying,@3ground,@3ghost,@3water,@3psychic,@3fairy&!<fighting&!<ghost&!<fire",
+      "Poison-type Female Grunt": "flying,poison,ghost,electric,psychic&@1flying,@1ground,@1rock,@1steel,@1fire,@1electric,@1psychic,@1ice&@2flying,@2ground,@2rock,@2steel,@2fire,@2electric,@2psychic,@2ice,@3flying,@3ground,@3rock,@3steel,@3fire,@3electric,@3psychic,@3ice&!<grass&!<poison&!<flying&!<water&!<fairy&!<fighting",
+      "Ground-type Male Grunt": "normal,flying,dark,fairy&@1bug,@1ghost,@1water,@1grass,@1ice,@1dragon,@1dark,@1fairy&@2bug,@2ghost,@2water,@2grass,@2ice,@2dragon,@2dark,@2fairy,@3bug,@3ghost,@3water,@3grass,@3ice,@3dragon,@3dark,@3fairy&!<ground&!<flying&!<psychic&!<dragon&!<ghost",
+      "Flying-type Female Grunt": "flying,ghost,water&@1flying,@1rock,@1fire,@1water,@1electric,@1psychic,@1ice,@1dragon,@1fairy&@2flying,@2rock,@2fire,@2water,@2electric,@2psychic,@2ice,@2dragon,@2fairy,@3flying,@3rock,@3fire,@3water,@3electric,@3psychic,@3ice,@3dragon,@3fairy&!<normal&!<flying&!<poison&!<ground&!<bug&!<dragon&!<water",
+      "Psychic-type Male Grunt": "flying,bug,fire,fairy&@1flying,@1poison,@1bug,@1ghost,@1steel,@1dark,@1fairy&@2flying,@2poison,@2bug,@2ghost,@2steel,@2dark,@2fairy,@3flying,@3poison,@3bug,@3ghost,@3steel,@3dark,@3fairy&!<psychic&!<fairy&!<fighting&!<dark",
+      "Bug-type Male Grunt": "fighting,poison,ground,ghost,steel,electric,dragon&@1flying,@1rock,@1steel,@1fire,@1water,@1psychic&@2flying,@2rock,@2steel,@2fire,@2water,@2psychic,@3flying,@3rock,@3steel,@3fire,@3water,@3psychic&!<bug&!<poison&!<rock&!<electric&!<steel",
+      "Rock-type Male Grunt": "fighting,ghost,water&@1fighting,@1ground,@1rock,@1steel,@1water,@1grass,@1electric,@1ice,@1dragon,@1fairy&@2fighting,@2ground,@2rock,@2steel,@2water,@2grass,@2electric,@2ice,@2dragon,@2fairy,@3fighting,@3ground,@3rock,@3steel,@3water,@3grass,@3electric,@3ice,@3dragon,@3fairy&!<bug&!<rock&!<water&!<ground&!<steel&!<ice&!<dragon",
+      "Ghost-type Male Grunt": "normal,fighting,poison,rock,steel,fire,water,ice,dark&@1ground,@1rock,@1ghost,@1steel,@1fire,@1psychic,@1dark,@1fairy&@2ground,@2rock,@2ghost,@2steel,@2fire,@2psychic,@2dark,@2fairy,@3ground,@3rock,@3ghost,@3steel,@3fire,@3psychic,@3dark,@3fairy&!<ghost&!<poison&!<dark&!<ice",
+      "Dragon-type Female Grunt": "flying,dark,fairy&@1fighting,@1flying,@1poison,@1rock,@1bug,@1ice,@1dragon,@1fairy&@2fighting,@2flying,@2poison,@2rock,@2bug,@2ice,@2dragon,@2fairy,@3fighting,@3flying,@3poison,@3rock,@3bug,@3ice,@3dragon,@3fairy&!<dragon&!<dark&!<grass&!<ground&!<flying",
+      "Dark-type Female Grunt": "fighting,steel,water,grass,dark,fairy&@1fighting,@1bug,@1grass,@1electric,@1ice,@1dragon,@1fairy&@2fighting,@2bug,@2grass,@2electric,@2ice,@2dragon,@2fairy,@3fighting,@3bug,@3grass,@3electric,@3ice,@3dragon,@3fairy&!<dark&!<normal&!<water&!<dragon",
+      "Steel-type Male Grunt": "steel,water,electric,psychic,dark&@1fighting,@1ground,@1ghost,@1fire,@1water,@1electric,@1dark&@2fighting,@2ground,@2ghost,@2fire,@2water,@2electric,@2dark,@3fighting,@3ground,@3ghost,@3fire,@3water,@3electric,@3dark&!<ice&!<steel&!<psychic&!<rock&!<flying",
+      "Fairy-type Female Grunt": "rock,ghost,steel,fire,water,psychic,ice&@1fighting,@1poison,@1ground,@1rock,@1ghost,@1steel,@1fire,@1psychic&@2fighting,@2poison,@2ground,@2rock,@2ghost,@2steel,@2fire,@2psychic,@3fighting,@3poison,@3ground,@3rock,@3ghost,@3steel,@3fire,@3psychic&!<fairy&!<ice&!<psychic&!<poison"
+    },
+    "rocketGenericGrunts": {
+      "Male Grunt": "@1electric,@1fire,@1flying&@2electric,@2fire,@2flying,@3electric,@3fire,@3flying",
+      "Female Grunt": "@1fighting,@1electric,@1fairy&@2fighting,@2electric,@2fairy,@3fighting,@3electric,@3fairy",
+      "Decoy Female Grunt": "@1fighting,@1fire,@1flying&@2fighting,@2fire,@2flying,@3fighting,@3fire,@3flying"
+    },
+    "pvpFilters": {
+      "great": "+quagsire,+tinkaton,+corviknight,+jellicent,+empoleon,+forretress,+altaria,+azumarill,+wigglytuff,+feraligatr,+lickilicky,+medicham,+corsola,+talonflame,+lapras,+sealeo,+malamar,+clodsire,+dusclops,+stunfisk,+clefable,+drapion,+annihilape,+blastoise,+florges,+cradily,+politoed,+aegislash,+charjabug,+greedent&cp-1500&0-1attack&3-4defense&3-4hp",
+      "ultra": "+jellicent,+corviknight,+lapras,+tinkaton,+empoleon,+moltres,+feraligatr,+malamar,+florges,+dondozo,+virizion,+regidrago,+lickilicky,+ludicolo,+clefable,+blastoise,+oranguru,+zygarde,+dusknoir,+ninetales,+walrein,+turtonator,+drapion,+annihilape,+kingdra,+giratina,+bellibolt,+cresselia,+forretress,+togekiss&cp-2500&0-1attack&3-4defense&3-4hp",
+      "master": "+zacian,+palkia,+metagross,+xerneas,+zamazenta,+kyurem,+dialga,+lunala,+reshiram,+zekrom,+marshadow,+kyogre,+lugia,+eternatus,+necrozma,+yveltal,+ho-oh,+garchomp,+groudon,+meloetta,+latios,+gholdengo,+solgaleo,+florges,+gyarados,+mewtwo,+jirachi,+keldeo,+zygarde,+latias&0-1attack&3-4defense&3-4hp"
     },
     "trashClauseCount": 30,
     "tradeClauseCount": 28
   },
   "de": {
-    "trash": "0*,1*,2*&0*,1*,2*,0-3angriffs-wert,0-3verteidigungs-wert,0-2kp&0*,1*,2*,0-3angriffs-wert,0-2verteidigungs-wert,0-3kp&0*,1*,2*,0-2angriffs-wert,0-3verteidigungs-wert,0-3kp&1-4angriffs-wert,0-2verteidigungs-wert,0-2kp&!4*&!#&!favorit&!schillernd&!legendär&!mysteriös,808,649&!ultrabestie&!crypto&!kostümiert&!glücks&!hintergrund&!dynaattacke1-&!neueentwicklung,mega0&!@spezial,farbeagle&!nurauseiern&!entfernung100-,getauscht&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&wp-2000&alter-30,getauscht",
+    "trash": "0*,1*,2*&0*,1*,2*,0-3angriffs-wert,0-3verteidigungs-wert,0-2kp&0*,1*,2*,0-3angriffs-wert,0-2verteidigungs-wert,0-3kp&0*,1*,2*,0-2angriffs-wert,0-3verteidigungs-wert,0-3kp&1-4angriffs-wert,0-2verteidigungs-wert,0-2kp&!4*&!#&!favorit&!schillernd&!legendär&!mysteriös,meltan,genesect&!ultrabestie&!crypto&!kostümiert&!glücks&!hintergrund&!dynaattacke1-&!neueentwicklung,mega0&!@spezial,farbeagle&!nurauseiern&!entfernung100-,getauscht&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&wp-2000&alter-30,getauscht",
     "trade": "0*,1*,2*&0*,1*,2*,0-3angriffs-wert,0-3verteidigungs-wert,0-2kp&0*,1*,2*,0-3angriffs-wert,0-2verteidigungs-wert,0-3kp&0*,1*,2*,0-2angriffs-wert,0-3verteidigungs-wert,0-3kp&1-4angriffs-wert,0-2verteidigungs-wert,0-2kp&!getauscht&!crypto&!glücks&!mysteriös,808,809&!#&!legendär&!ultrabestie&!schillernd&!kostümiert&!erlöst&!hintergrund&!favorit&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!dynaattacke1-&!xxl&!xl&!@spezial&alter-30&entfernung0-",
     "sort": "",
     "prestaged": "#Trade,#Fern-Tausch&!getauscht&!crypto&!glücks&!mysteriös,808,809",
     "gift": "schillernd,legendär,ultrabestie,kostümiert,hintergrund&!getauscht&!crypto&!mysteriös,808,809&!glücks&!4*&!favorit&!@spezial&!#,#Trade,#Fern-Tausch",
-    "shadowCheap": "crypto&bonbonkm1&!schillernd&!glücks&!@spezial&!#",
-    "shadowSafe": "crypto&!legendär&!mysteriös&!ultrabestie&!4*&!schillernd&!glücks&!kostümiert&!@spezial&!+mamutel&!+brutalanda&!+dragoran&!+metagross&!+machomei&!+mewtu&!+sumpex&!+lavados&!+raikou&!+elevoltek&!+magnezone&!+despotar&!+snibunna&!+ho-oh&!+entei&!+lohgock&!+guardevoir&!+hariyama&!+zapdos&!+latios&!+glurak&!+luxtra&!+tangoloss&!+gewaldro&!+bisaflor&!+impergator&!+garados&!+pinsir&!+scherox&!+lugia&!+kramshef&!+staraptor&!+hundemon&!+tornupto&!+arkani&!+magbrant&!+chelterrar&!+golgantes&!+simsala&!+aerodactyl&!+stolloss&!+galagladi&!+kokowei&!+granbull&!+latias",
+    "shadowCheap": "crypto&bonbonkm1&!schillernd&!@spezial&!#",
+    "shadowSafe": "crypto&!legendär&!mysteriös&!ultrabestie&!4*&!schillernd&!kostümiert&!@spezial&!+dialga&!+palkia&!+heatran&!+groudon&!+rameidon&!+brutalanda&!+mewtu&!+quajutsu&!+trikephalo&!+darkrai&!+tukanon&!+donarion&!+monargoras&!+meistagrif&!+flampivian&!+skelabra&!+stalobor&!+regigigas&!+brockoloss&!+kyogre&!+mamutel&!+elevoltek&!+magnezone&!+knakrack&!+rihornior&!+metagross&!+despotar&!+lohgock&!+ho-oh&!+raikou&!+guardevoir&!+sumpex&!+dragoran&!+lavados&!+gengar&!+machomei&!+demeteros&!+kingler&!+fennexis&!+brigaron&!+giratina&!+flambirex&!+kramshef&!+latios&!+staraptor&!+snibunna&!+krebutack&!+absol&!+hariyama&!+gewaldro&!+entei&!+aerodactyl&!+zapdos",
     "shadowHundoCandidates": "crypto&3-4angriffs-wert&3-4verteidigungs-wert&3-4kp&!4*",
-    "shadowFrustration": "crypto&@frustration&+mamutel,+brutalanda,+dragoran,+metagross,+machomei,+mewtu,+sumpex,+lavados,+raikou,+elevoltek,+magnezone,+despotar,+snibunna,+ho-oh,+entei,+lohgock,+guardevoir,+hariyama,+zapdos,+latios,+glurak,+luxtra,+tangoloss,+gewaldro,+bisaflor,+impergator,+garados,+pinsir,+scherox,+lugia,+kramshef,+staraptor,+hundemon,+tornupto,+arkani,+magbrant,+chelterrar,+golgantes,+simsala,+aerodactyl,+stolloss,+galagladi,+kokowei,+granbull,+latias",
+    "shadowFrustration": "crypto&@frustration&+dialga,+palkia,+heatran,+groudon,+rameidon,+brutalanda,+mewtu,+quajutsu,+trikephalo,+darkrai,+tukanon,+donarion,+monargoras,+meistagrif,+flampivian,+skelabra,+stalobor,+regigigas,+brockoloss,+kyogre,+mamutel,+elevoltek,+magnezone,+knakrack,+rihornior,+metagross,+despotar,+lohgock,+ho-oh,+raikou,+guardevoir,+sumpex,+dragoran,+lavados,+gengar,+machomei,+demeteros,+kingler,+fennexis,+brigaron,+giratina,+flambirex,+kramshef,+latios,+staraptor,+snibunna,+krebutack,+absol,+hariyama,+gewaldro,+entei,+aerodactyl,+zapdos",
     "cheapEvolve": "raupy,hornliu,taubsi,waumpel,flurmel,dusselgurr,abra,kadabra,machollo,maschock,kleinstein,georok,nebulak,alpollo,kiesling,sedimantur,praktibalk,strepoli,laukaps,schnuthelm,paragoni,irrbis&raupy,hornliu,taubsi,waumpel,flurmel,dusselgurr,getauscht&0*,1*,2*&!schillernd&!kostümiert&!@spezial&!#",
     "dexPlus": "entwickeln&neueentwicklung&!entwicklungsaufgabe",
     "megaEvolve": "megaentwicklung&mega1-2,neueentwicklung",
     "pilotLong": "entfernung1000-&!getauscht&!4*&!legendär&!mysteriös&!schillernd",
     "raidFilters": {
+      "mega": {
+        "BANETTE": "normal,unlicht&@1unlicht,@1geist&@2unlicht,@2geist,@3unlicht,@3geist&!<geist"
+      },
       "lvl5": {
-        "TAPU_KOKO": "(gift,boden,stahl,feuer,pflanze,elektro)&(@boden,@gift)"
+        "TAPU_LELE": "stahl,feuer,psycho&@1geist,@1gift,@1stahl&@2geist,@2gift,@2stahl,@3geist,@3gift,@3stahl&!<psycho&!<fee"
       },
       "lvl3": {
-        "ORTHWORM": "(stahl,feuer,wasser,elektro)&(@kampf,@feuer,@boden)"
+        "ORTHWORM": "stahl,feuer,wasser,elektro&@1kampf,@1feuer,@1boden&@2kampf,@2feuer,@2boden,@3kampf,@3feuer,@3boden&!<stahl"
       },
       "lvl1": {
-        "BELDUM": "(stahl,feuer,wasser,elektro,psycho,unlicht)&(@unlicht,@feuer,@geist,@boden)",
-        "SHIELDON": "(kampf,boden,stahl,wasser,elektro)&(@kampf,@boden,@wasser)",
-        "HONEDGE": "(normal,stahl,feuer,wasser,elektro,unlicht)&(@unlicht,@feuer,@geist,@boden)"
+        "BELDUM": "stahl,feuer,wasser,elektro,psycho,unlicht&@1unlicht,@1feuer,@1geist,@1boden&@2unlicht,@2feuer,@2geist,@2boden,@3unlicht,@3feuer,@3geist,@3boden&!<stahl&!<psycho",
+        "SHIELDON": "kampf,boden,stahl,wasser,elektro&@1kampf,@1boden,@1wasser&@2kampf,@2boden,@2wasser,@3kampf,@3boden,@3wasser&!<gestein&!<stahl",
+        "HONEDGE": "normal,stahl,feuer,wasser,elektro,unlicht&@1unlicht,@1feuer,@1geist,@1boden&@2unlicht,@2feuer,@2geist,@2boden,@3unlicht,@3feuer,@3geist,@3boden&!<stahl&!<geist"
       },
       "shadow_lvl5": {
-        "LATIOS": "(stahl,psycho,unlicht,fee)&(@käfer,@unlicht,@drache,@fee,@geist,@eis)"
+        "LATIOS": "stahl,psycho,unlicht,fee&@1käfer,@1unlicht,@1drache,@1fee,@1geist,@1eis&@2käfer,@2unlicht,@2drache,@2fee,@2geist,@2eis,@3käfer,@3unlicht,@3drache,@3fee,@3geist,@3eis&!<drache&!<psycho"
       },
       "shadow_lvl3": {
-        "MAROWAK": "(normal,gestein,feuer,wasser,drache,unlicht)&(@unlicht,@geist,@boden,@gestein,@wasser)",
-        "LAPRAS": "(stahl,wasser,eis)&(@elektro,@kampf,@pflanze,@gestein)",
-        "STANTLER": "(gestein,geist,stahl)&(@kampf)"
+        "MAROWAK": "normal,gestein,feuer,wasser,drache,unlicht&@1unlicht,@1geist,@1boden,@1gestein,@1wasser&@2unlicht,@2geist,@2boden,@2gestein,@2wasser,@3unlicht,@3geist,@3boden,@3gestein,@3wasser&!<feuer&!<geist",
+        "LAPRAS": "stahl,wasser,eis&@1elektro,@1kampf,@1pflanze,@1gestein&@2elektro,@2kampf,@2pflanze,@2gestein,@3elektro,@3kampf,@3pflanze,@3gestein&!<wasser&!<eis",
+        "STANTLER": "gestein,geist,stahl&@1kampf&@2kampf,@3kampf&!<normal"
       },
       "shadow_lvl1": {
-        "DRATINI": "(stahl,fee)&(@drache,@fee,@eis)",
-        "GLIGAR": "(flug)&(@eis,@wasser)",
-        "CACNEA": "(flug,gift,käfer,stahl,feuer,pflanze,drache)&(@käfer,@feuer,@flug,@eis,@gift)",
-        "JOLTIK": "(kampf,gift,boden,geist,stahl,feuer,elektro,drache,fee)&(@feuer,@gestein)"
+        "DRATINI": "stahl,fee&@1drache,@1fee,@1eis&@2drache,@2fee,@2eis,@3drache,@3fee,@3eis&!<drache",
+        "GLIGAR": "flug&@1eis,@1wasser&@2eis,@2wasser,@3eis,@3wasser&!<boden&!<flug",
+        "CACNEA": "flug,gift,käfer,stahl,feuer,pflanze,drache&@1käfer,@1feuer,@1flug,@1eis,@1gift&@2käfer,@2feuer,@2flug,@2eis,@2gift,@3käfer,@3feuer,@3flug,@3eis,@3gift&!<pflanze",
+        "JOLTIK": "kampf,gift,boden,geist,stahl,feuer,elektro,drache,fee&@1feuer,@1gestein&@2feuer,@2gestein,@3feuer,@3gestein&!<käfer&!<elektro"
       }
     },
     "maxBattleFilters": {
       "tier_1": {
-        "BULBASAUR": "(flug,gift,käfer,geist,stahl,feuer,drache)&(@flug,@feuer,@psycho,@eis)&dynaattacke1-",
-        "CHARMANDER": "(gestein,feuer,wasser,drache)&(@boden,@gestein,@wasser)&dynaattacke1-",
-        "SQUIRTLE": "(wasser,pflanze,drache)&(@pflanze,@elektro)&dynaattacke1-",
-        "CATERPIE": "(kampf,flug,gift,geist,stahl,feuer,fee)&(@flug,@gestein,@feuer)&dynaattacke1-",
-        "GROWLITHE": "(gestein,feuer,wasser,drache)&(@boden,@gestein,@wasser)&dynaattacke1-",
-        "ABRA": "(stahl,psycho,unlicht)&(@käfer,@geist,@unlicht)&dynaattacke1-",
-        "GASTLY": "(normal,gift,boden,gestein,stahl,unlicht)&(@boden,@geist,@psycho,@unlicht)&dynaattacke1-",
-        "KRABBY": "(wasser,pflanze,drache)&(@pflanze,@elektro)&dynaattacke1-",
-        "OMANYTE": "(kampf,stahl,wasser,pflanze,drache)&(@kampf,@boden,@pflanze,@elektro)&dynaattacke1-",
-        "KABUTO": "(kampf,stahl,wasser,pflanze,drache)&(@kampf,@boden,@pflanze,@elektro)&dynaattacke1-",
-        "RALTS": "(stahl,feuer,psycho)&(@gift,@geist,@stahl)&dynaattacke1-",
-        "SPHEAL": "(stahl,wasser,eis)&(@kampf,@gestein,@pflanze,@elektro)&dynaattacke1-",
-        "PIDOVE": "(gestein,geist,stahl,elektro)&(@gestein,@elektro,@eis)&dynaattacke1-",
-        "ROGGENROLA": "(kampf,boden,stahl)&(@kampf,@boden,@stahl,@wasser,@pflanze)&dynaattacke1-",
-        "WOOBAT": "(gestein,stahl,elektro,psycho,unlicht)&(@gestein,@geist,@elektro,@eis,@unlicht)&dynaattacke1-",
-        "DRILBUR": "(flug,käfer,pflanze)&(@wasser,@pflanze,@eis)&dynaattacke1-",
-        "TRUBBISH": "(gift,boden,gestein,geist,stahl)&(@boden,@psycho)&dynaattacke1-",
-        "INKAY": "(stahl,unlicht,fee)&(@käfer,@fee)&dynaattacke1-",
-        "BOUNSWEET": "(flug,gift,käfer,stahl,feuer,pflanze,drache)&(@flug,@gift,@käfer,@feuer,@eis)&dynaattacke1-",
-        "GROOKEY": "(flug,gift,käfer,stahl,feuer,pflanze,drache)&(@flug,@gift,@käfer,@feuer,@eis)&dynaattacke1-",
-        "SCORBUNNY": "(gestein,feuer,wasser,drache)&(@boden,@gestein,@wasser)&dynaattacke1-",
-        "SOBBLE": "(wasser,pflanze,drache)&(@pflanze,@elektro)&dynaattacke1-",
-        "SKWOVET": "(gestein,geist,stahl)&(@kampf)&dynaattacke1-",
-        "ROOKIDEE": "(gestein,stahl,elektro)&(@gestein,@elektro,@eis)&dynaattacke1-",
-        "WOOLOO": "(gestein,geist,stahl)&(@kampf)&dynaattacke1-",
-        "HATENNA": "(stahl,psycho,unlicht)&(@käfer,@geist,@unlicht)&dynaattacke1-"
+        "BULBASAUR": "flug,gift,käfer,geist,stahl,feuer,drache&@1flug,@1feuer,@1psycho,@1eis&@2flug,@2feuer,@2psycho,@2eis,@3flug,@3feuer,@3psycho,@3eis&dynaattacke1-&!<pflanze&!<gift",
+        "CHARMANDER": "gestein,feuer,wasser,drache&@1boden,@1gestein,@1wasser&@2boden,@2gestein,@2wasser,@3boden,@3gestein,@3wasser&dynaattacke1-&!<feuer",
+        "SQUIRTLE": "wasser,pflanze,drache&@1pflanze,@1elektro&@2pflanze,@2elektro,@3pflanze,@3elektro&dynaattacke1-&!<wasser",
+        "CATERPIE": "kampf,flug,gift,geist,stahl,feuer,fee&@1flug,@1gestein,@1feuer&@2flug,@2gestein,@2feuer,@3flug,@3gestein,@3feuer&dynaattacke1-&!<käfer",
+        "GROWLITHE": "gestein,feuer,wasser,drache&@1boden,@1gestein,@1wasser&@2boden,@2gestein,@2wasser,@3boden,@3gestein,@3wasser&dynaattacke1-&!<feuer",
+        "ABRA": "stahl,psycho,unlicht&@1käfer,@1geist,@1unlicht&@2käfer,@2geist,@2unlicht,@3käfer,@3geist,@3unlicht&dynaattacke1-&!<psycho",
+        "GASTLY": "normal,gift,boden,gestein,stahl,unlicht&@1boden,@1geist,@1psycho,@1unlicht&@2boden,@2geist,@2psycho,@2unlicht,@3boden,@3geist,@3psycho,@3unlicht&dynaattacke1-&!<geist&!<gift",
+        "KRABBY": "wasser,pflanze,drache&@1pflanze,@1elektro&@2pflanze,@2elektro,@3pflanze,@3elektro&dynaattacke1-&!<wasser",
+        "OMANYTE": "kampf,stahl,wasser,pflanze,drache&@1kampf,@1boden,@1pflanze,@1elektro&@2kampf,@2boden,@2pflanze,@2elektro,@3kampf,@3boden,@3pflanze,@3elektro&dynaattacke1-&!<gestein&!<wasser",
+        "KABUTO": "kampf,stahl,wasser,pflanze,drache&@1kampf,@1boden,@1pflanze,@1elektro&@2kampf,@2boden,@2pflanze,@2elektro,@3kampf,@3boden,@3pflanze,@3elektro&dynaattacke1-&!<gestein&!<wasser",
+        "RALTS": "stahl,feuer,psycho&@1gift,@1geist,@1stahl&@2gift,@2geist,@2stahl,@3gift,@3geist,@3stahl&dynaattacke1-&!<psycho&!<fee",
+        "SPHEAL": "stahl,wasser,eis&@1kampf,@1gestein,@1pflanze,@1elektro&@2kampf,@2gestein,@2pflanze,@2elektro,@3kampf,@3gestein,@3pflanze,@3elektro&dynaattacke1-&!<eis&!<wasser",
+        "PIDOVE": "gestein,geist,stahl,elektro&@1gestein,@1elektro,@1eis&@2gestein,@2elektro,@2eis,@3gestein,@3elektro,@3eis&dynaattacke1-&!<normal&!<flug",
+        "ROGGENROLA": "kampf,boden,stahl&@1kampf,@1boden,@1stahl,@1wasser,@1pflanze&@2kampf,@2boden,@2stahl,@2wasser,@2pflanze,@3kampf,@3boden,@3stahl,@3wasser,@3pflanze&dynaattacke1-&!<gestein",
+        "WOOBAT": "gestein,stahl,elektro,psycho,unlicht&@1gestein,@1geist,@1elektro,@1eis,@1unlicht&@2gestein,@2geist,@2elektro,@2eis,@2unlicht,@3gestein,@3geist,@3elektro,@3eis,@3unlicht&dynaattacke1-&!<psycho&!<flug",
+        "DRILBUR": "flug,käfer,pflanze&@1wasser,@1pflanze,@1eis&@2wasser,@2pflanze,@2eis,@3wasser,@3pflanze,@3eis&dynaattacke1-&!<boden",
+        "TRUBBISH": "gift,boden,gestein,geist,stahl&@1boden,@1psycho&@2boden,@2psycho,@3boden,@3psycho&dynaattacke1-&!<gift",
+        "INKAY": "stahl,unlicht,fee&@1käfer,@1fee&@2käfer,@2fee,@3käfer,@3fee&dynaattacke1-&!<unlicht&!<psycho",
+        "BOUNSWEET": "flug,gift,käfer,stahl,feuer,pflanze,drache&@1flug,@1gift,@1käfer,@1feuer,@1eis&@2flug,@2gift,@2käfer,@2feuer,@2eis,@3flug,@3gift,@3käfer,@3feuer,@3eis&dynaattacke1-&!<pflanze",
+        "GROOKEY": "flug,gift,käfer,stahl,feuer,pflanze,drache&@1flug,@1gift,@1käfer,@1feuer,@1eis&@2flug,@2gift,@2käfer,@2feuer,@2eis,@3flug,@3gift,@3käfer,@3feuer,@3eis&dynaattacke1-&!<pflanze",
+        "SCORBUNNY": "gestein,feuer,wasser,drache&@1boden,@1gestein,@1wasser&@2boden,@2gestein,@2wasser,@3boden,@3gestein,@3wasser&dynaattacke1-&!<feuer",
+        "SOBBLE": "wasser,pflanze,drache&@1pflanze,@1elektro&@2pflanze,@2elektro,@3pflanze,@3elektro&dynaattacke1-&!<wasser",
+        "SKWOVET": "gestein,geist,stahl&@1kampf&@2kampf,@3kampf&dynaattacke1-&!<normal",
+        "ROOKIDEE": "gestein,stahl,elektro&@1gestein,@1elektro,@1eis&@2gestein,@2elektro,@2eis,@3gestein,@3elektro,@3eis&dynaattacke1-&!<flug",
+        "WOOLOO": "gestein,geist,stahl&@1kampf&@2kampf,@3kampf&dynaattacke1-&!<normal",
+        "HATENNA": "stahl,psycho,unlicht&@1käfer,@1geist,@1unlicht&@2käfer,@2geist,@2unlicht,@3käfer,@3geist,@3unlicht&dynaattacke1-&!<psycho"
       },
       "tier_2": {
-        "MACHOP": "(flug,gift,käfer,geist,psycho,fee)&(@flug,@psycho,@fee)&dynaattacke1-",
-        "EEVEE": "(gestein,geist,stahl)&(@kampf)&dynaattacke1-",
-        "SHUCKLE": "(kampf,gift,boden,geist,stahl,fee)&(@gestein,@stahl,@wasser)&dynaattacke1-",
-        "WAILMER": "(wasser,pflanze,drache)&(@pflanze,@elektro)&dynaattacke1-",
-        "DARUMAKA": "(gestein,feuer,wasser,drache)&(@boden,@gestein,@wasser)&dynaattacke1-"
+        "MACHOP": "flug,gift,käfer,geist,psycho,fee&@1flug,@1psycho,@1fee&@2flug,@2psycho,@2fee,@3flug,@3psycho,@3fee&dynaattacke1-&!<kampf",
+        "EEVEE": "gestein,geist,stahl&@1kampf&@2kampf,@3kampf&dynaattacke1-&!<normal",
+        "SHUCKLE": "kampf,gift,boden,geist,stahl,fee&@1gestein,@1stahl,@1wasser&@2gestein,@2stahl,@2wasser,@3gestein,@3stahl,@3wasser&dynaattacke1-&!<käfer&!<gestein",
+        "WAILMER": "wasser,pflanze,drache&@1pflanze,@1elektro&@2pflanze,@2elektro,@3pflanze,@3elektro&dynaattacke1-&!<wasser",
+        "DARUMAKA": "gestein,feuer,wasser,drache&@1boden,@1gestein,@1wasser&@2boden,@2gestein,@2wasser,@3boden,@3gestein,@3wasser&dynaattacke1-&!<feuer"
       },
       "tier_3": {
-        "HITMONLEE": "(flug,gift,käfer,geist,psycho,fee)&(@flug,@psycho,@fee)&dynaattacke1-",
-        "HITMONCHAN": "(flug,gift,käfer,geist,psycho,fee)&(@flug,@psycho,@fee)&dynaattacke1-",
-        "CHANSEY": "(gestein,geist,stahl)&(@kampf)&dynaattacke1-",
-        "SABLEYE": "(normal,kampf,unlicht,fee)&(@fee)&dynaattacke1-",
-        "BELDUM": "(stahl,feuer,wasser,elektro,psycho,unlicht)&(@boden,@geist,@feuer,@unlicht)&dynaattacke1-",
-        "CRYOGONAL": "(stahl,feuer,wasser,eis)&(@kampf,@gestein,@stahl,@feuer)&dynaattacke1-",
-        "PASSIMIAN": "(flug,gift,käfer,geist,psycho,fee)&(@flug,@psycho,@fee)&dynaattacke1-",
-        "DRAMPA": "(gestein,geist,stahl,fee)&(@kampf,@eis,@drache,@fee)&dynaattacke1-",
-        "FALINKS": "(flug,gift,käfer,geist,psycho,fee)&(@flug,@psycho,@fee)&dynaattacke1-"
+        "HITMONLEE": "flug,gift,käfer,geist,psycho,fee&@1flug,@1psycho,@1fee&@2flug,@2psycho,@2fee,@3flug,@3psycho,@3fee&dynaattacke1-&!<kampf",
+        "HITMONCHAN": "flug,gift,käfer,geist,psycho,fee&@1flug,@1psycho,@1fee&@2flug,@2psycho,@2fee,@3flug,@3psycho,@3fee&dynaattacke1-&!<kampf",
+        "CHANSEY": "gestein,geist,stahl&@1kampf&@2kampf,@3kampf&dynaattacke1-&!<normal",
+        "SABLEYE": "normal,kampf,unlicht,fee&@1fee&@2fee,@3fee&dynaattacke1-&!<unlicht&!<geist",
+        "BELDUM": "stahl,feuer,wasser,elektro,psycho,unlicht&@1boden,@1geist,@1feuer,@1unlicht&@2boden,@2geist,@2feuer,@2unlicht,@3boden,@3geist,@3feuer,@3unlicht&dynaattacke1-&!<stahl&!<psycho",
+        "CRYOGONAL": "stahl,feuer,wasser,eis&@1kampf,@1gestein,@1stahl,@1feuer&@2kampf,@2gestein,@2stahl,@2feuer,@3kampf,@3gestein,@3stahl,@3feuer&dynaattacke1-&!<eis",
+        "PASSIMIAN": "flug,gift,käfer,geist,psycho,fee&@1flug,@1psycho,@1fee&@2flug,@2psycho,@2fee,@3flug,@3psycho,@3fee&dynaattacke1-&!<kampf",
+        "DRAMPA": "gestein,geist,stahl,fee&@1kampf,@1eis,@1drache,@1fee&@2kampf,@2eis,@2drache,@2fee,@3kampf,@3eis,@3drache,@3fee&dynaattacke1-&!<normal&!<drache",
+        "FALINKS": "flug,gift,käfer,geist,psycho,fee&@1flug,@1psycho,@1fee&@2flug,@2psycho,@2fee,@3flug,@3psycho,@3fee&dynaattacke1-&!<kampf"
       }
+    },
+    "maxTank": "@1biss,@1käferbiss,@1zerschneider,@1feuerodem,@1zornklinge,@1blattwerk,@1schlecker,@1zielschuss,@1fußkick,@1metallklaue,@1lehmschuss,@1giftstachel,@1klaps,@1psychoklinge,@1kratzer,@1dunkelklaue,@1funkensprung,@1tiefschlag,@1tackle,@1donnerschock,@1rankenhieb,@1aquaknarre&dynaattacke1-",
+    "rocketLeaders": {
+      "Giovanni": {
+        "1": "gestein,geist,stahl&@1kampf&@2kampf,@3kampf&!<normal",
+        "2": "kampf,boden,geist&@1kampf,@1boden,@1stahl,@1wasser,@1pflanze,@1psycho,@1eis&@2kampf,@2boden,@2stahl,@2wasser,@2pflanze,@2psycho,@2eis,@3kampf,@3boden,@3stahl,@3wasser,@3pflanze,@3psycho,@3eis&!<normal&!<gift&!<boden&!<gestein",
+        "3": "flug&@1wasser,@1eis&@2wasser,@2eis,@3wasser,@3eis&!<boden&!<flug"
+      },
+      "Cliff": {
+        "1": "gestein,geist,stahl&@1kampf&@2kampf,@3kampf&!<normal",
+        "2": "stahl,feuer,psycho&@1gift,@1geist,@1stahl&@2gift,@2geist,@2stahl,@3gift,@3geist,@3stahl&!<psycho&!<fee",
+        "3": "kampf,boden,stahl,unlicht,fee&@1kampf,@1boden,@1käfer,@1stahl,@1wasser,@1pflanze,@1fee&@2kampf,@2boden,@2käfer,@2stahl,@2wasser,@2pflanze,@2fee,@3kampf,@3boden,@3käfer,@3stahl,@3wasser,@3pflanze,@3fee&!<gestein&!<unlicht"
+      },
+      "Arlo": {
+        "1": "kampf,flug,gift,geist,stahl,feuer,fee&@1flug,@1gestein,@1feuer&@2flug,@2gestein,@2feuer,@3flug,@3gestein,@3feuer&!<käfer",
+        "2": "kampf,boden,wasser,pflanze&@1kampf,@1boden,@1stahl,@1feuer,@1wasser,@1pflanze&@2kampf,@2boden,@2stahl,@2feuer,@2wasser,@2pflanze,@3kampf,@3boden,@3stahl,@3feuer,@3wasser,@3pflanze&!<stahl&!<boden&!<gestein",
+        "3": "kampf,flug,gift,geist,stahl,feuer,wasser,elektro&@1feuer&@2feuer,@3feuer&!<käfer&!<stahl"
+      },
+      "Sierra": {
+        "1": "normal,unlicht&@1geist,@1unlicht&@2geist,@2unlicht,@3geist,@3unlicht&!<geist",
+        "2": "flug,gift,käfer,stahl,feuer,pflanze,elektro,drache&@1kampf,@1feuer&@2kampf,@2feuer,@3kampf,@3feuer&!<pflanze&!<stahl",
+        "3": "kampf,flug,wasser,drache,unlicht&@1kampf,@1boden,@1gestein,@1feuer,@1wasser&@2kampf,@2boden,@2gestein,@2feuer,@2wasser,@3kampf,@3boden,@3gestein,@3feuer,@3wasser&!<unlicht&!<feuer&!<stahl&!<boden"
+      }
+    },
+    "rocketTypedGrunts": {
+      "Normal-Rüpel ♂": "flug,gift,geist,elektro,psycho,fee&@1kampf,@1flug,@1gestein,@1elektro,@1psycho,@1eis,@1fee&@2kampf,@2flug,@2gestein,@2elektro,@2psycho,@2eis,@2fee,@3kampf,@3flug,@3gestein,@3elektro,@3psycho,@3eis,@3fee&!<normal&!<kampf&!<flug",
+      "Feuer-Rüpel ♀": "normal,flug,wasser,drache,unlicht&@1boden,@1gestein,@1geist,@1wasser,@1unlicht&@2boden,@2gestein,@2geist,@2wasser,@2unlicht,@3boden,@3gestein,@3geist,@3wasser,@3unlicht&!<feuer&!<geist&!<boden&!<psycho",
+      "Wasser-Rüpel ♀": "kampf,gift,stahl,wasser,eis&@1kampf,@1flug,@1boden,@1gestein,@1käfer,@1pflanze,@1elektro,@1psycho,@1fee&@2kampf,@2flug,@2boden,@2gestein,@2käfer,@2pflanze,@2elektro,@2psycho,@2fee,@3kampf,@3flug,@3boden,@3gestein,@3käfer,@3pflanze,@3elektro,@3psycho,@3fee&!<wasser&!<käfer&!<unlicht&!<gift&!<eis",
+      "Wasser-Rüpel ♂": "stahl,wasser,elektro,drache&@1gestein,@1pflanze,@1elektro&@2gestein,@2pflanze,@2elektro,@3gestein,@3pflanze,@3elektro&!<wasser&!<flug",
+      "Elektro-Rüpel ♀": "kampf,gift,boden,gestein,geist,stahl,elektro,drache,fee&@1kampf,@1boden,@1gestein,@1feuer,@1wasser,@1pflanze&@2kampf,@2boden,@2gestein,@2feuer,@2wasser,@2pflanze,@3kampf,@3boden,@3gestein,@3feuer,@3wasser,@3pflanze&!<elektro&!<normal&!<gestein&!<käfer",
+      "Pflanze-Rüpel ♂": "gift,pflanze,elektro&@1kampf,@1flug,@1gift,@1käfer,@1geist,@1stahl,@1feuer,@1psycho,@1eis,@1unlicht,@1fee&@2kampf,@2flug,@2gift,@2käfer,@2geist,@2stahl,@2feuer,@2psycho,@2eis,@2unlicht,@2fee,@3kampf,@3flug,@3gift,@3käfer,@3geist,@3stahl,@3feuer,@3psycho,@3eis,@3unlicht,@3fee&!<pflanze&!<fee&!<stahl&!<gestein&!<kampf&!<geist",
+      "Eis-Rüpel ♀": "normal,wasser,fee&@1kampf,@1gift,@1boden,@1gestein,@1käfer,@1geist,@1stahl,@1feuer,@1wasser,@1pflanze,@1elektro,@1unlicht,@1fee&@2kampf,@2gift,@2boden,@2gestein,@2käfer,@2geist,@2stahl,@2feuer,@2wasser,@2pflanze,@2elektro,@2unlicht,@2fee,@3kampf,@3gift,@3boden,@3gestein,@3käfer,@3geist,@3stahl,@3feuer,@3wasser,@3pflanze,@3elektro,@3unlicht,@3fee&!<eis&!<wasser&!<boden&!<unlicht&!<geist&!<fee&!<gestein",
+      "Kampf-Rüpel ♀": "flug,gift,feuer,wasser,drache,fee&@1flug,@1boden,@1geist,@1wasser,@1psycho,@1fee&@2flug,@2boden,@2geist,@2wasser,@2psycho,@2fee,@3flug,@3boden,@3geist,@3wasser,@3psycho,@3fee&!<kampf&!<geist&!<feuer",
+      "Gift-Rüpel ♀": "flug,gift,geist,elektro,psycho&@1flug,@1boden,@1gestein,@1stahl,@1feuer,@1elektro,@1psycho,@1eis&@2flug,@2boden,@2gestein,@2stahl,@2feuer,@2elektro,@2psycho,@2eis,@3flug,@3boden,@3gestein,@3stahl,@3feuer,@3elektro,@3psycho,@3eis&!<pflanze&!<gift&!<flug&!<wasser&!<fee&!<kampf",
+      "Boden-Rüpel ♂": "normal,flug,unlicht,fee&@1käfer,@1geist,@1wasser,@1pflanze,@1eis,@1drache,@1unlicht,@1fee&@2käfer,@2geist,@2wasser,@2pflanze,@2eis,@2drache,@2unlicht,@2fee,@3käfer,@3geist,@3wasser,@3pflanze,@3eis,@3drache,@3unlicht,@3fee&!<boden&!<flug&!<psycho&!<drache&!<geist",
+      "Flug-Rüpel ♀": "flug,geist,wasser&@1flug,@1gestein,@1feuer,@1wasser,@1elektro,@1psycho,@1eis,@1drache,@1fee&@2flug,@2gestein,@2feuer,@2wasser,@2elektro,@2psycho,@2eis,@2drache,@2fee,@3flug,@3gestein,@3feuer,@3wasser,@3elektro,@3psycho,@3eis,@3drache,@3fee&!<normal&!<flug&!<gift&!<boden&!<käfer&!<drache&!<wasser",
+      "Psycho-Rüpel ♂": "flug,käfer,feuer,fee&@1flug,@1gift,@1käfer,@1geist,@1stahl,@1unlicht,@1fee&@2flug,@2gift,@2käfer,@2geist,@2stahl,@2unlicht,@2fee,@3flug,@3gift,@3käfer,@3geist,@3stahl,@3unlicht,@3fee&!<psycho&!<fee&!<kampf&!<unlicht",
+      "Käfer-Rüpel ♂": "kampf,gift,boden,geist,stahl,elektro,drache&@1flug,@1gestein,@1stahl,@1feuer,@1wasser,@1psycho&@2flug,@2gestein,@2stahl,@2feuer,@2wasser,@2psycho,@3flug,@3gestein,@3stahl,@3feuer,@3wasser,@3psycho&!<käfer&!<gift&!<gestein&!<elektro&!<stahl",
+      "Gestein-Rüpel ♂": "kampf,geist,wasser&@1kampf,@1boden,@1gestein,@1stahl,@1wasser,@1pflanze,@1elektro,@1eis,@1drache,@1fee&@2kampf,@2boden,@2gestein,@2stahl,@2wasser,@2pflanze,@2elektro,@2eis,@2drache,@2fee,@3kampf,@3boden,@3gestein,@3stahl,@3wasser,@3pflanze,@3elektro,@3eis,@3drache,@3fee&!<käfer&!<gestein&!<wasser&!<boden&!<stahl&!<eis&!<drache",
+      "Geist-Rüpel ♂": "normal,kampf,gift,gestein,stahl,feuer,wasser,eis,unlicht&@1boden,@1gestein,@1geist,@1stahl,@1feuer,@1psycho,@1unlicht,@1fee&@2boden,@2gestein,@2geist,@2stahl,@2feuer,@2psycho,@2unlicht,@2fee,@3boden,@3gestein,@3geist,@3stahl,@3feuer,@3psycho,@3unlicht,@3fee&!<geist&!<gift&!<unlicht&!<eis",
+      "Drache-Rüpel ♀": "flug,unlicht,fee&@1kampf,@1flug,@1gift,@1gestein,@1käfer,@1eis,@1drache,@1fee&@2kampf,@2flug,@2gift,@2gestein,@2käfer,@2eis,@2drache,@2fee,@3kampf,@3flug,@3gift,@3gestein,@3käfer,@3eis,@3drache,@3fee&!<drache&!<unlicht&!<pflanze&!<boden&!<flug",
+      "Unlicht-Rüpel ♀": "kampf,stahl,wasser,pflanze,unlicht,fee&@1kampf,@1käfer,@1pflanze,@1elektro,@1eis,@1drache,@1fee&@2kampf,@2käfer,@2pflanze,@2elektro,@2eis,@2drache,@2fee,@3kampf,@3käfer,@3pflanze,@3elektro,@3eis,@3drache,@3fee&!<unlicht&!<normal&!<wasser&!<drache",
+      "Stahl-Rüpel ♂": "stahl,wasser,elektro,psycho,unlicht&@1kampf,@1boden,@1geist,@1feuer,@1wasser,@1elektro,@1unlicht&@2kampf,@2boden,@2geist,@2feuer,@2wasser,@2elektro,@2unlicht,@3kampf,@3boden,@3geist,@3feuer,@3wasser,@3elektro,@3unlicht&!<eis&!<stahl&!<psycho&!<gestein&!<flug",
+      "Fee-Rüpel ♀": "gestein,geist,stahl,feuer,wasser,psycho,eis&@1kampf,@1gift,@1boden,@1gestein,@1geist,@1stahl,@1feuer,@1psycho&@2kampf,@2gift,@2boden,@2gestein,@2geist,@2stahl,@2feuer,@2psycho,@3kampf,@3gift,@3boden,@3gestein,@3geist,@3stahl,@3feuer,@3psycho&!<fee&!<eis&!<psycho&!<gift"
+    },
+    "rocketGenericGrunts": {
+      "Male Grunt": "@1elektro,@1feuer,@1flug&@2elektro,@2feuer,@2flug,@3elektro,@3feuer,@3flug",
+      "Female Grunt": "@1kampf,@1elektro,@1fee&@2kampf,@2elektro,@2fee,@3kampf,@3elektro,@3fee",
+      "Decoy Female Grunt": "@1kampf,@1feuer,@1flug&@2kampf,@2feuer,@2flug,@3kampf,@3feuer,@3flug"
+    },
+    "pvpFilters": {
+      "great": "+morlord,+granforgita,+krarmor,+apoquallyp,+impoleon,+forstellka,+altaria,+azumarill,+knuddeluff,+impergator,+schlurplek,+meditalis,+corasonn,+fiaro,+lapras,+seejong,+calamanero,+suelord,+zwirrklop,+flunschlik,+pixi,+piondragi,+epitaff,+turtok,+florges,+wielie,+quaxo,+durengard,+akkup,+schlaraffel&wp-1500&0-1angriffs-wert&3-4verteidigungs-wert&3-4kp",
+      "ultra": "+apoquallyp,+krarmor,+lapras,+granforgita,+impoleon,+lavados,+impergator,+calamanero,+florges,+heerashai,+viridium,+regidrago,+schlurplek,+kappalores,+pixi,+turtok,+kommandutan,+zygarde,+zwirrfinst,+vulnona,+walraisa,+tortunator,+piondragi,+epitaff,+seedraking,+giratina,+wampitz,+cresselia,+forstellka,+togekiss&wp-2500&0-1angriffs-wert&3-4verteidigungs-wert&3-4kp",
+      "master": "+zacian,+palkia,+metagross,+xerneas,+zamazenta,+kyurem,+dialga,+lunala,+reshiram,+zekrom,+marshadow,+kyogre,+lugia,+endynalos,+necrozma,+yveltal,+ho-oh,+knakrack,+groudon,+meloetta,+latios,+monetigo,+solgaleo,+florges,+garados,+mewtu,+jirachi,+keldeo,+zygarde,+latias&0-1angriffs-wert&3-4verteidigungs-wert&3-4kp"
     },
     "trashClauseCount": 30,
     "tradeClauseCount": 28
   },
   "es": {
-    "trash": "0*,1*,2*&0*,1*,2*,0-3ataque,0-3defensa,0-2ps&0*,1*,2*,0-3ataque,0-2defensa,0-3ps&0*,1*,2*,0-2ataque,0-3defensa,0-3ps&1-4ataque,0-2defensa,0-2ps&!4*&!#&!favoritos&!variocolor&!legendario&!singular,808,649&!ultraente&!oscuro&!disfraz&!suerte&!fondo&!movimientomax1-&!nuevaevolución,mega0&!@especial,smeargle&!huevosolo&!distancia100-,intercambiados&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&pc-2000&edad-30,intercambiados",
+    "trash": "0*,1*,2*&0*,1*,2*,0-3ataque,0-3defensa,0-2ps&0*,1*,2*,0-3ataque,0-2defensa,0-3ps&0*,1*,2*,0-2ataque,0-3defensa,0-3ps&1-4ataque,0-2defensa,0-2ps&!4*&!#&!favoritos&!variocolor&!legendario&!singular,meltan,genesect&!ultraente&!oscuro&!disfraz&!suerte&!fondo&!movimientomax1-&!nuevaevolución,mega0&!@especial,smeargle&!huevosolo&!distancia100-,intercambiados&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&pc-2000&edad-30,intercambiados",
     "trade": "0*,1*,2*&0*,1*,2*,0-3ataque,0-3defensa,0-2ps&0*,1*,2*,0-3ataque,0-2defensa,0-3ps&0*,1*,2*,0-2ataque,0-3defensa,0-3ps&1-4ataque,0-2defensa,0-2ps&!intercambiados&!oscuro&!suerte&!singular,808,809&!#&!legendario&!ultraente&!variocolor&!disfraz&!purificado&!fondo&!favoritos&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!movimientomax1-&!xxl&!xl&!@especial&edad-30&distancia0-",
     "sort": "",
     "prestaged": "#Trade,#Fern-Tausch&!intercambiados&!oscuro&!suerte&!singular,808,809",
     "gift": "variocolor,legendario,ultraente,disfraz,fondo&!intercambiados&!oscuro&!singular,808,809&!suerte&!4*&!favoritos&!@especial&!#,#Trade,#Fern-Tausch",
-    "shadowCheap": "oscuro&kmcaramelo1&!variocolor&!suerte&!@especial&!#",
-    "shadowSafe": "oscuro&!legendario&!singular&!ultraente&!4*&!variocolor&!suerte&!disfraz&!@especial&!+mamoswine&!+salamence&!+dragonite&!+metagross&!+machamp&!+mewtwo&!+swampert&!+moltres&!+raikou&!+electivire&!+magnezone&!+tyranitar&!+weavile&!+ho-oh&!+entei&!+blaziken&!+gardevoir&!+hariyama&!+zapdos&!+latios&!+charizard&!+luxray&!+tangrowth&!+sceptile&!+venusaur&!+feraligatr&!+gyarados&!+pinsir&!+scizor&!+lugia&!+honchkrow&!+staraptor&!+houndoom&!+typhlosion&!+arcanine&!+magmortar&!+torterra&!+golurk&!+alakazam&!+aerodactyl&!+aggron&!+gallade&!+exeggutor&!+granbull&!+latias",
+    "shadowCheap": "oscuro&kmcaramelo1&!variocolor&!@especial&!#",
+    "shadowSafe": "oscuro&!legendario&!singular&!ultraente&!4*&!variocolor&!disfraz&!@especial&!+dialga&!+palkia&!+heatran&!+groudon&!+rampardos&!+salamence&!+mewtwo&!+greninja&!+hydreigon&!+darkrai&!+toucannon&!+vikavolt&!+tyrantrum&!+conkeldurr&!+darmanitan&!+chandelure&!+excadrill&!+regigigas&!+gigalith&!+kyogre&!+mamoswine&!+electivire&!+magnezone&!+garchomp&!+rhyperior&!+metagross&!+tyranitar&!+blaziken&!+ho-oh&!+raikou&!+gardevoir&!+swampert&!+dragonite&!+moltres&!+gengar&!+machamp&!+landorus&!+kingler&!+delphox&!+chesnaught&!+giratina&!+emboar&!+honchkrow&!+latios&!+staraptor&!+weavile&!+crawdaunt&!+absol&!+hariyama&!+sceptile&!+entei&!+aerodactyl&!+zapdos",
     "shadowHundoCandidates": "oscuro&3-4ataque&3-4defensa&3-4ps&!4*",
-    "shadowFrustration": "oscuro&@frustración&+mamoswine,+salamence,+dragonite,+metagross,+machamp,+mewtwo,+swampert,+moltres,+raikou,+electivire,+magnezone,+tyranitar,+weavile,+ho-oh,+entei,+blaziken,+gardevoir,+hariyama,+zapdos,+latios,+charizard,+luxray,+tangrowth,+sceptile,+venusaur,+feraligatr,+gyarados,+pinsir,+scizor,+lugia,+honchkrow,+staraptor,+houndoom,+typhlosion,+arcanine,+magmortar,+torterra,+golurk,+alakazam,+aerodactyl,+aggron,+gallade,+exeggutor,+granbull,+latias",
+    "shadowFrustration": "oscuro&@frustración&+dialga,+palkia,+heatran,+groudon,+rampardos,+salamence,+mewtwo,+greninja,+hydreigon,+darkrai,+toucannon,+vikavolt,+tyrantrum,+conkeldurr,+darmanitan,+chandelure,+excadrill,+regigigas,+gigalith,+kyogre,+mamoswine,+electivire,+magnezone,+garchomp,+rhyperior,+metagross,+tyranitar,+blaziken,+ho-oh,+raikou,+gardevoir,+swampert,+dragonite,+moltres,+gengar,+machamp,+landorus,+kingler,+delphox,+chesnaught,+giratina,+emboar,+honchkrow,+latios,+staraptor,+weavile,+crawdaunt,+absol,+hariyama,+sceptile,+entei,+aerodactyl,+zapdos",
     "cheapEvolve": "caterpie,weedle,pidgey,wurmple,whismur,pidove,abra,kadabra,machop,machoke,geodude,graveler,gastly,haunter,roggenrola,boldore,timburr,gurdurr,karrablast,shelmet,phantump,pumpkaboo&caterpie,weedle,pidgey,wurmple,whismur,pidove,intercambiados&0*,1*,2*&!variocolor&!disfraz&!@especial&!#",
     "dexPlus": "evolucionar&nuevaevolución&!investigacionevolucion",
     "megaEvolve": "megaevoluciona&mega1-2,nuevaevolución",
     "pilotLong": "distancia1000-&!intercambiados&!4*&!legendario&!singular&!variocolor",
     "raidFilters": {
+      "mega": {
+        "BANETTE": "normal,siniestro&@1siniestro,@1fantasma&@2siniestro,@2fantasma,@3siniestro,@3fantasma&!<fantasma"
+      },
       "lvl5": {
-        "TAPU_KOKO": "(veneno,tierra,acero,fuego,planta,eléctrico)&(@tierra,@veneno)"
+        "TAPU_LELE": "acero,fuego,psíquico&@1fantasma,@1veneno,@1acero&@2fantasma,@2veneno,@2acero,@3fantasma,@3veneno,@3acero&!<psíquico&!<hada"
       },
       "lvl3": {
-        "ORTHWORM": "(acero,fuego,agua,eléctrico)&(@lucha,@fuego,@tierra)"
+        "ORTHWORM": "acero,fuego,agua,eléctrico&@1lucha,@1fuego,@1tierra&@2lucha,@2fuego,@2tierra,@3lucha,@3fuego,@3tierra&!<acero"
       },
       "lvl1": {
-        "BELDUM": "(acero,fuego,agua,eléctrico,psíquico,siniestro)&(@siniestro,@fuego,@fantasma,@tierra)",
-        "SHIELDON": "(lucha,tierra,acero,agua,eléctrico)&(@lucha,@tierra,@agua)",
-        "HONEDGE": "(normal,acero,fuego,agua,eléctrico,siniestro)&(@siniestro,@fuego,@fantasma,@tierra)"
+        "BELDUM": "acero,fuego,agua,eléctrico,psíquico,siniestro&@1siniestro,@1fuego,@1fantasma,@1tierra&@2siniestro,@2fuego,@2fantasma,@2tierra,@3siniestro,@3fuego,@3fantasma,@3tierra&!<acero&!<psíquico",
+        "SHIELDON": "lucha,tierra,acero,agua,eléctrico&@1lucha,@1tierra,@1agua&@2lucha,@2tierra,@2agua,@3lucha,@3tierra,@3agua&!<roca&!<acero",
+        "HONEDGE": "normal,acero,fuego,agua,eléctrico,siniestro&@1siniestro,@1fuego,@1fantasma,@1tierra&@2siniestro,@2fuego,@2fantasma,@2tierra,@3siniestro,@3fuego,@3fantasma,@3tierra&!<acero&!<fantasma"
       },
       "shadow_lvl5": {
-        "LATIOS": "(acero,psíquico,siniestro,hada)&(@bicho,@siniestro,@dragón,@hada,@fantasma,@hielo)"
+        "LATIOS": "acero,psíquico,siniestro,hada&@1bicho,@1siniestro,@1dragón,@1hada,@1fantasma,@1hielo&@2bicho,@2siniestro,@2dragón,@2hada,@2fantasma,@2hielo,@3bicho,@3siniestro,@3dragón,@3hada,@3fantasma,@3hielo&!<dragón&!<psíquico"
       },
       "shadow_lvl3": {
-        "MAROWAK": "(normal,roca,fuego,agua,dragón,siniestro)&(@siniestro,@fantasma,@tierra,@roca,@agua)",
-        "LAPRAS": "(acero,agua,hielo)&(@eléctrico,@lucha,@planta,@roca)",
-        "STANTLER": "(roca,fantasma,acero)&(@lucha)"
+        "MAROWAK": "normal,roca,fuego,agua,dragón,siniestro&@1siniestro,@1fantasma,@1tierra,@1roca,@1agua&@2siniestro,@2fantasma,@2tierra,@2roca,@2agua,@3siniestro,@3fantasma,@3tierra,@3roca,@3agua&!<fuego&!<fantasma",
+        "LAPRAS": "acero,agua,hielo&@1eléctrico,@1lucha,@1planta,@1roca&@2eléctrico,@2lucha,@2planta,@2roca,@3eléctrico,@3lucha,@3planta,@3roca&!<agua&!<hielo",
+        "STANTLER": "roca,fantasma,acero&@1lucha&@2lucha,@3lucha&!<normal"
       },
       "shadow_lvl1": {
-        "DRATINI": "(acero,hada)&(@dragón,@hada,@hielo)",
-        "GLIGAR": "(volador)&(@hielo,@agua)",
-        "CACNEA": "(volador,veneno,bicho,acero,fuego,planta,dragón)&(@bicho,@fuego,@volador,@hielo,@veneno)",
-        "JOLTIK": "(lucha,veneno,tierra,fantasma,acero,fuego,eléctrico,dragón,hada)&(@fuego,@roca)"
+        "DRATINI": "acero,hada&@1dragón,@1hada,@1hielo&@2dragón,@2hada,@2hielo,@3dragón,@3hada,@3hielo&!<dragón",
+        "GLIGAR": "volador&@1hielo,@1agua&@2hielo,@2agua,@3hielo,@3agua&!<tierra&!<volador",
+        "CACNEA": "volador,veneno,bicho,acero,fuego,planta,dragón&@1bicho,@1fuego,@1volador,@1hielo,@1veneno&@2bicho,@2fuego,@2volador,@2hielo,@2veneno,@3bicho,@3fuego,@3volador,@3hielo,@3veneno&!<planta",
+        "JOLTIK": "lucha,veneno,tierra,fantasma,acero,fuego,eléctrico,dragón,hada&@1fuego,@1roca&@2fuego,@2roca,@3fuego,@3roca&!<bicho&!<eléctrico"
       }
     },
     "maxBattleFilters": {
       "tier_1": {
-        "BULBASAUR": "(volador,veneno,bicho,fantasma,acero,fuego,dragón)&(@volador,@fuego,@psíquico,@hielo)&movimientomax1-",
-        "CHARMANDER": "(roca,fuego,agua,dragón)&(@tierra,@roca,@agua)&movimientomax1-",
-        "SQUIRTLE": "(agua,planta,dragón)&(@planta,@eléctrico)&movimientomax1-",
-        "CATERPIE": "(lucha,volador,veneno,fantasma,acero,fuego,hada)&(@volador,@roca,@fuego)&movimientomax1-",
-        "GROWLITHE": "(roca,fuego,agua,dragón)&(@tierra,@roca,@agua)&movimientomax1-",
-        "ABRA": "(acero,psíquico,siniestro)&(@bicho,@fantasma,@siniestro)&movimientomax1-",
-        "GASTLY": "(normal,veneno,tierra,roca,acero,siniestro)&(@tierra,@fantasma,@psíquico,@siniestro)&movimientomax1-",
-        "KRABBY": "(agua,planta,dragón)&(@planta,@eléctrico)&movimientomax1-",
-        "OMANYTE": "(lucha,acero,agua,planta,dragón)&(@lucha,@tierra,@planta,@eléctrico)&movimientomax1-",
-        "KABUTO": "(lucha,acero,agua,planta,dragón)&(@lucha,@tierra,@planta,@eléctrico)&movimientomax1-",
-        "RALTS": "(acero,fuego,psíquico)&(@veneno,@fantasma,@acero)&movimientomax1-",
-        "SPHEAL": "(acero,agua,hielo)&(@lucha,@roca,@planta,@eléctrico)&movimientomax1-",
-        "PIDOVE": "(roca,fantasma,acero,eléctrico)&(@roca,@eléctrico,@hielo)&movimientomax1-",
-        "ROGGENROLA": "(lucha,tierra,acero)&(@lucha,@tierra,@acero,@agua,@planta)&movimientomax1-",
-        "WOOBAT": "(roca,acero,eléctrico,psíquico,siniestro)&(@roca,@fantasma,@eléctrico,@hielo,@siniestro)&movimientomax1-",
-        "DRILBUR": "(volador,bicho,planta)&(@agua,@planta,@hielo)&movimientomax1-",
-        "TRUBBISH": "(veneno,tierra,roca,fantasma,acero)&(@tierra,@psíquico)&movimientomax1-",
-        "INKAY": "(acero,siniestro,hada)&(@bicho,@hada)&movimientomax1-",
-        "BOUNSWEET": "(volador,veneno,bicho,acero,fuego,planta,dragón)&(@volador,@veneno,@bicho,@fuego,@hielo)&movimientomax1-",
-        "GROOKEY": "(volador,veneno,bicho,acero,fuego,planta,dragón)&(@volador,@veneno,@bicho,@fuego,@hielo)&movimientomax1-",
-        "SCORBUNNY": "(roca,fuego,agua,dragón)&(@tierra,@roca,@agua)&movimientomax1-",
-        "SOBBLE": "(agua,planta,dragón)&(@planta,@eléctrico)&movimientomax1-",
-        "SKWOVET": "(roca,fantasma,acero)&(@lucha)&movimientomax1-",
-        "ROOKIDEE": "(roca,acero,eléctrico)&(@roca,@eléctrico,@hielo)&movimientomax1-",
-        "WOOLOO": "(roca,fantasma,acero)&(@lucha)&movimientomax1-",
-        "HATENNA": "(acero,psíquico,siniestro)&(@bicho,@fantasma,@siniestro)&movimientomax1-"
+        "BULBASAUR": "volador,veneno,bicho,fantasma,acero,fuego,dragón&@1volador,@1fuego,@1psíquico,@1hielo&@2volador,@2fuego,@2psíquico,@2hielo,@3volador,@3fuego,@3psíquico,@3hielo&movimientomax1-&!<planta&!<veneno",
+        "CHARMANDER": "roca,fuego,agua,dragón&@1tierra,@1roca,@1agua&@2tierra,@2roca,@2agua,@3tierra,@3roca,@3agua&movimientomax1-&!<fuego",
+        "SQUIRTLE": "agua,planta,dragón&@1planta,@1eléctrico&@2planta,@2eléctrico,@3planta,@3eléctrico&movimientomax1-&!<agua",
+        "CATERPIE": "lucha,volador,veneno,fantasma,acero,fuego,hada&@1volador,@1roca,@1fuego&@2volador,@2roca,@2fuego,@3volador,@3roca,@3fuego&movimientomax1-&!<bicho",
+        "GROWLITHE": "roca,fuego,agua,dragón&@1tierra,@1roca,@1agua&@2tierra,@2roca,@2agua,@3tierra,@3roca,@3agua&movimientomax1-&!<fuego",
+        "ABRA": "acero,psíquico,siniestro&@1bicho,@1fantasma,@1siniestro&@2bicho,@2fantasma,@2siniestro,@3bicho,@3fantasma,@3siniestro&movimientomax1-&!<psíquico",
+        "GASTLY": "normal,veneno,tierra,roca,acero,siniestro&@1tierra,@1fantasma,@1psíquico,@1siniestro&@2tierra,@2fantasma,@2psíquico,@2siniestro,@3tierra,@3fantasma,@3psíquico,@3siniestro&movimientomax1-&!<fantasma&!<veneno",
+        "KRABBY": "agua,planta,dragón&@1planta,@1eléctrico&@2planta,@2eléctrico,@3planta,@3eléctrico&movimientomax1-&!<agua",
+        "OMANYTE": "lucha,acero,agua,planta,dragón&@1lucha,@1tierra,@1planta,@1eléctrico&@2lucha,@2tierra,@2planta,@2eléctrico,@3lucha,@3tierra,@3planta,@3eléctrico&movimientomax1-&!<roca&!<agua",
+        "KABUTO": "lucha,acero,agua,planta,dragón&@1lucha,@1tierra,@1planta,@1eléctrico&@2lucha,@2tierra,@2planta,@2eléctrico,@3lucha,@3tierra,@3planta,@3eléctrico&movimientomax1-&!<roca&!<agua",
+        "RALTS": "acero,fuego,psíquico&@1veneno,@1fantasma,@1acero&@2veneno,@2fantasma,@2acero,@3veneno,@3fantasma,@3acero&movimientomax1-&!<psíquico&!<hada",
+        "SPHEAL": "acero,agua,hielo&@1lucha,@1roca,@1planta,@1eléctrico&@2lucha,@2roca,@2planta,@2eléctrico,@3lucha,@3roca,@3planta,@3eléctrico&movimientomax1-&!<hielo&!<agua",
+        "PIDOVE": "roca,fantasma,acero,eléctrico&@1roca,@1eléctrico,@1hielo&@2roca,@2eléctrico,@2hielo,@3roca,@3eléctrico,@3hielo&movimientomax1-&!<normal&!<volador",
+        "ROGGENROLA": "lucha,tierra,acero&@1lucha,@1tierra,@1acero,@1agua,@1planta&@2lucha,@2tierra,@2acero,@2agua,@2planta,@3lucha,@3tierra,@3acero,@3agua,@3planta&movimientomax1-&!<roca",
+        "WOOBAT": "roca,acero,eléctrico,psíquico,siniestro&@1roca,@1fantasma,@1eléctrico,@1hielo,@1siniestro&@2roca,@2fantasma,@2eléctrico,@2hielo,@2siniestro,@3roca,@3fantasma,@3eléctrico,@3hielo,@3siniestro&movimientomax1-&!<psíquico&!<volador",
+        "DRILBUR": "volador,bicho,planta&@1agua,@1planta,@1hielo&@2agua,@2planta,@2hielo,@3agua,@3planta,@3hielo&movimientomax1-&!<tierra",
+        "TRUBBISH": "veneno,tierra,roca,fantasma,acero&@1tierra,@1psíquico&@2tierra,@2psíquico,@3tierra,@3psíquico&movimientomax1-&!<veneno",
+        "INKAY": "acero,siniestro,hada&@1bicho,@1hada&@2bicho,@2hada,@3bicho,@3hada&movimientomax1-&!<siniestro&!<psíquico",
+        "BOUNSWEET": "volador,veneno,bicho,acero,fuego,planta,dragón&@1volador,@1veneno,@1bicho,@1fuego,@1hielo&@2volador,@2veneno,@2bicho,@2fuego,@2hielo,@3volador,@3veneno,@3bicho,@3fuego,@3hielo&movimientomax1-&!<planta",
+        "GROOKEY": "volador,veneno,bicho,acero,fuego,planta,dragón&@1volador,@1veneno,@1bicho,@1fuego,@1hielo&@2volador,@2veneno,@2bicho,@2fuego,@2hielo,@3volador,@3veneno,@3bicho,@3fuego,@3hielo&movimientomax1-&!<planta",
+        "SCORBUNNY": "roca,fuego,agua,dragón&@1tierra,@1roca,@1agua&@2tierra,@2roca,@2agua,@3tierra,@3roca,@3agua&movimientomax1-&!<fuego",
+        "SOBBLE": "agua,planta,dragón&@1planta,@1eléctrico&@2planta,@2eléctrico,@3planta,@3eléctrico&movimientomax1-&!<agua",
+        "SKWOVET": "roca,fantasma,acero&@1lucha&@2lucha,@3lucha&movimientomax1-&!<normal",
+        "ROOKIDEE": "roca,acero,eléctrico&@1roca,@1eléctrico,@1hielo&@2roca,@2eléctrico,@2hielo,@3roca,@3eléctrico,@3hielo&movimientomax1-&!<volador",
+        "WOOLOO": "roca,fantasma,acero&@1lucha&@2lucha,@3lucha&movimientomax1-&!<normal",
+        "HATENNA": "acero,psíquico,siniestro&@1bicho,@1fantasma,@1siniestro&@2bicho,@2fantasma,@2siniestro,@3bicho,@3fantasma,@3siniestro&movimientomax1-&!<psíquico"
       },
       "tier_2": {
-        "MACHOP": "(volador,veneno,bicho,fantasma,psíquico,hada)&(@volador,@psíquico,@hada)&movimientomax1-",
-        "EEVEE": "(roca,fantasma,acero)&(@lucha)&movimientomax1-",
-        "SHUCKLE": "(lucha,veneno,tierra,fantasma,acero,hada)&(@roca,@acero,@agua)&movimientomax1-",
-        "WAILMER": "(agua,planta,dragón)&(@planta,@eléctrico)&movimientomax1-",
-        "DARUMAKA": "(roca,fuego,agua,dragón)&(@tierra,@roca,@agua)&movimientomax1-"
+        "MACHOP": "volador,veneno,bicho,fantasma,psíquico,hada&@1volador,@1psíquico,@1hada&@2volador,@2psíquico,@2hada,@3volador,@3psíquico,@3hada&movimientomax1-&!<lucha",
+        "EEVEE": "roca,fantasma,acero&@1lucha&@2lucha,@3lucha&movimientomax1-&!<normal",
+        "SHUCKLE": "lucha,veneno,tierra,fantasma,acero,hada&@1roca,@1acero,@1agua&@2roca,@2acero,@2agua,@3roca,@3acero,@3agua&movimientomax1-&!<bicho&!<roca",
+        "WAILMER": "agua,planta,dragón&@1planta,@1eléctrico&@2planta,@2eléctrico,@3planta,@3eléctrico&movimientomax1-&!<agua",
+        "DARUMAKA": "roca,fuego,agua,dragón&@1tierra,@1roca,@1agua&@2tierra,@2roca,@2agua,@3tierra,@3roca,@3agua&movimientomax1-&!<fuego"
       },
       "tier_3": {
-        "HITMONLEE": "(volador,veneno,bicho,fantasma,psíquico,hada)&(@volador,@psíquico,@hada)&movimientomax1-",
-        "HITMONCHAN": "(volador,veneno,bicho,fantasma,psíquico,hada)&(@volador,@psíquico,@hada)&movimientomax1-",
-        "CHANSEY": "(roca,fantasma,acero)&(@lucha)&movimientomax1-",
-        "SABLEYE": "(normal,lucha,siniestro,hada)&(@hada)&movimientomax1-",
-        "BELDUM": "(acero,fuego,agua,eléctrico,psíquico,siniestro)&(@tierra,@fantasma,@fuego,@siniestro)&movimientomax1-",
-        "CRYOGONAL": "(acero,fuego,agua,hielo)&(@lucha,@roca,@acero,@fuego)&movimientomax1-",
-        "PASSIMIAN": "(volador,veneno,bicho,fantasma,psíquico,hada)&(@volador,@psíquico,@hada)&movimientomax1-",
-        "DRAMPA": "(roca,fantasma,acero,hada)&(@lucha,@hielo,@dragón,@hada)&movimientomax1-",
-        "FALINKS": "(volador,veneno,bicho,fantasma,psíquico,hada)&(@volador,@psíquico,@hada)&movimientomax1-"
+        "HITMONLEE": "volador,veneno,bicho,fantasma,psíquico,hada&@1volador,@1psíquico,@1hada&@2volador,@2psíquico,@2hada,@3volador,@3psíquico,@3hada&movimientomax1-&!<lucha",
+        "HITMONCHAN": "volador,veneno,bicho,fantasma,psíquico,hada&@1volador,@1psíquico,@1hada&@2volador,@2psíquico,@2hada,@3volador,@3psíquico,@3hada&movimientomax1-&!<lucha",
+        "CHANSEY": "roca,fantasma,acero&@1lucha&@2lucha,@3lucha&movimientomax1-&!<normal",
+        "SABLEYE": "normal,lucha,siniestro,hada&@1hada&@2hada,@3hada&movimientomax1-&!<siniestro&!<fantasma",
+        "BELDUM": "acero,fuego,agua,eléctrico,psíquico,siniestro&@1tierra,@1fantasma,@1fuego,@1siniestro&@2tierra,@2fantasma,@2fuego,@2siniestro,@3tierra,@3fantasma,@3fuego,@3siniestro&movimientomax1-&!<acero&!<psíquico",
+        "CRYOGONAL": "acero,fuego,agua,hielo&@1lucha,@1roca,@1acero,@1fuego&@2lucha,@2roca,@2acero,@2fuego,@3lucha,@3roca,@3acero,@3fuego&movimientomax1-&!<hielo",
+        "PASSIMIAN": "volador,veneno,bicho,fantasma,psíquico,hada&@1volador,@1psíquico,@1hada&@2volador,@2psíquico,@2hada,@3volador,@3psíquico,@3hada&movimientomax1-&!<lucha",
+        "DRAMPA": "roca,fantasma,acero,hada&@1lucha,@1hielo,@1dragón,@1hada&@2lucha,@2hielo,@2dragón,@2hada,@3lucha,@3hielo,@3dragón,@3hada&movimientomax1-&!<normal&!<dragón",
+        "FALINKS": "volador,veneno,bicho,fantasma,psíquico,hada&@1volador,@1psíquico,@1hada&@2volador,@2psíquico,@2hada,@3volador,@3psíquico,@3hada&movimientomax1-&!<lucha"
       }
+    },
+    "maxTank": "@1mordisco,@1picadura,@1corte,@1dragoaliento,@1cortefuria,@1follaje,@1lengüetazo,@1fijarblanco,@1patadabaja,@1garrametal,@1disparolodo,@1picotazoveneno,@1destructor,@1psicocorte,@1arañazo,@1garraumbría,@1chispa,@1golpebajo,@1placaje,@1impactrueno,@1látigocepa,@1pistolaagua&movimientomax1-",
+    "rocketLeaders": {
+      "Giovanni": {
+        "1": "roca,fantasma,acero&@1lucha&@2lucha,@3lucha&!<normal",
+        "2": "lucha,tierra,fantasma&@1lucha,@1tierra,@1acero,@1agua,@1planta,@1psíquico,@1hielo&@2lucha,@2tierra,@2acero,@2agua,@2planta,@2psíquico,@2hielo,@3lucha,@3tierra,@3acero,@3agua,@3planta,@3psíquico,@3hielo&!<normal&!<veneno&!<tierra&!<roca",
+        "3": "volador&@1agua,@1hielo&@2agua,@2hielo,@3agua,@3hielo&!<tierra&!<volador"
+      },
+      "Cliff": {
+        "1": "roca,fantasma,acero&@1lucha&@2lucha,@3lucha&!<normal",
+        "2": "acero,fuego,psíquico&@1veneno,@1fantasma,@1acero&@2veneno,@2fantasma,@2acero,@3veneno,@3fantasma,@3acero&!<psíquico&!<hada",
+        "3": "lucha,tierra,acero,siniestro,hada&@1lucha,@1tierra,@1bicho,@1acero,@1agua,@1planta,@1hada&@2lucha,@2tierra,@2bicho,@2acero,@2agua,@2planta,@2hada,@3lucha,@3tierra,@3bicho,@3acero,@3agua,@3planta,@3hada&!<roca&!<siniestro"
+      },
+      "Arlo": {
+        "1": "lucha,volador,veneno,fantasma,acero,fuego,hada&@1volador,@1roca,@1fuego&@2volador,@2roca,@2fuego,@3volador,@3roca,@3fuego&!<bicho",
+        "2": "lucha,tierra,agua,planta&@1lucha,@1tierra,@1acero,@1fuego,@1agua,@1planta&@2lucha,@2tierra,@2acero,@2fuego,@2agua,@2planta,@3lucha,@3tierra,@3acero,@3fuego,@3agua,@3planta&!<acero&!<tierra&!<roca",
+        "3": "lucha,volador,veneno,fantasma,acero,fuego,agua,eléctrico&@1fuego&@2fuego,@3fuego&!<bicho&!<acero"
+      },
+      "Sierra": {
+        "1": "normal,siniestro&@1fantasma,@1siniestro&@2fantasma,@2siniestro,@3fantasma,@3siniestro&!<fantasma",
+        "2": "volador,veneno,bicho,acero,fuego,planta,eléctrico,dragón&@1lucha,@1fuego&@2lucha,@2fuego,@3lucha,@3fuego&!<planta&!<acero",
+        "3": "lucha,volador,agua,dragón,siniestro&@1lucha,@1tierra,@1roca,@1fuego,@1agua&@2lucha,@2tierra,@2roca,@2fuego,@2agua,@3lucha,@3tierra,@3roca,@3fuego,@3agua&!<siniestro&!<fuego&!<acero&!<tierra"
+      }
+    },
+    "rocketTypedGrunts": {
+      "Normal-type Male Grunt": "volador,veneno,fantasma,eléctrico,psíquico,hada&@1lucha,@1volador,@1roca,@1eléctrico,@1psíquico,@1hielo,@1hada&@2lucha,@2volador,@2roca,@2eléctrico,@2psíquico,@2hielo,@2hada,@3lucha,@3volador,@3roca,@3eléctrico,@3psíquico,@3hielo,@3hada&!<normal&!<lucha&!<volador",
+      "Fuego-type Female Grunt": "normal,volador,agua,dragón,siniestro&@1tierra,@1roca,@1fantasma,@1agua,@1siniestro&@2tierra,@2roca,@2fantasma,@2agua,@2siniestro,@3tierra,@3roca,@3fantasma,@3agua,@3siniestro&!<fuego&!<fantasma&!<tierra&!<psíquico",
+      "Agua-type Female Grunt": "lucha,veneno,acero,agua,hielo&@1lucha,@1volador,@1tierra,@1roca,@1bicho,@1planta,@1eléctrico,@1psíquico,@1hada&@2lucha,@2volador,@2tierra,@2roca,@2bicho,@2planta,@2eléctrico,@2psíquico,@2hada,@3lucha,@3volador,@3tierra,@3roca,@3bicho,@3planta,@3eléctrico,@3psíquico,@3hada&!<agua&!<bicho&!<siniestro&!<veneno&!<hielo",
+      "Agua-type Male Grunt": "acero,agua,eléctrico,dragón&@1roca,@1planta,@1eléctrico&@2roca,@2planta,@2eléctrico,@3roca,@3planta,@3eléctrico&!<agua&!<volador",
+      "Eléctrico-type Female Grunt": "lucha,veneno,tierra,roca,fantasma,acero,eléctrico,dragón,hada&@1lucha,@1tierra,@1roca,@1fuego,@1agua,@1planta&@2lucha,@2tierra,@2roca,@2fuego,@2agua,@2planta,@3lucha,@3tierra,@3roca,@3fuego,@3agua,@3planta&!<eléctrico&!<normal&!<roca&!<bicho",
+      "Planta-type Male Grunt": "veneno,planta,eléctrico&@1lucha,@1volador,@1veneno,@1bicho,@1fantasma,@1acero,@1fuego,@1psíquico,@1hielo,@1siniestro,@1hada&@2lucha,@2volador,@2veneno,@2bicho,@2fantasma,@2acero,@2fuego,@2psíquico,@2hielo,@2siniestro,@2hada,@3lucha,@3volador,@3veneno,@3bicho,@3fantasma,@3acero,@3fuego,@3psíquico,@3hielo,@3siniestro,@3hada&!<planta&!<hada&!<acero&!<roca&!<lucha&!<fantasma",
+      "Hielo-type Female Grunt": "normal,agua,hada&@1lucha,@1veneno,@1tierra,@1roca,@1bicho,@1fantasma,@1acero,@1fuego,@1agua,@1planta,@1eléctrico,@1siniestro,@1hada&@2lucha,@2veneno,@2tierra,@2roca,@2bicho,@2fantasma,@2acero,@2fuego,@2agua,@2planta,@2eléctrico,@2siniestro,@2hada,@3lucha,@3veneno,@3tierra,@3roca,@3bicho,@3fantasma,@3acero,@3fuego,@3agua,@3planta,@3eléctrico,@3siniestro,@3hada&!<hielo&!<agua&!<tierra&!<siniestro&!<fantasma&!<hada&!<roca",
+      "Lucha-type Female Grunt": "volador,veneno,fuego,agua,dragón,hada&@1volador,@1tierra,@1fantasma,@1agua,@1psíquico,@1hada&@2volador,@2tierra,@2fantasma,@2agua,@2psíquico,@2hada,@3volador,@3tierra,@3fantasma,@3agua,@3psíquico,@3hada&!<lucha&!<fantasma&!<fuego",
+      "Veneno-type Female Grunt": "volador,veneno,fantasma,eléctrico,psíquico&@1volador,@1tierra,@1roca,@1acero,@1fuego,@1eléctrico,@1psíquico,@1hielo&@2volador,@2tierra,@2roca,@2acero,@2fuego,@2eléctrico,@2psíquico,@2hielo,@3volador,@3tierra,@3roca,@3acero,@3fuego,@3eléctrico,@3psíquico,@3hielo&!<planta&!<veneno&!<volador&!<agua&!<hada&!<lucha",
+      "Tierra-type Male Grunt": "normal,volador,siniestro,hada&@1bicho,@1fantasma,@1agua,@1planta,@1hielo,@1dragón,@1siniestro,@1hada&@2bicho,@2fantasma,@2agua,@2planta,@2hielo,@2dragón,@2siniestro,@2hada,@3bicho,@3fantasma,@3agua,@3planta,@3hielo,@3dragón,@3siniestro,@3hada&!<tierra&!<volador&!<psíquico&!<dragón&!<fantasma",
+      "Volador-type Female Grunt": "volador,fantasma,agua&@1volador,@1roca,@1fuego,@1agua,@1eléctrico,@1psíquico,@1hielo,@1dragón,@1hada&@2volador,@2roca,@2fuego,@2agua,@2eléctrico,@2psíquico,@2hielo,@2dragón,@2hada,@3volador,@3roca,@3fuego,@3agua,@3eléctrico,@3psíquico,@3hielo,@3dragón,@3hada&!<normal&!<volador&!<veneno&!<tierra&!<bicho&!<dragón&!<agua",
+      "Psíquico-type Male Grunt": "volador,bicho,fuego,hada&@1volador,@1veneno,@1bicho,@1fantasma,@1acero,@1siniestro,@1hada&@2volador,@2veneno,@2bicho,@2fantasma,@2acero,@2siniestro,@2hada,@3volador,@3veneno,@3bicho,@3fantasma,@3acero,@3siniestro,@3hada&!<psíquico&!<hada&!<lucha&!<siniestro",
+      "Bicho-type Male Grunt": "lucha,veneno,tierra,fantasma,acero,eléctrico,dragón&@1volador,@1roca,@1acero,@1fuego,@1agua,@1psíquico&@2volador,@2roca,@2acero,@2fuego,@2agua,@2psíquico,@3volador,@3roca,@3acero,@3fuego,@3agua,@3psíquico&!<bicho&!<veneno&!<roca&!<eléctrico&!<acero",
+      "Roca-type Male Grunt": "lucha,fantasma,agua&@1lucha,@1tierra,@1roca,@1acero,@1agua,@1planta,@1eléctrico,@1hielo,@1dragón,@1hada&@2lucha,@2tierra,@2roca,@2acero,@2agua,@2planta,@2eléctrico,@2hielo,@2dragón,@2hada,@3lucha,@3tierra,@3roca,@3acero,@3agua,@3planta,@3eléctrico,@3hielo,@3dragón,@3hada&!<bicho&!<roca&!<agua&!<tierra&!<acero&!<hielo&!<dragón",
+      "Fantasma-type Male Grunt": "normal,lucha,veneno,roca,acero,fuego,agua,hielo,siniestro&@1tierra,@1roca,@1fantasma,@1acero,@1fuego,@1psíquico,@1siniestro,@1hada&@2tierra,@2roca,@2fantasma,@2acero,@2fuego,@2psíquico,@2siniestro,@2hada,@3tierra,@3roca,@3fantasma,@3acero,@3fuego,@3psíquico,@3siniestro,@3hada&!<fantasma&!<veneno&!<siniestro&!<hielo",
+      "Dragón-type Female Grunt": "volador,siniestro,hada&@1lucha,@1volador,@1veneno,@1roca,@1bicho,@1hielo,@1dragón,@1hada&@2lucha,@2volador,@2veneno,@2roca,@2bicho,@2hielo,@2dragón,@2hada,@3lucha,@3volador,@3veneno,@3roca,@3bicho,@3hielo,@3dragón,@3hada&!<dragón&!<siniestro&!<planta&!<tierra&!<volador",
+      "Siniestro-type Female Grunt": "lucha,acero,agua,planta,siniestro,hada&@1lucha,@1bicho,@1planta,@1eléctrico,@1hielo,@1dragón,@1hada&@2lucha,@2bicho,@2planta,@2eléctrico,@2hielo,@2dragón,@2hada,@3lucha,@3bicho,@3planta,@3eléctrico,@3hielo,@3dragón,@3hada&!<siniestro&!<normal&!<agua&!<dragón",
+      "Acero-type Male Grunt": "acero,agua,eléctrico,psíquico,siniestro&@1lucha,@1tierra,@1fantasma,@1fuego,@1agua,@1eléctrico,@1siniestro&@2lucha,@2tierra,@2fantasma,@2fuego,@2agua,@2eléctrico,@2siniestro,@3lucha,@3tierra,@3fantasma,@3fuego,@3agua,@3eléctrico,@3siniestro&!<hielo&!<acero&!<psíquico&!<roca&!<volador",
+      "Hada-type Female Grunt": "roca,fantasma,acero,fuego,agua,psíquico,hielo&@1lucha,@1veneno,@1tierra,@1roca,@1fantasma,@1acero,@1fuego,@1psíquico&@2lucha,@2veneno,@2tierra,@2roca,@2fantasma,@2acero,@2fuego,@2psíquico,@3lucha,@3veneno,@3tierra,@3roca,@3fantasma,@3acero,@3fuego,@3psíquico&!<hada&!<hielo&!<psíquico&!<veneno"
+    },
+    "rocketGenericGrunts": {
+      "Male Grunt": "@1eléctrico,@1fuego,@1volador&@2eléctrico,@2fuego,@2volador,@3eléctrico,@3fuego,@3volador",
+      "Female Grunt": "@1lucha,@1eléctrico,@1hada&@2lucha,@2eléctrico,@2hada,@3lucha,@3eléctrico,@3hada",
+      "Decoy Female Grunt": "@1lucha,@1fuego,@1volador&@2lucha,@2fuego,@2volador,@3lucha,@3fuego,@3volador"
+    },
+    "pvpFilters": {
+      "great": "+quagsire,+tinkaton,+corviknight,+jellicent,+empoleon,+forretress,+altaria,+azumarill,+wigglytuff,+feraligatr,+lickilicky,+medicham,+corsola,+talonflame,+lapras,+sealeo,+malamar,+clodsire,+dusclops,+stunfisk,+clefable,+drapion,+annihilape,+blastoise,+florges,+cradily,+politoed,+aegislash,+charjabug,+greedent&pc-1500&0-1ataque&3-4defensa&3-4ps",
+      "ultra": "+jellicent,+corviknight,+lapras,+tinkaton,+empoleon,+moltres,+feraligatr,+malamar,+florges,+dondozo,+virizion,+regidrago,+lickilicky,+ludicolo,+clefable,+blastoise,+oranguru,+zygarde,+dusknoir,+ninetales,+walrein,+turtonator,+drapion,+annihilape,+kingdra,+giratina,+bellibolt,+cresselia,+forretress,+togekiss&pc-2500&0-1ataque&3-4defensa&3-4ps",
+      "master": "+zacian,+palkia,+metagross,+xerneas,+zamazenta,+kyurem,+dialga,+lunala,+reshiram,+zekrom,+marshadow,+kyogre,+lugia,+eternatus,+necrozma,+yveltal,+ho-oh,+garchomp,+groudon,+meloetta,+latios,+gholdengo,+solgaleo,+florges,+gyarados,+mewtwo,+jirachi,+keldeo,+zygarde,+latias&0-1ataque&3-4defensa&3-4ps"
     },
     "trashClauseCount": 30,
     "tradeClauseCount": 28
   },
   "fr": {
-    "trash": "0*,1*,2*&0*,1*,2*,0-3attaque,0-3défense,0-2pv&0*,1*,2*,0-3attaque,0-2défense,0-3pv&0*,1*,2*,0-2attaque,0-3défense,0-3pv&1-4attaque,0-2défense,0-2pv&!4*&!#&!favoris&!chromatique&!légendaire&!fabuleux,808,649&!ultra-chimère&!obscur&!costume&!chanceux&!fond&!capacitédynamax1-&!nouvelleévolution,méga0&!@spécial,queulorior&!oeufseulement&!distance100-,échangé&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&pc-2000&âge-30,échangé",
+    "trash": "0*,1*,2*&0*,1*,2*,0-3attaque,0-3défense,0-2pv&0*,1*,2*,0-3attaque,0-2défense,0-3pv&0*,1*,2*,0-2attaque,0-3défense,0-3pv&1-4attaque,0-2défense,0-2pv&!4*&!#&!favoris&!chromatique&!légendaire&!fabuleux,meltan,genesect&!ultra-chimère&!obscur&!costume&!chanceux&!fond&!capacitédynamax1-&!nouvelleévolution,méga0&!@spécial,queulorior&!oeufseulement&!distance100-,échangé&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&pc-2000&âge-30,échangé",
     "trade": "0*,1*,2*&0*,1*,2*,0-3attaque,0-3défense,0-2pv&0*,1*,2*,0-3attaque,0-2défense,0-3pv&0*,1*,2*,0-2attaque,0-3défense,0-3pv&1-4attaque,0-2défense,0-2pv&!échangé&!obscur&!chanceux&!fabuleux,808,809&!#&!légendaire&!ultra-chimère&!chromatique&!costume&!purifié&!fond&!favoris&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!capacitédynamax1-&!xxl&!xl&!@spécial&âge-30&distance0-",
     "sort": "",
     "prestaged": "#Trade,#Fern-Tausch&!échangé&!obscur&!chanceux&!fabuleux,808,809",
     "gift": "chromatique,légendaire,ultra-chimère,costume,fond&!échangé&!obscur&!fabuleux,808,809&!chanceux&!4*&!favoris&!@spécial&!#,#Trade,#Fern-Tausch",
-    "shadowCheap": "obscur&kmbonbon1&!chromatique&!chanceux&!@spécial&!#",
-    "shadowSafe": "obscur&!légendaire&!fabuleux&!ultra-chimère&!4*&!chromatique&!chanceux&!costume&!@spécial&!+mammochon&!+drattak&!+dracolosse&!+métalosse&!+mackogneur&!+mewtwo&!+laggron&!+sulfura&!+raikou&!+élekable&!+magnézone&!+tyranocif&!+dimoret&!+ho-oh&!+entei&!+braségali&!+gardevoir&!+hariyama&!+électhor&!+latios&!+dracaufeu&!+luxray&!+bouldeneu&!+jungko&!+florizarre&!+aligatueur&!+léviator&!+scarabrute&!+cizayox&!+lugia&!+corboss&!+étouraptor&!+démolosse&!+typhlosion&!+arcanin&!+maganon&!+torterra&!+golemastoc&!+alakazam&!+ptéra&!+galeking&!+gallame&!+noadkoko&!+granbull&!+latias",
+    "shadowCheap": "obscur&kmbonbon1&!chromatique&!@spécial&!#",
+    "shadowSafe": "obscur&!légendaire&!fabuleux&!ultra-chimère&!4*&!chromatique&!costume&!@spécial&!+dialga&!+palkia&!+heatran&!+groudon&!+charkos&!+drattak&!+mewtwo&!+amphinobi&!+trioxhydre&!+darkrai&!+bazoucan&!+lucanon&!+rexillius&!+bétochef&!+darumacho&!+lugulabre&!+minotaupe&!+regigigas&!+gigalithe&!+kyogre&!+mammochon&!+élekable&!+magnézone&!+carchacrok&!+rhinastoc&!+métalosse&!+tyranocif&!+braségali&!+ho-oh&!+raikou&!+gardevoir&!+laggron&!+dracolosse&!+sulfura&!+ectoplasma&!+mackogneur&!+démétéros&!+krabboss&!+goupelin&!+blindépique&!+giratina&!+roitiflam&!+corboss&!+latios&!+étouraptor&!+dimoret&!+colhomard&!+absol&!+hariyama&!+jungko&!+entei&!+ptéra&!+électhor",
     "shadowHundoCandidates": "obscur&3-4attaque&3-4défense&3-4pv&!4*",
-    "shadowFrustration": "obscur&@frustration&+mammochon,+drattak,+dracolosse,+métalosse,+mackogneur,+mewtwo,+laggron,+sulfura,+raikou,+élekable,+magnézone,+tyranocif,+dimoret,+ho-oh,+entei,+braségali,+gardevoir,+hariyama,+électhor,+latios,+dracaufeu,+luxray,+bouldeneu,+jungko,+florizarre,+aligatueur,+léviator,+scarabrute,+cizayox,+lugia,+corboss,+étouraptor,+démolosse,+typhlosion,+arcanin,+maganon,+torterra,+golemastoc,+alakazam,+ptéra,+galeking,+gallame,+noadkoko,+granbull,+latias",
+    "shadowFrustration": "obscur&@frustration&+dialga,+palkia,+heatran,+groudon,+charkos,+drattak,+mewtwo,+amphinobi,+trioxhydre,+darkrai,+bazoucan,+lucanon,+rexillius,+bétochef,+darumacho,+lugulabre,+minotaupe,+regigigas,+gigalithe,+kyogre,+mammochon,+élekable,+magnézone,+carchacrok,+rhinastoc,+métalosse,+tyranocif,+braségali,+ho-oh,+raikou,+gardevoir,+laggron,+dracolosse,+sulfura,+ectoplasma,+mackogneur,+démétéros,+krabboss,+goupelin,+blindépique,+giratina,+roitiflam,+corboss,+latios,+étouraptor,+dimoret,+colhomard,+absol,+hariyama,+jungko,+entei,+ptéra,+électhor",
     "cheapEvolve": "chenipan,aspicot,roucool,chenipotte,chuchmur,poichigeon,abra,kadabra,machoc,machopeur,racaillou,gravalanch,fantominus,spectrum,nodulithe,géolithe,charpenti,ouvrifier,carabing,escargaume,brocélôme,pitrouille&chenipan,aspicot,roucool,chenipotte,chuchmur,poichigeon,échangé&0*,1*,2*&!chromatique&!costume&!@spécial&!#",
     "dexPlus": "évoluer&nouvelleévolution&!évolutionparquête",
     "megaEvolve": "mégaévolue&méga1-2,nouvelleévolution",
     "pilotLong": "distance1000-&!échangé&!4*&!légendaire&!fabuleux&!chromatique",
     "raidFilters": {
+      "mega": {
+        "BANETTE": "normal,ténèbres&@1ténèbres,@1spectre&@2ténèbres,@2spectre,@3ténèbres,@3spectre&!<spectre"
+      },
       "lvl5": {
-        "TAPU_KOKO": "(poison,sol,acier,feu,plante,électrik)&(@sol,@poison)"
+        "TAPU_LELE": "acier,feu,psy&@1spectre,@1poison,@1acier&@2spectre,@2poison,@2acier,@3spectre,@3poison,@3acier&!<psy&!<fée"
       },
       "lvl3": {
-        "ORTHWORM": "(acier,feu,eau,électrik)&(@combat,@feu,@sol)"
+        "ORTHWORM": "acier,feu,eau,électrik&@1combat,@1feu,@1sol&@2combat,@2feu,@2sol,@3combat,@3feu,@3sol&!<acier"
       },
       "lvl1": {
-        "BELDUM": "(acier,feu,eau,électrik,psy,ténèbres)&(@ténèbres,@feu,@spectre,@sol)",
-        "SHIELDON": "(combat,sol,acier,eau,électrik)&(@combat,@sol,@eau)",
-        "HONEDGE": "(normal,acier,feu,eau,électrik,ténèbres)&(@ténèbres,@feu,@spectre,@sol)"
+        "BELDUM": "acier,feu,eau,électrik,psy,ténèbres&@1ténèbres,@1feu,@1spectre,@1sol&@2ténèbres,@2feu,@2spectre,@2sol,@3ténèbres,@3feu,@3spectre,@3sol&!<acier&!<psy",
+        "SHIELDON": "combat,sol,acier,eau,électrik&@1combat,@1sol,@1eau&@2combat,@2sol,@2eau,@3combat,@3sol,@3eau&!<roche&!<acier",
+        "HONEDGE": "normal,acier,feu,eau,électrik,ténèbres&@1ténèbres,@1feu,@1spectre,@1sol&@2ténèbres,@2feu,@2spectre,@2sol,@3ténèbres,@3feu,@3spectre,@3sol&!<acier&!<spectre"
       },
       "shadow_lvl5": {
-        "LATIOS": "(acier,psy,ténèbres,fée)&(@insecte,@ténèbres,@dragon,@fée,@spectre,@glace)"
+        "LATIOS": "acier,psy,ténèbres,fée&@1insecte,@1ténèbres,@1dragon,@1fée,@1spectre,@1glace&@2insecte,@2ténèbres,@2dragon,@2fée,@2spectre,@2glace,@3insecte,@3ténèbres,@3dragon,@3fée,@3spectre,@3glace&!<dragon&!<psy"
       },
       "shadow_lvl3": {
-        "MAROWAK": "(normal,roche,feu,eau,dragon,ténèbres)&(@ténèbres,@spectre,@sol,@roche,@eau)",
-        "LAPRAS": "(acier,eau,glace)&(@électrik,@combat,@plante,@roche)",
-        "STANTLER": "(roche,spectre,acier)&(@combat)"
+        "MAROWAK": "normal,roche,feu,eau,dragon,ténèbres&@1ténèbres,@1spectre,@1sol,@1roche,@1eau&@2ténèbres,@2spectre,@2sol,@2roche,@2eau,@3ténèbres,@3spectre,@3sol,@3roche,@3eau&!<feu&!<spectre",
+        "LAPRAS": "acier,eau,glace&@1électrik,@1combat,@1plante,@1roche&@2électrik,@2combat,@2plante,@2roche,@3électrik,@3combat,@3plante,@3roche&!<eau&!<glace",
+        "STANTLER": "roche,spectre,acier&@1combat&@2combat,@3combat&!<normal"
       },
       "shadow_lvl1": {
-        "DRATINI": "(acier,fée)&(@dragon,@fée,@glace)",
-        "GLIGAR": "(vol)&(@glace,@eau)",
-        "CACNEA": "(vol,poison,insecte,acier,feu,plante,dragon)&(@insecte,@feu,@vol,@glace,@poison)",
-        "JOLTIK": "(combat,poison,sol,spectre,acier,feu,électrik,dragon,fée)&(@feu,@roche)"
+        "DRATINI": "acier,fée&@1dragon,@1fée,@1glace&@2dragon,@2fée,@2glace,@3dragon,@3fée,@3glace&!<dragon",
+        "GLIGAR": "vol&@1glace,@1eau&@2glace,@2eau,@3glace,@3eau&!<sol&!<vol",
+        "CACNEA": "vol,poison,insecte,acier,feu,plante,dragon&@1insecte,@1feu,@1vol,@1glace,@1poison&@2insecte,@2feu,@2vol,@2glace,@2poison,@3insecte,@3feu,@3vol,@3glace,@3poison&!<plante",
+        "JOLTIK": "combat,poison,sol,spectre,acier,feu,électrik,dragon,fée&@1feu,@1roche&@2feu,@2roche,@3feu,@3roche&!<insecte&!<électrik"
       }
     },
     "maxBattleFilters": {
       "tier_1": {
-        "BULBASAUR": "(vol,poison,insecte,spectre,acier,feu,dragon)&(@vol,@feu,@psy,@glace)&capacitédynamax1-",
-        "CHARMANDER": "(roche,feu,eau,dragon)&(@sol,@roche,@eau)&capacitédynamax1-",
-        "SQUIRTLE": "(eau,plante,dragon)&(@plante,@électrik)&capacitédynamax1-",
-        "CATERPIE": "(combat,vol,poison,spectre,acier,feu,fée)&(@vol,@roche,@feu)&capacitédynamax1-",
-        "GROWLITHE": "(roche,feu,eau,dragon)&(@sol,@roche,@eau)&capacitédynamax1-",
-        "ABRA": "(acier,psy,ténèbres)&(@insecte,@spectre,@ténèbres)&capacitédynamax1-",
-        "GASTLY": "(normal,poison,sol,roche,acier,ténèbres)&(@sol,@spectre,@psy,@ténèbres)&capacitédynamax1-",
-        "KRABBY": "(eau,plante,dragon)&(@plante,@électrik)&capacitédynamax1-",
-        "OMANYTE": "(combat,acier,eau,plante,dragon)&(@combat,@sol,@plante,@électrik)&capacitédynamax1-",
-        "KABUTO": "(combat,acier,eau,plante,dragon)&(@combat,@sol,@plante,@électrik)&capacitédynamax1-",
-        "RALTS": "(acier,feu,psy)&(@poison,@spectre,@acier)&capacitédynamax1-",
-        "SPHEAL": "(acier,eau,glace)&(@combat,@roche,@plante,@électrik)&capacitédynamax1-",
-        "PIDOVE": "(roche,spectre,acier,électrik)&(@roche,@électrik,@glace)&capacitédynamax1-",
-        "ROGGENROLA": "(combat,sol,acier)&(@combat,@sol,@acier,@eau,@plante)&capacitédynamax1-",
-        "WOOBAT": "(roche,acier,électrik,psy,ténèbres)&(@roche,@spectre,@électrik,@glace,@ténèbres)&capacitédynamax1-",
-        "DRILBUR": "(vol,insecte,plante)&(@eau,@plante,@glace)&capacitédynamax1-",
-        "TRUBBISH": "(poison,sol,roche,spectre,acier)&(@sol,@psy)&capacitédynamax1-",
-        "INKAY": "(acier,ténèbres,fée)&(@insecte,@fée)&capacitédynamax1-",
-        "BOUNSWEET": "(vol,poison,insecte,acier,feu,plante,dragon)&(@vol,@poison,@insecte,@feu,@glace)&capacitédynamax1-",
-        "GROOKEY": "(vol,poison,insecte,acier,feu,plante,dragon)&(@vol,@poison,@insecte,@feu,@glace)&capacitédynamax1-",
-        "SCORBUNNY": "(roche,feu,eau,dragon)&(@sol,@roche,@eau)&capacitédynamax1-",
-        "SOBBLE": "(eau,plante,dragon)&(@plante,@électrik)&capacitédynamax1-",
-        "SKWOVET": "(roche,spectre,acier)&(@combat)&capacitédynamax1-",
-        "ROOKIDEE": "(roche,acier,électrik)&(@roche,@électrik,@glace)&capacitédynamax1-",
-        "WOOLOO": "(roche,spectre,acier)&(@combat)&capacitédynamax1-",
-        "HATENNA": "(acier,psy,ténèbres)&(@insecte,@spectre,@ténèbres)&capacitédynamax1-"
+        "BULBASAUR": "vol,poison,insecte,spectre,acier,feu,dragon&@1vol,@1feu,@1psy,@1glace&@2vol,@2feu,@2psy,@2glace,@3vol,@3feu,@3psy,@3glace&capacitédynamax1-&!<plante&!<poison",
+        "CHARMANDER": "roche,feu,eau,dragon&@1sol,@1roche,@1eau&@2sol,@2roche,@2eau,@3sol,@3roche,@3eau&capacitédynamax1-&!<feu",
+        "SQUIRTLE": "eau,plante,dragon&@1plante,@1électrik&@2plante,@2électrik,@3plante,@3électrik&capacitédynamax1-&!<eau",
+        "CATERPIE": "combat,vol,poison,spectre,acier,feu,fée&@1vol,@1roche,@1feu&@2vol,@2roche,@2feu,@3vol,@3roche,@3feu&capacitédynamax1-&!<insecte",
+        "GROWLITHE": "roche,feu,eau,dragon&@1sol,@1roche,@1eau&@2sol,@2roche,@2eau,@3sol,@3roche,@3eau&capacitédynamax1-&!<feu",
+        "ABRA": "acier,psy,ténèbres&@1insecte,@1spectre,@1ténèbres&@2insecte,@2spectre,@2ténèbres,@3insecte,@3spectre,@3ténèbres&capacitédynamax1-&!<psy",
+        "GASTLY": "normal,poison,sol,roche,acier,ténèbres&@1sol,@1spectre,@1psy,@1ténèbres&@2sol,@2spectre,@2psy,@2ténèbres,@3sol,@3spectre,@3psy,@3ténèbres&capacitédynamax1-&!<spectre&!<poison",
+        "KRABBY": "eau,plante,dragon&@1plante,@1électrik&@2plante,@2électrik,@3plante,@3électrik&capacitédynamax1-&!<eau",
+        "OMANYTE": "combat,acier,eau,plante,dragon&@1combat,@1sol,@1plante,@1électrik&@2combat,@2sol,@2plante,@2électrik,@3combat,@3sol,@3plante,@3électrik&capacitédynamax1-&!<roche&!<eau",
+        "KABUTO": "combat,acier,eau,plante,dragon&@1combat,@1sol,@1plante,@1électrik&@2combat,@2sol,@2plante,@2électrik,@3combat,@3sol,@3plante,@3électrik&capacitédynamax1-&!<roche&!<eau",
+        "RALTS": "acier,feu,psy&@1poison,@1spectre,@1acier&@2poison,@2spectre,@2acier,@3poison,@3spectre,@3acier&capacitédynamax1-&!<psy&!<fée",
+        "SPHEAL": "acier,eau,glace&@1combat,@1roche,@1plante,@1électrik&@2combat,@2roche,@2plante,@2électrik,@3combat,@3roche,@3plante,@3électrik&capacitédynamax1-&!<glace&!<eau",
+        "PIDOVE": "roche,spectre,acier,électrik&@1roche,@1électrik,@1glace&@2roche,@2électrik,@2glace,@3roche,@3électrik,@3glace&capacitédynamax1-&!<normal&!<vol",
+        "ROGGENROLA": "combat,sol,acier&@1combat,@1sol,@1acier,@1eau,@1plante&@2combat,@2sol,@2acier,@2eau,@2plante,@3combat,@3sol,@3acier,@3eau,@3plante&capacitédynamax1-&!<roche",
+        "WOOBAT": "roche,acier,électrik,psy,ténèbres&@1roche,@1spectre,@1électrik,@1glace,@1ténèbres&@2roche,@2spectre,@2électrik,@2glace,@2ténèbres,@3roche,@3spectre,@3électrik,@3glace,@3ténèbres&capacitédynamax1-&!<psy&!<vol",
+        "DRILBUR": "vol,insecte,plante&@1eau,@1plante,@1glace&@2eau,@2plante,@2glace,@3eau,@3plante,@3glace&capacitédynamax1-&!<sol",
+        "TRUBBISH": "poison,sol,roche,spectre,acier&@1sol,@1psy&@2sol,@2psy,@3sol,@3psy&capacitédynamax1-&!<poison",
+        "INKAY": "acier,ténèbres,fée&@1insecte,@1fée&@2insecte,@2fée,@3insecte,@3fée&capacitédynamax1-&!<ténèbres&!<psy",
+        "BOUNSWEET": "vol,poison,insecte,acier,feu,plante,dragon&@1vol,@1poison,@1insecte,@1feu,@1glace&@2vol,@2poison,@2insecte,@2feu,@2glace,@3vol,@3poison,@3insecte,@3feu,@3glace&capacitédynamax1-&!<plante",
+        "GROOKEY": "vol,poison,insecte,acier,feu,plante,dragon&@1vol,@1poison,@1insecte,@1feu,@1glace&@2vol,@2poison,@2insecte,@2feu,@2glace,@3vol,@3poison,@3insecte,@3feu,@3glace&capacitédynamax1-&!<plante",
+        "SCORBUNNY": "roche,feu,eau,dragon&@1sol,@1roche,@1eau&@2sol,@2roche,@2eau,@3sol,@3roche,@3eau&capacitédynamax1-&!<feu",
+        "SOBBLE": "eau,plante,dragon&@1plante,@1électrik&@2plante,@2électrik,@3plante,@3électrik&capacitédynamax1-&!<eau",
+        "SKWOVET": "roche,spectre,acier&@1combat&@2combat,@3combat&capacitédynamax1-&!<normal",
+        "ROOKIDEE": "roche,acier,électrik&@1roche,@1électrik,@1glace&@2roche,@2électrik,@2glace,@3roche,@3électrik,@3glace&capacitédynamax1-&!<vol",
+        "WOOLOO": "roche,spectre,acier&@1combat&@2combat,@3combat&capacitédynamax1-&!<normal",
+        "HATENNA": "acier,psy,ténèbres&@1insecte,@1spectre,@1ténèbres&@2insecte,@2spectre,@2ténèbres,@3insecte,@3spectre,@3ténèbres&capacitédynamax1-&!<psy"
       },
       "tier_2": {
-        "MACHOP": "(vol,poison,insecte,spectre,psy,fée)&(@vol,@psy,@fée)&capacitédynamax1-",
-        "EEVEE": "(roche,spectre,acier)&(@combat)&capacitédynamax1-",
-        "SHUCKLE": "(combat,poison,sol,spectre,acier,fée)&(@roche,@acier,@eau)&capacitédynamax1-",
-        "WAILMER": "(eau,plante,dragon)&(@plante,@électrik)&capacitédynamax1-",
-        "DARUMAKA": "(roche,feu,eau,dragon)&(@sol,@roche,@eau)&capacitédynamax1-"
+        "MACHOP": "vol,poison,insecte,spectre,psy,fée&@1vol,@1psy,@1fée&@2vol,@2psy,@2fée,@3vol,@3psy,@3fée&capacitédynamax1-&!<combat",
+        "EEVEE": "roche,spectre,acier&@1combat&@2combat,@3combat&capacitédynamax1-&!<normal",
+        "SHUCKLE": "combat,poison,sol,spectre,acier,fée&@1roche,@1acier,@1eau&@2roche,@2acier,@2eau,@3roche,@3acier,@3eau&capacitédynamax1-&!<insecte&!<roche",
+        "WAILMER": "eau,plante,dragon&@1plante,@1électrik&@2plante,@2électrik,@3plante,@3électrik&capacitédynamax1-&!<eau",
+        "DARUMAKA": "roche,feu,eau,dragon&@1sol,@1roche,@1eau&@2sol,@2roche,@2eau,@3sol,@3roche,@3eau&capacitédynamax1-&!<feu"
       },
       "tier_3": {
-        "HITMONLEE": "(vol,poison,insecte,spectre,psy,fée)&(@vol,@psy,@fée)&capacitédynamax1-",
-        "HITMONCHAN": "(vol,poison,insecte,spectre,psy,fée)&(@vol,@psy,@fée)&capacitédynamax1-",
-        "CHANSEY": "(roche,spectre,acier)&(@combat)&capacitédynamax1-",
-        "SABLEYE": "(normal,combat,ténèbres,fée)&(@fée)&capacitédynamax1-",
-        "BELDUM": "(acier,feu,eau,électrik,psy,ténèbres)&(@sol,@spectre,@feu,@ténèbres)&capacitédynamax1-",
-        "CRYOGONAL": "(acier,feu,eau,glace)&(@combat,@roche,@acier,@feu)&capacitédynamax1-",
-        "PASSIMIAN": "(vol,poison,insecte,spectre,psy,fée)&(@vol,@psy,@fée)&capacitédynamax1-",
-        "DRAMPA": "(roche,spectre,acier,fée)&(@combat,@glace,@dragon,@fée)&capacitédynamax1-",
-        "FALINKS": "(vol,poison,insecte,spectre,psy,fée)&(@vol,@psy,@fée)&capacitédynamax1-"
+        "HITMONLEE": "vol,poison,insecte,spectre,psy,fée&@1vol,@1psy,@1fée&@2vol,@2psy,@2fée,@3vol,@3psy,@3fée&capacitédynamax1-&!<combat",
+        "HITMONCHAN": "vol,poison,insecte,spectre,psy,fée&@1vol,@1psy,@1fée&@2vol,@2psy,@2fée,@3vol,@3psy,@3fée&capacitédynamax1-&!<combat",
+        "CHANSEY": "roche,spectre,acier&@1combat&@2combat,@3combat&capacitédynamax1-&!<normal",
+        "SABLEYE": "normal,combat,ténèbres,fée&@1fée&@2fée,@3fée&capacitédynamax1-&!<ténèbres&!<spectre",
+        "BELDUM": "acier,feu,eau,électrik,psy,ténèbres&@1sol,@1spectre,@1feu,@1ténèbres&@2sol,@2spectre,@2feu,@2ténèbres,@3sol,@3spectre,@3feu,@3ténèbres&capacitédynamax1-&!<acier&!<psy",
+        "CRYOGONAL": "acier,feu,eau,glace&@1combat,@1roche,@1acier,@1feu&@2combat,@2roche,@2acier,@2feu,@3combat,@3roche,@3acier,@3feu&capacitédynamax1-&!<glace",
+        "PASSIMIAN": "vol,poison,insecte,spectre,psy,fée&@1vol,@1psy,@1fée&@2vol,@2psy,@2fée,@3vol,@3psy,@3fée&capacitédynamax1-&!<combat",
+        "DRAMPA": "roche,spectre,acier,fée&@1combat,@1glace,@1dragon,@1fée&@2combat,@2glace,@2dragon,@2fée,@3combat,@3glace,@3dragon,@3fée&capacitédynamax1-&!<normal&!<dragon",
+        "FALINKS": "vol,poison,insecte,spectre,psy,fée&@1vol,@1psy,@1fée&@2vol,@2psy,@2fée,@3vol,@3psy,@3fée&capacitédynamax1-&!<combat"
       }
+    },
+    "maxTank": "@1morsure,@1piqûre,@1coupe,@1draco-souffle,@1taillade,@1feuillage,@1léchouille,@1verrouillage,@1balayage,@1griffeacier,@1tirdeboue,@1dard-venin,@1écras’face,@1coupepsycho,@1griffe,@1griffeombre,@1étincelle,@1coupbas,@1charge,@1éclair,@1fouetlianes,@1pistoletào&capacitédynamax1-",
+    "rocketLeaders": {
+      "Giovanni": {
+        "1": "roche,spectre,acier&@1combat&@2combat,@3combat&!<normal",
+        "2": "combat,sol,spectre&@1combat,@1sol,@1acier,@1eau,@1plante,@1psy,@1glace&@2combat,@2sol,@2acier,@2eau,@2plante,@2psy,@2glace,@3combat,@3sol,@3acier,@3eau,@3plante,@3psy,@3glace&!<normal&!<poison&!<sol&!<roche",
+        "3": "vol&@1eau,@1glace&@2eau,@2glace,@3eau,@3glace&!<sol&!<vol"
+      },
+      "Cliff": {
+        "1": "roche,spectre,acier&@1combat&@2combat,@3combat&!<normal",
+        "2": "acier,feu,psy&@1poison,@1spectre,@1acier&@2poison,@2spectre,@2acier,@3poison,@3spectre,@3acier&!<psy&!<fée",
+        "3": "combat,sol,acier,ténèbres,fée&@1combat,@1sol,@1insecte,@1acier,@1eau,@1plante,@1fée&@2combat,@2sol,@2insecte,@2acier,@2eau,@2plante,@2fée,@3combat,@3sol,@3insecte,@3acier,@3eau,@3plante,@3fée&!<roche&!<ténèbres"
+      },
+      "Arlo": {
+        "1": "combat,vol,poison,spectre,acier,feu,fée&@1vol,@1roche,@1feu&@2vol,@2roche,@2feu,@3vol,@3roche,@3feu&!<insecte",
+        "2": "combat,sol,eau,plante&@1combat,@1sol,@1acier,@1feu,@1eau,@1plante&@2combat,@2sol,@2acier,@2feu,@2eau,@2plante,@3combat,@3sol,@3acier,@3feu,@3eau,@3plante&!<acier&!<sol&!<roche",
+        "3": "combat,vol,poison,spectre,acier,feu,eau,électrik&@1feu&@2feu,@3feu&!<insecte&!<acier"
+      },
+      "Sierra": {
+        "1": "normal,ténèbres&@1spectre,@1ténèbres&@2spectre,@2ténèbres,@3spectre,@3ténèbres&!<spectre",
+        "2": "vol,poison,insecte,acier,feu,plante,électrik,dragon&@1combat,@1feu&@2combat,@2feu,@3combat,@3feu&!<plante&!<acier",
+        "3": "combat,vol,eau,dragon,ténèbres&@1combat,@1sol,@1roche,@1feu,@1eau&@2combat,@2sol,@2roche,@2feu,@2eau,@3combat,@3sol,@3roche,@3feu,@3eau&!<ténèbres&!<feu&!<acier&!<sol"
+      }
+    },
+    "rocketTypedGrunts": {
+      "Normal-type Male Grunt": "vol,poison,spectre,électrik,psy,fée&@1combat,@1vol,@1roche,@1électrik,@1psy,@1glace,@1fée&@2combat,@2vol,@2roche,@2électrik,@2psy,@2glace,@2fée,@3combat,@3vol,@3roche,@3électrik,@3psy,@3glace,@3fée&!<normal&!<combat&!<vol",
+      "Feu-type Female Grunt": "normal,vol,eau,dragon,ténèbres&@1sol,@1roche,@1spectre,@1eau,@1ténèbres&@2sol,@2roche,@2spectre,@2eau,@2ténèbres,@3sol,@3roche,@3spectre,@3eau,@3ténèbres&!<feu&!<spectre&!<sol&!<psy",
+      "Eau-type Female Grunt": "combat,poison,acier,eau,glace&@1combat,@1vol,@1sol,@1roche,@1insecte,@1plante,@1électrik,@1psy,@1fée&@2combat,@2vol,@2sol,@2roche,@2insecte,@2plante,@2électrik,@2psy,@2fée,@3combat,@3vol,@3sol,@3roche,@3insecte,@3plante,@3électrik,@3psy,@3fée&!<eau&!<insecte&!<ténèbres&!<poison&!<glace",
+      "Eau-type Male Grunt": "acier,eau,électrik,dragon&@1roche,@1plante,@1électrik&@2roche,@2plante,@2électrik,@3roche,@3plante,@3électrik&!<eau&!<vol",
+      "Électrik-type Female Grunt": "combat,poison,sol,roche,spectre,acier,électrik,dragon,fée&@1combat,@1sol,@1roche,@1feu,@1eau,@1plante&@2combat,@2sol,@2roche,@2feu,@2eau,@2plante,@3combat,@3sol,@3roche,@3feu,@3eau,@3plante&!<électrik&!<normal&!<roche&!<insecte",
+      "Plante-type Male Grunt": "poison,plante,électrik&@1combat,@1vol,@1poison,@1insecte,@1spectre,@1acier,@1feu,@1psy,@1glace,@1ténèbres,@1fée&@2combat,@2vol,@2poison,@2insecte,@2spectre,@2acier,@2feu,@2psy,@2glace,@2ténèbres,@2fée,@3combat,@3vol,@3poison,@3insecte,@3spectre,@3acier,@3feu,@3psy,@3glace,@3ténèbres,@3fée&!<plante&!<fée&!<acier&!<roche&!<combat&!<spectre",
+      "Glace-type Female Grunt": "normal,eau,fée&@1combat,@1poison,@1sol,@1roche,@1insecte,@1spectre,@1acier,@1feu,@1eau,@1plante,@1électrik,@1ténèbres,@1fée&@2combat,@2poison,@2sol,@2roche,@2insecte,@2spectre,@2acier,@2feu,@2eau,@2plante,@2électrik,@2ténèbres,@2fée,@3combat,@3poison,@3sol,@3roche,@3insecte,@3spectre,@3acier,@3feu,@3eau,@3plante,@3électrik,@3ténèbres,@3fée&!<glace&!<eau&!<sol&!<ténèbres&!<spectre&!<fée&!<roche",
+      "Combat-type Female Grunt": "vol,poison,feu,eau,dragon,fée&@1vol,@1sol,@1spectre,@1eau,@1psy,@1fée&@2vol,@2sol,@2spectre,@2eau,@2psy,@2fée,@3vol,@3sol,@3spectre,@3eau,@3psy,@3fée&!<combat&!<spectre&!<feu",
+      "Poison-type Female Grunt": "vol,poison,spectre,électrik,psy&@1vol,@1sol,@1roche,@1acier,@1feu,@1électrik,@1psy,@1glace&@2vol,@2sol,@2roche,@2acier,@2feu,@2électrik,@2psy,@2glace,@3vol,@3sol,@3roche,@3acier,@3feu,@3électrik,@3psy,@3glace&!<plante&!<poison&!<vol&!<eau&!<fée&!<combat",
+      "Sol-type Male Grunt": "normal,vol,ténèbres,fée&@1insecte,@1spectre,@1eau,@1plante,@1glace,@1dragon,@1ténèbres,@1fée&@2insecte,@2spectre,@2eau,@2plante,@2glace,@2dragon,@2ténèbres,@2fée,@3insecte,@3spectre,@3eau,@3plante,@3glace,@3dragon,@3ténèbres,@3fée&!<sol&!<vol&!<psy&!<dragon&!<spectre",
+      "Vol-type Female Grunt": "vol,spectre,eau&@1vol,@1roche,@1feu,@1eau,@1électrik,@1psy,@1glace,@1dragon,@1fée&@2vol,@2roche,@2feu,@2eau,@2électrik,@2psy,@2glace,@2dragon,@2fée,@3vol,@3roche,@3feu,@3eau,@3électrik,@3psy,@3glace,@3dragon,@3fée&!<normal&!<vol&!<poison&!<sol&!<insecte&!<dragon&!<eau",
+      "Psy-type Male Grunt": "vol,insecte,feu,fée&@1vol,@1poison,@1insecte,@1spectre,@1acier,@1ténèbres,@1fée&@2vol,@2poison,@2insecte,@2spectre,@2acier,@2ténèbres,@2fée,@3vol,@3poison,@3insecte,@3spectre,@3acier,@3ténèbres,@3fée&!<psy&!<fée&!<combat&!<ténèbres",
+      "Insecte-type Male Grunt": "combat,poison,sol,spectre,acier,électrik,dragon&@1vol,@1roche,@1acier,@1feu,@1eau,@1psy&@2vol,@2roche,@2acier,@2feu,@2eau,@2psy,@3vol,@3roche,@3acier,@3feu,@3eau,@3psy&!<insecte&!<poison&!<roche&!<électrik&!<acier",
+      "Roche-type Male Grunt": "combat,spectre,eau&@1combat,@1sol,@1roche,@1acier,@1eau,@1plante,@1électrik,@1glace,@1dragon,@1fée&@2combat,@2sol,@2roche,@2acier,@2eau,@2plante,@2électrik,@2glace,@2dragon,@2fée,@3combat,@3sol,@3roche,@3acier,@3eau,@3plante,@3électrik,@3glace,@3dragon,@3fée&!<insecte&!<roche&!<eau&!<sol&!<acier&!<glace&!<dragon",
+      "Spectre-type Male Grunt": "normal,combat,poison,roche,acier,feu,eau,glace,ténèbres&@1sol,@1roche,@1spectre,@1acier,@1feu,@1psy,@1ténèbres,@1fée&@2sol,@2roche,@2spectre,@2acier,@2feu,@2psy,@2ténèbres,@2fée,@3sol,@3roche,@3spectre,@3acier,@3feu,@3psy,@3ténèbres,@3fée&!<spectre&!<poison&!<ténèbres&!<glace",
+      "Dragon-type Female Grunt": "vol,ténèbres,fée&@1combat,@1vol,@1poison,@1roche,@1insecte,@1glace,@1dragon,@1fée&@2combat,@2vol,@2poison,@2roche,@2insecte,@2glace,@2dragon,@2fée,@3combat,@3vol,@3poison,@3roche,@3insecte,@3glace,@3dragon,@3fée&!<dragon&!<ténèbres&!<plante&!<sol&!<vol",
+      "Ténèbres-type Female Grunt": "combat,acier,eau,plante,ténèbres,fée&@1combat,@1insecte,@1plante,@1électrik,@1glace,@1dragon,@1fée&@2combat,@2insecte,@2plante,@2électrik,@2glace,@2dragon,@2fée,@3combat,@3insecte,@3plante,@3électrik,@3glace,@3dragon,@3fée&!<ténèbres&!<normal&!<eau&!<dragon",
+      "Acier-type Male Grunt": "acier,eau,électrik,psy,ténèbres&@1combat,@1sol,@1spectre,@1feu,@1eau,@1électrik,@1ténèbres&@2combat,@2sol,@2spectre,@2feu,@2eau,@2électrik,@2ténèbres,@3combat,@3sol,@3spectre,@3feu,@3eau,@3électrik,@3ténèbres&!<glace&!<acier&!<psy&!<roche&!<vol",
+      "Fée-type Female Grunt": "roche,spectre,acier,feu,eau,psy,glace&@1combat,@1poison,@1sol,@1roche,@1spectre,@1acier,@1feu,@1psy&@2combat,@2poison,@2sol,@2roche,@2spectre,@2acier,@2feu,@2psy,@3combat,@3poison,@3sol,@3roche,@3spectre,@3acier,@3feu,@3psy&!<fée&!<glace&!<psy&!<poison"
+    },
+    "rocketGenericGrunts": {
+      "Male Grunt": "@1électrik,@1feu,@1vol&@2électrik,@2feu,@2vol,@3électrik,@3feu,@3vol",
+      "Female Grunt": "@1combat,@1électrik,@1fée&@2combat,@2électrik,@2fée,@3combat,@3électrik,@3fée",
+      "Decoy Female Grunt": "@1combat,@1feu,@1vol&@2combat,@2feu,@2vol,@3combat,@3feu,@3vol"
+    },
+    "pvpFilters": {
+      "great": "+maraiste,+forgelina,+corvaillus,+moyade,+pingoléon,+foretress,+altaria,+azumarill,+grodoudou,+aligatueur,+coudlangue,+charmina,+corayon,+flambusard,+lokhlass,+phogleur,+sepiatroce,+terraiste,+téraclope,+limonde,+mélodelfe,+drascore,+courrousinge,+tortank,+florges,+vacilys,+tarpaud,+exagide,+chrysapile,+rongrigou&pc-1500&0-1attaque&3-4défense&3-4pv",
+      "ultra": "+moyade,+corvaillus,+lokhlass,+forgelina,+pingoléon,+sulfura,+aligatueur,+sepiatroce,+florges,+oyacata,+viridium,+regidrago,+coudlangue,+ludicolo,+mélodelfe,+tortank,+gouroutan,+zygarde,+noctunoir,+feunard,+kaimorse,+boumata,+drascore,+courrousinge,+hyporoi,+giratina,+ampibidou,+cresselia,+foretress,+togekiss&pc-2500&0-1attaque&3-4défense&3-4pv",
+      "master": "+zacian,+palkia,+métalosse,+xerneas,+zamazenta,+kyurem,+dialga,+lunala,+reshiram,+zekrom,+marshadow,+kyogre,+lugia,+éthernatos,+necrozma,+yveltal,+ho-oh,+carchacrok,+groudon,+meloetta,+latios,+gromago,+solgaleo,+florges,+léviator,+mewtwo,+jirachi,+keldeo,+zygarde,+latias&0-1attaque&3-4défense&3-4pv"
     },
     "trashClauseCount": 30,
     "tradeClauseCount": 28
   },
   "zh-TW": {
-    "trash": "0*,1*,2*&0*,1*,2*,0-3攻擊,0-3防禦,0-2hp&0*,1*,2*,0-3攻擊,0-2防禦,0-3hp&0*,1*,2*,0-2攻擊,0-3防禦,0-3hp&1-4攻擊,0-2防禦,0-2hp&!4*&!#&!我的最愛&!異色&!傳說的寶可夢&!幻,808,649&!究極異獸&!暗影&!特殊&!亮晶晶&!背卡&!極巨招式1-&!未登錄,超級0&!@特別,圖圖犬&!只限蛋&!距離100-,交換&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&日數-30,交換",
+    "trash": "0*,1*,2*&0*,1*,2*,0-3攻擊,0-3防禦,0-2hp&0*,1*,2*,0-3攻擊,0-2防禦,0-3hp&0*,1*,2*,0-2攻擊,0-3防禦,0-3hp&1-4攻擊,0-2防禦,0-2hp&!4*&!#&!我的最愛&!異色&!傳說的寶可夢&!幻,美錄坦,蓋諾賽克特&!究極異獸&!暗影&!特殊&!亮晶晶&!背卡&!極巨招式1-&!未登錄,超級0&!@特別,圖圖犬&!只限蛋&!距離100-,交換&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&日數-30,交換",
     "trade": "0*,1*,2*&0*,1*,2*,0-3攻擊,0-3防禦,0-2hp&0*,1*,2*,0-3攻擊,0-2防禦,0-3hp&0*,1*,2*,0-2攻擊,0-3防禦,0-3hp&1-4攻擊,0-2防禦,0-2hp&!交換&!暗影&!亮晶晶&!幻,808,809&!#&!傳說的寶可夢&!究極異獸&!異色&!特殊&!淨化&!背卡&!我的最愛&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!極巨招式1-&!xxl&!xl&!@特別&日數-30&距離0-",
     "sort": "",
     "prestaged": "#Trade,#Fern-Tausch&!交換&!暗影&!亮晶晶&!幻,808,809",
     "gift": "異色,傳說的寶可夢,究極異獸,特殊,背卡&!交換&!暗影&!幻,808,809&!亮晶晶&!4*&!我的最愛&!@特別&!#,#Trade,#Fern-Tausch",
-    "shadowCheap": "暗影&糖果距離1&!異色&!亮晶晶&!@特別&!#",
-    "shadowSafe": "暗影&!傳說的寶可夢&!幻&!究極異獸&!4*&!異色&!亮晶晶&!特殊&!@特別&!+象牙豬&!+暴飛龍&!+快龍&!+巨金怪&!+怪力&!+超夢&!+巨沼怪&!+火焰鳥&!+雷公&!+電擊魔獸&!+自爆磁怪&!+班基拉斯&!+瑪狃拉&!+鳳王&!+炎帝&!+火焰雞&!+沙奈朵&!+鐵掌力士&!+閃電鳥&!+拉帝歐斯&!+噴火龍&!+倫琴貓&!+巨蔓藤&!+蜥蜴王&!+妙蛙花&!+大力鱷&!+暴鯉龍&!+凱羅斯&!+巨鉗螳螂&!+洛奇亞&!+烏鴉頭頭&!+姆克鷹&!+黑魯加&!+火爆獸&!+風速狗&!+鴨嘴炎獸&!+土台龜&!+泥偶巨人&!+胡地&!+化石翼龍&!+波士可多拉&!+艾路雷朵&!+椰蛋樹&!+布魯皇&!+拉帝亞斯",
+    "shadowCheap": "暗影&糖果距離1&!異色&!@特別&!#",
+    "shadowSafe": "暗影&!傳說的寶可夢&!幻&!究極異獸&!4*&!異色&!特殊&!@特別&!+帝牙盧卡&!+帕路奇亞&!+席多藍恩&!+固拉多&!+戰槌龍&!+暴飛龍&!+超夢&!+甲賀忍蛙&!+三首惡龍&!+達克萊伊&!+銃嘴大鳥&!+鍬農炮蟲&!+怪顎龍&!+修建老匠&!+達摩狒狒&!+水晶燈火靈&!+龍頭地鼠&!+雷吉奇卡斯&!+龐岩怪&!+蓋歐卡&!+象牙豬&!+電擊魔獸&!+自爆磁怪&!+烈咬陸鯊&!+超甲狂犀&!+巨金怪&!+班基拉斯&!+火焰雞&!+鳳王&!+雷公&!+沙奈朵&!+巨沼怪&!+快龍&!+火焰鳥&!+耿鬼&!+怪力&!+土地雲&!+巨鉗蟹&!+妖火紅狐&!+布里卡隆&!+騎拉帝納&!+炎武王&!+烏鴉頭頭&!+拉帝歐斯&!+姆克鷹&!+瑪狃拉&!+鐵螯龍蝦&!+阿勃梭魯&!+鐵掌力士&!+蜥蜴王&!+炎帝&!+化石翼龍&!+閃電鳥",
     "shadowHundoCandidates": "暗影&3-4攻擊&3-4防禦&3-4hp&!4*",
-    "shadowFrustration": "暗影&@遷怒&+象牙豬,+暴飛龍,+快龍,+巨金怪,+怪力,+超夢,+巨沼怪,+火焰鳥,+雷公,+電擊魔獸,+自爆磁怪,+班基拉斯,+瑪狃拉,+鳳王,+炎帝,+火焰雞,+沙奈朵,+鐵掌力士,+閃電鳥,+拉帝歐斯,+噴火龍,+倫琴貓,+巨蔓藤,+蜥蜴王,+妙蛙花,+大力鱷,+暴鯉龍,+凱羅斯,+巨鉗螳螂,+洛奇亞,+烏鴉頭頭,+姆克鷹,+黑魯加,+火爆獸,+風速狗,+鴨嘴炎獸,+土台龜,+泥偶巨人,+胡地,+化石翼龍,+波士可多拉,+艾路雷朵,+椰蛋樹,+布魯皇,+拉帝亞斯",
+    "shadowFrustration": "暗影&@遷怒&+帝牙盧卡,+帕路奇亞,+席多藍恩,+固拉多,+戰槌龍,+暴飛龍,+超夢,+甲賀忍蛙,+三首惡龍,+達克萊伊,+銃嘴大鳥,+鍬農炮蟲,+怪顎龍,+修建老匠,+達摩狒狒,+水晶燈火靈,+龍頭地鼠,+雷吉奇卡斯,+龐岩怪,+蓋歐卡,+象牙豬,+電擊魔獸,+自爆磁怪,+烈咬陸鯊,+超甲狂犀,+巨金怪,+班基拉斯,+火焰雞,+鳳王,+雷公,+沙奈朵,+巨沼怪,+快龍,+火焰鳥,+耿鬼,+怪力,+土地雲,+巨鉗蟹,+妖火紅狐,+布里卡隆,+騎拉帝納,+炎武王,+烏鴉頭頭,+拉帝歐斯,+姆克鷹,+瑪狃拉,+鐵螯龍蝦,+阿勃梭魯,+鐵掌力士,+蜥蜴王,+炎帝,+化石翼龍,+閃電鳥",
     "cheapEvolve": "綠毛蟲,獨角蟲,波波,刺尾蟲,咕妞妞,豆豆鴿,凱西,勇基拉,腕力,豪力,小拳石,隆隆石,鬼斯,鬼斯通,石丸子,地幔岩,搬運小匠,鐵骨土人,蓋蓋蟲,小嘴蝸,小木靈,南瓜精&綠毛蟲,獨角蟲,波波,刺尾蟲,咕妞妞,豆豆鴿,交換&0*,1*,2*&!異色&!特殊&!@特別&!#",
     "dexPlus": "進化&未登錄&!有進化條件",
     "megaEvolve": "超級進化&超級1-2,未登錄",
     "pilotLong": "距離1000-&!交換&!4*&!傳說的寶可夢&!幻&!異色",
     "raidFilters": {
+      "mega": {
+        "BANETTE": "一般,惡&@1惡,@1幽靈&@2惡,@2幽靈,@3惡,@3幽靈&!<幽靈"
+      },
       "lvl5": {
-        "TAPU_KOKO": "(毒,地面,鋼,火,草,電)&(@地面,@毒)"
+        "TAPU_LELE": "鋼,火,超能力&@1幽靈,@1毒,@1鋼&@2幽靈,@2毒,@2鋼,@3幽靈,@3毒,@3鋼&!<超能力&!<妖精"
       },
       "lvl3": {
-        "ORTHWORM": "(鋼,火,水,電)&(@格鬥,@火,@地面)"
+        "ORTHWORM": "鋼,火,水,電&@1格鬥,@1火,@1地面&@2格鬥,@2火,@2地面,@3格鬥,@3火,@3地面&!<鋼"
       },
       "lvl1": {
-        "BELDUM": "(鋼,火,水,電,超能力,惡)&(@惡,@火,@幽靈,@地面)",
-        "SHIELDON": "(格鬥,地面,鋼,水,電)&(@格鬥,@地面,@水)",
-        "HONEDGE": "(一般,鋼,火,水,電,惡)&(@惡,@火,@幽靈,@地面)"
+        "BELDUM": "鋼,火,水,電,超能力,惡&@1惡,@1火,@1幽靈,@1地面&@2惡,@2火,@2幽靈,@2地面,@3惡,@3火,@3幽靈,@3地面&!<鋼&!<超能力",
+        "SHIELDON": "格鬥,地面,鋼,水,電&@1格鬥,@1地面,@1水&@2格鬥,@2地面,@2水,@3格鬥,@3地面,@3水&!<岩石&!<鋼",
+        "HONEDGE": "一般,鋼,火,水,電,惡&@1惡,@1火,@1幽靈,@1地面&@2惡,@2火,@2幽靈,@2地面,@3惡,@3火,@3幽靈,@3地面&!<鋼&!<幽靈"
       },
       "shadow_lvl5": {
-        "LATIOS": "(鋼,超能力,惡,妖精)&(@蟲,@惡,@龍,@妖精,@幽靈,@冰)"
+        "LATIOS": "鋼,超能力,惡,妖精&@1蟲,@1惡,@1龍,@1妖精,@1幽靈,@1冰&@2蟲,@2惡,@2龍,@2妖精,@2幽靈,@2冰,@3蟲,@3惡,@3龍,@3妖精,@3幽靈,@3冰&!<龍&!<超能力"
       },
       "shadow_lvl3": {
-        "MAROWAK": "(一般,岩石,火,水,龍,惡)&(@惡,@幽靈,@地面,@岩石,@水)",
-        "LAPRAS": "(鋼,水,冰)&(@電,@格鬥,@草,@岩石)",
-        "STANTLER": "(岩石,幽靈,鋼)&(@格鬥)"
+        "MAROWAK": "一般,岩石,火,水,龍,惡&@1惡,@1幽靈,@1地面,@1岩石,@1水&@2惡,@2幽靈,@2地面,@2岩石,@2水,@3惡,@3幽靈,@3地面,@3岩石,@3水&!<火&!<幽靈",
+        "LAPRAS": "鋼,水,冰&@1電,@1格鬥,@1草,@1岩石&@2電,@2格鬥,@2草,@2岩石,@3電,@3格鬥,@3草,@3岩石&!<水&!<冰",
+        "STANTLER": "岩石,幽靈,鋼&@1格鬥&@2格鬥,@3格鬥&!<一般"
       },
       "shadow_lvl1": {
-        "DRATINI": "(鋼,妖精)&(@龍,@妖精,@冰)",
-        "GLIGAR": "(飛行)&(@冰,@水)",
-        "CACNEA": "(飛行,毒,蟲,鋼,火,草,龍)&(@蟲,@火,@飛行,@冰,@毒)",
-        "JOLTIK": "(格鬥,毒,地面,幽靈,鋼,火,電,龍,妖精)&(@火,@岩石)"
+        "DRATINI": "鋼,妖精&@1龍,@1妖精,@1冰&@2龍,@2妖精,@2冰,@3龍,@3妖精,@3冰&!<龍",
+        "GLIGAR": "飛行&@1冰,@1水&@2冰,@2水,@3冰,@3水&!<地面&!<飛行",
+        "CACNEA": "飛行,毒,蟲,鋼,火,草,龍&@1蟲,@1火,@1飛行,@1冰,@1毒&@2蟲,@2火,@2飛行,@2冰,@2毒,@3蟲,@3火,@3飛行,@3冰,@3毒&!<草",
+        "JOLTIK": "格鬥,毒,地面,幽靈,鋼,火,電,龍,妖精&@1火,@1岩石&@2火,@2岩石,@3火,@3岩石&!<蟲&!<電"
       }
     },
     "maxBattleFilters": {
       "tier_1": {
-        "BULBASAUR": "(飛行,毒,蟲,幽靈,鋼,火,龍)&(@飛行,@火,@超能力,@冰)&極巨招式1-",
-        "CHARMANDER": "(岩石,火,水,龍)&(@地面,@岩石,@水)&極巨招式1-",
-        "SQUIRTLE": "(水,草,龍)&(@草,@電)&極巨招式1-",
-        "CATERPIE": "(格鬥,飛行,毒,幽靈,鋼,火,妖精)&(@飛行,@岩石,@火)&極巨招式1-",
-        "GROWLITHE": "(岩石,火,水,龍)&(@地面,@岩石,@水)&極巨招式1-",
-        "ABRA": "(鋼,超能力,惡)&(@蟲,@幽靈,@惡)&極巨招式1-",
-        "GASTLY": "(一般,毒,地面,岩石,鋼,惡)&(@地面,@幽靈,@超能力,@惡)&極巨招式1-",
-        "KRABBY": "(水,草,龍)&(@草,@電)&極巨招式1-",
-        "OMANYTE": "(格鬥,鋼,水,草,龍)&(@格鬥,@地面,@草,@電)&極巨招式1-",
-        "KABUTO": "(格鬥,鋼,水,草,龍)&(@格鬥,@地面,@草,@電)&極巨招式1-",
-        "RALTS": "(鋼,火,超能力)&(@毒,@幽靈,@鋼)&極巨招式1-",
-        "SPHEAL": "(鋼,水,冰)&(@格鬥,@岩石,@草,@電)&極巨招式1-",
-        "PIDOVE": "(岩石,幽靈,鋼,電)&(@岩石,@電,@冰)&極巨招式1-",
-        "ROGGENROLA": "(格鬥,地面,鋼)&(@格鬥,@地面,@鋼,@水,@草)&極巨招式1-",
-        "WOOBAT": "(岩石,鋼,電,超能力,惡)&(@岩石,@幽靈,@電,@冰,@惡)&極巨招式1-",
-        "DRILBUR": "(飛行,蟲,草)&(@水,@草,@冰)&極巨招式1-",
-        "TRUBBISH": "(毒,地面,岩石,幽靈,鋼)&(@地面,@超能力)&極巨招式1-",
-        "INKAY": "(鋼,惡,妖精)&(@蟲,@妖精)&極巨招式1-",
-        "BOUNSWEET": "(飛行,毒,蟲,鋼,火,草,龍)&(@飛行,@毒,@蟲,@火,@冰)&極巨招式1-",
-        "GROOKEY": "(飛行,毒,蟲,鋼,火,草,龍)&(@飛行,@毒,@蟲,@火,@冰)&極巨招式1-",
-        "SCORBUNNY": "(岩石,火,水,龍)&(@地面,@岩石,@水)&極巨招式1-",
-        "SOBBLE": "(水,草,龍)&(@草,@電)&極巨招式1-",
-        "SKWOVET": "(岩石,幽靈,鋼)&(@格鬥)&極巨招式1-",
-        "ROOKIDEE": "(岩石,鋼,電)&(@岩石,@電,@冰)&極巨招式1-",
-        "WOOLOO": "(岩石,幽靈,鋼)&(@格鬥)&極巨招式1-",
-        "HATENNA": "(鋼,超能力,惡)&(@蟲,@幽靈,@惡)&極巨招式1-"
+        "BULBASAUR": "飛行,毒,蟲,幽靈,鋼,火,龍&@1飛行,@1火,@1超能力,@1冰&@2飛行,@2火,@2超能力,@2冰,@3飛行,@3火,@3超能力,@3冰&極巨招式1-&!<草&!<毒",
+        "CHARMANDER": "岩石,火,水,龍&@1地面,@1岩石,@1水&@2地面,@2岩石,@2水,@3地面,@3岩石,@3水&極巨招式1-&!<火",
+        "SQUIRTLE": "水,草,龍&@1草,@1電&@2草,@2電,@3草,@3電&極巨招式1-&!<水",
+        "CATERPIE": "格鬥,飛行,毒,幽靈,鋼,火,妖精&@1飛行,@1岩石,@1火&@2飛行,@2岩石,@2火,@3飛行,@3岩石,@3火&極巨招式1-&!<蟲",
+        "GROWLITHE": "岩石,火,水,龍&@1地面,@1岩石,@1水&@2地面,@2岩石,@2水,@3地面,@3岩石,@3水&極巨招式1-&!<火",
+        "ABRA": "鋼,超能力,惡&@1蟲,@1幽靈,@1惡&@2蟲,@2幽靈,@2惡,@3蟲,@3幽靈,@3惡&極巨招式1-&!<超能力",
+        "GASTLY": "一般,毒,地面,岩石,鋼,惡&@1地面,@1幽靈,@1超能力,@1惡&@2地面,@2幽靈,@2超能力,@2惡,@3地面,@3幽靈,@3超能力,@3惡&極巨招式1-&!<幽靈&!<毒",
+        "KRABBY": "水,草,龍&@1草,@1電&@2草,@2電,@3草,@3電&極巨招式1-&!<水",
+        "OMANYTE": "格鬥,鋼,水,草,龍&@1格鬥,@1地面,@1草,@1電&@2格鬥,@2地面,@2草,@2電,@3格鬥,@3地面,@3草,@3電&極巨招式1-&!<岩石&!<水",
+        "KABUTO": "格鬥,鋼,水,草,龍&@1格鬥,@1地面,@1草,@1電&@2格鬥,@2地面,@2草,@2電,@3格鬥,@3地面,@3草,@3電&極巨招式1-&!<岩石&!<水",
+        "RALTS": "鋼,火,超能力&@1毒,@1幽靈,@1鋼&@2毒,@2幽靈,@2鋼,@3毒,@3幽靈,@3鋼&極巨招式1-&!<超能力&!<妖精",
+        "SPHEAL": "鋼,水,冰&@1格鬥,@1岩石,@1草,@1電&@2格鬥,@2岩石,@2草,@2電,@3格鬥,@3岩石,@3草,@3電&極巨招式1-&!<冰&!<水",
+        "PIDOVE": "岩石,幽靈,鋼,電&@1岩石,@1電,@1冰&@2岩石,@2電,@2冰,@3岩石,@3電,@3冰&極巨招式1-&!<一般&!<飛行",
+        "ROGGENROLA": "格鬥,地面,鋼&@1格鬥,@1地面,@1鋼,@1水,@1草&@2格鬥,@2地面,@2鋼,@2水,@2草,@3格鬥,@3地面,@3鋼,@3水,@3草&極巨招式1-&!<岩石",
+        "WOOBAT": "岩石,鋼,電,超能力,惡&@1岩石,@1幽靈,@1電,@1冰,@1惡&@2岩石,@2幽靈,@2電,@2冰,@2惡,@3岩石,@3幽靈,@3電,@3冰,@3惡&極巨招式1-&!<超能力&!<飛行",
+        "DRILBUR": "飛行,蟲,草&@1水,@1草,@1冰&@2水,@2草,@2冰,@3水,@3草,@3冰&極巨招式1-&!<地面",
+        "TRUBBISH": "毒,地面,岩石,幽靈,鋼&@1地面,@1超能力&@2地面,@2超能力,@3地面,@3超能力&極巨招式1-&!<毒",
+        "INKAY": "鋼,惡,妖精&@1蟲,@1妖精&@2蟲,@2妖精,@3蟲,@3妖精&極巨招式1-&!<惡&!<超能力",
+        "BOUNSWEET": "飛行,毒,蟲,鋼,火,草,龍&@1飛行,@1毒,@1蟲,@1火,@1冰&@2飛行,@2毒,@2蟲,@2火,@2冰,@3飛行,@3毒,@3蟲,@3火,@3冰&極巨招式1-&!<草",
+        "GROOKEY": "飛行,毒,蟲,鋼,火,草,龍&@1飛行,@1毒,@1蟲,@1火,@1冰&@2飛行,@2毒,@2蟲,@2火,@2冰,@3飛行,@3毒,@3蟲,@3火,@3冰&極巨招式1-&!<草",
+        "SCORBUNNY": "岩石,火,水,龍&@1地面,@1岩石,@1水&@2地面,@2岩石,@2水,@3地面,@3岩石,@3水&極巨招式1-&!<火",
+        "SOBBLE": "水,草,龍&@1草,@1電&@2草,@2電,@3草,@3電&極巨招式1-&!<水",
+        "SKWOVET": "岩石,幽靈,鋼&@1格鬥&@2格鬥,@3格鬥&極巨招式1-&!<一般",
+        "ROOKIDEE": "岩石,鋼,電&@1岩石,@1電,@1冰&@2岩石,@2電,@2冰,@3岩石,@3電,@3冰&極巨招式1-&!<飛行",
+        "WOOLOO": "岩石,幽靈,鋼&@1格鬥&@2格鬥,@3格鬥&極巨招式1-&!<一般",
+        "HATENNA": "鋼,超能力,惡&@1蟲,@1幽靈,@1惡&@2蟲,@2幽靈,@2惡,@3蟲,@3幽靈,@3惡&極巨招式1-&!<超能力"
       },
       "tier_2": {
-        "MACHOP": "(飛行,毒,蟲,幽靈,超能力,妖精)&(@飛行,@超能力,@妖精)&極巨招式1-",
-        "EEVEE": "(岩石,幽靈,鋼)&(@格鬥)&極巨招式1-",
-        "SHUCKLE": "(格鬥,毒,地面,幽靈,鋼,妖精)&(@岩石,@鋼,@水)&極巨招式1-",
-        "WAILMER": "(水,草,龍)&(@草,@電)&極巨招式1-",
-        "DARUMAKA": "(岩石,火,水,龍)&(@地面,@岩石,@水)&極巨招式1-"
+        "MACHOP": "飛行,毒,蟲,幽靈,超能力,妖精&@1飛行,@1超能力,@1妖精&@2飛行,@2超能力,@2妖精,@3飛行,@3超能力,@3妖精&極巨招式1-&!<格鬥",
+        "EEVEE": "岩石,幽靈,鋼&@1格鬥&@2格鬥,@3格鬥&極巨招式1-&!<一般",
+        "SHUCKLE": "格鬥,毒,地面,幽靈,鋼,妖精&@1岩石,@1鋼,@1水&@2岩石,@2鋼,@2水,@3岩石,@3鋼,@3水&極巨招式1-&!<蟲&!<岩石",
+        "WAILMER": "水,草,龍&@1草,@1電&@2草,@2電,@3草,@3電&極巨招式1-&!<水",
+        "DARUMAKA": "岩石,火,水,龍&@1地面,@1岩石,@1水&@2地面,@2岩石,@2水,@3地面,@3岩石,@3水&極巨招式1-&!<火"
       },
       "tier_3": {
-        "HITMONLEE": "(飛行,毒,蟲,幽靈,超能力,妖精)&(@飛行,@超能力,@妖精)&極巨招式1-",
-        "HITMONCHAN": "(飛行,毒,蟲,幽靈,超能力,妖精)&(@飛行,@超能力,@妖精)&極巨招式1-",
-        "CHANSEY": "(岩石,幽靈,鋼)&(@格鬥)&極巨招式1-",
-        "SABLEYE": "(一般,格鬥,惡,妖精)&(@妖精)&極巨招式1-",
-        "BELDUM": "(鋼,火,水,電,超能力,惡)&(@地面,@幽靈,@火,@惡)&極巨招式1-",
-        "CRYOGONAL": "(鋼,火,水,冰)&(@格鬥,@岩石,@鋼,@火)&極巨招式1-",
-        "PASSIMIAN": "(飛行,毒,蟲,幽靈,超能力,妖精)&(@飛行,@超能力,@妖精)&極巨招式1-",
-        "DRAMPA": "(岩石,幽靈,鋼,妖精)&(@格鬥,@冰,@龍,@妖精)&極巨招式1-",
-        "FALINKS": "(飛行,毒,蟲,幽靈,超能力,妖精)&(@飛行,@超能力,@妖精)&極巨招式1-"
+        "HITMONLEE": "飛行,毒,蟲,幽靈,超能力,妖精&@1飛行,@1超能力,@1妖精&@2飛行,@2超能力,@2妖精,@3飛行,@3超能力,@3妖精&極巨招式1-&!<格鬥",
+        "HITMONCHAN": "飛行,毒,蟲,幽靈,超能力,妖精&@1飛行,@1超能力,@1妖精&@2飛行,@2超能力,@2妖精,@3飛行,@3超能力,@3妖精&極巨招式1-&!<格鬥",
+        "CHANSEY": "岩石,幽靈,鋼&@1格鬥&@2格鬥,@3格鬥&極巨招式1-&!<一般",
+        "SABLEYE": "一般,格鬥,惡,妖精&@1妖精&@2妖精,@3妖精&極巨招式1-&!<惡&!<幽靈",
+        "BELDUM": "鋼,火,水,電,超能力,惡&@1地面,@1幽靈,@1火,@1惡&@2地面,@2幽靈,@2火,@2惡,@3地面,@3幽靈,@3火,@3惡&極巨招式1-&!<鋼&!<超能力",
+        "CRYOGONAL": "鋼,火,水,冰&@1格鬥,@1岩石,@1鋼,@1火&@2格鬥,@2岩石,@2鋼,@2火,@3格鬥,@3岩石,@3鋼,@3火&極巨招式1-&!<冰",
+        "PASSIMIAN": "飛行,毒,蟲,幽靈,超能力,妖精&@1飛行,@1超能力,@1妖精&@2飛行,@2超能力,@2妖精,@3飛行,@3超能力,@3妖精&極巨招式1-&!<格鬥",
+        "DRAMPA": "岩石,幽靈,鋼,妖精&@1格鬥,@1冰,@1龍,@1妖精&@2格鬥,@2冰,@2龍,@2妖精,@3格鬥,@3冰,@3龍,@3妖精&極巨招式1-&!<一般&!<龍",
+        "FALINKS": "飛行,毒,蟲,幽靈,超能力,妖精&@1飛行,@1超能力,@1妖精&@2飛行,@2超能力,@2妖精,@3飛行,@3超能力,@3妖精&極巨招式1-&!<格鬥"
       }
+    },
+    "maxTank": "@1咬住,@1蟲咬,@1居合斬,@1龍息,@1連斬,@1樹葉,@1舌舔,@1鎖定,@1踢倒,@1金屬爪,@1泥巴射擊,@1毒針,@1拍擊,@1精神利刃,@1抓,@1暗影爪,@1電光,@1突襲,@1撞擊,@1電擊,@1藤鞭,@1水槍&極巨招式1-",
+    "rocketLeaders": {
+      "Giovanni": {
+        "1": "岩石,幽靈,鋼&@1格鬥&@2格鬥,@3格鬥&!<一般",
+        "2": "格鬥,地面,幽靈&@1格鬥,@1地面,@1鋼,@1水,@1草,@1超能力,@1冰&@2格鬥,@2地面,@2鋼,@2水,@2草,@2超能力,@2冰,@3格鬥,@3地面,@3鋼,@3水,@3草,@3超能力,@3冰&!<一般&!<毒&!<地面&!<岩石",
+        "3": "飛行&@1水,@1冰&@2水,@2冰,@3水,@3冰&!<地面&!<飛行"
+      },
+      "Cliff": {
+        "1": "岩石,幽靈,鋼&@1格鬥&@2格鬥,@3格鬥&!<一般",
+        "2": "鋼,火,超能力&@1毒,@1幽靈,@1鋼&@2毒,@2幽靈,@2鋼,@3毒,@3幽靈,@3鋼&!<超能力&!<妖精",
+        "3": "格鬥,地面,鋼,惡,妖精&@1格鬥,@1地面,@1蟲,@1鋼,@1水,@1草,@1妖精&@2格鬥,@2地面,@2蟲,@2鋼,@2水,@2草,@2妖精,@3格鬥,@3地面,@3蟲,@3鋼,@3水,@3草,@3妖精&!<岩石&!<惡"
+      },
+      "Arlo": {
+        "1": "格鬥,飛行,毒,幽靈,鋼,火,妖精&@1飛行,@1岩石,@1火&@2飛行,@2岩石,@2火,@3飛行,@3岩石,@3火&!<蟲",
+        "2": "格鬥,地面,水,草&@1格鬥,@1地面,@1鋼,@1火,@1水,@1草&@2格鬥,@2地面,@2鋼,@2火,@2水,@2草,@3格鬥,@3地面,@3鋼,@3火,@3水,@3草&!<鋼&!<地面&!<岩石",
+        "3": "格鬥,飛行,毒,幽靈,鋼,火,水,電&@1火&@2火,@3火&!<蟲&!<鋼"
+      },
+      "Sierra": {
+        "1": "一般,惡&@1幽靈,@1惡&@2幽靈,@2惡,@3幽靈,@3惡&!<幽靈",
+        "2": "飛行,毒,蟲,鋼,火,草,電,龍&@1格鬥,@1火&@2格鬥,@2火,@3格鬥,@3火&!<草&!<鋼",
+        "3": "格鬥,飛行,水,龍,惡&@1格鬥,@1地面,@1岩石,@1火,@1水&@2格鬥,@2地面,@2岩石,@2火,@2水,@3格鬥,@3地面,@3岩石,@3火,@3水&!<惡&!<火&!<鋼&!<地面"
+      }
+    },
+    "rocketTypedGrunts": {
+      "一般-type Male Grunt": "飛行,毒,幽靈,電,超能力,妖精&@1格鬥,@1飛行,@1岩石,@1電,@1超能力,@1冰,@1妖精&@2格鬥,@2飛行,@2岩石,@2電,@2超能力,@2冰,@2妖精,@3格鬥,@3飛行,@3岩石,@3電,@3超能力,@3冰,@3妖精&!<一般&!<格鬥&!<飛行",
+      "火-type Female Grunt": "一般,飛行,水,龍,惡&@1地面,@1岩石,@1幽靈,@1水,@1惡&@2地面,@2岩石,@2幽靈,@2水,@2惡,@3地面,@3岩石,@3幽靈,@3水,@3惡&!<火&!<幽靈&!<地面&!<超能力",
+      "水-type Female Grunt": "格鬥,毒,鋼,水,冰&@1格鬥,@1飛行,@1地面,@1岩石,@1蟲,@1草,@1電,@1超能力,@1妖精&@2格鬥,@2飛行,@2地面,@2岩石,@2蟲,@2草,@2電,@2超能力,@2妖精,@3格鬥,@3飛行,@3地面,@3岩石,@3蟲,@3草,@3電,@3超能力,@3妖精&!<水&!<蟲&!<惡&!<毒&!<冰",
+      "水-type Male Grunt": "鋼,水,電,龍&@1岩石,@1草,@1電&@2岩石,@2草,@2電,@3岩石,@3草,@3電&!<水&!<飛行",
+      "電-type Female Grunt": "格鬥,毒,地面,岩石,幽靈,鋼,電,龍,妖精&@1格鬥,@1地面,@1岩石,@1火,@1水,@1草&@2格鬥,@2地面,@2岩石,@2火,@2水,@2草,@3格鬥,@3地面,@3岩石,@3火,@3水,@3草&!<電&!<一般&!<岩石&!<蟲",
+      "草-type Male Grunt": "毒,草,電&@1格鬥,@1飛行,@1毒,@1蟲,@1幽靈,@1鋼,@1火,@1超能力,@1冰,@1惡,@1妖精&@2格鬥,@2飛行,@2毒,@2蟲,@2幽靈,@2鋼,@2火,@2超能力,@2冰,@2惡,@2妖精,@3格鬥,@3飛行,@3毒,@3蟲,@3幽靈,@3鋼,@3火,@3超能力,@3冰,@3惡,@3妖精&!<草&!<妖精&!<鋼&!<岩石&!<格鬥&!<幽靈",
+      "冰-type Female Grunt": "一般,水,妖精&@1格鬥,@1毒,@1地面,@1岩石,@1蟲,@1幽靈,@1鋼,@1火,@1水,@1草,@1電,@1惡,@1妖精&@2格鬥,@2毒,@2地面,@2岩石,@2蟲,@2幽靈,@2鋼,@2火,@2水,@2草,@2電,@2惡,@2妖精,@3格鬥,@3毒,@3地面,@3岩石,@3蟲,@3幽靈,@3鋼,@3火,@3水,@3草,@3電,@3惡,@3妖精&!<冰&!<水&!<地面&!<惡&!<幽靈&!<妖精&!<岩石",
+      "格鬥-type Female Grunt": "飛行,毒,火,水,龍,妖精&@1飛行,@1地面,@1幽靈,@1水,@1超能力,@1妖精&@2飛行,@2地面,@2幽靈,@2水,@2超能力,@2妖精,@3飛行,@3地面,@3幽靈,@3水,@3超能力,@3妖精&!<格鬥&!<幽靈&!<火",
+      "毒-type Female Grunt": "飛行,毒,幽靈,電,超能力&@1飛行,@1地面,@1岩石,@1鋼,@1火,@1電,@1超能力,@1冰&@2飛行,@2地面,@2岩石,@2鋼,@2火,@2電,@2超能力,@2冰,@3飛行,@3地面,@3岩石,@3鋼,@3火,@3電,@3超能力,@3冰&!<草&!<毒&!<飛行&!<水&!<妖精&!<格鬥",
+      "地面-type Male Grunt": "一般,飛行,惡,妖精&@1蟲,@1幽靈,@1水,@1草,@1冰,@1龍,@1惡,@1妖精&@2蟲,@2幽靈,@2水,@2草,@2冰,@2龍,@2惡,@2妖精,@3蟲,@3幽靈,@3水,@3草,@3冰,@3龍,@3惡,@3妖精&!<地面&!<飛行&!<超能力&!<龍&!<幽靈",
+      "飛行-type Female Grunt": "飛行,幽靈,水&@1飛行,@1岩石,@1火,@1水,@1電,@1超能力,@1冰,@1龍,@1妖精&@2飛行,@2岩石,@2火,@2水,@2電,@2超能力,@2冰,@2龍,@2妖精,@3飛行,@3岩石,@3火,@3水,@3電,@3超能力,@3冰,@3龍,@3妖精&!<一般&!<飛行&!<毒&!<地面&!<蟲&!<龍&!<水",
+      "超能力-type Male Grunt": "飛行,蟲,火,妖精&@1飛行,@1毒,@1蟲,@1幽靈,@1鋼,@1惡,@1妖精&@2飛行,@2毒,@2蟲,@2幽靈,@2鋼,@2惡,@2妖精,@3飛行,@3毒,@3蟲,@3幽靈,@3鋼,@3惡,@3妖精&!<超能力&!<妖精&!<格鬥&!<惡",
+      "蟲-type Male Grunt": "格鬥,毒,地面,幽靈,鋼,電,龍&@1飛行,@1岩石,@1鋼,@1火,@1水,@1超能力&@2飛行,@2岩石,@2鋼,@2火,@2水,@2超能力,@3飛行,@3岩石,@3鋼,@3火,@3水,@3超能力&!<蟲&!<毒&!<岩石&!<電&!<鋼",
+      "岩石-type Male Grunt": "格鬥,幽靈,水&@1格鬥,@1地面,@1岩石,@1鋼,@1水,@1草,@1電,@1冰,@1龍,@1妖精&@2格鬥,@2地面,@2岩石,@2鋼,@2水,@2草,@2電,@2冰,@2龍,@2妖精,@3格鬥,@3地面,@3岩石,@3鋼,@3水,@3草,@3電,@3冰,@3龍,@3妖精&!<蟲&!<岩石&!<水&!<地面&!<鋼&!<冰&!<龍",
+      "幽靈-type Male Grunt": "一般,格鬥,毒,岩石,鋼,火,水,冰,惡&@1地面,@1岩石,@1幽靈,@1鋼,@1火,@1超能力,@1惡,@1妖精&@2地面,@2岩石,@2幽靈,@2鋼,@2火,@2超能力,@2惡,@2妖精,@3地面,@3岩石,@3幽靈,@3鋼,@3火,@3超能力,@3惡,@3妖精&!<幽靈&!<毒&!<惡&!<冰",
+      "龍-type Female Grunt": "飛行,惡,妖精&@1格鬥,@1飛行,@1毒,@1岩石,@1蟲,@1冰,@1龍,@1妖精&@2格鬥,@2飛行,@2毒,@2岩石,@2蟲,@2冰,@2龍,@2妖精,@3格鬥,@3飛行,@3毒,@3岩石,@3蟲,@3冰,@3龍,@3妖精&!<龍&!<惡&!<草&!<地面&!<飛行",
+      "惡-type Female Grunt": "格鬥,鋼,水,草,惡,妖精&@1格鬥,@1蟲,@1草,@1電,@1冰,@1龍,@1妖精&@2格鬥,@2蟲,@2草,@2電,@2冰,@2龍,@2妖精,@3格鬥,@3蟲,@3草,@3電,@3冰,@3龍,@3妖精&!<惡&!<一般&!<水&!<龍",
+      "鋼-type Male Grunt": "鋼,水,電,超能力,惡&@1格鬥,@1地面,@1幽靈,@1火,@1水,@1電,@1惡&@2格鬥,@2地面,@2幽靈,@2火,@2水,@2電,@2惡,@3格鬥,@3地面,@3幽靈,@3火,@3水,@3電,@3惡&!<冰&!<鋼&!<超能力&!<岩石&!<飛行",
+      "妖精-type Female Grunt": "岩石,幽靈,鋼,火,水,超能力,冰&@1格鬥,@1毒,@1地面,@1岩石,@1幽靈,@1鋼,@1火,@1超能力&@2格鬥,@2毒,@2地面,@2岩石,@2幽靈,@2鋼,@2火,@2超能力,@3格鬥,@3毒,@3地面,@3岩石,@3幽靈,@3鋼,@3火,@3超能力&!<妖精&!<冰&!<超能力&!<毒"
+    },
+    "rocketGenericGrunts": {
+      "Male Grunt": "@1電,@1火,@1飛行&@2電,@2火,@2飛行,@3電,@3火,@3飛行",
+      "Female Grunt": "@1格鬥,@1電,@1妖精&@2格鬥,@2電,@2妖精,@3格鬥,@3電,@3妖精",
+      "Decoy Female Grunt": "@1格鬥,@1火,@1飛行&@2格鬥,@2火,@2飛行,@3格鬥,@3火,@3飛行"
+    },
+    "pvpFilters": {
+      "great": "+沼王,+巨鍛匠,+鋼鎧鴉,+胖嘟嘟,+帝王拿波,+佛烈托斯,+七夕青鳥,+瑪力露麗,+胖可丁,+大力鱷,+大舌舔,+恰雷姆,+太陽珊瑚,+烈箭鷹,+拉普拉斯,+海魔獅,+烏賊王,+土王,+彷徨夜靈,+泥巴魚,+皮可西,+龍王蠍,+棄世猴,+水箭龜,+花潔夫人,+搖籃百合,+蚊香蛙皇,+堅盾劍怪,+蟲電寶,+藏飽栗鼠&cp-1500&0-1攻擊&3-4防禦&3-4hp",
+      "ultra": "+胖嘟嘟,+鋼鎧鴉,+拉普拉斯,+巨鍛匠,+帝王拿波,+火焰鳥,+大力鱷,+烏賊王,+花潔夫人,+吃吼霸,+畢力吉翁,+雷吉鐸拉戈,+大舌舔,+樂天河童,+皮可西,+水箭龜,+智揮猩,+基格爾德,+黑夜魔靈,+九尾,+帝牙海獅,+爆焰龜獸,+龍王蠍,+棄世猴,+刺龍王,+騎拉帝納,+電肚蛙,+克雷色利亞,+佛烈托斯,+波克基斯&cp-2500&0-1攻擊&3-4防禦&3-4hp",
+      "master": "+蒼響,+帕路奇亞,+巨金怪,+哲爾尼亞斯,+藏瑪然特,+酋雷姆,+帝牙盧卡,+露奈雅拉,+萊希拉姆,+捷克羅姆,+瑪夏多,+蓋歐卡,+洛奇亞,+無極汰那,+奈克洛茲瑪,+伊裴爾塔爾,+鳳王,+烈咬陸鯊,+固拉多,+美洛耶塔,+拉帝歐斯,+賽富豪,+索爾迦雷歐,+花潔夫人,+暴鯉龍,+超夢,+基拉祈,+凱路迪歐,+基格爾德,+拉帝亞斯&0-1攻擊&3-4防禦&3-4hp"
     },
     "trashClauseCount": 30,
     "tradeClauseCount": 28
   },
   "hi": {
-    "trash": "0*,1*,2*&0*,1*,2*,0-3अटैक,0-3डफ़ेंस,0-2hp&0*,1*,2*,0-3अटैक,0-2डफ़ेंस,0-3hp&0*,1*,2*,0-2अटैक,0-3डफ़ेंस,0-3hp&1-4अटैक,0-2डफ़ेंस,0-2hp&!4*&!#&!पसंदीदा&!शाइनी&!लजेंडर&!मथकल,808,649&!अटाबीट&!शैडो&!कॉट्यूम&!लक&!बैकाउंड&!मैसमूव1-&!नया वकास करं,मेगा0&!@पेशल,मीगल&!सफ़ अंडे&!दूर100-,टड कये गए&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&उ-30,टड कये गए",
+    "trash": "0*,1*,2*&0*,1*,2*,0-3अटैक,0-3डफ़ेंस,0-2hp&0*,1*,2*,0-3अटैक,0-2डफ़ेंस,0-3hp&0*,1*,2*,0-2अटैक,0-3डफ़ेंस,0-3hp&1-4अटैक,0-2डफ़ेंस,0-2hp&!4*&!#&!पसंदीदा&!शाइनी&!लजेंडर&!मथकल,मेटन,जेनेसेट&!अटाबीट&!शैडो&!कॉट्यूम&!लक&!बैकाउंड&!मैसमूव1-&!नया वकास करं,मेगा0&!@पेशल,मीगल&!सफ़ अंडे&!दूर100-,टड कये गए&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&उ-30,टड कये गए",
     "trade": "0*,1*,2*&0*,1*,2*,0-3अटैक,0-3डफ़ेंस,0-2hp&0*,1*,2*,0-3अटैक,0-2डफ़ेंस,0-3hp&0*,1*,2*,0-2अटैक,0-3डफ़ेंस,0-3hp&1-4अटैक,0-2डफ़ेंस,0-2hp&!टड कये गए&!शैडो&!लक&!मथकल,808,809&!#&!लजेंडर&!अटाबीट&!शाइनी&!कॉट्यूम&!शु&!बैकाउंड&!पसंदीदा&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!मैसमूव1-&!xxl&!xl&!@पेशल&उ-30&दूर0-",
     "sort": "",
     "prestaged": "#Trade,#Fern-Tausch&!टड कये गए&!शैडो&!लक&!मथकल,808,809",
     "gift": "शाइनी,लजेंडर,अटाबीट,कॉट्यूम,बैकाउंड&!टड कये गए&!शैडो&!मथकल,808,809&!लक&!4*&!पसंदीदा&!@पेशल&!#,#Trade,#Fern-Tausch",
-    "shadowCheap": "शैडो&कडी km1&!शाइनी&!लक&!@पेशल&!#",
-    "shadowSafe": "शैडो&!लजेंडर&!मथकल&!अटाबीट&!4*&!शाइनी&!लक&!कॉट्यूम&!@पेशल&!+मैमोवाइन&!+सैलामेंस&!+डैगनाइट&!+मेटाोस&!+मचैप&!+यूटू&!+वॉपट&!+मोटस&!+राइको&!+इलटवायर&!+मैनेज़ोन&!+टायरैनटार&!+वीवाइल&!+हो-ओह&!+एंटइ&!+लज़कन&!+गाडेवुआर&!+हरयामा&!+ज़ैपडोस&!+लाटयोस&!+चारज़ाड&!+लसर&!+टैंोथ&!+सेटाइल&!+वीनासॉर&!+फ़रैलगेटर&!+गैराडोस&!+िपंसर&!+सज़ॉर&!+लूगया&!+हॉचो&!+टारैटर&!+हाउंडूम&!+टाइलोज़न&!+आकनाइन&!+मैमॉटर&!+टॉटेरा&!+गोलक&!+आलाकज़ाम&!+ऐरोडैटल&!+ऐॉन&!+गलड&!+एज़ेयूटॉर&!+ैनबुल&!+लाटयास",
+    "shadowCheap": "शैडो&कडी km1&!शाइनी&!@पेशल&!#",
+    "shadowSafe": "शैडो&!लजेंडर&!मथकल&!अटाबीट&!4*&!शाइनी&!कॉट्यूम&!@पेशल&!+डयागा&!+पाकया&!+हीटैन&!+ाउडॉन&!+रैपराडॉस&!+सैलामेंस&!+यूटू&!+ेनंजा&!+हाईडैगन&!+डाकराय&!+टुकनन&!+वाइकावोट&!+टाइरंटम&!+बूडाबडा&!+डारमैनटैन&!+शैंडेयुर&!+एसकाडल&!+रजीगीगस&!+गीगालथ&!+कायोगर&!+मैमोवाइन&!+इलटवायर&!+मैनेज़ोन&!+गारचॉप&!+राइिपरयर&!+मेटाोस&!+टायरैनटार&!+लज़कन&!+हो-ओह&!+राइको&!+गाडेवुआर&!+वॉपट&!+डैगनाइट&!+मोटस&!+गेंगार&!+मचैप&!+लैंडोरस&!+कंगलर&!+डेलफ़ॉस&!+चेसनॉट&!+गराटना&!+एबोर&!+हॉचो&!+लाटयोस&!+टारैटर&!+वीवाइल&!+ॉडॉट&!+ऐसॉल&!+हरयामा&!+सेटाइल&!+एंटइ&!+ऐरोडैटल&!+ज़ैपडोस",
     "shadowHundoCandidates": "शैडो&3-4अटैक&3-4डफ़ेंस&3-4hp&!4*",
-    "shadowFrustration": "शैडो&@टशन&+मैमोवाइन,+सैलामेंस,+डैगनाइट,+मेटाोस,+मचैप,+यूटू,+वॉपट,+मोटस,+राइको,+इलटवायर,+मैनेज़ोन,+टायरैनटार,+वीवाइल,+हो-ओह,+एंटइ,+लज़कन,+गाडेवुआर,+हरयामा,+ज़ैपडोस,+लाटयोस,+चारज़ाड,+लसर,+टैंोथ,+सेटाइल,+वीनासॉर,+फ़रैलगेटर,+गैराडोस,+िपंसर,+सज़ॉर,+लूगया,+हॉचो,+टारैटर,+हाउंडूम,+टाइलोज़न,+आकनाइन,+मैमॉटर,+टॉटेरा,+गोलक,+आलाकज़ाम,+ऐरोडैटल,+ऐॉन,+गलड,+एज़ेयूटॉर,+ैनबुल,+लाटयास",
+    "shadowFrustration": "शैडो&@टशन&+डयागा,+पाकया,+हीटैन,+ाउडॉन,+रैपराडॉस,+सैलामेंस,+यूटू,+ेनंजा,+हाईडैगन,+डाकराय,+टुकनन,+वाइकावोट,+टाइरंटम,+बूडाबडा,+डारमैनटैन,+शैंडेयुर,+एसकाडल,+रजीगीगस,+गीगालथ,+कायोगर,+मैमोवाइन,+इलटवायर,+मैनेज़ोन,+गारचॉप,+राइिपरयर,+मेटाोस,+टायरैनटार,+लज़कन,+हो-ओह,+राइको,+गाडेवुआर,+वॉपट,+डैगनाइट,+मोटस,+गेंगार,+मचैप,+लैंडोरस,+कंगलर,+डेलफ़ॉस,+चेसनॉट,+गराटना,+एबोर,+हॉचो,+लाटयोस,+टारैटर,+वीवाइल,+ॉडॉट,+ऐसॉल,+हरयामा,+सेटाइल,+एंटइ,+ऐरोडैटल,+ज़ैपडोस",
     "cheapEvolve": "कटरपी,वीडल,िपजी,वमपल,हमर,िपडव,आबरा,काडाबरा,मचॉप,मचोक,जयोडूड,ैवलर,गैटल,हॉटर,रॉगेनरोला,बोडोर,टबर,गडर,करालाट,शेलमेट,फ़ैंटप,पंपकबू&कटरपी,वीडल,िपजी,वमपल,हमर,िपडव,टड कये गए&0*,1*,2*&!शाइनी&!कॉट्यूम&!@पेशल&!#",
     "dexPlus": "वकसत&नया वकास करं&!इवॉववेट",
     "megaEvolve": "मेगा एवॉव&मेगा1-2,नया वकास करं",
     "pilotLong": "दूर1000-&!टड कये गए&!4*&!लजेंडर&!मथकल&!शाइनी",
     "raidFilters": {
+      "mega": {
+        "BANETTE": "नॉमल,डाक&@1डाक,@1घोट&@2डाक,@2घोट,@3डाक,@3घोट&!<घोट"
+      },
       "lvl5": {
-        "TAPU_KOKO": "(पॉइज़न,ाउंड,टल,फ़ायर,ास,इलटक)&(@ाउंड,@पॉइज़न)"
+        "TAPU_LELE": "टल,फ़ायर,साइकक&@1घोट,@1पॉइज़न,@1टल&@2घोट,@2पॉइज़न,@2टल,@3घोट,@3पॉइज़न,@3टल&!<साइकक&!<फ़ेर"
       },
       "lvl3": {
-        "ORTHWORM": "(टल,फ़ायर,वॉटर,इलटक)&(@फ़ाइटंग,@फ़ायर,@ाउंड)"
+        "ORTHWORM": "टल,फ़ायर,वॉटर,इलटक&@1फ़ाइटंग,@1फ़ायर,@1ाउंड&@2फ़ाइटंग,@2फ़ायर,@2ाउंड,@3फ़ाइटंग,@3फ़ायर,@3ाउंड&!<टल"
       },
       "lvl1": {
-        "BELDUM": "(टल,फ़ायर,वॉटर,इलटक,साइकक,डाक)&(@डाक,@फ़ायर,@घोट,@ाउंड)",
-        "SHIELDON": "(फ़ाइटंग,ाउंड,टल,वॉटर,इलटक)&(@फ़ाइटंग,@ाउंड,@वॉटर)",
-        "HONEDGE": "(नॉमल,टल,फ़ायर,वॉटर,इलटक,डाक)&(@डाक,@फ़ायर,@घोट,@ाउंड)"
+        "BELDUM": "टल,फ़ायर,वॉटर,इलटक,साइकक,डाक&@1डाक,@1फ़ायर,@1घोट,@1ाउंड&@2डाक,@2फ़ायर,@2घोट,@2ाउंड,@3डाक,@3फ़ायर,@3घोट,@3ाउंड&!<टल&!<साइकक",
+        "SHIELDON": "फ़ाइटंग,ाउंड,टल,वॉटर,इलटक&@1फ़ाइटंग,@1ाउंड,@1वॉटर&@2फ़ाइटंग,@2ाउंड,@2वॉटर,@3फ़ाइटंग,@3ाउंड,@3वॉटर&!<रॉक&!<टल",
+        "HONEDGE": "नॉमल,टल,फ़ायर,वॉटर,इलटक,डाक&@1डाक,@1फ़ायर,@1घोट,@1ाउंड&@2डाक,@2फ़ायर,@2घोट,@2ाउंड,@3डाक,@3फ़ायर,@3घोट,@3ाउंड&!<टल&!<घोट"
       },
       "shadow_lvl5": {
-        "LATIOS": "(टल,साइकक,डाक,फ़ेर)&(@बग,@डाक,@डैगन,@फ़ेर,@घोट,@आइस)"
+        "LATIOS": "टल,साइकक,डाक,फ़ेर&@1बग,@1डाक,@1डैगन,@1फ़ेर,@1घोट,@1आइस&@2बग,@2डाक,@2डैगन,@2फ़ेर,@2घोट,@2आइस,@3बग,@3डाक,@3डैगन,@3फ़ेर,@3घोट,@3आइस&!<डैगन&!<साइकक"
       },
       "shadow_lvl3": {
-        "MAROWAK": "(नॉमल,रॉक,फ़ायर,वॉटर,डैगन,डाक)&(@डाक,@घोट,@ाउंड,@रॉक,@वॉटर)",
-        "LAPRAS": "(टल,वॉटर,आइस)&(@इलटक,@फ़ाइटंग,@ास,@रॉक)",
-        "STANTLER": "(रॉक,घोट,टल)&(@फ़ाइटंग)"
+        "MAROWAK": "नॉमल,रॉक,फ़ायर,वॉटर,डैगन,डाक&@1डाक,@1घोट,@1ाउंड,@1रॉक,@1वॉटर&@2डाक,@2घोट,@2ाउंड,@2रॉक,@2वॉटर,@3डाक,@3घोट,@3ाउंड,@3रॉक,@3वॉटर&!<फ़ायर&!<घोट",
+        "LAPRAS": "टल,वॉटर,आइस&@1इलटक,@1फ़ाइटंग,@1ास,@1रॉक&@2इलटक,@2फ़ाइटंग,@2ास,@2रॉक,@3इलटक,@3फ़ाइटंग,@3ास,@3रॉक&!<वॉटर&!<आइस",
+        "STANTLER": "रॉक,घोट,टल&@1फ़ाइटंग&@2फ़ाइटंग,@3फ़ाइटंग&!<नॉमल"
       },
       "shadow_lvl1": {
-        "DRATINI": "(टल,फ़ेर)&(@डैगन,@फ़ेर,@आइस)",
-        "GLIGAR": "(़लाइंग)&(@आइस,@वॉटर)",
-        "CACNEA": "(़लाइंग,पॉइज़न,बग,टल,फ़ायर,ास,डैगन)&(@बग,@फ़ायर,@़लाइंग,@आइस,@पॉइज़न)",
-        "JOLTIK": "(फ़ाइटंग,पॉइज़न,ाउंड,घोट,टल,फ़ायर,इलटक,डैगन,फ़ेर)&(@फ़ायर,@रॉक)"
+        "DRATINI": "टल,फ़ेर&@1डैगन,@1फ़ेर,@1आइस&@2डैगन,@2फ़ेर,@2आइस,@3डैगन,@3फ़ेर,@3आइस&!<डैगन",
+        "GLIGAR": "़लाइंग&@1आइस,@1वॉटर&@2आइस,@2वॉटर,@3आइस,@3वॉटर&!<ाउंड&!<़लाइंग",
+        "CACNEA": "़लाइंग,पॉइज़न,बग,टल,फ़ायर,ास,डैगन&@1बग,@1फ़ायर,@1़लाइंग,@1आइस,@1पॉइज़न&@2बग,@2फ़ायर,@2़लाइंग,@2आइस,@2पॉइज़न,@3बग,@3फ़ायर,@3़लाइंग,@3आइस,@3पॉइज़न&!<ास",
+        "JOLTIK": "फ़ाइटंग,पॉइज़न,ाउंड,घोट,टल,फ़ायर,इलटक,डैगन,फ़ेर&@1फ़ायर,@1रॉक&@2फ़ायर,@2रॉक,@3फ़ायर,@3रॉक&!<बग&!<इलटक"
       }
     },
     "maxBattleFilters": {
       "tier_1": {
-        "BULBASAUR": "(़लाइंग,पॉइज़न,बग,घोट,टल,फ़ायर,डैगन)&(@़लाइंग,@फ़ायर,@साइकक,@आइस)&मैसमूव1-",
-        "CHARMANDER": "(रॉक,फ़ायर,वॉटर,डैगन)&(@ाउंड,@रॉक,@वॉटर)&मैसमूव1-",
-        "SQUIRTLE": "(वॉटर,ास,डैगन)&(@ास,@इलटक)&मैसमूव1-",
-        "CATERPIE": "(फ़ाइटंग,़लाइंग,पॉइज़न,घोट,टल,फ़ायर,फ़ेर)&(@़लाइंग,@रॉक,@फ़ायर)&मैसमूव1-",
-        "GROWLITHE": "(रॉक,फ़ायर,वॉटर,डैगन)&(@ाउंड,@रॉक,@वॉटर)&मैसमूव1-",
-        "ABRA": "(टल,साइकक,डाक)&(@बग,@घोट,@डाक)&मैसमूव1-",
-        "GASTLY": "(नॉमल,पॉइज़न,ाउंड,रॉक,टल,डाक)&(@ाउंड,@घोट,@साइकक,@डाक)&मैसमूव1-",
-        "KRABBY": "(वॉटर,ास,डैगन)&(@ास,@इलटक)&मैसमूव1-",
-        "OMANYTE": "(फ़ाइटंग,टल,वॉटर,ास,डैगन)&(@फ़ाइटंग,@ाउंड,@ास,@इलटक)&मैसमूव1-",
-        "KABUTO": "(फ़ाइटंग,टल,वॉटर,ास,डैगन)&(@फ़ाइटंग,@ाउंड,@ास,@इलटक)&मैसमूव1-",
-        "RALTS": "(टल,फ़ायर,साइकक)&(@पॉइज़न,@घोट,@टल)&मैसमूव1-",
-        "SPHEAL": "(टल,वॉटर,आइस)&(@फ़ाइटंग,@रॉक,@ास,@इलटक)&मैसमूव1-",
-        "PIDOVE": "(रॉक,घोट,टल,इलटक)&(@रॉक,@इलटक,@आइस)&मैसमूव1-",
-        "ROGGENROLA": "(फ़ाइटंग,ाउंड,टल)&(@फ़ाइटंग,@ाउंड,@टल,@वॉटर,@ास)&मैसमूव1-",
-        "WOOBAT": "(रॉक,टल,इलटक,साइकक,डाक)&(@रॉक,@घोट,@इलटक,@आइस,@डाक)&मैसमूव1-",
-        "DRILBUR": "(़लाइंग,बग,ास)&(@वॉटर,@ास,@आइस)&मैसमूव1-",
-        "TRUBBISH": "(पॉइज़न,ाउंड,रॉक,घोट,टल)&(@ाउंड,@साइकक)&मैसमूव1-",
-        "INKAY": "(टल,डाक,फ़ेर)&(@बग,@फ़ेर)&मैसमूव1-",
-        "BOUNSWEET": "(़लाइंग,पॉइज़न,बग,टल,फ़ायर,ास,डैगन)&(@़लाइंग,@पॉइज़न,@बग,@फ़ायर,@आइस)&मैसमूव1-",
-        "GROOKEY": "(़लाइंग,पॉइज़न,बग,टल,फ़ायर,ास,डैगन)&(@़लाइंग,@पॉइज़न,@बग,@फ़ायर,@आइस)&मैसमूव1-",
-        "SCORBUNNY": "(रॉक,फ़ायर,वॉटर,डैगन)&(@ाउंड,@रॉक,@वॉटर)&मैसमूव1-",
-        "SOBBLE": "(वॉटर,ास,डैगन)&(@ास,@इलटक)&मैसमूव1-",
-        "SKWOVET": "(रॉक,घोट,टल)&(@फ़ाइटंग)&मैसमूव1-",
-        "ROOKIDEE": "(रॉक,टल,इलटक)&(@रॉक,@इलटक,@आइस)&मैसमूव1-",
-        "WOOLOO": "(रॉक,घोट,टल)&(@फ़ाइटंग)&मैसमूव1-",
-        "HATENNA": "(टल,साइकक,डाक)&(@बग,@घोट,@डाक)&मैसमूव1-"
+        "BULBASAUR": "़लाइंग,पॉइज़न,बग,घोट,टल,फ़ायर,डैगन&@1़लाइंग,@1फ़ायर,@1साइकक,@1आइस&@2़लाइंग,@2फ़ायर,@2साइकक,@2आइस,@3़लाइंग,@3फ़ायर,@3साइकक,@3आइस&मैसमूव1-&!<ास&!<पॉइज़न",
+        "CHARMANDER": "रॉक,फ़ायर,वॉटर,डैगन&@1ाउंड,@1रॉक,@1वॉटर&@2ाउंड,@2रॉक,@2वॉटर,@3ाउंड,@3रॉक,@3वॉटर&मैसमूव1-&!<फ़ायर",
+        "SQUIRTLE": "वॉटर,ास,डैगन&@1ास,@1इलटक&@2ास,@2इलटक,@3ास,@3इलटक&मैसमूव1-&!<वॉटर",
+        "CATERPIE": "फ़ाइटंग,़लाइंग,पॉइज़न,घोट,टल,फ़ायर,फ़ेर&@1़लाइंग,@1रॉक,@1फ़ायर&@2़लाइंग,@2रॉक,@2फ़ायर,@3़लाइंग,@3रॉक,@3फ़ायर&मैसमूव1-&!<बग",
+        "GROWLITHE": "रॉक,फ़ायर,वॉटर,डैगन&@1ाउंड,@1रॉक,@1वॉटर&@2ाउंड,@2रॉक,@2वॉटर,@3ाउंड,@3रॉक,@3वॉटर&मैसमूव1-&!<फ़ायर",
+        "ABRA": "टल,साइकक,डाक&@1बग,@1घोट,@1डाक&@2बग,@2घोट,@2डाक,@3बग,@3घोट,@3डाक&मैसमूव1-&!<साइकक",
+        "GASTLY": "नॉमल,पॉइज़न,ाउंड,रॉक,टल,डाक&@1ाउंड,@1घोट,@1साइकक,@1डाक&@2ाउंड,@2घोट,@2साइकक,@2डाक,@3ाउंड,@3घोट,@3साइकक,@3डाक&मैसमूव1-&!<घोट&!<पॉइज़न",
+        "KRABBY": "वॉटर,ास,डैगन&@1ास,@1इलटक&@2ास,@2इलटक,@3ास,@3इलटक&मैसमूव1-&!<वॉटर",
+        "OMANYTE": "फ़ाइटंग,टल,वॉटर,ास,डैगन&@1फ़ाइटंग,@1ाउंड,@1ास,@1इलटक&@2फ़ाइटंग,@2ाउंड,@2ास,@2इलटक,@3फ़ाइटंग,@3ाउंड,@3ास,@3इलटक&मैसमूव1-&!<रॉक&!<वॉटर",
+        "KABUTO": "फ़ाइटंग,टल,वॉटर,ास,डैगन&@1फ़ाइटंग,@1ाउंड,@1ास,@1इलटक&@2फ़ाइटंग,@2ाउंड,@2ास,@2इलटक,@3फ़ाइटंग,@3ाउंड,@3ास,@3इलटक&मैसमूव1-&!<रॉक&!<वॉटर",
+        "RALTS": "टल,फ़ायर,साइकक&@1पॉइज़न,@1घोट,@1टल&@2पॉइज़न,@2घोट,@2टल,@3पॉइज़न,@3घोट,@3टल&मैसमूव1-&!<साइकक&!<फ़ेर",
+        "SPHEAL": "टल,वॉटर,आइस&@1फ़ाइटंग,@1रॉक,@1ास,@1इलटक&@2फ़ाइटंग,@2रॉक,@2ास,@2इलटक,@3फ़ाइटंग,@3रॉक,@3ास,@3इलटक&मैसमूव1-&!<आइस&!<वॉटर",
+        "PIDOVE": "रॉक,घोट,टल,इलटक&@1रॉक,@1इलटक,@1आइस&@2रॉक,@2इलटक,@2आइस,@3रॉक,@3इलटक,@3आइस&मैसमूव1-&!<नॉमल&!<़लाइंग",
+        "ROGGENROLA": "फ़ाइटंग,ाउंड,टल&@1फ़ाइटंग,@1ाउंड,@1टल,@1वॉटर,@1ास&@2फ़ाइटंग,@2ाउंड,@2टल,@2वॉटर,@2ास,@3फ़ाइटंग,@3ाउंड,@3टल,@3वॉटर,@3ास&मैसमूव1-&!<रॉक",
+        "WOOBAT": "रॉक,टल,इलटक,साइकक,डाक&@1रॉक,@1घोट,@1इलटक,@1आइस,@1डाक&@2रॉक,@2घोट,@2इलटक,@2आइस,@2डाक,@3रॉक,@3घोट,@3इलटक,@3आइस,@3डाक&मैसमूव1-&!<साइकक&!<़लाइंग",
+        "DRILBUR": "़लाइंग,बग,ास&@1वॉटर,@1ास,@1आइस&@2वॉटर,@2ास,@2आइस,@3वॉटर,@3ास,@3आइस&मैसमूव1-&!<ाउंड",
+        "TRUBBISH": "पॉइज़न,ाउंड,रॉक,घोट,टल&@1ाउंड,@1साइकक&@2ाउंड,@2साइकक,@3ाउंड,@3साइकक&मैसमूव1-&!<पॉइज़न",
+        "INKAY": "टल,डाक,फ़ेर&@1बग,@1फ़ेर&@2बग,@2फ़ेर,@3बग,@3फ़ेर&मैसमूव1-&!<डाक&!<साइकक",
+        "BOUNSWEET": "़लाइंग,पॉइज़न,बग,टल,फ़ायर,ास,डैगन&@1़लाइंग,@1पॉइज़न,@1बग,@1फ़ायर,@1आइस&@2़लाइंग,@2पॉइज़न,@2बग,@2फ़ायर,@2आइस,@3़लाइंग,@3पॉइज़न,@3बग,@3फ़ायर,@3आइस&मैसमूव1-&!<ास",
+        "GROOKEY": "़लाइंग,पॉइज़न,बग,टल,फ़ायर,ास,डैगन&@1़लाइंग,@1पॉइज़न,@1बग,@1फ़ायर,@1आइस&@2़लाइंग,@2पॉइज़न,@2बग,@2फ़ायर,@2आइस,@3़लाइंग,@3पॉइज़न,@3बग,@3फ़ायर,@3आइस&मैसमूव1-&!<ास",
+        "SCORBUNNY": "रॉक,फ़ायर,वॉटर,डैगन&@1ाउंड,@1रॉक,@1वॉटर&@2ाउंड,@2रॉक,@2वॉटर,@3ाउंड,@3रॉक,@3वॉटर&मैसमूव1-&!<फ़ायर",
+        "SOBBLE": "वॉटर,ास,डैगन&@1ास,@1इलटक&@2ास,@2इलटक,@3ास,@3इलटक&मैसमूव1-&!<वॉटर",
+        "SKWOVET": "रॉक,घोट,टल&@1फ़ाइटंग&@2फ़ाइटंग,@3फ़ाइटंग&मैसमूव1-&!<नॉमल",
+        "ROOKIDEE": "रॉक,टल,इलटक&@1रॉक,@1इलटक,@1आइस&@2रॉक,@2इलटक,@2आइस,@3रॉक,@3इलटक,@3आइस&मैसमूव1-&!<़लाइंग",
+        "WOOLOO": "रॉक,घोट,टल&@1फ़ाइटंग&@2फ़ाइटंग,@3फ़ाइटंग&मैसमूव1-&!<नॉमल",
+        "HATENNA": "टल,साइकक,डाक&@1बग,@1घोट,@1डाक&@2बग,@2घोट,@2डाक,@3बग,@3घोट,@3डाक&मैसमूव1-&!<साइकक"
       },
       "tier_2": {
-        "MACHOP": "(़लाइंग,पॉइज़न,बग,घोट,साइकक,फ़ेर)&(@़लाइंग,@साइकक,@फ़ेर)&मैसमूव1-",
-        "EEVEE": "(रॉक,घोट,टल)&(@फ़ाइटंग)&मैसमूव1-",
-        "SHUCKLE": "(फ़ाइटंग,पॉइज़न,ाउंड,घोट,टल,फ़ेर)&(@रॉक,@टल,@वॉटर)&मैसमूव1-",
-        "WAILMER": "(वॉटर,ास,डैगन)&(@ास,@इलटक)&मैसमूव1-",
-        "DARUMAKA": "(रॉक,फ़ायर,वॉटर,डैगन)&(@ाउंड,@रॉक,@वॉटर)&मैसमूव1-"
+        "MACHOP": "़लाइंग,पॉइज़न,बग,घोट,साइकक,फ़ेर&@1़लाइंग,@1साइकक,@1फ़ेर&@2़लाइंग,@2साइकक,@2फ़ेर,@3़लाइंग,@3साइकक,@3फ़ेर&मैसमूव1-&!<फ़ाइटंग",
+        "EEVEE": "रॉक,घोट,टल&@1फ़ाइटंग&@2फ़ाइटंग,@3फ़ाइटंग&मैसमूव1-&!<नॉमल",
+        "SHUCKLE": "फ़ाइटंग,पॉइज़न,ाउंड,घोट,टल,फ़ेर&@1रॉक,@1टल,@1वॉटर&@2रॉक,@2टल,@2वॉटर,@3रॉक,@3टल,@3वॉटर&मैसमूव1-&!<बग&!<रॉक",
+        "WAILMER": "वॉटर,ास,डैगन&@1ास,@1इलटक&@2ास,@2इलटक,@3ास,@3इलटक&मैसमूव1-&!<वॉटर",
+        "DARUMAKA": "रॉक,फ़ायर,वॉटर,डैगन&@1ाउंड,@1रॉक,@1वॉटर&@2ाउंड,@2रॉक,@2वॉटर,@3ाउंड,@3रॉक,@3वॉटर&मैसमूव1-&!<फ़ायर"
       },
       "tier_3": {
-        "HITMONLEE": "(़लाइंग,पॉइज़न,बग,घोट,साइकक,फ़ेर)&(@़लाइंग,@साइकक,@फ़ेर)&मैसमूव1-",
-        "HITMONCHAN": "(़लाइंग,पॉइज़न,बग,घोट,साइकक,फ़ेर)&(@़लाइंग,@साइकक,@फ़ेर)&मैसमूव1-",
-        "CHANSEY": "(रॉक,घोट,टल)&(@फ़ाइटंग)&मैसमूव1-",
-        "SABLEYE": "(नॉमल,फ़ाइटंग,डाक,फ़ेर)&(@फ़ेर)&मैसमूव1-",
-        "BELDUM": "(टल,फ़ायर,वॉटर,इलटक,साइकक,डाक)&(@ाउंड,@घोट,@फ़ायर,@डाक)&मैसमूव1-",
-        "CRYOGONAL": "(टल,फ़ायर,वॉटर,आइस)&(@फ़ाइटंग,@रॉक,@टल,@फ़ायर)&मैसमूव1-",
-        "PASSIMIAN": "(़लाइंग,पॉइज़न,बग,घोट,साइकक,फ़ेर)&(@़लाइंग,@साइकक,@फ़ेर)&मैसमूव1-",
-        "DRAMPA": "(रॉक,घोट,टल,फ़ेर)&(@फ़ाइटंग,@आइस,@डैगन,@फ़ेर)&मैसमूव1-",
-        "FALINKS": "(़लाइंग,पॉइज़न,बग,घोट,साइकक,फ़ेर)&(@़लाइंग,@साइकक,@फ़ेर)&मैसमूव1-"
+        "HITMONLEE": "़लाइंग,पॉइज़न,बग,घोट,साइकक,फ़ेर&@1़लाइंग,@1साइकक,@1फ़ेर&@2़लाइंग,@2साइकक,@2फ़ेर,@3़लाइंग,@3साइकक,@3फ़ेर&मैसमूव1-&!<फ़ाइटंग",
+        "HITMONCHAN": "़लाइंग,पॉइज़न,बग,घोट,साइकक,फ़ेर&@1़लाइंग,@1साइकक,@1फ़ेर&@2़लाइंग,@2साइकक,@2फ़ेर,@3़लाइंग,@3साइकक,@3फ़ेर&मैसमूव1-&!<फ़ाइटंग",
+        "CHANSEY": "रॉक,घोट,टल&@1फ़ाइटंग&@2फ़ाइटंग,@3फ़ाइटंग&मैसमूव1-&!<नॉमल",
+        "SABLEYE": "नॉमल,फ़ाइटंग,डाक,फ़ेर&@1फ़ेर&@2फ़ेर,@3फ़ेर&मैसमूव1-&!<डाक&!<घोट",
+        "BELDUM": "टल,फ़ायर,वॉटर,इलटक,साइकक,डाक&@1ाउंड,@1घोट,@1फ़ायर,@1डाक&@2ाउंड,@2घोट,@2फ़ायर,@2डाक,@3ाउंड,@3घोट,@3फ़ायर,@3डाक&मैसमूव1-&!<टल&!<साइकक",
+        "CRYOGONAL": "टल,फ़ायर,वॉटर,आइस&@1फ़ाइटंग,@1रॉक,@1टल,@1फ़ायर&@2फ़ाइटंग,@2रॉक,@2टल,@2फ़ायर,@3फ़ाइटंग,@3रॉक,@3टल,@3फ़ायर&मैसमूव1-&!<आइस",
+        "PASSIMIAN": "़लाइंग,पॉइज़न,बग,घोट,साइकक,फ़ेर&@1़लाइंग,@1साइकक,@1फ़ेर&@2़लाइंग,@2साइकक,@2फ़ेर,@3़लाइंग,@3साइकक,@3फ़ेर&मैसमूव1-&!<फ़ाइटंग",
+        "DRAMPA": "रॉक,घोट,टल,फ़ेर&@1फ़ाइटंग,@1आइस,@1डैगन,@1फ़ेर&@2फ़ाइटंग,@2आइस,@2डैगन,@2फ़ेर,@3फ़ाइटंग,@3आइस,@3डैगन,@3फ़ेर&मैसमूव1-&!<नॉमल&!<डैगन",
+        "FALINKS": "़लाइंग,पॉइज़न,बग,घोट,साइकक,फ़ेर&@1़लाइंग,@1साइकक,@1फ़ेर&@2़लाइंग,@2साइकक,@2फ़ेर,@3़लाइंग,@3साइकक,@3फ़ेर&मैसमूव1-&!<फ़ाइटंग"
       }
+    },
+    "maxTank": "@1बाइट,@1बगबाईट,@1कट,@1डैगनेथ,@1युरकटर,@1लफ़ेज,@1लक,@1लॉक-ऑन,@1अड़ंगी,@1मेटललॉ,@1मडशॉट,@1पॉइज़नटंग,@1पाउंड,@1साइकोकट,@1ैच,@1शैडोलॉ,@1पाक,@1सर्ाइज़पंच,@1टैकल,@1थंडरशॉक,@1वाइनवप,@1वॉटरगन&मैसमूव1-",
+    "rocketLeaders": {
+      "Giovanni": {
+        "1": "रॉक,घोट,टल&@1फ़ाइटंग&@2फ़ाइटंग,@3फ़ाइटंग&!<नॉमल",
+        "2": "फ़ाइटंग,ाउंड,घोट&@1फ़ाइटंग,@1ाउंड,@1टल,@1वॉटर,@1ास,@1साइकक,@1आइस&@2फ़ाइटंग,@2ाउंड,@2टल,@2वॉटर,@2ास,@2साइकक,@2आइस,@3फ़ाइटंग,@3ाउंड,@3टल,@3वॉटर,@3ास,@3साइकक,@3आइस&!<नॉमल&!<पॉइज़न&!<ाउंड&!<रॉक",
+        "3": "़लाइंग&@1वॉटर,@1आइस&@2वॉटर,@2आइस,@3वॉटर,@3आइस&!<ाउंड&!<़लाइंग"
+      },
+      "Cliff": {
+        "1": "रॉक,घोट,टल&@1फ़ाइटंग&@2फ़ाइटंग,@3फ़ाइटंग&!<नॉमल",
+        "2": "टल,फ़ायर,साइकक&@1पॉइज़न,@1घोट,@1टल&@2पॉइज़न,@2घोट,@2टल,@3पॉइज़न,@3घोट,@3टल&!<साइकक&!<फ़ेर",
+        "3": "फ़ाइटंग,ाउंड,टल,डाक,फ़ेर&@1फ़ाइटंग,@1ाउंड,@1बग,@1टल,@1वॉटर,@1ास,@1फ़ेर&@2फ़ाइटंग,@2ाउंड,@2बग,@2टल,@2वॉटर,@2ास,@2फ़ेर,@3फ़ाइटंग,@3ाउंड,@3बग,@3टल,@3वॉटर,@3ास,@3फ़ेर&!<रॉक&!<डाक"
+      },
+      "Arlo": {
+        "1": "फ़ाइटंग,़लाइंग,पॉइज़न,घोट,टल,फ़ायर,फ़ेर&@1़लाइंग,@1रॉक,@1फ़ायर&@2़लाइंग,@2रॉक,@2फ़ायर,@3़लाइंग,@3रॉक,@3फ़ायर&!<बग",
+        "2": "फ़ाइटंग,ाउंड,वॉटर,ास&@1फ़ाइटंग,@1ाउंड,@1टल,@1फ़ायर,@1वॉटर,@1ास&@2फ़ाइटंग,@2ाउंड,@2टल,@2फ़ायर,@2वॉटर,@2ास,@3फ़ाइटंग,@3ाउंड,@3टल,@3फ़ायर,@3वॉटर,@3ास&!<टल&!<ाउंड&!<रॉक",
+        "3": "फ़ाइटंग,़लाइंग,पॉइज़न,घोट,टल,फ़ायर,वॉटर,इलटक&@1फ़ायर&@2फ़ायर,@3फ़ायर&!<बग&!<टल"
+      },
+      "Sierra": {
+        "1": "नॉमल,डाक&@1घोट,@1डाक&@2घोट,@2डाक,@3घोट,@3डाक&!<घोट",
+        "2": "़लाइंग,पॉइज़न,बग,टल,फ़ायर,ास,इलटक,डैगन&@1फ़ाइटंग,@1फ़ायर&@2फ़ाइटंग,@2फ़ायर,@3फ़ाइटंग,@3फ़ायर&!<ास&!<टल",
+        "3": "फ़ाइटंग,़लाइंग,वॉटर,डैगन,डाक&@1फ़ाइटंग,@1ाउंड,@1रॉक,@1फ़ायर,@1वॉटर&@2फ़ाइटंग,@2ाउंड,@2रॉक,@2फ़ायर,@2वॉटर,@3फ़ाइटंग,@3ाउंड,@3रॉक,@3फ़ायर,@3वॉटर&!<डाक&!<फ़ायर&!<टल&!<ाउंड"
+      }
+    },
+    "rocketTypedGrunts": {
+      "नॉमल-type Male Grunt": "़लाइंग,पॉइज़न,घोट,इलटक,साइकक,फ़ेर&@1फ़ाइटंग,@1़लाइंग,@1रॉक,@1इलटक,@1साइकक,@1आइस,@1फ़ेर&@2फ़ाइटंग,@2़लाइंग,@2रॉक,@2इलटक,@2साइकक,@2आइस,@2फ़ेर,@3फ़ाइटंग,@3़लाइंग,@3रॉक,@3इलटक,@3साइकक,@3आइस,@3फ़ेर&!<नॉमल&!<फ़ाइटंग&!<़लाइंग",
+      "फ़ायर-type Female Grunt": "नॉमल,़लाइंग,वॉटर,डैगन,डाक&@1ाउंड,@1रॉक,@1घोट,@1वॉटर,@1डाक&@2ाउंड,@2रॉक,@2घोट,@2वॉटर,@2डाक,@3ाउंड,@3रॉक,@3घोट,@3वॉटर,@3डाक&!<फ़ायर&!<घोट&!<ाउंड&!<साइकक",
+      "वॉटर-type Female Grunt": "फ़ाइटंग,पॉइज़न,टल,वॉटर,आइस&@1फ़ाइटंग,@1़लाइंग,@1ाउंड,@1रॉक,@1बग,@1ास,@1इलटक,@1साइकक,@1फ़ेर&@2फ़ाइटंग,@2़लाइंग,@2ाउंड,@2रॉक,@2बग,@2ास,@2इलटक,@2साइकक,@2फ़ेर,@3फ़ाइटंग,@3़लाइंग,@3ाउंड,@3रॉक,@3बग,@3ास,@3इलटक,@3साइकक,@3फ़ेर&!<वॉटर&!<बग&!<डाक&!<पॉइज़न&!<आइस",
+      "वॉटर-type Male Grunt": "टल,वॉटर,इलटक,डैगन&@1रॉक,@1ास,@1इलटक&@2रॉक,@2ास,@2इलटक,@3रॉक,@3ास,@3इलटक&!<वॉटर&!<़लाइंग",
+      "इलटक-type Female Grunt": "फ़ाइटंग,पॉइज़न,ाउंड,रॉक,घोट,टल,इलटक,डैगन,फ़ेर&@1फ़ाइटंग,@1ाउंड,@1रॉक,@1फ़ायर,@1वॉटर,@1ास&@2फ़ाइटंग,@2ाउंड,@2रॉक,@2फ़ायर,@2वॉटर,@2ास,@3फ़ाइटंग,@3ाउंड,@3रॉक,@3फ़ायर,@3वॉटर,@3ास&!<इलटक&!<नॉमल&!<रॉक&!<बग",
+      "ास-type Male Grunt": "पॉइज़न,ास,इलटक&@1फ़ाइटंग,@1़लाइंग,@1पॉइज़न,@1बग,@1घोट,@1टल,@1फ़ायर,@1साइकक,@1आइस,@1डाक,@1फ़ेर&@2फ़ाइटंग,@2़लाइंग,@2पॉइज़न,@2बग,@2घोट,@2टल,@2फ़ायर,@2साइकक,@2आइस,@2डाक,@2फ़ेर,@3फ़ाइटंग,@3़लाइंग,@3पॉइज़न,@3बग,@3घोट,@3टल,@3फ़ायर,@3साइकक,@3आइस,@3डाक,@3फ़ेर&!<ास&!<फ़ेर&!<टल&!<रॉक&!<फ़ाइटंग&!<घोट",
+      "आइस-type Female Grunt": "नॉमल,वॉटर,फ़ेर&@1फ़ाइटंग,@1पॉइज़न,@1ाउंड,@1रॉक,@1बग,@1घोट,@1टल,@1फ़ायर,@1वॉटर,@1ास,@1इलटक,@1डाक,@1फ़ेर&@2फ़ाइटंग,@2पॉइज़न,@2ाउंड,@2रॉक,@2बग,@2घोट,@2टल,@2फ़ायर,@2वॉटर,@2ास,@2इलटक,@2डाक,@2फ़ेर,@3फ़ाइटंग,@3पॉइज़न,@3ाउंड,@3रॉक,@3बग,@3घोट,@3टल,@3फ़ायर,@3वॉटर,@3ास,@3इलटक,@3डाक,@3फ़ेर&!<आइस&!<वॉटर&!<ाउंड&!<डाक&!<घोट&!<फ़ेर&!<रॉक",
+      "फ़ाइटंग-type Female Grunt": "़लाइंग,पॉइज़न,फ़ायर,वॉटर,डैगन,फ़ेर&@1़लाइंग,@1ाउंड,@1घोट,@1वॉटर,@1साइकक,@1फ़ेर&@2़लाइंग,@2ाउंड,@2घोट,@2वॉटर,@2साइकक,@2फ़ेर,@3़लाइंग,@3ाउंड,@3घोट,@3वॉटर,@3साइकक,@3फ़ेर&!<फ़ाइटंग&!<घोट&!<फ़ायर",
+      "पॉइज़न-type Female Grunt": "़लाइंग,पॉइज़न,घोट,इलटक,साइकक&@1़लाइंग,@1ाउंड,@1रॉक,@1टल,@1फ़ायर,@1इलटक,@1साइकक,@1आइस&@2़लाइंग,@2ाउंड,@2रॉक,@2टल,@2फ़ायर,@2इलटक,@2साइकक,@2आइस,@3़लाइंग,@3ाउंड,@3रॉक,@3टल,@3फ़ायर,@3इलटक,@3साइकक,@3आइस&!<ास&!<पॉइज़न&!<़लाइंग&!<वॉटर&!<फ़ेर&!<फ़ाइटंग",
+      "ाउंड-type Male Grunt": "नॉमल,़लाइंग,डाक,फ़ेर&@1बग,@1घोट,@1वॉटर,@1ास,@1आइस,@1डैगन,@1डाक,@1फ़ेर&@2बग,@2घोट,@2वॉटर,@2ास,@2आइस,@2डैगन,@2डाक,@2फ़ेर,@3बग,@3घोट,@3वॉटर,@3ास,@3आइस,@3डैगन,@3डाक,@3फ़ेर&!<ाउंड&!<़लाइंग&!<साइकक&!<डैगन&!<घोट",
+      "़लाइंग-type Female Grunt": "़लाइंग,घोट,वॉटर&@1़लाइंग,@1रॉक,@1फ़ायर,@1वॉटर,@1इलटक,@1साइकक,@1आइस,@1डैगन,@1फ़ेर&@2़लाइंग,@2रॉक,@2फ़ायर,@2वॉटर,@2इलटक,@2साइकक,@2आइस,@2डैगन,@2फ़ेर,@3़लाइंग,@3रॉक,@3फ़ायर,@3वॉटर,@3इलटक,@3साइकक,@3आइस,@3डैगन,@3फ़ेर&!<नॉमल&!<़लाइंग&!<पॉइज़न&!<ाउंड&!<बग&!<डैगन&!<वॉटर",
+      "साइकक-type Male Grunt": "़लाइंग,बग,फ़ायर,फ़ेर&@1़लाइंग,@1पॉइज़न,@1बग,@1घोट,@1टल,@1डाक,@1फ़ेर&@2़लाइंग,@2पॉइज़न,@2बग,@2घोट,@2टल,@2डाक,@2फ़ेर,@3़लाइंग,@3पॉइज़न,@3बग,@3घोट,@3टल,@3डाक,@3फ़ेर&!<साइकक&!<फ़ेर&!<फ़ाइटंग&!<डाक",
+      "बग-type Male Grunt": "फ़ाइटंग,पॉइज़न,ाउंड,घोट,टल,इलटक,डैगन&@1़लाइंग,@1रॉक,@1टल,@1फ़ायर,@1वॉटर,@1साइकक&@2़लाइंग,@2रॉक,@2टल,@2फ़ायर,@2वॉटर,@2साइकक,@3़लाइंग,@3रॉक,@3टल,@3फ़ायर,@3वॉटर,@3साइकक&!<बग&!<पॉइज़न&!<रॉक&!<इलटक&!<टल",
+      "रॉक-type Male Grunt": "फ़ाइटंग,घोट,वॉटर&@1फ़ाइटंग,@1ाउंड,@1रॉक,@1टल,@1वॉटर,@1ास,@1इलटक,@1आइस,@1डैगन,@1फ़ेर&@2फ़ाइटंग,@2ाउंड,@2रॉक,@2टल,@2वॉटर,@2ास,@2इलटक,@2आइस,@2डैगन,@2फ़ेर,@3फ़ाइटंग,@3ाउंड,@3रॉक,@3टल,@3वॉटर,@3ास,@3इलटक,@3आइस,@3डैगन,@3फ़ेर&!<बग&!<रॉक&!<वॉटर&!<ाउंड&!<टल&!<आइस&!<डैगन",
+      "घोट-type Male Grunt": "नॉमल,फ़ाइटंग,पॉइज़न,रॉक,टल,फ़ायर,वॉटर,आइस,डाक&@1ाउंड,@1रॉक,@1घोट,@1टल,@1फ़ायर,@1साइकक,@1डाक,@1फ़ेर&@2ाउंड,@2रॉक,@2घोट,@2टल,@2फ़ायर,@2साइकक,@2डाक,@2फ़ेर,@3ाउंड,@3रॉक,@3घोट,@3टल,@3फ़ायर,@3साइकक,@3डाक,@3फ़ेर&!<घोट&!<पॉइज़न&!<डाक&!<आइस",
+      "डैगन-type Female Grunt": "़लाइंग,डाक,फ़ेर&@1फ़ाइटंग,@1़लाइंग,@1पॉइज़न,@1रॉक,@1बग,@1आइस,@1डैगन,@1फ़ेर&@2फ़ाइटंग,@2़लाइंग,@2पॉइज़न,@2रॉक,@2बग,@2आइस,@2डैगन,@2फ़ेर,@3फ़ाइटंग,@3़लाइंग,@3पॉइज़न,@3रॉक,@3बग,@3आइस,@3डैगन,@3फ़ेर&!<डैगन&!<डाक&!<ास&!<ाउंड&!<़लाइंग",
+      "डाक-type Female Grunt": "फ़ाइटंग,टल,वॉटर,ास,डाक,फ़ेर&@1फ़ाइटंग,@1बग,@1ास,@1इलटक,@1आइस,@1डैगन,@1फ़ेर&@2फ़ाइटंग,@2बग,@2ास,@2इलटक,@2आइस,@2डैगन,@2फ़ेर,@3फ़ाइटंग,@3बग,@3ास,@3इलटक,@3आइस,@3डैगन,@3फ़ेर&!<डाक&!<नॉमल&!<वॉटर&!<डैगन",
+      "टल-type Male Grunt": "टल,वॉटर,इलटक,साइकक,डाक&@1फ़ाइटंग,@1ाउंड,@1घोट,@1फ़ायर,@1वॉटर,@1इलटक,@1डाक&@2फ़ाइटंग,@2ाउंड,@2घोट,@2फ़ायर,@2वॉटर,@2इलटक,@2डाक,@3फ़ाइटंग,@3ाउंड,@3घोट,@3फ़ायर,@3वॉटर,@3इलटक,@3डाक&!<आइस&!<टल&!<साइकक&!<रॉक&!<़लाइंग",
+      "फ़ेर-type Female Grunt": "रॉक,घोट,टल,फ़ायर,वॉटर,साइकक,आइस&@1फ़ाइटंग,@1पॉइज़न,@1ाउंड,@1रॉक,@1घोट,@1टल,@1फ़ायर,@1साइकक&@2फ़ाइटंग,@2पॉइज़न,@2ाउंड,@2रॉक,@2घोट,@2टल,@2फ़ायर,@2साइकक,@3फ़ाइटंग,@3पॉइज़न,@3ाउंड,@3रॉक,@3घोट,@3टल,@3फ़ायर,@3साइकक&!<फ़ेर&!<आइस&!<साइकक&!<पॉइज़न"
+    },
+    "rocketGenericGrunts": {
+      "Male Grunt": "@1इलटक,@1फ़ायर,@1़लाइंग&@2इलटक,@2फ़ायर,@2़लाइंग,@3इलटक,@3फ़ायर,@3़लाइंग",
+      "Female Grunt": "@1फ़ाइटंग,@1इलटक,@1फ़ेर&@2फ़ाइटंग,@2इलटक,@2फ़ेर,@3फ़ाइटंग,@3इलटक,@3फ़ेर",
+      "Decoy Female Grunt": "@1फ़ाइटंग,@1फ़ायर,@1़लाइंग&@2फ़ाइटंग,@2फ़ायर,@2़लाइंग,@3फ़ाइटंग,@3फ़ायर,@3़लाइंग"
+    },
+    "pvpFilters": {
+      "great": "+वैगसायर,+टंकाटन,+कोवनाइट,+जेलसेंट,+एपोलयॉन,+फ़ॉरटस,+ऑटारया,+अज़ूमैरल,+वलटफ़,+फ़रैलगेटर,+लकलक,+मेडीचैम,+कॉसला,+टैलनलम,+लैस,+सीलयो,+मैलामार,+लॉडसायर,+डलॉस,+टनफ़क,+लफ़ेबल,+डािपयॉन,+अनायलप,+लाटॉइस,+लोजेस,+ेडल,+पॉलटोड,+ईजलैश,+चाजाबग,+ीडेट&cp-1500&0-1अटैक&3-4डफ़ेंस&3-4hp",
+      "ultra": "+जेलसेंट,+कोवनाइट,+लैस,+टंकाटन,+एपोलयॉन,+मोटस,+फ़रैलगेटर,+मैलामार,+लोजेस,+डॉनडोज़ो,+वराइिज़यन,+रजीडेगो,+लकलक,+लुडकोलो,+लफ़ेबल,+लाटॉइस,+ओरैंगु,+ज़ाइगाड,+डकनुआर,+नाइनटस,+वॉलरन,+टटोनेटर,+डािपयॉन,+अनायलप,+कंगडा,+गराटना,+बेलबोट,+सेलया,+फ़ॉरटस,+टोगेकस&cp-2500&0-1अटैक&3-4डफ़ेंस&3-4hp",
+      "master": "+ज़ाशयन,+पाकया,+मेटाोस,+ज़नयस,+ज़ामाज़ैंटा,+यूरम,+डयागा,+लुनाला,+रशरैम,+ज़ेोम,+माशैडो,+कायोगर,+लूगया,+इटनेटस,+नैॉ़मा,+इवेटाल,+हो-ओह,+गारचॉप,+ाउडॉन,+मेलोएटा,+लाटयोस,+गोडनगो,+सोलगलयो,+लोजेस,+गैराडोस,+यूटू,+जराची,+कडयो,+ज़ाइगाड,+लाटयास&0-1अटैक&3-4डफ़ेंस&3-4hp"
     },
     "trashClauseCount": 30,
     "tradeClauseCount": 28
   },
   "ja": {
-    "trash": "0*,1*,2*&0*,1*,2*,0-3こうげき,0-3ぼうぎょ,0-2hp&0*,1*,2*,0-3こうげき,0-2ぼうぎょ,0-3hp&0*,1*,2*,0-2こうげき,0-3ぼうぎょ,0-3hp&1-4こうげき,0-2ぼうぎょ,0-2hp&!4*&!#&!お気に入り&!色違い&!伝説のポケモン&!まぼろし,808,649&!ウルトラビースト&!しゃどう&!とくべつ&!キラ&!はいけい&!まっくすわざ1-&!みとうろく,メガ0&!@わざ,ドーブル&!たまごのみ&!きょり100-,こうかん&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&日数-30,こうかん",
+    "trash": "0*,1*,2*&0*,1*,2*,0-3こうげき,0-3ぼうぎょ,0-2hp&0*,1*,2*,0-3こうげき,0-2ぼうぎょ,0-3hp&0*,1*,2*,0-2こうげき,0-3ぼうぎょ,0-3hp&1-4こうげき,0-2ぼうぎょ,0-2hp&!4*&!#&!お気に入り&!色違い&!伝説のポケモン&!まぼろし,メルタン,ゲノセクト&!ウルトラビースト&!しゃどう&!とくべつ&!キラ&!はいけい&!まっくすわざ1-&!みとうろく,メガ0&!@わざ,ドーブル&!たまごのみ&!きょり100-,こうかん&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&日数-30,こうかん",
     "trade": "0*,1*,2*&0*,1*,2*,0-3こうげき,0-3ぼうぎょ,0-2hp&0*,1*,2*,0-3こうげき,0-2ぼうぎょ,0-3hp&0*,1*,2*,0-2こうげき,0-3ぼうぎょ,0-3hp&1-4こうげき,0-2ぼうぎょ,0-2hp&!こうかん&!しゃどう&!キラ&!まぼろし,808,809&!#&!伝説のポケモン&!ウルトラビースト&!色違い&!とくべつ&!らいと&!はいけい&!お気に入り&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!まっくすわざ1-&!xxl&!xl&!@わざ&日数-30&きょり0-",
     "sort": "",
     "prestaged": "#Trade,#Fern-Tausch&!こうかん&!しゃどう&!キラ&!まぼろし,808,809",
     "gift": "色違い,伝説のポケモン,ウルトラビースト,とくべつ,はいけい&!こうかん&!しゃどう&!まぼろし,808,809&!キラ&!4*&!お気に入り&!@わざ&!#,#Trade,#Fern-Tausch",
-    "shadowCheap": "しゃどう&アメ距離1&!色違い&!キラ&!@わざ&!#",
-    "shadowSafe": "しゃどう&!伝説のポケモン&!まぼろし&!ウルトラビースト&!4*&!色違い&!キラ&!とくべつ&!@わざ&!+マンムー&!+ボーマンダ&!+カイリュー&!+メタグロス&!+カイリキー&!+ミュウツー&!+ラグラージ&!+ファイヤー&!+ライコウ&!+エレキブル&!+ジバコイル&!+バンギラス&!+マニューラ&!+ホウオウ&!+エンテイ&!+バシャーモ&!+サーナイト&!+ハリテヤマ&!+サンダー&!+ラティオス&!+リザードン&!+レントラー&!+モジャンボ&!+ジュカイン&!+フシギバナ&!+オーダイル&!+ギャラドス&!+カイロス&!+ハッサム&!+ルギア&!+ドンカラス&!+ムクホーク&!+ヘルガー&!+バクフーン&!+ウインディ&!+ブーバーン&!+ドダイトス&!+ゴルーグ&!+フーディン&!+プテラ&!+ボスゴドラ&!+エルレイド&!+ナッシー&!+グランブル&!+ラティアス",
+    "shadowCheap": "しゃどう&アメ距離1&!色違い&!@わざ&!#",
+    "shadowSafe": "しゃどう&!伝説のポケモン&!まぼろし&!ウルトラビースト&!4*&!色違い&!とくべつ&!@わざ&!+ディアルガ&!+パルキア&!+ヒードラン&!+グラードン&!+ラムパルド&!+ボーマンダ&!+ミュウツー&!+ゲッコウガ&!+サザンドラ&!+ダークライ&!+ドデカバシ&!+クワガノン&!+ガチゴラス&!+ローブシン&!+ヒヒダルマ&!+シャンデラ&!+ドリュウズ&!+レジギガス&!+ギガイアス&!+カイオーガ&!+マンムー&!+エレキブル&!+ジバコイル&!+ガブリアス&!+ドサイドン&!+メタグロス&!+バンギラス&!+バシャーモ&!+ホウオウ&!+ライコウ&!+サーナイト&!+ラグラージ&!+カイリュー&!+ファイヤー&!+ゲンガー&!+カイリキー&!+ランドロス&!+キングラー&!+マフォクシー&!+ブリガロン&!+ギラティナ&!+エンブオー&!+ドンカラス&!+ラティオス&!+ムクホーク&!+マニューラ&!+シザリガー&!+アブソル&!+ハリテヤマ&!+ジュカイン&!+エンテイ&!+プテラ&!+サンダー",
     "shadowHundoCandidates": "しゃどう&3-4こうげき&3-4ぼうぎょ&3-4hp&!4*",
-    "shadowFrustration": "しゃどう&@やつあたり&+マンムー,+ボーマンダ,+カイリュー,+メタグロス,+カイリキー,+ミュウツー,+ラグラージ,+ファイヤー,+ライコウ,+エレキブル,+ジバコイル,+バンギラス,+マニューラ,+ホウオウ,+エンテイ,+バシャーモ,+サーナイト,+ハリテヤマ,+サンダー,+ラティオス,+リザードン,+レントラー,+モジャンボ,+ジュカイン,+フシギバナ,+オーダイル,+ギャラドス,+カイロス,+ハッサム,+ルギア,+ドンカラス,+ムクホーク,+ヘルガー,+バクフーン,+ウインディ,+ブーバーン,+ドダイトス,+ゴルーグ,+フーディン,+プテラ,+ボスゴドラ,+エルレイド,+ナッシー,+グランブル,+ラティアス",
+    "shadowFrustration": "しゃどう&@やつあたり&+ディアルガ,+パルキア,+ヒードラン,+グラードン,+ラムパルド,+ボーマンダ,+ミュウツー,+ゲッコウガ,+サザンドラ,+ダークライ,+ドデカバシ,+クワガノン,+ガチゴラス,+ローブシン,+ヒヒダルマ,+シャンデラ,+ドリュウズ,+レジギガス,+ギガイアス,+カイオーガ,+マンムー,+エレキブル,+ジバコイル,+ガブリアス,+ドサイドン,+メタグロス,+バンギラス,+バシャーモ,+ホウオウ,+ライコウ,+サーナイト,+ラグラージ,+カイリュー,+ファイヤー,+ゲンガー,+カイリキー,+ランドロス,+キングラー,+マフォクシー,+ブリガロン,+ギラティナ,+エンブオー,+ドンカラス,+ラティオス,+ムクホーク,+マニューラ,+シザリガー,+アブソル,+ハリテヤマ,+ジュカイン,+エンテイ,+プテラ,+サンダー",
     "cheapEvolve": "キャタピー,ビードル,ポッポ,ケムッソ,ゴニョニョ,マメパト,ケーシィ,ユンゲラー,ワンリキー,ゴーリキー,イシツブテ,ゴローン,ゴース,ゴースト,ダンゴロ,ガントル,ドッコラー,ドテッコツ,カブルモ,チョボマキ,ボクレー,バケッチャ&キャタピー,ビードル,ポッポ,ケムッソ,ゴニョニョ,マメパト,こうかん&0*,1*,2*&!色違い&!とくべつ&!@わざ&!#",
     "dexPlus": "進化&みとうろく&!じょうけんしんか",
     "megaEvolve": "めがしんか&メガ1-2,みとうろく",
     "pilotLong": "きょり1000-&!こうかん&!4*&!伝説のポケモン&!まぼろし&!色違い",
     "raidFilters": {
+      "mega": {
+        "BANETTE": "ノーマル,あく&@1あく,@1ゴースト&@2あく,@2ゴースト,@3あく,@3ゴースト&!<ゴースト"
+      },
       "lvl5": {
-        "TAPU_KOKO": "(どく,じめん,はがね,ほのお,くさ,でんき)&(@じめん,@どく)"
+        "TAPU_LELE": "はがね,ほのお,エスパー&@1ゴースト,@1どく,@1はがね&@2ゴースト,@2どく,@2はがね,@3ゴースト,@3どく,@3はがね&!<エスパー&!<フェアリー"
       },
       "lvl3": {
-        "ORTHWORM": "(はがね,ほのお,みず,でんき)&(@かくとう,@ほのお,@じめん)"
+        "ORTHWORM": "はがね,ほのお,みず,でんき&@1かくとう,@1ほのお,@1じめん&@2かくとう,@2ほのお,@2じめん,@3かくとう,@3ほのお,@3じめん&!<はがね"
       },
       "lvl1": {
-        "BELDUM": "(はがね,ほのお,みず,でんき,エスパー,あく)&(@あく,@ほのお,@ゴースト,@じめん)",
-        "SHIELDON": "(かくとう,じめん,はがね,みず,でんき)&(@かくとう,@じめん,@みず)",
-        "HONEDGE": "(ノーマル,はがね,ほのお,みず,でんき,あく)&(@あく,@ほのお,@ゴースト,@じめん)"
+        "BELDUM": "はがね,ほのお,みず,でんき,エスパー,あく&@1あく,@1ほのお,@1ゴースト,@1じめん&@2あく,@2ほのお,@2ゴースト,@2じめん,@3あく,@3ほのお,@3ゴースト,@3じめん&!<はがね&!<エスパー",
+        "SHIELDON": "かくとう,じめん,はがね,みず,でんき&@1かくとう,@1じめん,@1みず&@2かくとう,@2じめん,@2みず,@3かくとう,@3じめん,@3みず&!<いわ&!<はがね",
+        "HONEDGE": "ノーマル,はがね,ほのお,みず,でんき,あく&@1あく,@1ほのお,@1ゴースト,@1じめん&@2あく,@2ほのお,@2ゴースト,@2じめん,@3あく,@3ほのお,@3ゴースト,@3じめん&!<はがね&!<ゴースト"
       },
       "shadow_lvl5": {
-        "LATIOS": "(はがね,エスパー,あく,フェアリー)&(@むし,@あく,@ドラゴン,@フェアリー,@ゴースト,@こおり)"
+        "LATIOS": "はがね,エスパー,あく,フェアリー&@1むし,@1あく,@1ドラゴン,@1フェアリー,@1ゴースト,@1こおり&@2むし,@2あく,@2ドラゴン,@2フェアリー,@2ゴースト,@2こおり,@3むし,@3あく,@3ドラゴン,@3フェアリー,@3ゴースト,@3こおり&!<ドラゴン&!<エスパー"
       },
       "shadow_lvl3": {
-        "MAROWAK": "(ノーマル,いわ,ほのお,みず,ドラゴン,あく)&(@あく,@ゴースト,@じめん,@いわ,@みず)",
-        "LAPRAS": "(はがね,みず,こおり)&(@でんき,@かくとう,@くさ,@いわ)",
-        "STANTLER": "(いわ,ゴースト,はがね)&(@かくとう)"
+        "MAROWAK": "ノーマル,いわ,ほのお,みず,ドラゴン,あく&@1あく,@1ゴースト,@1じめん,@1いわ,@1みず&@2あく,@2ゴースト,@2じめん,@2いわ,@2みず,@3あく,@3ゴースト,@3じめん,@3いわ,@3みず&!<ほのお&!<ゴースト",
+        "LAPRAS": "はがね,みず,こおり&@1でんき,@1かくとう,@1くさ,@1いわ&@2でんき,@2かくとう,@2くさ,@2いわ,@3でんき,@3かくとう,@3くさ,@3いわ&!<みず&!<こおり",
+        "STANTLER": "いわ,ゴースト,はがね&@1かくとう&@2かくとう,@3かくとう&!<ノーマル"
       },
       "shadow_lvl1": {
-        "DRATINI": "(はがね,フェアリー)&(@ドラゴン,@フェアリー,@こおり)",
-        "GLIGAR": "(ひこう)&(@こおり,@みず)",
-        "CACNEA": "(ひこう,どく,むし,はがね,ほのお,くさ,ドラゴン)&(@むし,@ほのお,@ひこう,@こおり,@どく)",
-        "JOLTIK": "(かくとう,どく,じめん,ゴースト,はがね,ほのお,でんき,ドラゴン,フェアリー)&(@ほのお,@いわ)"
+        "DRATINI": "はがね,フェアリー&@1ドラゴン,@1フェアリー,@1こおり&@2ドラゴン,@2フェアリー,@2こおり,@3ドラゴン,@3フェアリー,@3こおり&!<ドラゴン",
+        "GLIGAR": "ひこう&@1こおり,@1みず&@2こおり,@2みず,@3こおり,@3みず&!<じめん&!<ひこう",
+        "CACNEA": "ひこう,どく,むし,はがね,ほのお,くさ,ドラゴン&@1むし,@1ほのお,@1ひこう,@1こおり,@1どく&@2むし,@2ほのお,@2ひこう,@2こおり,@2どく,@3むし,@3ほのお,@3ひこう,@3こおり,@3どく&!<くさ",
+        "JOLTIK": "かくとう,どく,じめん,ゴースト,はがね,ほのお,でんき,ドラゴン,フェアリー&@1ほのお,@1いわ&@2ほのお,@2いわ,@3ほのお,@3いわ&!<むし&!<でんき"
       }
     },
     "maxBattleFilters": {
       "tier_1": {
-        "BULBASAUR": "(ひこう,どく,むし,ゴースト,はがね,ほのお,ドラゴン)&(@ひこう,@ほのお,@エスパー,@こおり)&まっくすわざ1-",
-        "CHARMANDER": "(いわ,ほのお,みず,ドラゴン)&(@じめん,@いわ,@みず)&まっくすわざ1-",
-        "SQUIRTLE": "(みず,くさ,ドラゴン)&(@くさ,@でんき)&まっくすわざ1-",
-        "CATERPIE": "(かくとう,ひこう,どく,ゴースト,はがね,ほのお,フェアリー)&(@ひこう,@いわ,@ほのお)&まっくすわざ1-",
-        "GROWLITHE": "(いわ,ほのお,みず,ドラゴン)&(@じめん,@いわ,@みず)&まっくすわざ1-",
-        "ABRA": "(はがね,エスパー,あく)&(@むし,@ゴースト,@あく)&まっくすわざ1-",
-        "GASTLY": "(ノーマル,どく,じめん,いわ,はがね,あく)&(@じめん,@ゴースト,@エスパー,@あく)&まっくすわざ1-",
-        "KRABBY": "(みず,くさ,ドラゴン)&(@くさ,@でんき)&まっくすわざ1-",
-        "OMANYTE": "(かくとう,はがね,みず,くさ,ドラゴン)&(@かくとう,@じめん,@くさ,@でんき)&まっくすわざ1-",
-        "KABUTO": "(かくとう,はがね,みず,くさ,ドラゴン)&(@かくとう,@じめん,@くさ,@でんき)&まっくすわざ1-",
-        "RALTS": "(はがね,ほのお,エスパー)&(@どく,@ゴースト,@はがね)&まっくすわざ1-",
-        "SPHEAL": "(はがね,みず,こおり)&(@かくとう,@いわ,@くさ,@でんき)&まっくすわざ1-",
-        "PIDOVE": "(いわ,ゴースト,はがね,でんき)&(@いわ,@でんき,@こおり)&まっくすわざ1-",
-        "ROGGENROLA": "(かくとう,じめん,はがね)&(@かくとう,@じめん,@はがね,@みず,@くさ)&まっくすわざ1-",
-        "WOOBAT": "(いわ,はがね,でんき,エスパー,あく)&(@いわ,@ゴースト,@でんき,@こおり,@あく)&まっくすわざ1-",
-        "DRILBUR": "(ひこう,むし,くさ)&(@みず,@くさ,@こおり)&まっくすわざ1-",
-        "TRUBBISH": "(どく,じめん,いわ,ゴースト,はがね)&(@じめん,@エスパー)&まっくすわざ1-",
-        "INKAY": "(はがね,あく,フェアリー)&(@むし,@フェアリー)&まっくすわざ1-",
-        "BOUNSWEET": "(ひこう,どく,むし,はがね,ほのお,くさ,ドラゴン)&(@ひこう,@どく,@むし,@ほのお,@こおり)&まっくすわざ1-",
-        "GROOKEY": "(ひこう,どく,むし,はがね,ほのお,くさ,ドラゴン)&(@ひこう,@どく,@むし,@ほのお,@こおり)&まっくすわざ1-",
-        "SCORBUNNY": "(いわ,ほのお,みず,ドラゴン)&(@じめん,@いわ,@みず)&まっくすわざ1-",
-        "SOBBLE": "(みず,くさ,ドラゴン)&(@くさ,@でんき)&まっくすわざ1-",
-        "SKWOVET": "(いわ,ゴースト,はがね)&(@かくとう)&まっくすわざ1-",
-        "ROOKIDEE": "(いわ,はがね,でんき)&(@いわ,@でんき,@こおり)&まっくすわざ1-",
-        "WOOLOO": "(いわ,ゴースト,はがね)&(@かくとう)&まっくすわざ1-",
-        "HATENNA": "(はがね,エスパー,あく)&(@むし,@ゴースト,@あく)&まっくすわざ1-"
+        "BULBASAUR": "ひこう,どく,むし,ゴースト,はがね,ほのお,ドラゴン&@1ひこう,@1ほのお,@1エスパー,@1こおり&@2ひこう,@2ほのお,@2エスパー,@2こおり,@3ひこう,@3ほのお,@3エスパー,@3こおり&まっくすわざ1-&!<くさ&!<どく",
+        "CHARMANDER": "いわ,ほのお,みず,ドラゴン&@1じめん,@1いわ,@1みず&@2じめん,@2いわ,@2みず,@3じめん,@3いわ,@3みず&まっくすわざ1-&!<ほのお",
+        "SQUIRTLE": "みず,くさ,ドラゴン&@1くさ,@1でんき&@2くさ,@2でんき,@3くさ,@3でんき&まっくすわざ1-&!<みず",
+        "CATERPIE": "かくとう,ひこう,どく,ゴースト,はがね,ほのお,フェアリー&@1ひこう,@1いわ,@1ほのお&@2ひこう,@2いわ,@2ほのお,@3ひこう,@3いわ,@3ほのお&まっくすわざ1-&!<むし",
+        "GROWLITHE": "いわ,ほのお,みず,ドラゴン&@1じめん,@1いわ,@1みず&@2じめん,@2いわ,@2みず,@3じめん,@3いわ,@3みず&まっくすわざ1-&!<ほのお",
+        "ABRA": "はがね,エスパー,あく&@1むし,@1ゴースト,@1あく&@2むし,@2ゴースト,@2あく,@3むし,@3ゴースト,@3あく&まっくすわざ1-&!<エスパー",
+        "GASTLY": "ノーマル,どく,じめん,いわ,はがね,あく&@1じめん,@1ゴースト,@1エスパー,@1あく&@2じめん,@2ゴースト,@2エスパー,@2あく,@3じめん,@3ゴースト,@3エスパー,@3あく&まっくすわざ1-&!<ゴースト&!<どく",
+        "KRABBY": "みず,くさ,ドラゴン&@1くさ,@1でんき&@2くさ,@2でんき,@3くさ,@3でんき&まっくすわざ1-&!<みず",
+        "OMANYTE": "かくとう,はがね,みず,くさ,ドラゴン&@1かくとう,@1じめん,@1くさ,@1でんき&@2かくとう,@2じめん,@2くさ,@2でんき,@3かくとう,@3じめん,@3くさ,@3でんき&まっくすわざ1-&!<いわ&!<みず",
+        "KABUTO": "かくとう,はがね,みず,くさ,ドラゴン&@1かくとう,@1じめん,@1くさ,@1でんき&@2かくとう,@2じめん,@2くさ,@2でんき,@3かくとう,@3じめん,@3くさ,@3でんき&まっくすわざ1-&!<いわ&!<みず",
+        "RALTS": "はがね,ほのお,エスパー&@1どく,@1ゴースト,@1はがね&@2どく,@2ゴースト,@2はがね,@3どく,@3ゴースト,@3はがね&まっくすわざ1-&!<エスパー&!<フェアリー",
+        "SPHEAL": "はがね,みず,こおり&@1かくとう,@1いわ,@1くさ,@1でんき&@2かくとう,@2いわ,@2くさ,@2でんき,@3かくとう,@3いわ,@3くさ,@3でんき&まっくすわざ1-&!<こおり&!<みず",
+        "PIDOVE": "いわ,ゴースト,はがね,でんき&@1いわ,@1でんき,@1こおり&@2いわ,@2でんき,@2こおり,@3いわ,@3でんき,@3こおり&まっくすわざ1-&!<ノーマル&!<ひこう",
+        "ROGGENROLA": "かくとう,じめん,はがね&@1かくとう,@1じめん,@1はがね,@1みず,@1くさ&@2かくとう,@2じめん,@2はがね,@2みず,@2くさ,@3かくとう,@3じめん,@3はがね,@3みず,@3くさ&まっくすわざ1-&!<いわ",
+        "WOOBAT": "いわ,はがね,でんき,エスパー,あく&@1いわ,@1ゴースト,@1でんき,@1こおり,@1あく&@2いわ,@2ゴースト,@2でんき,@2こおり,@2あく,@3いわ,@3ゴースト,@3でんき,@3こおり,@3あく&まっくすわざ1-&!<エスパー&!<ひこう",
+        "DRILBUR": "ひこう,むし,くさ&@1みず,@1くさ,@1こおり&@2みず,@2くさ,@2こおり,@3みず,@3くさ,@3こおり&まっくすわざ1-&!<じめん",
+        "TRUBBISH": "どく,じめん,いわ,ゴースト,はがね&@1じめん,@1エスパー&@2じめん,@2エスパー,@3じめん,@3エスパー&まっくすわざ1-&!<どく",
+        "INKAY": "はがね,あく,フェアリー&@1むし,@1フェアリー&@2むし,@2フェアリー,@3むし,@3フェアリー&まっくすわざ1-&!<あく&!<エスパー",
+        "BOUNSWEET": "ひこう,どく,むし,はがね,ほのお,くさ,ドラゴン&@1ひこう,@1どく,@1むし,@1ほのお,@1こおり&@2ひこう,@2どく,@2むし,@2ほのお,@2こおり,@3ひこう,@3どく,@3むし,@3ほのお,@3こおり&まっくすわざ1-&!<くさ",
+        "GROOKEY": "ひこう,どく,むし,はがね,ほのお,くさ,ドラゴン&@1ひこう,@1どく,@1むし,@1ほのお,@1こおり&@2ひこう,@2どく,@2むし,@2ほのお,@2こおり,@3ひこう,@3どく,@3むし,@3ほのお,@3こおり&まっくすわざ1-&!<くさ",
+        "SCORBUNNY": "いわ,ほのお,みず,ドラゴン&@1じめん,@1いわ,@1みず&@2じめん,@2いわ,@2みず,@3じめん,@3いわ,@3みず&まっくすわざ1-&!<ほのお",
+        "SOBBLE": "みず,くさ,ドラゴン&@1くさ,@1でんき&@2くさ,@2でんき,@3くさ,@3でんき&まっくすわざ1-&!<みず",
+        "SKWOVET": "いわ,ゴースト,はがね&@1かくとう&@2かくとう,@3かくとう&まっくすわざ1-&!<ノーマル",
+        "ROOKIDEE": "いわ,はがね,でんき&@1いわ,@1でんき,@1こおり&@2いわ,@2でんき,@2こおり,@3いわ,@3でんき,@3こおり&まっくすわざ1-&!<ひこう",
+        "WOOLOO": "いわ,ゴースト,はがね&@1かくとう&@2かくとう,@3かくとう&まっくすわざ1-&!<ノーマル",
+        "HATENNA": "はがね,エスパー,あく&@1むし,@1ゴースト,@1あく&@2むし,@2ゴースト,@2あく,@3むし,@3ゴースト,@3あく&まっくすわざ1-&!<エスパー"
       },
       "tier_2": {
-        "MACHOP": "(ひこう,どく,むし,ゴースト,エスパー,フェアリー)&(@ひこう,@エスパー,@フェアリー)&まっくすわざ1-",
-        "EEVEE": "(いわ,ゴースト,はがね)&(@かくとう)&まっくすわざ1-",
-        "SHUCKLE": "(かくとう,どく,じめん,ゴースト,はがね,フェアリー)&(@いわ,@はがね,@みず)&まっくすわざ1-",
-        "WAILMER": "(みず,くさ,ドラゴン)&(@くさ,@でんき)&まっくすわざ1-",
-        "DARUMAKA": "(いわ,ほのお,みず,ドラゴン)&(@じめん,@いわ,@みず)&まっくすわざ1-"
+        "MACHOP": "ひこう,どく,むし,ゴースト,エスパー,フェアリー&@1ひこう,@1エスパー,@1フェアリー&@2ひこう,@2エスパー,@2フェアリー,@3ひこう,@3エスパー,@3フェアリー&まっくすわざ1-&!<かくとう",
+        "EEVEE": "いわ,ゴースト,はがね&@1かくとう&@2かくとう,@3かくとう&まっくすわざ1-&!<ノーマル",
+        "SHUCKLE": "かくとう,どく,じめん,ゴースト,はがね,フェアリー&@1いわ,@1はがね,@1みず&@2いわ,@2はがね,@2みず,@3いわ,@3はがね,@3みず&まっくすわざ1-&!<むし&!<いわ",
+        "WAILMER": "みず,くさ,ドラゴン&@1くさ,@1でんき&@2くさ,@2でんき,@3くさ,@3でんき&まっくすわざ1-&!<みず",
+        "DARUMAKA": "いわ,ほのお,みず,ドラゴン&@1じめん,@1いわ,@1みず&@2じめん,@2いわ,@2みず,@3じめん,@3いわ,@3みず&まっくすわざ1-&!<ほのお"
       },
       "tier_3": {
-        "HITMONLEE": "(ひこう,どく,むし,ゴースト,エスパー,フェアリー)&(@ひこう,@エスパー,@フェアリー)&まっくすわざ1-",
-        "HITMONCHAN": "(ひこう,どく,むし,ゴースト,エスパー,フェアリー)&(@ひこう,@エスパー,@フェアリー)&まっくすわざ1-",
-        "CHANSEY": "(いわ,ゴースト,はがね)&(@かくとう)&まっくすわざ1-",
-        "SABLEYE": "(ノーマル,かくとう,あく,フェアリー)&(@フェアリー)&まっくすわざ1-",
-        "BELDUM": "(はがね,ほのお,みず,でんき,エスパー,あく)&(@じめん,@ゴースト,@ほのお,@あく)&まっくすわざ1-",
-        "CRYOGONAL": "(はがね,ほのお,みず,こおり)&(@かくとう,@いわ,@はがね,@ほのお)&まっくすわざ1-",
-        "PASSIMIAN": "(ひこう,どく,むし,ゴースト,エスパー,フェアリー)&(@ひこう,@エスパー,@フェアリー)&まっくすわざ1-",
-        "DRAMPA": "(いわ,ゴースト,はがね,フェアリー)&(@かくとう,@こおり,@ドラゴン,@フェアリー)&まっくすわざ1-",
-        "FALINKS": "(ひこう,どく,むし,ゴースト,エスパー,フェアリー)&(@ひこう,@エスパー,@フェアリー)&まっくすわざ1-"
+        "HITMONLEE": "ひこう,どく,むし,ゴースト,エスパー,フェアリー&@1ひこう,@1エスパー,@1フェアリー&@2ひこう,@2エスパー,@2フェアリー,@3ひこう,@3エスパー,@3フェアリー&まっくすわざ1-&!<かくとう",
+        "HITMONCHAN": "ひこう,どく,むし,ゴースト,エスパー,フェアリー&@1ひこう,@1エスパー,@1フェアリー&@2ひこう,@2エスパー,@2フェアリー,@3ひこう,@3エスパー,@3フェアリー&まっくすわざ1-&!<かくとう",
+        "CHANSEY": "いわ,ゴースト,はがね&@1かくとう&@2かくとう,@3かくとう&まっくすわざ1-&!<ノーマル",
+        "SABLEYE": "ノーマル,かくとう,あく,フェアリー&@1フェアリー&@2フェアリー,@3フェアリー&まっくすわざ1-&!<あく&!<ゴースト",
+        "BELDUM": "はがね,ほのお,みず,でんき,エスパー,あく&@1じめん,@1ゴースト,@1ほのお,@1あく&@2じめん,@2ゴースト,@2ほのお,@2あく,@3じめん,@3ゴースト,@3ほのお,@3あく&まっくすわざ1-&!<はがね&!<エスパー",
+        "CRYOGONAL": "はがね,ほのお,みず,こおり&@1かくとう,@1いわ,@1はがね,@1ほのお&@2かくとう,@2いわ,@2はがね,@2ほのお,@3かくとう,@3いわ,@3はがね,@3ほのお&まっくすわざ1-&!<こおり",
+        "PASSIMIAN": "ひこう,どく,むし,ゴースト,エスパー,フェアリー&@1ひこう,@1エスパー,@1フェアリー&@2ひこう,@2エスパー,@2フェアリー,@3ひこう,@3エスパー,@3フェアリー&まっくすわざ1-&!<かくとう",
+        "DRAMPA": "いわ,ゴースト,はがね,フェアリー&@1かくとう,@1こおり,@1ドラゴン,@1フェアリー&@2かくとう,@2こおり,@2ドラゴン,@2フェアリー,@3かくとう,@3こおり,@3ドラゴン,@3フェアリー&まっくすわざ1-&!<ノーマル&!<ドラゴン",
+        "FALINKS": "ひこう,どく,むし,ゴースト,エスパー,フェアリー&@1ひこう,@1エスパー,@1フェアリー&@2ひこう,@2エスパー,@2フェアリー,@3ひこう,@3エスパー,@3フェアリー&まっくすわざ1-&!<かくとう"
       }
+    },
+    "maxTank": "@1かみつく,@1むしくい,@1いあいぎり,@1りゅうのいぶき,@1れんぞくぎり,@1このは,@1したでなめる,@1ロックオン,@1けたぐり,@1メタルクロー,@1マッドショット,@1どくばり,@1はたく,@1サイコカッター,@1ひっかく,@1シャドークロー,@1スパーク,@1ふいうち,@1たいあたり,@1でんきショック,@1つるのムチ,@1みずでっぽう&まっくすわざ1-",
+    "rocketLeaders": {
+      "Giovanni": {
+        "1": "いわ,ゴースト,はがね&@1かくとう&@2かくとう,@3かくとう&!<ノーマル",
+        "2": "かくとう,じめん,ゴースト&@1かくとう,@1じめん,@1はがね,@1みず,@1くさ,@1エスパー,@1こおり&@2かくとう,@2じめん,@2はがね,@2みず,@2くさ,@2エスパー,@2こおり,@3かくとう,@3じめん,@3はがね,@3みず,@3くさ,@3エスパー,@3こおり&!<ノーマル&!<どく&!<じめん&!<いわ",
+        "3": "ひこう&@1みず,@1こおり&@2みず,@2こおり,@3みず,@3こおり&!<じめん&!<ひこう"
+      },
+      "Cliff": {
+        "1": "いわ,ゴースト,はがね&@1かくとう&@2かくとう,@3かくとう&!<ノーマル",
+        "2": "はがね,ほのお,エスパー&@1どく,@1ゴースト,@1はがね&@2どく,@2ゴースト,@2はがね,@3どく,@3ゴースト,@3はがね&!<エスパー&!<フェアリー",
+        "3": "かくとう,じめん,はがね,あく,フェアリー&@1かくとう,@1じめん,@1むし,@1はがね,@1みず,@1くさ,@1フェアリー&@2かくとう,@2じめん,@2むし,@2はがね,@2みず,@2くさ,@2フェアリー,@3かくとう,@3じめん,@3むし,@3はがね,@3みず,@3くさ,@3フェアリー&!<いわ&!<あく"
+      },
+      "Arlo": {
+        "1": "かくとう,ひこう,どく,ゴースト,はがね,ほのお,フェアリー&@1ひこう,@1いわ,@1ほのお&@2ひこう,@2いわ,@2ほのお,@3ひこう,@3いわ,@3ほのお&!<むし",
+        "2": "かくとう,じめん,みず,くさ&@1かくとう,@1じめん,@1はがね,@1ほのお,@1みず,@1くさ&@2かくとう,@2じめん,@2はがね,@2ほのお,@2みず,@2くさ,@3かくとう,@3じめん,@3はがね,@3ほのお,@3みず,@3くさ&!<はがね&!<じめん&!<いわ",
+        "3": "かくとう,ひこう,どく,ゴースト,はがね,ほのお,みず,でんき&@1ほのお&@2ほのお,@3ほのお&!<むし&!<はがね"
+      },
+      "Sierra": {
+        "1": "ノーマル,あく&@1ゴースト,@1あく&@2ゴースト,@2あく,@3ゴースト,@3あく&!<ゴースト",
+        "2": "ひこう,どく,むし,はがね,ほのお,くさ,でんき,ドラゴン&@1かくとう,@1ほのお&@2かくとう,@2ほのお,@3かくとう,@3ほのお&!<くさ&!<はがね",
+        "3": "かくとう,ひこう,みず,ドラゴン,あく&@1かくとう,@1じめん,@1いわ,@1ほのお,@1みず&@2かくとう,@2じめん,@2いわ,@2ほのお,@2みず,@3かくとう,@3じめん,@3いわ,@3ほのお,@3みず&!<あく&!<ほのお&!<はがね&!<じめん"
+      }
+    },
+    "rocketTypedGrunts": {
+      "ノーマル-type Male Grunt": "ひこう,どく,ゴースト,でんき,エスパー,フェアリー&@1かくとう,@1ひこう,@1いわ,@1でんき,@1エスパー,@1こおり,@1フェアリー&@2かくとう,@2ひこう,@2いわ,@2でんき,@2エスパー,@2こおり,@2フェアリー,@3かくとう,@3ひこう,@3いわ,@3でんき,@3エスパー,@3こおり,@3フェアリー&!<ノーマル&!<かくとう&!<ひこう",
+      "ほのお-type Female Grunt": "ノーマル,ひこう,みず,ドラゴン,あく&@1じめん,@1いわ,@1ゴースト,@1みず,@1あく&@2じめん,@2いわ,@2ゴースト,@2みず,@2あく,@3じめん,@3いわ,@3ゴースト,@3みず,@3あく&!<ほのお&!<ゴースト&!<じめん&!<エスパー",
+      "みず-type Female Grunt": "かくとう,どく,はがね,みず,こおり&@1かくとう,@1ひこう,@1じめん,@1いわ,@1むし,@1くさ,@1でんき,@1エスパー,@1フェアリー&@2かくとう,@2ひこう,@2じめん,@2いわ,@2むし,@2くさ,@2でんき,@2エスパー,@2フェアリー,@3かくとう,@3ひこう,@3じめん,@3いわ,@3むし,@3くさ,@3でんき,@3エスパー,@3フェアリー&!<みず&!<むし&!<あく&!<どく&!<こおり",
+      "みず-type Male Grunt": "はがね,みず,でんき,ドラゴン&@1いわ,@1くさ,@1でんき&@2いわ,@2くさ,@2でんき,@3いわ,@3くさ,@3でんき&!<みず&!<ひこう",
+      "でんき-type Female Grunt": "かくとう,どく,じめん,いわ,ゴースト,はがね,でんき,ドラゴン,フェアリー&@1かくとう,@1じめん,@1いわ,@1ほのお,@1みず,@1くさ&@2かくとう,@2じめん,@2いわ,@2ほのお,@2みず,@2くさ,@3かくとう,@3じめん,@3いわ,@3ほのお,@3みず,@3くさ&!<でんき&!<ノーマル&!<いわ&!<むし",
+      "くさ-type Male Grunt": "どく,くさ,でんき&@1かくとう,@1ひこう,@1どく,@1むし,@1ゴースト,@1はがね,@1ほのお,@1エスパー,@1こおり,@1あく,@1フェアリー&@2かくとう,@2ひこう,@2どく,@2むし,@2ゴースト,@2はがね,@2ほのお,@2エスパー,@2こおり,@2あく,@2フェアリー,@3かくとう,@3ひこう,@3どく,@3むし,@3ゴースト,@3はがね,@3ほのお,@3エスパー,@3こおり,@3あく,@3フェアリー&!<くさ&!<フェアリー&!<はがね&!<いわ&!<かくとう&!<ゴースト",
+      "こおり-type Female Grunt": "ノーマル,みず,フェアリー&@1かくとう,@1どく,@1じめん,@1いわ,@1むし,@1ゴースト,@1はがね,@1ほのお,@1みず,@1くさ,@1でんき,@1あく,@1フェアリー&@2かくとう,@2どく,@2じめん,@2いわ,@2むし,@2ゴースト,@2はがね,@2ほのお,@2みず,@2くさ,@2でんき,@2あく,@2フェアリー,@3かくとう,@3どく,@3じめん,@3いわ,@3むし,@3ゴースト,@3はがね,@3ほのお,@3みず,@3くさ,@3でんき,@3あく,@3フェアリー&!<こおり&!<みず&!<じめん&!<あく&!<ゴースト&!<フェアリー&!<いわ",
+      "かくとう-type Female Grunt": "ひこう,どく,ほのお,みず,ドラゴン,フェアリー&@1ひこう,@1じめん,@1ゴースト,@1みず,@1エスパー,@1フェアリー&@2ひこう,@2じめん,@2ゴースト,@2みず,@2エスパー,@2フェアリー,@3ひこう,@3じめん,@3ゴースト,@3みず,@3エスパー,@3フェアリー&!<かくとう&!<ゴースト&!<ほのお",
+      "どく-type Female Grunt": "ひこう,どく,ゴースト,でんき,エスパー&@1ひこう,@1じめん,@1いわ,@1はがね,@1ほのお,@1でんき,@1エスパー,@1こおり&@2ひこう,@2じめん,@2いわ,@2はがね,@2ほのお,@2でんき,@2エスパー,@2こおり,@3ひこう,@3じめん,@3いわ,@3はがね,@3ほのお,@3でんき,@3エスパー,@3こおり&!<くさ&!<どく&!<ひこう&!<みず&!<フェアリー&!<かくとう",
+      "じめん-type Male Grunt": "ノーマル,ひこう,あく,フェアリー&@1むし,@1ゴースト,@1みず,@1くさ,@1こおり,@1ドラゴン,@1あく,@1フェアリー&@2むし,@2ゴースト,@2みず,@2くさ,@2こおり,@2ドラゴン,@2あく,@2フェアリー,@3むし,@3ゴースト,@3みず,@3くさ,@3こおり,@3ドラゴン,@3あく,@3フェアリー&!<じめん&!<ひこう&!<エスパー&!<ドラゴン&!<ゴースト",
+      "ひこう-type Female Grunt": "ひこう,ゴースト,みず&@1ひこう,@1いわ,@1ほのお,@1みず,@1でんき,@1エスパー,@1こおり,@1ドラゴン,@1フェアリー&@2ひこう,@2いわ,@2ほのお,@2みず,@2でんき,@2エスパー,@2こおり,@2ドラゴン,@2フェアリー,@3ひこう,@3いわ,@3ほのお,@3みず,@3でんき,@3エスパー,@3こおり,@3ドラゴン,@3フェアリー&!<ノーマル&!<ひこう&!<どく&!<じめん&!<むし&!<ドラゴン&!<みず",
+      "エスパー-type Male Grunt": "ひこう,むし,ほのお,フェアリー&@1ひこう,@1どく,@1むし,@1ゴースト,@1はがね,@1あく,@1フェアリー&@2ひこう,@2どく,@2むし,@2ゴースト,@2はがね,@2あく,@2フェアリー,@3ひこう,@3どく,@3むし,@3ゴースト,@3はがね,@3あく,@3フェアリー&!<エスパー&!<フェアリー&!<かくとう&!<あく",
+      "むし-type Male Grunt": "かくとう,どく,じめん,ゴースト,はがね,でんき,ドラゴン&@1ひこう,@1いわ,@1はがね,@1ほのお,@1みず,@1エスパー&@2ひこう,@2いわ,@2はがね,@2ほのお,@2みず,@2エスパー,@3ひこう,@3いわ,@3はがね,@3ほのお,@3みず,@3エスパー&!<むし&!<どく&!<いわ&!<でんき&!<はがね",
+      "いわ-type Male Grunt": "かくとう,ゴースト,みず&@1かくとう,@1じめん,@1いわ,@1はがね,@1みず,@1くさ,@1でんき,@1こおり,@1ドラゴン,@1フェアリー&@2かくとう,@2じめん,@2いわ,@2はがね,@2みず,@2くさ,@2でんき,@2こおり,@2ドラゴン,@2フェアリー,@3かくとう,@3じめん,@3いわ,@3はがね,@3みず,@3くさ,@3でんき,@3こおり,@3ドラゴン,@3フェアリー&!<むし&!<いわ&!<みず&!<じめん&!<はがね&!<こおり&!<ドラゴン",
+      "ゴースト-type Male Grunt": "ノーマル,かくとう,どく,いわ,はがね,ほのお,みず,こおり,あく&@1じめん,@1いわ,@1ゴースト,@1はがね,@1ほのお,@1エスパー,@1あく,@1フェアリー&@2じめん,@2いわ,@2ゴースト,@2はがね,@2ほのお,@2エスパー,@2あく,@2フェアリー,@3じめん,@3いわ,@3ゴースト,@3はがね,@3ほのお,@3エスパー,@3あく,@3フェアリー&!<ゴースト&!<どく&!<あく&!<こおり",
+      "ドラゴン-type Female Grunt": "ひこう,あく,フェアリー&@1かくとう,@1ひこう,@1どく,@1いわ,@1むし,@1こおり,@1ドラゴン,@1フェアリー&@2かくとう,@2ひこう,@2どく,@2いわ,@2むし,@2こおり,@2ドラゴン,@2フェアリー,@3かくとう,@3ひこう,@3どく,@3いわ,@3むし,@3こおり,@3ドラゴン,@3フェアリー&!<ドラゴン&!<あく&!<くさ&!<じめん&!<ひこう",
+      "あく-type Female Grunt": "かくとう,はがね,みず,くさ,あく,フェアリー&@1かくとう,@1むし,@1くさ,@1でんき,@1こおり,@1ドラゴン,@1フェアリー&@2かくとう,@2むし,@2くさ,@2でんき,@2こおり,@2ドラゴン,@2フェアリー,@3かくとう,@3むし,@3くさ,@3でんき,@3こおり,@3ドラゴン,@3フェアリー&!<あく&!<ノーマル&!<みず&!<ドラゴン",
+      "はがね-type Male Grunt": "はがね,みず,でんき,エスパー,あく&@1かくとう,@1じめん,@1ゴースト,@1ほのお,@1みず,@1でんき,@1あく&@2かくとう,@2じめん,@2ゴースト,@2ほのお,@2みず,@2でんき,@2あく,@3かくとう,@3じめん,@3ゴースト,@3ほのお,@3みず,@3でんき,@3あく&!<こおり&!<はがね&!<エスパー&!<いわ&!<ひこう",
+      "フェアリー-type Female Grunt": "いわ,ゴースト,はがね,ほのお,みず,エスパー,こおり&@1かくとう,@1どく,@1じめん,@1いわ,@1ゴースト,@1はがね,@1ほのお,@1エスパー&@2かくとう,@2どく,@2じめん,@2いわ,@2ゴースト,@2はがね,@2ほのお,@2エスパー,@3かくとう,@3どく,@3じめん,@3いわ,@3ゴースト,@3はがね,@3ほのお,@3エスパー&!<フェアリー&!<こおり&!<エスパー&!<どく"
+    },
+    "rocketGenericGrunts": {
+      "Male Grunt": "@1でんき,@1ほのお,@1ひこう&@2でんき,@2ほのお,@2ひこう,@3でんき,@3ほのお,@3ひこう",
+      "Female Grunt": "@1かくとう,@1でんき,@1フェアリー&@2かくとう,@2でんき,@2フェアリー,@3かくとう,@3でんき,@3フェアリー",
+      "Decoy Female Grunt": "@1かくとう,@1ほのお,@1ひこう&@2かくとう,@2ほのお,@2ひこう,@3かくとう,@3ほのお,@3ひこう"
+    },
+    "pvpFilters": {
+      "great": "+ヌオー,+デカヌチャン,+アーマーガア,+ブルンゲル,+エンペルト,+フォレトス,+チルタリス,+マリルリ,+プクリン,+オーダイル,+ベロベルト,+チャーレム,+サニーゴ,+ファイアロー,+ラプラス,+トドグラー,+カラマネロ,+ドオー,+サマヨール,+マッギョ,+ピクシー,+ドラピオン,+コノヨザル,+カメックス,+フラージェス,+ユレイドル,+ニョロトノ,+ギルガルド,+デンヂムシ,+ヨクバリス&cp-1500&0-1こうげき&3-4ぼうぎょ&3-4hp",
+      "ultra": "+ブルンゲル,+アーマーガア,+ラプラス,+デカヌチャン,+エンペルト,+ファイヤー,+オーダイル,+カラマネロ,+フラージェス,+ヘイラッシャ,+ビリジオン,+レジドラゴ,+ベロベルト,+ルンパッパ,+ピクシー,+カメックス,+ヤレユータン,+ジガルデ,+ヨノワール,+キュウコン,+トドゼルガ,+バクガメス,+ドラピオン,+コノヨザル,+キングドラ,+ギラティナ,+ハラバリー,+クレセリア,+フォレトス,+トゲキッス&cp-2500&0-1こうげき&3-4ぼうぎょ&3-4hp",
+      "master": "+ザシアン,+パルキア,+メタグロス,+ゼルネアス,+ザマゼンタ,+キュレム,+ディアルガ,+ルナアーラ,+レシラム,+ゼクロム,+マーシャドー,+カイオーガ,+ルギア,+ムゲンダイナ,+ネクロズマ,+イベルタル,+ホウオウ,+ガブリアス,+グラードン,+メロエッタ,+ラティオス,+サーフゴー,+ソルガレオ,+フラージェス,+ギャラドス,+ミュウツー,+ジラーチ,+ケルディオ,+ジガルデ,+ラティアス&0-1こうげき&3-4ぼうぎょ&3-4hp"
     },
     "trashClauseCount": 30,
     "tradeClauseCount": 28

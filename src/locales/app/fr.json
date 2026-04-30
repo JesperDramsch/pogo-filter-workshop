@@ -99,10 +99,6 @@
   "app.protect.home_locals.none": "aucun",
   "app.protect.home_locals.note": "Ils apparaissent localement chez vous — les protéger serait redondant et réduirait le filtre poubelle pour vos 100%.",
 
-  "app.protect.myth_carve.label": "Fabuleux dont vous avez des doublons (numéros Pokédex, séparés par virgules)",
-  "app.protect.myth_carve.placeholder": "par ex. 808,649 pour Meltan + Genesect",
-  "app.protect.myth_carve.help": "Ils sont exemptés de la protection fabuleux — par ex. Meltan, dont la plupart des joueurs ont des centaines.",
-
   "app.protect.favorites.label": "Favoris",
   "app.protect.favorites.why": "Pokémon marqués d'une étoile",
   "app.protect.any_tag.label": "Pokémon étiquetés (toute étiquette)",
