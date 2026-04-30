@@ -1,0 +1,1456 @@
+{
+  "fetchedAt": "2026-04-30T11:47:45.780Z",
+  "raids": {
+    "lvl5": [
+      {
+        "id": "TAPU_KOKO",
+        "names": {
+          "en": "Tapu Koko",
+          "de": "Kapu-Riki",
+          "fr": "Tokorico",
+          "it": "Tapu Koko",
+          "ja": "カプ・コケコ",
+          "ko": "카푸꼬꼬꼭",
+          "es": "Tapu Koko"
+        },
+        "types": [
+          "electric",
+          "fairy"
+        ],
+        "resistorTypes": [
+          "poison",
+          "ground",
+          "steel",
+          "fire",
+          "grass",
+          "electric"
+        ],
+        "seMoveTypes": [
+          "ground",
+          "poison"
+        ]
+      }
+    ],
+    "lvl3": [
+      {
+        "id": "ORTHWORM",
+        "names": {
+          "en": "Orthworm",
+          "de": "Schlurm",
+          "fr": "Ferdeter",
+          "it": "Orthworm",
+          "ja": "ミミズズ",
+          "ko": "꿈트렁",
+          "es": "Orthworm"
+        },
+        "types": [
+          "steel"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "electric"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "fire",
+          "ground"
+        ]
+      }
+    ],
+    "lvl1": [
+      {
+        "id": "BELDUM",
+        "names": {
+          "en": "Beldum",
+          "de": "Tanhel",
+          "fr": "Terhal",
+          "it": "Beldum",
+          "ja": "ダンバル",
+          "ko": "메탕",
+          "es": "Beldum"
+        },
+        "types": [
+          "steel",
+          "psychic"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "electric",
+          "psychic",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "fire",
+          "ghost",
+          "ground"
+        ]
+      },
+      {
+        "id": "SHIELDON",
+        "names": {
+          "en": "Shieldon",
+          "de": "Schilterus",
+          "fr": "Dinoclier",
+          "it": "Shieldon",
+          "ja": "タテトプス",
+          "ko": "방패톱스",
+          "es": "Shieldon"
+        },
+        "types": [
+          "rock",
+          "steel"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "ground",
+          "steel",
+          "water",
+          "electric"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "ground",
+          "water"
+        ]
+      },
+      {
+        "id": "HONEDGE",
+        "names": {
+          "en": "Honedge",
+          "de": "Gramokles",
+          "fr": "Monorpale",
+          "it": "Honedge",
+          "ja": "ヒトツキ",
+          "ko": "단칼빙",
+          "es": "Honedge"
+        },
+        "types": [
+          "steel",
+          "ghost"
+        ],
+        "resistorTypes": [
+          "normal",
+          "steel",
+          "fire",
+          "water",
+          "electric",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "fire",
+          "ghost",
+          "ground"
+        ]
+      }
+    ],
+    "shadow_lvl5": [
+      {
+        "id": "LATIOS",
+        "names": {
+          "en": "Latios",
+          "de": "Latios",
+          "fr": "Latios",
+          "it": "Latios",
+          "ja": "ラティオス",
+          "ko": "라티오스",
+          "es": "Latios"
+        },
+        "types": [
+          "dragon",
+          "psychic"
+        ],
+        "resistorTypes": [
+          "steel",
+          "psychic",
+          "dark",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "bug",
+          "dark",
+          "dragon",
+          "fairy",
+          "ghost",
+          "ice"
+        ]
+      }
+    ],
+    "shadow_lvl3": [
+      {
+        "id": "MAROWAK",
+        "names": {
+          "en": "Alolan Marowak",
+          "de": "Alola-Knogga",
+          "fr": "Ossatueur d'Alola",
+          "it": "Marowak di Alola",
+          "ja": "アローラ ガラガラ",
+          "ko": "알로라 텅구리",
+          "es": "Marowak de Alola"
+        },
+        "types": [
+          "fire",
+          "ghost"
+        ],
+        "resistorTypes": [
+          "normal",
+          "rock",
+          "fire",
+          "water",
+          "dragon",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "ghost",
+          "ground",
+          "rock",
+          "water"
+        ]
+      },
+      {
+        "id": "LAPRAS",
+        "names": {
+          "en": "Lapras",
+          "de": "Lapras",
+          "fr": "Lokhlass",
+          "it": "Lapras",
+          "ja": "ラプラス",
+          "ko": "라프라스",
+          "es": "Lapras"
+        },
+        "types": [
+          "water",
+          "ice"
+        ],
+        "resistorTypes": [
+          "steel",
+          "water",
+          "ice"
+        ],
+        "seMoveTypes": [
+          "electric",
+          "fighting",
+          "grass",
+          "rock"
+        ]
+      },
+      {
+        "id": "STANTLER",
+        "names": {
+          "en": "Stantler",
+          "de": "Damhirplex",
+          "fr": "Cerfrousse",
+          "it": "Stantler",
+          "ja": "オドシシ",
+          "ko": "노라키",
+          "es": "Stantler"
+        },
+        "types": [
+          "normal"
+        ],
+        "resistorTypes": [
+          "rock",
+          "ghost",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "fighting"
+        ]
+      }
+    ],
+    "shadow_lvl1": [
+      {
+        "id": "DRATINI",
+        "names": {
+          "en": "Dratini",
+          "de": "Dratini",
+          "fr": "Minidraco",
+          "it": "Dratini",
+          "ja": "ミニリュウ",
+          "ko": "미뇽",
+          "es": "Dratini"
+        },
+        "types": [
+          "dragon"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "dragon",
+          "fairy",
+          "ice"
+        ]
+      },
+      {
+        "id": "GLIGAR",
+        "names": {
+          "en": "Gligar",
+          "de": "Skorgla",
+          "fr": "Scorplane",
+          "it": "Gligar",
+          "ja": "グライガー",
+          "ko": "글라이거",
+          "es": "Gligar"
+        },
+        "types": [
+          "ground",
+          "flying"
+        ],
+        "resistorTypes": [
+          "flying"
+        ],
+        "seMoveTypes": [
+          "ice",
+          "water"
+        ]
+      },
+      {
+        "id": "CACNEA",
+        "names": {
+          "en": "Cacnea",
+          "de": "Tuska",
+          "fr": "Cacnea",
+          "it": "Cacnea",
+          "ja": "サボネア",
+          "ko": "선인왕",
+          "es": "Cacnea"
+        },
+        "types": [
+          "grass"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "steel",
+          "fire",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "bug",
+          "fire",
+          "flying",
+          "ice",
+          "poison"
+        ]
+      },
+      {
+        "id": "JOLTIK",
+        "names": {
+          "en": "Joltik",
+          "de": "Wattzapf",
+          "fr": "Statitik",
+          "it": "Joltik",
+          "ja": "バチュル",
+          "ko": "파쪼옥",
+          "es": "Joltik"
+        },
+        "types": [
+          "bug",
+          "electric"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "poison",
+          "ground",
+          "ghost",
+          "steel",
+          "fire",
+          "electric",
+          "dragon",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "fire",
+          "rock"
+        ]
+      }
+    ]
+  },
+  "maxBattles": {
+    "tier_1": [
+      {
+        "id": "BULBASAUR",
+        "names": {
+          "en": "Bulbasaur",
+          "de": "Bisasam",
+          "fr": "Bulbizarre",
+          "it": "Bulbasaur",
+          "ja": "フシギダネ",
+          "ko": "이상해씨",
+          "es": "Bulbasaur"
+        },
+        "types": [
+          "grass",
+          "poison"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "steel",
+          "fire",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "fire",
+          "psychic",
+          "ice"
+        ]
+      },
+      {
+        "id": "CHARMANDER",
+        "names": {
+          "en": "Charmander",
+          "de": "Glumanda",
+          "fr": "Salamèche",
+          "it": "Charmander",
+          "ja": "ヒトカゲ",
+          "ko": "파이리",
+          "es": "Charmander"
+        },
+        "types": [
+          "fire"
+        ],
+        "resistorTypes": [
+          "rock",
+          "fire",
+          "water",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground",
+          "rock",
+          "water"
+        ]
+      },
+      {
+        "id": "SQUIRTLE",
+        "names": {
+          "en": "Squirtle",
+          "de": "Schiggy",
+          "fr": "Carapuce",
+          "it": "Squirtle",
+          "ja": "ゼニガメ",
+          "ko": "꼬부기",
+          "es": "Squirtle"
+        },
+        "types": [
+          "water"
+        ],
+        "resistorTypes": [
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "grass",
+          "electric"
+        ]
+      },
+      {
+        "id": "CATERPIE",
+        "names": {
+          "en": "Caterpie",
+          "de": "Raupy",
+          "fr": "Chenipan",
+          "it": "Caterpie",
+          "ja": "キャタピー",
+          "ko": "캐터피",
+          "es": "Caterpie"
+        },
+        "types": [
+          "bug"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "flying",
+          "poison",
+          "ghost",
+          "steel",
+          "fire",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "rock",
+          "fire"
+        ]
+      },
+      {
+        "id": "GROWLITHE",
+        "names": {
+          "en": "Growlithe",
+          "de": "Fukano",
+          "fr": "Caninos",
+          "it": "Growlithe",
+          "ja": "ガーディ",
+          "ko": "가디",
+          "es": "Growlithe"
+        },
+        "types": [
+          "fire"
+        ],
+        "resistorTypes": [
+          "rock",
+          "fire",
+          "water",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground",
+          "rock",
+          "water"
+        ]
+      },
+      {
+        "id": "ABRA",
+        "names": {
+          "en": "Abra",
+          "de": "Abra",
+          "fr": "Abra",
+          "it": "Abra",
+          "ja": "ケーシィ",
+          "ko": "캐이시",
+          "es": "Abra"
+        },
+        "types": [
+          "psychic"
+        ],
+        "resistorTypes": [
+          "steel",
+          "psychic",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "bug",
+          "ghost",
+          "dark"
+        ]
+      },
+      {
+        "id": "GASTLY",
+        "names": {
+          "en": "Gastly",
+          "de": "Nebulak",
+          "fr": "Fantominus",
+          "it": "Gastly",
+          "ja": "ゴース",
+          "ko": "고오스",
+          "es": "Gastly"
+        },
+        "types": [
+          "ghost",
+          "poison"
+        ],
+        "resistorTypes": [
+          "normal",
+          "poison",
+          "ground",
+          "rock",
+          "steel",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "ground",
+          "ghost",
+          "psychic",
+          "dark"
+        ]
+      },
+      {
+        "id": "KRABBY",
+        "names": {
+          "en": "Krabby",
+          "de": "Krabby",
+          "fr": "Krabby",
+          "it": "Krabby",
+          "ja": "クラブ",
+          "ko": "크랩",
+          "es": "Krabby"
+        },
+        "types": [
+          "water"
+        ],
+        "resistorTypes": [
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "grass",
+          "electric"
+        ]
+      },
+      {
+        "id": "OMANYTE",
+        "names": {
+          "en": "Omanyte",
+          "de": "Amonitas",
+          "fr": "Amonita",
+          "it": "Omanyte",
+          "ja": "オムナイト",
+          "ko": "암나이트",
+          "es": "Omanyte"
+        },
+        "types": [
+          "rock",
+          "water"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "steel",
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "ground",
+          "grass",
+          "electric"
+        ]
+      },
+      {
+        "id": "KABUTO",
+        "names": {
+          "en": "Kabuto",
+          "de": "Kabuto",
+          "fr": "Kabuto",
+          "it": "Kabuto",
+          "ja": "カブト",
+          "ko": "투구",
+          "es": "Kabuto"
+        },
+        "types": [
+          "rock",
+          "water"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "steel",
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "ground",
+          "grass",
+          "electric"
+        ]
+      },
+      {
+        "id": "RALTS",
+        "names": {
+          "en": "Ralts",
+          "de": "Trasla",
+          "fr": "Tarsal",
+          "it": "Ralts",
+          "ja": "ラルトス",
+          "ko": "랄토스",
+          "es": "Ralts"
+        },
+        "types": [
+          "psychic",
+          "fairy"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "psychic"
+        ],
+        "seMoveTypes": [
+          "poison",
+          "ghost",
+          "steel"
+        ]
+      },
+      {
+        "id": "SPHEAL",
+        "names": {
+          "en": "Spheal",
+          "de": "Seemops",
+          "fr": "Obalie",
+          "it": "Spheal",
+          "ja": "タマザラシ",
+          "ko": "대굴레오",
+          "es": "Spheal"
+        },
+        "types": [
+          "ice",
+          "water"
+        ],
+        "resistorTypes": [
+          "steel",
+          "water",
+          "ice"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "rock",
+          "grass",
+          "electric"
+        ]
+      },
+      {
+        "id": "PIDOVE",
+        "names": {
+          "en": "Pidove",
+          "de": "Dusselgurr",
+          "fr": "Poichigeon",
+          "it": "Pidove",
+          "ja": "マメパト",
+          "ko": "콩둘기",
+          "es": "Pidove"
+        },
+        "types": [
+          "normal",
+          "flying"
+        ],
+        "resistorTypes": [
+          "rock",
+          "ghost",
+          "steel",
+          "electric"
+        ],
+        "seMoveTypes": [
+          "rock",
+          "electric",
+          "ice"
+        ]
+      },
+      {
+        "id": "ROGGENROLA",
+        "names": {
+          "en": "Roggenrola",
+          "de": "Kiesling",
+          "fr": "Nodulithe",
+          "it": "Roggenrola",
+          "ja": "ダンゴロ",
+          "ko": "단굴",
+          "es": "Roggenrola"
+        },
+        "types": [
+          "rock"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "ground",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "ground",
+          "steel",
+          "water",
+          "grass"
+        ]
+      },
+      {
+        "id": "WOOBAT",
+        "names": {
+          "en": "Woobat",
+          "de": "Fleknoil",
+          "fr": "Chovsourir",
+          "it": "Woobat",
+          "ja": "コロモリ",
+          "ko": "또르박쥐",
+          "es": "Woobat"
+        },
+        "types": [
+          "psychic",
+          "flying"
+        ],
+        "resistorTypes": [
+          "rock",
+          "steel",
+          "electric",
+          "psychic",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "rock",
+          "ghost",
+          "electric",
+          "ice",
+          "dark"
+        ]
+      },
+      {
+        "id": "DRILBUR",
+        "names": {
+          "en": "Drilbur",
+          "de": "Rotomurf",
+          "fr": "Rototaupe",
+          "it": "Drilbur",
+          "ja": "モグリュー",
+          "ko": "두더류",
+          "es": "Drilbur"
+        },
+        "types": [
+          "ground"
+        ],
+        "resistorTypes": [
+          "flying",
+          "bug",
+          "grass"
+        ],
+        "seMoveTypes": [
+          "water",
+          "grass",
+          "ice"
+        ]
+      },
+      {
+        "id": "TRUBBISH",
+        "names": {
+          "en": "Trubbish",
+          "de": "Unratütox",
+          "fr": "Miamiasme",
+          "it": "Trubbish",
+          "ja": "ヤブクロン",
+          "ko": "깨봉이",
+          "es": "Trubbish"
+        },
+        "types": [
+          "poison"
+        ],
+        "resistorTypes": [
+          "poison",
+          "ground",
+          "rock",
+          "ghost",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "ground",
+          "psychic"
+        ]
+      },
+      {
+        "id": "INKAY",
+        "names": {
+          "en": "Inkay",
+          "de": "Iscalar",
+          "fr": "Sepiatop",
+          "it": "Inkay",
+          "ja": "マーイーカ",
+          "ko": "오케이징",
+          "es": "Inkay"
+        },
+        "types": [
+          "dark",
+          "psychic"
+        ],
+        "resistorTypes": [
+          "steel",
+          "dark",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "bug",
+          "fairy"
+        ]
+      },
+      {
+        "id": "BOUNSWEET",
+        "names": {
+          "en": "Bounsweet",
+          "de": "Frubberl",
+          "fr": "Croquine",
+          "it": "Bounsweet",
+          "ja": "アマカジ",
+          "ko": "달콤아",
+          "es": "Bounsweet"
+        },
+        "types": [
+          "grass"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "steel",
+          "fire",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "fire",
+          "ice"
+        ]
+      },
+      {
+        "id": "GROOKEY",
+        "names": {
+          "en": "Grookey",
+          "de": "Chimpep",
+          "fr": "Ouistempo",
+          "it": "Grookey",
+          "ja": "サルノリ",
+          "ko": "흥나숭",
+          "es": "Grookey"
+        },
+        "types": [
+          "grass"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "steel",
+          "fire",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "fire",
+          "ice"
+        ]
+      },
+      {
+        "id": "SCORBUNNY",
+        "names": {
+          "en": "Scorbunny",
+          "de": "Hopplo",
+          "fr": "Flambino",
+          "it": "Scorbunny",
+          "ja": "ヒバニー",
+          "ko": "염버니",
+          "es": "Scorbunny"
+        },
+        "types": [
+          "fire"
+        ],
+        "resistorTypes": [
+          "rock",
+          "fire",
+          "water",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground",
+          "rock",
+          "water"
+        ]
+      },
+      {
+        "id": "SOBBLE",
+        "names": {
+          "en": "Sobble",
+          "de": "Memmeon",
+          "fr": "Larméléon",
+          "it": "Sobble",
+          "ja": "メッソン",
+          "ko": "울머기",
+          "es": "Sobble"
+        },
+        "types": [
+          "water"
+        ],
+        "resistorTypes": [
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "grass",
+          "electric"
+        ]
+      },
+      {
+        "id": "SKWOVET",
+        "names": {
+          "en": "Skwovet",
+          "de": "Raffel",
+          "fr": "Rongourmand",
+          "it": "Skwovet",
+          "ja": "ホシガリス",
+          "ko": "탐리스",
+          "es": "Skwovet"
+        },
+        "types": [
+          "normal"
+        ],
+        "resistorTypes": [
+          "rock",
+          "ghost",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "fighting"
+        ]
+      },
+      {
+        "id": "ROOKIDEE",
+        "names": {
+          "en": "Rookidee",
+          "de": "Meikro",
+          "fr": "Minisange",
+          "it": "Rookidee",
+          "ja": "ココガラ",
+          "ko": "파라꼬",
+          "es": "Rookidee"
+        },
+        "types": [
+          "flying"
+        ],
+        "resistorTypes": [
+          "rock",
+          "steel",
+          "electric"
+        ],
+        "seMoveTypes": [
+          "rock",
+          "electric",
+          "ice"
+        ]
+      },
+      {
+        "id": "WOOLOO",
+        "names": {
+          "en": "Wooloo",
+          "de": "Wolly",
+          "fr": "Moumouton",
+          "it": "Wooloo",
+          "ja": "ウールー",
+          "ko": "우르",
+          "es": "Wooloo"
+        },
+        "types": [
+          "normal"
+        ],
+        "resistorTypes": [
+          "rock",
+          "ghost",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "fighting"
+        ]
+      },
+      {
+        "id": "HATENNA",
+        "names": {
+          "en": "Hatenna",
+          "de": "Brimova",
+          "fr": "Bibichut",
+          "it": "Hatenna",
+          "ja": "ミブリム",
+          "ko": "몸지브림",
+          "es": "Hatenna"
+        },
+        "types": [
+          "psychic"
+        ],
+        "resistorTypes": [
+          "steel",
+          "psychic",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "bug",
+          "ghost",
+          "dark"
+        ]
+      }
+    ],
+    "tier_2": [
+      {
+        "id": "MACHOP",
+        "names": {
+          "en": "Machop",
+          "de": "Machollo",
+          "fr": "Machoc",
+          "it": "Machop",
+          "ja": "ワンリキー",
+          "ko": "알통몬",
+          "es": "Machop"
+        },
+        "types": [
+          "fighting"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "psychic",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "psychic",
+          "fairy"
+        ]
+      },
+      {
+        "id": "EEVEE",
+        "names": {
+          "en": "Eevee",
+          "de": "Evoli",
+          "fr": "Évoli",
+          "it": "Eevee",
+          "ja": "イーブイ",
+          "ko": "이브이",
+          "es": "Eevee"
+        },
+        "types": [
+          "normal"
+        ],
+        "resistorTypes": [
+          "rock",
+          "ghost",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "fighting"
+        ]
+      },
+      {
+        "id": "SHUCKLE",
+        "names": {
+          "en": "Shuckle",
+          "de": "Pottrott",
+          "fr": "Caratroc",
+          "it": "Shuckle",
+          "ja": "ツボツボ",
+          "ko": "단단지",
+          "es": "Shuckle"
+        },
+        "types": [
+          "bug",
+          "rock"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "poison",
+          "ground",
+          "ghost",
+          "steel",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "rock",
+          "steel",
+          "water"
+        ]
+      },
+      {
+        "id": "WAILMER",
+        "names": {
+          "en": "Wailmer",
+          "de": "Wailmer",
+          "fr": "Wailmer",
+          "it": "Wailmer",
+          "ja": "ホエルコ",
+          "ko": "고래왕자",
+          "es": "Wailmer"
+        },
+        "types": [
+          "water"
+        ],
+        "resistorTypes": [
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "grass",
+          "electric"
+        ]
+      },
+      {
+        "id": "DARUMAKA",
+        "names": {
+          "en": "Darumaka",
+          "de": "Flampion",
+          "fr": "Darumarond",
+          "it": "Darumaka",
+          "ja": "ダルマッカ",
+          "ko": "달막화",
+          "es": "Darumaka"
+        },
+        "types": [
+          "fire"
+        ],
+        "resistorTypes": [
+          "rock",
+          "fire",
+          "water",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground",
+          "rock",
+          "water"
+        ]
+      }
+    ],
+    "tier_3": [
+      {
+        "id": "HITMONLEE",
+        "names": {
+          "en": "Hitmonlee",
+          "de": "Kicklee",
+          "fr": "Kicklee",
+          "it": "Hitmonlee",
+          "ja": "サワムラー",
+          "ko": "시라소몬",
+          "es": "Hitmonlee"
+        },
+        "types": [
+          "fighting"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "psychic",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "psychic",
+          "fairy"
+        ]
+      },
+      {
+        "id": "HITMONCHAN",
+        "names": {
+          "en": "Hitmonchan",
+          "de": "Nockchan",
+          "fr": "Tygnon",
+          "it": "Hitmonchan",
+          "ja": "エビワラー",
+          "ko": "홍수몬",
+          "es": "Hitmonchan"
+        },
+        "types": [
+          "fighting"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "psychic",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "psychic",
+          "fairy"
+        ]
+      },
+      {
+        "id": "CHANSEY",
+        "names": {
+          "en": "Chansey",
+          "de": "Chaneira",
+          "fr": "Leveinard",
+          "it": "Chansey",
+          "ja": "ラッキー",
+          "ko": "럭키",
+          "es": "Chansey"
+        },
+        "types": [
+          "normal"
+        ],
+        "resistorTypes": [
+          "rock",
+          "ghost",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "fighting"
+        ]
+      },
+      {
+        "id": "SABLEYE",
+        "names": {
+          "en": "Sableye",
+          "de": "Zobiris",
+          "fr": "Ténéfix",
+          "it": "Sableye",
+          "ja": "ヤミラミ",
+          "ko": "깜까미",
+          "es": "Sableye"
+        },
+        "types": [
+          "dark",
+          "ghost"
+        ],
+        "resistorTypes": [
+          "normal",
+          "fighting",
+          "dark",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "fairy"
+        ]
+      },
+      {
+        "id": "BELDUM",
+        "names": {
+          "en": "Beldum",
+          "de": "Tanhel",
+          "fr": "Terhal",
+          "it": "Beldum",
+          "ja": "ダンバル",
+          "ko": "메탕",
+          "es": "Beldum"
+        },
+        "types": [
+          "steel",
+          "psychic"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "electric",
+          "psychic",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "ground",
+          "ghost",
+          "fire",
+          "dark"
+        ]
+      },
+      {
+        "id": "CRYOGONAL",
+        "names": {
+          "en": "Cryogonal",
+          "de": "Frigometri",
+          "fr": "Hexagel",
+          "it": "Cryogonal",
+          "ja": "フリージオ",
+          "ko": "프리지오",
+          "es": "Cryogonal"
+        },
+        "types": [
+          "ice"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "ice"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "rock",
+          "steel",
+          "fire"
+        ]
+      },
+      {
+        "id": "PASSIMIAN",
+        "names": {
+          "en": "Passimian",
+          "de": "Quartermak",
+          "fr": "Quartermac",
+          "it": "Passimian",
+          "ja": "ナゲツケサル",
+          "ko": "내던숭이",
+          "es": "Passimian"
+        },
+        "types": [
+          "fighting"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "psychic",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "psychic",
+          "fairy"
+        ]
+      },
+      {
+        "id": "DRAMPA",
+        "names": {
+          "en": "Drampa",
+          "de": "Sen-Long",
+          "fr": "Draïeul",
+          "it": "Drampa",
+          "ja": "ジジーロン",
+          "ko": "할비롱",
+          "es": "Drampa"
+        },
+        "types": [
+          "normal",
+          "dragon"
+        ],
+        "resistorTypes": [
+          "rock",
+          "ghost",
+          "steel",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "ice",
+          "dragon",
+          "fairy"
+        ]
+      },
+      {
+        "id": "FALINKS",
+        "names": {
+          "en": "Falinks",
+          "de": "Legios",
+          "fr": "Hexadron",
+          "it": "Falinks",
+          "ja": "タイレーツ",
+          "ko": "대여르",
+          "es": "Falinks"
+        },
+        "types": [
+          "fighting"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "psychic",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "psychic",
+          "fairy"
+        ]
+      }
+    ]
+  }
+}

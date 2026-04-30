@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "fetch-translations": "node scripts/fetch-translations.mjs",
-    "prebuild": "node scripts/fetch-translations.mjs --offline-ok",
+    "fetch-raid-bosses": "node scripts/fetch-raid-bosses.mjs",
+    "prebuild": "node scripts/fetch-translations.mjs --offline-ok && node scripts/fetch-raid-bosses.mjs --offline-ok",
     "build": "vite build",
     "test:fixtures": "vite-node scripts/check-fixtures.mjs",
     "fixtures:update": "vite-node scripts/generate-fixtures.mjs",

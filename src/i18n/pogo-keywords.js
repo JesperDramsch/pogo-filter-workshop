@@ -36,9 +36,20 @@ export function pogoKeywords(outputLocale) {
       hatched:      k(messages, "filter_key_hatched"),
       baby:         k(messages, "filter_key_baby"),
       new_evo:      k(messages, "filter_key_evolve_to_new"),
+      evolvable:    k(messages, "pokemon_info_evolve_button"),
+      evolve_quest: k(messages, "filter_key_evolve_with_quest"),
       special_move: k(messages, "filter_key_special_move"),
       mega:         k(messages, "filter_key_mega_level"),
+      mega_evolve:  k(messages, "filter_key_evolve_mega"),
       dynamax_move: k(messages, "filter_key_bread_move_a"),
+      // PoGo's `@3move` matches Pokémon that still need a 3rd-move TM (i.e.,
+      // NOT yet double-moved). Currently a literal English keyword in PoGo
+      // even on localized clients; fallback to "3move" in case a localized
+      // key gets added to the in-game sheet later.
+      three_move:   k(messages, "filter_key_3rd_move", "3move"),
+      // Frustration is a move name, not a flag, but PoGo's `@move-name`
+      // search treats it the same way for filter-builder purposes.
+      frustration:  (messages["move.frustration"] || "Frustration").toLowerCase().trim(),
       xxl:          k(messages, "general_xxl"),
       xl:           k(messages, "general_xl"),
       xxs:          k(messages, "general_xxs"),
@@ -49,6 +60,9 @@ export function pogoKeywords(outputLocale) {
       age:      k(messages, "filter_key_age"),
       year:     k(messages, "filter_key_year"),
       buddy:    k(messages, "buddy_level_0"),
+      // Buddy-walk distance per candy (1km/3km/5km/20km tiers). Used to find
+      // common-rarity species — e.g. `candykm1` matches the cheap-purify pool.
+      candy_km: k(messages, "filter_key_candy_km"),
     },
     type: {
       bug:      k(messages, "pokemon_type_bug"),

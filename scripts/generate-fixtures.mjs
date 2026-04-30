@@ -24,6 +24,15 @@ function makeTFn(locale) {
   };
 }
 
+// Flattens a tier→boss[] map to tier→{bossId: clause} for compact snapshots.
+function flattenBossMap(byTier) {
+  const out = {};
+  for (const [tier, list] of Object.entries(byTier || {})) {
+    out[tier] = Object.fromEntries((list || []).map(b => [b.id, b.clause]));
+  }
+  return out;
+}
+
 const fixture = {};
 for (const locale of Object.keys(LOCALES)) {
   const tFn = makeTFn(locale);
@@ -34,6 +43,21 @@ for (const locale of Object.keys(LOCALES)) {
     sort: result.sort,
     prestaged: result.prestaged,
     gift: result.gift,
+    // Aux pro-tools — task-oriented filter strings. Snapshot so accidental
+    // changes to the new clause logic break loudly in CI.
+    shadowCheap: result.shadowCheap,
+    shadowSafe: result.shadowSafe,
+    shadowHundoCandidates: result.shadowHundoCandidates,
+    shadowFrustration: result.shadowFrustration,
+    cheapEvolve: result.cheapEvolve,
+    dexPlus: result.dexPlus,
+    megaEvolve: result.megaEvolve,
+    pilotLong: result.pilotLong,
+    // Raid + max-battle per-boss counters. Flattened to id→clause so the
+    // snapshot stays compact; the full clauses array is reconstructible
+    // from the raid-bosses.json artifact in src/data/.
+    raidFilters: flattenBossMap(result.raidFilters),
+    maxBattleFilters: flattenBossMap(result.maxBattleFilters),
     trashClauseCount: result.trashClauses.length,
     tradeClauseCount: result.tradeClauses.length,
   };

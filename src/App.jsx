@@ -8,6 +8,7 @@ import {
   pokemonNameFor,
 } from "./data/species.js";
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from "./i18n/pogo-keywords.js";
+import RAID_BOSSES from "./data/raid-bosses.json";
 import { useTranslation } from "./i18n/I18nProvider.jsx";
 import Landing from "./Landing.jsx";
 import General from "./explain/General.jsx";
@@ -119,7 +120,7 @@ export const DEFAULT_CONFIG = {
   expertMode: false,           // hides niche toggles in normal mode
 
   // PvP
-  pvpMode: "loose",            // "loose" | "strict" | "none"
+  pvpMode: "strict",           // "loose" | "strict" | "none"
 
   // Universal protections (most always-on in normal mode; visible in expert)
   protectFavorites: true,
@@ -173,6 +174,28 @@ export const DEFAULT_CONFIG = {
   cpCap: 2000,
   ageScopeDays: 30,            // "Vor wie vielen Tagen gefangen — Filterumfang"
   distanceProtect: 100,        // km — Pilot medal protection
+
+  // Shadows you'd never purify even during take-over events. Comma-separated
+  // base-form names (lowercase). Used by the shadow-safe-purify auxiliary
+  // filter; resolved via `resolveSpecies` so users can type in any locale.
+  // Default: ~20 widely-acknowledged top non-legendary raid attackers.
+  shadowKeeperSpecies: "mamoswine,salamence,dragonite,metagross,machamp,mewtwo,swampert,moltres,raikou,electivire,magnezone,tyranitar,weavile,ho-oh,entei,blaziken,gardevoir,hariyama,zapdos,latios,charizard,luxray,tangrowth,sceptile,venusaur,feraligatr,gyarados,pinsir,scizor,lugia,honchkrow,staraptor,houndoom,typhlosion,arcanine,magmortar,torterra,golurk,alakazam,aerodactyl,aggron,gallade,exeggutor,granbull,latias",
+
+  // Optional tag bookkeepers can use to manually flag a non-keeper shadow
+  // for Frustration removal during a take-over (e.g. a high-IV gem they
+  // want to keep but isn't on the meta-attacker list). Empty by default.
+  removeFrustrationTagName: "",
+
+  // Raid + max-battle counter filters. When true, appends `&!@3move` to
+  // every per-boss filter, narrowing the result to attackers whose second
+  // charge move is already unlocked. Default off so newer accounts still
+  // see candidates worth investing in.
+  raidRequireSecondMove: false,
+
+  // The preset key the user last clicked, if they haven't tweaked anything
+  // in ConfigPanel since. Cleared by any individual toggle change so the
+  // marker reflects "what's currently in effect" rather than just history.
+  lastAppliedPreset: null,
 };
 
 // ─── REGIONAL FORM CHECKS ───────────────────────────────────────────────────
@@ -652,8 +675,194 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   }
   const gift = giftClauses.map(c => c.clause).join("&");
 
+  // ── AUX FILTERS — task-oriented pro tools, paste these into the search
+  //    box to *find* candidates (positive search filters, not the inverted
+  //    trash style). Grouped by game aspect: shadows / evos / trades.
+
+  // -- SHADOW · cheap purify --------------------------------------------
+  // Common-rarity shadows for level-up-task fodder. Cost on purify scales
+  // with species rarity, not IV — so we filter by 1km-buddy-walk (the
+  // common pool: Pidgey, Magikarp, Eevee line, ...). 1km walks naturally
+  // exclude legendaries / mythicals / pseudo-legendaries (5km+).
+  const shadowCheapClauses = [];
+  push(shadowCheapClauses, kw.flag.shadow,                          tFn("app.clause_why.shadow_cheap_pool"));
+  push(shadowCheapClauses, `${kw.numeric.candy_km}1`,               tFn("app.clause_why.shadow_cheap_common"));
+  push(shadowCheapClauses, `!${kw.flag.shiny}`,                     tFn("app.clause_why.shinies_protected"));
+  push(shadowCheapClauses, `!${kw.flag.lucky}`,                     tFn("app.clause_why.luckies_protected"));
+  push(shadowCheapClauses, `!@${kw.flag.special_move}`,             tFn("app.clause_why.legacy_moves"));
+  push(shadowCheapClauses, "!#",                                    tFn("app.clause_why.tags_protected_short"));
+  const shadowCheap = shadowCheapClauses.map(c => c.clause).join("&");
+
+  // -- SHADOW · safe purify (mass purify, keep raid attackers) ---------
+  // Excludes legendaries / mythicals / UBs / 4★ / shinies / lucky /
+  // costumes / legacy-move shadows, plus a user-curated list of top
+  // raid-attacker species (`shadowKeeperSpecies`) family-wide via `+`.
+  const keeperRaw = (cfg.shadowKeeperSpecies || "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+  const keeperResolved = keeperRaw
+    .map((s) => speciesForOutput(s, outputLocale))
+    .filter(Boolean);
+  const shadowSafeClauses = [];
+  push(shadowSafeClauses, kw.flag.shadow,                           tFn("app.clause_why.shadow_safe_pool"));
+  push(shadowSafeClauses, `!${kw.flag.legendary}`,                  tFn("app.clause_why.legendaries"));
+  push(shadowSafeClauses, `!${kw.flag.mythical}`,                   tFn("app.clause_why.mythicals_short"));
+  push(shadowSafeClauses, `!${kw.flag.ultra_beast}`,                tFn("app.clause_why.ultra_beasts"));
+  push(shadowSafeClauses, "!4*",                                    tFn("app.clause_why.never_4star"));
+  push(shadowSafeClauses, `!${kw.flag.shiny}`,                      tFn("app.clause_why.shinies_protected"));
+  push(shadowSafeClauses, `!${kw.flag.lucky}`,                      tFn("app.clause_why.luckies_protected"));
+  push(shadowSafeClauses, `!${kw.flag.costume}`,                    tFn("app.clause_why.costumes"));
+  push(shadowSafeClauses, `!@${kw.flag.special_move}`,              tFn("app.clause_why.legacy_moves"));
+  for (const sp of keeperResolved) {
+    push(shadowSafeClauses, `!+${sp}`, tFn("app.clause_why.shadow_keeper_species", { params: { species: sp } }));
+  }
+  const shadowSafe = shadowSafeClauses.map(c => c.clause).join("&");
+
+  // -- SHADOW · TM Frustration (take-over event) ------------------------
+  // During take-over events, Charge TM removes Frustration. Surface the
+  // shadows worth saving the TMs for: keeper-species attackers + anything
+  // the user manually tagged for removal.
+  const removeTag = (cfg.removeFrustrationTagName || "").trim();
+  const keeperFamilyTerms = keeperResolved.map((sp) => `+${sp}`);
+  const tagTerm = removeTag ? `#${removeTag}` : null;
+  const includePool = [...keeperFamilyTerms, tagTerm].filter(Boolean).join(",");
+  const shadowFrustrationClauses = [];
+  if (includePool && kw.flag.frustration) {
+    push(shadowFrustrationClauses, kw.flag.shadow,                  tFn("app.clause_why.shadow_only"));
+    push(shadowFrustrationClauses, `@${kw.flag.frustration}`,       tFn("app.clause_why.frustration_move", { params: { move: kw.flag.frustration } }));
+    push(shadowFrustrationClauses, includePool,
+      removeTag
+        ? tFn("app.clause_why.frustration_pool_with_tag", { params: { tag: removeTag } })
+        : tFn("app.clause_why.frustration_pool_keepers_only"));
+  }
+  const shadowFrustration = shadowFrustrationClauses.map(c => c.clause).join("&");
+
+  // -- SHADOW · purify-to-hundo candidates ------------------------------
+  // PoGo's appraisal search is bucket-based (0/1/2/3/4). Bucket 3+ on
+  // every stat means IV ≥13. Purify adds +2 (capped at 15), so 13/14/15
+  // all become 15 — every match in this bucket pattern purifies to a
+  // 15/15/15 hundo. Excludes already-4★ shadows.
+  const shadowHundoClauses = [];
+  push(shadowHundoClauses, kw.flag.shadow,                          tFn("app.clause_why.shadow_only"));
+  push(shadowHundoClauses, `3-4${kw.iv.atk}`,                       tFn("app.clause_why.iv_bucket_high_atk"));
+  push(shadowHundoClauses, `3-4${kw.iv.def}`,                       tFn("app.clause_why.iv_bucket_high_def"));
+  push(shadowHundoClauses, `3-4${kw.iv.hp}`,                        tFn("app.clause_why.iv_bucket_high_hp"));
+  push(shadowHundoClauses, "!4*",                                   tFn("app.clause_why.exclude_already_4star"));
+  const shadowHundoCandidates = shadowHundoClauses.map(c => c.clause).join("&");
+
+  // -- EVOS · cheap full-evolve -----------------------------------------
+  // Two paths combined via distribution to CNF (see Algebra chapter §8):
+  //   cheap = (early ∪ TE_basics) ∩ (early ∪ traded) ∩ (modifiers)
+  // `early` = low-candy XP lines; `TE_basics` = pre-final members of every
+  // trade-evo family (drop the final form — Alakazam/Machamp/etc. — since
+  // it doesn't evolve further). Resolved to locale-specific species names
+  // so the filter reads naturally in the user's PoGo client.
+  const dexToName = (d) => pokemonNameFor(String(d), outputLocale)?.toLowerCase();
+  const earlyDexes = [10, 13, 16, 265, 293, 519];
+  const teBasicsDexes = Object.values(TRADE_EVO_FAMILIES)
+    .flatMap(f => f.memberDex.slice(0, -1));
+  const earlyList = earlyDexes.map(dexToName).filter(Boolean).join(",");
+  const teBasicsList = [...earlyDexes, ...teBasicsDexes].map(dexToName).filter(Boolean).join(",");
+  const cheapEvolveClauses = [];
+  push(cheapEvolveClauses, teBasicsList,                            tFn("app.clause_why.cheap_evolve_either"));
+  push(cheapEvolveClauses, `${earlyList},${kw.flag.traded}`,        tFn("app.clause_why.cheap_evolve_traded_path"));
+  push(cheapEvolveClauses, "0*,1*,2*",                              tFn("app.clause_why.cheap_evolve_low_iv"));
+  push(cheapEvolveClauses, `!${kw.flag.shiny}`,                     tFn("app.clause_why.shinies_protected"));
+  push(cheapEvolveClauses, `!${kw.flag.costume}`,                   tFn("app.clause_why.costumes_trade"));
+  push(cheapEvolveClauses, `!@${kw.flag.special_move}`,             tFn("app.clause_why.legacy_moves"));
+  push(cheapEvolveClauses, "!#",                                    tFn("app.clause_why.tags_protected_short"));
+  const cheapEvolve = cheapEvolveClauses.map(c => c.clause).join("&");
+
+  // -- EVOS · Pokédex++ — pure new-dex pushes ---------------------------
+  // Anything that can evolve into a new dex entry and is candy-evolvable
+  // right now. Excludes evolve-quest species (those need quest completion,
+  // not just candy — surfacing them is misleading for a "ready to evolve"
+  // pile).
+  const dexPlusClauses = [];
+  push(dexPlusClauses, kw.flag.evolvable,                           tFn("app.clause_why.dex_plus_evolvable"));
+  push(dexPlusClauses, kw.flag.new_evo,                             tFn("app.clause_why.dex_plus_new_evo"));
+  push(dexPlusClauses, `!${kw.flag.evolve_quest}`,                  tFn("app.clause_why.dex_plus_skip_quest"));
+  const dexPlus = dexPlusClauses.map(c => c.clause).join("&");
+
+  // -- MEGAS · mega-evolve candidates -----------------------------------
+  // User's pattern: mega-eligible Pokémon that have either prior mega
+  // history (mega1-2, cheaper subsequent mega cost) OR are new evolutions
+  // (filling the medal/dex). Skips already-mega3 entries (already maxed).
+  const megaEvolveClauses = [];
+  push(megaEvolveClauses, kw.flag.mega_evolve,                      tFn("app.clause_why.mega_eligible"));
+  push(megaEvolveClauses, `${kw.flag.mega}1-2,${kw.flag.new_evo}`,  tFn("app.clause_why.mega_progress_or_new"));
+  const megaEvolve = megaEvolveClauses.map(c => c.clause).join("&");
+
+  // -- TRADES · Pilot 1000+ stash --------------------------------------
+  // Extreme-distance catches not yet traded. The regular trade filter
+  // covers ≥100km; this one is the ≥1000km deep stash.
+  const pilotLongClauses = [];
+  push(pilotLongClauses, `${kw.numeric.distance}1000-`,             tFn("app.clause_why.pilot_1000"));
+  push(pilotLongClauses, `!${kw.flag.traded}`,                      tFn("app.clause_why.not_yet_traded"));
+  push(pilotLongClauses, "!4*",                                     tFn("app.clause_why.never_4star"));
+  push(pilotLongClauses, `!${kw.flag.legendary}`,                   tFn("app.clause_why.legendaries"));
+  push(pilotLongClauses, `!${kw.flag.mythical}`,                    tFn("app.clause_why.mythicals_short"));
+  push(pilotLongClauses, `!${kw.flag.shiny}`,                       tFn("app.clause_why.shinies_protected"));
+  const pilotLong = pilotLongClauses.map(c => c.clause).join("&");
+
+  // -- RAIDS / MAX BATTLES · per-boss counter filters ------------------
+  // Each boss yields one filter: defenders that resist the boss's STAB
+  // ANDed with attackers that carry a super-effective move type. The
+  // `@<type>` syntax matches Pokémon with a move of that type — distinct
+  // from `@<move-name>`. No IV gate — raid DPS is dominated by level +
+  // moveset, so an IV cut would hide already-built workhorses.
+  const buildBossEntry = (boss, { requiresDynamax = false } = {}) => {
+    const resistorList = (boss.resistorTypes || [])
+      .map(t => kw.type[t]).filter(Boolean);
+    const seMoveList = (boss.seMoveTypes || [])
+      .map(t => kw.type[t]).filter(Boolean);
+    if (resistorList.length === 0 || seMoveList.length === 0) {
+      return { id: boss.id, name: boss.names?.[outputLocale] || boss.names?.en || boss.id,
+               clause: "", clauses: [], skipped: true };
+    }
+    const resistorClause = `(${resistorList.join(",")})`;
+    const seClause = `(${seMoveList.map(t => `@${t}`).join(",")})`;
+    const clauses = [];
+    push(clauses, resistorClause, tFn("app.clause_why.raid_resistor_types"));
+    push(clauses, seClause,       tFn("app.clause_why.raid_se_moves"));
+    // Max battles only let you bring Dynamax-capable Pokémon, so narrow to
+    // species that have at least one Max move unlocked. PoGo's keyword is
+    // `<dynamax-move>1-` — locale-aware via kw.flag.dynamax_move.
+    if (requiresDynamax && kw.flag.dynamax_move) {
+      push(clauses, `${kw.flag.dynamax_move}1-`, tFn("app.clause_why.max_battle_dynamax_only"));
+    }
+    if (cfg.raidRequireSecondMove) {
+      push(clauses, `!@${kw.flag.three_move}`, tFn("app.clause_why.raid_second_move"));
+    }
+    return {
+      id: boss.id,
+      name: boss.names?.[outputLocale] || boss.names?.en || boss.id,
+      clause: clauses.map(c => c.clause).join("&"),
+      clauses,
+      skipped: false,
+    };
+  };
+  const buildBossTiers = (tieredBosses, opts) => {
+    const out = {};
+    for (const [tier, list] of Object.entries(tieredBosses || {})) {
+      out[tier] = list.map(b => buildBossEntry(b, opts));
+    }
+    return out;
+  };
+  const raidFilters = buildBossTiers(RAID_BOSSES.raids);
+  const maxBattleFilters = buildBossTiers(RAID_BOSSES.maxBattles, { requiresDynamax: true });
+  const raidBossesFetchedAt = RAID_BOSSES.fetchedAt || null;
+
   return { trash, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
-           trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses };
+           trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses,
+           // Aux pro-tools
+           shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
+           cheapEvolve, dexPlus, megaEvolve, pilotLong,
+           shadowCheapClauses, shadowSafeClauses, shadowHundoClauses, shadowFrustrationClauses,
+           cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
+           // Per-boss raid + max-battle counters
+           raidFilters, maxBattleFilters, raidBossesFetchedAt };
 }
 
 // ─── PARSER (for verification panel) ──────────────────────────────────────
@@ -883,6 +1092,12 @@ export default function App() {
   const [newHundo, setNewHundo] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [showSetTheory, setShowSetTheory] = useState(false);
+  const [showAuxShadows, setShowAuxShadows] = useState(false);
+  const [showAuxEvos, setShowAuxEvos] = useState(false);
+  const [showAuxTrades, setShowAuxTrades] = useState(false);
+  const [showAuxMegas, setShowAuxMegas] = useState(false);
+  const [showAuxRaids, setShowAuxRaids] = useState(false);
+  const [showAuxMaxBattles, setShowAuxMaxBattles] = useState(false);
   const [showRawClauses, setShowRawClauses] = useState(false);
   const [showVerify, setShowVerify] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -902,7 +1117,12 @@ export default function App() {
   const [homeLocation, setHomeLocation] = useState(null);   // [lon, lat] — drives defaults
   const [lastPin, setLastPin] = useState(null);             // [lon, lat] — inspector
   const [bazaarTags, setBazaarTags] = useState([]);
-  const [copied, setCopied] = useState({ trash: false, trade: false, sort: false, prestaged: false, gift: false });
+  const [copied, setCopied] = useState({
+    trash: false, trade: false, sort: false, prestaged: false, gift: false,
+    // Aux pro-tools
+    shadowCheap: false, shadowSafe: false, shadowHundoCandidates: false, shadowFrustration: false,
+    cheapEvolve: false, dexPlus: false, megaEvolve: false, pilotLong: false,
+  });
   const [resetArmed, setResetArmed] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   useEffect(() => {
@@ -1000,7 +1220,12 @@ export default function App() {
   // different language than their browser).
   const effectiveOutputLocale = effectiveConfig.expertMode ? outputLocale : locale;
   const { trash, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
-          trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses } = useMemo(
+          trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses,
+          shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
+          cheapEvolve, dexPlus, megaEvolve, pilotLong,
+          shadowCheapClauses, shadowSafeClauses, shadowHundoClauses, shadowFrustrationClauses,
+          cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
+          raidFilters, maxBattleFilters, raidBossesFetchedAt } = useMemo(
     () => buildFilters(hundos, effectiveConfig, homeLocals, effectiveOutputLocale, t),
     [hundos, effectiveConfig, homeLocals, effectiveOutputLocale, t]
   );
@@ -1218,6 +1443,7 @@ export default function App() {
                   filterStr={trash}
                   copied={copied.trash}
                   onCopy={() => copyToClipboard("trash", trash)}
+                  hint={t("app.filter.trash_hint")}
                 />
                 <FilterBox
                   label={t("app.filter.trade_label")}
@@ -1225,6 +1451,7 @@ export default function App() {
                   filterStr={trade}
                   copied={copied.trade}
                   onCopy={() => copyToClipboard("trade", trade)}
+                  hint={t("app.filter.trade_hint")}
                 />
                 {sort && (
                   <FilterBox
@@ -1233,24 +1460,7 @@ export default function App() {
                     filterStr={sort}
                     copied={copied.sort}
                     onCopy={() => copyToClipboard("sort", sort)}
-                  />
-                )}
-                {prestaged && (
-                  <FilterBox
-                    label={t("app.filter.prestaged_label")}
-                    accent="#9B59B6"
-                    filterStr={prestaged}
-                    copied={copied.prestaged}
-                    onCopy={() => copyToClipboard("prestaged", prestaged)}
-                  />
-                )}
-                {gift && (
-                  <FilterBox
-                    label={t("app.filter.gift_label")}
-                    accent="#27AE60"
-                    filterStr={gift}
-                    copied={copied.gift}
-                    onCopy={() => copyToClipboard("gift", gift)}
+                    hint={t("app.filter.sort_hint")}
                   />
                 )}
                 {buddyCatchFilters.length > 0 && (
@@ -1269,7 +1479,171 @@ export default function App() {
                   <StatBox label={t("app.filter.trade_label")} value={`${trade.length}c`} />
                 </div>
 
-                {/* Collapsibles */}
+                {/* Aux pro-tools — task-oriented filters grouped by game aspect.
+                    Collapsed by default; sit above the deeper internals (set
+                    theory / raw clauses / verify). */}
+                <div className="space-y-3 pt-2">
+                  <Collapsible
+                    icon="🌑"
+                    label={t("app.collapsible.aux_shadows")}
+                    open={showAuxShadows}
+                    onToggle={() => setShowAuxShadows((s) => !s)}>
+                    <div className="space-y-4">
+                      <FilterBox
+                        label={t("app.filter.shadow_cheap_label")}
+                        accent="#9B59B6"
+                        filterStr={shadowCheap}
+                        copied={copied.shadowCheap}
+                        onCopy={() => copyToClipboard("shadowCheap", shadowCheap)}
+                        hint={t("app.filter.shadow_cheap_hint")}
+                      />
+                      <FilterBox
+                        label={t("app.filter.shadow_safe_label")}
+                        accent="#9B59B6"
+                        filterStr={shadowSafe}
+                        copied={copied.shadowSafe}
+                        onCopy={() => copyToClipboard("shadowSafe", shadowSafe)}
+                        hint={t("app.filter.shadow_safe_hint")}
+                      />
+                      <FilterBox
+                        label={t("app.filter.shadow_hundo_candidates_label")}
+                        accent="#9B59B6"
+                        filterStr={shadowHundoCandidates}
+                        copied={copied.shadowHundoCandidates}
+                        onCopy={() => copyToClipboard("shadowHundoCandidates", shadowHundoCandidates)}
+                        hint={t("app.filter.shadow_hundo_candidates_hint")}
+                      />
+                      {shadowFrustration && (
+                        <FilterBox
+                          label={t("app.filter.shadow_frustration_label")}
+                          accent="#9B59B6"
+                          filterStr={shadowFrustration}
+                          copied={copied.shadowFrustration}
+                          onCopy={() => copyToClipboard("shadowFrustration", shadowFrustration)}
+                          hint={t("app.filter.shadow_frustration_hint")}
+                        />
+                      )}
+                    </div>
+                  </Collapsible>
+
+                  <Collapsible
+                    icon="🥚"
+                    label={t("app.collapsible.aux_evos")}
+                    open={showAuxEvos}
+                    onToggle={() => setShowAuxEvos((s) => !s)}>
+                    <div className="space-y-4">
+                      {cheapEvolve ? (
+                        <FilterBox
+                          label={t("app.filter.cheap_evolve_label")}
+                          accent="#27AE60"
+                          filterStr={cheapEvolve}
+                          copied={copied.cheapEvolve}
+                          onCopy={() => copyToClipboard("cheapEvolve", cheapEvolve)}
+                          hint={t("app.filter.cheap_evolve_hint")}
+                        />
+                      ) : (
+                        <p className="text-xs italic text-[#8B98A5]">
+                          {t("app.filter.cheap_evolve_empty")}
+                        </p>
+                      )}
+                      <FilterBox
+                        label={t("app.filter.dex_plus_label")}
+                        accent="#27AE60"
+                        filterStr={dexPlus}
+                        copied={copied.dexPlus}
+                        onCopy={() => copyToClipboard("dexPlus", dexPlus)}
+                        hint={t("app.filter.dex_plus_hint")}
+                      />
+                    </div>
+                  </Collapsible>
+
+                  <Collapsible
+                    icon="🛬"
+                    label={t("app.collapsible.aux_trades")}
+                    open={showAuxTrades}
+                    onToggle={() => setShowAuxTrades((s) => !s)}>
+                    <div className="space-y-4">
+                      {prestaged && (
+                        <FilterBox
+                          label={t("app.filter.prestaged_label")}
+                          accent="#9B59B6"
+                          filterStr={prestaged}
+                          copied={copied.prestaged}
+                          onCopy={() => copyToClipboard("prestaged", prestaged)}
+                          hint={t("app.filter.prestaged_hint", { params: { tags: [effectiveConfig.basarTagName, effectiveConfig.fernTauschTagName].filter(Boolean).map(tag => `#${tag}`).join(", ") } })}
+                        />
+                      )}
+                      {gift && (
+                        <FilterBox
+                          label={t("app.filter.gift_label")}
+                          accent="#27AE60"
+                          filterStr={gift}
+                          copied={copied.gift}
+                          onCopy={() => copyToClipboard("gift", gift)}
+                          hint={t("app.filter.gift_hint")}
+                        />
+                      )}
+                      <FilterBox
+                        label={t("app.filter.pilot_long_label")}
+                        accent="#5EAFC5"
+                        filterStr={pilotLong}
+                        copied={copied.pilotLong}
+                        onCopy={() => copyToClipboard("pilotLong", pilotLong)}
+                        hint={t("app.filter.pilot_long_hint")}
+                      />
+                    </div>
+                  </Collapsible>
+
+                  <Collapsible
+                    icon="⚡"
+                    label={t("app.collapsible.aux_megas")}
+                    open={showAuxMegas}
+                    onToggle={() => setShowAuxMegas((s) => !s)}>
+                    <FilterBox
+                      label={t("app.filter.mega_evolve_label")}
+                      accent="#E91E63"
+                      filterStr={megaEvolve}
+                      copied={copied.megaEvolve}
+                      onCopy={() => copyToClipboard("megaEvolve", megaEvolve)}
+                      hint={t("app.filter.mega_evolve_hint")}
+                    />
+                  </Collapsible>
+
+                  {/* Raids — one FilterBox per current 5★/3★/1★ boss (and
+                      their shadow variants). Bosses pulled from lily-dex-api;
+                      run `npm run fetch-raid-bosses` to refresh the snapshot. */}
+                  <BossCollapsible
+                    icon="⚔️"
+                    titleKey="app.collapsible.aux_raids"
+                    fetchedAt={raidBossesFetchedAt}
+                    bossesByTier={raidFilters}
+                    tierOrder={["lvl5", "shadow_lvl5", "lvl3", "shadow_lvl3", "lvl1", "shadow_lvl1"]}
+                    accent="#E74C3C"
+                    open={showAuxRaids}
+                    onToggle={() => setShowAuxRaids((s) => !s)}
+                    copied={copied}
+                    copyToClipboard={copyToClipboard}
+                    keyPrefix="raid"
+                    t={t}
+                  />
+
+                  <BossCollapsible
+                    icon="💥"
+                    titleKey="app.collapsible.aux_max_battles"
+                    fetchedAt={raidBossesFetchedAt}
+                    bossesByTier={maxBattleFilters}
+                    tierOrder={["tier_3", "tier_2", "tier_1"]}
+                    accent="#F39C12"
+                    open={showAuxMaxBattles}
+                    onToggle={() => setShowAuxMaxBattles((s) => !s)}
+                    copied={copied}
+                    copyToClipboard={copyToClipboard}
+                    keyPrefix="max"
+                    t={t}
+                  />
+                </div>
+
+                {/* Internals — set theory / raw clauses / verify */}
                 <div className="space-y-3 pt-2">
                   <Collapsible
                     icon="∑"
@@ -1596,7 +1970,7 @@ function CustomCollectiblesEditor({ list, onChange }) {
 
 // ─── SUBCOMPONENTS ────────────────────────────────────────────────────────
 
-function FilterBox({ label, accent, filterStr, copied, onCopy }) {
+function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
   const { t } = useTranslation();
   const len = filterStr.length;
   const pct = Math.min(100, (len / 5000) * 100);
@@ -1645,6 +2019,11 @@ function FilterBox({ label, accent, filterStr, copied, onCopy }) {
           {buttonLabel}
         </button>
       </div>
+      {hint && (
+        <p className="px-4 py-2 text-xs italic text-[#8B98A5] leading-snug border-b border-[#1F2933] bg-[#0E141A]">
+          {hint}
+        </p>
+      )}
       <div className="p-4 max-h-40 overflow-auto bg-[#0B0F14]">
         <code
           ref={codeRef}
@@ -1670,6 +2049,78 @@ function Collapsible({ icon, label, open, onToggle, children }) {
       </summary>
       {open && <div className="px-4 pb-4 pt-2 border-t border-[#1F2933]">{children}</div>}
     </details>
+  );
+}
+
+// "2h ago", "3d ago" — relative-age formatter used in the Raid/Max-Battle
+// collapsible headers so users can tell when the boss snapshot was last synced.
+function formatSyncAge(iso, t) {
+  if (!iso) return null;
+  const ageMs = Date.now() - new Date(iso).getTime();
+  if (Number.isNaN(ageMs) || ageMs < 0) return null;
+  const minutes = Math.floor(ageMs / 60000);
+  if (minutes < 60) return t("app.filter.last_sync_minutes", { params: { minutes } });
+  const hours = Math.floor(minutes / 60);
+  if (hours < 48) return t("app.filter.last_sync_hours", { params: { hours } });
+  const days = Math.floor(hours / 24);
+  return t("app.filter.last_sync_days", { params: { days } });
+}
+
+// Renders a single per-aspect boss collapsible (Raids or Max Battles). Each
+// boss inside becomes one FilterBox; skipped bosses (no clean counter) get a
+// short italic note instead. Header shows total boss count and last sync age.
+function BossCollapsible({
+  icon, titleKey, fetchedAt, bossesByTier, tierOrder, accent,
+  open, onToggle, copied, copyToClipboard, keyPrefix, t,
+}) {
+  const allBosses = tierOrder.flatMap((tier) => bossesByTier?.[tier] || []);
+  const totalBosses = allBosses.length;
+  const age = formatSyncAge(fetchedAt, t);
+  const headerLabel = t(titleKey, { params: { count: totalBosses, age: age || "" } });
+  if (totalBosses === 0) {
+    return (
+      <Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
+        <p className="text-xs italic text-[#8B98A5]">{t("app.filter.aux_bosses_empty")}</p>
+      </Collapsible>
+    );
+  }
+  return (
+    <Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
+      <div className="space-y-5">
+        {tierOrder.map((tier) => {
+          const list = bossesByTier?.[tier];
+          if (!list || list.length === 0) return null;
+          return (
+            <div key={tier} className="space-y-3">
+              <h4 className="mono text-xs uppercase tracking-wide text-[#8090A0]">
+                {t(`app.collapsible.aux_boss_tier.${tier}`)}
+              </h4>
+              {list.map((boss) => {
+                if (boss.skipped) {
+                  return (
+                    <p key={boss.id} className="text-xs italic text-[#8B98A5] pl-2">
+                      {t("app.filter.boss_no_clean_counter", { params: { boss: boss.name } })}
+                    </p>
+                  );
+                }
+                const copyKey = `${keyPrefix}_${boss.id}`;
+                return (
+                  <FilterBox
+                    key={boss.id}
+                    label={t("app.filter.raid_counter_label", { params: { boss: boss.name } })}
+                    accent={accent}
+                    filterStr={boss.clause}
+                    copied={copied[copyKey]}
+                    onCopy={() => copyToClipboard(copyKey, boss.clause)}
+                    hint={t("app.filter.raid_counter_hint", { params: { boss: boss.name } })}
+                  />
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </Collapsible>
   );
 }
 
@@ -1886,7 +2337,7 @@ const PRESETS = {
     descriptionKey: "app.preset.casual.description",
     apply: (cfg) => ({
       ...cfg,
-      pvpMode: "loose",
+      pvpMode: "strict",
       protectFavorites: true, protectShinies: true, protectLuckies: true,
       protectLegendaries: true, protectMythicals: true,
       protectUltraBeasts: true, protectShadows: true, protectPurified: true,
@@ -1905,7 +2356,7 @@ const PRESETS = {
       const groups = defaultRegionalToggles();
       for (const k of Object.keys(groups)) groups[k].enabled = true;
       return { ...cfg,
-        pvpMode: "loose",
+        pvpMode: "none",
         protectFavorites: true, protectShinies: true, protectLuckies: true,
         protectLegendaries: true, protectMythicals: true,
         protectUltraBeasts: true, protectShadows: true, protectPurified: true,
@@ -1948,7 +2399,7 @@ const PRESETS = {
       groups.hisuian.enabled = false;
       groups.paldean.enabled = false;
       return { ...cfg,
-        pvpMode: "strict",
+        pvpMode: "loose",
         protectFavorites: true, protectShinies: true, protectLuckies: true,
         protectLegendaries: true, protectMythicals: true,
         protectUltraBeasts: true, protectShadows: true, protectPurified: true,
@@ -1981,14 +2432,17 @@ const EXPERT_ONLY_KEYS = new Set([
 
 function ConfigPanel({ config, setConfig, homeLocals = [] }) {
   const { t, outputLocale } = useTranslation();
-  function set(k, v) { setConfig({ ...config, [k]: v }); }
+  // Any individual change in ConfigPanel clears the preset marker — the
+  // marker means "this preset is currently in effect"; the moment the
+  // user tweaks anything, that's no longer literally true.
+  function set(k, v) { setConfig({ ...config, [k]: v, lastAppliedPreset: null }); }
   function setGroup(groupKey, partial) {
     const groups = { ...(config.regionalGroups || {}) };
     groups[groupKey] = { ...groups[groupKey], ...partial };
     set("regionalGroups", groups);
   }
   function applyPreset(presetKey) {
-    setConfig(PRESETS[presetKey].apply(config));
+    setConfig({ ...PRESETS[presetKey].apply(config), lastAppliedPreset: presetKey });
   }
 
   const expert = !!config.expertMode;
@@ -1996,33 +2450,33 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
   // Universal protections — shown in all modes (these are the "obviously yes" ones)
   // [configKey, translationKeyBase, extra?] — labels & whys resolve via t() at
   // render time. Translation keys live in src/locales/app/{locale}.json.
-  const alwaysOn = [
-    ["protectFavorites",     "app.protect.favorites"],
-    ["protectAnyTag",        "app.protect.any_tag"],
-    ["protectTradeEvos",     "app.protect.trade_evos"],
-    ["protectShinies",       "app.protect.shinies"],
-    ["protectLuckies",       "app.protect.luckies"],
-    ["protectLegendaries",   "app.protect.legendaries"],
-    ["protectShadows",       "app.protect.shadows"],
-    ["protectCostumes",      "app.protect.costumes"],
-    ["protectBackgrounds",   "app.protect.backgrounds"],
-    ["protectLegacyMoves",   "app.protect.legacy_moves"],
-    ["protectBabies",        "app.protect.babies"],
-    ["protectXXL",           "app.protect.xxl"],
-    ["protectXL",            "app.protect.xl"],
-    ["protectXXS",           "app.protect.xxs"],
-    ["protectNewEvolutions", "app.protect.new_evolutions"],
-    ["protectDoubleMoved",   "app.protect.double_moved"],
-  ];
-
-  const expertOnly = [
-    ["protectFourStar",        "app.protect.four_star",       { requireConfirmOff: true }],
-    ["protectMythicals",       "app.protect.mythicals"],
-    ["protectUltraBeasts",     "app.protect.ultra_beasts"],
-    ["protectPurified",        "app.protect.purified"],
-    ["protectDynamax",         "app.protect.dynamax"],
-    ["protectBuddies",         "app.protect.buddies_protect"],
-    ["protectSmeargleLegacy",  "app.protect.smeargle_legacy"],
+  // Single ordered list: simple-mode shows non-expert rows; expert mode adds
+  // the `{ expertOnly: true }` rows in-place so related toggles stay
+  // visually adjacent (e.g. Smeargle carve-out next to Legacy Moves).
+  const settings = [
+    ["protectFavorites",      "app.protect.favorites"],
+    ["protectFourStar",       "app.protect.four_star",      { expertOnly: true, requireConfirmOff: true }],
+    ["protectAnyTag",         "app.protect.any_tag"],
+    ["protectTradeEvos",      "app.protect.trade_evos"],
+    ["protectShinies",        "app.protect.shinies",        { expertOnly: true }],
+    ["protectLuckies",        "app.protect.luckies",        { expertOnly: true }],
+    ["protectLegendaries",    "app.protect.legendaries"],
+    ["protectMythicals",      "app.protect.mythicals",      { expertOnly: true }],
+    ["protectUltraBeasts",    "app.protect.ultra_beasts",   { expertOnly: true }],
+    ["protectShadows",        "app.protect.shadows",        { expertOnly: true }],
+    ["protectPurified",       "app.protect.purified",       { expertOnly: true }],
+    ["protectCostumes",       "app.protect.costumes"],
+    ["protectBackgrounds",    "app.protect.backgrounds"],
+    ["protectLegacyMoves",    "app.protect.legacy_moves",   { expertOnly: true }],
+    ["protectSmeargleLegacy", "app.protect.smeargle_legacy", { expertOnly: true }],
+    ["protectBabies",         "app.protect.babies"],
+    ["protectXXL",            "app.protect.xxl"],
+    ["protectXL",             "app.protect.xl"],
+    ["protectXXS",            "app.protect.xxs"],
+    ["protectNewEvolutions",  "app.protect.new_evolutions", { expertOnly: true }],
+    ["protectDoubleMoved",    "app.protect.double_moved",   { expertOnly: true }],
+    ["protectDynamax",        "app.protect.dynamax",        { expertOnly: true }],
+    ["protectBuddies",        "app.protect.buddies_protect", { expertOnly: true }],
   ];
 
   return (
@@ -2054,14 +2508,21 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
       <div>
         <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">{t("app.preset.section_title")}</div>
         <div className="flex flex-wrap gap-1.5">
-          {Object.entries(PRESETS).map(([key, preset]) => (
-            <button key={key}
-              onClick={() => applyPreset(key)}
-              title={t(preset.descriptionKey)}
-              className="mono text-xs px-3 py-1.5 rounded bg-[#1F2933] text-[#E6EDF3] hover:bg-[#5EAFC5] hover:text-[#0F1419] transition">
-              {t(preset.labelKey)}
-            </button>
-          ))}
+          {Object.entries(PRESETS).map(([key, preset]) => {
+            const active = config.lastAppliedPreset === key;
+            return (
+              <button key={key}
+                onClick={() => applyPreset(key)}
+                title={t(preset.descriptionKey)}
+                className={`mono text-xs px-3 py-1.5 rounded transition ${
+                  active
+                    ? "bg-[#5EAFC5] text-[#0F1419]"
+                    : "bg-[#1F2933] text-[#E6EDF3] hover:bg-[#5EAFC5] hover:text-[#0F1419]"
+                }`}>
+                {t(preset.labelKey)}
+              </button>
+            );
+          })}
         </div>
         <div className="mono text-[10.5px] text-[#8090A0] mt-1.5">
           {t("app.preset.section_hint")}
@@ -2091,6 +2552,9 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
             </button>
           ))}
         </div>
+        <p className="mono text-[11px] text-[#8B98A5] mt-2 leading-snug">
+          {t(`app.pvp.help_${config.pvpMode}`)}
+        </p>
       </div>
 
       <hr className="border-[#1F2933]" />
@@ -2101,14 +2565,15 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
           {t("app.protect.section_title")}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
-          {alwaysOn.map(([k, keyBase, extra]) => (
-            <ToggleRow key={k} k={k} label={t(`${keyBase}.label`)} why={t(`${keyBase}.why`)}
-              checked={!!config[k]} onChange={v => set(k, v)} {...(extra || {})} />
-          ))}
-          {expert && expertOnly.map(([k, keyBase, extra]) => (
-            <ToggleRow key={k} k={k} label={t(`${keyBase}.label`)} why={t(`${keyBase}.why`)} expertBadge
-              checked={!!config[k]} onChange={v => set(k, v)} {...(extra || {})} />
-          ))}
+          {settings.map(([k, keyBase, extra]) => {
+            if (extra?.expertOnly && !expert) return null;
+            const { expertOnly: _eo, ...rowExtra } = extra || {};
+            return (
+              <ToggleRow key={k} k={k} label={t(`${keyBase}.label`)} why={t(`${keyBase}.why`)}
+                expertBadge={!!extra?.expertOnly}
+                checked={!!config[k]} onChange={v => set(k, v)} {...rowExtra} />
+            );
+          })}
         </div>
       </div>
 
@@ -2129,6 +2594,46 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
           </div>
         </div>
       )}
+
+      {/* SHADOW KEEPER SPECIES (expert) — drives the "safe purify" aux filter */}
+      {expert && (
+        <div>
+          <label className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-1 block">
+            {t("app.protect.shadow_keepers.label")}
+          </label>
+          <textarea
+            value={config.shadowKeeperSpecies || ""}
+            onChange={e => set("shadowKeeperSpecies", e.target.value)}
+            placeholder={t("app.protect.shadow_keepers.placeholder")}
+            rows={3}
+            className="mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3] resize-y" />
+          <div className="mono text-[10px] text-[#8090A0] mt-1">
+            {t("app.protect.shadow_keepers.help")}
+          </div>
+        </div>
+      )}
+
+      {/* RAID FILTERS (expert) — narrows per-boss counter filters */}
+      {expert && (
+        <div>
+          <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
+            {t("app.raids.section_title")}
+          </div>
+          <label className="flex items-start gap-2 cursor-pointer mono text-xs">
+            <input
+              type="checkbox"
+              checked={!!config.raidRequireSecondMove}
+              onChange={e => set("raidRequireSecondMove", e.target.checked)}
+              className="mt-0.5"
+            />
+            <div>
+              <span className="text-[#E6EDF3]">{t("app.protect.raid_require_second_move.label")}</span>
+              <p className="text-[#8B98A5] mt-0.5">{t("app.protect.raid_require_second_move.help")}</p>
+            </div>
+          </label>
+        </div>
+      )}
+
 
       <hr className="border-[#1F2933]" />
 
@@ -2173,9 +2678,10 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
         onChange={list => set("customCollectibles", list)}
       />
 
-      <hr className="border-[#1F2933]" />
+      {expert && <hr className="border-[#1F2933]" />}
 
-      {/* TRADE-EVO FAMILIES */}
+      {/* TRADE-EVO FAMILIES (expert) — fine-tune which families are protected */}
+      {expert && (
       <div>
         <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
           {t("app.protect.te_section_title")}
@@ -2199,6 +2705,7 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
           })}
         </div>
       </div>
+      )}
     </div>
   );
 }
@@ -3025,6 +3532,20 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
                   className="mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]" />
                 <div className="mono text-[10px] text-[#8090A0] mt-1">{t("app.modal.tags.fern_help")}</div>
               </div>
+              {expert && (
+                <div>
+                  <label className="mono text-[10.5px] text-[#8090A0] block mb-1">
+                    {t("app.modal.tags.frustration_label")}
+                  </label>
+                  <input
+                    type="text"
+                    value={config.removeFrustrationTagName || ""}
+                    onChange={e => set("removeFrustrationTagName", e.target.value)}
+                    placeholder={t("app.modal.tags.frustration_placeholder")}
+                    className="mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]" />
+                  <div className="mono text-[10px] text-[#8090A0] mt-1">{t("app.modal.tags.frustration_help")}</div>
+                </div>
+              )}
             </div>
           </div>
 

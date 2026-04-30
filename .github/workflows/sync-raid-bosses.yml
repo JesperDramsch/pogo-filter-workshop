@@ -1,0 +1,38 @@
+name: Sync raid bosses
+
+on:
+  schedule:
+    - cron: "43 7 * * *" # daily at 07:43 UTC (offset from translation sync)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Both steps below exit 1 on real failure (fetch error, empty upstream
+      # response). A failed run shows up as a red workflow + GitHub
+      # notification, which is the only intervention the user wants.
+      - name: Fetch raid + max-battle bosses from lily-dex-api
+        run: npm run fetch-raid-bosses
+      - name: Regenerate fixture snapshot
+        run: npx vite-node scripts/generate-fixtures.mjs
+      - name: Commit + push if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- src/data/raid-bosses.json src/__fixtures__/default-filter-output.json; then
+            echo "No boss changes — skipping commit."
+            exit 0
+          fi
+          git add src/data/raid-bosses.json src/__fixtures__/default-filter-output.json
+          git commit -m "chore(raids): sync boss snapshot from lily-dex-api"
+          git push
