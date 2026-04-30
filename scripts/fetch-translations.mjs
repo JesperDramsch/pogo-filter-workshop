@@ -32,6 +32,7 @@ const SHEET_BASE =
 const SOURCES = [
   { gid: "1236962912", kind: "ingame", namespace: "ingame", label: "In-game UI terms" },
   { gid: "2001059420", kind: "pokemon", namespace: "pokemon", label: "Pokémon names" },
+  { gid: "264930304",  kind: "move",    namespace: "move",    label: "Move names" },
 ];
 
 // Spreadsheet column header → BCP47 locale code. Languages not listed here are
@@ -111,6 +112,32 @@ function processIngameSheet(rows) {
     for (const [loc, col] of Object.entries(localeColMap)) {
       const val = (row[col] || "").trim();
       if (val) result[loc][`ingame.${key}`] = val;
+    }
+  }
+  return result;
+}
+
+// Move sheet has rows like `move_name_0322 | Frustration | ... | Frustration | やつあたり | ...`.
+// Key by lowercased EN name so callers can look up `move.frustration`. If the
+// same EN name recurs (rare; e.g. "Vine Whip" twice), last wins — fine since
+// translations are identical.
+function processMovesSheet(rows) {
+  const headerIdx = findHeaderRow(rows);
+  const localeColMap = buildLocaleColumnMap(rows[headerIdx]);
+  const enCol = localeColMap.en;
+  const result = Object.fromEntries(TARGET_LOCALES.map((l) => [l, {}]));
+
+  for (let i = headerIdx + 1; i < rows.length; i++) {
+    const row = rows[i] || [];
+    const id = (row[0] || "").trim();
+    if (!id.startsWith("move_name_")) continue;
+    const enName = (row[enCol] || "").trim();
+    if (!enName) continue;
+    const key = `move.${enName.toLowerCase()}`;
+
+    for (const [loc, col] of Object.entries(localeColMap)) {
+      const val = (row[col] || "").trim();
+      if (val) result[loc][key] = val;
     }
   }
   return result;
@@ -227,6 +254,19 @@ async function main() {
         }
         pokemonNames = result;
         console.log(`  ✓ ${Object.keys(result).length} Pokémon entries`);
+      } else if (src.kind === "move") {
+        const result = processMovesSheet(rows);
+        let totalKeys = 0;
+        for (const loc of TARGET_LOCALES) {
+          for (const [k, v] of Object.entries(result[loc])) {
+            ingameByLocale[loc][k] = v;
+            totalKeys++;
+          }
+        }
+        if (totalKeys === 0) {
+          throw new Error(`Move sheet returned 0 keys — refusing to overwrite cache`);
+        }
+        console.log(`  ✓ ${totalKeys / TARGET_LOCALES.length | 0} avg moves per locale`);
       } else if (src.kind === "ingame") {
         const result = processIngameSheet(rows);
         let totalKeys = 0;

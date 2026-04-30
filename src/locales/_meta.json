@@ -9,10 +9,15 @@
       "gid": "2001059420",
       "label": "Pokémon names",
       "namespace": "pokemon"
+    },
+    {
+      "gid": "264930304",
+      "label": "Move names",
+      "namespace": "move"
     }
   ],
   "counts": {
-    "ingameKeysUnion": 114,
+    "ingameKeysUnion": 484,
     "pokemonNames": 1153
   },
   "missingTranslationsCount": {
