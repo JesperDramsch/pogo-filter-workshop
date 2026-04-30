@@ -201,13 +201,14 @@ export const DEFAULT_CONFIG = {
   ageScopeDays: 30,            // "Vor wie vielen Tagen gefangen — Filterumfang"
   distanceProtect: 100,        // km — Pilot medal protection
 
-  // Shadows you'd never purify even during take-over events. Comma-separated
-  // base-form names (lowercase). Used by the shadow-safe-purify auxiliary
-  // filter; resolved via `resolveSpecies` so users can type in any locale.
-  // Default: ~20 widely-acknowledged top non-legendary raid attackers.
-  // Species whose shadow form is S / A+ / A tier per the latest community
-  // raid-attacker tier list. Used family-wide (+species) by the safe-purify
-  // filter so accidental purification of a top-tier shadow is impossible.
+  // Shadows you'd never purify, even during take-over events. Acts as
+  // belt-and-suspenders alongside !legendär — the legendary entries here
+  // duplicate that protection so the list stays complete if the global
+  // flag is ever toggled off. Non-legendary entries cover S / A+ / A tier
+  // shadow raid attackers per the community / META.md tier lists, focusing
+  // on species without a relevant Mega form (where Shadow IS the canonical
+  // top form). Resolved via `resolveSpecies` so users can type in any
+  // locale; expanded family-wide (+species) by shadowSafe.
   shadowKeeperSpecies: [
     // S tier shadows
     "dialga","palkia","heatran","groudon","rampardos","salamence","mewtwo",
@@ -220,6 +221,8 @@ export const DEFAULT_CONFIG = {
     "landorus","kingler","delphox","chesnaught","giratina","emboar","honchkrow","latios",
     "staraptor","weavile","crawdaunt","absol","hariyama","sceptile","entei","aerodactyl",
     "zapdos",
+    // A tier non-Mega shadow attackers (Shadow is the top form for these)
+    "togekiss","roserade","toxicroak","glaceon","espeon","sylveon",
   ],
 
   // Optional tag bookkeepers can use to manually flag a non-keeper shadow
@@ -747,6 +750,7 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   // No `!lucky` clause: Shadows are untradeable and Lucky is set at trade
   // time, so a shadow can never be lucky — the AND would be dead.
   push(shadowCheapClauses, `!@${kw.flag.special_move}`,             tFn("app.clause_why.legacy_moves"));
+  push(shadowCheapClauses, `!${kw.flag.favorite}`,                  tFn("app.clause_why.favorites"));
   push(shadowCheapClauses, "!#",                                    tFn("app.clause_why.tags_protected_short"));
   const shadowCheap = shadowCheapClauses.map(c => c.clause).join("&");
 
@@ -767,6 +771,8 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   // No `!lucky` clause: shadows can never be lucky (game mechanic).
   push(shadowSafeClauses, `!${kw.flag.costume}`,                    tFn("app.clause_why.costumes"));
   push(shadowSafeClauses, `!@${kw.flag.special_move}`,              tFn("app.clause_why.legacy_moves"));
+  push(shadowSafeClauses, `!${kw.flag.favorite}`,                   tFn("app.clause_why.favorites"));
+  push(shadowSafeClauses, "!#",                                     tFn("app.clause_why.tags_protected_short"));
   for (const sp of keeperResolved) {
     push(shadowSafeClauses, `!+${sp}`, tFn("app.clause_why.shadow_keeper_species", { params: { species: sp } }));
   }
@@ -792,10 +798,12 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   const shadowFrustration = shadowFrustrationClauses.map(c => c.clause).join("&");
 
   // -- SHADOW · purify-to-hundo candidates ------------------------------
-  // PoGo's appraisal search is bucket-based (0/1/2/3/4). Bucket 3+ on
-  // every stat means IV ≥13. Purify adds +2 (capped at 15), so 13/14/15
-  // all become 15 — every match in this bucket pattern purifies to a
-  // 15/15/15 hundo. Excludes already-4★ shadows.
+  // PoGo's appraisal search is bucket-based: bucket 3 = IV 11-14, bucket
+  // 4 = IV 15. `3-4{atk}&3-4{def}&3-4{hp}` matches IV ≥11 in every stat.
+  // Purify adds +2 (capped at 15), so IV 13/14/15 → 15 (hundo) but IV
+  // 11/12 → 13/14 (NOT hundo). This is therefore a *candidate* set —
+  // review each match before purifying, since PoGo's bucket syntax can't
+  // isolate IV ≥13. Excludes already-4★ shadows.
   const shadowHundoClauses = [];
   push(shadowHundoClauses, kw.flag.shadow,                          tFn("app.clause_why.shadow_only"));
   push(shadowHundoClauses, `3-4${kw.iv.atk}`,                       tFn("app.clause_why.iv_bucket_high_atk"));
