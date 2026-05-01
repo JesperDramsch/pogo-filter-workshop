@@ -44,6 +44,9 @@ async function fetchJson(url) {
   return res.json();
 }
 
+// lily-dex's matchup table matches PoGo's (Gen VI+) — verified across all 18
+// types against the canonical chart, so no PoGo-specific override layer is
+// applied. If a future audit finds a divergence, patch typeIdx after this fn.
 function indexTypes(typesArr) {
   const idx = {};
   for (const entry of typesArr) {
@@ -144,6 +147,21 @@ function unionTypesOf(pokemons) {
   return [...set];
 }
 
+// Types that appear on enough of the lineup's Pokémon to be worth a partial
+// weakness guard for generic grunts. Counts per Pokémon entry (so a species
+// appearing in multiple phases votes multiple times — that's the actual
+// encounter exposure). Returned alphabetically for stable JSON diffs.
+function commonStabsOf(pokemons, threshold) {
+  const counts = {};
+  for (const p of pokemons) {
+    for (const t of (p.types || [])) {
+      const k = t.toLowerCase();
+      counts[k] = (counts[k] || 0) + 1;
+    }
+  }
+  return Object.keys(counts).filter(t => counts[t] >= threshold).sort();
+}
+
 function pokemonSummary(p) {
   return { name: p.name, types: (p.types || []).map(t => t.toLowerCase()) };
 }
@@ -186,12 +204,16 @@ function deriveGenericGrunt(entry, allTypeNames, typeIdx) {
   const slots = phasesOf(entry);
   const pokemons = slots.flat().map(pokemonSummary);
   const { types: top, hitMap } = topOffensiveTypes(pokemons, allTypeNames, typeIdx);
+  const commonStabThreshold = Math.max(2, Math.ceil(pokemons.length / 3));
+  const commonStabTypes = commonStabsOf(pokemons, commonStabThreshold);
   return {
     name: entry.name,
     kind: "generic_grunt",
     phases: slots.map((slot, i) => ({ slot: i + 1, pokemons: slot.map(pokemonSummary) })),
     topOffensiveTypes: top,
     topHits: top.map(t => ({ type: t, hits: hitMap[t], total: pokemons.length })),
+    commonStabTypes,
+    commonStabThreshold,
     lineupSize: pokemons.length,
   };
 }

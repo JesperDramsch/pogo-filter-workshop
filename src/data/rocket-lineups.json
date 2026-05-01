@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-01T09:58:23.437Z",
+  "fetchedAt": "2026-05-01T10:27:08.299Z",
   "trainers": [
     {
       "name": "Giovanni",
@@ -2296,6 +2296,13 @@
           "total": 9
         }
       ],
+      "commonStabTypes": [
+        "fire",
+        "grass",
+        "poison",
+        "water"
+      ],
+      "commonStabThreshold": 3,
       "lineupSize": 9
     },
     {
@@ -2393,6 +2400,11 @@
           "total": 8
         }
       ],
+      "commonStabTypes": [
+        "normal",
+        "water"
+      ],
+      "commonStabThreshold": 3,
       "lineupSize": 8
     },
     {
@@ -2469,6 +2481,12 @@
           "total": 5
         }
       ],
+      "commonStabTypes": [
+        "grass",
+        "normal",
+        "poison"
+      ],
+      "commonStabThreshold": 2,
       "lineupSize": 5
     }
   ]

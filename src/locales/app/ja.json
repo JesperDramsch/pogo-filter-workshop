@@ -201,6 +201,7 @@
   "app.clause_why.raid_se_charge": "少なくとも1つのスペシャル技タイプがボスに効果抜群でヒット",
   "app.clause_why.raid_not_weak_to_boss": "防御側がボスのSTAB攻撃に弱くない(許可リストにも適用)",
   "app.clause_why.rocket_not_weak_to_lineup": "防御側が編成に登場し得るどのSTABタイプにも弱くない",
+  "app.clause_why.rocket_not_weak_to_common_stab": "防御側が編成の大半に出現するSTABタイプに弱くない(部分ガード — 稀な編成パターンは通り抜ける可能性あり)",
   "app.clause_why.raid_second_move": "2つ目のスペシャル技を既に解放(レイド対応)",
   "app.clause_why.max_battle_dynamax_only": "ダイマックス可能(これらだけがマックスバトルに参加可)",
   "app.clause_why.max_tank_chargers": "通常技が0.5秒ティア(マックスゲージを最速で満たす)",

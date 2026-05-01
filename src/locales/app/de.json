@@ -201,6 +201,7 @@
   "app.clause_why.raid_se_charge": "mindestens ein Lade-Move-Typ trifft Boss super-effektiv",
   "app.clause_why.raid_not_weak_to_boss": "Verteidiger nicht schwach gegen STAB-Attacken des Bosses (gilt auch für die Allowlist)",
   "app.clause_why.rocket_not_weak_to_lineup": "Verteidiger nicht schwach gegen irgendeinen STAB-Typ, der im Lineup vorkommen könnte",
+  "app.clause_why.rocket_not_weak_to_common_stab": "Verteidiger nicht schwach gegen STAB-Typen, die in einem Großteil des Lineups vorkommen (Teil-Absicherung — seltene Lineup-Varianten können durchrutschen)",
   "app.clause_why.raid_second_move": "zweiter Lade-Move schon freigeschaltet (raid-bereit)",
   "app.clause_why.max_battle_dynamax_only": "Dynamax-fähig (nur die können in Max-Kämpfe)",
   "app.clause_why.max_tank_chargers": "Sofort-Attacke in der 0,5-Sekunden-Klasse (füllt den Max-Balken am schnellsten)",

@@ -1101,6 +1101,12 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     push(clauses, chargeMoveClause(seMoveList), tFn("app.clause_why.rocket_top_offensive_charge"));
     const second = buildSecondMoveAndAppraise();
     if (second) push(clauses, second.clause, second.why);
+    // Partial weakness guard: only STAB types that show up on enough of the
+    // lineup to be worth excluding defenders weak to them. Rare lineup pulls
+    // (e.g. a single Charizard's flying STAB) intentionally slip through so
+    // we don't drop solid counters that happen to have one minority weakness.
+    const wGuard = weaknessGuard(trainer.commonStabTypes || []);
+    if (wGuard) push(clauses, wGuard, tFn("app.clause_why.rocket_not_weak_to_common_stab"));
     return { name: trainer.name, phases: localizedPhases, topHits: localizedTopHits,
              clause: clauses.map(c => c.clause).join("&"), clauses, skipped: false };
   };

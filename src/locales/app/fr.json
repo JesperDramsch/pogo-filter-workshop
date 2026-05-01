@@ -201,6 +201,7 @@
   "app.clause_why.raid_se_charge": "au moins un type d'attaque chargée touche le boss super-efficacement",
   "app.clause_why.raid_not_weak_to_boss": "défenseur pas faible aux attaques STAB du boss (s'applique aussi à la liste autorisée)",
   "app.clause_why.rocket_not_weak_to_lineup": "défenseur pas faible à un type STAB qui pourrait apparaître dans la composition",
+  "app.clause_why.rocket_not_weak_to_common_stab": "défenseur pas faible aux types STAB présents dans la majorité de la composition (couverture partielle — les variantes rares peuvent passer)",
   "app.clause_why.raid_second_move": "deuxième attaque chargée déjà débloquée (raid-ready)",
   "app.clause_why.max_battle_dynamax_only": "capable Dynamax (seuls eux peuvent entrer en Combats Max)",
   "app.clause_why.max_tank_chargers": "attaque rapide dans le palier 0,5 seconde (remplit la Jauge Max le plus vite)",

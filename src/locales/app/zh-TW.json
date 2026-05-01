@@ -201,6 +201,7 @@
   "app.clause_why.raid_se_charge": "至少一個特殊招式屬性對首領造成效果絕佳",
   "app.clause_why.raid_not_weak_to_boss": "防守方不弱於首領的 STAB 攻擊(也適用於允許清單)",
   "app.clause_why.rocket_not_weak_to_lineup": "防守方不弱於陣容中可能出現的任何 STAB 屬性",
+  "app.clause_why.rocket_not_weak_to_common_stab": "防守方不弱於陣容中多數寶可夢具有的 STAB 屬性(部分防護 — 罕見的陣容組合可能漏網)",
   "app.clause_why.raid_second_move": "已解鎖第二個特殊招式(團體戰就緒)",
   "app.clause_why.max_battle_dynamax_only": "可極巨化(只有這些能進極巨戰)",
   "app.clause_why.max_tank_chargers": "一般招式在 0.5 秒檔位(填極巨槽最快)",

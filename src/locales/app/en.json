@@ -218,6 +218,7 @@
   "app.clause_why.raid_se_charge": "at least one charge move type hits the boss super-effectively",
   "app.clause_why.raid_not_weak_to_boss": "defender not weak to the boss's STAB attacks (applies to the allowlist too)",
   "app.clause_why.rocket_not_weak_to_lineup": "defender not weak to any STAB type that could appear in the lineup",
+  "app.clause_why.rocket_not_weak_to_common_stab": "defender not weak to STAB types that show up across most of the lineup (partial guard — rare lineup pulls may slip through)",
   "app.clause_why.raid_second_move": "second charge move already unlocked (raid-ready)",
   "app.clause_why.max_battle_dynamax_only": "Dynamax-capable (only these can enter Max Battles)",
   "app.clause_why.max_tank_chargers": "fast move in the 0.5-second tier (fills the Max Meter fastest)",

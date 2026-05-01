@@ -201,6 +201,7 @@
   "app.clause_why.raid_se_charge": "al menos un tipo de ataque cargado pega super-efectivo al jefe",
   "app.clause_why.raid_not_weak_to_boss": "el defensor no es débil a los ataques STAB del jefe (también aplica a la lista permitida)",
   "app.clause_why.rocket_not_weak_to_lineup": "el defensor no es débil a ningún tipo STAB que pueda aparecer en la alineación",
+  "app.clause_why.rocket_not_weak_to_common_stab": "el defensor no es débil a los tipos STAB que aparecen en la mayor parte de la alineación (cobertura parcial — las variantes raras pueden colarse)",
   "app.clause_why.raid_second_move": "segundo ataque cargado ya desbloqueado (listo para incursión)",
   "app.clause_why.max_battle_dynamax_only": "capaz de Dinamax (solo estos pueden entrar a Combates Max)",
   "app.clause_why.max_tank_chargers": "ataque rápido en el tier de 0.5 segundos (llena el Medidor Max más rápido)",

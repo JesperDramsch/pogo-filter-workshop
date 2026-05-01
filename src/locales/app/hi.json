@@ -201,6 +201,7 @@
   "app.clause_why.raid_se_charge": "कम से कम एक charge move type boss को super-effectively हिट करता है",
   "app.clause_why.raid_not_weak_to_boss": "defender boss के STAB attacks के प्रति weak नहीं (allowlist पर भी लागू)",
   "app.clause_why.rocket_not_weak_to_lineup": "defender किसी भी STAB type के प्रति weak नहीं जो lineup में आ सकता है",
+  "app.clause_why.rocket_not_weak_to_common_stab": "defender उन STAB types के प्रति weak नहीं जो lineup के अधिकांश Pokémon में दिखते हैं (आंशिक guard — दुर्लभ lineup variants slip हो सकती हैं)",
   "app.clause_why.raid_second_move": "दूसरा charge move पहले से unlocked (रेड-ready)",
   "app.clause_why.max_battle_dynamax_only": "डायनामैक्स-capable (सिर्फ़ ये Max Battles में entry कर सकते हैं)",
   "app.clause_why.max_tank_chargers": "fast move 0.5-second tier में (Max Meter सबसे तेज़ भरता है)",
