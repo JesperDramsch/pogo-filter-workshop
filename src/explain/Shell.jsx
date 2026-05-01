@@ -350,14 +350,23 @@ function NavChip({ icon: Icon, label, onClick, tone, iconRight = false }) {
   );
 }
 
-// Sign-off used on every page (landing, chapters, workshop). Two compact
-// lines: the personal credit + the author's other projects (all linked).
+// Sign-off used on every page (landing, chapters, workshop). Three compact
+// lines: the personal credit, the author's other projects, and the upstream
+// data sources the workshop snapshots from. Data credit is mandatory courtesy —
+// ScrapedDuck, LeekDuck, and PoGoAPI ask for attribution; lily-dex-api is MIT.
 const CREDIT_PROJECTS = [
   { label: "ML.recipes",             url: "https://ml.recipes"          },
   { label: "data-science-gui.de",    url: "https://data-science-gui.de" },
   { label: "python-deadlin.es",      url: "https://python-deadlin.es"   },
   { label: "Late to the Party 🎉",   url: "https://late.email"          },
   { label: "Latent Space Community", url: "https://latent.club"         },
+];
+
+const DATA_CREDIT_PROJECTS = [
+  { label: "ScrapedDuck",  url: "https://github.com/bigfoott/ScrapedDuck"      },
+  { label: "LeekDuck",     url: "https://leekduck.com"                         },
+  { label: "lily-dex-api", url: "https://github.com/mknepprath/lily-dex-api"   },
+  { label: "PoGoAPI",      url: "https://pogoapi.net"                          },
 ];
 
 export function AppCredit() {
@@ -378,6 +387,17 @@ export function AppCredit() {
       <div className="mono text-[10px]" style={{ color: C.dim, opacity: 0.8 }}>
         {t("app.credit.also")}{" "}
         {CREDIT_PROJECTS.map((p, i) => (
+          <React.Fragment key={p.url}>
+            {i > 0 && " · "}
+            <a href={p.url} target="_blank" rel="noreferrer" style={linkStyle}>
+              {p.label}
+            </a>
+          </React.Fragment>
+        ))}
+      </div>
+      <div className="mono text-[10px]" style={{ color: C.dim, opacity: 0.8 }}>
+        {t("app.credit.data")}{" "}
+        {DATA_CREDIT_PROJECTS.map((p, i) => (
           <React.Fragment key={p.url}>
             {i > 0 && " · "}
             <a href={p.url} target="_blank" rel="noreferrer" style={linkStyle}>

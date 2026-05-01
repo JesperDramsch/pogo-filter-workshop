@@ -61,7 +61,12 @@ This uses the `gh-pages` package to push `dist/` to a `gh-pages` branch. Set Pag
 
 ## Data sources
 
-- **Pokémon names dictionary** (1025 species, EN + DE) from [Leidwesen's PhraseTranslator](https://leidwesen.github.io/PhraseTranslator/) — last updated APK 0.407.0 (April 2026). Embedded in `App.jsx`.
+Snapshots are refreshed by the scripts in `scripts/` (run on demand, also wired into `npm run prebuild --offline-ok` and the `.github/workflows/sync-*.yml` schedules).
+
+- **Team GO Rocket lineups** from [bigfoott/ScrapedDuck](https://github.com/bigfoott/ScrapedDuck), which scrapes [LeekDuck.com](https://leekduck.com). Snapshot at `src/data/rocket-lineups.json`, refreshed by `npm run fetch-rocket-lineups`.
+- **Type chart, PvP rankings, raid bosses, Max Battles** from [mknepprath/lily-dex-api](https://github.com/mknepprath/lily-dex-api). Snapshots at `src/data/{pvp-rankings,raid-bosses}.json`, refreshed by `npm run fetch-pvp-rankings` and `npm run fetch-raid-bosses`. The Rocket-counter logic also pulls the type chart from here.
+- **Pokémon stats & moves** from [PoGoAPI.net](https://pogoapi.net/). Snapshot at `src/data/meta-rankings.json`, refreshed by `npm run fetch-meta-rankings`.
+- **Translations & Pokémon names** (EN, DE, ES, FR, zh-TW, HI, JA — 1025+ species, moves, in-game UI strings) from a community-maintained [Google Sheet](https://docs.google.com/spreadsheets/d/e/2PACX-1vSQubiAFnRgCUp9BSJaCq0-XSGU0-x3LvOwzWdAj-JlrXsdkBWrGrlfmvFmGcbjUnCa5XFSnv4C1Nzs/pub). Snapshots at `src/locales/`, refreshed by `npm run fetch-translations`.
 - **Regional polygons** from the community KMZ originally by u/zoglandboy / u/Mattman243 / pokemoncalendar.com (March 2022) plus manually-added Hawlucha (Mexico) and Stonjourner (UK) post-2022 regionals.
 - **World topology** for the basemap fetched at runtime from `cdn.jsdelivr.net/npm/world-atlas` (with `unpkg.com` fallback).
 
