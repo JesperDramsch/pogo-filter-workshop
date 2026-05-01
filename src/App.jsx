@@ -826,21 +826,31 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   // with species rarity, not IV — so we filter by 1km-buddy-walk (the
   // common pool: Pidgey, Magikarp, Eevee line, ...). 1km walks naturally
   // exclude legendaries / mythicals / pseudo-legendaries (5km+).
+  //
+  // Investment gate: `@frustration` (positive) — only match shadows that
+  // STILL have the default Frustration charged move. A shadow whose
+  // Frustration was Charge-TM'd off (during a Rocket take-over) is a real
+  // TM investment; purifying it loses the move and the +20% atk boost.
+  // `!@special` would NOT catch this case: a TM'd shadow with no other
+  // legacy (e.g. Tyranitar with Crunch+Stone Edge) has no @special flag
+  // and would slip through. `@frustration` is the surgical positive gate.
   const shadowCheapClauses = [];
   push(shadowCheapClauses, kw.flag.shadow,                          tFn("app.clause_why.shadow_cheap_pool"));
   push(shadowCheapClauses, `${kw.numeric.candy_km}1`,               tFn("app.clause_why.shadow_cheap_common"));
   push(shadowCheapClauses, `!${kw.flag.shiny}`,                     tFn("app.clause_why.shinies_protected"));
-  // No `!lucky` clause: Shadows are untradeable and Lucky is set at trade
-  // time, so a shadow can never be lucky — the AND would be dead.
-  push(shadowCheapClauses, `!@${kw.flag.special_move}`,             tFn("app.clause_why.legacy_moves"));
+  push(shadowCheapClauses, `@${kw.flag.frustration}`,               tFn("app.clause_why.frustration_unmoved", { params: { move: kw.flag.frustration } }));
   push(shadowCheapClauses, `!${kw.flag.favorite}`,                  tFn("app.clause_why.favorites"));
   push(shadowCheapClauses, "!#",                                    tFn("app.clause_why.tags_protected_short"));
   const shadowCheap = shadowCheapClauses.map(c => c.clause).join("&");
 
   // -- SHADOW · safe purify (mass purify, keep raid attackers) ---------
-  // Excludes legendaries / mythicals / UBs / 4★ / shinies / lucky /
-  // costumes / legacy-move shadows, plus a user-curated list of top
-  // raid-attacker species (`shadowKeeperSpecies`) family-wide via `+`.
+  // Excludes legendaries / mythicals / UBs / 4★ / shinies / costumes,
+  // plus a user-curated list of top raid-attacker species
+  // (`shadowKeeperSpecies`) family-wide via `+`.
+  //
+  // Investment gate: `@frustration` (same reasoning as shadowCheap above)
+  // — only purify shadows still in default state. A Charge-TM'd shadow
+  // is an investment; purifying it loses the TM and the +20% boost.
   const keeperResolved = (cfg.shadowKeeperSpecies || [])
     .map((s) => speciesForOutput(s, outputLocale))
     .filter(Boolean);
@@ -851,9 +861,8 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   push(shadowSafeClauses, `!${kw.flag.ultra_beast}`,                tFn("app.clause_why.ultra_beasts"));
   push(shadowSafeClauses, "!4*",                                    tFn("app.clause_why.never_4star"));
   push(shadowSafeClauses, `!${kw.flag.shiny}`,                      tFn("app.clause_why.shinies_protected"));
-  // No `!lucky` clause: shadows can never be lucky (game mechanic).
   push(shadowSafeClauses, `!${kw.flag.costume}`,                    tFn("app.clause_why.costumes"));
-  push(shadowSafeClauses, `!@${kw.flag.special_move}`,              tFn("app.clause_why.legacy_moves"));
+  push(shadowSafeClauses, `@${kw.flag.frustration}`,                tFn("app.clause_why.frustration_unmoved", { params: { move: kw.flag.frustration } }));
   push(shadowSafeClauses, `!${kw.flag.favorite}`,                   tFn("app.clause_why.favorites"));
   push(shadowSafeClauses, "!#",                                     tFn("app.clause_why.tags_protected_short"));
   for (const sp of keeperResolved) {
@@ -887,8 +896,13 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   // 11/12 → 13/14 (NOT hundo). This is therefore a *candidate* set —
   // review each match before purifying, since PoGo's bucket syntax can't
   // isolate IV ≥13. Excludes already-4★ shadows.
+  //
+  // Investment gate: `@frustration` — a high-IV shadow whose Frustration
+  // was Charge-TM'd off is doubly valuable (TM investment + Shadow boost).
+  // Purifying it would lose both. Only surface default-state shadows.
   const shadowHundoClauses = [];
   push(shadowHundoClauses, kw.flag.shadow,                          tFn("app.clause_why.shadow_only"));
+  push(shadowHundoClauses, `@${kw.flag.frustration}`,               tFn("app.clause_why.frustration_unmoved", { params: { move: kw.flag.frustration } }));
   push(shadowHundoClauses, `3-4${kw.iv.atk}`,                       tFn("app.clause_why.iv_bucket_high_atk"));
   push(shadowHundoClauses, `3-4${kw.iv.def}`,                       tFn("app.clause_why.iv_bucket_high_def"));
   push(shadowHundoClauses, `3-4${kw.iv.hp}`,                        tFn("app.clause_why.iv_bucket_high_hp"));
