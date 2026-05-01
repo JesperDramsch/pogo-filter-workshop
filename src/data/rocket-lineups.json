@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-04-30T12:59:03.860Z",
+  "fetchedAt": "2026-05-01T09:58:23.437Z",
   "trainers": [
     {
       "name": "Giovanni",
@@ -279,21 +279,34 @@
                 "grass",
                 "steel"
               ]
+            },
+            {
+              "name": "Blastoise",
+              "types": [
+                "water"
+              ]
+            },
+            {
+              "name": "Flygon",
+              "types": [
+                "ground",
+                "dragon"
+              ]
             }
           ],
           "resistorTypes": [
             "flying",
-            "poison",
             "bug",
-            "steel",
-            "fire",
-            "grass",
-            "electric",
-            "dragon"
+            "grass"
           ],
           "seMoveTypes": [
             "fighting",
-            "fire"
+            "fire",
+            "grass",
+            "electric",
+            "ice",
+            "dragon",
+            "fairy"
           ]
         },
         {
@@ -312,6 +325,12 @@
                 "steel",
                 "ground"
               ]
+            },
+            {
+              "name": "Milotic",
+              "types": [
+                "water"
+              ]
             }
           ],
           "resistorTypes": [
@@ -326,7 +345,9 @@
             "ground",
             "rock",
             "fire",
-            "water"
+            "water",
+            "grass",
+            "electric"
           ]
         }
       ]
@@ -365,7 +386,7 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Loudred",
+              "name": "Teddiursa",
               "types": [
                 "normal"
               ]
@@ -468,7 +489,7 @@
               ]
             },
             {
-              "name": "Camerupt",
+              "name": "Numel",
               "types": [
                 "fire",
                 "ground"
@@ -556,7 +577,7 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Sharpedo",
+              "name": "Carvanha",
               "types": [
                 "water",
                 "dark"
@@ -821,10 +842,10 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Ferrothorn",
+              "name": "Phantump",
               "types": [
-                "grass",
-                "steel"
+                "ghost",
+                "grass"
               ]
             },
             {
@@ -872,7 +893,7 @@
       "resistorTypes": [
         "poison",
         "grass",
-        "electric"
+        "fairy"
       ],
       "seMoveTypes": [
         "fighting",
@@ -2289,6 +2310,13 @@
               "types": [
                 "normal"
               ]
+            },
+            {
+              "name": "Lapras",
+              "types": [
+                "water",
+                "ice"
+              ]
             }
           ]
         },
@@ -2346,26 +2374,26 @@
       "topOffensiveTypes": [
         "fighting",
         "electric",
-        "fairy"
+        "rock"
       ],
       "topHits": [
         {
           "type": "fighting",
-          "hits": 3,
-          "total": 7
+          "hits": 4,
+          "total": 8
         },
         {
           "type": "electric",
-          "hits": 2,
-          "total": 7
+          "hits": 3,
+          "total": 8
         },
         {
-          "type": "fairy",
-          "hits": 2,
-          "total": 7
+          "type": "rock",
+          "hits": 3,
+          "total": 8
         }
       ],
-      "lineupSize": 7
+      "lineupSize": 8
     },
     {
       "name": "Decoy Female Grunt",

@@ -110,8 +110,8 @@
       },
       "Sierra": {
         "1": "normal,dark&@1ghost,@1dark&@2ghost,@2dark,@3ghost,@3dark&!<ghost",
-        "2": "flying,poison,bug,steel,fire,grass,electric,dragon&@1fighting,@1fire&@2fighting,@2fire,@3fighting,@3fire&!<grass&!<steel",
-        "3": "fighting,flying,water,dragon,dark&@1fighting,@1ground,@1rock,@1fire,@1water&@2fighting,@2ground,@2rock,@2fire,@2water,@3fighting,@3ground,@3rock,@3fire,@3water&!<dark&!<fire&!<steel&!<ground"
+        "2": "flying,bug,grass&@1fighting,@1fire,@1grass,@1electric,@1ice,@1dragon,@1fairy&@2fighting,@2fire,@2grass,@2electric,@2ice,@2dragon,@2fairy,@3fighting,@3fire,@3grass,@3electric,@3ice,@3dragon,@3fairy&!<grass&!<steel&!<water&!<ground&!<dragon",
+        "3": "fighting,flying,water,dragon,dark&@1fighting,@1ground,@1rock,@1fire,@1water,@1grass,@1electric&@2fighting,@2ground,@2rock,@2fire,@2water,@2grass,@2electric,@3fighting,@3ground,@3rock,@3fire,@3water,@3grass,@3electric&!<dark&!<fire&!<steel&!<ground&!<water"
       }
     },
     "rocketTypedGrunts": {
@@ -120,7 +120,7 @@
       "Water-type Female Grunt": "fighting,poison,steel,water,ice&@1fighting,@1flying,@1ground,@1rock,@1bug,@1grass,@1electric,@1psychic,@1fairy&@2fighting,@2flying,@2ground,@2rock,@2bug,@2grass,@2electric,@2psychic,@2fairy,@3fighting,@3flying,@3ground,@3rock,@3bug,@3grass,@3electric,@3psychic,@3fairy&!<water&!<bug&!<dark&!<poison&!<ice",
       "Water-type Male Grunt": "steel,water,electric,dragon&@1rock,@1grass,@1electric&@2rock,@2grass,@2electric,@3rock,@3grass,@3electric&!<water&!<flying",
       "Electric-type Female Grunt": "fighting,poison,ground,rock,ghost,steel,electric,dragon,fairy&@1fighting,@1ground,@1rock,@1fire,@1water,@1grass&@2fighting,@2ground,@2rock,@2fire,@2water,@2grass,@3fighting,@3ground,@3rock,@3fire,@3water,@3grass&!<electric&!<normal&!<rock&!<bug",
-      "Grass-type Male Grunt": "poison,grass,electric&@1fighting,@1flying,@1poison,@1bug,@1ghost,@1steel,@1fire,@1psychic,@1ice,@1dark,@1fairy&@2fighting,@2flying,@2poison,@2bug,@2ghost,@2steel,@2fire,@2psychic,@2ice,@2dark,@2fairy,@3fighting,@3flying,@3poison,@3bug,@3ghost,@3steel,@3fire,@3psychic,@3ice,@3dark,@3fairy&!<grass&!<fairy&!<steel&!<rock&!<fighting&!<ghost",
+      "Grass-type Male Grunt": "poison,grass,fairy&@1fighting,@1flying,@1poison,@1bug,@1ghost,@1steel,@1fire,@1psychic,@1ice,@1dark,@1fairy&@2fighting,@2flying,@2poison,@2bug,@2ghost,@2steel,@2fire,@2psychic,@2ice,@2dark,@2fairy,@3fighting,@3flying,@3poison,@3bug,@3ghost,@3steel,@3fire,@3psychic,@3ice,@3dark,@3fairy&!<grass&!<fairy&!<ghost&!<rock&!<fighting",
       "Ice-type Female Grunt": "normal,water,fairy&@1fighting,@1poison,@1ground,@1rock,@1bug,@1ghost,@1steel,@1fire,@1water,@1grass,@1electric,@1dark,@1fairy&@2fighting,@2poison,@2ground,@2rock,@2bug,@2ghost,@2steel,@2fire,@2water,@2grass,@2electric,@2dark,@2fairy,@3fighting,@3poison,@3ground,@3rock,@3bug,@3ghost,@3steel,@3fire,@3water,@3grass,@3electric,@3dark,@3fairy&!<ice&!<water&!<ground&!<dark&!<ghost&!<fairy&!<rock",
       "Fighting-type Female Grunt": "flying,poison,fire,water,dragon,fairy&@1flying,@1ground,@1ghost,@1water,@1psychic,@1fairy&@2flying,@2ground,@2ghost,@2water,@2psychic,@2fairy,@3flying,@3ground,@3ghost,@3water,@3psychic,@3fairy&!<fighting&!<ghost&!<fire",
       "Poison-type Female Grunt": "flying,poison,ghost,electric,psychic&@1flying,@1ground,@1rock,@1steel,@1fire,@1electric,@1psychic,@1ice&@2flying,@2ground,@2rock,@2steel,@2fire,@2electric,@2psychic,@2ice,@3flying,@3ground,@3rock,@3steel,@3fire,@3electric,@3psychic,@3ice&!<grass&!<poison&!<flying&!<water&!<fairy&!<fighting",
@@ -137,7 +137,7 @@
     },
     "rocketGenericGrunts": {
       "Male Grunt": "@1electric,@1fire,@1flying&@2electric,@2fire,@2flying,@3electric,@3fire,@3flying",
-      "Female Grunt": "@1fighting,@1electric,@1fairy&@2fighting,@2electric,@2fairy,@3fighting,@3electric,@3fairy",
+      "Female Grunt": "@1fighting,@1electric,@1rock&@2fighting,@2electric,@2rock,@3fighting,@3electric,@3rock",
       "Decoy Female Grunt": "@1fighting,@1fire,@1flying&@2fighting,@2fire,@2flying,@3fighting,@3fire,@3flying"
     },
     "pvpFilters": {
@@ -259,8 +259,8 @@
       },
       "Sierra": {
         "1": "normal,unlicht&@1geist,@1unlicht&@2geist,@2unlicht,@3geist,@3unlicht&!<geist",
-        "2": "flug,gift,käfer,stahl,feuer,pflanze,elektro,drache&@1kampf,@1feuer&@2kampf,@2feuer,@3kampf,@3feuer&!<pflanze&!<stahl",
-        "3": "kampf,flug,wasser,drache,unlicht&@1kampf,@1boden,@1gestein,@1feuer,@1wasser&@2kampf,@2boden,@2gestein,@2feuer,@2wasser,@3kampf,@3boden,@3gestein,@3feuer,@3wasser&!<unlicht&!<feuer&!<stahl&!<boden"
+        "2": "flug,käfer,pflanze&@1kampf,@1feuer,@1pflanze,@1elektro,@1eis,@1drache,@1fee&@2kampf,@2feuer,@2pflanze,@2elektro,@2eis,@2drache,@2fee,@3kampf,@3feuer,@3pflanze,@3elektro,@3eis,@3drache,@3fee&!<pflanze&!<stahl&!<wasser&!<boden&!<drache",
+        "3": "kampf,flug,wasser,drache,unlicht&@1kampf,@1boden,@1gestein,@1feuer,@1wasser,@1pflanze,@1elektro&@2kampf,@2boden,@2gestein,@2feuer,@2wasser,@2pflanze,@2elektro,@3kampf,@3boden,@3gestein,@3feuer,@3wasser,@3pflanze,@3elektro&!<unlicht&!<feuer&!<stahl&!<boden&!<wasser"
       }
     },
     "rocketTypedGrunts": {
@@ -269,7 +269,7 @@
       "Wasser-Rüpel ♀": "kampf,gift,stahl,wasser,eis&@1kampf,@1flug,@1boden,@1gestein,@1käfer,@1pflanze,@1elektro,@1psycho,@1fee&@2kampf,@2flug,@2boden,@2gestein,@2käfer,@2pflanze,@2elektro,@2psycho,@2fee,@3kampf,@3flug,@3boden,@3gestein,@3käfer,@3pflanze,@3elektro,@3psycho,@3fee&!<wasser&!<käfer&!<unlicht&!<gift&!<eis",
       "Wasser-Rüpel ♂": "stahl,wasser,elektro,drache&@1gestein,@1pflanze,@1elektro&@2gestein,@2pflanze,@2elektro,@3gestein,@3pflanze,@3elektro&!<wasser&!<flug",
       "Elektro-Rüpel ♀": "kampf,gift,boden,gestein,geist,stahl,elektro,drache,fee&@1kampf,@1boden,@1gestein,@1feuer,@1wasser,@1pflanze&@2kampf,@2boden,@2gestein,@2feuer,@2wasser,@2pflanze,@3kampf,@3boden,@3gestein,@3feuer,@3wasser,@3pflanze&!<elektro&!<normal&!<gestein&!<käfer",
-      "Pflanze-Rüpel ♂": "gift,pflanze,elektro&@1kampf,@1flug,@1gift,@1käfer,@1geist,@1stahl,@1feuer,@1psycho,@1eis,@1unlicht,@1fee&@2kampf,@2flug,@2gift,@2käfer,@2geist,@2stahl,@2feuer,@2psycho,@2eis,@2unlicht,@2fee,@3kampf,@3flug,@3gift,@3käfer,@3geist,@3stahl,@3feuer,@3psycho,@3eis,@3unlicht,@3fee&!<pflanze&!<fee&!<stahl&!<gestein&!<kampf&!<geist",
+      "Pflanze-Rüpel ♂": "gift,pflanze,fee&@1kampf,@1flug,@1gift,@1käfer,@1geist,@1stahl,@1feuer,@1psycho,@1eis,@1unlicht,@1fee&@2kampf,@2flug,@2gift,@2käfer,@2geist,@2stahl,@2feuer,@2psycho,@2eis,@2unlicht,@2fee,@3kampf,@3flug,@3gift,@3käfer,@3geist,@3stahl,@3feuer,@3psycho,@3eis,@3unlicht,@3fee&!<pflanze&!<fee&!<geist&!<gestein&!<kampf",
       "Eis-Rüpel ♀": "normal,wasser,fee&@1kampf,@1gift,@1boden,@1gestein,@1käfer,@1geist,@1stahl,@1feuer,@1wasser,@1pflanze,@1elektro,@1unlicht,@1fee&@2kampf,@2gift,@2boden,@2gestein,@2käfer,@2geist,@2stahl,@2feuer,@2wasser,@2pflanze,@2elektro,@2unlicht,@2fee,@3kampf,@3gift,@3boden,@3gestein,@3käfer,@3geist,@3stahl,@3feuer,@3wasser,@3pflanze,@3elektro,@3unlicht,@3fee&!<eis&!<wasser&!<boden&!<unlicht&!<geist&!<fee&!<gestein",
       "Kampf-Rüpel ♀": "flug,gift,feuer,wasser,drache,fee&@1flug,@1boden,@1geist,@1wasser,@1psycho,@1fee&@2flug,@2boden,@2geist,@2wasser,@2psycho,@2fee,@3flug,@3boden,@3geist,@3wasser,@3psycho,@3fee&!<kampf&!<geist&!<feuer",
       "Gift-Rüpel ♀": "flug,gift,geist,elektro,psycho&@1flug,@1boden,@1gestein,@1stahl,@1feuer,@1elektro,@1psycho,@1eis&@2flug,@2boden,@2gestein,@2stahl,@2feuer,@2elektro,@2psycho,@2eis,@3flug,@3boden,@3gestein,@3stahl,@3feuer,@3elektro,@3psycho,@3eis&!<pflanze&!<gift&!<flug&!<wasser&!<fee&!<kampf",
@@ -286,7 +286,7 @@
     },
     "rocketGenericGrunts": {
       "Male Grunt": "@1elektro,@1feuer,@1flug&@2elektro,@2feuer,@2flug,@3elektro,@3feuer,@3flug",
-      "Female Grunt": "@1kampf,@1elektro,@1fee&@2kampf,@2elektro,@2fee,@3kampf,@3elektro,@3fee",
+      "Female Grunt": "@1kampf,@1elektro,@1gestein&@2kampf,@2elektro,@2gestein,@3kampf,@3elektro,@3gestein",
       "Decoy Female Grunt": "@1kampf,@1feuer,@1flug&@2kampf,@2feuer,@2flug,@3kampf,@3feuer,@3flug"
     },
     "pvpFilters": {
@@ -408,34 +408,34 @@
       },
       "Sierra": {
         "1": "normal,siniestro&@1fantasma,@1siniestro&@2fantasma,@2siniestro,@3fantasma,@3siniestro&!<fantasma",
-        "2": "volador,veneno,bicho,acero,fuego,planta,eléctrico,dragón&@1lucha,@1fuego&@2lucha,@2fuego,@3lucha,@3fuego&!<planta&!<acero",
-        "3": "lucha,volador,agua,dragón,siniestro&@1lucha,@1tierra,@1roca,@1fuego,@1agua&@2lucha,@2tierra,@2roca,@2fuego,@2agua,@3lucha,@3tierra,@3roca,@3fuego,@3agua&!<siniestro&!<fuego&!<acero&!<tierra"
+        "2": "volador,bicho,planta&@1lucha,@1fuego,@1planta,@1eléctrico,@1hielo,@1dragón,@1hada&@2lucha,@2fuego,@2planta,@2eléctrico,@2hielo,@2dragón,@2hada,@3lucha,@3fuego,@3planta,@3eléctrico,@3hielo,@3dragón,@3hada&!<planta&!<acero&!<agua&!<tierra&!<dragón",
+        "3": "lucha,volador,agua,dragón,siniestro&@1lucha,@1tierra,@1roca,@1fuego,@1agua,@1planta,@1eléctrico&@2lucha,@2tierra,@2roca,@2fuego,@2agua,@2planta,@2eléctrico,@3lucha,@3tierra,@3roca,@3fuego,@3agua,@3planta,@3eléctrico&!<siniestro&!<fuego&!<acero&!<tierra&!<agua"
       }
     },
     "rocketTypedGrunts": {
-      "Normal-type Male Grunt": "volador,veneno,fantasma,eléctrico,psíquico,hada&@1lucha,@1volador,@1roca,@1eléctrico,@1psíquico,@1hielo,@1hada&@2lucha,@2volador,@2roca,@2eléctrico,@2psíquico,@2hielo,@2hada,@3lucha,@3volador,@3roca,@3eléctrico,@3psíquico,@3hielo,@3hada&!<normal&!<lucha&!<volador",
-      "Fuego-type Female Grunt": "normal,volador,agua,dragón,siniestro&@1tierra,@1roca,@1fantasma,@1agua,@1siniestro&@2tierra,@2roca,@2fantasma,@2agua,@2siniestro,@3tierra,@3roca,@3fantasma,@3agua,@3siniestro&!<fuego&!<fantasma&!<tierra&!<psíquico",
-      "Agua-type Female Grunt": "lucha,veneno,acero,agua,hielo&@1lucha,@1volador,@1tierra,@1roca,@1bicho,@1planta,@1eléctrico,@1psíquico,@1hada&@2lucha,@2volador,@2tierra,@2roca,@2bicho,@2planta,@2eléctrico,@2psíquico,@2hada,@3lucha,@3volador,@3tierra,@3roca,@3bicho,@3planta,@3eléctrico,@3psíquico,@3hada&!<agua&!<bicho&!<siniestro&!<veneno&!<hielo",
-      "Agua-type Male Grunt": "acero,agua,eléctrico,dragón&@1roca,@1planta,@1eléctrico&@2roca,@2planta,@2eléctrico,@3roca,@3planta,@3eléctrico&!<agua&!<volador",
-      "Eléctrico-type Female Grunt": "lucha,veneno,tierra,roca,fantasma,acero,eléctrico,dragón,hada&@1lucha,@1tierra,@1roca,@1fuego,@1agua,@1planta&@2lucha,@2tierra,@2roca,@2fuego,@2agua,@2planta,@3lucha,@3tierra,@3roca,@3fuego,@3agua,@3planta&!<eléctrico&!<normal&!<roca&!<bicho",
-      "Planta-type Male Grunt": "veneno,planta,eléctrico&@1lucha,@1volador,@1veneno,@1bicho,@1fantasma,@1acero,@1fuego,@1psíquico,@1hielo,@1siniestro,@1hada&@2lucha,@2volador,@2veneno,@2bicho,@2fantasma,@2acero,@2fuego,@2psíquico,@2hielo,@2siniestro,@2hada,@3lucha,@3volador,@3veneno,@3bicho,@3fantasma,@3acero,@3fuego,@3psíquico,@3hielo,@3siniestro,@3hada&!<planta&!<hada&!<acero&!<roca&!<lucha&!<fantasma",
-      "Hielo-type Female Grunt": "normal,agua,hada&@1lucha,@1veneno,@1tierra,@1roca,@1bicho,@1fantasma,@1acero,@1fuego,@1agua,@1planta,@1eléctrico,@1siniestro,@1hada&@2lucha,@2veneno,@2tierra,@2roca,@2bicho,@2fantasma,@2acero,@2fuego,@2agua,@2planta,@2eléctrico,@2siniestro,@2hada,@3lucha,@3veneno,@3tierra,@3roca,@3bicho,@3fantasma,@3acero,@3fuego,@3agua,@3planta,@3eléctrico,@3siniestro,@3hada&!<hielo&!<agua&!<tierra&!<siniestro&!<fantasma&!<hada&!<roca",
-      "Lucha-type Female Grunt": "volador,veneno,fuego,agua,dragón,hada&@1volador,@1tierra,@1fantasma,@1agua,@1psíquico,@1hada&@2volador,@2tierra,@2fantasma,@2agua,@2psíquico,@2hada,@3volador,@3tierra,@3fantasma,@3agua,@3psíquico,@3hada&!<lucha&!<fantasma&!<fuego",
-      "Veneno-type Female Grunt": "volador,veneno,fantasma,eléctrico,psíquico&@1volador,@1tierra,@1roca,@1acero,@1fuego,@1eléctrico,@1psíquico,@1hielo&@2volador,@2tierra,@2roca,@2acero,@2fuego,@2eléctrico,@2psíquico,@2hielo,@3volador,@3tierra,@3roca,@3acero,@3fuego,@3eléctrico,@3psíquico,@3hielo&!<planta&!<veneno&!<volador&!<agua&!<hada&!<lucha",
-      "Tierra-type Male Grunt": "normal,volador,siniestro,hada&@1bicho,@1fantasma,@1agua,@1planta,@1hielo,@1dragón,@1siniestro,@1hada&@2bicho,@2fantasma,@2agua,@2planta,@2hielo,@2dragón,@2siniestro,@2hada,@3bicho,@3fantasma,@3agua,@3planta,@3hielo,@3dragón,@3siniestro,@3hada&!<tierra&!<volador&!<psíquico&!<dragón&!<fantasma",
-      "Volador-type Female Grunt": "volador,fantasma,agua&@1volador,@1roca,@1fuego,@1agua,@1eléctrico,@1psíquico,@1hielo,@1dragón,@1hada&@2volador,@2roca,@2fuego,@2agua,@2eléctrico,@2psíquico,@2hielo,@2dragón,@2hada,@3volador,@3roca,@3fuego,@3agua,@3eléctrico,@3psíquico,@3hielo,@3dragón,@3hada&!<normal&!<volador&!<veneno&!<tierra&!<bicho&!<dragón&!<agua",
-      "Psíquico-type Male Grunt": "volador,bicho,fuego,hada&@1volador,@1veneno,@1bicho,@1fantasma,@1acero,@1siniestro,@1hada&@2volador,@2veneno,@2bicho,@2fantasma,@2acero,@2siniestro,@2hada,@3volador,@3veneno,@3bicho,@3fantasma,@3acero,@3siniestro,@3hada&!<psíquico&!<hada&!<lucha&!<siniestro",
-      "Bicho-type Male Grunt": "lucha,veneno,tierra,fantasma,acero,eléctrico,dragón&@1volador,@1roca,@1acero,@1fuego,@1agua,@1psíquico&@2volador,@2roca,@2acero,@2fuego,@2agua,@2psíquico,@3volador,@3roca,@3acero,@3fuego,@3agua,@3psíquico&!<bicho&!<veneno&!<roca&!<eléctrico&!<acero",
-      "Roca-type Male Grunt": "lucha,fantasma,agua&@1lucha,@1tierra,@1roca,@1acero,@1agua,@1planta,@1eléctrico,@1hielo,@1dragón,@1hada&@2lucha,@2tierra,@2roca,@2acero,@2agua,@2planta,@2eléctrico,@2hielo,@2dragón,@2hada,@3lucha,@3tierra,@3roca,@3acero,@3agua,@3planta,@3eléctrico,@3hielo,@3dragón,@3hada&!<bicho&!<roca&!<agua&!<tierra&!<acero&!<hielo&!<dragón",
-      "Fantasma-type Male Grunt": "normal,lucha,veneno,roca,acero,fuego,agua,hielo,siniestro&@1tierra,@1roca,@1fantasma,@1acero,@1fuego,@1psíquico,@1siniestro,@1hada&@2tierra,@2roca,@2fantasma,@2acero,@2fuego,@2psíquico,@2siniestro,@2hada,@3tierra,@3roca,@3fantasma,@3acero,@3fuego,@3psíquico,@3siniestro,@3hada&!<fantasma&!<veneno&!<siniestro&!<hielo",
-      "Dragón-type Female Grunt": "volador,siniestro,hada&@1lucha,@1volador,@1veneno,@1roca,@1bicho,@1hielo,@1dragón,@1hada&@2lucha,@2volador,@2veneno,@2roca,@2bicho,@2hielo,@2dragón,@2hada,@3lucha,@3volador,@3veneno,@3roca,@3bicho,@3hielo,@3dragón,@3hada&!<dragón&!<siniestro&!<planta&!<tierra&!<volador",
-      "Siniestro-type Female Grunt": "lucha,acero,agua,planta,siniestro,hada&@1lucha,@1bicho,@1planta,@1eléctrico,@1hielo,@1dragón,@1hada&@2lucha,@2bicho,@2planta,@2eléctrico,@2hielo,@2dragón,@2hada,@3lucha,@3bicho,@3planta,@3eléctrico,@3hielo,@3dragón,@3hada&!<siniestro&!<normal&!<agua&!<dragón",
-      "Acero-type Male Grunt": "acero,agua,eléctrico,psíquico,siniestro&@1lucha,@1tierra,@1fantasma,@1fuego,@1agua,@1eléctrico,@1siniestro&@2lucha,@2tierra,@2fantasma,@2fuego,@2agua,@2eléctrico,@2siniestro,@3lucha,@3tierra,@3fantasma,@3fuego,@3agua,@3eléctrico,@3siniestro&!<hielo&!<acero&!<psíquico&!<roca&!<volador",
-      "Hada-type Female Grunt": "roca,fantasma,acero,fuego,agua,psíquico,hielo&@1lucha,@1veneno,@1tierra,@1roca,@1fantasma,@1acero,@1fuego,@1psíquico&@2lucha,@2veneno,@2tierra,@2roca,@2fantasma,@2acero,@2fuego,@2psíquico,@3lucha,@3veneno,@3tierra,@3roca,@3fantasma,@3acero,@3fuego,@3psíquico&!<hada&!<hielo&!<psíquico&!<veneno"
+      "Recluta Masculino tipo Normal": "volador,veneno,fantasma,eléctrico,psíquico,hada&@1lucha,@1volador,@1roca,@1eléctrico,@1psíquico,@1hielo,@1hada&@2lucha,@2volador,@2roca,@2eléctrico,@2psíquico,@2hielo,@2hada,@3lucha,@3volador,@3roca,@3eléctrico,@3psíquico,@3hielo,@3hada&!<normal&!<lucha&!<volador",
+      "Recluta Femenina tipo Fuego": "normal,volador,agua,dragón,siniestro&@1tierra,@1roca,@1fantasma,@1agua,@1siniestro&@2tierra,@2roca,@2fantasma,@2agua,@2siniestro,@3tierra,@3roca,@3fantasma,@3agua,@3siniestro&!<fuego&!<fantasma&!<tierra&!<psíquico",
+      "Recluta Femenina tipo Agua": "lucha,veneno,acero,agua,hielo&@1lucha,@1volador,@1tierra,@1roca,@1bicho,@1planta,@1eléctrico,@1psíquico,@1hada&@2lucha,@2volador,@2tierra,@2roca,@2bicho,@2planta,@2eléctrico,@2psíquico,@2hada,@3lucha,@3volador,@3tierra,@3roca,@3bicho,@3planta,@3eléctrico,@3psíquico,@3hada&!<agua&!<bicho&!<siniestro&!<veneno&!<hielo",
+      "Recluta Masculino tipo Agua": "acero,agua,eléctrico,dragón&@1roca,@1planta,@1eléctrico&@2roca,@2planta,@2eléctrico,@3roca,@3planta,@3eléctrico&!<agua&!<volador",
+      "Recluta Femenina tipo Eléctrico": "lucha,veneno,tierra,roca,fantasma,acero,eléctrico,dragón,hada&@1lucha,@1tierra,@1roca,@1fuego,@1agua,@1planta&@2lucha,@2tierra,@2roca,@2fuego,@2agua,@2planta,@3lucha,@3tierra,@3roca,@3fuego,@3agua,@3planta&!<eléctrico&!<normal&!<roca&!<bicho",
+      "Recluta Masculino tipo Planta": "veneno,planta,hada&@1lucha,@1volador,@1veneno,@1bicho,@1fantasma,@1acero,@1fuego,@1psíquico,@1hielo,@1siniestro,@1hada&@2lucha,@2volador,@2veneno,@2bicho,@2fantasma,@2acero,@2fuego,@2psíquico,@2hielo,@2siniestro,@2hada,@3lucha,@3volador,@3veneno,@3bicho,@3fantasma,@3acero,@3fuego,@3psíquico,@3hielo,@3siniestro,@3hada&!<planta&!<hada&!<fantasma&!<roca&!<lucha",
+      "Recluta Femenina tipo Hielo": "normal,agua,hada&@1lucha,@1veneno,@1tierra,@1roca,@1bicho,@1fantasma,@1acero,@1fuego,@1agua,@1planta,@1eléctrico,@1siniestro,@1hada&@2lucha,@2veneno,@2tierra,@2roca,@2bicho,@2fantasma,@2acero,@2fuego,@2agua,@2planta,@2eléctrico,@2siniestro,@2hada,@3lucha,@3veneno,@3tierra,@3roca,@3bicho,@3fantasma,@3acero,@3fuego,@3agua,@3planta,@3eléctrico,@3siniestro,@3hada&!<hielo&!<agua&!<tierra&!<siniestro&!<fantasma&!<hada&!<roca",
+      "Recluta Femenina tipo Lucha": "volador,veneno,fuego,agua,dragón,hada&@1volador,@1tierra,@1fantasma,@1agua,@1psíquico,@1hada&@2volador,@2tierra,@2fantasma,@2agua,@2psíquico,@2hada,@3volador,@3tierra,@3fantasma,@3agua,@3psíquico,@3hada&!<lucha&!<fantasma&!<fuego",
+      "Recluta Femenina tipo Veneno": "volador,veneno,fantasma,eléctrico,psíquico&@1volador,@1tierra,@1roca,@1acero,@1fuego,@1eléctrico,@1psíquico,@1hielo&@2volador,@2tierra,@2roca,@2acero,@2fuego,@2eléctrico,@2psíquico,@2hielo,@3volador,@3tierra,@3roca,@3acero,@3fuego,@3eléctrico,@3psíquico,@3hielo&!<planta&!<veneno&!<volador&!<agua&!<hada&!<lucha",
+      "Recluta Masculino tipo Tierra": "normal,volador,siniestro,hada&@1bicho,@1fantasma,@1agua,@1planta,@1hielo,@1dragón,@1siniestro,@1hada&@2bicho,@2fantasma,@2agua,@2planta,@2hielo,@2dragón,@2siniestro,@2hada,@3bicho,@3fantasma,@3agua,@3planta,@3hielo,@3dragón,@3siniestro,@3hada&!<tierra&!<volador&!<psíquico&!<dragón&!<fantasma",
+      "Recluta Femenina tipo Volador": "volador,fantasma,agua&@1volador,@1roca,@1fuego,@1agua,@1eléctrico,@1psíquico,@1hielo,@1dragón,@1hada&@2volador,@2roca,@2fuego,@2agua,@2eléctrico,@2psíquico,@2hielo,@2dragón,@2hada,@3volador,@3roca,@3fuego,@3agua,@3eléctrico,@3psíquico,@3hielo,@3dragón,@3hada&!<normal&!<volador&!<veneno&!<tierra&!<bicho&!<dragón&!<agua",
+      "Recluta Masculino tipo Psíquico": "volador,bicho,fuego,hada&@1volador,@1veneno,@1bicho,@1fantasma,@1acero,@1siniestro,@1hada&@2volador,@2veneno,@2bicho,@2fantasma,@2acero,@2siniestro,@2hada,@3volador,@3veneno,@3bicho,@3fantasma,@3acero,@3siniestro,@3hada&!<psíquico&!<hada&!<lucha&!<siniestro",
+      "Recluta Masculino tipo Bicho": "lucha,veneno,tierra,fantasma,acero,eléctrico,dragón&@1volador,@1roca,@1acero,@1fuego,@1agua,@1psíquico&@2volador,@2roca,@2acero,@2fuego,@2agua,@2psíquico,@3volador,@3roca,@3acero,@3fuego,@3agua,@3psíquico&!<bicho&!<veneno&!<roca&!<eléctrico&!<acero",
+      "Recluta Masculino tipo Roca": "lucha,fantasma,agua&@1lucha,@1tierra,@1roca,@1acero,@1agua,@1planta,@1eléctrico,@1hielo,@1dragón,@1hada&@2lucha,@2tierra,@2roca,@2acero,@2agua,@2planta,@2eléctrico,@2hielo,@2dragón,@2hada,@3lucha,@3tierra,@3roca,@3acero,@3agua,@3planta,@3eléctrico,@3hielo,@3dragón,@3hada&!<bicho&!<roca&!<agua&!<tierra&!<acero&!<hielo&!<dragón",
+      "Recluta Masculino tipo Fantasma": "normal,lucha,veneno,roca,acero,fuego,agua,hielo,siniestro&@1tierra,@1roca,@1fantasma,@1acero,@1fuego,@1psíquico,@1siniestro,@1hada&@2tierra,@2roca,@2fantasma,@2acero,@2fuego,@2psíquico,@2siniestro,@2hada,@3tierra,@3roca,@3fantasma,@3acero,@3fuego,@3psíquico,@3siniestro,@3hada&!<fantasma&!<veneno&!<siniestro&!<hielo",
+      "Recluta Femenina tipo Dragón": "volador,siniestro,hada&@1lucha,@1volador,@1veneno,@1roca,@1bicho,@1hielo,@1dragón,@1hada&@2lucha,@2volador,@2veneno,@2roca,@2bicho,@2hielo,@2dragón,@2hada,@3lucha,@3volador,@3veneno,@3roca,@3bicho,@3hielo,@3dragón,@3hada&!<dragón&!<siniestro&!<planta&!<tierra&!<volador",
+      "Recluta Femenina tipo Siniestro": "lucha,acero,agua,planta,siniestro,hada&@1lucha,@1bicho,@1planta,@1eléctrico,@1hielo,@1dragón,@1hada&@2lucha,@2bicho,@2planta,@2eléctrico,@2hielo,@2dragón,@2hada,@3lucha,@3bicho,@3planta,@3eléctrico,@3hielo,@3dragón,@3hada&!<siniestro&!<normal&!<agua&!<dragón",
+      "Recluta Masculino tipo Acero": "acero,agua,eléctrico,psíquico,siniestro&@1lucha,@1tierra,@1fantasma,@1fuego,@1agua,@1eléctrico,@1siniestro&@2lucha,@2tierra,@2fantasma,@2fuego,@2agua,@2eléctrico,@2siniestro,@3lucha,@3tierra,@3fantasma,@3fuego,@3agua,@3eléctrico,@3siniestro&!<hielo&!<acero&!<psíquico&!<roca&!<volador",
+      "Recluta Femenina tipo Hada": "roca,fantasma,acero,fuego,agua,psíquico,hielo&@1lucha,@1veneno,@1tierra,@1roca,@1fantasma,@1acero,@1fuego,@1psíquico&@2lucha,@2veneno,@2tierra,@2roca,@2fantasma,@2acero,@2fuego,@2psíquico,@3lucha,@3veneno,@3tierra,@3roca,@3fantasma,@3acero,@3fuego,@3psíquico&!<hada&!<hielo&!<psíquico&!<veneno"
     },
     "rocketGenericGrunts": {
       "Male Grunt": "@1eléctrico,@1fuego,@1volador&@2eléctrico,@2fuego,@2volador,@3eléctrico,@3fuego,@3volador",
-      "Female Grunt": "@1lucha,@1eléctrico,@1hada&@2lucha,@2eléctrico,@2hada,@3lucha,@3eléctrico,@3hada",
+      "Female Grunt": "@1lucha,@1eléctrico,@1roca&@2lucha,@2eléctrico,@2roca,@3lucha,@3eléctrico,@3roca",
       "Decoy Female Grunt": "@1lucha,@1fuego,@1volador&@2lucha,@2fuego,@2volador,@3lucha,@3fuego,@3volador"
     },
     "pvpFilters": {
@@ -557,34 +557,34 @@
       },
       "Sierra": {
         "1": "normal,ténèbres&@1spectre,@1ténèbres&@2spectre,@2ténèbres,@3spectre,@3ténèbres&!<spectre",
-        "2": "vol,poison,insecte,acier,feu,plante,électrik,dragon&@1combat,@1feu&@2combat,@2feu,@3combat,@3feu&!<plante&!<acier",
-        "3": "combat,vol,eau,dragon,ténèbres&@1combat,@1sol,@1roche,@1feu,@1eau&@2combat,@2sol,@2roche,@2feu,@2eau,@3combat,@3sol,@3roche,@3feu,@3eau&!<ténèbres&!<feu&!<acier&!<sol"
+        "2": "vol,insecte,plante&@1combat,@1feu,@1plante,@1électrik,@1glace,@1dragon,@1fée&@2combat,@2feu,@2plante,@2électrik,@2glace,@2dragon,@2fée,@3combat,@3feu,@3plante,@3électrik,@3glace,@3dragon,@3fée&!<plante&!<acier&!<eau&!<sol&!<dragon",
+        "3": "combat,vol,eau,dragon,ténèbres&@1combat,@1sol,@1roche,@1feu,@1eau,@1plante,@1électrik&@2combat,@2sol,@2roche,@2feu,@2eau,@2plante,@2électrik,@3combat,@3sol,@3roche,@3feu,@3eau,@3plante,@3électrik&!<ténèbres&!<feu&!<acier&!<sol&!<eau"
       }
     },
     "rocketTypedGrunts": {
-      "Normal-type Male Grunt": "vol,poison,spectre,électrik,psy,fée&@1combat,@1vol,@1roche,@1électrik,@1psy,@1glace,@1fée&@2combat,@2vol,@2roche,@2électrik,@2psy,@2glace,@2fée,@3combat,@3vol,@3roche,@3électrik,@3psy,@3glace,@3fée&!<normal&!<combat&!<vol",
-      "Feu-type Female Grunt": "normal,vol,eau,dragon,ténèbres&@1sol,@1roche,@1spectre,@1eau,@1ténèbres&@2sol,@2roche,@2spectre,@2eau,@2ténèbres,@3sol,@3roche,@3spectre,@3eau,@3ténèbres&!<feu&!<spectre&!<sol&!<psy",
-      "Eau-type Female Grunt": "combat,poison,acier,eau,glace&@1combat,@1vol,@1sol,@1roche,@1insecte,@1plante,@1électrik,@1psy,@1fée&@2combat,@2vol,@2sol,@2roche,@2insecte,@2plante,@2électrik,@2psy,@2fée,@3combat,@3vol,@3sol,@3roche,@3insecte,@3plante,@3électrik,@3psy,@3fée&!<eau&!<insecte&!<ténèbres&!<poison&!<glace",
-      "Eau-type Male Grunt": "acier,eau,électrik,dragon&@1roche,@1plante,@1électrik&@2roche,@2plante,@2électrik,@3roche,@3plante,@3électrik&!<eau&!<vol",
-      "Électrik-type Female Grunt": "combat,poison,sol,roche,spectre,acier,électrik,dragon,fée&@1combat,@1sol,@1roche,@1feu,@1eau,@1plante&@2combat,@2sol,@2roche,@2feu,@2eau,@2plante,@3combat,@3sol,@3roche,@3feu,@3eau,@3plante&!<électrik&!<normal&!<roche&!<insecte",
-      "Plante-type Male Grunt": "poison,plante,électrik&@1combat,@1vol,@1poison,@1insecte,@1spectre,@1acier,@1feu,@1psy,@1glace,@1ténèbres,@1fée&@2combat,@2vol,@2poison,@2insecte,@2spectre,@2acier,@2feu,@2psy,@2glace,@2ténèbres,@2fée,@3combat,@3vol,@3poison,@3insecte,@3spectre,@3acier,@3feu,@3psy,@3glace,@3ténèbres,@3fée&!<plante&!<fée&!<acier&!<roche&!<combat&!<spectre",
-      "Glace-type Female Grunt": "normal,eau,fée&@1combat,@1poison,@1sol,@1roche,@1insecte,@1spectre,@1acier,@1feu,@1eau,@1plante,@1électrik,@1ténèbres,@1fée&@2combat,@2poison,@2sol,@2roche,@2insecte,@2spectre,@2acier,@2feu,@2eau,@2plante,@2électrik,@2ténèbres,@2fée,@3combat,@3poison,@3sol,@3roche,@3insecte,@3spectre,@3acier,@3feu,@3eau,@3plante,@3électrik,@3ténèbres,@3fée&!<glace&!<eau&!<sol&!<ténèbres&!<spectre&!<fée&!<roche",
-      "Combat-type Female Grunt": "vol,poison,feu,eau,dragon,fée&@1vol,@1sol,@1spectre,@1eau,@1psy,@1fée&@2vol,@2sol,@2spectre,@2eau,@2psy,@2fée,@3vol,@3sol,@3spectre,@3eau,@3psy,@3fée&!<combat&!<spectre&!<feu",
-      "Poison-type Female Grunt": "vol,poison,spectre,électrik,psy&@1vol,@1sol,@1roche,@1acier,@1feu,@1électrik,@1psy,@1glace&@2vol,@2sol,@2roche,@2acier,@2feu,@2électrik,@2psy,@2glace,@3vol,@3sol,@3roche,@3acier,@3feu,@3électrik,@3psy,@3glace&!<plante&!<poison&!<vol&!<eau&!<fée&!<combat",
-      "Sol-type Male Grunt": "normal,vol,ténèbres,fée&@1insecte,@1spectre,@1eau,@1plante,@1glace,@1dragon,@1ténèbres,@1fée&@2insecte,@2spectre,@2eau,@2plante,@2glace,@2dragon,@2ténèbres,@2fée,@3insecte,@3spectre,@3eau,@3plante,@3glace,@3dragon,@3ténèbres,@3fée&!<sol&!<vol&!<psy&!<dragon&!<spectre",
-      "Vol-type Female Grunt": "vol,spectre,eau&@1vol,@1roche,@1feu,@1eau,@1électrik,@1psy,@1glace,@1dragon,@1fée&@2vol,@2roche,@2feu,@2eau,@2électrik,@2psy,@2glace,@2dragon,@2fée,@3vol,@3roche,@3feu,@3eau,@3électrik,@3psy,@3glace,@3dragon,@3fée&!<normal&!<vol&!<poison&!<sol&!<insecte&!<dragon&!<eau",
-      "Psy-type Male Grunt": "vol,insecte,feu,fée&@1vol,@1poison,@1insecte,@1spectre,@1acier,@1ténèbres,@1fée&@2vol,@2poison,@2insecte,@2spectre,@2acier,@2ténèbres,@2fée,@3vol,@3poison,@3insecte,@3spectre,@3acier,@3ténèbres,@3fée&!<psy&!<fée&!<combat&!<ténèbres",
-      "Insecte-type Male Grunt": "combat,poison,sol,spectre,acier,électrik,dragon&@1vol,@1roche,@1acier,@1feu,@1eau,@1psy&@2vol,@2roche,@2acier,@2feu,@2eau,@2psy,@3vol,@3roche,@3acier,@3feu,@3eau,@3psy&!<insecte&!<poison&!<roche&!<électrik&!<acier",
-      "Roche-type Male Grunt": "combat,spectre,eau&@1combat,@1sol,@1roche,@1acier,@1eau,@1plante,@1électrik,@1glace,@1dragon,@1fée&@2combat,@2sol,@2roche,@2acier,@2eau,@2plante,@2électrik,@2glace,@2dragon,@2fée,@3combat,@3sol,@3roche,@3acier,@3eau,@3plante,@3électrik,@3glace,@3dragon,@3fée&!<insecte&!<roche&!<eau&!<sol&!<acier&!<glace&!<dragon",
-      "Spectre-type Male Grunt": "normal,combat,poison,roche,acier,feu,eau,glace,ténèbres&@1sol,@1roche,@1spectre,@1acier,@1feu,@1psy,@1ténèbres,@1fée&@2sol,@2roche,@2spectre,@2acier,@2feu,@2psy,@2ténèbres,@2fée,@3sol,@3roche,@3spectre,@3acier,@3feu,@3psy,@3ténèbres,@3fée&!<spectre&!<poison&!<ténèbres&!<glace",
-      "Dragon-type Female Grunt": "vol,ténèbres,fée&@1combat,@1vol,@1poison,@1roche,@1insecte,@1glace,@1dragon,@1fée&@2combat,@2vol,@2poison,@2roche,@2insecte,@2glace,@2dragon,@2fée,@3combat,@3vol,@3poison,@3roche,@3insecte,@3glace,@3dragon,@3fée&!<dragon&!<ténèbres&!<plante&!<sol&!<vol",
-      "Ténèbres-type Female Grunt": "combat,acier,eau,plante,ténèbres,fée&@1combat,@1insecte,@1plante,@1électrik,@1glace,@1dragon,@1fée&@2combat,@2insecte,@2plante,@2électrik,@2glace,@2dragon,@2fée,@3combat,@3insecte,@3plante,@3électrik,@3glace,@3dragon,@3fée&!<ténèbres&!<normal&!<eau&!<dragon",
-      "Acier-type Male Grunt": "acier,eau,électrik,psy,ténèbres&@1combat,@1sol,@1spectre,@1feu,@1eau,@1électrik,@1ténèbres&@2combat,@2sol,@2spectre,@2feu,@2eau,@2électrik,@2ténèbres,@3combat,@3sol,@3spectre,@3feu,@3eau,@3électrik,@3ténèbres&!<glace&!<acier&!<psy&!<roche&!<vol",
-      "Fée-type Female Grunt": "roche,spectre,acier,feu,eau,psy,glace&@1combat,@1poison,@1sol,@1roche,@1spectre,@1acier,@1feu,@1psy&@2combat,@2poison,@2sol,@2roche,@2spectre,@2acier,@2feu,@2psy,@3combat,@3poison,@3sol,@3roche,@3spectre,@3acier,@3feu,@3psy&!<fée&!<glace&!<psy&!<poison"
+      "Sbire Masculin type Normal": "vol,poison,spectre,électrik,psy,fée&@1combat,@1vol,@1roche,@1électrik,@1psy,@1glace,@1fée&@2combat,@2vol,@2roche,@2électrik,@2psy,@2glace,@2fée,@3combat,@3vol,@3roche,@3électrik,@3psy,@3glace,@3fée&!<normal&!<combat&!<vol",
+      "Sbire Féminin type Feu": "normal,vol,eau,dragon,ténèbres&@1sol,@1roche,@1spectre,@1eau,@1ténèbres&@2sol,@2roche,@2spectre,@2eau,@2ténèbres,@3sol,@3roche,@3spectre,@3eau,@3ténèbres&!<feu&!<spectre&!<sol&!<psy",
+      "Sbire Féminin type Eau": "combat,poison,acier,eau,glace&@1combat,@1vol,@1sol,@1roche,@1insecte,@1plante,@1électrik,@1psy,@1fée&@2combat,@2vol,@2sol,@2roche,@2insecte,@2plante,@2électrik,@2psy,@2fée,@3combat,@3vol,@3sol,@3roche,@3insecte,@3plante,@3électrik,@3psy,@3fée&!<eau&!<insecte&!<ténèbres&!<poison&!<glace",
+      "Sbire Masculin type Eau": "acier,eau,électrik,dragon&@1roche,@1plante,@1électrik&@2roche,@2plante,@2électrik,@3roche,@3plante,@3électrik&!<eau&!<vol",
+      "Sbire Féminin type Électrik": "combat,poison,sol,roche,spectre,acier,électrik,dragon,fée&@1combat,@1sol,@1roche,@1feu,@1eau,@1plante&@2combat,@2sol,@2roche,@2feu,@2eau,@2plante,@3combat,@3sol,@3roche,@3feu,@3eau,@3plante&!<électrik&!<normal&!<roche&!<insecte",
+      "Sbire Masculin type Plante": "poison,plante,fée&@1combat,@1vol,@1poison,@1insecte,@1spectre,@1acier,@1feu,@1psy,@1glace,@1ténèbres,@1fée&@2combat,@2vol,@2poison,@2insecte,@2spectre,@2acier,@2feu,@2psy,@2glace,@2ténèbres,@2fée,@3combat,@3vol,@3poison,@3insecte,@3spectre,@3acier,@3feu,@3psy,@3glace,@3ténèbres,@3fée&!<plante&!<fée&!<spectre&!<roche&!<combat",
+      "Sbire Féminin type Glace": "normal,eau,fée&@1combat,@1poison,@1sol,@1roche,@1insecte,@1spectre,@1acier,@1feu,@1eau,@1plante,@1électrik,@1ténèbres,@1fée&@2combat,@2poison,@2sol,@2roche,@2insecte,@2spectre,@2acier,@2feu,@2eau,@2plante,@2électrik,@2ténèbres,@2fée,@3combat,@3poison,@3sol,@3roche,@3insecte,@3spectre,@3acier,@3feu,@3eau,@3plante,@3électrik,@3ténèbres,@3fée&!<glace&!<eau&!<sol&!<ténèbres&!<spectre&!<fée&!<roche",
+      "Sbire Féminin type Combat": "vol,poison,feu,eau,dragon,fée&@1vol,@1sol,@1spectre,@1eau,@1psy,@1fée&@2vol,@2sol,@2spectre,@2eau,@2psy,@2fée,@3vol,@3sol,@3spectre,@3eau,@3psy,@3fée&!<combat&!<spectre&!<feu",
+      "Sbire Féminin type Poison": "vol,poison,spectre,électrik,psy&@1vol,@1sol,@1roche,@1acier,@1feu,@1électrik,@1psy,@1glace&@2vol,@2sol,@2roche,@2acier,@2feu,@2électrik,@2psy,@2glace,@3vol,@3sol,@3roche,@3acier,@3feu,@3électrik,@3psy,@3glace&!<plante&!<poison&!<vol&!<eau&!<fée&!<combat",
+      "Sbire Masculin type Sol": "normal,vol,ténèbres,fée&@1insecte,@1spectre,@1eau,@1plante,@1glace,@1dragon,@1ténèbres,@1fée&@2insecte,@2spectre,@2eau,@2plante,@2glace,@2dragon,@2ténèbres,@2fée,@3insecte,@3spectre,@3eau,@3plante,@3glace,@3dragon,@3ténèbres,@3fée&!<sol&!<vol&!<psy&!<dragon&!<spectre",
+      "Sbire Féminin type Vol": "vol,spectre,eau&@1vol,@1roche,@1feu,@1eau,@1électrik,@1psy,@1glace,@1dragon,@1fée&@2vol,@2roche,@2feu,@2eau,@2électrik,@2psy,@2glace,@2dragon,@2fée,@3vol,@3roche,@3feu,@3eau,@3électrik,@3psy,@3glace,@3dragon,@3fée&!<normal&!<vol&!<poison&!<sol&!<insecte&!<dragon&!<eau",
+      "Sbire Masculin type Psy": "vol,insecte,feu,fée&@1vol,@1poison,@1insecte,@1spectre,@1acier,@1ténèbres,@1fée&@2vol,@2poison,@2insecte,@2spectre,@2acier,@2ténèbres,@2fée,@3vol,@3poison,@3insecte,@3spectre,@3acier,@3ténèbres,@3fée&!<psy&!<fée&!<combat&!<ténèbres",
+      "Sbire Masculin type Insecte": "combat,poison,sol,spectre,acier,électrik,dragon&@1vol,@1roche,@1acier,@1feu,@1eau,@1psy&@2vol,@2roche,@2acier,@2feu,@2eau,@2psy,@3vol,@3roche,@3acier,@3feu,@3eau,@3psy&!<insecte&!<poison&!<roche&!<électrik&!<acier",
+      "Sbire Masculin type Roche": "combat,spectre,eau&@1combat,@1sol,@1roche,@1acier,@1eau,@1plante,@1électrik,@1glace,@1dragon,@1fée&@2combat,@2sol,@2roche,@2acier,@2eau,@2plante,@2électrik,@2glace,@2dragon,@2fée,@3combat,@3sol,@3roche,@3acier,@3eau,@3plante,@3électrik,@3glace,@3dragon,@3fée&!<insecte&!<roche&!<eau&!<sol&!<acier&!<glace&!<dragon",
+      "Sbire Masculin type Spectre": "normal,combat,poison,roche,acier,feu,eau,glace,ténèbres&@1sol,@1roche,@1spectre,@1acier,@1feu,@1psy,@1ténèbres,@1fée&@2sol,@2roche,@2spectre,@2acier,@2feu,@2psy,@2ténèbres,@2fée,@3sol,@3roche,@3spectre,@3acier,@3feu,@3psy,@3ténèbres,@3fée&!<spectre&!<poison&!<ténèbres&!<glace",
+      "Sbire Féminin type Dragon": "vol,ténèbres,fée&@1combat,@1vol,@1poison,@1roche,@1insecte,@1glace,@1dragon,@1fée&@2combat,@2vol,@2poison,@2roche,@2insecte,@2glace,@2dragon,@2fée,@3combat,@3vol,@3poison,@3roche,@3insecte,@3glace,@3dragon,@3fée&!<dragon&!<ténèbres&!<plante&!<sol&!<vol",
+      "Sbire Féminin type Ténèbres": "combat,acier,eau,plante,ténèbres,fée&@1combat,@1insecte,@1plante,@1électrik,@1glace,@1dragon,@1fée&@2combat,@2insecte,@2plante,@2électrik,@2glace,@2dragon,@2fée,@3combat,@3insecte,@3plante,@3électrik,@3glace,@3dragon,@3fée&!<ténèbres&!<normal&!<eau&!<dragon",
+      "Sbire Masculin type Acier": "acier,eau,électrik,psy,ténèbres&@1combat,@1sol,@1spectre,@1feu,@1eau,@1électrik,@1ténèbres&@2combat,@2sol,@2spectre,@2feu,@2eau,@2électrik,@2ténèbres,@3combat,@3sol,@3spectre,@3feu,@3eau,@3électrik,@3ténèbres&!<glace&!<acier&!<psy&!<roche&!<vol",
+      "Sbire Féminin type Fée": "roche,spectre,acier,feu,eau,psy,glace&@1combat,@1poison,@1sol,@1roche,@1spectre,@1acier,@1feu,@1psy&@2combat,@2poison,@2sol,@2roche,@2spectre,@2acier,@2feu,@2psy,@3combat,@3poison,@3sol,@3roche,@3spectre,@3acier,@3feu,@3psy&!<fée&!<glace&!<psy&!<poison"
     },
     "rocketGenericGrunts": {
       "Male Grunt": "@1électrik,@1feu,@1vol&@2électrik,@2feu,@2vol,@3électrik,@3feu,@3vol",
-      "Female Grunt": "@1combat,@1électrik,@1fée&@2combat,@2électrik,@2fée,@3combat,@3électrik,@3fée",
+      "Female Grunt": "@1combat,@1électrik,@1roche&@2combat,@2électrik,@2roche,@3combat,@3électrik,@3roche",
       "Decoy Female Grunt": "@1combat,@1feu,@1vol&@2combat,@2feu,@2vol,@3combat,@3feu,@3vol"
     },
     "pvpFilters": {
@@ -706,34 +706,34 @@
       },
       "Sierra": {
         "1": "一般,惡&@1幽靈,@1惡&@2幽靈,@2惡,@3幽靈,@3惡&!<幽靈",
-        "2": "飛行,毒,蟲,鋼,火,草,電,龍&@1格鬥,@1火&@2格鬥,@2火,@3格鬥,@3火&!<草&!<鋼",
-        "3": "格鬥,飛行,水,龍,惡&@1格鬥,@1地面,@1岩石,@1火,@1水&@2格鬥,@2地面,@2岩石,@2火,@2水,@3格鬥,@3地面,@3岩石,@3火,@3水&!<惡&!<火&!<鋼&!<地面"
+        "2": "飛行,蟲,草&@1格鬥,@1火,@1草,@1電,@1冰,@1龍,@1妖精&@2格鬥,@2火,@2草,@2電,@2冰,@2龍,@2妖精,@3格鬥,@3火,@3草,@3電,@3冰,@3龍,@3妖精&!<草&!<鋼&!<水&!<地面&!<龍",
+        "3": "格鬥,飛行,水,龍,惡&@1格鬥,@1地面,@1岩石,@1火,@1水,@1草,@1電&@2格鬥,@2地面,@2岩石,@2火,@2水,@2草,@2電,@3格鬥,@3地面,@3岩石,@3火,@3水,@3草,@3電&!<惡&!<火&!<鋼&!<地面&!<水"
       }
     },
     "rocketTypedGrunts": {
-      "一般-type Male Grunt": "飛行,毒,幽靈,電,超能力,妖精&@1格鬥,@1飛行,@1岩石,@1電,@1超能力,@1冰,@1妖精&@2格鬥,@2飛行,@2岩石,@2電,@2超能力,@2冰,@2妖精,@3格鬥,@3飛行,@3岩石,@3電,@3超能力,@3冰,@3妖精&!<一般&!<格鬥&!<飛行",
-      "火-type Female Grunt": "一般,飛行,水,龍,惡&@1地面,@1岩石,@1幽靈,@1水,@1惡&@2地面,@2岩石,@2幽靈,@2水,@2惡,@3地面,@3岩石,@3幽靈,@3水,@3惡&!<火&!<幽靈&!<地面&!<超能力",
-      "水-type Female Grunt": "格鬥,毒,鋼,水,冰&@1格鬥,@1飛行,@1地面,@1岩石,@1蟲,@1草,@1電,@1超能力,@1妖精&@2格鬥,@2飛行,@2地面,@2岩石,@2蟲,@2草,@2電,@2超能力,@2妖精,@3格鬥,@3飛行,@3地面,@3岩石,@3蟲,@3草,@3電,@3超能力,@3妖精&!<水&!<蟲&!<惡&!<毒&!<冰",
-      "水-type Male Grunt": "鋼,水,電,龍&@1岩石,@1草,@1電&@2岩石,@2草,@2電,@3岩石,@3草,@3電&!<水&!<飛行",
-      "電-type Female Grunt": "格鬥,毒,地面,岩石,幽靈,鋼,電,龍,妖精&@1格鬥,@1地面,@1岩石,@1火,@1水,@1草&@2格鬥,@2地面,@2岩石,@2火,@2水,@2草,@3格鬥,@3地面,@3岩石,@3火,@3水,@3草&!<電&!<一般&!<岩石&!<蟲",
-      "草-type Male Grunt": "毒,草,電&@1格鬥,@1飛行,@1毒,@1蟲,@1幽靈,@1鋼,@1火,@1超能力,@1冰,@1惡,@1妖精&@2格鬥,@2飛行,@2毒,@2蟲,@2幽靈,@2鋼,@2火,@2超能力,@2冰,@2惡,@2妖精,@3格鬥,@3飛行,@3毒,@3蟲,@3幽靈,@3鋼,@3火,@3超能力,@3冰,@3惡,@3妖精&!<草&!<妖精&!<鋼&!<岩石&!<格鬥&!<幽靈",
-      "冰-type Female Grunt": "一般,水,妖精&@1格鬥,@1毒,@1地面,@1岩石,@1蟲,@1幽靈,@1鋼,@1火,@1水,@1草,@1電,@1惡,@1妖精&@2格鬥,@2毒,@2地面,@2岩石,@2蟲,@2幽靈,@2鋼,@2火,@2水,@2草,@2電,@2惡,@2妖精,@3格鬥,@3毒,@3地面,@3岩石,@3蟲,@3幽靈,@3鋼,@3火,@3水,@3草,@3電,@3惡,@3妖精&!<冰&!<水&!<地面&!<惡&!<幽靈&!<妖精&!<岩石",
-      "格鬥-type Female Grunt": "飛行,毒,火,水,龍,妖精&@1飛行,@1地面,@1幽靈,@1水,@1超能力,@1妖精&@2飛行,@2地面,@2幽靈,@2水,@2超能力,@2妖精,@3飛行,@3地面,@3幽靈,@3水,@3超能力,@3妖精&!<格鬥&!<幽靈&!<火",
-      "毒-type Female Grunt": "飛行,毒,幽靈,電,超能力&@1飛行,@1地面,@1岩石,@1鋼,@1火,@1電,@1超能力,@1冰&@2飛行,@2地面,@2岩石,@2鋼,@2火,@2電,@2超能力,@2冰,@3飛行,@3地面,@3岩石,@3鋼,@3火,@3電,@3超能力,@3冰&!<草&!<毒&!<飛行&!<水&!<妖精&!<格鬥",
-      "地面-type Male Grunt": "一般,飛行,惡,妖精&@1蟲,@1幽靈,@1水,@1草,@1冰,@1龍,@1惡,@1妖精&@2蟲,@2幽靈,@2水,@2草,@2冰,@2龍,@2惡,@2妖精,@3蟲,@3幽靈,@3水,@3草,@3冰,@3龍,@3惡,@3妖精&!<地面&!<飛行&!<超能力&!<龍&!<幽靈",
-      "飛行-type Female Grunt": "飛行,幽靈,水&@1飛行,@1岩石,@1火,@1水,@1電,@1超能力,@1冰,@1龍,@1妖精&@2飛行,@2岩石,@2火,@2水,@2電,@2超能力,@2冰,@2龍,@2妖精,@3飛行,@3岩石,@3火,@3水,@3電,@3超能力,@3冰,@3龍,@3妖精&!<一般&!<飛行&!<毒&!<地面&!<蟲&!<龍&!<水",
-      "超能力-type Male Grunt": "飛行,蟲,火,妖精&@1飛行,@1毒,@1蟲,@1幽靈,@1鋼,@1惡,@1妖精&@2飛行,@2毒,@2蟲,@2幽靈,@2鋼,@2惡,@2妖精,@3飛行,@3毒,@3蟲,@3幽靈,@3鋼,@3惡,@3妖精&!<超能力&!<妖精&!<格鬥&!<惡",
-      "蟲-type Male Grunt": "格鬥,毒,地面,幽靈,鋼,電,龍&@1飛行,@1岩石,@1鋼,@1火,@1水,@1超能力&@2飛行,@2岩石,@2鋼,@2火,@2水,@2超能力,@3飛行,@3岩石,@3鋼,@3火,@3水,@3超能力&!<蟲&!<毒&!<岩石&!<電&!<鋼",
-      "岩石-type Male Grunt": "格鬥,幽靈,水&@1格鬥,@1地面,@1岩石,@1鋼,@1水,@1草,@1電,@1冰,@1龍,@1妖精&@2格鬥,@2地面,@2岩石,@2鋼,@2水,@2草,@2電,@2冰,@2龍,@2妖精,@3格鬥,@3地面,@3岩石,@3鋼,@3水,@3草,@3電,@3冰,@3龍,@3妖精&!<蟲&!<岩石&!<水&!<地面&!<鋼&!<冰&!<龍",
-      "幽靈-type Male Grunt": "一般,格鬥,毒,岩石,鋼,火,水,冰,惡&@1地面,@1岩石,@1幽靈,@1鋼,@1火,@1超能力,@1惡,@1妖精&@2地面,@2岩石,@2幽靈,@2鋼,@2火,@2超能力,@2惡,@2妖精,@3地面,@3岩石,@3幽靈,@3鋼,@3火,@3超能力,@3惡,@3妖精&!<幽靈&!<毒&!<惡&!<冰",
-      "龍-type Female Grunt": "飛行,惡,妖精&@1格鬥,@1飛行,@1毒,@1岩石,@1蟲,@1冰,@1龍,@1妖精&@2格鬥,@2飛行,@2毒,@2岩石,@2蟲,@2冰,@2龍,@2妖精,@3格鬥,@3飛行,@3毒,@3岩石,@3蟲,@3冰,@3龍,@3妖精&!<龍&!<惡&!<草&!<地面&!<飛行",
-      "惡-type Female Grunt": "格鬥,鋼,水,草,惡,妖精&@1格鬥,@1蟲,@1草,@1電,@1冰,@1龍,@1妖精&@2格鬥,@2蟲,@2草,@2電,@2冰,@2龍,@2妖精,@3格鬥,@3蟲,@3草,@3電,@3冰,@3龍,@3妖精&!<惡&!<一般&!<水&!<龍",
-      "鋼-type Male Grunt": "鋼,水,電,超能力,惡&@1格鬥,@1地面,@1幽靈,@1火,@1水,@1電,@1惡&@2格鬥,@2地面,@2幽靈,@2火,@2水,@2電,@2惡,@3格鬥,@3地面,@3幽靈,@3火,@3水,@3電,@3惡&!<冰&!<鋼&!<超能力&!<岩石&!<飛行",
-      "妖精-type Female Grunt": "岩石,幽靈,鋼,火,水,超能力,冰&@1格鬥,@1毒,@1地面,@1岩石,@1幽靈,@1鋼,@1火,@1超能力&@2格鬥,@2毒,@2地面,@2岩石,@2幽靈,@2鋼,@2火,@2超能力,@3格鬥,@3毒,@3地面,@3岩石,@3幽靈,@3鋼,@3火,@3超能力&!<妖精&!<冰&!<超能力&!<毒"
+      "一般 屬性 男小嘍囉": "飛行,毒,幽靈,電,超能力,妖精&@1格鬥,@1飛行,@1岩石,@1電,@1超能力,@1冰,@1妖精&@2格鬥,@2飛行,@2岩石,@2電,@2超能力,@2冰,@2妖精,@3格鬥,@3飛行,@3岩石,@3電,@3超能力,@3冰,@3妖精&!<一般&!<格鬥&!<飛行",
+      "火 屬性 女小嘍囉": "一般,飛行,水,龍,惡&@1地面,@1岩石,@1幽靈,@1水,@1惡&@2地面,@2岩石,@2幽靈,@2水,@2惡,@3地面,@3岩石,@3幽靈,@3水,@3惡&!<火&!<幽靈&!<地面&!<超能力",
+      "水 屬性 女小嘍囉": "格鬥,毒,鋼,水,冰&@1格鬥,@1飛行,@1地面,@1岩石,@1蟲,@1草,@1電,@1超能力,@1妖精&@2格鬥,@2飛行,@2地面,@2岩石,@2蟲,@2草,@2電,@2超能力,@2妖精,@3格鬥,@3飛行,@3地面,@3岩石,@3蟲,@3草,@3電,@3超能力,@3妖精&!<水&!<蟲&!<惡&!<毒&!<冰",
+      "水 屬性 男小嘍囉": "鋼,水,電,龍&@1岩石,@1草,@1電&@2岩石,@2草,@2電,@3岩石,@3草,@3電&!<水&!<飛行",
+      "電 屬性 女小嘍囉": "格鬥,毒,地面,岩石,幽靈,鋼,電,龍,妖精&@1格鬥,@1地面,@1岩石,@1火,@1水,@1草&@2格鬥,@2地面,@2岩石,@2火,@2水,@2草,@3格鬥,@3地面,@3岩石,@3火,@3水,@3草&!<電&!<一般&!<岩石&!<蟲",
+      "草 屬性 男小嘍囉": "毒,草,妖精&@1格鬥,@1飛行,@1毒,@1蟲,@1幽靈,@1鋼,@1火,@1超能力,@1冰,@1惡,@1妖精&@2格鬥,@2飛行,@2毒,@2蟲,@2幽靈,@2鋼,@2火,@2超能力,@2冰,@2惡,@2妖精,@3格鬥,@3飛行,@3毒,@3蟲,@3幽靈,@3鋼,@3火,@3超能力,@3冰,@3惡,@3妖精&!<草&!<妖精&!<幽靈&!<岩石&!<格鬥",
+      "冰 屬性 女小嘍囉": "一般,水,妖精&@1格鬥,@1毒,@1地面,@1岩石,@1蟲,@1幽靈,@1鋼,@1火,@1水,@1草,@1電,@1惡,@1妖精&@2格鬥,@2毒,@2地面,@2岩石,@2蟲,@2幽靈,@2鋼,@2火,@2水,@2草,@2電,@2惡,@2妖精,@3格鬥,@3毒,@3地面,@3岩石,@3蟲,@3幽靈,@3鋼,@3火,@3水,@3草,@3電,@3惡,@3妖精&!<冰&!<水&!<地面&!<惡&!<幽靈&!<妖精&!<岩石",
+      "格鬥 屬性 女小嘍囉": "飛行,毒,火,水,龍,妖精&@1飛行,@1地面,@1幽靈,@1水,@1超能力,@1妖精&@2飛行,@2地面,@2幽靈,@2水,@2超能力,@2妖精,@3飛行,@3地面,@3幽靈,@3水,@3超能力,@3妖精&!<格鬥&!<幽靈&!<火",
+      "毒 屬性 女小嘍囉": "飛行,毒,幽靈,電,超能力&@1飛行,@1地面,@1岩石,@1鋼,@1火,@1電,@1超能力,@1冰&@2飛行,@2地面,@2岩石,@2鋼,@2火,@2電,@2超能力,@2冰,@3飛行,@3地面,@3岩石,@3鋼,@3火,@3電,@3超能力,@3冰&!<草&!<毒&!<飛行&!<水&!<妖精&!<格鬥",
+      "地面 屬性 男小嘍囉": "一般,飛行,惡,妖精&@1蟲,@1幽靈,@1水,@1草,@1冰,@1龍,@1惡,@1妖精&@2蟲,@2幽靈,@2水,@2草,@2冰,@2龍,@2惡,@2妖精,@3蟲,@3幽靈,@3水,@3草,@3冰,@3龍,@3惡,@3妖精&!<地面&!<飛行&!<超能力&!<龍&!<幽靈",
+      "飛行 屬性 女小嘍囉": "飛行,幽靈,水&@1飛行,@1岩石,@1火,@1水,@1電,@1超能力,@1冰,@1龍,@1妖精&@2飛行,@2岩石,@2火,@2水,@2電,@2超能力,@2冰,@2龍,@2妖精,@3飛行,@3岩石,@3火,@3水,@3電,@3超能力,@3冰,@3龍,@3妖精&!<一般&!<飛行&!<毒&!<地面&!<蟲&!<龍&!<水",
+      "超能力 屬性 男小嘍囉": "飛行,蟲,火,妖精&@1飛行,@1毒,@1蟲,@1幽靈,@1鋼,@1惡,@1妖精&@2飛行,@2毒,@2蟲,@2幽靈,@2鋼,@2惡,@2妖精,@3飛行,@3毒,@3蟲,@3幽靈,@3鋼,@3惡,@3妖精&!<超能力&!<妖精&!<格鬥&!<惡",
+      "蟲 屬性 男小嘍囉": "格鬥,毒,地面,幽靈,鋼,電,龍&@1飛行,@1岩石,@1鋼,@1火,@1水,@1超能力&@2飛行,@2岩石,@2鋼,@2火,@2水,@2超能力,@3飛行,@3岩石,@3鋼,@3火,@3水,@3超能力&!<蟲&!<毒&!<岩石&!<電&!<鋼",
+      "岩石 屬性 男小嘍囉": "格鬥,幽靈,水&@1格鬥,@1地面,@1岩石,@1鋼,@1水,@1草,@1電,@1冰,@1龍,@1妖精&@2格鬥,@2地面,@2岩石,@2鋼,@2水,@2草,@2電,@2冰,@2龍,@2妖精,@3格鬥,@3地面,@3岩石,@3鋼,@3水,@3草,@3電,@3冰,@3龍,@3妖精&!<蟲&!<岩石&!<水&!<地面&!<鋼&!<冰&!<龍",
+      "幽靈 屬性 男小嘍囉": "一般,格鬥,毒,岩石,鋼,火,水,冰,惡&@1地面,@1岩石,@1幽靈,@1鋼,@1火,@1超能力,@1惡,@1妖精&@2地面,@2岩石,@2幽靈,@2鋼,@2火,@2超能力,@2惡,@2妖精,@3地面,@3岩石,@3幽靈,@3鋼,@3火,@3超能力,@3惡,@3妖精&!<幽靈&!<毒&!<惡&!<冰",
+      "龍 屬性 女小嘍囉": "飛行,惡,妖精&@1格鬥,@1飛行,@1毒,@1岩石,@1蟲,@1冰,@1龍,@1妖精&@2格鬥,@2飛行,@2毒,@2岩石,@2蟲,@2冰,@2龍,@2妖精,@3格鬥,@3飛行,@3毒,@3岩石,@3蟲,@3冰,@3龍,@3妖精&!<龍&!<惡&!<草&!<地面&!<飛行",
+      "惡 屬性 女小嘍囉": "格鬥,鋼,水,草,惡,妖精&@1格鬥,@1蟲,@1草,@1電,@1冰,@1龍,@1妖精&@2格鬥,@2蟲,@2草,@2電,@2冰,@2龍,@2妖精,@3格鬥,@3蟲,@3草,@3電,@3冰,@3龍,@3妖精&!<惡&!<一般&!<水&!<龍",
+      "鋼 屬性 男小嘍囉": "鋼,水,電,超能力,惡&@1格鬥,@1地面,@1幽靈,@1火,@1水,@1電,@1惡&@2格鬥,@2地面,@2幽靈,@2火,@2水,@2電,@2惡,@3格鬥,@3地面,@3幽靈,@3火,@3水,@3電,@3惡&!<冰&!<鋼&!<超能力&!<岩石&!<飛行",
+      "妖精 屬性 女小嘍囉": "岩石,幽靈,鋼,火,水,超能力,冰&@1格鬥,@1毒,@1地面,@1岩石,@1幽靈,@1鋼,@1火,@1超能力&@2格鬥,@2毒,@2地面,@2岩石,@2幽靈,@2鋼,@2火,@2超能力,@3格鬥,@3毒,@3地面,@3岩石,@3幽靈,@3鋼,@3火,@3超能力&!<妖精&!<冰&!<超能力&!<毒"
     },
     "rocketGenericGrunts": {
       "Male Grunt": "@1電,@1火,@1飛行&@2電,@2火,@2飛行,@3電,@3火,@3飛行",
-      "Female Grunt": "@1格鬥,@1電,@1妖精&@2格鬥,@2電,@2妖精,@3格鬥,@3電,@3妖精",
+      "Female Grunt": "@1格鬥,@1電,@1岩石&@2格鬥,@2電,@2岩石,@3格鬥,@3電,@3岩石",
       "Decoy Female Grunt": "@1格鬥,@1火,@1飛行&@2格鬥,@2火,@2飛行,@3格鬥,@3火,@3飛行"
     },
     "pvpFilters": {
@@ -855,34 +855,34 @@
       },
       "Sierra": {
         "1": "नॉमल,डाक&@1घोट,@1डाक&@2घोट,@2डाक,@3घोट,@3डाक&!<घोट",
-        "2": "़लाइंग,पॉइज़न,बग,टल,फ़ायर,ास,इलटक,डैगन&@1फ़ाइटंग,@1फ़ायर&@2फ़ाइटंग,@2फ़ायर,@3फ़ाइटंग,@3फ़ायर&!<ास&!<टल",
-        "3": "फ़ाइटंग,़लाइंग,वॉटर,डैगन,डाक&@1फ़ाइटंग,@1ाउंड,@1रॉक,@1फ़ायर,@1वॉटर&@2फ़ाइटंग,@2ाउंड,@2रॉक,@2फ़ायर,@2वॉटर,@3फ़ाइटंग,@3ाउंड,@3रॉक,@3फ़ायर,@3वॉटर&!<डाक&!<फ़ायर&!<टल&!<ाउंड"
+        "2": "़लाइंग,बग,ास&@1फ़ाइटंग,@1फ़ायर,@1ास,@1इलटक,@1आइस,@1डैगन,@1फ़ेर&@2फ़ाइटंग,@2फ़ायर,@2ास,@2इलटक,@2आइस,@2डैगन,@2फ़ेर,@3फ़ाइटंग,@3फ़ायर,@3ास,@3इलटक,@3आइस,@3डैगन,@3फ़ेर&!<ास&!<टल&!<वॉटर&!<ाउंड&!<डैगन",
+        "3": "फ़ाइटंग,़लाइंग,वॉटर,डैगन,डाक&@1फ़ाइटंग,@1ाउंड,@1रॉक,@1फ़ायर,@1वॉटर,@1ास,@1इलटक&@2फ़ाइटंग,@2ाउंड,@2रॉक,@2फ़ायर,@2वॉटर,@2ास,@2इलटक,@3फ़ाइटंग,@3ाउंड,@3रॉक,@3फ़ायर,@3वॉटर,@3ास,@3इलटक&!<डाक&!<फ़ायर&!<टल&!<ाउंड&!<वॉटर"
       }
     },
     "rocketTypedGrunts": {
-      "नॉमल-type Male Grunt": "़लाइंग,पॉइज़न,घोट,इलटक,साइकक,फ़ेर&@1फ़ाइटंग,@1़लाइंग,@1रॉक,@1इलटक,@1साइकक,@1आइस,@1फ़ेर&@2फ़ाइटंग,@2़लाइंग,@2रॉक,@2इलटक,@2साइकक,@2आइस,@2फ़ेर,@3फ़ाइटंग,@3़लाइंग,@3रॉक,@3इलटक,@3साइकक,@3आइस,@3फ़ेर&!<नॉमल&!<फ़ाइटंग&!<़लाइंग",
-      "फ़ायर-type Female Grunt": "नॉमल,़लाइंग,वॉटर,डैगन,डाक&@1ाउंड,@1रॉक,@1घोट,@1वॉटर,@1डाक&@2ाउंड,@2रॉक,@2घोट,@2वॉटर,@2डाक,@3ाउंड,@3रॉक,@3घोट,@3वॉटर,@3डाक&!<फ़ायर&!<घोट&!<ाउंड&!<साइकक",
-      "वॉटर-type Female Grunt": "फ़ाइटंग,पॉइज़न,टल,वॉटर,आइस&@1फ़ाइटंग,@1़लाइंग,@1ाउंड,@1रॉक,@1बग,@1ास,@1इलटक,@1साइकक,@1फ़ेर&@2फ़ाइटंग,@2़लाइंग,@2ाउंड,@2रॉक,@2बग,@2ास,@2इलटक,@2साइकक,@2फ़ेर,@3फ़ाइटंग,@3़लाइंग,@3ाउंड,@3रॉक,@3बग,@3ास,@3इलटक,@3साइकक,@3फ़ेर&!<वॉटर&!<बग&!<डाक&!<पॉइज़न&!<आइस",
-      "वॉटर-type Male Grunt": "टल,वॉटर,इलटक,डैगन&@1रॉक,@1ास,@1इलटक&@2रॉक,@2ास,@2इलटक,@3रॉक,@3ास,@3इलटक&!<वॉटर&!<़लाइंग",
-      "इलटक-type Female Grunt": "फ़ाइटंग,पॉइज़न,ाउंड,रॉक,घोट,टल,इलटक,डैगन,फ़ेर&@1फ़ाइटंग,@1ाउंड,@1रॉक,@1फ़ायर,@1वॉटर,@1ास&@2फ़ाइटंग,@2ाउंड,@2रॉक,@2फ़ायर,@2वॉटर,@2ास,@3फ़ाइटंग,@3ाउंड,@3रॉक,@3फ़ायर,@3वॉटर,@3ास&!<इलटक&!<नॉमल&!<रॉक&!<बग",
-      "ास-type Male Grunt": "पॉइज़न,ास,इलटक&@1फ़ाइटंग,@1़लाइंग,@1पॉइज़न,@1बग,@1घोट,@1टल,@1फ़ायर,@1साइकक,@1आइस,@1डाक,@1फ़ेर&@2फ़ाइटंग,@2़लाइंग,@2पॉइज़न,@2बग,@2घोट,@2टल,@2फ़ायर,@2साइकक,@2आइस,@2डाक,@2फ़ेर,@3फ़ाइटंग,@3़लाइंग,@3पॉइज़न,@3बग,@3घोट,@3टल,@3फ़ायर,@3साइकक,@3आइस,@3डाक,@3फ़ेर&!<ास&!<फ़ेर&!<टल&!<रॉक&!<फ़ाइटंग&!<घोट",
-      "आइस-type Female Grunt": "नॉमल,वॉटर,फ़ेर&@1फ़ाइटंग,@1पॉइज़न,@1ाउंड,@1रॉक,@1बग,@1घोट,@1टल,@1फ़ायर,@1वॉटर,@1ास,@1इलटक,@1डाक,@1फ़ेर&@2फ़ाइटंग,@2पॉइज़न,@2ाउंड,@2रॉक,@2बग,@2घोट,@2टल,@2फ़ायर,@2वॉटर,@2ास,@2इलटक,@2डाक,@2फ़ेर,@3फ़ाइटंग,@3पॉइज़न,@3ाउंड,@3रॉक,@3बग,@3घोट,@3टल,@3फ़ायर,@3वॉटर,@3ास,@3इलटक,@3डाक,@3फ़ेर&!<आइस&!<वॉटर&!<ाउंड&!<डाक&!<घोट&!<फ़ेर&!<रॉक",
-      "फ़ाइटंग-type Female Grunt": "़लाइंग,पॉइज़न,फ़ायर,वॉटर,डैगन,फ़ेर&@1़लाइंग,@1ाउंड,@1घोट,@1वॉटर,@1साइकक,@1फ़ेर&@2़लाइंग,@2ाउंड,@2घोट,@2वॉटर,@2साइकक,@2फ़ेर,@3़लाइंग,@3ाउंड,@3घोट,@3वॉटर,@3साइकक,@3फ़ेर&!<फ़ाइटंग&!<घोट&!<फ़ायर",
-      "पॉइज़न-type Female Grunt": "़लाइंग,पॉइज़न,घोट,इलटक,साइकक&@1़लाइंग,@1ाउंड,@1रॉक,@1टल,@1फ़ायर,@1इलटक,@1साइकक,@1आइस&@2़लाइंग,@2ाउंड,@2रॉक,@2टल,@2फ़ायर,@2इलटक,@2साइकक,@2आइस,@3़लाइंग,@3ाउंड,@3रॉक,@3टल,@3फ़ायर,@3इलटक,@3साइकक,@3आइस&!<ास&!<पॉइज़न&!<़लाइंग&!<वॉटर&!<फ़ेर&!<फ़ाइटंग",
-      "ाउंड-type Male Grunt": "नॉमल,़लाइंग,डाक,फ़ेर&@1बग,@1घोट,@1वॉटर,@1ास,@1आइस,@1डैगन,@1डाक,@1फ़ेर&@2बग,@2घोट,@2वॉटर,@2ास,@2आइस,@2डैगन,@2डाक,@2फ़ेर,@3बग,@3घोट,@3वॉटर,@3ास,@3आइस,@3डैगन,@3डाक,@3फ़ेर&!<ाउंड&!<़लाइंग&!<साइकक&!<डैगन&!<घोट",
-      "़लाइंग-type Female Grunt": "़लाइंग,घोट,वॉटर&@1़लाइंग,@1रॉक,@1फ़ायर,@1वॉटर,@1इलटक,@1साइकक,@1आइस,@1डैगन,@1फ़ेर&@2़लाइंग,@2रॉक,@2फ़ायर,@2वॉटर,@2इलटक,@2साइकक,@2आइस,@2डैगन,@2फ़ेर,@3़लाइंग,@3रॉक,@3फ़ायर,@3वॉटर,@3इलटक,@3साइकक,@3आइस,@3डैगन,@3फ़ेर&!<नॉमल&!<़लाइंग&!<पॉइज़न&!<ाउंड&!<बग&!<डैगन&!<वॉटर",
-      "साइकक-type Male Grunt": "़लाइंग,बग,फ़ायर,फ़ेर&@1़लाइंग,@1पॉइज़न,@1बग,@1घोट,@1टल,@1डाक,@1फ़ेर&@2़लाइंग,@2पॉइज़न,@2बग,@2घोट,@2टल,@2डाक,@2फ़ेर,@3़लाइंग,@3पॉइज़न,@3बग,@3घोट,@3टल,@3डाक,@3फ़ेर&!<साइकक&!<फ़ेर&!<फ़ाइटंग&!<डाक",
-      "बग-type Male Grunt": "फ़ाइटंग,पॉइज़न,ाउंड,घोट,टल,इलटक,डैगन&@1़लाइंग,@1रॉक,@1टल,@1फ़ायर,@1वॉटर,@1साइकक&@2़लाइंग,@2रॉक,@2टल,@2फ़ायर,@2वॉटर,@2साइकक,@3़लाइंग,@3रॉक,@3टल,@3फ़ायर,@3वॉटर,@3साइकक&!<बग&!<पॉइज़न&!<रॉक&!<इलटक&!<टल",
-      "रॉक-type Male Grunt": "फ़ाइटंग,घोट,वॉटर&@1फ़ाइटंग,@1ाउंड,@1रॉक,@1टल,@1वॉटर,@1ास,@1इलटक,@1आइस,@1डैगन,@1फ़ेर&@2फ़ाइटंग,@2ाउंड,@2रॉक,@2टल,@2वॉटर,@2ास,@2इलटक,@2आइस,@2डैगन,@2फ़ेर,@3फ़ाइटंग,@3ाउंड,@3रॉक,@3टल,@3वॉटर,@3ास,@3इलटक,@3आइस,@3डैगन,@3फ़ेर&!<बग&!<रॉक&!<वॉटर&!<ाउंड&!<टल&!<आइस&!<डैगन",
-      "घोट-type Male Grunt": "नॉमल,फ़ाइटंग,पॉइज़न,रॉक,टल,फ़ायर,वॉटर,आइस,डाक&@1ाउंड,@1रॉक,@1घोट,@1टल,@1फ़ायर,@1साइकक,@1डाक,@1फ़ेर&@2ाउंड,@2रॉक,@2घोट,@2टल,@2फ़ायर,@2साइकक,@2डाक,@2फ़ेर,@3ाउंड,@3रॉक,@3घोट,@3टल,@3फ़ायर,@3साइकक,@3डाक,@3फ़ेर&!<घोट&!<पॉइज़न&!<डाक&!<आइस",
-      "डैगन-type Female Grunt": "़लाइंग,डाक,फ़ेर&@1फ़ाइटंग,@1़लाइंग,@1पॉइज़न,@1रॉक,@1बग,@1आइस,@1डैगन,@1फ़ेर&@2फ़ाइटंग,@2़लाइंग,@2पॉइज़न,@2रॉक,@2बग,@2आइस,@2डैगन,@2फ़ेर,@3फ़ाइटंग,@3़लाइंग,@3पॉइज़न,@3रॉक,@3बग,@3आइस,@3डैगन,@3फ़ेर&!<डैगन&!<डाक&!<ास&!<ाउंड&!<़लाइंग",
-      "डाक-type Female Grunt": "फ़ाइटंग,टल,वॉटर,ास,डाक,फ़ेर&@1फ़ाइटंग,@1बग,@1ास,@1इलटक,@1आइस,@1डैगन,@1फ़ेर&@2फ़ाइटंग,@2बग,@2ास,@2इलटक,@2आइस,@2डैगन,@2फ़ेर,@3फ़ाइटंग,@3बग,@3ास,@3इलटक,@3आइस,@3डैगन,@3फ़ेर&!<डाक&!<नॉमल&!<वॉटर&!<डैगन",
-      "टल-type Male Grunt": "टल,वॉटर,इलटक,साइकक,डाक&@1फ़ाइटंग,@1ाउंड,@1घोट,@1फ़ायर,@1वॉटर,@1इलटक,@1डाक&@2फ़ाइटंग,@2ाउंड,@2घोट,@2फ़ायर,@2वॉटर,@2इलटक,@2डाक,@3फ़ाइटंग,@3ाउंड,@3घोट,@3फ़ायर,@3वॉटर,@3इलटक,@3डाक&!<आइस&!<टल&!<साइकक&!<रॉक&!<़लाइंग",
-      "फ़ेर-type Female Grunt": "रॉक,घोट,टल,फ़ायर,वॉटर,साइकक,आइस&@1फ़ाइटंग,@1पॉइज़न,@1ाउंड,@1रॉक,@1घोट,@1टल,@1फ़ायर,@1साइकक&@2फ़ाइटंग,@2पॉइज़न,@2ाउंड,@2रॉक,@2घोट,@2टल,@2फ़ायर,@2साइकक,@3फ़ाइटंग,@3पॉइज़न,@3ाउंड,@3रॉक,@3घोट,@3टल,@3फ़ायर,@3साइकक&!<फ़ेर&!<आइस&!<साइकक&!<पॉइज़न"
+      "नॉमल-type पुरुष Grunt": "़लाइंग,पॉइज़न,घोट,इलटक,साइकक,फ़ेर&@1फ़ाइटंग,@1़लाइंग,@1रॉक,@1इलटक,@1साइकक,@1आइस,@1फ़ेर&@2फ़ाइटंग,@2़लाइंग,@2रॉक,@2इलटक,@2साइकक,@2आइस,@2फ़ेर,@3फ़ाइटंग,@3़लाइंग,@3रॉक,@3इलटक,@3साइकक,@3आइस,@3फ़ेर&!<नॉमल&!<फ़ाइटंग&!<़लाइंग",
+      "फ़ायर-type महिला Grunt": "नॉमल,़लाइंग,वॉटर,डैगन,डाक&@1ाउंड,@1रॉक,@1घोट,@1वॉटर,@1डाक&@2ाउंड,@2रॉक,@2घोट,@2वॉटर,@2डाक,@3ाउंड,@3रॉक,@3घोट,@3वॉटर,@3डाक&!<फ़ायर&!<घोट&!<ाउंड&!<साइकक",
+      "वॉटर-type महिला Grunt": "फ़ाइटंग,पॉइज़न,टल,वॉटर,आइस&@1फ़ाइटंग,@1़लाइंग,@1ाउंड,@1रॉक,@1बग,@1ास,@1इलटक,@1साइकक,@1फ़ेर&@2फ़ाइटंग,@2़लाइंग,@2ाउंड,@2रॉक,@2बग,@2ास,@2इलटक,@2साइकक,@2फ़ेर,@3फ़ाइटंग,@3़लाइंग,@3ाउंड,@3रॉक,@3बग,@3ास,@3इलटक,@3साइकक,@3फ़ेर&!<वॉटर&!<बग&!<डाक&!<पॉइज़न&!<आइस",
+      "वॉटर-type पुरुष Grunt": "टल,वॉटर,इलटक,डैगन&@1रॉक,@1ास,@1इलटक&@2रॉक,@2ास,@2इलटक,@3रॉक,@3ास,@3इलटक&!<वॉटर&!<़लाइंग",
+      "इलटक-type महिला Grunt": "फ़ाइटंग,पॉइज़न,ाउंड,रॉक,घोट,टल,इलटक,डैगन,फ़ेर&@1फ़ाइटंग,@1ाउंड,@1रॉक,@1फ़ायर,@1वॉटर,@1ास&@2फ़ाइटंग,@2ाउंड,@2रॉक,@2फ़ायर,@2वॉटर,@2ास,@3फ़ाइटंग,@3ाउंड,@3रॉक,@3फ़ायर,@3वॉटर,@3ास&!<इलटक&!<नॉमल&!<रॉक&!<बग",
+      "ास-type पुरुष Grunt": "पॉइज़न,ास,फ़ेर&@1फ़ाइटंग,@1़लाइंग,@1पॉइज़न,@1बग,@1घोट,@1टल,@1फ़ायर,@1साइकक,@1आइस,@1डाक,@1फ़ेर&@2फ़ाइटंग,@2़लाइंग,@2पॉइज़न,@2बग,@2घोट,@2टल,@2फ़ायर,@2साइकक,@2आइस,@2डाक,@2फ़ेर,@3फ़ाइटंग,@3़लाइंग,@3पॉइज़न,@3बग,@3घोट,@3टल,@3फ़ायर,@3साइकक,@3आइस,@3डाक,@3फ़ेर&!<ास&!<फ़ेर&!<घोट&!<रॉक&!<फ़ाइटंग",
+      "आइस-type महिला Grunt": "नॉमल,वॉटर,फ़ेर&@1फ़ाइटंग,@1पॉइज़न,@1ाउंड,@1रॉक,@1बग,@1घोट,@1टल,@1फ़ायर,@1वॉटर,@1ास,@1इलटक,@1डाक,@1फ़ेर&@2फ़ाइटंग,@2पॉइज़न,@2ाउंड,@2रॉक,@2बग,@2घोट,@2टल,@2फ़ायर,@2वॉटर,@2ास,@2इलटक,@2डाक,@2फ़ेर,@3फ़ाइटंग,@3पॉइज़न,@3ाउंड,@3रॉक,@3बग,@3घोट,@3टल,@3फ़ायर,@3वॉटर,@3ास,@3इलटक,@3डाक,@3फ़ेर&!<आइस&!<वॉटर&!<ाउंड&!<डाक&!<घोट&!<फ़ेर&!<रॉक",
+      "फ़ाइटंग-type महिला Grunt": "़लाइंग,पॉइज़न,फ़ायर,वॉटर,डैगन,फ़ेर&@1़लाइंग,@1ाउंड,@1घोट,@1वॉटर,@1साइकक,@1फ़ेर&@2़लाइंग,@2ाउंड,@2घोट,@2वॉटर,@2साइकक,@2फ़ेर,@3़लाइंग,@3ाउंड,@3घोट,@3वॉटर,@3साइकक,@3फ़ेर&!<फ़ाइटंग&!<घोट&!<फ़ायर",
+      "पॉइज़न-type महिला Grunt": "़लाइंग,पॉइज़न,घोट,इलटक,साइकक&@1़लाइंग,@1ाउंड,@1रॉक,@1टल,@1फ़ायर,@1इलटक,@1साइकक,@1आइस&@2़लाइंग,@2ाउंड,@2रॉक,@2टल,@2फ़ायर,@2इलटक,@2साइकक,@2आइस,@3़लाइंग,@3ाउंड,@3रॉक,@3टल,@3फ़ायर,@3इलटक,@3साइकक,@3आइस&!<ास&!<पॉइज़न&!<़लाइंग&!<वॉटर&!<फ़ेर&!<फ़ाइटंग",
+      "ाउंड-type पुरुष Grunt": "नॉमल,़लाइंग,डाक,फ़ेर&@1बग,@1घोट,@1वॉटर,@1ास,@1आइस,@1डैगन,@1डाक,@1फ़ेर&@2बग,@2घोट,@2वॉटर,@2ास,@2आइस,@2डैगन,@2डाक,@2फ़ेर,@3बग,@3घोट,@3वॉटर,@3ास,@3आइस,@3डैगन,@3डाक,@3फ़ेर&!<ाउंड&!<़लाइंग&!<साइकक&!<डैगन&!<घोट",
+      "़लाइंग-type महिला Grunt": "़लाइंग,घोट,वॉटर&@1़लाइंग,@1रॉक,@1फ़ायर,@1वॉटर,@1इलटक,@1साइकक,@1आइस,@1डैगन,@1फ़ेर&@2़लाइंग,@2रॉक,@2फ़ायर,@2वॉटर,@2इलटक,@2साइकक,@2आइस,@2डैगन,@2फ़ेर,@3़लाइंग,@3रॉक,@3फ़ायर,@3वॉटर,@3इलटक,@3साइकक,@3आइस,@3डैगन,@3फ़ेर&!<नॉमल&!<़लाइंग&!<पॉइज़न&!<ाउंड&!<बग&!<डैगन&!<वॉटर",
+      "साइकक-type पुरुष Grunt": "़लाइंग,बग,फ़ायर,फ़ेर&@1़लाइंग,@1पॉइज़न,@1बग,@1घोट,@1टल,@1डाक,@1फ़ेर&@2़लाइंग,@2पॉइज़न,@2बग,@2घोट,@2टल,@2डाक,@2फ़ेर,@3़लाइंग,@3पॉइज़न,@3बग,@3घोट,@3टल,@3डाक,@3फ़ेर&!<साइकक&!<फ़ेर&!<फ़ाइटंग&!<डाक",
+      "बग-type पुरुष Grunt": "फ़ाइटंग,पॉइज़न,ाउंड,घोट,टल,इलटक,डैगन&@1़लाइंग,@1रॉक,@1टल,@1फ़ायर,@1वॉटर,@1साइकक&@2़लाइंग,@2रॉक,@2टल,@2फ़ायर,@2वॉटर,@2साइकक,@3़लाइंग,@3रॉक,@3टल,@3फ़ायर,@3वॉटर,@3साइकक&!<बग&!<पॉइज़न&!<रॉक&!<इलटक&!<टल",
+      "रॉक-type पुरुष Grunt": "फ़ाइटंग,घोट,वॉटर&@1फ़ाइटंग,@1ाउंड,@1रॉक,@1टल,@1वॉटर,@1ास,@1इलटक,@1आइस,@1डैगन,@1फ़ेर&@2फ़ाइटंग,@2ाउंड,@2रॉक,@2टल,@2वॉटर,@2ास,@2इलटक,@2आइस,@2डैगन,@2फ़ेर,@3फ़ाइटंग,@3ाउंड,@3रॉक,@3टल,@3वॉटर,@3ास,@3इलटक,@3आइस,@3डैगन,@3फ़ेर&!<बग&!<रॉक&!<वॉटर&!<ाउंड&!<टल&!<आइस&!<डैगन",
+      "घोट-type पुरुष Grunt": "नॉमल,फ़ाइटंग,पॉइज़न,रॉक,टल,फ़ायर,वॉटर,आइस,डाक&@1ाउंड,@1रॉक,@1घोट,@1टल,@1फ़ायर,@1साइकक,@1डाक,@1फ़ेर&@2ाउंड,@2रॉक,@2घोट,@2टल,@2फ़ायर,@2साइकक,@2डाक,@2फ़ेर,@3ाउंड,@3रॉक,@3घोट,@3टल,@3फ़ायर,@3साइकक,@3डाक,@3फ़ेर&!<घोट&!<पॉइज़न&!<डाक&!<आइस",
+      "डैगन-type महिला Grunt": "़लाइंग,डाक,फ़ेर&@1फ़ाइटंग,@1़लाइंग,@1पॉइज़न,@1रॉक,@1बग,@1आइस,@1डैगन,@1फ़ेर&@2फ़ाइटंग,@2़लाइंग,@2पॉइज़न,@2रॉक,@2बग,@2आइस,@2डैगन,@2फ़ेर,@3फ़ाइटंग,@3़लाइंग,@3पॉइज़न,@3रॉक,@3बग,@3आइस,@3डैगन,@3फ़ेर&!<डैगन&!<डाक&!<ास&!<ाउंड&!<़लाइंग",
+      "डाक-type महिला Grunt": "फ़ाइटंग,टल,वॉटर,ास,डाक,फ़ेर&@1फ़ाइटंग,@1बग,@1ास,@1इलटक,@1आइस,@1डैगन,@1फ़ेर&@2फ़ाइटंग,@2बग,@2ास,@2इलटक,@2आइस,@2डैगन,@2फ़ेर,@3फ़ाइटंग,@3बग,@3ास,@3इलटक,@3आइस,@3डैगन,@3फ़ेर&!<डाक&!<नॉमल&!<वॉटर&!<डैगन",
+      "टल-type पुरुष Grunt": "टल,वॉटर,इलटक,साइकक,डाक&@1फ़ाइटंग,@1ाउंड,@1घोट,@1फ़ायर,@1वॉटर,@1इलटक,@1डाक&@2फ़ाइटंग,@2ाउंड,@2घोट,@2फ़ायर,@2वॉटर,@2इलटक,@2डाक,@3फ़ाइटंग,@3ाउंड,@3घोट,@3फ़ायर,@3वॉटर,@3इलटक,@3डाक&!<आइस&!<टल&!<साइकक&!<रॉक&!<़लाइंग",
+      "फ़ेर-type महिला Grunt": "रॉक,घोट,टल,फ़ायर,वॉटर,साइकक,आइस&@1फ़ाइटंग,@1पॉइज़न,@1ाउंड,@1रॉक,@1घोट,@1टल,@1फ़ायर,@1साइकक&@2फ़ाइटंग,@2पॉइज़न,@2ाउंड,@2रॉक,@2घोट,@2टल,@2फ़ायर,@2साइकक,@3फ़ाइटंग,@3पॉइज़न,@3ाउंड,@3रॉक,@3घोट,@3टल,@3फ़ायर,@3साइकक&!<फ़ेर&!<आइस&!<साइकक&!<पॉइज़न"
     },
     "rocketGenericGrunts": {
       "Male Grunt": "@1इलटक,@1फ़ायर,@1़लाइंग&@2इलटक,@2फ़ायर,@2़लाइंग,@3इलटक,@3फ़ायर,@3़लाइंग",
-      "Female Grunt": "@1फ़ाइटंग,@1इलटक,@1फ़ेर&@2फ़ाइटंग,@2इलटक,@2फ़ेर,@3फ़ाइटंग,@3इलटक,@3फ़ेर",
+      "Female Grunt": "@1फ़ाइटंग,@1इलटक,@1रॉक&@2फ़ाइटंग,@2इलटक,@2रॉक,@3फ़ाइटंग,@3इलटक,@3रॉक",
       "Decoy Female Grunt": "@1फ़ाइटंग,@1फ़ायर,@1़लाइंग&@2फ़ाइटंग,@2फ़ायर,@2़लाइंग,@3फ़ाइटंग,@3फ़ायर,@3़लाइंग"
     },
     "pvpFilters": {
@@ -1004,34 +1004,34 @@
       },
       "Sierra": {
         "1": "ノーマル,あく&@1ゴースト,@1あく&@2ゴースト,@2あく,@3ゴースト,@3あく&!<ゴースト",
-        "2": "ひこう,どく,むし,はがね,ほのお,くさ,でんき,ドラゴン&@1かくとう,@1ほのお&@2かくとう,@2ほのお,@3かくとう,@3ほのお&!<くさ&!<はがね",
-        "3": "かくとう,ひこう,みず,ドラゴン,あく&@1かくとう,@1じめん,@1いわ,@1ほのお,@1みず&@2かくとう,@2じめん,@2いわ,@2ほのお,@2みず,@3かくとう,@3じめん,@3いわ,@3ほのお,@3みず&!<あく&!<ほのお&!<はがね&!<じめん"
+        "2": "ひこう,むし,くさ&@1かくとう,@1ほのお,@1くさ,@1でんき,@1こおり,@1ドラゴン,@1フェアリー&@2かくとう,@2ほのお,@2くさ,@2でんき,@2こおり,@2ドラゴン,@2フェアリー,@3かくとう,@3ほのお,@3くさ,@3でんき,@3こおり,@3ドラゴン,@3フェアリー&!<くさ&!<はがね&!<みず&!<じめん&!<ドラゴン",
+        "3": "かくとう,ひこう,みず,ドラゴン,あく&@1かくとう,@1じめん,@1いわ,@1ほのお,@1みず,@1くさ,@1でんき&@2かくとう,@2じめん,@2いわ,@2ほのお,@2みず,@2くさ,@2でんき,@3かくとう,@3じめん,@3いわ,@3ほのお,@3みず,@3くさ,@3でんき&!<あく&!<ほのお&!<はがね&!<じめん&!<みず"
       }
     },
     "rocketTypedGrunts": {
-      "ノーマル-type Male Grunt": "ひこう,どく,ゴースト,でんき,エスパー,フェアリー&@1かくとう,@1ひこう,@1いわ,@1でんき,@1エスパー,@1こおり,@1フェアリー&@2かくとう,@2ひこう,@2いわ,@2でんき,@2エスパー,@2こおり,@2フェアリー,@3かくとう,@3ひこう,@3いわ,@3でんき,@3エスパー,@3こおり,@3フェアリー&!<ノーマル&!<かくとう&!<ひこう",
-      "ほのお-type Female Grunt": "ノーマル,ひこう,みず,ドラゴン,あく&@1じめん,@1いわ,@1ゴースト,@1みず,@1あく&@2じめん,@2いわ,@2ゴースト,@2みず,@2あく,@3じめん,@3いわ,@3ゴースト,@3みず,@3あく&!<ほのお&!<ゴースト&!<じめん&!<エスパー",
-      "みず-type Female Grunt": "かくとう,どく,はがね,みず,こおり&@1かくとう,@1ひこう,@1じめん,@1いわ,@1むし,@1くさ,@1でんき,@1エスパー,@1フェアリー&@2かくとう,@2ひこう,@2じめん,@2いわ,@2むし,@2くさ,@2でんき,@2エスパー,@2フェアリー,@3かくとう,@3ひこう,@3じめん,@3いわ,@3むし,@3くさ,@3でんき,@3エスパー,@3フェアリー&!<みず&!<むし&!<あく&!<どく&!<こおり",
-      "みず-type Male Grunt": "はがね,みず,でんき,ドラゴン&@1いわ,@1くさ,@1でんき&@2いわ,@2くさ,@2でんき,@3いわ,@3くさ,@3でんき&!<みず&!<ひこう",
-      "でんき-type Female Grunt": "かくとう,どく,じめん,いわ,ゴースト,はがね,でんき,ドラゴン,フェアリー&@1かくとう,@1じめん,@1いわ,@1ほのお,@1みず,@1くさ&@2かくとう,@2じめん,@2いわ,@2ほのお,@2みず,@2くさ,@3かくとう,@3じめん,@3いわ,@3ほのお,@3みず,@3くさ&!<でんき&!<ノーマル&!<いわ&!<むし",
-      "くさ-type Male Grunt": "どく,くさ,でんき&@1かくとう,@1ひこう,@1どく,@1むし,@1ゴースト,@1はがね,@1ほのお,@1エスパー,@1こおり,@1あく,@1フェアリー&@2かくとう,@2ひこう,@2どく,@2むし,@2ゴースト,@2はがね,@2ほのお,@2エスパー,@2こおり,@2あく,@2フェアリー,@3かくとう,@3ひこう,@3どく,@3むし,@3ゴースト,@3はがね,@3ほのお,@3エスパー,@3こおり,@3あく,@3フェアリー&!<くさ&!<フェアリー&!<はがね&!<いわ&!<かくとう&!<ゴースト",
-      "こおり-type Female Grunt": "ノーマル,みず,フェアリー&@1かくとう,@1どく,@1じめん,@1いわ,@1むし,@1ゴースト,@1はがね,@1ほのお,@1みず,@1くさ,@1でんき,@1あく,@1フェアリー&@2かくとう,@2どく,@2じめん,@2いわ,@2むし,@2ゴースト,@2はがね,@2ほのお,@2みず,@2くさ,@2でんき,@2あく,@2フェアリー,@3かくとう,@3どく,@3じめん,@3いわ,@3むし,@3ゴースト,@3はがね,@3ほのお,@3みず,@3くさ,@3でんき,@3あく,@3フェアリー&!<こおり&!<みず&!<じめん&!<あく&!<ゴースト&!<フェアリー&!<いわ",
-      "かくとう-type Female Grunt": "ひこう,どく,ほのお,みず,ドラゴン,フェアリー&@1ひこう,@1じめん,@1ゴースト,@1みず,@1エスパー,@1フェアリー&@2ひこう,@2じめん,@2ゴースト,@2みず,@2エスパー,@2フェアリー,@3ひこう,@3じめん,@3ゴースト,@3みず,@3エスパー,@3フェアリー&!<かくとう&!<ゴースト&!<ほのお",
-      "どく-type Female Grunt": "ひこう,どく,ゴースト,でんき,エスパー&@1ひこう,@1じめん,@1いわ,@1はがね,@1ほのお,@1でんき,@1エスパー,@1こおり&@2ひこう,@2じめん,@2いわ,@2はがね,@2ほのお,@2でんき,@2エスパー,@2こおり,@3ひこう,@3じめん,@3いわ,@3はがね,@3ほのお,@3でんき,@3エスパー,@3こおり&!<くさ&!<どく&!<ひこう&!<みず&!<フェアリー&!<かくとう",
-      "じめん-type Male Grunt": "ノーマル,ひこう,あく,フェアリー&@1むし,@1ゴースト,@1みず,@1くさ,@1こおり,@1ドラゴン,@1あく,@1フェアリー&@2むし,@2ゴースト,@2みず,@2くさ,@2こおり,@2ドラゴン,@2あく,@2フェアリー,@3むし,@3ゴースト,@3みず,@3くさ,@3こおり,@3ドラゴン,@3あく,@3フェアリー&!<じめん&!<ひこう&!<エスパー&!<ドラゴン&!<ゴースト",
-      "ひこう-type Female Grunt": "ひこう,ゴースト,みず&@1ひこう,@1いわ,@1ほのお,@1みず,@1でんき,@1エスパー,@1こおり,@1ドラゴン,@1フェアリー&@2ひこう,@2いわ,@2ほのお,@2みず,@2でんき,@2エスパー,@2こおり,@2ドラゴン,@2フェアリー,@3ひこう,@3いわ,@3ほのお,@3みず,@3でんき,@3エスパー,@3こおり,@3ドラゴン,@3フェアリー&!<ノーマル&!<ひこう&!<どく&!<じめん&!<むし&!<ドラゴン&!<みず",
-      "エスパー-type Male Grunt": "ひこう,むし,ほのお,フェアリー&@1ひこう,@1どく,@1むし,@1ゴースト,@1はがね,@1あく,@1フェアリー&@2ひこう,@2どく,@2むし,@2ゴースト,@2はがね,@2あく,@2フェアリー,@3ひこう,@3どく,@3むし,@3ゴースト,@3はがね,@3あく,@3フェアリー&!<エスパー&!<フェアリー&!<かくとう&!<あく",
-      "むし-type Male Grunt": "かくとう,どく,じめん,ゴースト,はがね,でんき,ドラゴン&@1ひこう,@1いわ,@1はがね,@1ほのお,@1みず,@1エスパー&@2ひこう,@2いわ,@2はがね,@2ほのお,@2みず,@2エスパー,@3ひこう,@3いわ,@3はがね,@3ほのお,@3みず,@3エスパー&!<むし&!<どく&!<いわ&!<でんき&!<はがね",
-      "いわ-type Male Grunt": "かくとう,ゴースト,みず&@1かくとう,@1じめん,@1いわ,@1はがね,@1みず,@1くさ,@1でんき,@1こおり,@1ドラゴン,@1フェアリー&@2かくとう,@2じめん,@2いわ,@2はがね,@2みず,@2くさ,@2でんき,@2こおり,@2ドラゴン,@2フェアリー,@3かくとう,@3じめん,@3いわ,@3はがね,@3みず,@3くさ,@3でんき,@3こおり,@3ドラゴン,@3フェアリー&!<むし&!<いわ&!<みず&!<じめん&!<はがね&!<こおり&!<ドラゴン",
-      "ゴースト-type Male Grunt": "ノーマル,かくとう,どく,いわ,はがね,ほのお,みず,こおり,あく&@1じめん,@1いわ,@1ゴースト,@1はがね,@1ほのお,@1エスパー,@1あく,@1フェアリー&@2じめん,@2いわ,@2ゴースト,@2はがね,@2ほのお,@2エスパー,@2あく,@2フェアリー,@3じめん,@3いわ,@3ゴースト,@3はがね,@3ほのお,@3エスパー,@3あく,@3フェアリー&!<ゴースト&!<どく&!<あく&!<こおり",
-      "ドラゴン-type Female Grunt": "ひこう,あく,フェアリー&@1かくとう,@1ひこう,@1どく,@1いわ,@1むし,@1こおり,@1ドラゴン,@1フェアリー&@2かくとう,@2ひこう,@2どく,@2いわ,@2むし,@2こおり,@2ドラゴン,@2フェアリー,@3かくとう,@3ひこう,@3どく,@3いわ,@3むし,@3こおり,@3ドラゴン,@3フェアリー&!<ドラゴン&!<あく&!<くさ&!<じめん&!<ひこう",
-      "あく-type Female Grunt": "かくとう,はがね,みず,くさ,あく,フェアリー&@1かくとう,@1むし,@1くさ,@1でんき,@1こおり,@1ドラゴン,@1フェアリー&@2かくとう,@2むし,@2くさ,@2でんき,@2こおり,@2ドラゴン,@2フェアリー,@3かくとう,@3むし,@3くさ,@3でんき,@3こおり,@3ドラゴン,@3フェアリー&!<あく&!<ノーマル&!<みず&!<ドラゴン",
-      "はがね-type Male Grunt": "はがね,みず,でんき,エスパー,あく&@1かくとう,@1じめん,@1ゴースト,@1ほのお,@1みず,@1でんき,@1あく&@2かくとう,@2じめん,@2ゴースト,@2ほのお,@2みず,@2でんき,@2あく,@3かくとう,@3じめん,@3ゴースト,@3ほのお,@3みず,@3でんき,@3あく&!<こおり&!<はがね&!<エスパー&!<いわ&!<ひこう",
-      "フェアリー-type Female Grunt": "いわ,ゴースト,はがね,ほのお,みず,エスパー,こおり&@1かくとう,@1どく,@1じめん,@1いわ,@1ゴースト,@1はがね,@1ほのお,@1エスパー&@2かくとう,@2どく,@2じめん,@2いわ,@2ゴースト,@2はがね,@2ほのお,@2エスパー,@3かくとう,@3どく,@3じめん,@3いわ,@3ゴースト,@3はがね,@3ほのお,@3エスパー&!<フェアリー&!<こおり&!<エスパー&!<どく"
+      "ノーマルタイプ 男のしたっぱ": "ひこう,どく,ゴースト,でんき,エスパー,フェアリー&@1かくとう,@1ひこう,@1いわ,@1でんき,@1エスパー,@1こおり,@1フェアリー&@2かくとう,@2ひこう,@2いわ,@2でんき,@2エスパー,@2こおり,@2フェアリー,@3かくとう,@3ひこう,@3いわ,@3でんき,@3エスパー,@3こおり,@3フェアリー&!<ノーマル&!<かくとう&!<ひこう",
+      "ほのおタイプ 女のしたっぱ": "ノーマル,ひこう,みず,ドラゴン,あく&@1じめん,@1いわ,@1ゴースト,@1みず,@1あく&@2じめん,@2いわ,@2ゴースト,@2みず,@2あく,@3じめん,@3いわ,@3ゴースト,@3みず,@3あく&!<ほのお&!<ゴースト&!<じめん&!<エスパー",
+      "みずタイプ 女のしたっぱ": "かくとう,どく,はがね,みず,こおり&@1かくとう,@1ひこう,@1じめん,@1いわ,@1むし,@1くさ,@1でんき,@1エスパー,@1フェアリー&@2かくとう,@2ひこう,@2じめん,@2いわ,@2むし,@2くさ,@2でんき,@2エスパー,@2フェアリー,@3かくとう,@3ひこう,@3じめん,@3いわ,@3むし,@3くさ,@3でんき,@3エスパー,@3フェアリー&!<みず&!<むし&!<あく&!<どく&!<こおり",
+      "みずタイプ 男のしたっぱ": "はがね,みず,でんき,ドラゴン&@1いわ,@1くさ,@1でんき&@2いわ,@2くさ,@2でんき,@3いわ,@3くさ,@3でんき&!<みず&!<ひこう",
+      "でんきタイプ 女のしたっぱ": "かくとう,どく,じめん,いわ,ゴースト,はがね,でんき,ドラゴン,フェアリー&@1かくとう,@1じめん,@1いわ,@1ほのお,@1みず,@1くさ&@2かくとう,@2じめん,@2いわ,@2ほのお,@2みず,@2くさ,@3かくとう,@3じめん,@3いわ,@3ほのお,@3みず,@3くさ&!<でんき&!<ノーマル&!<いわ&!<むし",
+      "くさタイプ 男のしたっぱ": "どく,くさ,フェアリー&@1かくとう,@1ひこう,@1どく,@1むし,@1ゴースト,@1はがね,@1ほのお,@1エスパー,@1こおり,@1あく,@1フェアリー&@2かくとう,@2ひこう,@2どく,@2むし,@2ゴースト,@2はがね,@2ほのお,@2エスパー,@2こおり,@2あく,@2フェアリー,@3かくとう,@3ひこう,@3どく,@3むし,@3ゴースト,@3はがね,@3ほのお,@3エスパー,@3こおり,@3あく,@3フェアリー&!<くさ&!<フェアリー&!<ゴースト&!<いわ&!<かくとう",
+      "こおりタイプ 女のしたっぱ": "ノーマル,みず,フェアリー&@1かくとう,@1どく,@1じめん,@1いわ,@1むし,@1ゴースト,@1はがね,@1ほのお,@1みず,@1くさ,@1でんき,@1あく,@1フェアリー&@2かくとう,@2どく,@2じめん,@2いわ,@2むし,@2ゴースト,@2はがね,@2ほのお,@2みず,@2くさ,@2でんき,@2あく,@2フェアリー,@3かくとう,@3どく,@3じめん,@3いわ,@3むし,@3ゴースト,@3はがね,@3ほのお,@3みず,@3くさ,@3でんき,@3あく,@3フェアリー&!<こおり&!<みず&!<じめん&!<あく&!<ゴースト&!<フェアリー&!<いわ",
+      "かくとうタイプ 女のしたっぱ": "ひこう,どく,ほのお,みず,ドラゴン,フェアリー&@1ひこう,@1じめん,@1ゴースト,@1みず,@1エスパー,@1フェアリー&@2ひこう,@2じめん,@2ゴースト,@2みず,@2エスパー,@2フェアリー,@3ひこう,@3じめん,@3ゴースト,@3みず,@3エスパー,@3フェアリー&!<かくとう&!<ゴースト&!<ほのお",
+      "どくタイプ 女のしたっぱ": "ひこう,どく,ゴースト,でんき,エスパー&@1ひこう,@1じめん,@1いわ,@1はがね,@1ほのお,@1でんき,@1エスパー,@1こおり&@2ひこう,@2じめん,@2いわ,@2はがね,@2ほのお,@2でんき,@2エスパー,@2こおり,@3ひこう,@3じめん,@3いわ,@3はがね,@3ほのお,@3でんき,@3エスパー,@3こおり&!<くさ&!<どく&!<ひこう&!<みず&!<フェアリー&!<かくとう",
+      "じめんタイプ 男のしたっぱ": "ノーマル,ひこう,あく,フェアリー&@1むし,@1ゴースト,@1みず,@1くさ,@1こおり,@1ドラゴン,@1あく,@1フェアリー&@2むし,@2ゴースト,@2みず,@2くさ,@2こおり,@2ドラゴン,@2あく,@2フェアリー,@3むし,@3ゴースト,@3みず,@3くさ,@3こおり,@3ドラゴン,@3あく,@3フェアリー&!<じめん&!<ひこう&!<エスパー&!<ドラゴン&!<ゴースト",
+      "ひこうタイプ 女のしたっぱ": "ひこう,ゴースト,みず&@1ひこう,@1いわ,@1ほのお,@1みず,@1でんき,@1エスパー,@1こおり,@1ドラゴン,@1フェアリー&@2ひこう,@2いわ,@2ほのお,@2みず,@2でんき,@2エスパー,@2こおり,@2ドラゴン,@2フェアリー,@3ひこう,@3いわ,@3ほのお,@3みず,@3でんき,@3エスパー,@3こおり,@3ドラゴン,@3フェアリー&!<ノーマル&!<ひこう&!<どく&!<じめん&!<むし&!<ドラゴン&!<みず",
+      "エスパータイプ 男のしたっぱ": "ひこう,むし,ほのお,フェアリー&@1ひこう,@1どく,@1むし,@1ゴースト,@1はがね,@1あく,@1フェアリー&@2ひこう,@2どく,@2むし,@2ゴースト,@2はがね,@2あく,@2フェアリー,@3ひこう,@3どく,@3むし,@3ゴースト,@3はがね,@3あく,@3フェアリー&!<エスパー&!<フェアリー&!<かくとう&!<あく",
+      "むしタイプ 男のしたっぱ": "かくとう,どく,じめん,ゴースト,はがね,でんき,ドラゴン&@1ひこう,@1いわ,@1はがね,@1ほのお,@1みず,@1エスパー&@2ひこう,@2いわ,@2はがね,@2ほのお,@2みず,@2エスパー,@3ひこう,@3いわ,@3はがね,@3ほのお,@3みず,@3エスパー&!<むし&!<どく&!<いわ&!<でんき&!<はがね",
+      "いわタイプ 男のしたっぱ": "かくとう,ゴースト,みず&@1かくとう,@1じめん,@1いわ,@1はがね,@1みず,@1くさ,@1でんき,@1こおり,@1ドラゴン,@1フェアリー&@2かくとう,@2じめん,@2いわ,@2はがね,@2みず,@2くさ,@2でんき,@2こおり,@2ドラゴン,@2フェアリー,@3かくとう,@3じめん,@3いわ,@3はがね,@3みず,@3くさ,@3でんき,@3こおり,@3ドラゴン,@3フェアリー&!<むし&!<いわ&!<みず&!<じめん&!<はがね&!<こおり&!<ドラゴン",
+      "ゴーストタイプ 男のしたっぱ": "ノーマル,かくとう,どく,いわ,はがね,ほのお,みず,こおり,あく&@1じめん,@1いわ,@1ゴースト,@1はがね,@1ほのお,@1エスパー,@1あく,@1フェアリー&@2じめん,@2いわ,@2ゴースト,@2はがね,@2ほのお,@2エスパー,@2あく,@2フェアリー,@3じめん,@3いわ,@3ゴースト,@3はがね,@3ほのお,@3エスパー,@3あく,@3フェアリー&!<ゴースト&!<どく&!<あく&!<こおり",
+      "ドラゴンタイプ 女のしたっぱ": "ひこう,あく,フェアリー&@1かくとう,@1ひこう,@1どく,@1いわ,@1むし,@1こおり,@1ドラゴン,@1フェアリー&@2かくとう,@2ひこう,@2どく,@2いわ,@2むし,@2こおり,@2ドラゴン,@2フェアリー,@3かくとう,@3ひこう,@3どく,@3いわ,@3むし,@3こおり,@3ドラゴン,@3フェアリー&!<ドラゴン&!<あく&!<くさ&!<じめん&!<ひこう",
+      "あくタイプ 女のしたっぱ": "かくとう,はがね,みず,くさ,あく,フェアリー&@1かくとう,@1むし,@1くさ,@1でんき,@1こおり,@1ドラゴン,@1フェアリー&@2かくとう,@2むし,@2くさ,@2でんき,@2こおり,@2ドラゴン,@2フェアリー,@3かくとう,@3むし,@3くさ,@3でんき,@3こおり,@3ドラゴン,@3フェアリー&!<あく&!<ノーマル&!<みず&!<ドラゴン",
+      "はがねタイプ 男のしたっぱ": "はがね,みず,でんき,エスパー,あく&@1かくとう,@1じめん,@1ゴースト,@1ほのお,@1みず,@1でんき,@1あく&@2かくとう,@2じめん,@2ゴースト,@2ほのお,@2みず,@2でんき,@2あく,@3かくとう,@3じめん,@3ゴースト,@3ほのお,@3みず,@3でんき,@3あく&!<こおり&!<はがね&!<エスパー&!<いわ&!<ひこう",
+      "フェアリータイプ 女のしたっぱ": "いわ,ゴースト,はがね,ほのお,みず,エスパー,こおり&@1かくとう,@1どく,@1じめん,@1いわ,@1ゴースト,@1はがね,@1ほのお,@1エスパー&@2かくとう,@2どく,@2じめん,@2いわ,@2ゴースト,@2はがね,@2ほのお,@2エスパー,@3かくとう,@3どく,@3じめん,@3いわ,@3ゴースト,@3はがね,@3ほのお,@3エスパー&!<フェアリー&!<こおり&!<エスパー&!<どく"
     },
     "rocketGenericGrunts": {
       "Male Grunt": "@1でんき,@1ほのお,@1ひこう&@2でんき,@2ほのお,@2ひこう,@3でんき,@3ほのお,@3ひこう",
-      "Female Grunt": "@1かくとう,@1でんき,@1フェアリー&@2かくとう,@2でんき,@2フェアリー,@3かくとう,@3でんき,@3フェアリー",
+      "Female Grunt": "@1かくとう,@1でんき,@1いわ&@2かくとう,@2でんき,@2いわ,@3かくとう,@3でんき,@3いわ",
       "Decoy Female Grunt": "@1かくとう,@1ほのお,@1ひこう&@2かくとう,@2ほのお,@2ひこう,@3かくとう,@3ほのお,@3ひこう"
     },
     "pvpFilters": {
