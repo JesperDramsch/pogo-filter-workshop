@@ -1244,6 +1244,9 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   // (atk 0-1 OR'd, def 3-4, HP 3-4). Loose mirrors the pvpMode `loose`
   // semantic — wider than strict so the user keeps an attack-IV-1 candidate
   // they might still prefer for the bait power.
+  // Master League has no CP cap, so rank-1 IV math doesn't apply — there
+  // a high-attack hundo wins. Skip the IV clauses entirely for capless
+  // leagues; the user filters Master picks by what they have.
   const buildLeagueFilter = (league) => {
     const speciesList = (league?.species || [])
       .map(s => pokemonNameFor(String(s.dex), outputLocale) || s.name?.toLowerCase())
@@ -1255,10 +1258,10 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     if (league.cpCap) {
       push(clauses, `${kw.numeric.cp}-${league.cpCap}`,
            tFn("app.clause_why.pvp_cp_cap", { params: { cap: league.cpCap } }));
+      push(clauses, `0-1${kw.iv.atk}`, tFn("app.clause_why.pvp_loose_atk"));
+      push(clauses, `3-4${kw.iv.def}`, tFn("app.clause_why.pvp_loose_def"));
+      push(clauses, `3-4${kw.iv.hp}`,  tFn("app.clause_why.pvp_loose_hp"));
     }
-    push(clauses, `0-1${kw.iv.atk}`, tFn("app.clause_why.pvp_loose_atk"));
-    push(clauses, `3-4${kw.iv.def}`, tFn("app.clause_why.pvp_loose_def"));
-    push(clauses, `3-4${kw.iv.hp}`,  tFn("app.clause_why.pvp_loose_hp"));
     return { clause: clauses.map(c => c.clause).join("&"), clauses, skipped: false };
   };
   const pvpFilters = {};
