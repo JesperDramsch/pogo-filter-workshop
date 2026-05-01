@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import * as d3 from "d3";
-import { X, Plus, Copy, Check, ChevronDown, ChevronRight, RotateCcw, Sparkles, Settings, ArrowLeft } from "lucide-react";
+import { X, Plus, Copy, Check, ChevronDown, ChevronRight, RotateCcw, Sparkles, Settings, ArrowLeft, Download, Upload } from "lucide-react";
 import {
   POKEMON_NAMES_DICT,
   resolveSpecies,
@@ -370,6 +370,87 @@ function defaultRegionalToggles() {
 // Pokémon name dictionary, resolvers, and reverse-lookup helpers live in
 // src/data/species.js (multi-locale, generated from the published Google
 // Sheet via scripts/fetch-translations.mjs at build time). Imported above.
+
+// Normalize a raw config blob (from localStorage on load OR from a JSON
+// import file) onto the current DEFAULT_CONFIG shape. Single source of
+// truth so any future field rename / removal automatically migrates both
+// returning users AND old export files.
+//
+// Pattern: spread DEFAULT_CONFIG first so missing fields back-fill, then
+// the raw blob so user values win, then explicit cleanup for legacy keys
+// and renames. Unknown forward-compat keys are preserved.
+export function mergeImportedConfig(raw) {
+  const merged = { ...DEFAULT_CONFIG, ...(raw || {}) };
+  if (!merged.regionalGroups || Object.keys(merged.regionalGroups).length === 0) {
+    merged.regionalGroups = defaultRegionalToggles();
+  }
+  if (!merged.enabledTradeEvos || merged.enabledTradeEvos.length === 0) {
+    merged.enabledTradeEvos = Object.keys(TRADE_EVO_FAMILIES);
+  }
+  // Drop legacy keys (replaced or split)
+  delete merged.protectRegionals;
+  delete merged.protectSizes;        // split into XXL/XL/XXS
+  delete merged.protectLeagueTags;   // replaced with leagueTags string
+  delete merged.protectMegaConditional; // renamed to protectNewEvolutions
+  delete merged.yearMin;
+  // Migrate old field names (read from raw, write to merged)
+  if (raw?.mythCarveOuts && !raw.mythTooManyOf) merged.mythTooManyOf = raw.mythCarveOuts;
+  if (raw?.protectMegaConditional !== undefined && raw.protectNewEvolutions === undefined) {
+    merged.protectNewEvolutions = raw.protectMegaConditional;
+  }
+  // Old `protectTagged` (catch-all !#) → new `protectAnyTag`
+  if (raw?.protectTagged !== undefined && raw.protectAnyTag === undefined) {
+    merged.protectAnyTag = raw.protectTagged;
+  }
+  delete merged.protectTagged;
+  // Canonicalize seeded defaults to the storage locale so chips render
+  // consistently. Idempotent on already-canonical user input.
+  const canonicalize = (arr) => (arr || []).map(s => resolveSpecies(s) || s);
+  merged.mythTooManyOf = canonicalize(merged.mythTooManyOf);
+  merged.shadowKeeperSpecies = canonicalize(merged.shadowKeeperSpecies);
+  return merged;
+}
+
+// Pure validator for import envelopes. Returns an error code (not a
+// localized string) so the React consumer can render messages from the
+// i18n bundle. Code is one of: "invalid_json" (parsed isn't an object),
+// "wrong_schema" (no schema field or unrecognized prefix),
+// "unsupported_version" (right prefix but unknown version).
+//
+// Kept module-scope + pure so it's directly testable without React state.
+export const SCHEMA_PREFIX = "pogo-filter-workshop/";
+export const SCHEMA_CURRENT = "pogo-filter-workshop/v1";
+export function validateImportEnvelope(parsed) {
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return { ok: false, error: { code: "invalid_json" } };
+  }
+  if (typeof parsed.schema !== "string" || !parsed.schema.startsWith(SCHEMA_PREFIX)) {
+    return { ok: false, error: { code: "wrong_schema" } };
+  }
+  if (parsed.schema !== SCHEMA_CURRENT) {
+    return { ok: false, error: { code: "unsupported_version", params: { schema: parsed.schema } } };
+  }
+  return { ok: true, envelope: parsed };
+}
+
+// Pure "what state should the setters receive" computation. Mirrors the
+// shape filtering inline in the previous applyImportEnvelope: only
+// includes a key in the result if the envelope has a recognizable value.
+// Caller uses `if ("hundos" in prepared)` etc. to gate setter calls.
+export function prepareImport(envelope) {
+  const d = (envelope && envelope.data) || {};
+  const canonicalize = (arr) => (arr || []).map(s => resolveSpecies(s) || s);
+  const out = {};
+  if (Array.isArray(d.hundos))          out.hundos = d.hundos;
+  if (Array.isArray(d.topAttackers))    out.topAttackers = canonicalize(d.topAttackers);
+  if (Array.isArray(d.topMaxAttackers)) out.topMaxAttackers = canonicalize(d.topMaxAttackers);
+  if (d.config && typeof d.config === "object") out.config = mergeImportedConfig(d.config);
+  if (d.homeLocation === null || (Array.isArray(d.homeLocation) && d.homeLocation.length === 2)) {
+    out.homeLocation = d.homeLocation;
+  }
+  if (Array.isArray(d.bazaarTags)) out.bazaarTags = d.bazaarTags;
+  return out;
+}
 
 // ─── FILTER GENERATION (set-theoretic) ────────────────────────────────────
 
@@ -1490,35 +1571,8 @@ export default function App() {
       const b = await loadJSON(KEY_BAZAARTAGS, []);
       const step = await loadJSON(KEY_STEP, 1);
       setHundos(h);
-      const merged = { ...DEFAULT_CONFIG, ...c };
-      if (!merged.regionalGroups || Object.keys(merged.regionalGroups).length === 0) {
-        merged.regionalGroups = defaultRegionalToggles();
-      }
-      if (!merged.enabledTradeEvos || merged.enabledTradeEvos.length === 0) {
-        merged.enabledTradeEvos = Object.keys(TRADE_EVO_FAMILIES);
-      }
-      // Drop legacy keys (replaced or split)
-      delete merged.protectRegionals;
-      delete merged.protectSizes;        // split into XXL/XL/XXS
-      delete merged.protectLeagueTags;   // replaced with leagueTags string
-      delete merged.protectMegaConditional; // renamed to protectNewEvolutions
-      delete merged.yearMin;             // removed
-      // Migrate old field names
-      if (c.mythCarveOuts && !c.mythTooManyOf) merged.mythTooManyOf = c.mythCarveOuts;
-      if (c.protectMegaConditional !== undefined && c.protectNewEvolutions === undefined) {
-        merged.protectNewEvolutions = c.protectMegaConditional;
-      }
-      // Old `protectTagged` (catch-all !#) → new `protectAnyTag`
-      if (c.protectTagged !== undefined && c.protectAnyTag === undefined) {
-        merged.protectAnyTag = c.protectTagged;
-      }
-      delete merged.protectTagged;
-      // Canonicalize seeded defaults to the storage locale so chips render
-      // consistently. Idempotent on already-canonical user input.
-      const canonicalize = (arr) => arr.map(s => resolveSpecies(s) || s);
-      merged.mythTooManyOf = canonicalize(merged.mythTooManyOf);
-      merged.shadowKeeperSpecies = canonicalize(merged.shadowKeeperSpecies);
-      setConfig(merged);
+      setConfig(mergeImportedConfig(c));
+      const canonicalize = (arr) => (arr || []).map(s => resolveSpecies(s) || s);
       setTopAttackers(canonicalize(ta));
       setTopMaxAttackers(canonicalize(tma));
       setHomeLocation(home);
@@ -1717,6 +1771,54 @@ export default function App() {
     setBazaarTags([]);
     setResetArmed(false);
     setShowSettings(false);
+  }
+
+  // Build the export envelope from current React state. Reads from React
+  // (not localStorage) so a mid-edit export captures the live values.
+  function buildExportEnvelope() {
+    return {
+      schema: "pogo-filter-workshop/v1",
+      exportedAt: new Date().toISOString(),
+      data: {
+        hundos,
+        topAttackers,
+        topMaxAttackers,
+        config,
+        homeLocation,
+        bazaarTags,
+      },
+    };
+  }
+  // Trigger a JSON file download. Synchronous — no preview, no confirm,
+  // since exporting is non-destructive. Returns the filename used.
+  function exportState() {
+    const envelope = buildExportEnvelope();
+    const today = new Date().toISOString().slice(0, 10);
+    const filename = `pogo-filter-workshop-${today}.json`;
+    const blob = new Blob([JSON.stringify(envelope, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    return filename;
+  }
+  // Apply a previously-validated import envelope to React state. The
+  // pure prepareImport helper does the migration / canonicalization and
+  // returns only the keys it could parse; we then thread each one to its
+  // setter. Keeping the shape filtering pure keeps the import path
+  // testable without a React tree.
+  function applyImportEnvelope(envelope) {
+    const prepared = prepareImport(envelope);
+    if ("hundos" in prepared)          setHundos(prepared.hundos);
+    if ("topAttackers" in prepared)    setTopAttackers(prepared.topAttackers);
+    if ("topMaxAttackers" in prepared) setTopMaxAttackers(prepared.topMaxAttackers);
+    if ("config" in prepared)          setConfig(prepared.config);
+    if ("homeLocation" in prepared)    setHomeLocation(prepared.homeLocation);
+    if ("bazaarTags" in prepared)      setBazaarTags(prepared.bazaarTags);
   }
 
   // Step navigation helpers — labels/descs translated at render time
@@ -2195,6 +2297,8 @@ export default function App() {
         setConfig={setConfig}
         onResetAll={resetAll}
         resetArmed={resetArmed}
+        onExport={exportState}
+        onImport={applyImportEnvelope}
       />
     </div>
   );
@@ -4345,7 +4449,7 @@ function NumField({ label, value, onChange, text, hint }) {
 // behaves": expert mode, trade tag names, custom tags, league tags, scope
 // safety nets, and the dangerous reset. Reachable via gear icon in header.
 
-function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArmed }) {
+function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArmed, onExport, onImport }) {
   const { t, locale, setLocale, outputLocale, setOutputLocale, locales } = useTranslation();
   if (!open) return null;
   function set(k, v) { setConfig({ ...config, [k]: v }); }
@@ -4556,6 +4660,9 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
             onChange={list => set("buddies", list)}
           />
 
+          {/* Backup & Restore — JSON file round-trip for cross-device / browser-wipe recovery */}
+          <BackupRestoreSection onExport={onExport} onImport={onImport} />
+
           {/* Danger zone */}
           <div className="pt-4 border-t border-[#1F2933]">
             <div className="mono text-[10.5px] uppercase tracking-wider text-[#FF6B5B] mb-2">
@@ -4577,6 +4684,159 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─── BACKUP & RESTORE ───────────────────────────────────────────────────────
+
+// Settings-modal section that lets users dump current state to a JSON file
+// and restore from one. The restore flow is a two-step armed confirm —
+// matches the "danger zone" pattern so users don't accidentally clobber
+// their hundo list. Errors render inline (no toast inside modal).
+function BackupRestoreSection({ onExport, onImport }) {
+  const { t } = useTranslation();
+  const fileInputRef = useRef(null);
+  const [pending, setPending] = useState(null); // { envelope, summary }
+  const [armed, setArmed] = useState(false);
+  const [error, setError] = useState("");
+  const [exportedNote, setExportedNote] = useState("");
+
+  function handleExportClick() {
+    const filename = onExport();
+    setExportedNote(t("app.modal.backup.export_done", { params: { filename } }));
+    setTimeout(() => setExportedNote(""), 4000);
+  }
+
+  function summarize(env) {
+    const d = env.data || {};
+    return {
+      hundos: Array.isArray(d.hundos) ? d.hundos.length : 0,
+      topAttackers: Array.isArray(d.topAttackers) ? d.topAttackers.length : 0,
+      topMaxAttackers: Array.isArray(d.topMaxAttackers) ? d.topMaxAttackers.length : 0,
+      configFields: d.config && typeof d.config === "object" ? Object.keys(d.config).length : 0,
+      hasHome: Array.isArray(d.homeLocation) && d.homeLocation.length === 2,
+      bazaarTags: Array.isArray(d.bazaarTags) ? d.bazaarTags.length : 0,
+    };
+  }
+
+  async function handleFilePick(e) {
+    const file = e.target.files?.[0];
+    if (file) await loadFile(file);
+    // Reset so picking the same file again still triggers onChange.
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function loadFile(file) {
+    setError("");
+    setPending(null);
+    setArmed(false);
+    let text;
+    try {
+      text = await file.text();
+    } catch {
+      setError(t("app.modal.backup.import_error_invalid_json"));
+      return;
+    }
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      setError(t("app.modal.backup.import_error_invalid_json"));
+      return;
+    }
+    const result = validateImportEnvelope(parsed);
+    if (!result.ok) {
+      const { code, params } = result.error;
+      setError(t(`app.modal.backup.import_error_${code}`, params ? { params } : undefined));
+      return;
+    }
+    const { envelope } = result;
+    setPending({ envelope, summary: summarize(envelope), exportedAt: envelope.exportedAt || null });
+  }
+
+  function applyPending() {
+    if (!pending) return;
+    if (!armed) { setArmed(true); return; }
+    onImport(pending.envelope);
+    setPending(null);
+    setArmed(false);
+    setError("");
+  }
+
+  function cancelPending() {
+    setPending(null);
+    setArmed(false);
+    setError("");
+  }
+
+  const summaryParts = pending ? [
+    t("app.modal.backup.summary_hundos", { params: { count: pending.summary.hundos } }),
+    t("app.modal.backup.summary_attackers", { params: { count: pending.summary.topAttackers + pending.summary.topMaxAttackers } }),
+    t("app.modal.backup.summary_config", { params: { count: pending.summary.configFields } }),
+    pending.summary.hasHome ? t("app.modal.backup.summary_home") : null,
+    pending.summary.bazaarTags > 0 ? t("app.modal.backup.summary_tags", { params: { count: pending.summary.bazaarTags } }) : null,
+  ].filter(Boolean).join(" · ") : "";
+
+  return (
+    <div className="pt-4 border-t border-[#1F2933]">
+      <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
+        {t("app.modal.backup.section_title")}
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          onClick={handleExportClick}
+          className="mono text-xs bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47] px-3 py-1.5 rounded transition flex items-center gap-1.5">
+          <Download size={11} />
+          {t("app.modal.backup.export_button")}
+        </button>
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="mono text-xs bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47] px-3 py-1.5 rounded transition flex items-center gap-1.5">
+          <Upload size={11} />
+          {t("app.modal.backup.import_button")}
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json,application/json"
+          onChange={handleFilePick}
+          className="hidden"
+        />
+      </div>
+      <div className="mono text-[10px] text-[#8090A0] mt-1.5">
+        {t("app.modal.backup.help")}
+      </div>
+      {exportedNote && (
+        <div className="mono text-[10.5px] text-[#5EAFC5] mt-2">{exportedNote}</div>
+      )}
+      {error && (
+        <div className="mono text-[10.5px] text-[#FF6B5B] mt-2">{error}</div>
+      )}
+      {pending && (
+        <div className="mt-3 border border-[#2D3A47] rounded p-3 space-y-2 bg-[#0E141A]">
+          <div className="mono text-[11px] text-[#E6EDF3]">
+            {pending.exportedAt
+              ? t("app.modal.backup.import_preview_dated", { params: { date: pending.exportedAt.slice(0, 10) } })
+              : t("app.modal.backup.import_preview_undated")}
+          </div>
+          <div className="mono text-[10.5px] text-[#8090A0]">{summaryParts}</div>
+          <div className="flex items-center gap-2 pt-1">
+            <button
+              onClick={applyPending}
+              className={`mono text-xs px-3 py-1.5 rounded transition flex items-center gap-1.5 ${
+                armed ? "bg-[#E74C3C] text-white" : "bg-[#1F2933] text-[#FF6B5B] hover:bg-[#2D3A47]"
+              }`}>
+              {armed ? t("app.modal.backup.import_armed") : t("app.modal.backup.import_apply")}
+            </button>
+            <button
+              onClick={cancelPending}
+              className="mono text-xs bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47] px-3 py-1.5 rounded transition">
+              {t("app.modal.backup.import_cancel")}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

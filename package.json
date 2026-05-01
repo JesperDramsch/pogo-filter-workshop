@@ -14,6 +14,7 @@
     "prebuild": "node scripts/fetch-translations.mjs --offline-ok && node scripts/fetch-raid-bosses.mjs --offline-ok && node scripts/fetch-rocket-lineups.mjs --offline-ok && node scripts/fetch-rocket-grunt-quotes.mjs --offline-ok && node scripts/fetch-pvp-rankings.mjs --offline-ok && node scripts/fetch-meta-rankings.mjs --offline-ok",
     "build": "vite build",
     "test:fixtures": "vite-node scripts/check-fixtures.mjs",
+    "test:migration": "vite-node scripts/check-import-migration.mjs",
     "fixtures:update": "vite-node scripts/generate-fixtures.mjs",
     "preview": "vite preview",
     "deploy": "npm run build && gh-pages -d dist"
