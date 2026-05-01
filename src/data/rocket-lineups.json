@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-01T10:27:08.299Z",
+  "fetchedAt": "2026-05-01T15:29:40.862Z",
   "trainers": [
     {
       "name": "Giovanni",
@@ -203,21 +203,33 @@
               "types": [
                 "rock"
               ]
+            },
+            {
+              "name": "Slowbro",
+              "types": [
+                "water",
+                "psychic"
+              ]
             }
           ],
           "resistorTypes": [
-            "fighting",
-            "ground",
             "water",
-            "grass"
+            "grass",
+            "psychic",
+            "dragon",
+            "dark"
           ],
           "seMoveTypes": [
             "fighting",
             "ground",
+            "bug",
+            "ghost",
             "steel",
             "fire",
             "water",
-            "grass"
+            "grass",
+            "electric",
+            "dark"
           ]
         },
         {
@@ -440,13 +452,7 @@
         "fairy"
       ],
       "seMoveTypes": [
-        "fighting",
-        "flying",
-        "rock",
-        "electric",
-        "psychic",
-        "ice",
-        "fairy"
+        "fighting"
       ],
       "lineupSize": 9
     },
@@ -538,9 +544,7 @@
       "seMoveTypes": [
         "ground",
         "rock",
-        "ghost",
-        "water",
-        "dark"
+        "water"
       ],
       "lineupSize": 9
     },
@@ -633,15 +637,8 @@
         "ice"
       ],
       "seMoveTypes": [
-        "fighting",
-        "flying",
-        "ground",
-        "rock",
-        "bug",
-        "grass",
         "electric",
-        "psychic",
-        "fairy"
+        "grass"
       ],
       "lineupSize": 9
     },
@@ -704,9 +701,8 @@
         "dragon"
       ],
       "seMoveTypes": [
-        "rock",
-        "grass",
-        "electric"
+        "electric",
+        "grass"
       ],
       "lineupSize": 5
     },
@@ -800,12 +796,7 @@
         "fairy"
       ],
       "seMoveTypes": [
-        "fighting",
-        "ground",
-        "rock",
-        "fire",
-        "water",
-        "grass"
+        "ground"
       ],
       "lineupSize": 9
     },
@@ -896,17 +887,11 @@
         "fairy"
       ],
       "seMoveTypes": [
-        "fighting",
-        "flying",
-        "poison",
         "bug",
-        "ghost",
-        "steel",
         "fire",
-        "psychic",
+        "flying",
         "ice",
-        "dark",
-        "fairy"
+        "poison"
       ],
       "lineupSize": 9
     },
@@ -1000,18 +985,9 @@
       ],
       "seMoveTypes": [
         "fighting",
-        "poison",
-        "ground",
-        "rock",
-        "bug",
-        "ghost",
-        "steel",
         "fire",
-        "water",
-        "grass",
-        "electric",
-        "dark",
-        "fairy"
+        "rock",
+        "steel"
       ],
       "lineupSize": 9
     },
@@ -1101,12 +1077,9 @@
         "fairy"
       ],
       "seMoveTypes": [
+        "fairy",
         "flying",
-        "ground",
-        "ghost",
-        "water",
-        "psychic",
-        "fairy"
+        "psychic"
       ],
       "lineupSize": 9
     },
@@ -1199,14 +1172,8 @@
         "psychic"
       ],
       "seMoveTypes": [
-        "flying",
         "ground",
-        "rock",
-        "steel",
-        "fire",
-        "electric",
-        "psychic",
-        "ice"
+        "psychic"
       ],
       "lineupSize": 9
     },
@@ -1298,14 +1265,9 @@
         "fairy"
       ],
       "seMoveTypes": [
-        "bug",
-        "ghost",
-        "water",
         "grass",
         "ice",
-        "dragon",
-        "dark",
-        "fairy"
+        "water"
       ],
       "lineupSize": 9
     },
@@ -1399,15 +1361,9 @@
         "water"
       ],
       "seMoveTypes": [
-        "flying",
-        "rock",
-        "fire",
-        "water",
         "electric",
-        "psychic",
         "ice",
-        "dragon",
-        "fairy"
+        "rock"
       ],
       "lineupSize": 9
     },
@@ -1496,13 +1452,9 @@
         "fairy"
       ],
       "seMoveTypes": [
-        "flying",
-        "poison",
         "bug",
-        "ghost",
-        "steel",
         "dark",
-        "fairy"
+        "ghost"
       ],
       "lineupSize": 9
     },
@@ -1597,12 +1549,9 @@
         "dragon"
       ],
       "seMoveTypes": [
-        "flying",
-        "rock",
-        "steel",
         "fire",
-        "water",
-        "psychic"
+        "flying",
+        "rock"
       ],
       "lineupSize": 9
     },
@@ -1695,15 +1644,10 @@
       ],
       "seMoveTypes": [
         "fighting",
-        "ground",
-        "rock",
-        "steel",
-        "water",
         "grass",
-        "electric",
-        "ice",
-        "dragon",
-        "fairy"
+        "ground",
+        "steel",
+        "water"
       ],
       "lineupSize": 9
     },
@@ -1798,14 +1742,8 @@
         "dark"
       ],
       "seMoveTypes": [
-        "ground",
-        "rock",
-        "ghost",
-        "steel",
-        "fire",
-        "psychic",
         "dark",
-        "fairy"
+        "ghost"
       ],
       "lineupSize": 9
     },
@@ -1896,14 +1834,9 @@
         "fairy"
       ],
       "seMoveTypes": [
-        "fighting",
-        "flying",
-        "poison",
-        "rock",
-        "bug",
-        "ice",
         "dragon",
-        "fairy"
+        "fairy",
+        "ice"
       ],
       "lineupSize": 9
     },
@@ -1983,13 +1916,9 @@
         "fairy"
       ],
       "seMoveTypes": [
-        "fighting",
         "bug",
-        "grass",
-        "electric",
-        "ice",
-        "dragon",
-        "fairy"
+        "fairy",
+        "fighting"
       ],
       "lineupSize": 7
     },
@@ -2086,12 +2015,8 @@
       ],
       "seMoveTypes": [
         "fighting",
-        "ground",
-        "ghost",
         "fire",
-        "water",
-        "electric",
-        "dark"
+        "ground"
       ],
       "lineupSize": 9
     },
@@ -2185,14 +2110,8 @@
         "ice"
       ],
       "seMoveTypes": [
-        "fighting",
         "poison",
-        "ground",
-        "rock",
-        "ghost",
-        "steel",
-        "fire",
-        "psychic"
+        "steel"
       ],
       "lineupSize": 9
     },

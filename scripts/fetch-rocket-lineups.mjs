@@ -6,10 +6,16 @@
 // Three trainer kinds:
 //   * leader         — Giovanni / Cliff / Sierra / Arlo. Per-phase counters
 //                      so the user can swap Pokémon between phases.
-//   * typed_grunt    — 18 type-themed grunts. Aggregated counters across
-//                      their full lineup; secondary types of individual
-//                      Pokémon (e.g. Charizard's flying on a fire grunt)
-//                      flow into resistor / SE selection.
+//   * typed_grunt    — 18 type-themed grunts. Resistor selection still
+//                      considers the full union of lineup types (so a
+//                      ground secondary like Swinub knocks steel out of
+//                      the defender list). SE move selection anchors to
+//                      the type chart counters of the grunt's primary
+//                      type and only adds bonus types that hit ≥half of
+//                      the lineup AND aren't resisted by the primary —
+//                      otherwise a single off-type secondary (e.g.
+//                      Swinub's ground on an ice grunt) used to leak
+//                      water/grass/etc into the SE list.
 //   * generic_grunt  — Male/Female/Decoy. Lineups too varied for a clean
 //                      universal resistor. We rank candidate move types by
 //                      "how many of the lineup's Pokémon take SE damage"
@@ -118,6 +124,32 @@ function seVsAnyPokemon(pokemons, allTypeNames, typeIdx) {
   return out;
 }
 
+// SE move types for a typed grunt. Anchored to the type chart (always
+// includes types SE vs the primary type) plus "bonus coverage" types
+// that hit at least half the lineup SE AND aren't resisted by the
+// primary type. The resistance gate stops a single off-type secondary
+// (Swinub's ground on an ice grunt) from re-introducing types whose
+// STAB is halved by the headline matchup.
+function seMoveTypesForTypedGrunt(primaryType, pokemons, allTypeNames, typeIdx) {
+  const canonical = new Set(
+    allTypeNames.filter(cand => eff(cand, primaryType, typeIdx) > 1)
+  );
+  const threshold = Math.ceil(pokemons.length / 2);
+  const out = new Set(canonical);
+  for (const cand of allTypeNames) {
+    if (out.has(cand)) continue;
+    if (eff(cand, primaryType, typeIdx) < 1) continue;
+    let hits = 0;
+    for (const p of pokemons) {
+      if (effVsPokemon(cand, (p.types || []).map(t => t.toLowerCase()), typeIdx) > 1) {
+        hits++;
+      }
+    }
+    if (hits >= threshold) out.add(cand);
+  }
+  return [...out].sort();
+}
+
 // Top-N attacker types by "hits SE" count across a heterogeneous lineup.
 // Used for generic grunts whose phase composition is too varied for a
 // clean union-resistor. Ties broken alphabetically.
@@ -195,7 +227,7 @@ function deriveTypedGrunt(entry, allTypeNames, typeIdx) {
     type: entry.type,
     phases: slots.map((slot, i) => ({ slot: i + 1, pokemons: slot.map(pokemonSummary) })),
     resistorTypes: resistorsFor(unionTypes, allTypeNames, typeIdx),
-    seMoveTypes: seVsAnyPokemon(pokemons, allTypeNames, typeIdx),
+    seMoveTypes: seMoveTypesForTypedGrunt(entry.type.toLowerCase(), pokemons, allTypeNames, typeIdx),
     lineupSize: pokemons.length,
   };
 }
