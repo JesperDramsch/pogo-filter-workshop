@@ -1,0 +1,455 @@
+{
+  "fetchedAt": "2026-05-01T16:18:48.293Z",
+  "typed": {
+    "bug": {
+      "en": "Go, my super bug Pokémon!",
+      "de": "Los, mein super Käfer-Pokémon!",
+      "es": "¡Vamos, mi poderoso Pokémon de tipo Bicho!",
+      "fr": "Montre-lui ce que les Pokémon Insecte ont dans le ventre !",
+      "zh-TW": {
+        "female": "我可愛的蟲寶可夢，上吧！",
+        "male": "我可愛的蟲寶可夢啊！上吧！"
+      },
+      "hi": "जाओ, मेर सुपर बग पोकमॉन!",
+      "ja": {
+        "female": "あたしの可愛いむしポケ！　それいけーっ！",
+        "male": "おれの可愛いむしポケ！　それいけーっ！"
+      }
+    },
+    "dark": {
+      "en": "Wherever there is light, there is also shadow.",
+      "de": "Es mag etwas abgedroschen klingen, aber wo Licht ist, da ist auch Schatten.",
+      "es": {
+        "female": "Ya sé que es una frase manida, pero... Donde quiera que hay luz, también hay sombras...",
+        "male": "Ya sé que es una frase manida, pero... Donde quiera que hay luz, también hay sombras...\n"
+      },
+      "fr": "Comme on dit, là où il y a de la lumière, il y a de l’ombre.",
+      "zh-TW": "有光的地方，就會有影子。",
+      "hi": "जहां रोशनी है, वहां परछाई भी है।",
+      "ja": {
+        "female": "光があるところ、影ありっ！　行くわよ！",
+        "male": "光があるところ、影ありっ！　行くぞ！"
+      }
+    },
+    "dragon": {
+      "en": "ROAR! ...How’d that sound?",
+      "de": "Gut gebrüllt ist halb gewonnen!",
+      "es": {
+        "female": "¡GRRR! ¿Qué te pareció eso?",
+        "male": "¡GRRRR! ¿Qué te pareció eso?"
+      },
+      "fr": "Raaaahhh !!! ... C’était bien ?",
+      "zh-TW": "吼喔喔喔喔！怎樣，嚇到了吧！",
+      "hi": "रोर! …यह कसा सुनाई दया?",
+      "ja": {
+        "female": "ガオォォオッ！　ドラゴンの雄叫び！　どう、びっくりした？",
+        "male": "ガオォォオッ！　ドラゴンの雄叫び！　びびったか！"
+      }
+    },
+    "electric": {
+      "en": "Get ready to be shocked!",
+      "de": "Du wirst schockiert sein!",
+      "es": "¡Prepárate para alucinar!",
+      "fr": "Prêt pour un choc ?",
+      "zh-TW": "你就等著被電吧！",
+      "hi": "झटका खाने क लए तैयार हो जाओ!",
+      "ja": {
+        "female": "ビリビリ、ってするわよ！　ビリビリ！",
+        "male": "ビリビリ、ってするぞ！　ビリビリ！"
+      }
+    },
+    "fairy": {
+      "en": "Check out my cute Pokémon!",
+      "de": "Sieh mal, wie niedlich mein Pokémon ist!",
+      "es": "¡Mira a mi Pokémon tan mono!",
+      "fr": "Émerveille-toi devant mes adorables Pokémon !",
+      "zh-TW": {
+        "female": "看看我這可愛的寶可夢！",
+        "male": "看我可愛的寶可夢！"
+      },
+      "hi": "मेरा यूट पोकमॉन देखो!",
+      "ja": {
+        "female": "あたしのキュートなフェアリーたち、ご覧あれ！",
+        "male": "オレのキュートなフェアリーたち、どうだ！"
+      }
+    },
+    "fighting": {
+      "en": "This buff physique isn’t just for show!",
+      "de": "Dieser muskulöse Körper dient nicht nur der Show!",
+      "es": "Estos músculos no son solo para impresionar.",
+      "fr": "Mes biscoteaux ne sont pas seulement là pour faire joli !",
+      "zh-TW": "這飽滿的肌肉可不是擺著好看的！",
+      "hi": "यह कमाल क फज़ीक सर्फ़ दखाने क नहीं है!",
+      "ja": {
+        "female": "このムキムキ筋肉は、ダテじゃなーいーっ！　勝負よ！",
+        "male": "このムキムキ筋肉は、ダテじゃねえーっ！　バトルだ！"
+      }
+    },
+    "fire": {
+      "en": "Do you know how hot Pokémon fire breath can get?",
+      "de": "Weißt du eigentlich, wie heiß der Feueratem eines Pokémon sein kann?",
+      "es": "¿Sabes lo caliente que puede llegar a ser el aliento de fuego de los Pokémon?",
+      "fr": "Sais-tu que certains Pokémon soufflent le feu ?",
+      "zh-TW": {
+        "female": "你知道寶可夢吐出的火焰有多熱嗎？",
+        "male": "你知道寶可夢吐出的火焰高達攝氏幾度嗎？"
+      },
+      "hi": "या आप जानते हैं क पोकमॉन फ़ायर ेथ कतनी गम हो सकती है?",
+      "ja": {
+        "female": "ポケモンが吐く炎、どれだけ熱いか知ってる？　覚悟なさい！",
+        "male": "ポケモンが吐く炎、どんだけ熱いか知ってるか？　覚悟しな！"
+      }
+    },
+    "flying": {
+      "en": "Battle against my Flying-type Pokémon!",
+      "de": "Kämpfe gegen mein Flug-Pokémon!",
+      "es": "¡Mis Pokémon pájaro quieren combatir contigo!",
+      "fr": "Combats contre mes Pokémon de type Vol !",
+      "zh-TW": {
+        "female": "讓你見識見識我華麗的飛行屬性寶可夢！",
+        "male": "本大爺的飛行屬性寶可夢很想來場對戰！"
+      },
+      "hi": "मेर लाइंग टाइप पोकमॉन से बैटल करो!",
+      "ja": {
+        "female": "あたしのポケモンが華麗に舞ってみせるわ！",
+        "male": "おれのポケモンが華麗に舞うぜ！"
+      }
+    },
+    "ghost": {
+      "en": "Ke...ke...ke...ke...ke...ke!",
+      "de": "Buhu... Buhuhu...!",
+      "es": "Ja, ja, ja...",
+      "fr": "Ké... Ké... Ké... Ké... Ké... Ké !",
+      "zh-TW": "科、科科、科科科！",
+      "hi": "हे…हे…हे…हे…हे…हे!",
+      "ja": {
+        "female": "ヒ、ヒヒ．．．ヒヒッ！　こわいわよ～っ！",
+        "male": "ヒ、ヒヒ．．．ヒヒッ！　こわいぞう～っ！"
+      }
+    },
+    "grass": {
+      "en": "Don’t tangle with us!",
+      "de": "Mit uns ist nicht gut Beeren essen!",
+      "es": "¡No nos vaciles!",
+      "fr": "Ne t’approche pas de nous !",
+      "zh-TW": "我們可是野火燒不盡，春風吹又生！",
+      "hi": "हमसे मत उलझो!",
+      "ja": {
+        "female": "あたしたちにツタのように絡むとロクなことにならないわよ！",
+        "male": "おれ達にツタのように絡むとロクなことにならないぜ！"
+      }
+    },
+    "ground": {
+      "en": "You’ll be defeated into the ground!",
+      "de": "Wir werden dich in den Boden stampfen!",
+      "es": "¡Haré que te comas el polvo!",
+      "fr": "Tu vas mordre la poussière !",
+      "zh-TW": "我會把你重重地摔到地面上！",
+      "hi": "तुहें धूल चटा दी जाएगी!",
+      "ja": {
+        "female": "地面に叩き落としてやる！",
+        "male": "地面に叩き落としてやるぜ！"
+      }
+    },
+    "ice": {
+      "en": "You’re gonna be frozen in your tracks.",
+      "de": "Du bewegst dich auf dünnem Eis!",
+      "es": "El frío puede paralizarte, ¿no lo sabes?",
+      "fr": "Tu vas te geler sur place.",
+      "zh-TW": "我要把你們全部凍僵！",
+      "hi": "तुम राते में ही जम जाने वाल हो।",
+      "ja": {
+        "female": "向かって来るそばから凍らせちゃうから！　かかってきなさい！",
+        "male": "向かって来るそばから凍らせてやる！　かかってこい！"
+      }
+    },
+    "normal": {
+      "en": "Normal does not mean weak.",
+      "de": "Normal heißt noch lange nicht schwach.",
+      "es": {
+        "female": "Normal no significa débil. ",
+        "male": "Normal no significa débil."
+      },
+      "fr": "Normal ne veut pas dire faible.",
+      "zh-TW": "你以為一般屬性很弱嗎？",
+      "hi": "नॉमल का मतलब कमज़ोर मत समझना।",
+      "ja": {
+        "female": "ノーマルタイプが弱いって思ってる？　本当の強さを見せてあげるっ！",
+        "male": "ノーマルタイプが弱いって思ってるのか？　本当の強さを見せてやるっ！"
+      }
+    },
+    "poison": {
+      "en": "Coiled and ready to strike!",
+      "de": "Wir sind bereit. Da kannst du Gift drauf nehmen!",
+      "es": "¡En posición y listo para atacar!",
+      "fr": "Prêt à bondir sur l’adversaire !",
+      "zh-TW": "好好嚐嚐這猛毒吧！",
+      "hi": "हमल क लए तैयार!",
+      "ja": {
+        "female": "毒をたっぷり浴びせてあげるわ！",
+        "male": "毒をたっぷり浴びせてやるぜ！"
+      }
+    },
+    "psychic": {
+      "en": "Are you scared of psychics that use unseen power?",
+      "de": "Hast du Angst vor unsichtbaren Kräften?",
+      "es": "¿Te asustan los psíquicos que usan un poder invisible?",
+      "fr": "As-tu peur des kinésistes qui ont des pouvoirs occultes ?",
+      "zh-TW": {
+        "female": "使用看不見的力量的超能力者是不是讓你很害怕啊？",
+        "male": "你是不是很怕使用看不見的力量的超能力者？"
+      },
+      "hi": "आप उन भवय बताने वालों से डरते हैं जो अनदेखी शतयां इतेमाल करते हैं?",
+      "ja": {
+        "female": "見えないちからを使うエスパータイプを怖いと思わない・・・！？",
+        "male": "見えないちからを使うエスパータイプを怖いと思うか・・・！？"
+      }
+    },
+    "rock": {
+      "en": "Let’s rock and roll!",
+      "de": "Bringen wir den Stein ins Rollen!",
+      "es": "¡Soy fuerte como una roca!",
+      "fr": "Je vais te déc-rocher un coup de poing !",
+      "zh-TW": "Let’s rock and roll!",
+      "hi": "चलए रॉक ऐंड रोल करं!",
+      "ja": {
+        "female": "ロック魂の叫び！　キミにも聞こえる！？",
+        "male": "ロック魂の叫びを聞けーっ！"
+      }
+    },
+    "steel": {
+      "en": "You’re no match for my iron will!",
+      "de": "Gegen meinen eisernen Willen kommst du nicht an!",
+      "es": "¡No eres rival para mi voluntad de hierro!",
+      "fr": "Tu ne me surpasseras jamais, moi et ma volonté de fer !",
+      "zh-TW": {
+        "female": "我的意志跟鋼鐵一樣強韌！",
+        "male": "我的意志有如鋼鐵般強韌！"
+      },
+      "hi": "मेर फ़ौलादी इरादों क सामने तुहारा टकना नामुमकन है!",
+      "ja": {
+        "female": "テッペキのはがねを食らいなさい！　勝負よ！",
+        "male": "テッペキのはがねを食らいな！　勝負！"
+      }
+    },
+    "water": {
+      "en": "These waters are treacherous!",
+      "de": "Hey, du! Diese Gewässer sind trügerisch!",
+      "es": "¡Estas aguas son traicioneras!",
+      "fr": "Ces eaux sont dangereuses !",
+      "zh-TW": "這片海域很危險！",
+      "hi": "यह धोखे से भरा है!",
+      "ja": {
+        "female": "潮風とか、水とか、浴びたい頃なんじゃない？",
+        "male": "潮風とか、水とか、浴びたい頃だろ？"
+      }
+    }
+  },
+  "generic": [
+    {
+      "en": "Winning is for winners.",
+      "de": "Siegen ist für Sieger.",
+      "es": "Ganar es para los ganadores.",
+      "fr": "La gagne, c’est pour les gagnants.",
+      "zh-TW": "只有贏家才能贏！",
+      "hi": "जीत जीतने वालों क लए है।",
+      "ja": {
+        "female": "勝者のみが勝利できるのよ。",
+        "male": "勝者のみが勝利できるのだ。"
+      }
+    },
+    {
+      "en": "Don’t bother—I’ve already won.",
+      "de": "Versuch‘s gar nicht erst – der Sieg gehört mir.",
+      "es": "No te molestes, ya he ganado.",
+      "fr": "T’inquiète, j’ai gagné d’avance.",
+      "zh-TW": {
+        "female": "唉，你怎麼可能打得過我呢。",
+        "male": "唉，我就跟你打打看吧。"
+      },
+      "hi": {
+        "female": "परशान न हो—मैं पहल ही जीत चुक ं।",
+        "male": "परशान न हो—मैं पहल ही जीत चुका ं।"
+      },
+      "ja": {
+        "female": "いちおう戦ってみようかなー？",
+        "male": "いちおう戦ってみるかー。"
+      }
+    },
+    {
+      "en": "Get ready to be defeated!",
+      "de": "Bereite dich schon mal auf eine Niederlage vor!",
+      "es": "¡Prepárate para la derrota!",
+      "fr": "Prêt pour la défaite ?",
+      "zh-TW": "你就等著輸吧！",
+      "hi": "हारने क लए तैयार हो जाओ!",
+      "ja": {
+        "female": "覚悟しなさい！",
+        "male": "覚悟しろ！"
+      }
+    }
+  ],
+  "decoy": [
+    {
+      "en": "Fooled ya, twerp.",
+      "de": "Reingelegt, Knirps.",
+      "es": "Te engañé, papanatas.",
+      "fr": "On t’a berné, espèce de morveux.",
+      "zh-TW": "傻蛋，被騙倒了吧。",
+      "hi": "तुहें मूख बनाया।",
+      "ja": "まんまと、だまされたな。"
+    },
+    {
+      "en": "I can’t believe you fell for it!",
+      "de": "Ich kann nicht glauben, dass du darauf reingefallen bist!",
+      "es": "¡No me puedo creer que hayas caído en la trampa!",
+      "fr": "J’y crois pas ! Tu t’es fait avoir.",
+      "zh-TW": "真不敢相信你完全上當了！",
+      "hi": "मुझे यकन नहीं होता क तुमने यह मान लया!",
+      "ja": "まんまと引っかかったな！"
+    },
+    {
+      "en": "In the name of the boss, I’ll destroy you!",
+      "de": "Ich werde dich im Namen des Bosses vernichten!",
+      "es": "¡Te voy a destruir en el nombre del jefe!",
+      "fr": "Au nom du boss, je te détruirai.",
+      "zh-TW": "我以首領之名，發誓一定會摧毀你！",
+      "hi": "बॉस क तरफ़ से मैं तुहें बबाद कर दूंगा!",
+      "ja": "ボスの名にかけて、ひねりつぶす！"
+    },
+    {
+      "en": "You’ll never get to him!",
+      "de": "An ihn kommst du nicht ran!",
+      "es": "¡Nunca llegarás hasta él!",
+      "fr": "Tu n’arriveras jamais jusqu’à lui.",
+      "zh-TW": "你永遠都別想能找到他！",
+      "hi": "तुम उन तक कभी नहीं पंच पाओगे!",
+      "ja": "ボスを簡単に探せると思ったか？"
+    },
+    {
+      "en": "It feels good to see you disappointed.",
+      "de": "Deine Enttäuschung ist mir eine große Freude.",
+      "es": "Me gusta ver tu decepción.",
+      "fr": "Content de te voir déçu.",
+      "zh-TW": "真是太～遺～憾～了！",
+      "hi": "तुहें नराश देखकर बत अछा लग रहा है।",
+      "ja": "残念だったな！"
+    },
+    {
+      "en": "Wanna get to the boss, do ya? You’ll have to defeat me!",
+      "de": "Du willst an den Boss ran, was? Erst musst du mich besiegen!",
+      "es": "Quieres llegar hasta el jefe, ¿eh? ¡Tendrás que derrotarme!",
+      "fr": "Tu veux voir le boss, hein ? D’abord il va falloir me vaincre.",
+      "zh-TW": "想去老大那裡？先過我這關再說吧！",
+      "hi": "बॉस तक पंचना है तुहें? तुहें मुझे हराना होगा!",
+      "ja": "ボスにたどり着きたいんだろうが、そう簡単にはいかない！"
+    },
+    {
+      "en": "I’ll do anything to protect the boss!",
+      "de": "Ich tue alles, um den Boss zu beschützen!",
+      "es": "¡Haré cualquier cosa para proteger al jefe!",
+      "fr": "Je ferai tout pour protéger notre boss !",
+      "zh-TW": "休想動老大一根寒毛！",
+      "hi": "बॉस को बचाने क लए मैं कछ भी कंगा!",
+      "ja": "ボスに、指一本触れさせない！"
+    },
+    {
+      "en": "You’ve been bamboozled, punk!",
+      "de": "Ausgetrickst, Kerlchen!",
+      "es": "¡Te han engañado, canalla!",
+      "fr": "On t’a eu, vaurien !",
+      "zh-TW": "你完全上當了！",
+      "hi": "मैंने तुहार आंखों में धूल झोंक दी!",
+      "ja": "だまされたんだよ、まんまと。"
+    },
+    {
+      "en": "Get lost! You’ll never find him.",
+      "de": "Schleich dich! Du wirst ihn nie finden.",
+      "es": "¡Piérdete! Nunca lo encontrarás.",
+      "fr": "Retourne d’où tu viens. Tu ne le trouveras jamais.",
+      "zh-TW": "快滾！你永遠找不到老大的。",
+      "hi": "चल जाओ यहां से! तुहें वे कभी नहीं मलंगे।",
+      "ja": "失せろ！　ボスがそう簡単に見つかってたまるか。"
+    },
+    {
+      "en": "What, did you think finding the boss was going to be that easy?",
+      "de": "Was, hast du etwa gedacht, es wäre ganz leicht, den Boss zu finden?",
+      "es": "Qué, ¿pensabas que encontrar al jefe iba a ser tan fácil?",
+      "fr": "Tu croyais que ça serait facile de trouver le boss, hein ?",
+      "zh-TW": "什麼？你以為要找到老大有那麼簡單嗎？",
+      "hi": "तुहें या लगता है, बॉस को ढूंढना इतना आसान है?",
+      "ja": "は？　ボスが簡単に見つかるとでも思ったのか？"
+    }
+  ],
+  "balloon": [
+    {
+      "en": "Don’t hate us ’cause you ain’t us.",
+      "de": "Verachte uns nicht, weil du nicht wie wir bist.",
+      "es": "No nos odies porque no eres uno de los nuestros.",
+      "fr": "Tu ne fais pas partie de l’équipe, sois pas jaloux.",
+      "zh-TW": {
+        "female": "我想你也沒本事進得了GO火箭隊啊！",
+        "male": "你別因為進不了GO火箭隊就恨我啊！"
+      },
+      "hi": "जलो मत, बराबर करो।",
+      "ja": "GOロケット団に入れなくて、残念でした！"
+    },
+    {
+      "en": "I’m actually really scared of heights.",
+      "de": "Ich habe eigentlich Höhenangst.",
+      "es": "Lo cierto es que tengo miedo a las alturas.",
+      "fr": "J’ai le vertige.",
+      "zh-TW": {
+        "female": "其實人家有懼高症……",
+        "male": "其實我有懼高症……"
+      },
+      "hi": "मुझे ऊंचाई से वाकई बत डर लगता है।",
+      "ja": "本当は高いところとか無理ー。"
+    },
+    {
+      "en": "To be honest, I miss standing next to a PokéStop.",
+      "de": "Ich vermisse es, neben einem PokéStop zu stehen.",
+      "es": "A decir verdad, echo de menos estar al lado de una Poképarada.",
+      "fr": "En toute honnêteté, ça me manque de ne plus être à côté d’un PokéStop.",
+      "zh-TW": {
+        "female": "我得承認，其實我比較想去守著寶可補給站。",
+        "male": "我就老實跟你說了吧，其實我比較想去蹲寶可補給站。"
+      },
+      "hi": "सच कं, मुझे पोकटॉप क पास खड़े होने क बत याद आती है।",
+      "ja": {
+        "female": "やっぱり、ポケストップの横に立ってがほうが楽だわ。",
+        "male": "あー、ポケストップの横に立ってがほうが楽だー。"
+      }
+    },
+    {
+      "en": "Flying a hot-air balloon is harder than it looks.",
+      "de": "Einen Heißluftballon zu lenken, ist schwieriger, als es aussieht.",
+      "es": "Volar en globo aerostático es más difícil de lo que parece.",
+      "fr": "Diriger une montgolfière, c’est plus dur que ça en a l’air !",
+      "zh-TW": {
+        "female": "要讓熱氣球飛起來，可是比你想像得還要困難好幾百倍呢！",
+        "male": "要讓熱氣球飛起來可是比你想像得還要困難好幾百倍啊。"
+      },
+      "hi": "गम हवा का गुबारा उड़ाना जतना आसान दखता है, उतना है नहीं।",
+      "ja": {
+        "female": "気球飛ばすの、すごく難しいんだから！",
+        "male": "気球飛ばすの、すごく難しいんだからな！"
+      }
+    },
+    {
+      "en": "Have you seen any weirdos around lately? One with blue hair and one with magenta hair?",
+      "de": "Hast du in letzter Zeit komische Vögel gesehen? Einen mit blauen und einen mit roten Haaren?",
+      "es": "¿Has visto a algún “rarito” últimamente? ¿Con pelo azul y con pelo magenta...?",
+      "fr": "T’aurais pas vu deux personnes bizarres aux cheveux bleus et rouges récemment ?",
+      "zh-TW": {
+        "female": "我說你啊，你最近有沒有看到兩個怪人？一個有藍色頭髮，另一個有粉紅色頭髮……",
+        "male": "你最近有沒有看到兩個怪咖？一個頭髮是藍色的，另一個頭髮是粉紅色的……"
+      },
+      "hi": "या तुहें आस-पास कोई अजीब यत दखा? एक क बाल नील हैं और एक क मजेंटा?",
+      "ja": {
+        "female": "最近おかしな二人組見かけなかった？髪が青とピンクの．．．",
+        "male": "最近おかしな二人組見かけなかったか？髪が青とピンクの．．．"
+      }
+    }
+  ]
+}

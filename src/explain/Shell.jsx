@@ -367,6 +367,7 @@ const DATA_CREDIT_PROJECTS = [
   { label: "LeekDuck",     url: "https://leekduck.com"                         },
   { label: "lily-dex-api", url: "https://github.com/mknepprath/lily-dex-api"   },
   { label: "PoGoAPI",      url: "https://pogoapi.net"                          },
+  { label: "PokeMiners",   url: "https://github.com/PokeMiners/pogo_assets"    },
 ];
 
 export function AppCredit() {

@@ -1,0 +1,33 @@
+name: Sync rocket grunt quotes
+
+on:
+  schedule:
+    - cron: "23 8 * * 1" # weekly at Monday 08:23 UTC — quotes change rarely
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Fetch Team Rocket grunt quotes from PokeMiners
+        run: npm run fetch-rocket-grunt-quotes
+      - name: Commit + push if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- src/data/rocket-grunt-quotes.json; then
+            echo "No grunt-quote changes — skipping commit."
+            exit 0
+          fi
+          git add src/data/rocket-grunt-quotes.json
+          git commit -m "chore(rocket): sync grunt quotes from PokeMiners"
+          git push

@@ -10,6 +10,8 @@ import {
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from "./i18n/pogo-keywords.js";
 import RAID_BOSSES from "./data/raid-bosses.json";
 import ROCKET_LINEUPS from "./data/rocket-lineups.json";
+import ROCKET_GRUNT_QUOTES from "./data/rocket-grunt-quotes.json";
+import RocketQuoteLookup from "./explain/RocketQuoteLookup.jsx";
 import PVP_RANKINGS from "./data/pvp-rankings.json";
 import META_RANKINGS from "./data/meta-rankings.json";
 import { useTranslation } from "./i18n/I18nProvider.jsx";
@@ -1041,6 +1043,20 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     return { slot: phase.slot, pokemons: localizedPokemons,
              clause: clauses.map(c => c.clause).join("&"), clauses, skipped: false };
   };
+  // ScrapedDuck names are like "Ice-type Female Grunt" / "Male Grunt" — pull
+  // gender out of the EN string regardless of the user's outputLocale.
+  const gruntGender = (rawName) => /female/i.test(rawName) ? "female" : "male";
+  // Resolve a quote entry (locale-keyed; each value is either a plain string
+  // or a `{female, male}` object when the locale's grunt speech diverges by
+  // speaker). Falls back: outputLocale → en → null.
+  const resolveQuote = (entry, gender) => {
+    if (!entry) return null;
+    const localized = entry[outputLocale] ?? entry.en;
+    if (!localized) return null;
+    if (typeof localized === "string") return localized;
+    return localized[gender] ?? localized.male ?? localized.female ?? null;
+  };
+
   // Localize the EN ScrapedDuck name "Fire-type Female Grunt" via existing
   // type-name i18n. Gender stays as a symbol (♂/♀) since it's universal.
   // Falls back to the raw EN name if either token is missing.
@@ -1057,8 +1073,10 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     const seMoveList = (trainer.seMoveTypes || []).map(t => kw.type[t]).filter(Boolean);
     const displayName = localizedGruntName(trainer);
     const localizedPhases = localizePhases(trainer.phases);
+    const gender = gruntGender(trainer.name);
+    const quote = resolveQuote(ROCKET_GRUNT_QUOTES.typed?.[trainer.type], gender);
     if (resistorList.length === 0 || seMoveList.length === 0) {
-      return { name: displayName, type: trainer.type, phases: localizedPhases,
+      return { name: displayName, type: trainer.type, phases: localizedPhases, quote,
                clause: "", clauses: [], skipped: true };
     }
     const clauses = [];
@@ -1072,7 +1090,7 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     const allLineup = (trainer.phases || []).flatMap(p => p.pokemons || []);
     const wGuard = weaknessGuard(unionTypesOf(allLineup));
     if (wGuard) push(clauses, wGuard, tFn("app.clause_why.rocket_not_weak_to_lineup"));
-    return { name: displayName, type: trainer.type, phases: localizedPhases,
+    return { name: displayName, type: trainer.type, phases: localizedPhases, quote,
              clause: clauses.map(c => c.clause).join("&"), clauses, skipped: false };
   };
   // Capitalized localized type name for display ("Feuer", "Wasser"). The
@@ -1092,8 +1110,15 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
       ...h,
       localizedType: localizedTypeDisplay(h.type),
     }));
+    // Generic grunts have 3 numbered pre-battle quotes (any of which may
+    // appear). Surface all 3 in the matching speaker gender so the user can
+    // recognize the encounter regardless of which line was rolled.
+    const gender = gruntGender(trainer.name);
+    const quotes = (ROCKET_GRUNT_QUOTES.generic || [])
+      .map(e => resolveQuote(e, gender))
+      .filter(Boolean);
     if (seMoveList.length === 0) {
-      return { name: trainer.name, phases: localizedPhases, topHits: localizedTopHits,
+      return { name: trainer.name, phases: localizedPhases, topHits: localizedTopHits, quotes,
                clause: "", clauses: [], skipped: true };
     }
     const clauses = [];
@@ -1107,7 +1132,7 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     // we don't drop solid counters that happen to have one minority weakness.
     const wGuard = weaknessGuard(trainer.commonStabTypes || []);
     if (wGuard) push(clauses, wGuard, tFn("app.clause_why.rocket_not_weak_to_common_stab"));
-    return { name: trainer.name, phases: localizedPhases, topHits: localizedTopHits,
+    return { name: trainer.name, phases: localizedPhases, topHits: localizedTopHits, quotes,
              clause: clauses.map(c => c.clause).join("&"), clauses, skipped: false };
   };
   const rocketLeaders = [];
@@ -1126,6 +1151,11 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     }
   }
   const rocketLineupsFetchedAt = ROCKET_LINEUPS.fetchedAt || null;
+  // Localized, capitalized type names — used by the quote-lookup widget to
+  // render match labels like "{type}-Rüpel" / "{type}-type grunt".
+  const rocketTypeLabels = Object.fromEntries(
+    Object.keys(kw.type || {}).map(k => [k, localizedTypeDisplay(k)])
+  );
 
   // -- PVP · per-league meta filters ------------------------------------
   // For each league: family-search the top-N meta picks (deduped by base
@@ -1167,6 +1197,7 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
            raidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
            // Team Rocket counters (leaders / typed grunts / generic grunts)
            rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
+           rocketTypeLabels,
            // PvP league meta filters
            pvpFilters, pvpRankingsFetchedAt };
 }
@@ -1554,6 +1585,7 @@ export default function App() {
           cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
           raidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
           rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
+          rocketTypeLabels,
           pvpFilters, pvpRankingsFetchedAt } = useMemo(
     () => buildFilters(hundos, { ...effectiveConfig, topAttackers, topMaxAttackers }, homeLocals, effectiveOutputLocale, t),
     [hundos, effectiveConfig, homeLocals, effectiveOutputLocale, topAttackers, topMaxAttackers, t]
@@ -2007,6 +2039,7 @@ export default function App() {
                     leaders={rocketLeaders}
                     typedGrunts={rocketTypedGrunts}
                     genericGrunts={rocketGenericGrunts}
+                    typeLabels={rocketTypeLabels}
                     open={showAuxRocket}
                     onToggle={() => setShowAuxRocket((s) => !s)}
                     copied={copied}
@@ -2728,9 +2761,21 @@ function topHitsHint(topHits, t) {
 // open/close state — no React state plumbing needed, and multiple trainers
 // can stay open if the user wants to compare. Mirrors the visual rhythm of
 // the parent Collapsible but a half-step smaller.
-function TrainerAccordion({ name, teaser, accent, children }) {
+function TrainerAccordion({ name, teaser, accent, highlight, children }) {
+  // `highlight` (used when the quote-lookup widget locks onto this card):
+  // forces the accordion open and adds a colored ring so the user can see
+  // the match instantly. Re-mounts the <details> via key={highlight} so the
+  // browser respects the change of `open` after the user toggled it.
   return (
-    <details className="border border-[#1F2933] rounded bg-[#0E141A]">
+    <details
+      key={highlight ? "open" : "auto"}
+      open={highlight || undefined}
+      className="border rounded bg-[#0E141A] transition"
+      style={{
+        borderColor: highlight ? "#5EAFC5" : "#1F2933",
+        boxShadow: highlight ? "0 0 0 2px rgba(94, 175, 197, 0.25)" : "none",
+      }}
+    >
       <summary className="px-3 py-2 cursor-pointer flex items-center gap-3 hover:bg-[#141A21] transition list-none">
         <ChevronRight size={12} className="text-[#8090A0] details-arrow shrink-0" />
         <span className="mono text-sm font-medium" style={{ color: accent || "#E6EDF3" }}>{name}</span>
@@ -2897,10 +2942,30 @@ function PvpCollapsible({ fetchedAt, leagues, open, onToggle, copied, copyToClip
   );
 }
 
+// Renders the in-game "Spruch" the grunt yells before battle, in the
+// player's outputLocale. Displayed inside open trainer accordions so the
+// user can match the encounter dialog they just saw in PoGo.
+function GruntQuoteLine({ quote, t }) {
+  return (
+    <div className="mono italic text-[11.5px] leading-snug text-[#A8B3BD]">
+      <span className="not-italic text-[#8090A0] mr-1.5">{t("app.filter.rocket_grunt_quote_label")}:</span>
+      &ldquo;{quote}&rdquo;
+    </div>
+  );
+}
+function GruntQuoteList({ quotes, t }) {
+  return (
+    <div className="space-y-0.5">
+      {quotes.map((q, i) => <GruntQuoteLine key={i} quote={q} t={t} />)}
+    </div>
+  );
+}
+
 function RocketCollapsible({
-  fetchedAt, leaders, typedGrunts, genericGrunts,
+  fetchedAt, leaders, typedGrunts, genericGrunts, typeLabels,
   open, onToggle, copied, copyToClipboard, t, outputLocale,
 }) {
+  const [highlightedType, setHighlightedType] = useState(null);
   const totalFilters =
     leaders.reduce((a, l) => a + l.phases.filter(p => !p.skipped).length, 0) +
     typedGrunts.filter(g => !g.skipped).length +
@@ -2921,6 +2986,13 @@ function RocketCollapsible({
   return (
     <Collapsible icon="🚀" label={headerLabel} open={open} onToggle={onToggle}>
       <div className="space-y-5">
+        <RocketQuoteLookup
+          data={ROCKET_GRUNT_QUOTES}
+          outputLocale={outputLocale}
+          t={t}
+          onTypedMatch={setHighlightedType}
+          localizedTypeDisplay={(k) => (typeLabels && typeLabels[k]) || k}
+        />
         {leaders.length > 0 && (
           <div className="space-y-2">
             <h4 className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0]">
@@ -2972,7 +3044,9 @@ function RocketCollapsible({
                     name={g.name}
                     teaser={typedGruntTeaser(g, t)}
                     accent="#9B59B6"
+                    highlight={g.type === highlightedType}
                   >
+                    {g.quote && <GruntQuoteLine quote={g.quote} t={t} />}
                     <FilterBox
                       label={t("app.filter.rocket_grunt_filter_label")}
                       accent="#9B59B6"
@@ -3004,6 +3078,7 @@ function RocketCollapsible({
                     teaser={genericGruntTeaser(g, t)}
                     accent="#16A085"
                   >
+                    {(g.quotes || []).length > 0 && <GruntQuoteList quotes={g.quotes} t={t} />}
                     <FilterBox
                       label={t("app.filter.rocket_grunt_filter_label")}
                       accent="#16A085"
