@@ -26,7 +26,21 @@ const ENDPOINTS = {
   raidboss:   `${API_BASE}/raidboss.json`,
   maxbattles: `${API_BASE}/maxbattles.json`,
   types:      `${API_BASE}/types.json`,
+  // ScrapedDuck event feed — covers raid-day / raid-hour / raid-battles /
+  // raid-weekend events that lily-dex-api's `currentList` doesn't carry.
+  events:     "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.min.json",
+  // pogoapi name → types map for resolving bosses parsed out of event titles
+  // (raid-day / raid-hour entries don't carry structured boss metadata).
+  pokemonTypes: "https://pogoapi.net/api/v1/pokemon_types.json",
 };
+
+// Window for surfacing upcoming events: active now + the next 7 days. Anything
+// further out is noise (rotation slots routinely shift) and would force a
+// daily diff in the snapshot file.
+const EVENT_LOOKAHEAD_MS = 7 * 24 * 60 * 60 * 1000;
+const EVENT_RAID_TYPES = new Set([
+  "raid-day", "raid-hour", "raid-battles", "raid-weekend",
+]);
 
 // lily-dex-api uses spreadsheet-column language labels; we use BCP47.
 const LOCALE_MAP = {
@@ -134,6 +148,142 @@ function deriveBoss(boss, allTypes, typeIdx) {
   };
 }
 
+// Build a lowercase-name → {id, types} index from pogoapi.net's pokemon_types
+// dataset. The "Normal" form wins when the same dex number has multiple form
+// rows (e.g. Entei has Normal + an "S" Shadow tag row); we want canonical
+// non-form types for our derivation.
+function buildNameIndex(pokemonTypes) {
+  const idx = new Map();
+  for (const row of pokemonTypes) {
+    const name = row.pokemon_name;
+    if (!name || !Array.isArray(row.type)) continue;
+    const key = name.toLowerCase();
+    const isNormal = !row.form || row.form === "Normal";
+    if (idx.has(key) && !isNormal) continue;
+    idx.set(key, {
+      // lily-dex-api ID convention: TAPU_LELE, MR_MIME, etc.
+      id: name.toUpperCase().replace(/[\s-]+/g, "_"),
+      // Keep types in TitleCase ("Fire"/"Ground") to match the type index
+      // keys built from the upstream typesArr — `eff()` lookups fail silently
+      // on case-mismatched strings and would emit empty resistor/SE arrays.
+      // `lowerTypes()` inside `deriveBoss` handles the lowercase emit shape.
+      types: row.type,
+      displayName: name,
+    });
+  }
+  return idx;
+}
+
+// Pulls boss name(s) and shadow/mega flags out of a ScrapedDuck event entry.
+// raid-battles events ship with extraData.raidbattles.bosses[] — preferred
+// since the names are already canonical. raid-day / raid-hour / raid-weekend
+// entries only have a marketing title, so we strip the event-type tail
+// ("Raid Day"/"Raid Hour"/"Raid Weekend"), the "Super Mega" community-day
+// qualifier (which is not a Mega-tier marker), the leading Shadow/Mega
+// prefix (which IS a tier flag), and split multi-boss titles like
+// "Buzzwole, Pheromosa, and Xurkitree Raid Hour".
+function parseEventBosses(event) {
+  const title = event.name || "";
+  // "Super Mega" is a community-day qualifier ("Falinks Super Mega Raid Day"),
+  // not a Mega-tier marker. Strip it before testing so it doesn't trip isMega.
+  const cleanTitle = title.replace(/\bSuper\s+Mega\b/gi, " ");
+  const isShadow = /\bShadow\b/i.test(cleanTitle);
+  const isMega   = /\bMega\b/i.test(cleanTitle);
+
+  const fromExtra = event?.extraData?.raidbattles?.bosses;
+  if (Array.isArray(fromExtra) && fromExtra.length > 0) {
+    return {
+      isShadow, isMega,
+      names: fromExtra.map(b => b.name).filter(Boolean),
+    };
+  }
+
+  // Fallback: parse the event title for raid-day / raid-hour / raid-weekend.
+  let s = title
+    .replace(/\s+Raid\s+(Day|Hour|Weekend)$/i, "")
+    .replace(/\s+Super\s+Mega$/i, "")
+    .replace(/^Super\s+Mega\s+/i, "")
+    .replace(/^Shadow\s+/i, "")
+    .replace(/^Mega\s+/i, "");
+  // Multi-boss split — try ", and ", " and ", then ", " in that order so
+  // "A, B, and C" splits cleanly into [A, B, C].
+  const names = s
+    .split(/,\s*and\s+|\s+and\s+|,\s*/i)
+    .map(n => n.trim())
+    .filter(Boolean);
+  return { isShadow, isMega, names };
+}
+
+// Builds the per-event entry that the workshop UI consumes. Returns
+// `{entry, status}` where status is "ok" | "deduped" | "unresolved". Caller
+// uses the status to log a meaningful summary; an entry of null means we
+// drop the event entirely so the UI doesn't render an empty accordion.
+function buildEventEntry(event, nameIdx, allTypes, typeIdx, dedupeSet) {
+  const { isShadow, isMega, names } = parseEventBosses(event);
+  if (names.length === 0) return { entry: null, status: "unresolved" };
+
+  const bosses = [];
+  let anyUnresolved = false;
+  let anyDeduped = false;
+  for (const rawName of names) {
+    const key = rawName
+      .toLowerCase()
+      .replace(/^shadow\s+/i, "")
+      .replace(/^mega\s+/i, "")
+      .trim();
+    const hit = nameIdx.get(key);
+    if (!hit) {
+      anyUnresolved = true;
+      console.warn(`  ⚠ event "${event.name}": cannot resolve boss "${rawName}" — skipped`);
+      continue;
+    }
+    // Dedupe against the standing tier rotation so e.g. Shadow Latios doesn't
+    // appear twice (once in shadow_lvl5, once as a raid-battles event).
+    const dedupeKey = `${hit.id}|${isShadow ? "S" : ""}|${isMega ? "M" : ""}`;
+    if (dedupeSet.has(dedupeKey)) { anyDeduped = true; continue; }
+
+    // `normalizeNames()` keys off lily-dex-api's TitleCase language labels
+    // ("English", "German"), not BCP47 — pass the same shape so the resulting
+    // boss carries an `en` name that buildBossEntry() can fall back on.
+    const derived = deriveBoss(
+      { id: hit.id, names: { English: hit.displayName }, types: hit.types },
+      allTypes, typeIdx,
+    );
+    if (derived) bosses.push(derived);
+  }
+  if (bosses.length === 0) {
+    return { entry: null, status: anyUnresolved && !anyDeduped ? "unresolved" : "deduped" };
+  }
+  return {
+    entry: {
+      eventID: event.eventID,
+      name: event.name,
+      eventType: event.eventType,
+      start: event.start,
+      end: event.end,
+      isShadow,
+      isMega,
+      bosses,
+    },
+    status: "ok",
+  };
+}
+
+// Standing-tier dedupe set: every (id, shadow?, mega?) already covered by
+// raids.{mega, lvl5, shadow_lvl5, …}. Built from the derived tier output so
+// the ID format matches downstream consumers exactly.
+function buildStandingDedupeSet(tieredRaids) {
+  const set = new Set();
+  for (const [tier, list] of Object.entries(tieredRaids || {})) {
+    const isShadow = tier.startsWith("shadow_");
+    const isMega = tier === "mega";
+    for (const boss of list) {
+      set.add(`${boss.id}|${isShadow ? "S" : ""}|${isMega ? "M" : ""}`);
+    }
+  }
+  return set;
+}
+
 function deriveTiered(rawBossesByTier, allTypes, typeIdx) {
   const out = {};
   for (const [tier, list] of Object.entries(rawBossesByTier || {})) {
@@ -165,13 +315,15 @@ async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
 
-  let typesArr, raidBossRaw, maxBattlesRaw;
+  let typesArr, raidBossRaw, maxBattlesRaw, eventsRaw, pokemonTypesRaw;
   try {
-    console.log("→ Fetching lily-dex-api endpoints");
-    [typesArr, raidBossRaw, maxBattlesRaw] = await Promise.all([
+    console.log("→ Fetching lily-dex-api + ScrapedDuck + pogoapi endpoints");
+    [typesArr, raidBossRaw, maxBattlesRaw, eventsRaw, pokemonTypesRaw] = await Promise.all([
       fetchJson(ENDPOINTS.types),
       fetchJson(ENDPOINTS.raidboss),
       fetchJson(ENDPOINTS.maxbattles),
+      fetchJson(ENDPOINTS.events),
+      fetchJson(ENDPOINTS.pokemonTypes),
     ]);
   } catch (e) {
     console.error(`✗ Fetch failed: ${e.message}`);
@@ -196,6 +348,31 @@ async function main() {
     throw new Error("Both raids and maxBattles came back empty — refusing to overwrite cache");
   }
 
+  // Event raids — currently active + upcoming within the lookahead window.
+  // Built after the standing-tier derivation so dedupe can prune events
+  // whose bosses are already in the rotation.
+  const nameIdx = buildNameIndex(Array.isArray(pokemonTypesRaw) ? pokemonTypesRaw : []);
+  const dedupeSet = buildStandingDedupeSet(raids);
+  const now = Date.now();
+  const horizon = now + EVENT_LOOKAHEAD_MS;
+  const eventRaids = [];
+  let skippedDeduped = 0;
+  let skippedUnresolved = 0;
+  for (const event of (Array.isArray(eventsRaw) ? eventsRaw : [])) {
+    if (!EVENT_RAID_TYPES.has(event?.eventType)) continue;
+    const startMs = Date.parse(event.start);
+    const endMs = Date.parse(event.end);
+    if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) continue;
+    if (endMs < now) continue;          // already over
+    if (startMs > horizon) continue;    // beyond the 7-day lookahead
+    const { entry, status } = buildEventEntry(event, nameIdx, typesArr, typeIdx, dedupeSet);
+    if (entry) eventRaids.push(entry);
+    else if (status === "deduped") skippedDeduped++;
+    else skippedUnresolved++;
+  }
+  // Chronological order so the UI can render top-down without re-sorting.
+  eventRaids.sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+
   const totalRaids = Object.values(raids).reduce((a, l) => a + l.length, 0);
   const totalMax = Object.values(maxBattles).reduce((a, l) => a + l.length, 0);
 
@@ -203,6 +380,11 @@ async function main() {
   // scheduled sync workflow doesn't open a PR every day just because the
   // timestamp moved. The UI's "last sync · Xh ago" still reflects the
   // moment we last observed real upstream changes.
+  //
+  // `eventRaids` is intentionally excluded from the canonical hash: each event
+  // entry's relative window shifts every time the script runs (by definition,
+  // since we filter by `now`), so including it would force a daily diff even
+  // when nothing material changed in the rotation.
   const newContent = { raids, maxBattles };
   let fetchedAt = new Date().toISOString();
   if (existsSync(OUT_PATH)) {
@@ -216,10 +398,11 @@ async function main() {
     } catch { /* ignore parse errors; fall through to fresh write */ }
   }
 
-  writeJson(OUT_PATH, { fetchedAt, ...newContent });
+  writeJson(OUT_PATH, { fetchedAt, ...newContent, eventRaids });
   console.log(`✓ wrote ${OUT_PATH}`);
   console.log(`  raids: ${totalRaids} bosses across ${Object.keys(raids).length} tiers`);
   console.log(`  maxBattles: ${totalMax} bosses across ${Object.keys(maxBattles).length} tiers`);
+  console.log(`  eventRaids: ${eventRaids.length} surfaced · ${skippedDeduped} deduped against standing tiers · ${skippedUnresolved} unresolved`);
 }
 
 main().catch((e) => {

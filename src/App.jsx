@@ -821,6 +821,9 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   push(giftClauses, `!${kw.flag.lucky}`, tFn("app.clause_why.gift_must_lucky"));
   push(giftClauses, "!4*", tFn("app.clause_why.never_gift_4star"));
   push(giftClauses, `!${kw.flag.favorite}`, tFn("app.clause_why.favorites_protected"));
+  // Unconditional (unlike trash/trade which gate on cfg.protectLegacyMoves):
+  // gifting transfers the mon away, so the legacy move is unrecoverable.
+  // Same family as the mandatory !traded / !shadow / !lucky constraints above.
   push(giftClauses, `!@${kw.flag.special_move},@${kw.flag.return},@${kw.flag.frustration}`, tFn("app.clause_why.never_gift_legacy"));
   if (cfg.protectLuckyEligible && cfg.luckyEligibleYear && cfg.luckyEligibleYear > 0)
     push(giftClauses, `${kw.numeric.year}${cfg.luckyEligibleYear}-`, tFn("app.clause_why.lucky_eligible", { params: { year: cfg.luckyEligibleYear } }));
@@ -1070,6 +1073,21 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   const maxBattleFilters = buildBossTiers(RAID_BOSSES.maxBattles, { requiresDynamax: true });
   const raidBossesFetchedAt = RAID_BOSSES.fetchedAt || null;
 
+  // Event raids — short-window bosses (Raid Day / Raid Hour / etc.) sourced
+  // from ScrapedDuck's events feed. Each entry carries its own start/end
+  // window plus a parallel boss list with the same shape as the standing
+  // tiers, so the UI can reuse FilterBox for each derived counter.
+  const eventRaidFilters = (RAID_BOSSES.eventRaids || []).map(event => ({
+    eventID: event.eventID,
+    name: event.name,
+    eventType: event.eventType,
+    start: event.start,
+    end: event.end,
+    isShadow: !!event.isShadow,
+    isMega: !!event.isMega,
+    bosses: (event.bosses || []).map(b => buildBossEntry(b)),
+  }));
+
   // -- MAX BATTLE TANKS / CHARGERS · universal 0.5s-fast-move filter ---
   // Max Battle meta hinges on Max Meter charging speed: only the 0.5s-tier
   // fast moves fill the meter optimally (per Pokémon GO Hub's per-attack
@@ -1312,7 +1330,7 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
            shadowCheapClauses, shadowSafeClauses, shadowHundoClauses, shadowFrustrationClauses,
            cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
            // Per-boss raid + max-battle counters
-           raidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
+           raidFilters, eventRaidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
            // Team Rocket counters (leaders / typed grunts / generic grunts)
            rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
            rocketTypeLabels,
@@ -1674,7 +1692,7 @@ export default function App() {
           cheapEvolve, dexPlus, megaEvolve, pilotLong,
           shadowCheapClauses, shadowSafeClauses, shadowHundoClauses, shadowFrustrationClauses,
           cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
-          raidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
+          raidFilters, eventRaidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
           rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
           rocketTypeLabels,
           pvpFilters, pvpRankingsFetchedAt } = useMemo(
@@ -2241,6 +2259,7 @@ export default function App() {
                     titleKey="app.collapsible.aux_raids"
                     fetchedAt={raidBossesFetchedAt}
                     bossesByTier={raidFilters}
+                    eventGroups={eventRaidFilters}
                     tierOrder={["mega", "lvl5", "shadow_lvl5", "lvl3", "shadow_lvl3", "lvl1", "shadow_lvl1"]}
                     accent="#E74C3C"
                     open={showAuxRaids}
@@ -2249,6 +2268,7 @@ export default function App() {
                     copyToClipboard={copyToClipboard}
                     keyPrefix="raid"
                     t={t}
+                    locale={locale}
                   />
 
                   <MaxBattleCollapsible
@@ -2813,15 +2833,58 @@ function formatSyncAge(iso, t) {
   return t("app.filter.last_sync_days", { params: { days } });
 }
 
+// Formats a raid-event time window as a short teaser string for the
+// accordion summary line. Three branches:
+//   - active (now ∈ [start, end]):
+//       same calendar day  → "today HH:MM–HH:MM"
+//       multi-day          → "now → DOW HH:MM"
+//   - upcoming today        → "starts HH:MM"
+//   - upcoming this week    → "DOW HH:MM"
+// Locale-aware via Intl: weekday short-name and 24h time both follow `locale`.
+function formatEventWindow(start, end, t, locale) {
+  const startMs = Date.parse(start);
+  const endMs = Date.parse(end);
+  if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) return "";
+  const now = Date.now();
+  const fmtTime = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", hour12: false });
+  const fmtDow  = new Intl.DateTimeFormat(locale, { weekday: "short" });
+  const sameCalendarDay = (a, b) =>
+    new Date(a).toDateString() === new Date(b).toDateString();
+
+  if (now >= startMs && now <= endMs) {
+    if (sameCalendarDay(startMs, endMs)) {
+      return t("app.filter.event_window_active_today", {
+        params: { start: fmtTime.format(startMs), end: fmtTime.format(endMs) },
+      });
+    }
+    return t("app.filter.event_window_active_multiday", {
+      params: { dow: fmtDow.format(endMs), end: fmtTime.format(endMs) },
+    });
+  }
+  if (sameCalendarDay(startMs, now)) {
+    return t("app.filter.event_window_upcoming_today", {
+      params: { time: fmtTime.format(startMs) },
+    });
+  }
+  return t("app.filter.event_window_upcoming_week", {
+    params: { dow: fmtDow.format(startMs), time: fmtTime.format(startMs) },
+  });
+}
+
 // Renders a single per-aspect boss collapsible (Raids or Max Battles). Each
 // boss inside becomes one FilterBox; skipped bosses (no clean counter) get a
 // short italic note instead. Header shows total boss count and last sync age.
+//
+// `eventGroups` (optional) renders short-window event raids as their own
+// accordion rows above the standing tiers — currently-active events open
+// by default, upcoming ones collapse with a window teaser.
 function BossCollapsible({
-  icon, titleKey, fetchedAt, bossesByTier, tierOrder, accent,
-  open, onToggle, copied, copyToClipboard, keyPrefix, t,
+  icon, titleKey, fetchedAt, bossesByTier, eventGroups, tierOrder, accent,
+  open, onToggle, copied, copyToClipboard, keyPrefix, t, locale,
 }) {
-  const allBosses = tierOrder.flatMap((tier) => bossesByTier?.[tier] || []);
-  const totalBosses = allBosses.length;
+  const tierBosses = tierOrder.flatMap((tier) => bossesByTier?.[tier] || []);
+  const eventBosses = (eventGroups || []).flatMap(g => g.bosses || []);
+  const totalBosses = tierBosses.length + eventBosses.length;
   const age = formatSyncAge(fetchedAt, t);
   const headerLabel = t(titleKey);
   const countLabel = t("app.collapsible.aux_raids_count", { params: { count: totalBosses } });
@@ -2835,9 +2898,59 @@ function BossCollapsible({
       </Collapsible>
     );
   }
+  const renderBossBox = (boss, eventIdSuffix) => {
+    if (boss.skipped) {
+      return (
+        <p key={boss.id} className="text-xs italic text-[#8B98A5] pl-2">
+          {t("app.filter.boss_no_clean_counter", { params: { boss: boss.name } })}
+        </p>
+      );
+    }
+    // Distinct copy key per (event, boss) pair so an event-context Latios
+    // and a standing-tier Latios don't share copy state.
+    const copyKey = eventIdSuffix
+      ? `${keyPrefix}_evt_${eventIdSuffix}_${boss.id}`
+      : `${keyPrefix}_${boss.id}`;
+    return (
+      <FilterBox
+        key={boss.id}
+        label={t("app.filter.raid_counter_label", { params: { boss: boss.name } })}
+        accent={accent}
+        filterStr={boss.clause}
+        copied={copied[copyKey]}
+        onCopy={() => copyToClipboard(copyKey, boss.clause)}
+        hint={t("app.filter.raid_counter_hint", { params: { boss: boss.name } })}
+      />
+    );
+  };
+  const hasEvents = (eventGroups || []).length > 0;
   return (
     <Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
       <div className="space-y-5">{/* tiers below; footer rendered at end */}
+        {hasEvents && (
+          <div className="space-y-3">
+            <h4 className="mono text-xs uppercase tracking-wide text-[#8090A0]">
+              {t("app.collapsible.aux_event_raids_heading")}
+            </h4>
+            {eventGroups.map((event) => {
+              const startMs = Date.parse(event.start);
+              const endMs = Date.parse(event.end);
+              const isActive = Date.now() >= startMs && Date.now() <= endMs;
+              const teaser = formatEventWindow(event.start, event.end, t, locale);
+              return (
+                <TrainerAccordion
+                  key={event.eventID}
+                  name={event.name}
+                  teaser={teaser}
+                  accent={accent}
+                  highlight={isActive}
+                >
+                  {(event.bosses || []).map(b => renderBossBox(b, event.eventID))}
+                </TrainerAccordion>
+              );
+            })}
+          </div>
+        )}
         {tierOrder.map((tier) => {
           const list = bossesByTier?.[tier];
           if (!list || list.length === 0) return null;
@@ -2846,27 +2959,7 @@ function BossCollapsible({
               <h4 className="mono text-xs uppercase tracking-wide text-[#8090A0]">
                 {t(`app.collapsible.aux_boss_tier.${tier}`)}
               </h4>
-              {list.map((boss) => {
-                if (boss.skipped) {
-                  return (
-                    <p key={boss.id} className="text-xs italic text-[#8B98A5] pl-2">
-                      {t("app.filter.boss_no_clean_counter", { params: { boss: boss.name } })}
-                    </p>
-                  );
-                }
-                const copyKey = `${keyPrefix}_${boss.id}`;
-                return (
-                  <FilterBox
-                    key={boss.id}
-                    label={t("app.filter.raid_counter_label", { params: { boss: boss.name } })}
-                    accent={accent}
-                    filterStr={boss.clause}
-                    copied={copied[copyKey]}
-                    onCopy={() => copyToClipboard(copyKey, boss.clause)}
-                    hint={t("app.filter.raid_counter_hint", { params: { boss: boss.name } })}
-                  />
-                );
-              })}
+              {list.map((boss) => renderBossBox(boss))}
             </div>
           );
         })}

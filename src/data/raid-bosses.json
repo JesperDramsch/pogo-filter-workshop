@@ -1475,5 +1475,137 @@
         ]
       }
     ]
-  }
+  },
+  "eventRaids": [
+    {
+      "eventID": "mega-camerupt-in-mega-raids-may-2026",
+      "name": "Mega Camerupt in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-05-06T06:00:00.000",
+      "end": "2026-05-13T06:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "CAMERUPT",
+          "names": {
+            "en": "Camerupt"
+          },
+          "types": [
+            "fire",
+            "ground"
+          ],
+          "resistorTypes": [
+            "flying",
+            "water",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "ground",
+            "water"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "nihilego-in-5-star-raid-battles-may-2026",
+      "name": "Nihilego in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-05-06T06:00:00.000",
+      "end": "2026-05-13T06:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "NIHILEGO",
+          "names": {
+            "en": "Nihilego"
+          },
+          "types": [
+            "rock",
+            "poison"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "poison",
+            "ground",
+            "rock",
+            "ghost",
+            "steel"
+          ],
+          "seMoveTypes": [
+            "ground",
+            "steel",
+            "water",
+            "psychic"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "shadow-cresselia-in-shadow-raids-may-june-2026",
+      "name": "Shadow Cresselia in Shadow Raids",
+      "eventType": "raid-battles",
+      "start": "2026-05-06T06:00:00.000",
+      "end": "2026-06-03T06:00:00.000",
+      "isShadow": true,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "CRESSELIA",
+          "names": {
+            "en": "Cresselia"
+          },
+          "types": [
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "ghost",
+            "dark"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20260506",
+      "name": "Nihilego Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-05-06T18:00:00.000",
+      "end": "2026-05-06T19:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "NIHILEGO",
+          "names": {
+            "en": "Nihilego"
+          },
+          "types": [
+            "rock",
+            "poison"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "poison",
+            "ground",
+            "rock",
+            "ghost",
+            "steel"
+          ],
+          "seMoveTypes": [
+            "ground",
+            "steel",
+            "water",
+            "psychic"
+          ]
+        }
+      ]
+    }
+  ]
 }
