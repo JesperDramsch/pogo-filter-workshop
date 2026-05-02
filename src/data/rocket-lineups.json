@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-01T15:29:40.862Z",
+  "fetchedAt": "2026-05-02T09:33:51.345Z",
   "trainers": [
     {
       "name": "Giovanni",
@@ -116,17 +116,38 @@
                 "psychic",
                 "fairy"
               ]
+            },
+            {
+              "name": "Golurk",
+              "types": [
+                "ground",
+                "ghost"
+              ]
+            },
+            {
+              "name": "Galarian Weezing",
+              "types": [
+                "poison",
+                "fairy"
+              ]
             }
           ],
           "resistorTypes": [
-            "steel",
-            "fire",
-            "psychic"
+            "normal",
+            "flying",
+            "ground",
+            "bug"
           ],
           "seMoveTypes": [
             "poison",
+            "ground",
             "ghost",
-            "steel"
+            "steel",
+            "water",
+            "grass",
+            "psychic",
+            "ice",
+            "dark"
           ]
         },
         {
@@ -138,12 +159,20 @@
                 "rock",
                 "dark"
               ]
+            },
+            {
+              "name": "Camerupt",
+              "types": [
+                "fire",
+                "ground"
+              ]
             }
           ],
           "resistorTypes": [
             "fighting",
             "ground",
-            "steel",
+            "water",
+            "dragon",
             "dark",
             "fairy"
           ],
@@ -241,20 +270,37 @@
                 "bug",
                 "steel"
               ]
+            },
+            {
+              "name": "Alakazam",
+              "types": [
+                "psychic"
+              ]
+            },
+            {
+              "name": "Charizard",
+              "types": [
+                "fire",
+                "flying"
+              ]
             }
           ],
           "resistorTypes": [
-            "fighting",
             "flying",
-            "poison",
             "ghost",
-            "steel",
             "fire",
             "water",
-            "electric"
+            "electric",
+            "dragon"
           ],
           "seMoveTypes": [
-            "fire"
+            "rock",
+            "bug",
+            "ghost",
+            "fire",
+            "water",
+            "electric",
+            "dark"
           ]
         }
       ]
@@ -411,7 +457,7 @@
               ]
             },
             {
-              "name": "Rattata",
+              "name": "Loudred",
               "types": [
                 "normal"
               ]
@@ -1497,10 +1543,10 @@
               ]
             },
             {
-              "name": "Shuckle",
+              "name": "Dewpider",
               "types": [
-                "bug",
-                "rock"
+                "water",
+                "bug"
               ]
             },
             {
@@ -1542,7 +1588,6 @@
       "resistorTypes": [
         "fighting",
         "poison",
-        "ground",
         "ghost",
         "steel",
         "electric",

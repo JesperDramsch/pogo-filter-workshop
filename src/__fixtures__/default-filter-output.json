@@ -100,13 +100,13 @@
       },
       "Cliff": {
         "1": "rock,ghost,steel&@1fighting&@2fighting,@3fighting&!<normal",
-        "2": "steel,fire,psychic&@1poison,@1ghost,@1steel&@2poison,@2ghost,@2steel,@3poison,@3ghost,@3steel&!<psychic&!<fairy",
-        "3": "fighting,ground,steel,dark,fairy&@1fighting,@1ground,@1bug,@1steel,@1water,@1grass,@1fairy&@2fighting,@2ground,@2bug,@2steel,@2water,@2grass,@2fairy,@3fighting,@3ground,@3bug,@3steel,@3water,@3grass,@3fairy&!<rock&!<dark"
+        "2": "normal,flying,ground,bug&@1poison,@1ground,@1ghost,@1steel,@1water,@1grass,@1psychic,@1ice,@1dark&@2poison,@2ground,@2ghost,@2steel,@2water,@2grass,@2psychic,@2ice,@2dark,@3poison,@3ground,@3ghost,@3steel,@3water,@3grass,@3psychic,@3ice,@3dark&!<psychic&!<fairy&!<ground&!<ghost&!<poison",
+        "3": "fighting,ground,water,dragon,dark,fairy&@1fighting,@1ground,@1bug,@1steel,@1water,@1grass,@1fairy&@2fighting,@2ground,@2bug,@2steel,@2water,@2grass,@2fairy,@3fighting,@3ground,@3bug,@3steel,@3water,@3grass,@3fairy&!<rock&!<dark&!<fire&!<ground"
       },
       "Arlo": {
         "1": "fighting,flying,poison,ghost,steel,fire,fairy&@1flying,@1rock,@1fire&@2flying,@2rock,@2fire,@3flying,@3rock,@3fire&!<bug",
         "2": "water,grass,psychic,dragon,dark&@1fighting,@1ground,@1bug,@1ghost,@1steel,@1fire,@1water,@1grass,@1electric,@1dark&@2fighting,@2ground,@2bug,@2ghost,@2steel,@2fire,@2water,@2grass,@2electric,@2dark,@3fighting,@3ground,@3bug,@3ghost,@3steel,@3fire,@3water,@3grass,@3electric,@3dark&!<steel&!<ground&!<rock&!<water&!<psychic",
-        "3": "fighting,flying,poison,ghost,steel,fire,water,electric&@1fire&@2fire,@3fire&!<bug&!<steel"
+        "3": "flying,ghost,fire,water,electric,dragon&@1rock,@1bug,@1ghost,@1fire,@1water,@1electric,@1dark&@2rock,@2bug,@2ghost,@2fire,@2water,@2electric,@2dark,@3rock,@3bug,@3ghost,@3fire,@3water,@3electric,@3dark&!<bug&!<steel&!<psychic&!<fire&!<flying"
       },
       "Sierra": {
         "1": "normal,dark&@1ghost,@1dark&@2ghost,@2dark,@3ghost,@3dark&!<ghost",
@@ -127,7 +127,7 @@
       "Ground-type Male Grunt": "normal,flying,dark,fairy&@1grass,@1ice,@1water&@2grass,@2ice,@2water,@3grass,@3ice,@3water&!<ground&!<flying&!<psychic&!<dragon&!<ghost",
       "Flying-type Female Grunt": "flying,ghost,water&@1electric,@1ice,@1rock&@2electric,@2ice,@2rock,@3electric,@3ice,@3rock&!<normal&!<flying&!<poison&!<ground&!<bug&!<dragon&!<water",
       "Psychic-type Male Grunt": "flying,bug,fire,fairy&@1bug,@1dark,@1ghost&@2bug,@2dark,@2ghost,@3bug,@3dark,@3ghost&!<psychic&!<fairy&!<fighting&!<dark",
-      "Bug-type Male Grunt": "fighting,poison,ground,ghost,steel,electric,dragon&@1fire,@1flying,@1rock&@2fire,@2flying,@2rock,@3fire,@3flying,@3rock&!<bug&!<poison&!<rock&!<electric&!<steel",
+      "Bug-type Male Grunt": "fighting,poison,ghost,steel,electric,dragon&@1fire,@1flying,@1rock&@2fire,@2flying,@2rock,@3fire,@3flying,@3rock&!<bug&!<poison&!<water&!<rock&!<electric&!<steel",
       "Rock-type Male Grunt": "fighting,ghost,water&@1fighting,@1grass,@1ground,@1steel,@1water&@2fighting,@2grass,@2ground,@2steel,@2water,@3fighting,@3grass,@3ground,@3steel,@3water&!<bug&!<rock&!<water&!<ground&!<steel&!<ice&!<dragon",
       "Ghost-type Male Grunt": "normal,fighting,poison,rock,steel,fire,water,ice,dark&@1dark,@1ghost&@2dark,@2ghost,@3dark,@3ghost&!<ghost&!<poison&!<dark&!<ice",
       "Dragon-type Female Grunt": "flying,dark,fairy&@1dragon,@1fairy,@1ice&@2dragon,@2fairy,@2ice,@3dragon,@3fairy,@3ice&!<dragon&!<dark&!<grass&!<ground&!<flying",
@@ -249,13 +249,13 @@
       },
       "Cliff": {
         "1": "gestein,geist,stahl&@1kampf&@2kampf,@3kampf&!<normal",
-        "2": "stahl,feuer,psycho&@1gift,@1geist,@1stahl&@2gift,@2geist,@2stahl,@3gift,@3geist,@3stahl&!<psycho&!<fee",
-        "3": "kampf,boden,stahl,unlicht,fee&@1kampf,@1boden,@1käfer,@1stahl,@1wasser,@1pflanze,@1fee&@2kampf,@2boden,@2käfer,@2stahl,@2wasser,@2pflanze,@2fee,@3kampf,@3boden,@3käfer,@3stahl,@3wasser,@3pflanze,@3fee&!<gestein&!<unlicht"
+        "2": "normal,flug,boden,käfer&@1gift,@1boden,@1geist,@1stahl,@1wasser,@1pflanze,@1psycho,@1eis,@1unlicht&@2gift,@2boden,@2geist,@2stahl,@2wasser,@2pflanze,@2psycho,@2eis,@2unlicht,@3gift,@3boden,@3geist,@3stahl,@3wasser,@3pflanze,@3psycho,@3eis,@3unlicht&!<psycho&!<fee&!<boden&!<geist&!<gift",
+        "3": "kampf,boden,wasser,drache,unlicht,fee&@1kampf,@1boden,@1käfer,@1stahl,@1wasser,@1pflanze,@1fee&@2kampf,@2boden,@2käfer,@2stahl,@2wasser,@2pflanze,@2fee,@3kampf,@3boden,@3käfer,@3stahl,@3wasser,@3pflanze,@3fee&!<gestein&!<unlicht&!<feuer&!<boden"
       },
       "Arlo": {
         "1": "kampf,flug,gift,geist,stahl,feuer,fee&@1flug,@1gestein,@1feuer&@2flug,@2gestein,@2feuer,@3flug,@3gestein,@3feuer&!<käfer",
         "2": "wasser,pflanze,psycho,drache,unlicht&@1kampf,@1boden,@1käfer,@1geist,@1stahl,@1feuer,@1wasser,@1pflanze,@1elektro,@1unlicht&@2kampf,@2boden,@2käfer,@2geist,@2stahl,@2feuer,@2wasser,@2pflanze,@2elektro,@2unlicht,@3kampf,@3boden,@3käfer,@3geist,@3stahl,@3feuer,@3wasser,@3pflanze,@3elektro,@3unlicht&!<stahl&!<boden&!<gestein&!<wasser&!<psycho",
-        "3": "kampf,flug,gift,geist,stahl,feuer,wasser,elektro&@1feuer&@2feuer,@3feuer&!<käfer&!<stahl"
+        "3": "flug,geist,feuer,wasser,elektro,drache&@1gestein,@1käfer,@1geist,@1feuer,@1wasser,@1elektro,@1unlicht&@2gestein,@2käfer,@2geist,@2feuer,@2wasser,@2elektro,@2unlicht,@3gestein,@3käfer,@3geist,@3feuer,@3wasser,@3elektro,@3unlicht&!<käfer&!<stahl&!<psycho&!<feuer&!<flug"
       },
       "Sierra": {
         "1": "normal,unlicht&@1geist,@1unlicht&@2geist,@2unlicht,@3geist,@3unlicht&!<geist",
@@ -276,7 +276,7 @@
       "Boden-Rüpel ♂": "normal,flug,unlicht,fee&@1pflanze,@1eis,@1wasser&@2pflanze,@2eis,@2wasser,@3pflanze,@3eis,@3wasser&!<boden&!<flug&!<psycho&!<drache&!<geist",
       "Flug-Rüpel ♀": "flug,geist,wasser&@1elektro,@1eis,@1gestein&@2elektro,@2eis,@2gestein,@3elektro,@3eis,@3gestein&!<normal&!<flug&!<gift&!<boden&!<käfer&!<drache&!<wasser",
       "Psycho-Rüpel ♂": "flug,käfer,feuer,fee&@1käfer,@1unlicht,@1geist&@2käfer,@2unlicht,@2geist,@3käfer,@3unlicht,@3geist&!<psycho&!<fee&!<kampf&!<unlicht",
-      "Käfer-Rüpel ♂": "kampf,gift,boden,geist,stahl,elektro,drache&@1feuer,@1flug,@1gestein&@2feuer,@2flug,@2gestein,@3feuer,@3flug,@3gestein&!<käfer&!<gift&!<gestein&!<elektro&!<stahl",
+      "Käfer-Rüpel ♂": "kampf,gift,geist,stahl,elektro,drache&@1feuer,@1flug,@1gestein&@2feuer,@2flug,@2gestein,@3feuer,@3flug,@3gestein&!<käfer&!<gift&!<wasser&!<gestein&!<elektro&!<stahl",
       "Gestein-Rüpel ♂": "kampf,geist,wasser&@1kampf,@1pflanze,@1boden,@1stahl,@1wasser&@2kampf,@2pflanze,@2boden,@2stahl,@2wasser,@3kampf,@3pflanze,@3boden,@3stahl,@3wasser&!<käfer&!<gestein&!<wasser&!<boden&!<stahl&!<eis&!<drache",
       "Geist-Rüpel ♂": "normal,kampf,gift,gestein,stahl,feuer,wasser,eis,unlicht&@1unlicht,@1geist&@2unlicht,@2geist,@3unlicht,@3geist&!<geist&!<gift&!<unlicht&!<eis",
       "Drache-Rüpel ♀": "flug,unlicht,fee&@1drache,@1fee,@1eis&@2drache,@2fee,@2eis,@3drache,@3fee,@3eis&!<drache&!<unlicht&!<pflanze&!<boden&!<flug",
@@ -398,13 +398,13 @@
       },
       "Cliff": {
         "1": "roca,fantasma,acero&@1lucha&@2lucha,@3lucha&!<normal",
-        "2": "acero,fuego,psíquico&@1veneno,@1fantasma,@1acero&@2veneno,@2fantasma,@2acero,@3veneno,@3fantasma,@3acero&!<psíquico&!<hada",
-        "3": "lucha,tierra,acero,siniestro,hada&@1lucha,@1tierra,@1bicho,@1acero,@1agua,@1planta,@1hada&@2lucha,@2tierra,@2bicho,@2acero,@2agua,@2planta,@2hada,@3lucha,@3tierra,@3bicho,@3acero,@3agua,@3planta,@3hada&!<roca&!<siniestro"
+        "2": "normal,volador,tierra,bicho&@1veneno,@1tierra,@1fantasma,@1acero,@1agua,@1planta,@1psíquico,@1hielo,@1siniestro&@2veneno,@2tierra,@2fantasma,@2acero,@2agua,@2planta,@2psíquico,@2hielo,@2siniestro,@3veneno,@3tierra,@3fantasma,@3acero,@3agua,@3planta,@3psíquico,@3hielo,@3siniestro&!<psíquico&!<hada&!<tierra&!<fantasma&!<veneno",
+        "3": "lucha,tierra,agua,dragón,siniestro,hada&@1lucha,@1tierra,@1bicho,@1acero,@1agua,@1planta,@1hada&@2lucha,@2tierra,@2bicho,@2acero,@2agua,@2planta,@2hada,@3lucha,@3tierra,@3bicho,@3acero,@3agua,@3planta,@3hada&!<roca&!<siniestro&!<fuego&!<tierra"
       },
       "Arlo": {
         "1": "lucha,volador,veneno,fantasma,acero,fuego,hada&@1volador,@1roca,@1fuego&@2volador,@2roca,@2fuego,@3volador,@3roca,@3fuego&!<bicho",
         "2": "agua,planta,psíquico,dragón,siniestro&@1lucha,@1tierra,@1bicho,@1fantasma,@1acero,@1fuego,@1agua,@1planta,@1eléctrico,@1siniestro&@2lucha,@2tierra,@2bicho,@2fantasma,@2acero,@2fuego,@2agua,@2planta,@2eléctrico,@2siniestro,@3lucha,@3tierra,@3bicho,@3fantasma,@3acero,@3fuego,@3agua,@3planta,@3eléctrico,@3siniestro&!<acero&!<tierra&!<roca&!<agua&!<psíquico",
-        "3": "lucha,volador,veneno,fantasma,acero,fuego,agua,eléctrico&@1fuego&@2fuego,@3fuego&!<bicho&!<acero"
+        "3": "volador,fantasma,fuego,agua,eléctrico,dragón&@1roca,@1bicho,@1fantasma,@1fuego,@1agua,@1eléctrico,@1siniestro&@2roca,@2bicho,@2fantasma,@2fuego,@2agua,@2eléctrico,@2siniestro,@3roca,@3bicho,@3fantasma,@3fuego,@3agua,@3eléctrico,@3siniestro&!<bicho&!<acero&!<psíquico&!<fuego&!<volador"
       },
       "Sierra": {
         "1": "normal,siniestro&@1fantasma,@1siniestro&@2fantasma,@2siniestro,@3fantasma,@3siniestro&!<fantasma",
@@ -425,7 +425,7 @@
       "Recluta Masculino tipo Tierra": "normal,volador,siniestro,hada&@1planta,@1hielo,@1agua&@2planta,@2hielo,@2agua,@3planta,@3hielo,@3agua&!<tierra&!<volador&!<psíquico&!<dragón&!<fantasma",
       "Recluta Femenina tipo Volador": "volador,fantasma,agua&@1eléctrico,@1hielo,@1roca&@2eléctrico,@2hielo,@2roca,@3eléctrico,@3hielo,@3roca&!<normal&!<volador&!<veneno&!<tierra&!<bicho&!<dragón&!<agua",
       "Recluta Masculino tipo Psíquico": "volador,bicho,fuego,hada&@1bicho,@1siniestro,@1fantasma&@2bicho,@2siniestro,@2fantasma,@3bicho,@3siniestro,@3fantasma&!<psíquico&!<hada&!<lucha&!<siniestro",
-      "Recluta Masculino tipo Bicho": "lucha,veneno,tierra,fantasma,acero,eléctrico,dragón&@1fuego,@1volador,@1roca&@2fuego,@2volador,@2roca,@3fuego,@3volador,@3roca&!<bicho&!<veneno&!<roca&!<eléctrico&!<acero",
+      "Recluta Masculino tipo Bicho": "lucha,veneno,fantasma,acero,eléctrico,dragón&@1fuego,@1volador,@1roca&@2fuego,@2volador,@2roca,@3fuego,@3volador,@3roca&!<bicho&!<veneno&!<agua&!<roca&!<eléctrico&!<acero",
       "Recluta Masculino tipo Roca": "lucha,fantasma,agua&@1lucha,@1planta,@1tierra,@1acero,@1agua&@2lucha,@2planta,@2tierra,@2acero,@2agua,@3lucha,@3planta,@3tierra,@3acero,@3agua&!<bicho&!<roca&!<agua&!<tierra&!<acero&!<hielo&!<dragón",
       "Recluta Masculino tipo Fantasma": "normal,lucha,veneno,roca,acero,fuego,agua,hielo,siniestro&@1siniestro,@1fantasma&@2siniestro,@2fantasma,@3siniestro,@3fantasma&!<fantasma&!<veneno&!<siniestro&!<hielo",
       "Recluta Femenina tipo Dragón": "volador,siniestro,hada&@1dragón,@1hada,@1hielo&@2dragón,@2hada,@2hielo,@3dragón,@3hada,@3hielo&!<dragón&!<siniestro&!<planta&!<tierra&!<volador",
@@ -547,13 +547,13 @@
       },
       "Cliff": {
         "1": "roche,spectre,acier&@1combat&@2combat,@3combat&!<normal",
-        "2": "acier,feu,psy&@1poison,@1spectre,@1acier&@2poison,@2spectre,@2acier,@3poison,@3spectre,@3acier&!<psy&!<fée",
-        "3": "combat,sol,acier,ténèbres,fée&@1combat,@1sol,@1insecte,@1acier,@1eau,@1plante,@1fée&@2combat,@2sol,@2insecte,@2acier,@2eau,@2plante,@2fée,@3combat,@3sol,@3insecte,@3acier,@3eau,@3plante,@3fée&!<roche&!<ténèbres"
+        "2": "normal,vol,sol,insecte&@1poison,@1sol,@1spectre,@1acier,@1eau,@1plante,@1psy,@1glace,@1ténèbres&@2poison,@2sol,@2spectre,@2acier,@2eau,@2plante,@2psy,@2glace,@2ténèbres,@3poison,@3sol,@3spectre,@3acier,@3eau,@3plante,@3psy,@3glace,@3ténèbres&!<psy&!<fée&!<sol&!<spectre&!<poison",
+        "3": "combat,sol,eau,dragon,ténèbres,fée&@1combat,@1sol,@1insecte,@1acier,@1eau,@1plante,@1fée&@2combat,@2sol,@2insecte,@2acier,@2eau,@2plante,@2fée,@3combat,@3sol,@3insecte,@3acier,@3eau,@3plante,@3fée&!<roche&!<ténèbres&!<feu&!<sol"
       },
       "Arlo": {
         "1": "combat,vol,poison,spectre,acier,feu,fée&@1vol,@1roche,@1feu&@2vol,@2roche,@2feu,@3vol,@3roche,@3feu&!<insecte",
         "2": "eau,plante,psy,dragon,ténèbres&@1combat,@1sol,@1insecte,@1spectre,@1acier,@1feu,@1eau,@1plante,@1électrik,@1ténèbres&@2combat,@2sol,@2insecte,@2spectre,@2acier,@2feu,@2eau,@2plante,@2électrik,@2ténèbres,@3combat,@3sol,@3insecte,@3spectre,@3acier,@3feu,@3eau,@3plante,@3électrik,@3ténèbres&!<acier&!<sol&!<roche&!<eau&!<psy",
-        "3": "combat,vol,poison,spectre,acier,feu,eau,électrik&@1feu&@2feu,@3feu&!<insecte&!<acier"
+        "3": "vol,spectre,feu,eau,électrik,dragon&@1roche,@1insecte,@1spectre,@1feu,@1eau,@1électrik,@1ténèbres&@2roche,@2insecte,@2spectre,@2feu,@2eau,@2électrik,@2ténèbres,@3roche,@3insecte,@3spectre,@3feu,@3eau,@3électrik,@3ténèbres&!<insecte&!<acier&!<psy&!<feu&!<vol"
       },
       "Sierra": {
         "1": "normal,ténèbres&@1spectre,@1ténèbres&@2spectre,@2ténèbres,@3spectre,@3ténèbres&!<spectre",
@@ -574,7 +574,7 @@
       "Sbire Masculin type Sol": "normal,vol,ténèbres,fée&@1plante,@1glace,@1eau&@2plante,@2glace,@2eau,@3plante,@3glace,@3eau&!<sol&!<vol&!<psy&!<dragon&!<spectre",
       "Sbire Féminin type Vol": "vol,spectre,eau&@1électrik,@1glace,@1roche&@2électrik,@2glace,@2roche,@3électrik,@3glace,@3roche&!<normal&!<vol&!<poison&!<sol&!<insecte&!<dragon&!<eau",
       "Sbire Masculin type Psy": "vol,insecte,feu,fée&@1insecte,@1ténèbres,@1spectre&@2insecte,@2ténèbres,@2spectre,@3insecte,@3ténèbres,@3spectre&!<psy&!<fée&!<combat&!<ténèbres",
-      "Sbire Masculin type Insecte": "combat,poison,sol,spectre,acier,électrik,dragon&@1feu,@1vol,@1roche&@2feu,@2vol,@2roche,@3feu,@3vol,@3roche&!<insecte&!<poison&!<roche&!<électrik&!<acier",
+      "Sbire Masculin type Insecte": "combat,poison,spectre,acier,électrik,dragon&@1feu,@1vol,@1roche&@2feu,@2vol,@2roche,@3feu,@3vol,@3roche&!<insecte&!<poison&!<eau&!<roche&!<électrik&!<acier",
       "Sbire Masculin type Roche": "combat,spectre,eau&@1combat,@1plante,@1sol,@1acier,@1eau&@2combat,@2plante,@2sol,@2acier,@2eau,@3combat,@3plante,@3sol,@3acier,@3eau&!<insecte&!<roche&!<eau&!<sol&!<acier&!<glace&!<dragon",
       "Sbire Masculin type Spectre": "normal,combat,poison,roche,acier,feu,eau,glace,ténèbres&@1ténèbres,@1spectre&@2ténèbres,@2spectre,@3ténèbres,@3spectre&!<spectre&!<poison&!<ténèbres&!<glace",
       "Sbire Féminin type Dragon": "vol,ténèbres,fée&@1dragon,@1fée,@1glace&@2dragon,@2fée,@2glace,@3dragon,@3fée,@3glace&!<dragon&!<ténèbres&!<plante&!<sol&!<vol",
@@ -696,13 +696,13 @@
       },
       "Cliff": {
         "1": "岩石,幽靈,鋼&@1格鬥&@2格鬥,@3格鬥&!<一般",
-        "2": "鋼,火,超能力&@1毒,@1幽靈,@1鋼&@2毒,@2幽靈,@2鋼,@3毒,@3幽靈,@3鋼&!<超能力&!<妖精",
-        "3": "格鬥,地面,鋼,惡,妖精&@1格鬥,@1地面,@1蟲,@1鋼,@1水,@1草,@1妖精&@2格鬥,@2地面,@2蟲,@2鋼,@2水,@2草,@2妖精,@3格鬥,@3地面,@3蟲,@3鋼,@3水,@3草,@3妖精&!<岩石&!<惡"
+        "2": "一般,飛行,地面,蟲&@1毒,@1地面,@1幽靈,@1鋼,@1水,@1草,@1超能力,@1冰,@1惡&@2毒,@2地面,@2幽靈,@2鋼,@2水,@2草,@2超能力,@2冰,@2惡,@3毒,@3地面,@3幽靈,@3鋼,@3水,@3草,@3超能力,@3冰,@3惡&!<超能力&!<妖精&!<地面&!<幽靈&!<毒",
+        "3": "格鬥,地面,水,龍,惡,妖精&@1格鬥,@1地面,@1蟲,@1鋼,@1水,@1草,@1妖精&@2格鬥,@2地面,@2蟲,@2鋼,@2水,@2草,@2妖精,@3格鬥,@3地面,@3蟲,@3鋼,@3水,@3草,@3妖精&!<岩石&!<惡&!<火&!<地面"
       },
       "Arlo": {
         "1": "格鬥,飛行,毒,幽靈,鋼,火,妖精&@1飛行,@1岩石,@1火&@2飛行,@2岩石,@2火,@3飛行,@3岩石,@3火&!<蟲",
         "2": "水,草,超能力,龍,惡&@1格鬥,@1地面,@1蟲,@1幽靈,@1鋼,@1火,@1水,@1草,@1電,@1惡&@2格鬥,@2地面,@2蟲,@2幽靈,@2鋼,@2火,@2水,@2草,@2電,@2惡,@3格鬥,@3地面,@3蟲,@3幽靈,@3鋼,@3火,@3水,@3草,@3電,@3惡&!<鋼&!<地面&!<岩石&!<水&!<超能力",
-        "3": "格鬥,飛行,毒,幽靈,鋼,火,水,電&@1火&@2火,@3火&!<蟲&!<鋼"
+        "3": "飛行,幽靈,火,水,電,龍&@1岩石,@1蟲,@1幽靈,@1火,@1水,@1電,@1惡&@2岩石,@2蟲,@2幽靈,@2火,@2水,@2電,@2惡,@3岩石,@3蟲,@3幽靈,@3火,@3水,@3電,@3惡&!<蟲&!<鋼&!<超能力&!<火&!<飛行"
       },
       "Sierra": {
         "1": "一般,惡&@1幽靈,@1惡&@2幽靈,@2惡,@3幽靈,@3惡&!<幽靈",
@@ -723,7 +723,7 @@
       "地面 屬性 男小嘍囉": "一般,飛行,惡,妖精&@1草,@1冰,@1水&@2草,@2冰,@2水,@3草,@3冰,@3水&!<地面&!<飛行&!<超能力&!<龍&!<幽靈",
       "飛行 屬性 女小嘍囉": "飛行,幽靈,水&@1電,@1冰,@1岩石&@2電,@2冰,@2岩石,@3電,@3冰,@3岩石&!<一般&!<飛行&!<毒&!<地面&!<蟲&!<龍&!<水",
       "超能力 屬性 男小嘍囉": "飛行,蟲,火,妖精&@1蟲,@1惡,@1幽靈&@2蟲,@2惡,@2幽靈,@3蟲,@3惡,@3幽靈&!<超能力&!<妖精&!<格鬥&!<惡",
-      "蟲 屬性 男小嘍囉": "格鬥,毒,地面,幽靈,鋼,電,龍&@1火,@1飛行,@1岩石&@2火,@2飛行,@2岩石,@3火,@3飛行,@3岩石&!<蟲&!<毒&!<岩石&!<電&!<鋼",
+      "蟲 屬性 男小嘍囉": "格鬥,毒,幽靈,鋼,電,龍&@1火,@1飛行,@1岩石&@2火,@2飛行,@2岩石,@3火,@3飛行,@3岩石&!<蟲&!<毒&!<水&!<岩石&!<電&!<鋼",
       "岩石 屬性 男小嘍囉": "格鬥,幽靈,水&@1格鬥,@1草,@1地面,@1鋼,@1水&@2格鬥,@2草,@2地面,@2鋼,@2水,@3格鬥,@3草,@3地面,@3鋼,@3水&!<蟲&!<岩石&!<水&!<地面&!<鋼&!<冰&!<龍",
       "幽靈 屬性 男小嘍囉": "一般,格鬥,毒,岩石,鋼,火,水,冰,惡&@1惡,@1幽靈&@2惡,@2幽靈,@3惡,@3幽靈&!<幽靈&!<毒&!<惡&!<冰",
       "龍 屬性 女小嘍囉": "飛行,惡,妖精&@1龍,@1妖精,@1冰&@2龍,@2妖精,@2冰,@3龍,@3妖精,@3冰&!<龍&!<惡&!<草&!<地面&!<飛行",
@@ -845,13 +845,13 @@
       },
       "Cliff": {
         "1": "रॉक,घोट,टल&@1फ़ाइटंग&@2फ़ाइटंग,@3फ़ाइटंग&!<नॉमल",
-        "2": "टल,फ़ायर,साइकक&@1पॉइज़न,@1घोट,@1टल&@2पॉइज़न,@2घोट,@2टल,@3पॉइज़न,@3घोट,@3टल&!<साइकक&!<फ़ेर",
-        "3": "फ़ाइटंग,ाउंड,टल,डाक,फ़ेर&@1फ़ाइटंग,@1ाउंड,@1बग,@1टल,@1वॉटर,@1ास,@1फ़ेर&@2फ़ाइटंग,@2ाउंड,@2बग,@2टल,@2वॉटर,@2ास,@2फ़ेर,@3फ़ाइटंग,@3ाउंड,@3बग,@3टल,@3वॉटर,@3ास,@3फ़ेर&!<रॉक&!<डाक"
+        "2": "नॉमल,़लाइंग,ाउंड,बग&@1पॉइज़न,@1ाउंड,@1घोट,@1टल,@1वॉटर,@1ास,@1साइकक,@1आइस,@1डाक&@2पॉइज़न,@2ाउंड,@2घोट,@2टल,@2वॉटर,@2ास,@2साइकक,@2आइस,@2डाक,@3पॉइज़न,@3ाउंड,@3घोट,@3टल,@3वॉटर,@3ास,@3साइकक,@3आइस,@3डाक&!<साइकक&!<फ़ेर&!<ाउंड&!<घोट&!<पॉइज़न",
+        "3": "फ़ाइटंग,ाउंड,वॉटर,डैगन,डाक,फ़ेर&@1फ़ाइटंग,@1ाउंड,@1बग,@1टल,@1वॉटर,@1ास,@1फ़ेर&@2फ़ाइटंग,@2ाउंड,@2बग,@2टल,@2वॉटर,@2ास,@2फ़ेर,@3फ़ाइटंग,@3ाउंड,@3बग,@3टल,@3वॉटर,@3ास,@3फ़ेर&!<रॉक&!<डाक&!<फ़ायर&!<ाउंड"
       },
       "Arlo": {
         "1": "फ़ाइटंग,़लाइंग,पॉइज़न,घोट,टल,फ़ायर,फ़ेर&@1़लाइंग,@1रॉक,@1फ़ायर&@2़लाइंग,@2रॉक,@2फ़ायर,@3़लाइंग,@3रॉक,@3फ़ायर&!<बग",
         "2": "वॉटर,ास,साइकक,डैगन,डाक&@1फ़ाइटंग,@1ाउंड,@1बग,@1घोट,@1टल,@1फ़ायर,@1वॉटर,@1ास,@1इलटक,@1डाक&@2फ़ाइटंग,@2ाउंड,@2बग,@2घोट,@2टल,@2फ़ायर,@2वॉटर,@2ास,@2इलटक,@2डाक,@3फ़ाइटंग,@3ाउंड,@3बग,@3घोट,@3टल,@3फ़ायर,@3वॉटर,@3ास,@3इलटक,@3डाक&!<टल&!<ाउंड&!<रॉक&!<वॉटर&!<साइकक",
-        "3": "फ़ाइटंग,़लाइंग,पॉइज़न,घोट,टल,फ़ायर,वॉटर,इलटक&@1फ़ायर&@2फ़ायर,@3फ़ायर&!<बग&!<टल"
+        "3": "़लाइंग,घोट,फ़ायर,वॉटर,इलटक,डैगन&@1रॉक,@1बग,@1घोट,@1फ़ायर,@1वॉटर,@1इलटक,@1डाक&@2रॉक,@2बग,@2घोट,@2फ़ायर,@2वॉटर,@2इलटक,@2डाक,@3रॉक,@3बग,@3घोट,@3फ़ायर,@3वॉटर,@3इलटक,@3डाक&!<बग&!<टल&!<साइकक&!<फ़ायर&!<़लाइंग"
       },
       "Sierra": {
         "1": "नॉमल,डाक&@1घोट,@1डाक&@2घोट,@2डाक,@3घोट,@3डाक&!<घोट",
@@ -872,7 +872,7 @@
       "ाउंड-type पुरुष Grunt": "नॉमल,़लाइंग,डाक,फ़ेर&@1ास,@1आइस,@1वॉटर&@2ास,@2आइस,@2वॉटर,@3ास,@3आइस,@3वॉटर&!<ाउंड&!<़लाइंग&!<साइकक&!<डैगन&!<घोट",
       "़लाइंग-type महिला Grunt": "़लाइंग,घोट,वॉटर&@1इलटक,@1आइस,@1रॉक&@2इलटक,@2आइस,@2रॉक,@3इलटक,@3आइस,@3रॉक&!<नॉमल&!<़लाइंग&!<पॉइज़न&!<ाउंड&!<बग&!<डैगन&!<वॉटर",
       "साइकक-type पुरुष Grunt": "़लाइंग,बग,फ़ायर,फ़ेर&@1बग,@1डाक,@1घोट&@2बग,@2डाक,@2घोट,@3बग,@3डाक,@3घोट&!<साइकक&!<फ़ेर&!<फ़ाइटंग&!<डाक",
-      "बग-type पुरुष Grunt": "फ़ाइटंग,पॉइज़न,ाउंड,घोट,टल,इलटक,डैगन&@1फ़ायर,@1़लाइंग,@1रॉक&@2फ़ायर,@2़लाइंग,@2रॉक,@3फ़ायर,@3़लाइंग,@3रॉक&!<बग&!<पॉइज़न&!<रॉक&!<इलटक&!<टल",
+      "बग-type पुरुष Grunt": "फ़ाइटंग,पॉइज़न,घोट,टल,इलटक,डैगन&@1फ़ायर,@1़लाइंग,@1रॉक&@2फ़ायर,@2़लाइंग,@2रॉक,@3फ़ायर,@3़लाइंग,@3रॉक&!<बग&!<पॉइज़न&!<वॉटर&!<रॉक&!<इलटक&!<टल",
       "रॉक-type पुरुष Grunt": "फ़ाइटंग,घोट,वॉटर&@1फ़ाइटंग,@1ास,@1ाउंड,@1टल,@1वॉटर&@2फ़ाइटंग,@2ास,@2ाउंड,@2टल,@2वॉटर,@3फ़ाइटंग,@3ास,@3ाउंड,@3टल,@3वॉटर&!<बग&!<रॉक&!<वॉटर&!<ाउंड&!<टल&!<आइस&!<डैगन",
       "घोट-type पुरुष Grunt": "नॉमल,फ़ाइटंग,पॉइज़न,रॉक,टल,फ़ायर,वॉटर,आइस,डाक&@1डाक,@1घोट&@2डाक,@2घोट,@3डाक,@3घोट&!<घोट&!<पॉइज़न&!<डाक&!<आइस",
       "डैगन-type महिला Grunt": "़लाइंग,डाक,फ़ेर&@1डैगन,@1फ़ेर,@1आइस&@2डैगन,@2फ़ेर,@2आइस,@3डैगन,@3फ़ेर,@3आइस&!<डैगन&!<डाक&!<ास&!<ाउंड&!<़लाइंग",
@@ -994,13 +994,13 @@
       },
       "Cliff": {
         "1": "いわ,ゴースト,はがね&@1かくとう&@2かくとう,@3かくとう&!<ノーマル",
-        "2": "はがね,ほのお,エスパー&@1どく,@1ゴースト,@1はがね&@2どく,@2ゴースト,@2はがね,@3どく,@3ゴースト,@3はがね&!<エスパー&!<フェアリー",
-        "3": "かくとう,じめん,はがね,あく,フェアリー&@1かくとう,@1じめん,@1むし,@1はがね,@1みず,@1くさ,@1フェアリー&@2かくとう,@2じめん,@2むし,@2はがね,@2みず,@2くさ,@2フェアリー,@3かくとう,@3じめん,@3むし,@3はがね,@3みず,@3くさ,@3フェアリー&!<いわ&!<あく"
+        "2": "ノーマル,ひこう,じめん,むし&@1どく,@1じめん,@1ゴースト,@1はがね,@1みず,@1くさ,@1エスパー,@1こおり,@1あく&@2どく,@2じめん,@2ゴースト,@2はがね,@2みず,@2くさ,@2エスパー,@2こおり,@2あく,@3どく,@3じめん,@3ゴースト,@3はがね,@3みず,@3くさ,@3エスパー,@3こおり,@3あく&!<エスパー&!<フェアリー&!<じめん&!<ゴースト&!<どく",
+        "3": "かくとう,じめん,みず,ドラゴン,あく,フェアリー&@1かくとう,@1じめん,@1むし,@1はがね,@1みず,@1くさ,@1フェアリー&@2かくとう,@2じめん,@2むし,@2はがね,@2みず,@2くさ,@2フェアリー,@3かくとう,@3じめん,@3むし,@3はがね,@3みず,@3くさ,@3フェアリー&!<いわ&!<あく&!<ほのお&!<じめん"
       },
       "Arlo": {
         "1": "かくとう,ひこう,どく,ゴースト,はがね,ほのお,フェアリー&@1ひこう,@1いわ,@1ほのお&@2ひこう,@2いわ,@2ほのお,@3ひこう,@3いわ,@3ほのお&!<むし",
         "2": "みず,くさ,エスパー,ドラゴン,あく&@1かくとう,@1じめん,@1むし,@1ゴースト,@1はがね,@1ほのお,@1みず,@1くさ,@1でんき,@1あく&@2かくとう,@2じめん,@2むし,@2ゴースト,@2はがね,@2ほのお,@2みず,@2くさ,@2でんき,@2あく,@3かくとう,@3じめん,@3むし,@3ゴースト,@3はがね,@3ほのお,@3みず,@3くさ,@3でんき,@3あく&!<はがね&!<じめん&!<いわ&!<みず&!<エスパー",
-        "3": "かくとう,ひこう,どく,ゴースト,はがね,ほのお,みず,でんき&@1ほのお&@2ほのお,@3ほのお&!<むし&!<はがね"
+        "3": "ひこう,ゴースト,ほのお,みず,でんき,ドラゴン&@1いわ,@1むし,@1ゴースト,@1ほのお,@1みず,@1でんき,@1あく&@2いわ,@2むし,@2ゴースト,@2ほのお,@2みず,@2でんき,@2あく,@3いわ,@3むし,@3ゴースト,@3ほのお,@3みず,@3でんき,@3あく&!<むし&!<はがね&!<エスパー&!<ほのお&!<ひこう"
       },
       "Sierra": {
         "1": "ノーマル,あく&@1ゴースト,@1あく&@2ゴースト,@2あく,@3ゴースト,@3あく&!<ゴースト",
@@ -1021,7 +1021,7 @@
       "じめんタイプ 男のしたっぱ": "ノーマル,ひこう,あく,フェアリー&@1くさ,@1こおり,@1みず&@2くさ,@2こおり,@2みず,@3くさ,@3こおり,@3みず&!<じめん&!<ひこう&!<エスパー&!<ドラゴン&!<ゴースト",
       "ひこうタイプ 女のしたっぱ": "ひこう,ゴースト,みず&@1でんき,@1こおり,@1いわ&@2でんき,@2こおり,@2いわ,@3でんき,@3こおり,@3いわ&!<ノーマル&!<ひこう&!<どく&!<じめん&!<むし&!<ドラゴン&!<みず",
       "エスパータイプ 男のしたっぱ": "ひこう,むし,ほのお,フェアリー&@1むし,@1あく,@1ゴースト&@2むし,@2あく,@2ゴースト,@3むし,@3あく,@3ゴースト&!<エスパー&!<フェアリー&!<かくとう&!<あく",
-      "むしタイプ 男のしたっぱ": "かくとう,どく,じめん,ゴースト,はがね,でんき,ドラゴン&@1ほのお,@1ひこう,@1いわ&@2ほのお,@2ひこう,@2いわ,@3ほのお,@3ひこう,@3いわ&!<むし&!<どく&!<いわ&!<でんき&!<はがね",
+      "むしタイプ 男のしたっぱ": "かくとう,どく,ゴースト,はがね,でんき,ドラゴン&@1ほのお,@1ひこう,@1いわ&@2ほのお,@2ひこう,@2いわ,@3ほのお,@3ひこう,@3いわ&!<むし&!<どく&!<みず&!<いわ&!<でんき&!<はがね",
       "いわタイプ 男のしたっぱ": "かくとう,ゴースト,みず&@1かくとう,@1くさ,@1じめん,@1はがね,@1みず&@2かくとう,@2くさ,@2じめん,@2はがね,@2みず,@3かくとう,@3くさ,@3じめん,@3はがね,@3みず&!<むし&!<いわ&!<みず&!<じめん&!<はがね&!<こおり&!<ドラゴン",
       "ゴーストタイプ 男のしたっぱ": "ノーマル,かくとう,どく,いわ,はがね,ほのお,みず,こおり,あく&@1あく,@1ゴースト&@2あく,@2ゴースト,@3あく,@3ゴースト&!<ゴースト&!<どく&!<あく&!<こおり",
       "ドラゴンタイプ 女のしたっぱ": "ひこう,あく,フェアリー&@1ドラゴン,@1フェアリー,@1こおり&@2ドラゴン,@2フェアリー,@2こおり,@3ドラゴン,@3フェアリー,@3こおり&!<ドラゴン&!<あく&!<くさ&!<じめん&!<ひこう",
