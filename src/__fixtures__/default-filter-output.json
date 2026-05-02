@@ -1,15 +1,15 @@
 {
   "en": {
-    "trash": "0*,1*,2*&0*,1*,2*,0-3attack,0-3defense,0-2hp&0*,1*,2*,0-3attack,0-2defense,0-3hp&0*,1*,2*,0-2attack,0-3defense,0-3hp&1-4attack,0-2defense,0-2hp&!4*&!#&!favorite&!shiny&!legendary&!mythical,meltan,genesect&!ultrabeast&!shadow&!costume&!lucky&!background&!maxmove1-&!evolvenew,mega0&!@special,smeargle&!eggsonly&!distance100-,traded&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&age-30,traded",
-    "trade": "0*,1*,2*&0*,1*,2*,0-3attack,0-3defense,0-2hp&0*,1*,2*,0-3attack,0-2defense,0-3hp&0*,1*,2*,0-2attack,0-3defense,0-3hp&1-4attack,0-2defense,0-2hp&!traded&!shadow&!lucky&!mythical,808,809&!#&!legendary&!ultrabeast&!shiny&!costume&!purified&!background&!favorite&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!maxmove1-&!xxl&!xl&!@special&age-30&distance0-",
+    "trash": "0*,1*,2*&0*,1*,2*,0-3attack,0-3defense,0-2hp&0*,1*,2*,0-3attack,0-2defense,0-3hp&0*,1*,2*,0-2attack,0-3defense,0-3hp&1-4attack,0-2defense,0-2hp&!4*&!#&!favorite&!shiny&!legendary&!mythical,meltan,genesect&!ultrabeast&!shadow&!costume&!lucky&!background&!maxmove1-&!evolvenew,mega0&!@special,@return,@frustration,smeargle&!eggsonly&!distance100-,traded&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&age-30,traded,purified&year21-,traded",
+    "trade": "0*,1*,2*&0*,1*,2*,0-3attack,0-3defense,0-2hp&0*,1*,2*,0-3attack,0-2defense,0-3hp&0*,1*,2*,0-2attack,0-3defense,0-3hp&1-4attack,0-2defense,0-2hp&!traded&!shadow&!lucky&!mythical,808,809&!#&!legendary&!ultrabeast&!shiny&!costume&!purified&!background&!favorite&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!maxmove1-&!xxl&!xl&!@special,@return,@frustration&age-30,purified&year21-&distance0-",
     "sort": "",
     "prestaged": "#Trade,#Fern-Tausch&!traded&!shadow&!lucky&!mythical,808,809",
-    "gift": "shiny,legendary,ultrabeast,costume,background&!traded&!shadow&!mythical,808,809&!lucky&!4*&!favorite&!@special&!#,#Trade,#Fern-Tausch",
+    "gift": "shiny,legendary,ultrabeast,costume,background&!traded&!shadow&!mythical,808,809&!lucky&!4*&!favorite&!@special,@return,@frustration&year21-&!#,#Trade,#Fern-Tausch",
     "shadowCheap": "shadow&candykm1&!shiny&@frustration&!favorite&!#",
     "shadowSafe": "shadow&!legendary&!mythical&!ultrabeast&!4*&!shiny&!costume&@frustration&!favorite&!#&!+dialga&!+palkia&!+heatran&!+groudon&!+rampardos&!+salamence&!+mewtwo&!+greninja&!+hydreigon&!+darkrai&!+toucannon&!+vikavolt&!+tyrantrum&!+conkeldurr&!+darmanitan&!+chandelure&!+excadrill&!+regigigas&!+gigalith&!+kyogre&!+mamoswine&!+electivire&!+magnezone&!+garchomp&!+rhyperior&!+metagross&!+tyranitar&!+blaziken&!+ho-oh&!+raikou&!+gardevoir&!+swampert&!+dragonite&!+moltres&!+gengar&!+machamp&!+landorus&!+kingler&!+delphox&!+chesnaught&!+giratina&!+emboar&!+honchkrow&!+latios&!+staraptor&!+weavile&!+crawdaunt&!+absol&!+hariyama&!+sceptile&!+entei&!+aerodactyl&!+zapdos&!+togekiss&!+roserade&!+toxicroak&!+glaceon&!+espeon&!+sylveon",
     "shadowHundoCandidates": "shadow&@frustration&3-4attack&3-4defense&3-4hp&!4*",
     "shadowFrustration": "shadow&@frustration&+dialga,+palkia,+heatran,+groudon,+rampardos,+salamence,+mewtwo,+greninja,+hydreigon,+darkrai,+toucannon,+vikavolt,+tyrantrum,+conkeldurr,+darmanitan,+chandelure,+excadrill,+regigigas,+gigalith,+kyogre,+mamoswine,+electivire,+magnezone,+garchomp,+rhyperior,+metagross,+tyranitar,+blaziken,+ho-oh,+raikou,+gardevoir,+swampert,+dragonite,+moltres,+gengar,+machamp,+landorus,+kingler,+delphox,+chesnaught,+giratina,+emboar,+honchkrow,+latios,+staraptor,+weavile,+crawdaunt,+absol,+hariyama,+sceptile,+entei,+aerodactyl,+zapdos,+togekiss,+roserade,+toxicroak,+glaceon,+espeon,+sylveon",
-    "cheapEvolve": "caterpie,weedle,pidgey,wurmple,whismur,pidove,abra,kadabra,machop,machoke,geodude,graveler,gastly,haunter,roggenrola,boldore,timburr,gurdurr,karrablast,shelmet,phantump,pumpkaboo&caterpie,weedle,pidgey,wurmple,whismur,pidove,traded&0*,1*,2*&!shiny&!costume&!@special&!#",
+    "cheapEvolve": "caterpie,weedle,pidgey,wurmple,whismur,pidove,abra,kadabra,machop,machoke,geodude,graveler,gastly,haunter,roggenrola,boldore,timburr,gurdurr,karrablast,shelmet,phantump,pumpkaboo&caterpie,weedle,pidgey,wurmple,whismur,pidove,traded&0*,1*,2*&!shiny&!costume&!@special,@return,@frustration&year21-,traded&!#",
     "dexPlus": "evolve&evolvenew&!evolvequest",
     "megaEvolve": "megaevolve&mega1-2,evolvenew",
     "pilotLong": "distance1000-&!traded&!4*&!legendary&!mythical&!shiny",
@@ -145,20 +145,20 @@
       "ultra": "+jellicent,+corviknight,+lapras,+tinkaton,+empoleon,+moltres,+feraligatr,+malamar,+florges,+dondozo,+virizion,+regidrago,+lickilicky,+ludicolo,+clefable,+blastoise,+oranguru,+zygarde,+dusknoir,+ninetales,+walrein,+turtonator,+drapion,+annihilape,+kingdra,+giratina,+bellibolt,+cresselia,+forretress,+togekiss&cp-2500&0-1attack&3-4defense&3-4hp",
       "master": "+zacian,+palkia,+metagross,+xerneas,+zamazenta,+kyurem,+dialga,+lunala,+reshiram,+zekrom,+marshadow,+kyogre,+lugia,+eternatus,+necrozma,+yveltal,+ho-oh,+garchomp,+groudon,+meloetta,+latios,+gholdengo,+solgaleo,+florges,+gyarados,+mewtwo,+jirachi,+keldeo,+zygarde,+latias"
     },
-    "trashClauseCount": 30,
-    "tradeClauseCount": 28
+    "trashClauseCount": 31,
+    "tradeClauseCount": 29
   },
   "de": {
-    "trash": "0*,1*,2*&0*,1*,2*,0-3angriffs-wert,0-3verteidigungs-wert,0-2kp&0*,1*,2*,0-3angriffs-wert,0-2verteidigungs-wert,0-3kp&0*,1*,2*,0-2angriffs-wert,0-3verteidigungs-wert,0-3kp&1-4angriffs-wert,0-2verteidigungs-wert,0-2kp&!4*&!#&!favorit&!schillernd&!legendär&!mysteriös,meltan,genesect&!ultrabestie&!crypto&!kostümiert&!glücks&!hintergrund&!dynaattacke1-&!neueentwicklung,mega0&!@spezial,farbeagle&!nurauseiern&!entfernung100-,getauscht&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&wp-2000&alter-30,getauscht",
-    "trade": "0*,1*,2*&0*,1*,2*,0-3angriffs-wert,0-3verteidigungs-wert,0-2kp&0*,1*,2*,0-3angriffs-wert,0-2verteidigungs-wert,0-3kp&0*,1*,2*,0-2angriffs-wert,0-3verteidigungs-wert,0-3kp&1-4angriffs-wert,0-2verteidigungs-wert,0-2kp&!getauscht&!crypto&!glücks&!mysteriös,808,809&!#&!legendär&!ultrabestie&!schillernd&!kostümiert&!erlöst&!hintergrund&!favorit&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!dynaattacke1-&!xxl&!xl&!@spezial&alter-30&entfernung0-",
+    "trash": "0*,1*,2*&0*,1*,2*,0-3angriffs-wert,0-3verteidigungs-wert,0-2kp&0*,1*,2*,0-3angriffs-wert,0-2verteidigungs-wert,0-3kp&0*,1*,2*,0-2angriffs-wert,0-3verteidigungs-wert,0-3kp&1-4angriffs-wert,0-2verteidigungs-wert,0-2kp&!4*&!#&!favorit&!schillernd&!legendär&!mysteriös,meltan,genesect&!ultrabestie&!crypto&!kostümiert&!glücks&!hintergrund&!dynaattacke1-&!neueentwicklung,mega0&!@spezial,@rückkehr,@frustration,farbeagle&!nurauseiern&!entfernung100-,getauscht&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&wp-2000&alter-30,getauscht,erlöst&jahr21-,getauscht",
+    "trade": "0*,1*,2*&0*,1*,2*,0-3angriffs-wert,0-3verteidigungs-wert,0-2kp&0*,1*,2*,0-3angriffs-wert,0-2verteidigungs-wert,0-3kp&0*,1*,2*,0-2angriffs-wert,0-3verteidigungs-wert,0-3kp&1-4angriffs-wert,0-2verteidigungs-wert,0-2kp&!getauscht&!crypto&!glücks&!mysteriös,808,809&!#&!legendär&!ultrabestie&!schillernd&!kostümiert&!erlöst&!hintergrund&!favorit&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!dynaattacke1-&!xxl&!xl&!@spezial,@rückkehr,@frustration&alter-30,erlöst&jahr21-&entfernung0-",
     "sort": "",
     "prestaged": "#Trade,#Fern-Tausch&!getauscht&!crypto&!glücks&!mysteriös,808,809",
-    "gift": "schillernd,legendär,ultrabestie,kostümiert,hintergrund&!getauscht&!crypto&!mysteriös,808,809&!glücks&!4*&!favorit&!@spezial&!#,#Trade,#Fern-Tausch",
+    "gift": "schillernd,legendär,ultrabestie,kostümiert,hintergrund&!getauscht&!crypto&!mysteriös,808,809&!glücks&!4*&!favorit&!@spezial,@rückkehr,@frustration&jahr21-&!#,#Trade,#Fern-Tausch",
     "shadowCheap": "crypto&bonbonkm1&!schillernd&@frustration&!favorit&!#",
     "shadowSafe": "crypto&!legendär&!mysteriös&!ultrabestie&!4*&!schillernd&!kostümiert&@frustration&!favorit&!#&!+dialga&!+palkia&!+heatran&!+groudon&!+rameidon&!+brutalanda&!+mewtu&!+quajutsu&!+trikephalo&!+darkrai&!+tukanon&!+donarion&!+monargoras&!+meistagrif&!+flampivian&!+skelabra&!+stalobor&!+regigigas&!+brockoloss&!+kyogre&!+mamutel&!+elevoltek&!+magnezone&!+knakrack&!+rihornior&!+metagross&!+despotar&!+lohgock&!+ho-oh&!+raikou&!+guardevoir&!+sumpex&!+dragoran&!+lavados&!+gengar&!+machomei&!+demeteros&!+kingler&!+fennexis&!+brigaron&!+giratina&!+flambirex&!+kramshef&!+latios&!+staraptor&!+snibunna&!+krebutack&!+absol&!+hariyama&!+gewaldro&!+entei&!+aerodactyl&!+zapdos&!+togekiss&!+roserade&!+toxiquak&!+glaziola&!+psiana&!+feelinara",
     "shadowHundoCandidates": "crypto&@frustration&3-4angriffs-wert&3-4verteidigungs-wert&3-4kp&!4*",
     "shadowFrustration": "crypto&@frustration&+dialga,+palkia,+heatran,+groudon,+rameidon,+brutalanda,+mewtu,+quajutsu,+trikephalo,+darkrai,+tukanon,+donarion,+monargoras,+meistagrif,+flampivian,+skelabra,+stalobor,+regigigas,+brockoloss,+kyogre,+mamutel,+elevoltek,+magnezone,+knakrack,+rihornior,+metagross,+despotar,+lohgock,+ho-oh,+raikou,+guardevoir,+sumpex,+dragoran,+lavados,+gengar,+machomei,+demeteros,+kingler,+fennexis,+brigaron,+giratina,+flambirex,+kramshef,+latios,+staraptor,+snibunna,+krebutack,+absol,+hariyama,+gewaldro,+entei,+aerodactyl,+zapdos,+togekiss,+roserade,+toxiquak,+glaziola,+psiana,+feelinara",
-    "cheapEvolve": "raupy,hornliu,taubsi,waumpel,flurmel,dusselgurr,abra,kadabra,machollo,maschock,kleinstein,georok,nebulak,alpollo,kiesling,sedimantur,praktibalk,strepoli,laukaps,schnuthelm,paragoni,irrbis&raupy,hornliu,taubsi,waumpel,flurmel,dusselgurr,getauscht&0*,1*,2*&!schillernd&!kostümiert&!@spezial&!#",
+    "cheapEvolve": "raupy,hornliu,taubsi,waumpel,flurmel,dusselgurr,abra,kadabra,machollo,maschock,kleinstein,georok,nebulak,alpollo,kiesling,sedimantur,praktibalk,strepoli,laukaps,schnuthelm,paragoni,irrbis&raupy,hornliu,taubsi,waumpel,flurmel,dusselgurr,getauscht&0*,1*,2*&!schillernd&!kostümiert&!@spezial,@rückkehr,@frustration&jahr21-,getauscht&!#",
     "dexPlus": "entwickeln&neueentwicklung&!entwicklungsaufgabe",
     "megaEvolve": "megaentwicklung&mega1-2,neueentwicklung",
     "pilotLong": "entfernung1000-&!getauscht&!4*&!legendär&!mysteriös&!schillernd",
@@ -294,20 +294,20 @@
       "ultra": "+apoquallyp,+krarmor,+lapras,+granforgita,+impoleon,+lavados,+impergator,+calamanero,+florges,+heerashai,+viridium,+regidrago,+schlurplek,+kappalores,+pixi,+turtok,+kommandutan,+zygarde,+zwirrfinst,+vulnona,+walraisa,+tortunator,+piondragi,+epitaff,+seedraking,+giratina,+wampitz,+cresselia,+forstellka,+togekiss&wp-2500&0-1angriffs-wert&3-4verteidigungs-wert&3-4kp",
       "master": "+zacian,+palkia,+metagross,+xerneas,+zamazenta,+kyurem,+dialga,+lunala,+reshiram,+zekrom,+marshadow,+kyogre,+lugia,+endynalos,+necrozma,+yveltal,+ho-oh,+knakrack,+groudon,+meloetta,+latios,+monetigo,+solgaleo,+florges,+garados,+mewtu,+jirachi,+keldeo,+zygarde,+latias"
     },
-    "trashClauseCount": 30,
-    "tradeClauseCount": 28
+    "trashClauseCount": 31,
+    "tradeClauseCount": 29
   },
   "es": {
-    "trash": "0*,1*,2*&0*,1*,2*,0-3ataque,0-3defensa,0-2ps&0*,1*,2*,0-3ataque,0-2defensa,0-3ps&0*,1*,2*,0-2ataque,0-3defensa,0-3ps&1-4ataque,0-2defensa,0-2ps&!4*&!#&!favoritos&!variocolor&!legendario&!singular,meltan,genesect&!ultraente&!oscuro&!disfraz&!suerte&!fondo&!movimientomax1-&!nuevaevolución,mega0&!@especial,smeargle&!huevosolo&!distancia100-,intercambiados&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&pc-2000&edad-30,intercambiados",
-    "trade": "0*,1*,2*&0*,1*,2*,0-3ataque,0-3defensa,0-2ps&0*,1*,2*,0-3ataque,0-2defensa,0-3ps&0*,1*,2*,0-2ataque,0-3defensa,0-3ps&1-4ataque,0-2defensa,0-2ps&!intercambiados&!oscuro&!suerte&!singular,808,809&!#&!legendario&!ultraente&!variocolor&!disfraz&!purificado&!fondo&!favoritos&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!movimientomax1-&!xxl&!xl&!@especial&edad-30&distancia0-",
+    "trash": "0*,1*,2*&0*,1*,2*,0-3ataque,0-3defensa,0-2ps&0*,1*,2*,0-3ataque,0-2defensa,0-3ps&0*,1*,2*,0-2ataque,0-3defensa,0-3ps&1-4ataque,0-2defensa,0-2ps&!4*&!#&!favoritos&!variocolor&!legendario&!singular,meltan,genesect&!ultraente&!oscuro&!disfraz&!suerte&!fondo&!movimientomax1-&!nuevaevolución,mega0&!@especial,@retribución,@frustración,smeargle&!huevosolo&!distancia100-,intercambiados&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&pc-2000&edad-30,intercambiados,purificado&año21-,intercambiados",
+    "trade": "0*,1*,2*&0*,1*,2*,0-3ataque,0-3defensa,0-2ps&0*,1*,2*,0-3ataque,0-2defensa,0-3ps&0*,1*,2*,0-2ataque,0-3defensa,0-3ps&1-4ataque,0-2defensa,0-2ps&!intercambiados&!oscuro&!suerte&!singular,808,809&!#&!legendario&!ultraente&!variocolor&!disfraz&!purificado&!fondo&!favoritos&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!movimientomax1-&!xxl&!xl&!@especial,@retribución,@frustración&edad-30,purificado&año21-&distancia0-",
     "sort": "",
     "prestaged": "#Trade,#Fern-Tausch&!intercambiados&!oscuro&!suerte&!singular,808,809",
-    "gift": "variocolor,legendario,ultraente,disfraz,fondo&!intercambiados&!oscuro&!singular,808,809&!suerte&!4*&!favoritos&!@especial&!#,#Trade,#Fern-Tausch",
+    "gift": "variocolor,legendario,ultraente,disfraz,fondo&!intercambiados&!oscuro&!singular,808,809&!suerte&!4*&!favoritos&!@especial,@retribución,@frustración&año21-&!#,#Trade,#Fern-Tausch",
     "shadowCheap": "oscuro&kmcaramelo1&!variocolor&@frustración&!favoritos&!#",
     "shadowSafe": "oscuro&!legendario&!singular&!ultraente&!4*&!variocolor&!disfraz&@frustración&!favoritos&!#&!+dialga&!+palkia&!+heatran&!+groudon&!+rampardos&!+salamence&!+mewtwo&!+greninja&!+hydreigon&!+darkrai&!+toucannon&!+vikavolt&!+tyrantrum&!+conkeldurr&!+darmanitan&!+chandelure&!+excadrill&!+regigigas&!+gigalith&!+kyogre&!+mamoswine&!+electivire&!+magnezone&!+garchomp&!+rhyperior&!+metagross&!+tyranitar&!+blaziken&!+ho-oh&!+raikou&!+gardevoir&!+swampert&!+dragonite&!+moltres&!+gengar&!+machamp&!+landorus&!+kingler&!+delphox&!+chesnaught&!+giratina&!+emboar&!+honchkrow&!+latios&!+staraptor&!+weavile&!+crawdaunt&!+absol&!+hariyama&!+sceptile&!+entei&!+aerodactyl&!+zapdos&!+togekiss&!+roserade&!+toxicroak&!+glaceon&!+espeon&!+sylveon",
     "shadowHundoCandidates": "oscuro&@frustración&3-4ataque&3-4defensa&3-4ps&!4*",
     "shadowFrustration": "oscuro&@frustración&+dialga,+palkia,+heatran,+groudon,+rampardos,+salamence,+mewtwo,+greninja,+hydreigon,+darkrai,+toucannon,+vikavolt,+tyrantrum,+conkeldurr,+darmanitan,+chandelure,+excadrill,+regigigas,+gigalith,+kyogre,+mamoswine,+electivire,+magnezone,+garchomp,+rhyperior,+metagross,+tyranitar,+blaziken,+ho-oh,+raikou,+gardevoir,+swampert,+dragonite,+moltres,+gengar,+machamp,+landorus,+kingler,+delphox,+chesnaught,+giratina,+emboar,+honchkrow,+latios,+staraptor,+weavile,+crawdaunt,+absol,+hariyama,+sceptile,+entei,+aerodactyl,+zapdos,+togekiss,+roserade,+toxicroak,+glaceon,+espeon,+sylveon",
-    "cheapEvolve": "caterpie,weedle,pidgey,wurmple,whismur,pidove,abra,kadabra,machop,machoke,geodude,graveler,gastly,haunter,roggenrola,boldore,timburr,gurdurr,karrablast,shelmet,phantump,pumpkaboo&caterpie,weedle,pidgey,wurmple,whismur,pidove,intercambiados&0*,1*,2*&!variocolor&!disfraz&!@especial&!#",
+    "cheapEvolve": "caterpie,weedle,pidgey,wurmple,whismur,pidove,abra,kadabra,machop,machoke,geodude,graveler,gastly,haunter,roggenrola,boldore,timburr,gurdurr,karrablast,shelmet,phantump,pumpkaboo&caterpie,weedle,pidgey,wurmple,whismur,pidove,intercambiados&0*,1*,2*&!variocolor&!disfraz&!@especial,@retribución,@frustración&año21-,intercambiados&!#",
     "dexPlus": "evolucionar&nuevaevolución&!investigacionevolucion",
     "megaEvolve": "megaevoluciona&mega1-2,nuevaevolución",
     "pilotLong": "distancia1000-&!intercambiados&!4*&!legendario&!singular&!variocolor",
@@ -443,20 +443,20 @@
       "ultra": "+jellicent,+corviknight,+lapras,+tinkaton,+empoleon,+moltres,+feraligatr,+malamar,+florges,+dondozo,+virizion,+regidrago,+lickilicky,+ludicolo,+clefable,+blastoise,+oranguru,+zygarde,+dusknoir,+ninetales,+walrein,+turtonator,+drapion,+annihilape,+kingdra,+giratina,+bellibolt,+cresselia,+forretress,+togekiss&pc-2500&0-1ataque&3-4defensa&3-4ps",
       "master": "+zacian,+palkia,+metagross,+xerneas,+zamazenta,+kyurem,+dialga,+lunala,+reshiram,+zekrom,+marshadow,+kyogre,+lugia,+eternatus,+necrozma,+yveltal,+ho-oh,+garchomp,+groudon,+meloetta,+latios,+gholdengo,+solgaleo,+florges,+gyarados,+mewtwo,+jirachi,+keldeo,+zygarde,+latias"
     },
-    "trashClauseCount": 30,
-    "tradeClauseCount": 28
+    "trashClauseCount": 31,
+    "tradeClauseCount": 29
   },
   "fr": {
-    "trash": "0*,1*,2*&0*,1*,2*,0-3attaque,0-3défense,0-2pv&0*,1*,2*,0-3attaque,0-2défense,0-3pv&0*,1*,2*,0-2attaque,0-3défense,0-3pv&1-4attaque,0-2défense,0-2pv&!4*&!#&!favoris&!chromatique&!légendaire&!fabuleux,meltan,genesect&!ultra-chimère&!obscur&!costume&!chanceux&!fond&!capacitédynamax1-&!nouvelleévolution,méga0&!@spécial,queulorior&!oeufseulement&!distance100-,échangé&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&pc-2000&âge-30,échangé",
-    "trade": "0*,1*,2*&0*,1*,2*,0-3attaque,0-3défense,0-2pv&0*,1*,2*,0-3attaque,0-2défense,0-3pv&0*,1*,2*,0-2attaque,0-3défense,0-3pv&1-4attaque,0-2défense,0-2pv&!échangé&!obscur&!chanceux&!fabuleux,808,809&!#&!légendaire&!ultra-chimère&!chromatique&!costume&!purifié&!fond&!favoris&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!capacitédynamax1-&!xxl&!xl&!@spécial&âge-30&distance0-",
+    "trash": "0*,1*,2*&0*,1*,2*,0-3attaque,0-3défense,0-2pv&0*,1*,2*,0-3attaque,0-2défense,0-3pv&0*,1*,2*,0-2attaque,0-3défense,0-3pv&1-4attaque,0-2défense,0-2pv&!4*&!#&!favoris&!chromatique&!légendaire&!fabuleux,meltan,genesect&!ultra-chimère&!obscur&!costume&!chanceux&!fond&!capacitédynamax1-&!nouvelleévolution,méga0&!@spécial,@retour,@frustration,queulorior&!oeufseulement&!distance100-,échangé&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&pc-2000&âge-30,échangé,purifié&année21-,échangé",
+    "trade": "0*,1*,2*&0*,1*,2*,0-3attaque,0-3défense,0-2pv&0*,1*,2*,0-3attaque,0-2défense,0-3pv&0*,1*,2*,0-2attaque,0-3défense,0-3pv&1-4attaque,0-2défense,0-2pv&!échangé&!obscur&!chanceux&!fabuleux,808,809&!#&!légendaire&!ultra-chimère&!chromatique&!costume&!purifié&!fond&!favoris&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!capacitédynamax1-&!xxl&!xl&!@spécial,@retour,@frustration&âge-30,purifié&année21-&distance0-",
     "sort": "",
     "prestaged": "#Trade,#Fern-Tausch&!échangé&!obscur&!chanceux&!fabuleux,808,809",
-    "gift": "chromatique,légendaire,ultra-chimère,costume,fond&!échangé&!obscur&!fabuleux,808,809&!chanceux&!4*&!favoris&!@spécial&!#,#Trade,#Fern-Tausch",
+    "gift": "chromatique,légendaire,ultra-chimère,costume,fond&!échangé&!obscur&!fabuleux,808,809&!chanceux&!4*&!favoris&!@spécial,@retour,@frustration&année21-&!#,#Trade,#Fern-Tausch",
     "shadowCheap": "obscur&kmbonbon1&!chromatique&@frustration&!favoris&!#",
     "shadowSafe": "obscur&!légendaire&!fabuleux&!ultra-chimère&!4*&!chromatique&!costume&@frustration&!favoris&!#&!+dialga&!+palkia&!+heatran&!+groudon&!+charkos&!+drattak&!+mewtwo&!+amphinobi&!+trioxhydre&!+darkrai&!+bazoucan&!+lucanon&!+rexillius&!+bétochef&!+darumacho&!+lugulabre&!+minotaupe&!+regigigas&!+gigalithe&!+kyogre&!+mammochon&!+élekable&!+magnézone&!+carchacrok&!+rhinastoc&!+métalosse&!+tyranocif&!+braségali&!+ho-oh&!+raikou&!+gardevoir&!+laggron&!+dracolosse&!+sulfura&!+ectoplasma&!+mackogneur&!+démétéros&!+krabboss&!+goupelin&!+blindépique&!+giratina&!+roitiflam&!+corboss&!+latios&!+étouraptor&!+dimoret&!+colhomard&!+absol&!+hariyama&!+jungko&!+entei&!+ptéra&!+électhor&!+togekiss&!+roserade&!+coatox&!+givrali&!+mentali&!+nymphali",
     "shadowHundoCandidates": "obscur&@frustration&3-4attaque&3-4défense&3-4pv&!4*",
     "shadowFrustration": "obscur&@frustration&+dialga,+palkia,+heatran,+groudon,+charkos,+drattak,+mewtwo,+amphinobi,+trioxhydre,+darkrai,+bazoucan,+lucanon,+rexillius,+bétochef,+darumacho,+lugulabre,+minotaupe,+regigigas,+gigalithe,+kyogre,+mammochon,+élekable,+magnézone,+carchacrok,+rhinastoc,+métalosse,+tyranocif,+braségali,+ho-oh,+raikou,+gardevoir,+laggron,+dracolosse,+sulfura,+ectoplasma,+mackogneur,+démétéros,+krabboss,+goupelin,+blindépique,+giratina,+roitiflam,+corboss,+latios,+étouraptor,+dimoret,+colhomard,+absol,+hariyama,+jungko,+entei,+ptéra,+électhor,+togekiss,+roserade,+coatox,+givrali,+mentali,+nymphali",
-    "cheapEvolve": "chenipan,aspicot,roucool,chenipotte,chuchmur,poichigeon,abra,kadabra,machoc,machopeur,racaillou,gravalanch,fantominus,spectrum,nodulithe,géolithe,charpenti,ouvrifier,carabing,escargaume,brocélôme,pitrouille&chenipan,aspicot,roucool,chenipotte,chuchmur,poichigeon,échangé&0*,1*,2*&!chromatique&!costume&!@spécial&!#",
+    "cheapEvolve": "chenipan,aspicot,roucool,chenipotte,chuchmur,poichigeon,abra,kadabra,machoc,machopeur,racaillou,gravalanch,fantominus,spectrum,nodulithe,géolithe,charpenti,ouvrifier,carabing,escargaume,brocélôme,pitrouille&chenipan,aspicot,roucool,chenipotte,chuchmur,poichigeon,échangé&0*,1*,2*&!chromatique&!costume&!@spécial,@retour,@frustration&année21-,échangé&!#",
     "dexPlus": "évoluer&nouvelleévolution&!évolutionparquête",
     "megaEvolve": "mégaévolue&méga1-2,nouvelleévolution",
     "pilotLong": "distance1000-&!échangé&!4*&!légendaire&!fabuleux&!chromatique",
@@ -592,20 +592,20 @@
       "ultra": "+moyade,+corvaillus,+lokhlass,+forgelina,+pingoléon,+sulfura,+aligatueur,+sepiatroce,+florges,+oyacata,+viridium,+regidrago,+coudlangue,+ludicolo,+mélodelfe,+tortank,+gouroutan,+zygarde,+noctunoir,+feunard,+kaimorse,+boumata,+drascore,+courrousinge,+hyporoi,+giratina,+ampibidou,+cresselia,+foretress,+togekiss&pc-2500&0-1attaque&3-4défense&3-4pv",
       "master": "+zacian,+palkia,+métalosse,+xerneas,+zamazenta,+kyurem,+dialga,+lunala,+reshiram,+zekrom,+marshadow,+kyogre,+lugia,+éthernatos,+necrozma,+yveltal,+ho-oh,+carchacrok,+groudon,+meloetta,+latios,+gromago,+solgaleo,+florges,+léviator,+mewtwo,+jirachi,+keldeo,+zygarde,+latias"
     },
-    "trashClauseCount": 30,
-    "tradeClauseCount": 28
+    "trashClauseCount": 31,
+    "tradeClauseCount": 29
   },
   "zh-TW": {
-    "trash": "0*,1*,2*&0*,1*,2*,0-3攻擊,0-3防禦,0-2hp&0*,1*,2*,0-3攻擊,0-2防禦,0-3hp&0*,1*,2*,0-2攻擊,0-3防禦,0-3hp&1-4攻擊,0-2防禦,0-2hp&!4*&!#&!我的最愛&!異色&!傳說的寶可夢&!幻,美錄坦,蓋諾賽克特&!究極異獸&!暗影&!特殊&!亮晶晶&!背卡&!極巨招式1-&!未登錄,超級0&!@特別,圖圖犬&!只限蛋&!距離100-,交換&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&日數-30,交換",
-    "trade": "0*,1*,2*&0*,1*,2*,0-3攻擊,0-3防禦,0-2hp&0*,1*,2*,0-3攻擊,0-2防禦,0-3hp&0*,1*,2*,0-2攻擊,0-3防禦,0-3hp&1-4攻擊,0-2防禦,0-2hp&!交換&!暗影&!亮晶晶&!幻,808,809&!#&!傳說的寶可夢&!究極異獸&!異色&!特殊&!淨化&!背卡&!我的最愛&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!極巨招式1-&!xxl&!xl&!@特別&日數-30&距離0-",
+    "trash": "0*,1*,2*&0*,1*,2*,0-3攻擊,0-3防禦,0-2hp&0*,1*,2*,0-3攻擊,0-2防禦,0-3hp&0*,1*,2*,0-2攻擊,0-3防禦,0-3hp&1-4攻擊,0-2防禦,0-2hp&!4*&!#&!我的最愛&!異色&!傳說的寶可夢&!幻,美錄坦,蓋諾賽克特&!究極異獸&!暗影&!特殊&!亮晶晶&!背卡&!極巨招式1-&!未登錄,超級0&!@特別,@報恩,@遷怒,圖圖犬&!只限蛋&!距離100-,交換&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&日數-30,交換,淨化&年21-,交換",
+    "trade": "0*,1*,2*&0*,1*,2*,0-3攻擊,0-3防禦,0-2hp&0*,1*,2*,0-3攻擊,0-2防禦,0-3hp&0*,1*,2*,0-2攻擊,0-3防禦,0-3hp&1-4攻擊,0-2防禦,0-2hp&!交換&!暗影&!亮晶晶&!幻,808,809&!#&!傳說的寶可夢&!究極異獸&!異色&!特殊&!淨化&!背卡&!我的最愛&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!極巨招式1-&!xxl&!xl&!@特別,@報恩,@遷怒&日數-30,淨化&年21-&距離0-",
     "sort": "",
     "prestaged": "#Trade,#Fern-Tausch&!交換&!暗影&!亮晶晶&!幻,808,809",
-    "gift": "異色,傳說的寶可夢,究極異獸,特殊,背卡&!交換&!暗影&!幻,808,809&!亮晶晶&!4*&!我的最愛&!@特別&!#,#Trade,#Fern-Tausch",
+    "gift": "異色,傳說的寶可夢,究極異獸,特殊,背卡&!交換&!暗影&!幻,808,809&!亮晶晶&!4*&!我的最愛&!@特別,@報恩,@遷怒&年21-&!#,#Trade,#Fern-Tausch",
     "shadowCheap": "暗影&糖果距離1&!異色&@遷怒&!我的最愛&!#",
     "shadowSafe": "暗影&!傳說的寶可夢&!幻&!究極異獸&!4*&!異色&!特殊&@遷怒&!我的最愛&!#&!+帝牙盧卡&!+帕路奇亞&!+席多藍恩&!+固拉多&!+戰槌龍&!+暴飛龍&!+超夢&!+甲賀忍蛙&!+三首惡龍&!+達克萊伊&!+銃嘴大鳥&!+鍬農炮蟲&!+怪顎龍&!+修建老匠&!+達摩狒狒&!+水晶燈火靈&!+龍頭地鼠&!+雷吉奇卡斯&!+龐岩怪&!+蓋歐卡&!+象牙豬&!+電擊魔獸&!+自爆磁怪&!+烈咬陸鯊&!+超甲狂犀&!+巨金怪&!+班基拉斯&!+火焰雞&!+鳳王&!+雷公&!+沙奈朵&!+巨沼怪&!+快龍&!+火焰鳥&!+耿鬼&!+怪力&!+土地雲&!+巨鉗蟹&!+妖火紅狐&!+布里卡隆&!+騎拉帝納&!+炎武王&!+烏鴉頭頭&!+拉帝歐斯&!+姆克鷹&!+瑪狃拉&!+鐵螯龍蝦&!+阿勃梭魯&!+鐵掌力士&!+蜥蜴王&!+炎帝&!+化石翼龍&!+閃電鳥&!+波克基斯&!+羅絲雷朵&!+毒骷蛙&!+冰伊布&!+太陽伊布&!+仙子伊布",
     "shadowHundoCandidates": "暗影&@遷怒&3-4攻擊&3-4防禦&3-4hp&!4*",
     "shadowFrustration": "暗影&@遷怒&+帝牙盧卡,+帕路奇亞,+席多藍恩,+固拉多,+戰槌龍,+暴飛龍,+超夢,+甲賀忍蛙,+三首惡龍,+達克萊伊,+銃嘴大鳥,+鍬農炮蟲,+怪顎龍,+修建老匠,+達摩狒狒,+水晶燈火靈,+龍頭地鼠,+雷吉奇卡斯,+龐岩怪,+蓋歐卡,+象牙豬,+電擊魔獸,+自爆磁怪,+烈咬陸鯊,+超甲狂犀,+巨金怪,+班基拉斯,+火焰雞,+鳳王,+雷公,+沙奈朵,+巨沼怪,+快龍,+火焰鳥,+耿鬼,+怪力,+土地雲,+巨鉗蟹,+妖火紅狐,+布里卡隆,+騎拉帝納,+炎武王,+烏鴉頭頭,+拉帝歐斯,+姆克鷹,+瑪狃拉,+鐵螯龍蝦,+阿勃梭魯,+鐵掌力士,+蜥蜴王,+炎帝,+化石翼龍,+閃電鳥,+波克基斯,+羅絲雷朵,+毒骷蛙,+冰伊布,+太陽伊布,+仙子伊布",
-    "cheapEvolve": "綠毛蟲,獨角蟲,波波,刺尾蟲,咕妞妞,豆豆鴿,凱西,勇基拉,腕力,豪力,小拳石,隆隆石,鬼斯,鬼斯通,石丸子,地幔岩,搬運小匠,鐵骨土人,蓋蓋蟲,小嘴蝸,小木靈,南瓜精&綠毛蟲,獨角蟲,波波,刺尾蟲,咕妞妞,豆豆鴿,交換&0*,1*,2*&!異色&!特殊&!@特別&!#",
+    "cheapEvolve": "綠毛蟲,獨角蟲,波波,刺尾蟲,咕妞妞,豆豆鴿,凱西,勇基拉,腕力,豪力,小拳石,隆隆石,鬼斯,鬼斯通,石丸子,地幔岩,搬運小匠,鐵骨土人,蓋蓋蟲,小嘴蝸,小木靈,南瓜精&綠毛蟲,獨角蟲,波波,刺尾蟲,咕妞妞,豆豆鴿,交換&0*,1*,2*&!異色&!特殊&!@特別,@報恩,@遷怒&年21-,交換&!#",
     "dexPlus": "進化&未登錄&!有進化條件",
     "megaEvolve": "超級進化&超級1-2,未登錄",
     "pilotLong": "距離1000-&!交換&!4*&!傳說的寶可夢&!幻&!異色",
@@ -741,20 +741,20 @@
       "ultra": "+胖嘟嘟,+鋼鎧鴉,+拉普拉斯,+巨鍛匠,+帝王拿波,+火焰鳥,+大力鱷,+烏賊王,+花潔夫人,+吃吼霸,+畢力吉翁,+雷吉鐸拉戈,+大舌舔,+樂天河童,+皮可西,+水箭龜,+智揮猩,+基格爾德,+黑夜魔靈,+九尾,+帝牙海獅,+爆焰龜獸,+龍王蠍,+棄世猴,+刺龍王,+騎拉帝納,+電肚蛙,+克雷色利亞,+佛烈托斯,+波克基斯&cp-2500&0-1攻擊&3-4防禦&3-4hp",
       "master": "+蒼響,+帕路奇亞,+巨金怪,+哲爾尼亞斯,+藏瑪然特,+酋雷姆,+帝牙盧卡,+露奈雅拉,+萊希拉姆,+捷克羅姆,+瑪夏多,+蓋歐卡,+洛奇亞,+無極汰那,+奈克洛茲瑪,+伊裴爾塔爾,+鳳王,+烈咬陸鯊,+固拉多,+美洛耶塔,+拉帝歐斯,+賽富豪,+索爾迦雷歐,+花潔夫人,+暴鯉龍,+超夢,+基拉祈,+凱路迪歐,+基格爾德,+拉帝亞斯"
     },
-    "trashClauseCount": 30,
-    "tradeClauseCount": 28
+    "trashClauseCount": 31,
+    "tradeClauseCount": 29
   },
   "hi": {
-    "trash": "0*,1*,2*&0*,1*,2*,0-3अटैक,0-3डफ़ेंस,0-2hp&0*,1*,2*,0-3अटैक,0-2डफ़ेंस,0-3hp&0*,1*,2*,0-2अटैक,0-3डफ़ेंस,0-3hp&1-4अटैक,0-2डफ़ेंस,0-2hp&!4*&!#&!पसंदीदा&!शाइनी&!लजेंडर&!मथकल,मेटन,जेनेसेट&!अटाबीट&!शैडो&!कॉट्यूम&!लक&!बैकाउंड&!मैसमूव1-&!नया वकास करं,मेगा0&!@पेशल,मीगल&!सफ़ अंडे&!दूर100-,टड कये गए&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&उ-30,टड कये गए",
-    "trade": "0*,1*,2*&0*,1*,2*,0-3अटैक,0-3डफ़ेंस,0-2hp&0*,1*,2*,0-3अटैक,0-2डफ़ेंस,0-3hp&0*,1*,2*,0-2अटैक,0-3डफ़ेंस,0-3hp&1-4अटैक,0-2डफ़ेंस,0-2hp&!टड कये गए&!शैडो&!लक&!मथकल,808,809&!#&!लजेंडर&!अटाबीट&!शाइनी&!कॉट्यूम&!शु&!बैकाउंड&!पसंदीदा&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!मैसमूव1-&!xxl&!xl&!@पेशल&उ-30&दूर0-",
+    "trash": "0*,1*,2*&0*,1*,2*,0-3अटैक,0-3डफ़ेंस,0-2hp&0*,1*,2*,0-3अटैक,0-2डफ़ेंस,0-3hp&0*,1*,2*,0-2अटैक,0-3डफ़ेंस,0-3hp&1-4अटैक,0-2डफ़ेंस,0-2hp&!4*&!#&!पसंदीदा&!शाइनी&!लजेंडर&!मथकल,मेटन,जेनेसेट&!अटाबीट&!शैडो&!कॉट्यूम&!लक&!बैकाउंड&!मैसमूव1-&!नया वकास करं,मेगा0&!@पेशल,@रटन,@टशन,मीगल&!सफ़ अंडे&!दूर100-,टड कये गए&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&उ-30,टड कये गए,शु&साल21-,टड कये गए",
+    "trade": "0*,1*,2*&0*,1*,2*,0-3अटैक,0-3डफ़ेंस,0-2hp&0*,1*,2*,0-3अटैक,0-2डफ़ेंस,0-3hp&0*,1*,2*,0-2अटैक,0-3डफ़ेंस,0-3hp&1-4अटैक,0-2डफ़ेंस,0-2hp&!टड कये गए&!शैडो&!लक&!मथकल,808,809&!#&!लजेंडर&!अटाबीट&!शाइनी&!कॉट्यूम&!शु&!बैकाउंड&!पसंदीदा&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!मैसमूव1-&!xxl&!xl&!@पेशल,@रटन,@टशन&उ-30,शु&साल21-&दूर0-",
     "sort": "",
     "prestaged": "#Trade,#Fern-Tausch&!टड कये गए&!शैडो&!लक&!मथकल,808,809",
-    "gift": "शाइनी,लजेंडर,अटाबीट,कॉट्यूम,बैकाउंड&!टड कये गए&!शैडो&!मथकल,808,809&!लक&!4*&!पसंदीदा&!@पेशल&!#,#Trade,#Fern-Tausch",
+    "gift": "शाइनी,लजेंडर,अटाबीट,कॉट्यूम,बैकाउंड&!टड कये गए&!शैडो&!मथकल,808,809&!लक&!4*&!पसंदीदा&!@पेशल,@रटन,@टशन&साल21-&!#,#Trade,#Fern-Tausch",
     "shadowCheap": "शैडो&कडी km1&!शाइनी&@टशन&!पसंदीदा&!#",
     "shadowSafe": "शैडो&!लजेंडर&!मथकल&!अटाबीट&!4*&!शाइनी&!कॉट्यूम&@टशन&!पसंदीदा&!#&!+डयागा&!+पाकया&!+हीटैन&!+ाउडॉन&!+रैपराडॉस&!+सैलामेंस&!+यूटू&!+ेनंजा&!+हाईडैगन&!+डाकराय&!+टुकनन&!+वाइकावोट&!+टाइरंटम&!+बूडाबडा&!+डारमैनटैन&!+शैंडेयुर&!+एसकाडल&!+रजीगीगस&!+गीगालथ&!+कायोगर&!+मैमोवाइन&!+इलटवायर&!+मैनेज़ोन&!+गारचॉप&!+राइिपरयर&!+मेटाोस&!+टायरैनटार&!+लज़कन&!+हो-ओह&!+राइको&!+गाडेवुआर&!+वॉपट&!+डैगनाइट&!+मोटस&!+गेंगार&!+मचैप&!+लैंडोरस&!+कंगलर&!+डेलफ़ॉस&!+चेसनॉट&!+गराटना&!+एबोर&!+हॉचो&!+लाटयोस&!+टारैटर&!+वीवाइल&!+ॉडॉट&!+ऐसॉल&!+हरयामा&!+सेटाइल&!+एंटइ&!+ऐरोडैटल&!+ज़ैपडोस&!+टोगेकस&!+रोज़रड&!+टॉसोक&!+लसयॉन&!+एिपयॉन&!+सवयॉन",
     "shadowHundoCandidates": "शैडो&@टशन&3-4अटैक&3-4डफ़ेंस&3-4hp&!4*",
     "shadowFrustration": "शैडो&@टशन&+डयागा,+पाकया,+हीटैन,+ाउडॉन,+रैपराडॉस,+सैलामेंस,+यूटू,+ेनंजा,+हाईडैगन,+डाकराय,+टुकनन,+वाइकावोट,+टाइरंटम,+बूडाबडा,+डारमैनटैन,+शैंडेयुर,+एसकाडल,+रजीगीगस,+गीगालथ,+कायोगर,+मैमोवाइन,+इलटवायर,+मैनेज़ोन,+गारचॉप,+राइिपरयर,+मेटाोस,+टायरैनटार,+लज़कन,+हो-ओह,+राइको,+गाडेवुआर,+वॉपट,+डैगनाइट,+मोटस,+गेंगार,+मचैप,+लैंडोरस,+कंगलर,+डेलफ़ॉस,+चेसनॉट,+गराटना,+एबोर,+हॉचो,+लाटयोस,+टारैटर,+वीवाइल,+ॉडॉट,+ऐसॉल,+हरयामा,+सेटाइल,+एंटइ,+ऐरोडैटल,+ज़ैपडोस,+टोगेकस,+रोज़रड,+टॉसोक,+लसयॉन,+एिपयॉन,+सवयॉन",
-    "cheapEvolve": "कटरपी,वीडल,िपजी,वमपल,हमर,िपडव,आबरा,काडाबरा,मचॉप,मचोक,जयोडूड,ैवलर,गैटल,हॉटर,रॉगेनरोला,बोडोर,टबर,गडर,करालाट,शेलमेट,फ़ैंटप,पंपकबू&कटरपी,वीडल,िपजी,वमपल,हमर,िपडव,टड कये गए&0*,1*,2*&!शाइनी&!कॉट्यूम&!@पेशल&!#",
+    "cheapEvolve": "कटरपी,वीडल,िपजी,वमपल,हमर,िपडव,आबरा,काडाबरा,मचॉप,मचोक,जयोडूड,ैवलर,गैटल,हॉटर,रॉगेनरोला,बोडोर,टबर,गडर,करालाट,शेलमेट,फ़ैंटप,पंपकबू&कटरपी,वीडल,िपजी,वमपल,हमर,िपडव,टड कये गए&0*,1*,2*&!शाइनी&!कॉट्यूम&!@पेशल,@रटन,@टशन&साल21-,टड कये गए&!#",
     "dexPlus": "वकसत&नया वकास करं&!इवॉववेट",
     "megaEvolve": "मेगा एवॉव&मेगा1-2,नया वकास करं",
     "pilotLong": "दूर1000-&!टड कये गए&!4*&!लजेंडर&!मथकल&!शाइनी",
@@ -890,20 +890,20 @@
       "ultra": "+जेलसेंट,+कोवनाइट,+लैस,+टंकाटन,+एपोलयॉन,+मोटस,+फ़रैलगेटर,+मैलामार,+लोजेस,+डॉनडोज़ो,+वराइिज़यन,+रजीडेगो,+लकलक,+लुडकोलो,+लफ़ेबल,+लाटॉइस,+ओरैंगु,+ज़ाइगाड,+डकनुआर,+नाइनटस,+वॉलरन,+टटोनेटर,+डािपयॉन,+अनायलप,+कंगडा,+गराटना,+बेलबोट,+सेलया,+फ़ॉरटस,+टोगेकस&cp-2500&0-1अटैक&3-4डफ़ेंस&3-4hp",
       "master": "+ज़ाशयन,+पाकया,+मेटाोस,+ज़नयस,+ज़ामाज़ैंटा,+यूरम,+डयागा,+लुनाला,+रशरैम,+ज़ेोम,+माशैडो,+कायोगर,+लूगया,+इटनेटस,+नैॉ़मा,+इवेटाल,+हो-ओह,+गारचॉप,+ाउडॉन,+मेलोएटा,+लाटयोस,+गोडनगो,+सोलगलयो,+लोजेस,+गैराडोस,+यूटू,+जराची,+कडयो,+ज़ाइगाड,+लाटयास"
     },
-    "trashClauseCount": 30,
-    "tradeClauseCount": 28
+    "trashClauseCount": 31,
+    "tradeClauseCount": 29
   },
   "ja": {
-    "trash": "0*,1*,2*&0*,1*,2*,0-3こうげき,0-3ぼうぎょ,0-2hp&0*,1*,2*,0-3こうげき,0-2ぼうぎょ,0-3hp&0*,1*,2*,0-2こうげき,0-3ぼうぎょ,0-3hp&1-4こうげき,0-2ぼうぎょ,0-2hp&!4*&!#&!お気に入り&!色違い&!伝説のポケモン&!まぼろし,メルタン,ゲノセクト&!ウルトラビースト&!しゃどう&!とくべつ&!キラ&!はいけい&!まっくすわざ1-&!みとうろく,メガ0&!@わざ,ドーブル&!たまごのみ&!きょり100-,こうかん&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&日数-30,こうかん",
-    "trade": "0*,1*,2*&0*,1*,2*,0-3こうげき,0-3ぼうぎょ,0-2hp&0*,1*,2*,0-3こうげき,0-2ぼうぎょ,0-3hp&0*,1*,2*,0-2こうげき,0-3ぼうぎょ,0-3hp&1-4こうげき,0-2ぼうぎょ,0-2hp&!こうかん&!しゃどう&!キラ&!まぼろし,808,809&!#&!伝説のポケモン&!ウルトラビースト&!色違い&!とくべつ&!らいと&!はいけい&!お気に入り&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!まっくすわざ1-&!xxl&!xl&!@わざ&日数-30&きょり0-",
+    "trash": "0*,1*,2*&0*,1*,2*,0-3こうげき,0-3ぼうぎょ,0-2hp&0*,1*,2*,0-3こうげき,0-2ぼうぎょ,0-3hp&0*,1*,2*,0-2こうげき,0-3ぼうぎょ,0-3hp&1-4こうげき,0-2ぼうぎょ,0-2hp&!4*&!#&!お気に入り&!色違い&!伝説のポケモン&!まぼろし,メルタン,ゲノセクト&!ウルトラビースト&!しゃどう&!とくべつ&!キラ&!はいけい&!まっくすわざ1-&!みとうろく,メガ0&!@わざ,@おんがえし,@やつあたり,ドーブル&!たまごのみ&!きょり100-,こうかん&!xxl&!xl&!xxs&!ⓤ&!ⓖ&!ⓛ&@3move&cp-2000&日数-30,こうかん,らいと&年21-,こうかん",
+    "trade": "0*,1*,2*&0*,1*,2*,0-3こうげき,0-3ぼうぎょ,0-2hp&0*,1*,2*,0-3こうげき,0-2ぼうぎょ,0-3hp&0*,1*,2*,0-2こうげき,0-3ぼうぎょ,0-3hp&1-4こうげき,0-2ぼうぎょ,0-2hp&!こうかん&!しゃどう&!キラ&!まぼろし,808,809&!#&!伝説のポケモン&!ウルトラビースト&!色違い&!とくべつ&!らいと&!はいけい&!お気に入り&!4*&!ⓤ&!ⓖ&!ⓛ&@3move&!まっくすわざ1-&!xxl&!xl&!@わざ,@おんがえし,@やつあたり&日数-30,らいと&年21-&きょり0-",
     "sort": "",
     "prestaged": "#Trade,#Fern-Tausch&!こうかん&!しゃどう&!キラ&!まぼろし,808,809",
-    "gift": "色違い,伝説のポケモン,ウルトラビースト,とくべつ,はいけい&!こうかん&!しゃどう&!まぼろし,808,809&!キラ&!4*&!お気に入り&!@わざ&!#,#Trade,#Fern-Tausch",
+    "gift": "色違い,伝説のポケモン,ウルトラビースト,とくべつ,はいけい&!こうかん&!しゃどう&!まぼろし,808,809&!キラ&!4*&!お気に入り&!@わざ,@おんがえし,@やつあたり&年21-&!#,#Trade,#Fern-Tausch",
     "shadowCheap": "しゃどう&アメ距離1&!色違い&@やつあたり&!お気に入り&!#",
     "shadowSafe": "しゃどう&!伝説のポケモン&!まぼろし&!ウルトラビースト&!4*&!色違い&!とくべつ&@やつあたり&!お気に入り&!#&!+ディアルガ&!+パルキア&!+ヒードラン&!+グラードン&!+ラムパルド&!+ボーマンダ&!+ミュウツー&!+ゲッコウガ&!+サザンドラ&!+ダークライ&!+ドデカバシ&!+クワガノン&!+ガチゴラス&!+ローブシン&!+ヒヒダルマ&!+シャンデラ&!+ドリュウズ&!+レジギガス&!+ギガイアス&!+カイオーガ&!+マンムー&!+エレキブル&!+ジバコイル&!+ガブリアス&!+ドサイドン&!+メタグロス&!+バンギラス&!+バシャーモ&!+ホウオウ&!+ライコウ&!+サーナイト&!+ラグラージ&!+カイリュー&!+ファイヤー&!+ゲンガー&!+カイリキー&!+ランドロス&!+キングラー&!+マフォクシー&!+ブリガロン&!+ギラティナ&!+エンブオー&!+ドンカラス&!+ラティオス&!+ムクホーク&!+マニューラ&!+シザリガー&!+アブソル&!+ハリテヤマ&!+ジュカイン&!+エンテイ&!+プテラ&!+サンダー&!+トゲキッス&!+ロズレイド&!+ドクロッグ&!+グレイシア&!+エーフィ&!+ニンフィア",
     "shadowHundoCandidates": "しゃどう&@やつあたり&3-4こうげき&3-4ぼうぎょ&3-4hp&!4*",
     "shadowFrustration": "しゃどう&@やつあたり&+ディアルガ,+パルキア,+ヒードラン,+グラードン,+ラムパルド,+ボーマンダ,+ミュウツー,+ゲッコウガ,+サザンドラ,+ダークライ,+ドデカバシ,+クワガノン,+ガチゴラス,+ローブシン,+ヒヒダルマ,+シャンデラ,+ドリュウズ,+レジギガス,+ギガイアス,+カイオーガ,+マンムー,+エレキブル,+ジバコイル,+ガブリアス,+ドサイドン,+メタグロス,+バンギラス,+バシャーモ,+ホウオウ,+ライコウ,+サーナイト,+ラグラージ,+カイリュー,+ファイヤー,+ゲンガー,+カイリキー,+ランドロス,+キングラー,+マフォクシー,+ブリガロン,+ギラティナ,+エンブオー,+ドンカラス,+ラティオス,+ムクホーク,+マニューラ,+シザリガー,+アブソル,+ハリテヤマ,+ジュカイン,+エンテイ,+プテラ,+サンダー,+トゲキッス,+ロズレイド,+ドクロッグ,+グレイシア,+エーフィ,+ニンフィア",
-    "cheapEvolve": "キャタピー,ビードル,ポッポ,ケムッソ,ゴニョニョ,マメパト,ケーシィ,ユンゲラー,ワンリキー,ゴーリキー,イシツブテ,ゴローン,ゴース,ゴースト,ダンゴロ,ガントル,ドッコラー,ドテッコツ,カブルモ,チョボマキ,ボクレー,バケッチャ&キャタピー,ビードル,ポッポ,ケムッソ,ゴニョニョ,マメパト,こうかん&0*,1*,2*&!色違い&!とくべつ&!@わざ&!#",
+    "cheapEvolve": "キャタピー,ビードル,ポッポ,ケムッソ,ゴニョニョ,マメパト,ケーシィ,ユンゲラー,ワンリキー,ゴーリキー,イシツブテ,ゴローン,ゴース,ゴースト,ダンゴロ,ガントル,ドッコラー,ドテッコツ,カブルモ,チョボマキ,ボクレー,バケッチャ&キャタピー,ビードル,ポッポ,ケムッソ,ゴニョニョ,マメパト,こうかん&0*,1*,2*&!色違い&!とくべつ&!@わざ,@おんがえし,@やつあたり&年21-,こうかん&!#",
     "dexPlus": "進化&みとうろく&!じょうけんしんか",
     "megaEvolve": "めがしんか&メガ1-2,みとうろく",
     "pilotLong": "きょり1000-&!こうかん&!4*&!伝説のポケモン&!まぼろし&!色違い",
@@ -1039,7 +1039,7 @@
       "ultra": "+ブルンゲル,+アーマーガア,+ラプラス,+デカヌチャン,+エンペルト,+ファイヤー,+オーダイル,+カラマネロ,+フラージェス,+ヘイラッシャ,+ビリジオン,+レジドラゴ,+ベロベルト,+ルンパッパ,+ピクシー,+カメックス,+ヤレユータン,+ジガルデ,+ヨノワール,+キュウコン,+トドゼルガ,+バクガメス,+ドラピオン,+コノヨザル,+キングドラ,+ギラティナ,+ハラバリー,+クレセリア,+フォレトス,+トゲキッス&cp-2500&0-1こうげき&3-4ぼうぎょ&3-4hp",
       "master": "+ザシアン,+パルキア,+メタグロス,+ゼルネアス,+ザマゼンタ,+キュレム,+ディアルガ,+ルナアーラ,+レシラム,+ゼクロム,+マーシャドー,+カイオーガ,+ルギア,+ムゲンダイナ,+ネクロズマ,+イベルタル,+ホウオウ,+ガブリアス,+グラードン,+メロエッタ,+ラティオス,+サーフゴー,+ソルガレオ,+フラージェス,+ギャラドス,+ミュウツー,+ジラーチ,+ケルディオ,+ジガルデ,+ラティアス"
     },
-    "trashClauseCount": 30,
-    "tradeClauseCount": 28
+    "trashClauseCount": 31,
+    "tradeClauseCount": 29
   }
 }

@@ -202,6 +202,13 @@ export const DEFAULT_CONFIG = {
   cpCap: 2000,
   ageScopeDays: 30,            // "Vor wie vielen Tagen gefangen — Filterumfang"
   distanceProtect: 100,        // km — Pilot medal protection
+  // Lucky-trade protection: catches from this year or earlier are likely
+  // guaranteed-lucky candidates (PoGo's lucky-trade window grows with age).
+  // Emits `year{N}-` as an AND-clause so old untraded mons stay out of the
+  // bulk trash/trade/gift/cheap-evolve outputs. Disable in expert mode by
+  // flipping `protectLuckyEligible` off or setting the year to 0.
+  protectLuckyEligible: true,
+  luckyEligibleYear: 21,       // 2-digit year cutoff; mons caught in this year or later are still trashable
 
   // Shadows you'd never purify, even during take-over events. Acts as
   // belt-and-suspenders alongside !legendär — the legendary entries here
@@ -623,10 +630,15 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     // Sketched moves, so without ',smeargle' the clause would protect them
     // all. With OR-binding-tighter precedence, `!@special,smeargle` parses
     // as (!@special ∪ smeargle) — i.e. keep is "@special AND NOT smeargle".
+    //
+    // Same OR trick peels off purified-Return junk and still-Frustration
+    // shadows: `!@special,@return,@frustration` trashes them despite the
+    // @special flag PoGo paints on Return/Frustration carriers.
     const smeargleName = pokemonNameFor("235", outputLocale)?.toLowerCase() || "smeargle";
+    const legacySuffix = `,@${kw.flag.return},@${kw.flag.frustration}`;
     const clause = cfg.protectSmeargleLegacy
-      ? `!@${kw.flag.special_move}`
-      : `!@${kw.flag.special_move},${smeargleName}`;
+      ? `!@${kw.flag.special_move}${legacySuffix}`
+      : `!@${kw.flag.special_move}${legacySuffix},${smeargleName}`;
     push(trashClauses, clause, tFn("app.clause_why.legacy_moves"));
   }
   if (cfg.protectBabies)       push(trashClauses, `!${kw.flag.baby}`, tFn("app.clause_why.babies"));
@@ -682,7 +694,9 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   if (cfg.cpCap && cfg.cpCap > 0)
     push(trashClauses, `${kw.numeric.cp}-${cfg.cpCap}`, tFn("app.clause_why.cp_cap", { params: { cp: cfg.cpCap } }));
   if (cfg.ageScopeDays && cfg.ageScopeDays > 0)
-    push(trashClauses, `${kw.numeric.age}-${cfg.ageScopeDays},${kw.flag.traded}`, tFn("app.clause_why.age_traded", { params: { days: cfg.ageScopeDays } }));
+    push(trashClauses, `${kw.numeric.age}-${cfg.ageScopeDays},${kw.flag.traded},${kw.flag.purified}`, tFn("app.clause_why.age_traded", { params: { days: cfg.ageScopeDays } }));
+  if (cfg.protectLuckyEligible && cfg.luckyEligibleYear && cfg.luckyEligibleYear > 0)
+    push(trashClauses, `${kw.numeric.year}${cfg.luckyEligibleYear}-,${kw.flag.traded}`, tFn("app.clause_why.lucky_eligible", { params: { year: cfg.luckyEligibleYear } }));
 
   const trash = trashClauses.map(c => c.clause).join("&");
 
@@ -721,9 +735,11 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   if (cfg.protectDynamax)      push(tradeClauses, `!${kw.flag.dynamax_move}1-`, tFn("app.clause_why.dynamax"));
   if (cfg.protectXXL)          push(tradeClauses, `!${kw.flag.xxl}`, tFn("app.clause_why.xxl_trade"));
   if (cfg.protectXL)           push(tradeClauses, `!${kw.flag.xl}`,  tFn("app.clause_why.xl_trade"));
-  if (cfg.protectLegacyMoves)  push(tradeClauses, `!@${kw.flag.special_move}`, tFn("app.clause_why.legacy_moves"));
+  if (cfg.protectLegacyMoves)  push(tradeClauses, `!@${kw.flag.special_move},@${kw.flag.return},@${kw.flag.frustration}`, tFn("app.clause_why.legacy_moves"));
   if (cfg.ageScopeDays && cfg.ageScopeDays > 0)
-    push(tradeClauses, `${kw.numeric.age}-${cfg.ageScopeDays}`, tFn("app.clause_why.age_only", { params: { days: cfg.ageScopeDays } }));
+    push(tradeClauses, `${kw.numeric.age}-${cfg.ageScopeDays},${kw.flag.purified}`, tFn("app.clause_why.age_only", { params: { days: cfg.ageScopeDays } }));
+  if (cfg.protectLuckyEligible && cfg.luckyEligibleYear && cfg.luckyEligibleYear > 0)
+    push(tradeClauses, `${kw.numeric.year}${cfg.luckyEligibleYear}-`, tFn("app.clause_why.lucky_eligible", { params: { year: cfg.luckyEligibleYear } }));
   push(tradeClauses, `${kw.numeric.distance}0-`, tFn("app.clause_why.distance_zero"));
 
   const trade = tradeClauses.map(c => c.clause).join("&");
@@ -805,7 +821,9 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   push(giftClauses, `!${kw.flag.lucky}`, tFn("app.clause_why.gift_must_lucky"));
   push(giftClauses, "!4*", tFn("app.clause_why.never_gift_4star"));
   push(giftClauses, `!${kw.flag.favorite}`, tFn("app.clause_why.favorites_protected"));
-  push(giftClauses, `!@${kw.flag.special_move}`, tFn("app.clause_why.never_gift_legacy"));
+  push(giftClauses, `!@${kw.flag.special_move},@${kw.flag.return},@${kw.flag.frustration}`, tFn("app.clause_why.never_gift_legacy"));
+  if (cfg.protectLuckyEligible && cfg.luckyEligibleYear && cfg.luckyEligibleYear > 0)
+    push(giftClauses, `${kw.numeric.year}${cfg.luckyEligibleYear}-`, tFn("app.clause_why.lucky_eligible", { params: { year: cfg.luckyEligibleYear } }));
   const tagAllowList = [];
   if (basarTag)      tagAllowList.push(`#${basarTag}`);
   if (fernTauschTag) tagAllowList.push(`#${fernTauschTag}`);
@@ -928,7 +946,9 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   push(cheapEvolveClauses, "0*,1*,2*",                              tFn("app.clause_why.cheap_evolve_low_iv"));
   push(cheapEvolveClauses, `!${kw.flag.shiny}`,                     tFn("app.clause_why.shinies_protected"));
   push(cheapEvolveClauses, `!${kw.flag.costume}`,                   tFn("app.clause_why.costumes_trade"));
-  push(cheapEvolveClauses, `!@${kw.flag.special_move}`,             tFn("app.clause_why.legacy_moves"));
+  push(cheapEvolveClauses, `!@${kw.flag.special_move},@${kw.flag.return},@${kw.flag.frustration}`, tFn("app.clause_why.legacy_moves"));
+  if (cfg.protectLuckyEligible && cfg.luckyEligibleYear && cfg.luckyEligibleYear > 0)
+    push(cheapEvolveClauses, `${kw.numeric.year}${cfg.luckyEligibleYear}-,${kw.flag.traded}`, tFn("app.clause_why.lucky_eligible", { params: { year: cfg.luckyEligibleYear } }));
   push(cheapEvolveClauses, "!#",                                    tFn("app.clause_why.tags_protected_short"));
   const cheapEvolve = cheapEvolveClauses.map(c => c.clause).join("&");
 
@@ -3444,6 +3464,7 @@ const PRESETS = {
       protectXXL: true, protectXL: true, protectXXS: true,
       protectDoubleMoved: true, protectDynamax: true, protectNewEvolutions: true,
       protectBuddies: true,
+      protectLuckyEligible: true, luckyEligibleYear: 21,
       regionalGroups: defaultRegionalToggles(),
     }),
   },
@@ -3463,6 +3484,7 @@ const PRESETS = {
         protectXXL: true, protectXL: true, protectXXS: true,
         protectDoubleMoved: true, protectDynamax: true, protectNewEvolutions: true,
         protectBuddies: true,
+        protectLuckyEligible: true, luckyEligibleYear: 21,
         regionalGroups: groups,
       };
     },
@@ -3483,6 +3505,7 @@ const PRESETS = {
         protectXXL: false, protectXL: false, protectXXS: false,
         protectDoubleMoved: true, protectDynamax: true, protectNewEvolutions: false,
         protectBuddies: false,
+        protectLuckyEligible: true, luckyEligibleYear: 21,
         regionalGroups: groups,
       };
     },
@@ -3506,6 +3529,7 @@ const PRESETS = {
         protectXXL: false, protectXL: false, protectXXS: false,
         protectDoubleMoved: true, protectDynamax: false, protectNewEvolutions: false,
         protectBuddies: false,
+        protectLuckyEligible: true, luckyEligibleYear: 21,
         regionalGroups: groups,
       };
     },
@@ -3521,11 +3545,13 @@ const EXPERT_ONLY_KEYS = new Set([
   "protectPurified",
   "protectBuddies",
   "protectDynamax",
+  "protectLuckyEligible",
   "leagueTags",
   "customProtectedTags",
   "cpCap",
   "ageScopeDays",
   "distanceProtect",
+  "luckyEligibleYear",
 ]);
 
 function ConfigPanel({ config, setConfig, homeLocals = [] }) {
@@ -3575,6 +3601,7 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
     ["protectDoubleMoved",    "app.protect.double_moved",   { expertOnly: true }],
     ["protectDynamax",        "app.protect.dynamax",        { expertOnly: true }],
     ["protectBuddies",        "app.protect.buddies_protect", { expertOnly: true }],
+    ["protectLuckyEligible",  "app.protect.lucky_eligible", { expertOnly: true }],
   ];
 
   return (
@@ -4650,7 +4677,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
                 <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
                   {t("app.modal.safety.section_title")}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <NumField
                     label={t("app.modal.safety.cp_label")}
                     value={config.cpCap}
@@ -4666,6 +4693,11 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
                     value={config.distanceProtect}
                     onChange={v => set("distanceProtect", +v || 0)}
                     hint={t("app.modal.safety.distance_hint")} />
+                  <NumField
+                    label={t("app.modal.safety.lucky_year_label")}
+                    value={config.luckyEligibleYear}
+                    onChange={v => set("luckyEligibleYear", +v || 0)}
+                    hint={t("app.modal.safety.lucky_year_hint")} />
                 </div>
               </div>
             </>

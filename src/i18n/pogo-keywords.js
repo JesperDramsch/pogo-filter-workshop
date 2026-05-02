@@ -48,8 +48,12 @@ export function pogoKeywords(outputLocale) {
       // key gets added to the in-game sheet later.
       three_move:   k(messages, "filter_key_3rd_move", "3move"),
       // Frustration is a move name, not a flag, but PoGo's `@move-name`
-      // search treats it the same way for filter-builder purposes.
+      // search treats it the same way for filter-builder purposes. Return
+      // is the post-purify echo of Frustration — both flagged @special by
+      // PoGo, both worthless on most mons, so the legacy-move clauses OR
+      // them in to peel off accidental protection.
       frustration:  (messages["move.frustration"] || "Frustration").toLowerCase().trim(),
+      return:       (messages["move.return"]      || "Return").toLowerCase().trim(),
       xxl:          k(messages, "general_xxl"),
       xl:           k(messages, "general_xl"),
       xxs:          k(messages, "general_xxs"),
