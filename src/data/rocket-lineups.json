@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-02T09:33:51.345Z",
+  "fetchedAt": "2026-05-03T09:40:13.893Z",
   "trainers": [
     {
       "name": "Giovanni",
@@ -166,20 +166,27 @@
                 "fire",
                 "ground"
               ]
+            },
+            {
+              "name": "Gallade",
+              "types": [
+                "psychic",
+                "fighting"
+              ]
             }
           ],
           "resistorTypes": [
-            "fighting",
             "ground",
             "water",
             "dragon",
-            "dark",
             "fairy"
           ],
           "seMoveTypes": [
             "fighting",
+            "flying",
             "ground",
             "bug",
+            "ghost",
             "steel",
             "water",
             "grass",
