@@ -1,37 +1,31 @@
 {
   "app.header.tagline": "Trash & trade filters for Pokémon GO. Protect what matters, sweep the rest.",
   "app.header.settings_button": "Settings",
-
   "app.step.where.label": "Where do you play?",
   "app.step.where.tab": "Where",
   "app.step.where.desc": "Home location and local Pokémon",
   "app.step.where.title": "Where do you play?",
   "app.step.where.hint": "Pin your home location and discover which Pokémon are regional to you — we protect those automatically.",
   "app.step.where.next_label": "Continue to protections",
-
   "app.step.what.label": "What do you want to keep?",
   "app.step.what.tab": "What",
   "app.step.what.desc": "Protect your treasures",
   "app.step.what.title": "What do you want to keep?",
   "app.step.what.hint": "Pick a preset as a starting point, then fine-tune — favorites, shinies, legendaries, and more.",
   "app.step.what.next_label": "Continue to your collection",
-
   "app.step.have.label": "What's in your collection?",
   "app.step.have.tab": "Have",
   "app.step.have.desc": "Your 4★ Pokémon (hundos)",
   "app.step.have.title": "What's in your collection?",
   "app.step.have.hint": "Your 4★ collection (hundos) — these widen the trash filter so you can clean up spares.",
   "app.step.have.next_label": "Generate filters",
-
   "app.step.filter.label": "Your filter",
   "app.step.filter.tab": "Filter",
   "app.step.filter.desc": "Trash + trade — ready to copy",
   "app.step.filter.title": "Your filter",
   "app.step.filter.hint": "Done — copy the filter strings and paste them into PoGo's search box.",
-
   "app.step.next_default": "Next →",
   "app.step.back_button": "← Back",
-
   "app.hundos.count": "|H| = {count} families",
   "app.hundos.empty": "no hundos yet — add one",
   "app.hundos.input_placeholder": "Number or name — e.g. 1, Pikachu, Bulbasaur, 666",
@@ -43,7 +37,6 @@
   "app.hundos.input_help_numbers": "numbers",
   "app.hundos.input_help_english": "English",
   "app.hundos.input_help_german": "German",
-
   "app.top_attackers.count": "|T| = {count} top raid attackers",
   "app.top_attackers.empty": "no top attackers yet — add the species you trust to bring to a raid",
   "app.top_attackers.input_placeholder": "Number or name — e.g. 150, Mewtwo, Garchomp, Lucario",
@@ -55,7 +48,6 @@
   "app.top_attackers.input_help_numbers": "numbers",
   "app.top_attackers.input_help_english": "English",
   "app.top_attackers.input_help_german": "German",
-
   "app.top_max_attackers.count": "|T_max| = {count} top Max Battle attackers",
   "app.top_max_attackers.empty": "no Max Battle attackers yet — add Dynamax / Gigantamax species you trust to bring",
   "app.top_max_attackers.input_placeholder": "Number or name — e.g. Gengar, Inteleon, Rillaboom",
@@ -67,19 +59,16 @@
   "app.top_max_attackers.input_help_numbers": "numbers",
   "app.top_max_attackers.input_help_english": "English",
   "app.top_max_attackers.input_help_german": "German",
-
   "app.collectibles.title": "Your custom collectibles · added to trash protection",
   "app.collectibles.description": "Species you collect and never want to throw away — favorites, form collections, etc.",
   "app.collectibles.input_placeholder": "Number or name — e.g. Charizard, 6, Rayquaza",
   "app.collectibles.add_button": "add",
   "app.collectibles.preview_summary": "Preview · {new} new, {dupes} already added, {unresolved} unknown",
-
   "app.filterbox.copied": "copied",
   "app.filterbox.copy_error": "blocked — tap the text instead",
   "app.filterbox.copy_button": "copy",
   "app.filterbox.select_all_hint": "Tap to select all — then copy via the system menu",
   "app.filterbox.length_label": "{len} / 5000 chars",
-
   "app.clauses.intro": "Every clause in the final filter, with the reason it's there. Clauses are joined with & — every clause must match for a Pokémon to appear.",
   "app.clauses.trash_title": "Trash filter",
   "app.clauses.trade_title": "Trade filter",
@@ -87,11 +76,9 @@
   "app.clauses.prestaged_title": "Pre-staged trades",
   "app.clauses.gift_title": "Distant friends",
   "app.clauses.count_suffix": "{count} clauses",
-
   "app.buddy_catch.section_title": "catch for buddies",
   "app.buddy_catch.section_subtitle": "trashable Pokémon of the wish list species",
   "app.buddy_catch.filter_label": "catch for {name}",
-
   "app.filter.trash_label": "trash",
   "app.filter.trash_hint": "Mass-delete fodder. Inverts your protections so anything matching is safe to transfer.",
   "app.filter.trade_label": "trade",
@@ -102,10 +89,8 @@
   "app.filter.prestaged_hint": "Tagged trade pile ({tags}). Pre-curated so trade day is just hand it over.",
   "app.filter.gift_label": "distant friends",
   "app.filter.gift_hint": "Send-worthy catches: shinies, legendaries, costumes, plus your home regionals (a friend abroad gets a non-local).",
-
   "app.stats.location": "Location",
   "app.stats.hundos": "Hundos",
-
   "app.collapsible.set_theory": "set-theory breakdown",
   "app.collapsible.raw_clauses": "raw filter clauses · what comes from where",
   "app.collapsible.verify": "check a Pokémon",
@@ -144,7 +129,6 @@
   "app.collapsible.aux_rocket_leaders": "leaders · per-phase counters",
   "app.collapsible.aux_rocket_typed_grunts": "type-themed grunts",
   "app.collapsible.aux_rocket_generic_grunts": "generic grunts · top SE coverage",
-
   "app.filter.shadow_cheap_label": "cheap purify",
   "app.filter.shadow_cheap_hint": "Common 1km-walk shadows still in default state (Frustration). Excludes shinies, favorites, tagged, plus any shadow you've Charge-TM'd off Frustration — those are real TM investments.",
   "app.filter.shadow_safe_label": "safe purify",
@@ -153,6 +137,12 @@
   "app.filter.shadow_hundo_candidates_hint": "Default-state shadows with all three stats at IV bucket 3+ (≥13). Purify adds +2 (capped at 15), so every match becomes 15/15/15. Excludes Charge-TM'd shadows — purifying them would lose the TM and the +20% atk boost. Tap each in-game to confirm exact IVs before committing.",
   "app.filter.shadow_frustration_label": "TM Frustration",
   "app.filter.shadow_frustration_hint": "Take-over event TM target list: keeper-species shadows that still have Frustration. Charge TMs replace Frustration only during these events. Set an optional opt-in tag in Settings to flag extra Pokémon outside the keeper list.",
+  "app.filter.evo_swap_candy_label": "EvoSwap · candy-heavy",
+  "app.filter.evo_swap_candy_hint": "Trade-buddy purified-dex coordination. Shadows of species with a 400-candy single jump or cumulative ≥150 candy through final form (Magikarp, Wailmer, Swablu, Larvesta, Noibat, Stufful, Wimpod, Meltan, Toxel, Sinistea, Snom, Poltchageist, Roggenrola, Timburr, Karrablast, Shelmet, Phantump, Pumpkaboo, Type:Null, Poipole, Kubfu, Mankey, Teddiursa, Pawniard, Applin). Whole families included — Crypto-Gyarados surfaces too. Pick candidates, tag with #{tag} in-game, then ship via the Tagged-for-swap filter.",
+  "app.filter.evo_swap_item_label": "EvoSwap · item-gated",
+  "app.filter.evo_swap_item_hint": "Trade-buddy purified-dex coordination. Shadows of species whose evolution requires a special item (Sinnoh / Unova / Sun Stone, King's Rock, Metal Coat, Dragon Scale, Up-Grade, Apple variants) or lure module (Magnetic / Mossy / Glacial / Rainy). Whole families included. Pick candidates, tag with #{tag} in-game, then ship via the Tagged-for-swap filter.",
+  "app.filter.evo_swap_tagged_label": "EvoSwap · tagged for swap",
+  "app.filter.evo_swap_tagged_hint": "Action list. Pokémon you've tagged with #{tag} in-game — the candidates you've already nominated for the trade-buddy purified-dex swap. Same protections (no 4★, no shinies) as the candy/item candidate filters above.",
   "app.filter.cheap_evolve_label": "cheap full-evolve",
   "app.filter.cheap_evolve_hint": "Cheap-XP grind: low-candy lines (Pidgey/Caterpie/Weedle/Wurmple/Whismur/Pidove) plus the pre-final members of every trade-evo family — but only when already traded (free post-trade evo).",
   "app.filter.cheap_evolve_empty": "Enable trade-evo protection or set an output locale where the early-game species names resolve.",
@@ -201,7 +191,6 @@
   "app.filter.rocket_quote_match_generic": "Generic grunt (#{n}) — lineup varies, no type clue.",
   "app.filter.rocket_quote_match_decoy": "Decoy grunt (#{n}) — boss-attrappe, lineup varies.",
   "app.filter.rocket_quote_match_balloon": "Balloon grunt (#{n}) — Jessie/James event.",
-
   "app.clause_why.shadow_cheap_pool": "shadow Pokémon",
   "app.clause_why.shadow_cheap_common": "1km buddy walk — common-rarity species (cheap stardust+candy to purify)",
   "app.clause_why.shadow_safe_pool": "shadow Pokémon",
@@ -215,6 +204,10 @@
   "app.clause_why.iv_bucket_high_def": "defense IV bucket 3+ (≥13)",
   "app.clause_why.iv_bucket_high_hp": "HP IV bucket 3+ (≥13)",
   "app.clause_why.exclude_already_4star": "skip shadows already at 4★",
+  "app.clause_why.evo_swap_candy_pool": "expensive-evolution shadow species (whole family — base + evolved forms surface)",
+  "app.clause_why.evo_swap_item_pool": "item-gated-evolution shadow species (whole family)",
+  "app.clause_why.evo_swap_tagged_pool": "manually tagged with #{tag} for the EvoSwap workflow",
+  "app.clause_why.evo_swap_not_traded": "still tradeable as special trade (covers !lucky — lucky requires trade by definition)",
   "app.clause_why.cheap_evolve_either": "low-candy lines OR pre-final trade-evo members",
   "app.clause_why.cheap_evolve_traded_path": "low-candy lines OR already-traded (CNF distribution)",
   "app.clause_why.cheap_evolve_low_iv": "skip 3★/4★ — don't waste high-IV on dex grind",
@@ -249,7 +242,6 @@
   "app.clause_why.pvp_loose_atk": "attack IV bucket 0-1 (loose PvP rank-1)",
   "app.clause_why.pvp_loose_def": "defense IV bucket 3-4 (≥13)",
   "app.clause_why.pvp_loose_hp": "HP IV bucket 3-4 (≥13)",
-
   "app.protect.shadow_keepers.count": "{count} shadow keepers — top raid attackers worth keeping",
   "app.protect.shadow_keepers.empty": "no keepers — every shadow is fair game for the safe-purify filter",
   "app.protect.shadow_keepers.input_placeholder": "Number or name — e.g. Tyranitar, Salamence, Metagross",
@@ -261,11 +253,9 @@
   "app.protect.shadow_keepers.input_help_numbers": "numbers",
   "app.protect.shadow_keepers.input_help_english": "English",
   "app.protect.shadow_keepers.input_help_german": "German",
-
   "app.raids.section_title": "Raids · max battles",
   "app.protect.raid_require_second_move.label": "Only show raid candidates with second charge move",
   "app.protect.raid_require_second_move.help": "Adds `!@3move` to every per-boss filter, narrowing the result to attackers whose second charge move is already unlocked. Off by default so newer accounts still see candidates worth investing in.",
-
   "app.preset.section_title": "Presets",
   "app.preset.section_hint": "Presets overwrite all settings below. Fine-tune from there.",
   "app.preset.casual.label": "Casual",
@@ -276,18 +266,15 @@
   "app.preset.aggressive.description": "Fast cleanup — no form protection, strict PvP",
   "app.preset.pvpFocus.label": "PvP focus",
   "app.preset.pvpFocus.description": "Strict PvP IVs, protects league tags, otherwise aggressive",
-
   "app.protect.section_title": "Protections · what should never be tossed",
   "app.protect.expert_badge": "EXPERT",
   "app.protect.confirm_off": "really? click to confirm",
   "app.protect.regional_section_title": "Regional forms & collectibles",
   "app.protect.te_section_title": "Trade-evo families · free evo via trade",
   "app.protect.te_button_title": "+{name} — when on, all family members (pre- and post-evolutions) are protected in the trade filter",
-
   "app.protect.home_locals.title_prefix": "Auto-removed from protection:",
   "app.protect.home_locals.none": "none",
   "app.protect.home_locals.note": "These spawn locally for you — protecting them would be redundant and would shrink the trash filter for your hundos.",
-
   "app.protect.myth_carve.count": "{count} mythicals you have spares of",
   "app.protect.myth_carve.empty": "no carve-outs — all mythicals stay protected",
   "app.protect.myth_carve.input_placeholder": "Number or name — e.g. 808, Meltan, Genesect",
@@ -299,7 +286,6 @@
   "app.protect.myth_carve.input_help_numbers": "numbers",
   "app.protect.myth_carve.input_help_english": "English",
   "app.protect.myth_carve.input_help_german": "German",
-
   "app.protect.favorites.label": "Favorites",
   "app.protect.favorites.why": "Pokémon marked with the star",
   "app.protect.any_tag.label": "Tagged Pokémon (any tag)",
@@ -334,7 +320,6 @@
   "app.protect.new_evolutions.why": "Pokémon whose evolution would be a new dex entry",
   "app.protect.double_moved.label": "Second charge move",
   "app.protect.double_moved.why": "Pokémon with the second charge move unlocked",
-
   "app.protect.four_star.label": "Protect 4★ hundos",
   "app.protect.four_star.why": "Safety net: never toss 4★ — Rule 1. DISABLE AT YOUR OWN RISK.",
   "app.protect.mythicals.label": "Mythicals",
@@ -349,7 +334,6 @@
   "app.protect.buddies_protect.why": "Sentimental protection — no one wants to trade away their old buddies",
   "app.protect.lucky_eligible.label": "Lucky-trade candidates",
   "app.protect.lucky_eligible.why": "Old untraded catches — likely guaranteed lucky trades. Adjust the cutoff year in safety nets below.",
-
   "app.modal.settings.title": "Settings",
   "app.modal.settings.close_aria": "Close",
   "app.modal.language.section_title": "Language",
@@ -358,7 +342,6 @@
   "app.modal.language.output_label": "PoGo search-syntax language",
   "app.modal.language.output_help": "Language of your PoGo app — determines what language the filter output uses",
   "app.modal.language.output_mismatch": "⚠ Note: Filters output in {output} while the UI is in {ui}. Set both the same if your PoGo app matches your browser's language.",
-
   "app.modal.settings.mode_label": "Mode: {mode}",
   "app.modal.settings.mode_expert": "Expert",
   "app.modal.settings.mode_normal": "Normal",
@@ -366,7 +349,6 @@
   "app.modal.settings.mode_normal_help": "Sensible defaults — Expert for fine control",
   "app.modal.settings.mode_to_normal": "→ Normal",
   "app.modal.settings.mode_to_expert": "→ Expert",
-
   "app.modal.tags.section_title": "Trade tags · protected in the filter",
   "app.modal.tags.basar_label": "Bulk-trade tag (default: Trade)",
   "app.modal.tags.basar_placeholder": "e.g. Trade, Basar, give-away",
@@ -377,15 +359,15 @@
   "app.modal.tags.frustration_label": "TM Frustration tag",
   "app.modal.tags.frustration_placeholder": "remove-frustration",
   "app.modal.tags.frustration_help": "manually flag any shadow for Charge-TM removal during take-over events",
-
+  "app.modal.tags.evo_swap_label": "EvoSwap tag",
+  "app.modal.tags.evo_swap_placeholder": "EvoSwap",
+  "app.modal.tags.evo_swap_help": "tag for trade-buddy purified-dex coordination — rename to run multiple parallel campaigns (e.g. EvoSwap-Maja)",
   "app.modal.custom_tags.section_title": "Custom tags · additional #tags to protect",
   "app.modal.custom_tags.placeholder": "e.g. pvpiv, keep, pokegenie (comma-separated)",
   "app.modal.custom_tags.help": "e.g. if you use PvPIV or PokeGenie",
-
   "app.modal.league.section_title": "League tags · your naming convention",
   "app.modal.league.placeholder": "e.g. ⓤ,ⓖ,ⓛ — comma-separated",
   "app.modal.league.help": "embedded in the nickname — e.g. \"ⓤ Rattata\" for Ultra League",
-
   "app.modal.safety.section_title": "Safety nets · limit filter output",
   "app.modal.safety.cp_label": "CP cap",
   "app.modal.safety.cp_hint": "shows only Pokémon with CP ≤ value (default: 2000)",
@@ -395,12 +377,10 @@
   "app.modal.safety.distance_hint": "protects ≥X km caught (Jet Setter medal)",
   "app.modal.safety.lucky_year_label": "Lucky-trade cutoff year (2-digit)",
   "app.modal.safety.lucky_year_hint": "protects pre-20XX untraded catches (default: 21 → keeps 2020 and earlier; set 0 to disable)",
-
   "app.modal.danger.section_title": "Danger zone",
   "app.modal.danger.reset_armed": "really? click to confirm",
   "app.modal.danger.reset_button": "Reset everything",
   "app.modal.danger.reset_help": "Resets the hundo list, all protections, tags, home location and trash list to defaults.",
-
   "app.modal.backup.section_title": "Backup & Restore",
   "app.modal.backup.export_button": "Export to file",
   "app.modal.backup.export_done": "Exported to {filename}",
@@ -419,7 +399,6 @@
   "app.modal.backup.summary_config": "{count} settings",
   "app.modal.backup.summary_home": "home location",
   "app.modal.backup.summary_tags": "{count} tags",
-
   "app.buddy.section_title": "Trade buddies · one tag prefix per buddy (e.g. #Auri)",
   "app.buddy.section_help": "In the game you'd tag things like {tag1} or {tag2}. PoGo's substring match protects all sub-tags automatically.",
   "app.buddy.active_title": "active — tags are protected",
@@ -431,11 +410,9 @@
   "app.buddy.clause_match": "— matches {a}, {b}, etc.",
   "app.buddy.add_placeholder": "Buddy name (e.g. Auri)",
   "app.buddy.add_button": "add",
-
   "app.buddy_events.section_title": "Trade buddies · wish list species",
   "app.buddy_events.section_help": "Which species are you currently collecting for your buddies? Surfaces in the \"{filter_name}\" filter — shows only trashable (0–2★) Pokémon of those species that you haven't tagged yet.",
   "app.buddy_events.section_help_filter_name": "catch for buddy",
-
   "app.buddy_targets.prefix_label": "Prefix:",
   "app.buddy_targets.count_label": "{count} wish species",
   "app.buddy_targets.te_toggle_title": "Adds trade-evo families (Abra, Machop, Gastly, ...) to the catch filter — useful when the buddy collects free evolutions",
@@ -444,7 +421,6 @@
   "app.buddy_targets.input_placeholder": "Species (number or name) — e.g. Pikachu, 132, melmetal",
   "app.buddy_targets.add_button": "add",
   "app.buddy_targets.preview_summary": "Preview · {new} new, {dupes} already added, {unresolved} unknown",
-
   "app.regional_editor.active_count": "{count}/{total} active",
   "app.regional_editor.disabled": "disabled",
   "app.regional_editor.home_extra": "(+{count} via ⌂)",
@@ -454,7 +430,6 @@
   "app.regional_editor.collectors_label": "Collectors (species protection)",
   "app.regional_editor.home_local_title": "automatically disabled — this species spawns locally for you (home)",
   "app.regional_editor.all_family_members": "all family members",
-
   "app.regional.alolan.label": "Alolan forms",
   "app.regional.alolan.description": "Generation 7 — Alolan regional forms",
   "app.regional.alolan.notes.raichu_psychic": "Alolan Raichu (Electric/Psychic) — regular Raichu isn't Psychic",
@@ -465,7 +440,6 @@
   "app.regional.alolan.notes.kleinstein_electric": "Alolan Geodude (Rock/Electric)",
   "app.regional.alolan.notes.kokowei_dragon": "Alolan Exeggutor (Grass/Dragon)",
   "app.regional.alolan.notes.knogga_ghost": "Alolan Marowak (Ground/Ghost)",
-
   "app.regional.galarian.label": "Galarian forms",
   "app.regional.galarian.description": "Generation 8 — Galarian regional forms",
   "app.regional.galarian.notes.smogmog_fairy": "Galarian Weezing (Poison/Fairy)",
@@ -473,7 +447,6 @@
   "app.regional.galarian.notes.makabaja_ground": "Galarian Yamask (Ground/Ghost)",
   "app.regional.galarian.notes.porenta_fighting": "Galarian Farfetch'd (Fighting)",
   "app.regional.galarian.notes.corasonn_ghost": "Galarian Corsola (Ghost) — regular is Water/Rock",
-
   "app.regional.hisuian.label": "Hisuian forms",
   "app.regional.hisuian.description": "Pokémon Legends: Arceus — Hisuian regional forms",
   "app.regional.hisuian.notes.tornupto_ghost": "Hisuian Typhlosion (Fire/Ghost)",
@@ -484,19 +457,15 @@
   "app.regional.hisuian.notes.voltobal_grass": "Hisuian Voltorb (Electric/Grass)",
   "app.regional.hisuian.notes.lektrobal_grass": "Hisuian Electrode (Electric/Grass)",
   "app.regional.hisuian.notes.sichlor_rock": "Hisuian Scyther (Bug/Rock) → Kleavor",
-
   "app.regional.paldean.label": "Paldean forms",
   "app.regional.paldean.description": "Generation 9 — Paldean Tauros (3 breeds)",
   "app.regional.paldean.notes.tauros_fighting": "Paldean Tauros (Combat) — Iberian Peninsula",
   "app.regional.paldean.notes.tauros_fire": "Paldean Tauros (Blaze) — western hemisphere",
   "app.regional.paldean.notes.tauros_water": "Paldean Tauros (Aqua) — eastern hemisphere",
-
   "app.regional.regionals.label": "Regional Pokémon",
   "app.regional.regionals.description": "Continent-exclusive species — all paired/hemispheric/trio regionals",
-
   "app.regional.collectibles.label": "Collectibles",
   "app.regional.collectibles.description": "Multi-form / pattern collections — forms aren't separately searchable in PoGo",
-
   "app.clause_why.h_union_s012": "Set H ∪ S012 — species filter",
   "app.clause_why.not_k1": "¬K1 — keeper protection (4,4,3-4)",
   "app.clause_why.not_k2": "¬K2 — keeper protection (4,3-4,4)",
@@ -534,7 +503,6 @@
   "app.clause_why.cp_cap": "Safety net: CP ≤ {cp}",
   "app.clause_why.age_traded": "Safety net: caught within {days} days OR traded OR purified",
   "app.clause_why.lucky_eligible": "Lucky-trade safety: pre-20{year} untraded catches protected (likely guaranteed lucky)",
-
   "app.clause_why.h_s012_te": "Set H ∪ S012 ∪ TE — species (TE-trimmed)",
   "app.clause_why.not_k1_te": "¬K1 with TE escape",
   "app.clause_why.not_k2_te": "¬K2 with TE escape",
@@ -556,13 +524,11 @@
   "app.clause_why.xl_trade": "XL size",
   "app.clause_why.age_only": "Safety net: ≤{days} days old OR purified",
   "app.clause_why.distance_zero": "Safety net: distance > 0km (= was caught somewhere else)",
-
   "app.clause_why.prestaged_marked": "already marked ({tags})",
   "app.clause_why.must_traded_short": "MUST: already traded",
   "app.clause_why.must_shadow_short": "MUST: Shadow not tradeable",
   "app.clause_why.must_lucky_short": "MUST: Lucky can't be traded again",
   "app.clause_why.must_mythical_short": "MUST: Mythicals untradeable (except Meltan/Melmetal)",
-
   "app.clause_why.buddy_targets_count": "{count} wish species",
   "app.clause_why.buddy_te_count": "{count} trade-evo families",
   "app.clause_why.trashable_stars": "only trashable stars (0-2★) — you keep 3★+ yourself",
@@ -570,12 +536,10 @@
   "app.clause_why.favorites_protected": "Favorites protected",
   "app.clause_why.shinies_keep": "Shinies you keep yourself",
   "app.clause_why.legendaries_keep": "Legendaries you keep yourself",
-
   "app.clause_why.all_hundo_families": "all hundo families (sorting)",
   "app.clause_why.all_tags_protected": "all tags protected",
   "app.clause_why.shinies_protected": "Shinies protected",
   "app.clause_why.luckies_protected": "Lucky protected",
-
   "app.clause_why.valuables_no_locals": "Valuables: shiny, legendary, ultra beast, costume, background",
   "app.clause_why.valuables_with_locals": "Valuables: shiny, legendary, ultra beast, costume, background + local regionals ({count})",
   "app.clause_why.gift_must_traded": "MUST: not retradeable",
@@ -585,7 +549,6 @@
   "app.clause_why.never_gift_legacy": "don't gift legacy moves",
   "app.clause_why.untagged_or_marked": "untagged OR marked for trade ({tags}) — other tags protected",
   "app.clause_why.other_tags_protected": "other tags protected",
-
   "app.map.home_label": "Home:",
   "app.map.local_regionals_label": "Local regionals ({count}):",
   "app.map.remove_home": "remove",
@@ -617,7 +580,6 @@
   "app.map.attribution": "regional polygon data: u/zoglandboy / u/Mattman243 / pokemoncalendar.com",
   "app.map.loading": "loading world topology…",
   "app.map.load_error": "couldn't load map data",
-
   "app.pvp.section_title": "PvP mode · what counts as a keeper",
   "app.pvp.help_loose": "Loose keeps more Pokémon out of trash — every atk-IV 0 OR 1 spread with high defense/HP is protected (PvP rank-1 candidates). Wider safety net.",
   "app.pvp.help_strict": "Strict keeps only attack-IV 0 spreads with high defense/HP — classic PvP rank-1 only. Tighter trash, fewer false-positive keepers.",
@@ -628,7 +590,6 @@
   "app.pvp.strict_desc": "(0, 3-4, 3-4) — classic PvP rank-1 only",
   "app.pvp.none_label": "Off",
   "app.pvp.none_desc": "no PvP protection",
-
   "app.verify.field_family": "family",
   "app.verify.field_star": "star",
   "app.verify.field_atk": "atk IV",
@@ -660,7 +621,6 @@
   "app.verify.k_keeper": "K (keeper)",
   "app.verify.p_pvp": "P (PvP)",
   "app.verify.neither": "neither",
-
   "app.set_theory.h_value": "{count} families",
   "app.set_theory.h_note": "expanded via",
   "app.set_theory.k_note": "two perfect bars + third ≥ 11 IV",
@@ -672,7 +632,6 @@
   "app.set_theory.trade_label": "Trade",
   "app.set_theory.rule1_help": "Rule 1 (never toss 4★) is {auto} — any 4★ hundo trivially matches K, so ¬K excludes them. K and P are disjoint (atk≥3 vs atk≤1), so they don't overlap.",
   "app.set_theory.rule1_help_auto": "automatic",
-
   "app.landing.nav_about": "About",
   "app.landing.nav_back": "Back to workshop",
   "app.landing.title": "Storage triage,",
@@ -708,7 +667,6 @@
   "app.landing.finisher.heading": "And the result?",
   "app.landing.finisher.lead": "Look at all the beautiful space we have for more",
   "app.landing.finisher.tail": ".",
-
   "app.landing.regional.intro_heading": "Place matters",
   "app.landing.regional.intro_body": "Pokémon GO has regional Pokémon — Tauros in North America, Mr. Mime in Europe, Heracross in South America. The filter knows where you live, where you've been, and what to do about both.",
   "app.landing.regional.region_na": "North America",
@@ -727,7 +685,6 @@
   "app.landing.regional.act2_heading": "2. Home base",
   "app.landing.regional.act2_body": "Set your home location and the workshop figures out which regionals walk past your door. Those species auto-drop from collector protection — you'll catch more next week. Anything you favorited or tagged keeps its protection across the transition (favorites are protected regardless of region).",
   "app.landing.regional.act2_caption": "Locals released, favorites stay",
-
   "app.landing.trade.intro_heading": "Trades aren't optional",
   "app.landing.trade.intro_body": "Your storage isn't only yours. Friends want low-IV starters for free evolutions, hundo seekers want lucky-trade fuel, distant catches cost less stardust to swap. The trade filter mirrors trash — same engine, different keeper set.",
   "app.landing.trade.act1_heading": "1. Far catches are medal fuel",
@@ -739,7 +696,6 @@
   "app.landing.trade.act3_heading": "3. Buddies, by name",
   "app.landing.trade.act3_body": "Add a friend's name in Settings → Trade buddies and you get a personal tag (#auri, #julia). Tag a Bagon \"#auri\" and the filter stages it for Auri automatically. Pre-tag during the long climb up storage; trade when you next meet up.",
   "app.landing.trade.act3_caption": "Each buddy gets their own stash",
-
   "app.rules.nav": "Rules",
   "app.rules.nav_back": "Back to workshop",
   "app.rules.title": "The rules,",
@@ -747,7 +703,6 @@
   "app.rules.intro": "Every protection in the workshop earns its place by answering one question: would tossing this hurt? Here's the catalogue, grouped by why we keep things.",
   "app.rules.cta_open": "Open the workshop",
   "app.rules.cta_about": "See the story behind these →",
-
   "app.rules.group.safety.heading": "Safety nets",
   "app.rules.group.safety.note": "Things you can never undo.",
   "app.rules.group.rarity.heading": "Rarity protection",
@@ -758,7 +713,6 @@
   "app.rules.group.smart.note": "Where the workshop earns its name.",
   "app.rules.group.battle.heading": "Battle league",
   "app.rules.group.battle.note": "PvP plays by different rules.",
-
   "app.rules.r1.title": "Never toss a 4★",
   "app.rules.r1.body": "Perfect IVs (15/15/15) cost a thousand catches and a lot of luck. The filter never lets you trash one — even if every other rule disagrees. This rule overrules everything else.",
   "app.rules.r2.title": "Never toss a favorite",
@@ -809,7 +763,6 @@
   "app.landing.demo.phase_trade_evos": "Trade evolutions",
   "app.landing.demo.phase_protected": "Everything you keep",
   "app.landing.demo.phase_trash": "What's left → trash",
-
   "app.explain.chapter.general": "General",
   "app.explain.chapter.regional": "Regional",
   "app.explain.chapter.trade": "Trade",
@@ -818,7 +771,6 @@
   "app.algebra.title": "Set algebra,",
   "app.algebra.title_accent": "made workshop-shaped.",
   "app.algebra.intro": "PoGo's search box was built for finding Pokémon, not for throwing them away. The workshop's job is to turn 'I want to clear my storage' into a string the search box can actually use. The path goes through set theory.",
-
   "app.algebra.s1.heading": "1. The search box only knows how to show",
   "app.algebra.s1.body": "Pokémon GO gives you one input field and a tiny grammar. Type and the box shows whatever your terms describe — combined, intersected, or excluded by these operators:",
   "app.algebra.s1.op_or_label": "OR — matches either side",
@@ -830,7 +782,6 @@
   "app.algebra.s1.op_family_label": "evolution family",
   "app.algebra.s1.precedence_label": "Unusual: , binds tighter than &",
   "app.algebra.s1.precedence_body": "OR binds tighter than AND in PoGo — the inverse of most languages. Combined with no parens, this forces every expression to land in AND-of-ORs form (conjunctive normal form, CNF). Section 8 has the workout.",
-
   "app.algebra.s2.heading": "2. The inversion",
   "app.algebra.s2.body": "Here's the friction: search results are what you'd see in a list. But you don't want a list of trash — you want to bulk-select what's in your trash bin and tap delete. So the search string has to describe what BELONGS in the bin: 'show me everything that isn't worth keeping.'",
   "app.algebra.s2.naive_label": "Naive attempts that break",
@@ -840,7 +791,6 @@
   "app.algebra.s2.naive2_body": "Explodes combinatorially the moment you have 100 species and 10 keep rules per species. The string would blow past PoGo's 5,000-character limit before you got to Charizard.",
   "app.algebra.s2.working_label": "Working approach",
   "app.algebra.s2.working_body": "Describe what's NOT covered by any keep rule. Now adding a keep rule shrinks the trash by exactly the right amount — overlaps and edge cases handle themselves.",
-
   "app.algebra.s3.heading": "3. Set algebra to the rescue",
   "app.algebra.s3.body": "Lift each protection out of natural language and into a set. Each keep rule is a subset of your storage. Union them all and you've got the keepers; the complement is the trash.",
   "app.algebra.s3.def_u_label": "U",
@@ -851,28 +801,22 @@
   "app.algebra.s3.def_k_value": "the keepers — union of every keep rule",
   "app.algebra.s3.def_t_label": "T",
   "app.algebra.s3.def_t_value": "the trash candidates — everything in U that isn't in K",
-
   "app.algebra.s4.heading": "4. De Morgan's bridge",
   "app.algebra.s4.body": "The set definition tells you what trash is. The search syntax doesn't speak unions. To get from one to the other, lean on De Morgan's laws — the rule that says 'NOT (A OR B)' is the same as 'NOT A AND NOT B'. The second form maps directly onto the search box: '!' is NOT, '&' is AND.",
   "app.algebra.s4.law_label": "De Morgan, applied",
   "app.algebra.s4.translate_label": "Translate operators to syntax",
-
   "app.algebra.s5.heading": "5. Worked example",
   "app.algebra.s5.body": "Three keep rules. Watch them turn into one filter string.",
   "app.algebra.s5.rules_label": "Keep rules",
   "app.algebra.s5.derivation_label": "Derivation",
   "app.algebra.s5.result_label": "Result — paste into the search box:",
   "app.algebra.s5.result_note": "The actual workshop builds 10–20 more clauses for trade evos, regionals, sizes, costumes, legacy moves, etc. Same machinery, more terms, all stitched together with the same '&'.",
-
   "app.algebra.s6.heading": "6. K, visualised",
   "app.algebra.s6.body": "Three of the workshop's keep sets, drawn properly. Sample Pokémon dots populate the regions — including the intersections where multiple rules apply. Anything outside K is in T, pulsing red — those are the trash candidates the filter is asking the search box to show.",
-
   "app.algebra.s7.heading": "7. Trade is symmetric",
   "app.algebra.s7.body": "The trade filter uses the same engine, swapped out for a different keeper set: 'things you'd send to a friend.' Different K_trade, same De Morgan dance, same shape of search string. Once the inversion is solved, every other filter in the workshop is a free re-skin.",
-
   "app.algebra.s8.heading": "8. The parens PoGo doesn't have",
   "app.algebra.s8.body": "PoGo's syntax has no parentheses AND it binds OR tighter than AND — the inverse of most languages. The combined effect: every filter has to land in AND-of-ORs form (conjunctive normal form, CNF). Set theory's distributive law A ∪ (B ∩ C) = (A ∪ B) ∩ (A ∪ C) is the move that gets you there.",
-
   "app.algebra.s8.ex1_title": "Trash the Pikachu spares — keep Alolan Raichu",
   "app.algebra.s8.ex1_intent_label": "Intent",
   "app.algebra.s8.ex1_intent": "Got a Pikachu hundo. Now even the 3★ Pikachu are surplus — but never the Alolan Raichu, that's a regional you can't re-catch in your home zone.",
@@ -881,7 +825,6 @@
   "app.algebra.s8.ex1_typetrick_label": "Type trick: ¬alolan → ¬psychic",
   "app.algebra.s8.ex1_translate_label": "Translate to syntax",
   "app.algebra.s8.ex1_typetrick_note": "PoGo does have region keywords (`alola`, `hisui`, `paldea`), so `alola&raichu` is a valid way to address Alolan Raichu directly. The type substitution is just more compact and composes better in CNF: Alolan Raichu is Electric/Psychic while regular Raichu is just Electric, so `!psychic` cleanly excludes the Alolan form without dragging an extra clause around. The workshop's raid / max-battle / rocket counter filters use the same trick — typing `psychic` catches every Psychic-typed Pokémon, regional variants included.",
-
   "app.algebra.s8.ex2_title": "Cheap full evolves",
   "app.algebra.s8.ex2_intent_label": "Intent",
   "app.algebra.s8.ex2_intent": "Pidgey costs 12 candy to evolve. A traded Geodude carries the trade flag through evolution — 25 candy to Graveler, then Golem evolves for free. Both species are 'cheap full evolves' worth keeping for medal/lucky farming.",
@@ -889,12 +832,10 @@
   "app.algebra.s8.ex2_distribute_label": "Distribute ∪ over ∩ (to CNF)",
   "app.algebra.s8.ex2_syntax_label": "Translate to syntax",
   "app.algebra.s8.ex2_note": "Precedence trap: with , binding tighter than &, the naive `pidgey,geodude&traded` parses as `(pidgey ∪ geodude) ∩ traded` — find me anything that's pidgey or geodude AND was traded. That requires the Pidgey to be traded too, missing the whole point. Distribution to CNF gives the right thing.",
-
   "app.algebra.s8.laws_label": "Distributive laws — the move that flattens to CNF",
   "app.algebra.s8.laws_intro": "The first identity is the workhorse: it converts any OR-of-ANDs (DNF) into AND-of-ORs (CNF), the only form PoGo's syntax can parse. The second is its dual — going the other way produces DNF, which can't be pasted.",
   "app.algebra.s8.laws_useful": "→ this direction (CNF)",
   "app.algebra.s8.laws_unusable": "← wrong direction for PoGo (DNF)",
-
   "app.algebra.s9.heading": "9. The whole trick, in three identities",
   "app.algebra.s9.body": "Pull eight sections of math into the smallest possible package: three identities are all the algebra you need. Everything the workshop does for you compiles to combinations of these.",
   "app.algebra.s9.move1_label": "Inversion",
@@ -907,10 +848,8 @@
   "app.algebra.s9.manifesto_punch": "Ask it anything you can phrase as a set.",
   "app.algebra.s9.manifesto_credit": "And the nice part — the workshop runs the algebra for you, every click. You bring the intent.",
   "app.algebra.s9.qed": "QED. Now open the workshop.",
-
   "app.credit.also": "Also creator of",
   "app.credit.data": "Data:",
-
   "app.explain.nav.previous": "Previous",
   "app.explain.nav.next": "Next",
   "app.explain.nav.landing": "Home",

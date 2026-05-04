@@ -14,6 +14,7 @@ import ROCKET_GRUNT_QUOTES from "./data/rocket-grunt-quotes.json";
 import RocketQuoteLookup from "./explain/RocketQuoteLookup.jsx";
 import PVP_RANKINGS from "./data/pvp-rankings.json";
 import META_RANKINGS from "./data/meta-rankings.json";
+import EVOLUTION_COSTS from "./data/evolution-costs.json";
 import { useTranslation } from "./i18n/I18nProvider.jsx";
 import Landing from "./Landing.jsx";
 import General from "./explain/General.jsx";
@@ -183,6 +184,10 @@ export const DEFAULT_CONFIG = {
   // Trade tags (both protected as TAGS in PoGo via #name syntax)
   basarTagName: "Trade",          // bulk trade tag (was hardcoded #)
   fernTauschTagName: "Fern-Tausch", // Niantic's official long-distance trade tag (Dec 2025)
+  // EvoSwap tag — used by the trade-buddy purified-dex coordination filter
+  // in the Team Rocket aux section. Renaming lets you run multiple parallel
+  // swap campaigns ("EvoSwap-Maja", "EvoSwap-Tom") without overlap.
+  evoSwapTagName: "EvoSwap",
 
   // Custom tag protections — comma-separated list of additional #tags to protect
   customProtectedTags: "",     // e.g. "pvpiv,keep,shiny-hunting"
@@ -537,6 +542,15 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     .map(s => speciesForOutput(s, outputLocale))
     .filter(Boolean);
   const topMaxAttackersList = (cfg.topMaxAttackers || [])
+    .map(s => speciesForOutput(s, outputLocale))
+    .filter(Boolean);
+  // EvoSwap candidate pools — base species only (the +species operator
+  // expands to the whole family in PoGo's search). Filtered through
+  // speciesForOutput so the resulting clause reads in the user's PoGo locale.
+  const evoCandyList = (EVOLUTION_COSTS.candyHeavy || [])
+    .map(s => speciesForOutput(s, outputLocale))
+    .filter(Boolean);
+  const evoItemList = (EVOLUTION_COSTS.itemGated || [])
     .map(s => speciesForOutput(s, outputLocale))
     .filter(Boolean);
 
@@ -929,6 +943,53 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   push(shadowHundoClauses, `3-4${kw.iv.hp}`,                        tFn("app.clause_why.iv_bucket_high_hp"));
   push(shadowHundoClauses, "!4*",                                   tFn("app.clause_why.exclude_already_4star"));
   const shadowHundoCandidates = shadowHundoClauses.map(c => c.clause).join("&");
+
+  // -- EVOSWAP · candy-heavy / item-gated trade-buddy candidates ---------
+  // Surfaces shadows of species worth coordinating with a trade buddy:
+  // each player evolves+purifies *one* expensive species, then special-
+  // trades the result. Candy-heavy = chains with a 400-jump or cumulative
+  // ≥150 candy (Magikarp, Wailmer, Swablu, Larvesta, Noibat, Stufful,
+  // Wimpod, Meltan, Toxel, Sinistea, Snom, Poltchageist, Roggenrola,
+  // Timburr, Karrablast, Shelmet, Phantump, Pumpkaboo, Type:Null, Poipole,
+  // Kubfu, Mankey, Teddiursa, Pawniard, Applin). Item-gated = chains
+  // requiring Sinnoh/Unova/Sun Stone, King's Rock, Metal Coat, Dragon
+  // Scale, Up-Grade, an Apple variant, or any of the four lure modules.
+  // Whole-family inclusion via +species so an already-evolved trash Crypto
+  // Garados surfaces too (offer to buddy as their purified-dex pickup).
+  // !traded covers !lucky (lucky requires trade by definition).
+  const evoSwapBaseClauses = (familyList, poolWhyKey) => {
+    const clauses = [];
+    push(clauses, kw.flag.shadow,                                   tFn("app.clause_why.shadow_only"));
+    if (familyList.length > 0) {
+      push(clauses, familyList.map(sp => `+${sp}`).join(","),       tFn(poolWhyKey));
+    }
+    push(clauses, `!${kw.flag.traded}`,                             tFn("app.clause_why.evo_swap_not_traded"));
+    push(clauses, "!4*",                                            tFn("app.clause_why.never_4star"));
+    push(clauses, `!${kw.flag.shiny}`,                              tFn("app.clause_why.shinies_protected"));
+    return clauses;
+  };
+  const evoSwapCandyClauses = evoCandyList.length > 0
+    ? evoSwapBaseClauses(evoCandyList, "app.clause_why.evo_swap_candy_pool")
+    : [];
+  const evoSwapCandy = evoSwapCandyClauses.map(c => c.clause).join("&");
+  const evoSwapItemClauses = evoItemList.length > 0
+    ? evoSwapBaseClauses(evoItemList, "app.clause_why.evo_swap_item_pool")
+    : [];
+  const evoSwapItem = evoSwapItemClauses.map(c => c.clause).join("&");
+
+  // -- EVOSWAP · tagged-for-swap action list ----------------------------
+  // Once the user picks specific candidates from the candy/item filters
+  // above and applies the configured EvoSwap tag in-game, this filter
+  // surfaces the tagged set. Same protection layer (!4* / !shiny) so the
+  // action list inherits the guardrails. If the tag name is empty, skip.
+  const evoSwapTag = (cfg.evoSwapTagName || "").trim().replace(/^#/, "");
+  const evoSwapTaggedClauses = [];
+  if (evoSwapTag) {
+    push(evoSwapTaggedClauses, `#${evoSwapTag}`,                    tFn("app.clause_why.evo_swap_tagged_pool", { params: { tag: evoSwapTag } }));
+    push(evoSwapTaggedClauses, "!4*",                               tFn("app.clause_why.never_4star"));
+    push(evoSwapTaggedClauses, `!${kw.flag.shiny}`,                 tFn("app.clause_why.shinies_protected"));
+  }
+  const evoSwapTagged = evoSwapTaggedClauses.map(c => c.clause).join("&");
 
   // -- EVOS · cheap full-evolve -----------------------------------------
   // Two paths combined via distribution to CNF (see Algebra chapter §8):
@@ -1339,8 +1400,10 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
            trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses,
            // Aux pro-tools
            shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
+           evoSwapCandy, evoSwapItem, evoSwapTagged,
            cheapEvolve, dexPlus, megaEvolve, pilotLong,
            shadowCheapClauses, shadowSafeClauses, shadowHundoClauses, shadowFrustrationClauses,
+           evoSwapCandyClauses, evoSwapItemClauses, evoSwapTaggedClauses,
            cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
            // Per-boss raid + max-battle counters
            raidFilters, eventRaidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
@@ -1617,6 +1680,7 @@ export default function App() {
     trash: false, trade: false, sort: false, prestaged: false, gift: false,
     // Aux pro-tools
     shadowCheap: false, shadowSafe: false, shadowHundoCandidates: false, shadowFrustration: false,
+    evoSwapCandy: false, evoSwapItem: false, evoSwapTagged: false,
     cheapEvolve: false, dexPlus: false, megaEvolve: false, pilotLong: false,
   });
   const [resetArmed, setResetArmed] = useState(false);
@@ -1702,8 +1766,10 @@ export default function App() {
   const { trash, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
           trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses,
           shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
+          evoSwapCandy, evoSwapItem, evoSwapTagged,
           cheapEvolve, dexPlus, megaEvolve, pilotLong,
           shadowCheapClauses, shadowSafeClauses, shadowHundoClauses, shadowFrustrationClauses,
+          evoSwapCandyClauses, evoSwapItemClauses, evoSwapTaggedClauses,
           cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
           raidFilters, eventRaidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
           rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
@@ -2255,6 +2321,36 @@ export default function App() {
                           copied={copied.shadowFrustration}
                           onCopy={() => copyToClipboard("shadowFrustration", shadowFrustration)}
                           hint={t("app.filter.shadow_frustration_hint")}
+                        />
+                      )}
+                      {evoSwapCandy && (
+                        <FilterBox
+                          label={t("app.filter.evo_swap_candy_label")}
+                          accent="#9B59B6"
+                          filterStr={evoSwapCandy}
+                          copied={copied.evoSwapCandy}
+                          onCopy={() => copyToClipboard("evoSwapCandy", evoSwapCandy)}
+                          hint={t("app.filter.evo_swap_candy_hint", { params: { tag: effectiveConfig.evoSwapTagName || "EvoSwap" } })}
+                        />
+                      )}
+                      {evoSwapItem && (
+                        <FilterBox
+                          label={t("app.filter.evo_swap_item_label")}
+                          accent="#9B59B6"
+                          filterStr={evoSwapItem}
+                          copied={copied.evoSwapItem}
+                          onCopy={() => copyToClipboard("evoSwapItem", evoSwapItem)}
+                          hint={t("app.filter.evo_swap_item_hint", { params: { tag: effectiveConfig.evoSwapTagName || "EvoSwap" } })}
+                        />
+                      )}
+                      {evoSwapTagged && (
+                        <FilterBox
+                          label={t("app.filter.evo_swap_tagged_label")}
+                          accent="#9B59B6"
+                          filterStr={evoSwapTagged}
+                          copied={copied.evoSwapTagged}
+                          onCopy={() => copyToClipboard("evoSwapTagged", evoSwapTagged)}
+                          hint={t("app.filter.evo_swap_tagged_hint", { params: { tag: effectiveConfig.evoSwapTagName || "EvoSwap" } })}
                         />
                       )}
                     </div>
@@ -4751,6 +4847,20 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
                     placeholder={t("app.modal.tags.frustration_placeholder")}
                     className="mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]" />
                   <div className="mono text-[10px] text-[#8090A0] mt-1">{t("app.modal.tags.frustration_help")}</div>
+                </div>
+              )}
+              {expert && (
+                <div>
+                  <label className="mono text-[10.5px] text-[#8090A0] block mb-1">
+                    {t("app.modal.tags.evo_swap_label")}
+                  </label>
+                  <input
+                    type="text"
+                    value={config.evoSwapTagName || ""}
+                    onChange={e => set("evoSwapTagName", e.target.value)}
+                    placeholder={t("app.modal.tags.evo_swap_placeholder")}
+                    className="mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]" />
+                  <div className="mono text-[10px] text-[#8090A0] mt-1">{t("app.modal.tags.evo_swap_help")}</div>
                 </div>
               )}
             </div>
