@@ -188,6 +188,7 @@
   "app.clause_why.shadow_cheap_common": "1km पार्टनर walk — common-rarity species (purify करने के लिए सस्ती stardust+candy)",
   "app.clause_why.shadow_safe_pool": "शैडो Pokémon",
   "app.clause_why.shadow_only": "शैडो Pokémon",
+  "app.clause_why.shadow_or_purified": "shadow or purified Pokémon",
   "app.clause_why.shadow_keeper_species": "{species} family को शैडो के रूप में रखें (रेड attacker)",
   "app.clause_why.frustration_move": "अभी भी {move} legacy move है (take-over के दौरान Charge TM target)",
   "app.clause_why.frustration_unmoved": "अभी default state में ({move} है) — ऐसे शैडो skip करता है जिनकी Frustration आपने पहले Charge TM से बदली है",

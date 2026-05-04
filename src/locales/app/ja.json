@@ -188,6 +188,7 @@
   "app.clause_why.shadow_cheap_common": "1km相棒散歩 — 一般的なレア度の種(リトレーンに安いほしのすな+アメ)",
   "app.clause_why.shadow_safe_pool": "シャドウポケモン",
   "app.clause_why.shadow_only": "シャドウポケモン",
+  "app.clause_why.shadow_or_purified": "shadow or purified Pokémon",
   "app.clause_why.shadow_keeper_species": "{species}ファミリーをシャドウのまま保持(レイドアタッカー)",
   "app.clause_why.frustration_move": "まだ{move}レガシー技を持つ(テイクオーバー中のスペシャルわざマシン対象)",
   "app.clause_why.frustration_unmoved": "まだデフォルト状態({move}保持) — スペシャルわざマシンでやつあたりを既に置き換えたシャドウをスキップ",

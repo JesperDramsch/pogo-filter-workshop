@@ -188,6 +188,7 @@
   "app.clause_why.shadow_cheap_common": "balade copain 1km — espèces de rareté commune (poussière+bonbons pas chers à purifier)",
   "app.clause_why.shadow_safe_pool": "Pokémon obscurs",
   "app.clause_why.shadow_only": "Pokémon obscurs",
+  "app.clause_why.shadow_or_purified": "shadow or purified Pokémon",
   "app.clause_why.shadow_keeper_species": "garder la famille {species} en obscur (attaquant de raid)",
   "app.clause_why.frustration_move": "a encore l'attaque héritée {move} (cible CT Chargée pendant invasion)",
   "app.clause_why.frustration_unmoved": "encore en état par défaut (a {move}) — ignore les obscurs dont tu as déjà retiré Frustration via CT Chargée",

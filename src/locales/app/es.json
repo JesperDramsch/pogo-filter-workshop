@@ -188,6 +188,7 @@
   "app.clause_why.shadow_cheap_common": "paseo con compi 1km — especies de rareza común (polvoestelar+caramelos baratos para purificar)",
   "app.clause_why.shadow_safe_pool": "Pokémon oscuros",
   "app.clause_why.shadow_only": "Pokémon oscuros",
+  "app.clause_why.shadow_or_purified": "shadow or purified Pokémon",
   "app.clause_why.shadow_keeper_species": "mantener familia {species} como oscura (atacante de incursión)",
   "app.clause_why.frustration_move": "aún tiene el ataque heredado {move} (objetivo de MT Cargada durante invasión)",
   "app.clause_why.frustration_unmoved": "aún en estado por defecto (tiene {move}) — omite oscuros a los que ya quitaste Frustración con MT Cargada",

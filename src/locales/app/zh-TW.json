@@ -188,6 +188,7 @@
   "app.clause_why.shadow_cheap_common": "1km 夥伴散步 — 常見稀有度物種(便宜的星塵+糖果可淨化)",
   "app.clause_why.shadow_safe_pool": "暗影寶可夢",
   "app.clause_why.shadow_only": "暗影寶可夢",
+  "app.clause_why.shadow_or_purified": "shadow or purified Pokémon",
   "app.clause_why.shadow_keeper_species": "保留 {species} 家族的暗影狀態(團體戰攻擊手)",
   "app.clause_why.frustration_move": "還帶有 {move} 傳承招式(入侵期間的特殊招式學習器目標)",
   "app.clause_why.frustration_unmoved": "仍處於預設狀態(帶 {move}) — 跳過你已用特殊招式學習器替換掉焦躁的暗影",

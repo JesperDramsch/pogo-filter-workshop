@@ -959,13 +959,18 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   // !traded covers !lucky (lucky requires trade by definition).
   const evoSwapBaseClauses = (familyList, poolWhyKey) => {
     const clauses = [];
-    push(clauses, kw.flag.shadow,                                   tFn("app.clause_why.shadow_only"));
+    // Shadow OR purified — both states are valid swap material. A user who
+    // already evolved+purified a candidate themselves still wants to find
+    // the resulting (now-purified) mon to ship to their buddy.
+    push(clauses, `${kw.flag.shadow},${kw.flag.purified}`,          tFn("app.clause_why.shadow_or_purified"));
     if (familyList.length > 0) {
       push(clauses, familyList.map(sp => `+${sp}`).join(","),       tFn(poolWhyKey));
     }
     push(clauses, `!${kw.flag.traded}`,                             tFn("app.clause_why.evo_swap_not_traded"));
     push(clauses, "!4*",                                            tFn("app.clause_why.never_4star"));
     push(clauses, `!${kw.flag.shiny}`,                              tFn("app.clause_why.shinies_protected"));
+    push(clauses, `!${kw.flag.favorite}`,                           tFn("app.clause_why.favorites"));
+    push(clauses, "!#",                                             tFn("app.clause_why.tags_protected_short"));
     return clauses;
   };
   const evoSwapCandyClauses = evoCandyList.length > 0
