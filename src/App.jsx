@@ -1387,6 +1387,36 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   }
   const pvpRankingsFetchedAt = PVP_RANKINGS.fetchedAt || null;
 
+  // Active GBL cups — pair lily-dex's cup rankings with the ScrapedDuck
+  // event windows that mention each cup. Filter clauses reuse the league
+  // pipeline (species OR-list + cup CP cap + loose IV pattern), so the
+  // user's existing buildLeagueFilter machinery handles the math. Card is
+  // emitted with start/end metadata so the UI can hide itself outside the
+  // active window.
+  const nowMs = Date.now();
+  const cupFilters = [];
+  for (const event of (PVP_RANKINGS.gblEvents || [])) {
+    const startMs = Date.parse(event.start);
+    const endMs = Date.parse(event.end);
+    if (!(startMs <= nowMs && nowMs <= endMs)) continue;
+    for (const cupId of (event.cups || [])) {
+      const cup = PVP_RANKINGS.cups?.[cupId];
+      if (!cup) continue;
+      const filter = buildLeagueFilter(cup);
+      if (filter.skipped) continue;
+      cupFilters.push({
+        id: cup.id,
+        name: cup.name,
+        cpCap: cup.cpCap,
+        eventName: event.name,
+        start: event.start,
+        end: event.end,
+        clause: filter.clause,
+        clauses: filter.clauses,
+      });
+    }
+  }
+
   return { trash, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
            trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses,
            // Aux pro-tools
@@ -1402,7 +1432,7 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
            rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
            rocketTypeLabels,
            // PvP league meta filters
-           pvpFilters, pvpRankingsFetchedAt };
+           pvpFilters, pvpRankingsFetchedAt, cupFilters };
 }
 
 // ─── PARSER (for verification panel) ──────────────────────────────────────
@@ -1765,7 +1795,7 @@ export default function App() {
           raidFilters, eventRaidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
           rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
           rocketTypeLabels,
-          pvpFilters, pvpRankingsFetchedAt } = useMemo(
+          pvpFilters, pvpRankingsFetchedAt, cupFilters } = useMemo(
     () => buildFilters(hundos, { ...effectiveConfig, topAttackers, topMaxAttackers }, homeLocals, effectiveOutputLocale, t),
     [hundos, effectiveConfig, homeLocals, effectiveOutputLocale, topAttackers, topMaxAttackers, t]
   );
@@ -2385,11 +2415,13 @@ export default function App() {
                   <PvpCollapsible
                     fetchedAt={pvpRankingsFetchedAt}
                     leagues={pvpFilters}
+                    cupFilters={cupFilters}
                     open={showAuxPvp}
                     onToggle={() => setShowAuxPvp((s) => !s)}
                     copied={copied}
                     copyToClipboard={copyToClipboard}
                     t={t}
+                    locale={locale}
                   />
                 </div>
 
@@ -3232,20 +3264,25 @@ function MaxBattleCollapsible({
   );
 }
 
-// One filter per league (Great / Ultra / Master). Simpler than the boss /
-// rocket collapsibles since each league is a single FilterBox — no
-// nested accordion, no per-phase fan-out.
-function PvpCollapsible({ fetchedAt, leagues, open, onToggle, copied, copyToClipboard, t }) {
+// One filter per league (Great / Ultra / Master) plus zero-or-more
+// active-cup filters (Fantasy / Jungle / Catch / etc.) when a themed
+// rotation is currently running. Cups inherit the league filter shape
+// (species OR-list + CP cap + loose IV pattern), so the only visual
+// difference is the active-window teaser borrowed from the event-raids
+// strip.
+function PvpCollapsible({ fetchedAt, leagues, cupFilters, open, onToggle, copied, copyToClipboard, t, locale }) {
   const order = ["great", "ultra", "master"];
   const accentByLeague = { great: "#3498DB", ultra: "#9B59B6", master: "#F1C40F" };
   const populated = order.filter(k => leagues?.[k] && !leagues[k].skipped);
+  const cups = (cupFilters || []).filter(c => c?.clause);
+  const totalCount = populated.length + cups.length;
   const age = formatSyncAge(fetchedAt, t);
   const headerLabel = t("app.collapsible.aux_pvp");
-  const countLabel = t("app.collapsible.aux_pvp_count", { params: { count: populated.length } });
+  const countLabel = t("app.collapsible.aux_pvp_count", { params: { count: totalCount } });
   const footerLabel = age
     ? t("app.collapsible.aux_footer", { params: { count: countLabel, age } })
     : t("app.collapsible.aux_footer_no_age", { params: { count: countLabel } });
-  if (populated.length === 0) {
+  if (totalCount === 0) {
     return (
       <Collapsible icon="🥊" label={headerLabel} open={open} onToggle={onToggle}>
         <p className="text-xs italic text-[#8B98A5]">{t("app.filter.aux_pvp_empty")}</p>
@@ -3270,6 +3307,28 @@ function PvpCollapsible({ fetchedAt, leagues, open, onToggle, copied, copyToClip
             />
           );
         })}
+        {cups.length > 0 && (
+          <div className="space-y-3 pt-3 border-t border-[#1F2933]">
+            <h4 className="mono text-xs uppercase tracking-wide text-[#8090A0]">
+              {t("app.collapsible.aux_pvp_cups_heading")}
+            </h4>
+            {cups.map((cup) => {
+              const copyKey = `pvp_cup_${cup.id}`;
+              const teaser = formatEventWindow(cup.start, cup.end, t, locale);
+              return (
+                <FilterBox
+                  key={copyKey}
+                  label={t("app.filter.pvp_cup_label", { params: { name: cup.name, teaser } })}
+                  accent="#1ABC9C"
+                  filterStr={cup.clause}
+                  copied={copied[copyKey]}
+                  onCopy={() => copyToClipboard(copyKey, cup.clause)}
+                  hint={t("app.filter.pvp_cup_hint", { params: { name: cup.name, cap: cup.cpCap } })}
+                />
+              );
+            })}
+          </div>
+        )}
       </div>
       <p className="mono text-[10.5px] text-[#8090A0] mt-4 pt-3 border-t border-[#1F2933]">
         {footerLabel}

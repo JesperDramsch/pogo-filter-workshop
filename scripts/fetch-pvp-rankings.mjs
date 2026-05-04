@@ -4,6 +4,12 @@
 // per-league artifact at src/data/pvp-rankings.json that App.jsx
 // imports at build time.
 //
+// Also passes through lily-dex's per-cup rankings (Fantasy / Jungle /
+// Catch / etc.) and pairs them with active GBL event windows from
+// ScrapedDuck. The app uses (cup ranking, cup CP cap, current time vs
+// event windows) to render an "active cup" filter card that hides
+// itself outside the cup's run.
+//
 // Why store dex + name pairs (not raw speciesIds): forms like
 // `darmanitan_galarian_zen` need to fold into the base species so
 // PoGo's family-search (`+darmanitan`) catches every form. dexNr is
@@ -22,6 +28,7 @@ const DATA_DIR = resolve(ROOT, "src/data");
 const OUT_PATH = resolve(DATA_DIR, "pvp-rankings.json");
 
 const ENDPOINT = "https://mknepprath.github.io/lily-dex-api/rankings.json";
+const SCRAPED_DUCK_EVENTS = "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.min.json";
 const TOP_N = 30;
 const LEAGUES = {
   great:  { cpCap: 1500 },
@@ -73,10 +80,13 @@ async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
 
-  let raw;
+  let raw, sdEvents;
   try {
-    console.log("→ Fetching lily-dex-api rankings");
-    raw = await fetchJson(ENDPOINT);
+    console.log("→ Fetching lily-dex-api rankings + ScrapedDuck events");
+    [raw, sdEvents] = await Promise.all([
+      fetchJson(ENDPOINT),
+      fetchJson(SCRAPED_DUCK_EVENTS),
+    ]);
   } catch (e) {
     console.error(`✗ Fetch failed: ${e.message}`);
     if (offlineOk && existsSync(OUT_PATH)) {
@@ -99,12 +109,53 @@ async function main() {
     throw new Error("All leagues came back empty — refusing to overwrite cache");
   }
 
-  const newContent = { topN: TOP_N, leagues };
+  // Cups: lily-dex emits an array of { id, name, cp, rankings: [...] }. We
+  // store the same dex+name pairs as the standing leagues so App.jsx can
+  // pipe them through `buildLeagueFilter` unchanged. cp may differ per cup
+  // (most are 1500 today; Premier-style variants could differ), so trust
+  // lily-dex over a hardcoded cap.
+  const cups = {};
+  let cupTotalEntries = 0;
+  for (const cup of (raw.cups || [])) {
+    if (!cup || typeof cup.id !== "string") continue;
+    const list = topNByDex(cup.rankings, TOP_N);
+    if (list.length === 0) continue;
+    cups[cup.id] = {
+      id: cup.id,
+      name: cup.name || cup.id,
+      cpCap: typeof cup.cp === "number" ? cup.cp : null,
+      species: list,
+    };
+    cupTotalEntries += list.length;
+  }
+
+  // GBL event windows from ScrapedDuck. Each go-battle-league event has a
+  // start/end window and a name string with the active leagues + cup
+  // mentioned in plain text (e.g. "Great League and Fantasy Cup: …"). Match
+  // each event to the cup ids we just learned about by case-insensitive
+  // substring; tolerant against name-string drift.
+  const cupIds = Object.keys(cups);
+  const gblEvents = [];
+  for (const e of (Array.isArray(sdEvents) ? sdEvents : [])) {
+    if (e?.eventType !== "go-battle-league") continue;
+    const lower = String(e.name || "").toLowerCase();
+    const matchedCups = cupIds.filter(id => lower.includes(id));
+    gblEvents.push({
+      eventID: e.eventID,
+      name: e.name,
+      start: e.start,
+      end: e.end,
+      cups: matchedCups,
+    });
+  }
+  gblEvents.sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+
+  const newContent = { topN: TOP_N, leagues, cups, gblEvents };
   let fetchedAt = new Date().toISOString();
   if (existsSync(OUT_PATH)) {
     try {
       const prev = JSON.parse(readFileSync(OUT_PATH, "utf8"));
-      const prevContent = { topN: prev.topN, leagues: prev.leagues };
+      const { fetchedAt: _prev, ...prevContent } = prev;
       if (canonicalStringify(prevContent) === canonicalStringify(newContent) && prev.fetchedAt) {
         fetchedAt = prev.fetchedAt;
         console.log("  ↺ content unchanged — preserving previous fetchedAt");
@@ -115,6 +166,7 @@ async function main() {
   writeJson(OUT_PATH, { fetchedAt, ...newContent });
   console.log(`✓ wrote ${OUT_PATH}`);
   console.log(`  ${Object.keys(leagues).length} leagues, ${totalEntries} species total (top ${TOP_N} each, deduped by dex)`);
+  console.log(`  ${Object.keys(cups).length} cups, ${cupTotalEntries} species; ${gblEvents.length} GBL event windows`);
 }
 
 main().catch(e => { console.error(e); process.exit(1); });
