@@ -4977,6 +4977,12 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
             onChange={list => set("buddies", list)}
           />
 
+          {/* Storage persistence — request "permanent" storage status so the
+              browser doesn't evict our localStorage under pressure or on
+              "delete site data on quit" settings. Hidden when the Storage
+              API isn't available. */}
+          <StoragePersistenceSection />
+
           {/* Backup & Restore — JSON file round-trip for cross-device / browser-wipe recovery */}
           <BackupRestoreSection onExport={onExport} onImport={onImport} />
 
@@ -5001,6 +5007,75 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─── STORAGE PERSISTENCE ────────────────────────────────────────────────────
+
+// Surfaces and triggers the Storage API's persist() request. Some browsers
+// (notably Firefox with "Persistent storage = ask to allow") will keep
+// localStorage durable across sessions only if we explicitly ask. Without
+// the request, our state is "best effort" — eligible for eviction under
+// pressure, or wiped by "delete site data on quit"-style settings.
+//
+// `persist()` is a request, not a guarantee. Firefox may prompt, may grant
+// silently, or may defer until storage is under pressure — we just call it
+// and reflect whatever comes back. Chrome auto-grants based on heuristics
+// (bookmarks, install-as-PWA), so the button is mostly a no-op there but
+// harmless. The whole row hides itself when the Storage API is absent
+// (Safari ≤14, very old browsers) — no point showing a control we can't
+// drive.
+function StoragePersistenceSection() {
+  const { t } = useTranslation();
+  // null = API unsupported or check pending; true/false = current state.
+  const [persisted, setPersisted] = useState(null);
+  const [requesting, setRequesting] = useState(false);
+
+  useEffect(() => {
+    if (!navigator.storage?.persisted) return;
+    navigator.storage.persisted().then(setPersisted, () => setPersisted(null));
+  }, []);
+
+  async function request() {
+    if (!navigator.storage?.persist) return;
+    setRequesting(true);
+    try {
+      const granted = await navigator.storage.persist();
+      if (typeof granted === "boolean") setPersisted(granted);
+    } catch {
+      // browser-level rejection just leaves the row showing the request button
+    } finally {
+      setRequesting(false);
+    }
+  }
+
+  if (persisted === null) return null;
+
+  return (
+    <div className="pt-4 border-t border-[#1F2933]">
+      <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
+        {t("app.modal.storage.section_title")}
+      </div>
+      {persisted ? (
+        <div className="mono text-xs text-[#3FB67A]">
+          {t("app.modal.storage.persisted_status")}
+        </div>
+      ) : (
+        <>
+          <button
+            onClick={request}
+            disabled={requesting}
+            className="mono text-xs px-3 py-1.5 rounded transition bg-[#1F2933] text-[#5EAFC5] hover:bg-[#2D3A47] disabled:opacity-50">
+            {requesting
+              ? t("app.modal.storage.requesting")
+              : t("app.modal.storage.request_button")}
+          </button>
+          <div className="mono text-[10px] text-[#8090A0] mt-1.5">
+            {t("app.modal.storage.help")}
+          </div>
+        </>
+      )}
     </div>
   );
 }
