@@ -2954,13 +2954,19 @@ function BossCollapsible({
         {tierOrder.map((tier) => {
           const list = bossesByTier?.[tier];
           if (!list || list.length === 0) return null;
+          const tierTeaser = t("app.collapsible.aux_raids_count", {
+            params: { count: list.length },
+          });
           return (
-            <div key={tier} className="space-y-3">
-              <h4 className="mono text-xs uppercase tracking-wide text-[#8090A0]">
-                {t(`app.collapsible.aux_boss_tier.${tier}`)}
-              </h4>
+            <TrainerAccordion
+              key={tier}
+              name={t(`app.collapsible.aux_boss_tier.${tier}`)}
+              teaser={tierTeaser}
+              accent={accent}
+              highlight={false}
+            >
               {list.map((boss) => renderBossBox(boss))}
-            </div>
+            </TrainerAccordion>
           );
         })}
       </div>
@@ -2991,10 +2997,10 @@ function topHitsHint(topHits, t) {
     .join(" · ");
 }
 
-// Uncontrolled per-trainer accordion row. Native <details> handles its own
-// open/close state — no React state plumbing needed, and multiple trainers
-// can stay open if the user wants to compare. Mirrors the visual rhythm of
-// the parent Collapsible but a half-step smaller.
+// Uncontrolled accordion row used both for Rocket trainers and for raid /
+// Max Battle tiers. Native <details> handles its own open/close state — no
+// React state plumbing needed, and multiple rows can stay open at once.
+// Mirrors the visual rhythm of the parent Collapsible but a half-step smaller.
 function TrainerAccordion({ name, teaser, accent, highlight, children }) {
   // `highlight` (used when the quote-lookup widget locks onto this card):
   // forces the accordion open and adds a colored ring so the user can see
@@ -3091,11 +3097,17 @@ function MaxBattleCollapsible({
             {tierOrder.map((tier) => {
               const list = bossesByTier?.[tier];
               if (!list || list.length === 0) return null;
+              const tierTeaser = t("app.collapsible.aux_raids_count", {
+                params: { count: list.length },
+              });
               return (
-                <div key={tier} className="space-y-3">
-                  <h5 className="mono text-[10.5px] tracking-wide text-[#8090A0]">
-                    {t(`app.collapsible.aux_boss_tier.${tier}`)}
-                  </h5>
+                <TrainerAccordion
+                  key={tier}
+                  name={t(`app.collapsible.aux_boss_tier.${tier}`)}
+                  teaser={tierTeaser}
+                  accent={accent}
+                  highlight={false}
+                >
                   {list.map((boss) => {
                     if (boss.skipped) {
                       return (
@@ -3117,7 +3129,7 @@ function MaxBattleCollapsible({
                       />
                     );
                   })}
-                </div>
+                </TrainerAccordion>
               );
             })}
           </div>
