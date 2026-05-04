@@ -977,20 +977,6 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     : [];
   const evoSwapItem = evoSwapItemClauses.map(c => c.clause).join("&");
 
-  // -- EVOSWAP · tagged-for-swap action list ----------------------------
-  // Once the user picks specific candidates from the candy/item filters
-  // above and applies the configured EvoSwap tag in-game, this filter
-  // surfaces the tagged set. Same protection layer (!4* / !shiny) so the
-  // action list inherits the guardrails. If the tag name is empty, skip.
-  const evoSwapTag = (cfg.evoSwapTagName || "").trim().replace(/^#/, "");
-  const evoSwapTaggedClauses = [];
-  if (evoSwapTag) {
-    push(evoSwapTaggedClauses, `#${evoSwapTag}`,                    tFn("app.clause_why.evo_swap_tagged_pool", { params: { tag: evoSwapTag } }));
-    push(evoSwapTaggedClauses, "!4*",                               tFn("app.clause_why.never_4star"));
-    push(evoSwapTaggedClauses, `!${kw.flag.shiny}`,                 tFn("app.clause_why.shinies_protected"));
-  }
-  const evoSwapTagged = evoSwapTaggedClauses.map(c => c.clause).join("&");
-
   // -- EVOS · cheap full-evolve -----------------------------------------
   // Two paths combined via distribution to CNF (see Algebra chapter §8):
   //   cheap = (early ∪ TE_basics) ∩ (early ∪ traded) ∩ (modifiers)
@@ -1400,10 +1386,10 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
            trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses,
            // Aux pro-tools
            shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
-           evoSwapCandy, evoSwapItem, evoSwapTagged,
+           evoSwapCandy, evoSwapItem,
            cheapEvolve, dexPlus, megaEvolve, pilotLong,
            shadowCheapClauses, shadowSafeClauses, shadowHundoClauses, shadowFrustrationClauses,
-           evoSwapCandyClauses, evoSwapItemClauses, evoSwapTaggedClauses,
+           evoSwapCandyClauses, evoSwapItemClauses,
            cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
            // Per-boss raid + max-battle counters
            raidFilters, eventRaidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
@@ -1680,7 +1666,7 @@ export default function App() {
     trash: false, trade: false, sort: false, prestaged: false, gift: false,
     // Aux pro-tools
     shadowCheap: false, shadowSafe: false, shadowHundoCandidates: false, shadowFrustration: false,
-    evoSwapCandy: false, evoSwapItem: false, evoSwapTagged: false,
+    evoSwapCandy: false, evoSwapItem: false,
     cheapEvolve: false, dexPlus: false, megaEvolve: false, pilotLong: false,
   });
   const [resetArmed, setResetArmed] = useState(false);
@@ -1766,10 +1752,10 @@ export default function App() {
   const { trash, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
           trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses,
           shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
-          evoSwapCandy, evoSwapItem, evoSwapTagged,
+          evoSwapCandy, evoSwapItem,
           cheapEvolve, dexPlus, megaEvolve, pilotLong,
           shadowCheapClauses, shadowSafeClauses, shadowHundoClauses, shadowFrustrationClauses,
-          evoSwapCandyClauses, evoSwapItemClauses, evoSwapTaggedClauses,
+          evoSwapCandyClauses, evoSwapItemClauses,
           cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
           raidFilters, eventRaidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
           rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
@@ -2341,16 +2327,6 @@ export default function App() {
                           copied={copied.evoSwapItem}
                           onCopy={() => copyToClipboard("evoSwapItem", evoSwapItem)}
                           hint={t("app.filter.evo_swap_item_hint", { params: { tag: effectiveConfig.evoSwapTagName || "EvoSwap" } })}
-                        />
-                      )}
-                      {evoSwapTagged && (
-                        <FilterBox
-                          label={t("app.filter.evo_swap_tagged_label")}
-                          accent="#9B59B6"
-                          filterStr={evoSwapTagged}
-                          copied={copied.evoSwapTagged}
-                          onCopy={() => copyToClipboard("evoSwapTagged", evoSwapTagged)}
-                          hint={t("app.filter.evo_swap_tagged_hint", { params: { tag: effectiveConfig.evoSwapTagName || "EvoSwap" } })}
                         />
                       )}
                     </div>
