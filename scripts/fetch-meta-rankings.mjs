@@ -10,8 +10,9 @@
 // list filtered to a Dynamax-eligibility seed → topMaxAttackers.
 //
 // Also emits chargerMoves: fast moves with duration ≤ 500ms (the in-game
-// "0.5s tier" — the Max-Battle charger requirement). Currently informational;
-// future "Max Tank" filter will use it once move-name localization lands.
+// "0.5s tier" — the Max-Battle charger requirement). Consumed by App.jsx's
+// Max Tank filter (App.jsx:1159), which localizes each move name through
+// the move-name dictionary populated by fetch-translations.mjs.
 //
 // Flags: --offline-ok   tolerate fetch failures if cache exists.
 
@@ -242,9 +243,10 @@ async function main() {
     .filter(id => statsBySpecies.has(id))
     .sort((a, b) => statsBySpecies.get(b).base_attack - statsBySpecies.get(a).base_attack);
 
-  // 0.5s fast moves — the "charger" tier. Not currently consumed by App.jsx,
-  // but this is the data-driven source for the future Max-Tank filter
-  // (`@1<move>,@1<move>...`). Sorted by name for diff stability.
+  // 0.5s fast moves — the "charger" tier. Data-driven source for the
+  // Max-Tank filter (App.jsx:1159), emitted as `@1<move>,@1<move>...` after
+  // localization through the move-name dictionary. Sorted by name for diff
+  // stability.
   const chargerMoves = fast
     .filter(m => m.duration <= MAX_CHARGER_DURATION_MS)
     .map(m => ({ name: m.name, type: m.type.toLowerCase(), duration: m.duration }))
