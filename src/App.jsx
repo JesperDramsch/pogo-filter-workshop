@@ -1035,12 +1035,18 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
                clause: "", clauses: [], skipped: true };
     }
     // Per-context allowlist — different rosters for raids vs Max Battles.
-    // (Rocket has its own builder and skips allowlists entirely.)
+    // Rocket builders use `withAllowlist` directly on their resistor clause
+    // (same soft-bypass shape as raids).
     const wrap = requiresDynamax ? withMaxAllowlist : withAllowlist;
     const clauses = [];
+    // Resistor-type allowlist is *soft* (top attackers bypass) so picks like
+    // Machamp/Lucario surface even though Fighting/Steel aren't resistant
+    // typings vs e.g. Steel bosses. The SE-move clauses are *hard* (no wrap)
+    // — without them, top attackers like Mewtwo (psychic) get OR-allowed
+    // into a Steel-boss filter where their STAB is fully resisted.
     push(clauses, wrap(resistorList.join(",")),       tFn("app.clause_why.raid_resistor_types"));
-    push(clauses, wrap(fastMoveClause(seMoveList)),   tFn("app.clause_why.raid_se_fast"));
-    push(clauses, wrap(chargeMoveClause(seMoveList)), tFn("app.clause_why.raid_se_charge"));
+    push(clauses, fastMoveClause(seMoveList),         tFn("app.clause_why.raid_se_fast"));
+    push(clauses, chargeMoveClause(seMoveList),       tFn("app.clause_why.raid_se_charge"));
     // Max battles only let you bring Dynamax-capable Pokémon, so narrow to
     // species that have at least one Max move unlocked. PoGo's keyword is
     // `<dynamax-move>1-` — locale-aware via kw.flag.dynamax_move.
@@ -1164,7 +1170,13 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
       return { slot: phase.slot, pokemons: localizedPokemons, clause: "", clauses: [], skipped: true };
     }
     const clauses = [];
-    push(clauses, resistorList.join(","),       tFn("app.clause_why.rocket_resistor_types"));
+    // Soft resistor allowlist — narrow lineups like Landorus (resistorTypes:
+    // ["flying"]) would otherwise gate the filter to Flying-only attackers,
+    // which leaves Gyarados as the lone real candidate and gets melted by
+    // Stone Edge. Letting top attackers OR-bypass surfaces Glaceon, Galarian
+    // Darmanitan, Kyogre etc. who still have to clear the SE-move and
+    // weakness-guard hard gates below.
+    push(clauses, withAllowlist(resistorList.join(",")), tFn("app.clause_why.rocket_resistor_types"));
     push(clauses, fastMoveClause(seMoveList),   tFn("app.clause_why.rocket_se_fast"));
     push(clauses, chargeMoveClause(seMoveList), tFn("app.clause_why.rocket_se_charge"));
     const second = buildSecondMoveAndAppraise();
@@ -1213,7 +1225,8 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
                clause: "", clauses: [], skipped: true };
     }
     const clauses = [];
-    push(clauses, resistorList.join(","),       tFn("app.clause_why.rocket_resistor_types"));
+    // Soft resistor allowlist — see buildLeaderPhase for the rationale.
+    push(clauses, withAllowlist(resistorList.join(",")), tFn("app.clause_why.rocket_resistor_types"));
     push(clauses, fastMoveClause(seMoveList),   tFn("app.clause_why.rocket_se_fast"));
     push(clauses, chargeMoveClause(seMoveList), tFn("app.clause_why.rocket_se_charge"));
     const second = buildSecondMoveAndAppraise();
