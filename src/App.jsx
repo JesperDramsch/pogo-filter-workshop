@@ -1694,6 +1694,27 @@ export default function App() {
     onHashChange();
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
+  // Quietly request persistent storage the first time the user enters the
+  // workshop in a session. Skip the call when already-persisted (don't burn
+  // a prompt on a no-op) and skip the landing-page view (the user hasn't
+  // committed to using the app yet — no point asking). Failures stay
+  // silent; the Settings → "browser storage" row is the visible fallback
+  // for retry. The browser caches its decision per-origin, so subsequent
+  // sessions won't re-prompt once granted or denied.
+  const persistRequestedRef = useRef(false);
+  useEffect(() => {
+    if (view !== "workshop") return;
+    if (persistRequestedRef.current) return;
+    persistRequestedRef.current = true;
+    if (!navigator.storage?.persist || !navigator.storage?.persisted) return;
+    (async () => {
+      try {
+        const already = await navigator.storage.persisted();
+        if (already) return;
+        await navigator.storage.persist();
+      } catch { /* user can retry via Settings */ }
+    })();
+  }, [view]);
   const [homeLocation, setHomeLocation] = useState(null);   // [lon, lat] — drives defaults
   const [lastPin, setLastPin] = useState(null);             // [lon, lat] — inspector
   const [bazaarTags, setBazaarTags] = useState([]);
