@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-03T09:40:13.893Z",
+  "fetchedAt": "2026-05-04T10:25:51.335Z",
   "trainers": [
     {
       "name": "Giovanni",
@@ -34,10 +34,9 @@
               ]
             },
             {
-              "name": "Nidoking",
+              "name": "Machamp",
               "types": [
-                "poison",
-                "ground"
+                "fighting"
               ]
             },
             {
@@ -51,16 +50,21 @@
           "resistorTypes": [
             "fighting",
             "ground",
-            "ghost"
+            "ghost",
+            "grass",
+            "psychic",
+            "fairy"
           ],
           "seMoveTypes": [
             "fighting",
+            "flying",
             "ground",
             "steel",
             "water",
             "grass",
             "psychic",
-            "ice"
+            "ice",
+            "fairy"
           ]
         },
         {

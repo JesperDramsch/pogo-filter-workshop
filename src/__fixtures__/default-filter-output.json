@@ -96,7 +96,7 @@
     "rocketLeaders": {
       "Giovanni": {
         "1": "rock,ghost,steel&@1fighting&@2fighting,@3fighting&!<normal",
-        "2": "fighting,ground,ghost&@1fighting,@1ground,@1steel,@1water,@1grass,@1psychic,@1ice&@2fighting,@2ground,@2steel,@2water,@2grass,@2psychic,@2ice,@3fighting,@3ground,@3steel,@3water,@3grass,@3psychic,@3ice&!<normal&!<poison&!<ground&!<rock",
+        "2": "fighting,ground,ghost,grass,psychic,fairy&@1fighting,@1flying,@1ground,@1steel,@1water,@1grass,@1psychic,@1ice,@1fairy&@2fighting,@2flying,@2ground,@2steel,@2water,@2grass,@2psychic,@2ice,@2fairy,@3fighting,@3flying,@3ground,@3steel,@3water,@3grass,@3psychic,@3ice,@3fairy&!<normal&!<fighting&!<ground&!<rock",
         "3": "flying&@1water,@1ice&@2water,@2ice,@3water,@3ice&!<ground&!<flying"
       },
       "Cliff": {
@@ -246,7 +246,7 @@
     "rocketLeaders": {
       "Giovanni": {
         "1": "gestein,geist,stahl&@1kampf&@2kampf,@3kampf&!<normal",
-        "2": "kampf,boden,geist&@1kampf,@1boden,@1stahl,@1wasser,@1pflanze,@1psycho,@1eis&@2kampf,@2boden,@2stahl,@2wasser,@2pflanze,@2psycho,@2eis,@3kampf,@3boden,@3stahl,@3wasser,@3pflanze,@3psycho,@3eis&!<normal&!<gift&!<boden&!<gestein",
+        "2": "kampf,boden,geist,pflanze,psycho,fee&@1kampf,@1flug,@1boden,@1stahl,@1wasser,@1pflanze,@1psycho,@1eis,@1fee&@2kampf,@2flug,@2boden,@2stahl,@2wasser,@2pflanze,@2psycho,@2eis,@2fee,@3kampf,@3flug,@3boden,@3stahl,@3wasser,@3pflanze,@3psycho,@3eis,@3fee&!<normal&!<kampf&!<boden&!<gestein",
         "3": "flug&@1wasser,@1eis&@2wasser,@2eis,@3wasser,@3eis&!<boden&!<flug"
       },
       "Cliff": {
@@ -396,7 +396,7 @@
     "rocketLeaders": {
       "Giovanni": {
         "1": "roca,fantasma,acero&@1lucha&@2lucha,@3lucha&!<normal",
-        "2": "lucha,tierra,fantasma&@1lucha,@1tierra,@1acero,@1agua,@1planta,@1psíquico,@1hielo&@2lucha,@2tierra,@2acero,@2agua,@2planta,@2psíquico,@2hielo,@3lucha,@3tierra,@3acero,@3agua,@3planta,@3psíquico,@3hielo&!<normal&!<veneno&!<tierra&!<roca",
+        "2": "lucha,tierra,fantasma,planta,psíquico,hada&@1lucha,@1volador,@1tierra,@1acero,@1agua,@1planta,@1psíquico,@1hielo,@1hada&@2lucha,@2volador,@2tierra,@2acero,@2agua,@2planta,@2psíquico,@2hielo,@2hada,@3lucha,@3volador,@3tierra,@3acero,@3agua,@3planta,@3psíquico,@3hielo,@3hada&!<normal&!<lucha&!<tierra&!<roca",
         "3": "volador&@1agua,@1hielo&@2agua,@2hielo,@3agua,@3hielo&!<tierra&!<volador"
       },
       "Cliff": {
@@ -546,7 +546,7 @@
     "rocketLeaders": {
       "Giovanni": {
         "1": "roche,spectre,acier&@1combat&@2combat,@3combat&!<normal",
-        "2": "combat,sol,spectre&@1combat,@1sol,@1acier,@1eau,@1plante,@1psy,@1glace&@2combat,@2sol,@2acier,@2eau,@2plante,@2psy,@2glace,@3combat,@3sol,@3acier,@3eau,@3plante,@3psy,@3glace&!<normal&!<poison&!<sol&!<roche",
+        "2": "combat,sol,spectre,plante,psy,fée&@1combat,@1vol,@1sol,@1acier,@1eau,@1plante,@1psy,@1glace,@1fée&@2combat,@2vol,@2sol,@2acier,@2eau,@2plante,@2psy,@2glace,@2fée,@3combat,@3vol,@3sol,@3acier,@3eau,@3plante,@3psy,@3glace,@3fée&!<normal&!<combat&!<sol&!<roche",
         "3": "vol&@1eau,@1glace&@2eau,@2glace,@3eau,@3glace&!<sol&!<vol"
       },
       "Cliff": {
@@ -696,7 +696,7 @@
     "rocketLeaders": {
       "Giovanni": {
         "1": "岩石,幽靈,鋼&@1格鬥&@2格鬥,@3格鬥&!<一般",
-        "2": "格鬥,地面,幽靈&@1格鬥,@1地面,@1鋼,@1水,@1草,@1超能力,@1冰&@2格鬥,@2地面,@2鋼,@2水,@2草,@2超能力,@2冰,@3格鬥,@3地面,@3鋼,@3水,@3草,@3超能力,@3冰&!<一般&!<毒&!<地面&!<岩石",
+        "2": "格鬥,地面,幽靈,草,超能力,妖精&@1格鬥,@1飛行,@1地面,@1鋼,@1水,@1草,@1超能力,@1冰,@1妖精&@2格鬥,@2飛行,@2地面,@2鋼,@2水,@2草,@2超能力,@2冰,@2妖精,@3格鬥,@3飛行,@3地面,@3鋼,@3水,@3草,@3超能力,@3冰,@3妖精&!<一般&!<格鬥&!<地面&!<岩石",
         "3": "飛行&@1水,@1冰&@2水,@2冰,@3水,@3冰&!<地面&!<飛行"
       },
       "Cliff": {
@@ -846,7 +846,7 @@
     "rocketLeaders": {
       "Giovanni": {
         "1": "रॉक,घोट,टल&@1फ़ाइटंग&@2फ़ाइटंग,@3फ़ाइटंग&!<नॉमल",
-        "2": "फ़ाइटंग,ाउंड,घोट&@1फ़ाइटंग,@1ाउंड,@1टल,@1वॉटर,@1ास,@1साइकक,@1आइस&@2फ़ाइटंग,@2ाउंड,@2टल,@2वॉटर,@2ास,@2साइकक,@2आइस,@3फ़ाइटंग,@3ाउंड,@3टल,@3वॉटर,@3ास,@3साइकक,@3आइस&!<नॉमल&!<पॉइज़न&!<ाउंड&!<रॉक",
+        "2": "फ़ाइटंग,ाउंड,घोट,ास,साइकक,फ़ेर&@1फ़ाइटंग,@1़लाइंग,@1ाउंड,@1टल,@1वॉटर,@1ास,@1साइकक,@1आइस,@1फ़ेर&@2फ़ाइटंग,@2़लाइंग,@2ाउंड,@2टल,@2वॉटर,@2ास,@2साइकक,@2आइस,@2फ़ेर,@3फ़ाइटंग,@3़लाइंग,@3ाउंड,@3टल,@3वॉटर,@3ास,@3साइकक,@3आइस,@3फ़ेर&!<नॉमल&!<फ़ाइटंग&!<ाउंड&!<रॉक",
         "3": "़लाइंग&@1वॉटर,@1आइस&@2वॉटर,@2आइस,@3वॉटर,@3आइस&!<ाउंड&!<़लाइंग"
       },
       "Cliff": {
@@ -996,7 +996,7 @@
     "rocketLeaders": {
       "Giovanni": {
         "1": "いわ,ゴースト,はがね&@1かくとう&@2かくとう,@3かくとう&!<ノーマル",
-        "2": "かくとう,じめん,ゴースト&@1かくとう,@1じめん,@1はがね,@1みず,@1くさ,@1エスパー,@1こおり&@2かくとう,@2じめん,@2はがね,@2みず,@2くさ,@2エスパー,@2こおり,@3かくとう,@3じめん,@3はがね,@3みず,@3くさ,@3エスパー,@3こおり&!<ノーマル&!<どく&!<じめん&!<いわ",
+        "2": "かくとう,じめん,ゴースト,くさ,エスパー,フェアリー&@1かくとう,@1ひこう,@1じめん,@1はがね,@1みず,@1くさ,@1エスパー,@1こおり,@1フェアリー&@2かくとう,@2ひこう,@2じめん,@2はがね,@2みず,@2くさ,@2エスパー,@2こおり,@2フェアリー,@3かくとう,@3ひこう,@3じめん,@3はがね,@3みず,@3くさ,@3エスパー,@3こおり,@3フェアリー&!<ノーマル&!<かくとう&!<じめん&!<いわ",
         "3": "ひこう&@1みず,@1こおり&@2みず,@2こおり,@3みず,@3こおり&!<じめん&!<ひこう"
       },
       "Cliff": {
