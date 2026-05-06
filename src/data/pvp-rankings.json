@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-04T14:46:52.827Z",
+  "fetchedAt": "2026-05-06T10:30:13.289Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -379,133 +379,6 @@
     }
   },
   "cups": {
-    "fantasy": {
-      "id": "fantasy",
-      "name": "Fantasy Cup",
-      "cpCap": 1500,
-      "species": [
-        {
-          "dex": 618,
-          "name": "Stunfisk (Galarian)"
-        },
-        {
-          "dex": 110,
-          "name": "Weezing (Galarian) (Shadow)"
-        },
-        {
-          "dex": 681,
-          "name": "Aegislash (Shield)"
-        },
-        {
-          "dex": 205,
-          "name": "Forretress"
-        },
-        {
-          "dex": 776,
-          "name": "Turtonator"
-        },
-        {
-          "dex": 823,
-          "name": "Corviknight"
-        },
-        {
-          "dex": 680,
-          "name": "Doublade"
-        },
-        {
-          "dex": 968,
-          "name": "Orthworm"
-        },
-        {
-          "dex": 395,
-          "name": "Empoleon"
-        },
-        {
-          "dex": 530,
-          "name": "Excadrill (Shadow)"
-        },
-        {
-          "dex": 448,
-          "name": "Lucario"
-        },
-        {
-          "dex": 959,
-          "name": "Tinkaton"
-        },
-        {
-          "dex": 485,
-          "name": "Heatran (Shadow)"
-        },
-        {
-          "dex": 28,
-          "name": "Sandslash (Alolan)"
-        },
-        {
-          "dex": 379,
-          "name": "Registeel"
-        },
-        {
-          "dex": 208,
-          "name": "Steelix (Shadow)"
-        },
-        {
-          "dex": 334,
-          "name": "Altaria"
-        },
-        {
-          "dex": 809,
-          "name": "Melmetal"
-        },
-        {
-          "dex": 702,
-          "name": "Dedenne"
-        },
-        {
-          "dex": 730,
-          "name": "Primarina"
-        },
-        {
-          "dex": 184,
-          "name": "Azumarill"
-        },
-        {
-          "dex": 385,
-          "name": "Jirachi"
-        },
-        {
-          "dex": 468,
-          "name": "Togekiss"
-        },
-        {
-          "dex": 487,
-          "name": "Giratina (Altered) (Shadow)"
-        },
-        {
-          "dex": 176,
-          "name": "Togetic"
-        },
-        {
-          "dex": 330,
-          "name": "Flygon (Shadow)"
-        },
-        {
-          "dex": 788,
-          "name": "Tapu Fini"
-        },
-        {
-          "dex": 707,
-          "name": "Klefki"
-        },
-        {
-          "dex": 376,
-          "name": "Metagross"
-        },
-        {
-          "dex": 860,
-          "name": "Morgrem"
-        }
-      ]
-    },
     "jungle": {
       "id": "jungle",
       "name": "Jungle Cup",
@@ -762,15 +635,6 @@
     }
   },
   "gblEvents": [
-    {
-      "eventID": "gbl-memories-in-motion_great-league_fantasy-cup-great-league-edition",
-      "name": "Great League and Fantasy Cup: Great League Edition | Memories in Motion",
-      "start": "2026-04-28T20:00:00.000Z",
-      "end": "2026-05-05T20:00:00.000Z",
-      "cups": [
-        "fantasy"
-      ]
-    },
     {
       "eventID": "gbl-memories-in-motion_ultra-league_jungle-cup-great-league-edition",
       "name": "Ultra League and Jungle Cup: Great League Edition | Memories in Motion",
