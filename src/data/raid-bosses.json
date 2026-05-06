@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-04T06:42:48.534Z",
+  "fetchedAt": "2026-05-06T10:00:36.896Z",
   "raids": {
     "mega": [
       {
@@ -51,124 +51,6 @@
           "ghost",
           "poison",
           "steel"
-        ]
-      }
-    ],
-    "lvl3": [
-      {
-        "id": "ORTHWORM",
-        "names": {
-          "en": "Orthworm",
-          "de": "Schlurm",
-          "fr": "Ferdeter",
-          "it": "Orthworm",
-          "ja": "ミミズズ",
-          "ko": "꿈트렁",
-          "es": "Orthworm"
-        },
-        "types": [
-          "steel"
-        ],
-        "resistorTypes": [
-          "steel",
-          "fire",
-          "water",
-          "electric"
-        ],
-        "seMoveTypes": [
-          "fighting",
-          "fire",
-          "ground"
-        ]
-      }
-    ],
-    "lvl1": [
-      {
-        "id": "BELDUM",
-        "names": {
-          "en": "Beldum",
-          "de": "Tanhel",
-          "fr": "Terhal",
-          "it": "Beldum",
-          "ja": "ダンバル",
-          "ko": "메탕",
-          "es": "Beldum"
-        },
-        "types": [
-          "steel",
-          "psychic"
-        ],
-        "resistorTypes": [
-          "steel",
-          "fire",
-          "water",
-          "electric",
-          "psychic",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "fire",
-          "ghost",
-          "ground"
-        ]
-      },
-      {
-        "id": "SHIELDON",
-        "names": {
-          "en": "Shieldon",
-          "de": "Schilterus",
-          "fr": "Dinoclier",
-          "it": "Shieldon",
-          "ja": "タテトプス",
-          "ko": "방패톱스",
-          "es": "Shieldon"
-        },
-        "types": [
-          "rock",
-          "steel"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "ground",
-          "steel",
-          "water",
-          "electric"
-        ],
-        "seMoveTypes": [
-          "fighting",
-          "ground",
-          "water"
-        ]
-      },
-      {
-        "id": "HONEDGE",
-        "names": {
-          "en": "Honedge",
-          "de": "Gramokles",
-          "fr": "Monorpale",
-          "it": "Honedge",
-          "ja": "ヒトツキ",
-          "ko": "단칼빙",
-          "es": "Honedge"
-        },
-        "types": [
-          "steel",
-          "ghost"
-        ],
-        "resistorTypes": [
-          "normal",
-          "steel",
-          "fire",
-          "water",
-          "electric",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "fire",
-          "ghost",
-          "ground"
         ]
       }
     ],
@@ -1509,41 +1391,11 @@
   },
   "eventRaids": [
     {
-      "eventID": "mega-camerupt-in-mega-raids-may-2026",
-      "name": "Mega Camerupt in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-05-06T06:00:00.000",
-      "end": "2026-05-13T06:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "CAMERUPT",
-          "names": {
-            "en": "Camerupt"
-          },
-          "types": [
-            "fire",
-            "ground"
-          ],
-          "resistorTypes": [
-            "flying",
-            "water",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "ground",
-            "water"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "nihilego-in-5-star-raid-battles-may-2026",
       "name": "Nihilego in 5-star Raid Battles",
       "eventType": "raid-battles",
       "start": "2026-05-06T06:00:00.000",
-      "end": "2026-05-13T06:00:00.000",
+      "end": "2026-05-12T22:00:00.000",
       "isShadow": false,
       "isMega": false,
       "bosses": [
@@ -1569,6 +1421,36 @@
             "steel",
             "water",
             "psychic"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-camerupt-in-mega-raids-may-2026",
+      "name": "Mega Camerupt in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-05-06T06:00:00.000",
+      "end": "2026-05-13T06:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "CAMERUPT",
+          "names": {
+            "en": "Camerupt"
+          },
+          "types": [
+            "fire",
+            "ground"
+          ],
+          "resistorTypes": [
+            "flying",
+            "water",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "ground",
+            "water"
           ]
         }
       ]
@@ -1634,6 +1516,117 @@
             "steel",
             "water",
             "psychic"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "buzzwole-pheromosa-xurkitree-in-5-star-raid-battles-may-2026",
+      "name": "Buzzwole, Pheromosa, and Xurkitree in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-05-13T06:00:00.000",
+      "end": "2026-05-19T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "BUZZWOLE",
+          "names": {
+            "en": "Buzzwole"
+          },
+          "types": [
+            "bug",
+            "fighting"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
+            "fire",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "fire",
+            "psychic",
+            "fairy"
+          ]
+        },
+        {
+          "id": "PHEROMOSA",
+          "names": {
+            "en": "Pheromosa"
+          },
+          "types": [
+            "bug",
+            "fighting"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
+            "fire",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "fire",
+            "psychic",
+            "fairy"
+          ]
+        },
+        {
+          "id": "XURKITREE",
+          "names": {
+            "en": "Xurkitree"
+          },
+          "types": [
+            "electric"
+          ],
+          "resistorTypes": [
+            "ground",
+            "grass",
+            "electric",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "ground"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-glalie-in-mega-raids-may-2026",
+      "name": "Mega Glalie in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-05-13T06:00:00.000",
+      "end": "2026-05-20T06:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "GLALIE",
+          "names": {
+            "en": "Glalie"
+          },
+          "types": [
+            "ice"
+          ],
+          "resistorTypes": [
+            "steel",
+            "fire",
+            "water",
+            "ice"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "rock",
+            "steel",
+            "fire"
           ]
         }
       ]

@@ -20,14 +20,6 @@
       "lvl5": {
         "TAPU_LELE": "steel,fire,psychic&@1ghost,@1poison,@1steel&@2ghost,@2poison,@2steel,@3ghost,@3poison,@3steel&!<psychic&!<fairy"
       },
-      "lvl3": {
-        "ORTHWORM": "steel,fire,water,electric&@1fighting,@1fire,@1ground&@2fighting,@2fire,@2ground,@3fighting,@3fire,@3ground&!<steel"
-      },
-      "lvl1": {
-        "BELDUM": "steel,fire,water,electric,psychic,dark&@1dark,@1fire,@1ghost,@1ground&@2dark,@2fire,@2ghost,@2ground,@3dark,@3fire,@3ghost,@3ground&!<steel&!<psychic",
-        "SHIELDON": "fighting,ground,steel,water,electric&@1fighting,@1ground,@1water&@2fighting,@2ground,@2water,@3fighting,@3ground,@3water&!<rock&!<steel",
-        "HONEDGE": "normal,steel,fire,water,electric,dark&@1dark,@1fire,@1ghost,@1ground&@2dark,@2fire,@2ghost,@2ground,@3dark,@3fire,@3ghost,@3ground&!<steel&!<ghost"
-      },
       "shadow_lvl5": {
         "LATIOS": "steel,psychic,dark,fairy&@1bug,@1dark,@1dragon,@1fairy,@1ghost,@1ice&@2bug,@2dark,@2dragon,@2fairy,@2ghost,@2ice,@3bug,@3dark,@3dragon,@3fairy,@3ghost,@3ice&!<dragon&!<psychic"
       },
@@ -169,14 +161,6 @@
       },
       "lvl5": {
         "TAPU_LELE": "stahl,feuer,psycho&@1geist,@1gift,@1stahl&@2geist,@2gift,@2stahl,@3geist,@3gift,@3stahl&!<psycho&!<fee"
-      },
-      "lvl3": {
-        "ORTHWORM": "stahl,feuer,wasser,elektro&@1kampf,@1feuer,@1boden&@2kampf,@2feuer,@2boden,@3kampf,@3feuer,@3boden&!<stahl"
-      },
-      "lvl1": {
-        "BELDUM": "stahl,feuer,wasser,elektro,psycho,unlicht&@1unlicht,@1feuer,@1geist,@1boden&@2unlicht,@2feuer,@2geist,@2boden,@3unlicht,@3feuer,@3geist,@3boden&!<stahl&!<psycho",
-        "SHIELDON": "kampf,boden,stahl,wasser,elektro&@1kampf,@1boden,@1wasser&@2kampf,@2boden,@2wasser,@3kampf,@3boden,@3wasser&!<gestein&!<stahl",
-        "HONEDGE": "normal,stahl,feuer,wasser,elektro,unlicht&@1unlicht,@1feuer,@1geist,@1boden&@2unlicht,@2feuer,@2geist,@2boden,@3unlicht,@3feuer,@3geist,@3boden&!<stahl&!<geist"
       },
       "shadow_lvl5": {
         "LATIOS": "stahl,psycho,unlicht,fee&@1käfer,@1unlicht,@1drache,@1fee,@1geist,@1eis&@2käfer,@2unlicht,@2drache,@2fee,@2geist,@2eis,@3käfer,@3unlicht,@3drache,@3fee,@3geist,@3eis&!<drache&!<psycho"
@@ -320,14 +304,6 @@
       "lvl5": {
         "TAPU_LELE": "acero,fuego,psíquico&@1fantasma,@1veneno,@1acero&@2fantasma,@2veneno,@2acero,@3fantasma,@3veneno,@3acero&!<psíquico&!<hada"
       },
-      "lvl3": {
-        "ORTHWORM": "acero,fuego,agua,eléctrico&@1lucha,@1fuego,@1tierra&@2lucha,@2fuego,@2tierra,@3lucha,@3fuego,@3tierra&!<acero"
-      },
-      "lvl1": {
-        "BELDUM": "acero,fuego,agua,eléctrico,psíquico,siniestro&@1siniestro,@1fuego,@1fantasma,@1tierra&@2siniestro,@2fuego,@2fantasma,@2tierra,@3siniestro,@3fuego,@3fantasma,@3tierra&!<acero&!<psíquico",
-        "SHIELDON": "lucha,tierra,acero,agua,eléctrico&@1lucha,@1tierra,@1agua&@2lucha,@2tierra,@2agua,@3lucha,@3tierra,@3agua&!<roca&!<acero",
-        "HONEDGE": "normal,acero,fuego,agua,eléctrico,siniestro&@1siniestro,@1fuego,@1fantasma,@1tierra&@2siniestro,@2fuego,@2fantasma,@2tierra,@3siniestro,@3fuego,@3fantasma,@3tierra&!<acero&!<fantasma"
-      },
       "shadow_lvl5": {
         "LATIOS": "acero,psíquico,siniestro,hada&@1bicho,@1siniestro,@1dragón,@1hada,@1fantasma,@1hielo&@2bicho,@2siniestro,@2dragón,@2hada,@2fantasma,@2hielo,@3bicho,@3siniestro,@3dragón,@3hada,@3fantasma,@3hielo&!<dragón&!<psíquico"
       },
@@ -469,14 +445,6 @@
       },
       "lvl5": {
         "TAPU_LELE": "acier,feu,psy&@1spectre,@1poison,@1acier&@2spectre,@2poison,@2acier,@3spectre,@3poison,@3acier&!<psy&!<fée"
-      },
-      "lvl3": {
-        "ORTHWORM": "acier,feu,eau,électrik&@1combat,@1feu,@1sol&@2combat,@2feu,@2sol,@3combat,@3feu,@3sol&!<acier"
-      },
-      "lvl1": {
-        "BELDUM": "acier,feu,eau,électrik,psy,ténèbres&@1ténèbres,@1feu,@1spectre,@1sol&@2ténèbres,@2feu,@2spectre,@2sol,@3ténèbres,@3feu,@3spectre,@3sol&!<acier&!<psy",
-        "SHIELDON": "combat,sol,acier,eau,électrik&@1combat,@1sol,@1eau&@2combat,@2sol,@2eau,@3combat,@3sol,@3eau&!<roche&!<acier",
-        "HONEDGE": "normal,acier,feu,eau,électrik,ténèbres&@1ténèbres,@1feu,@1spectre,@1sol&@2ténèbres,@2feu,@2spectre,@2sol,@3ténèbres,@3feu,@3spectre,@3sol&!<acier&!<spectre"
       },
       "shadow_lvl5": {
         "LATIOS": "acier,psy,ténèbres,fée&@1insecte,@1ténèbres,@1dragon,@1fée,@1spectre,@1glace&@2insecte,@2ténèbres,@2dragon,@2fée,@2spectre,@2glace,@3insecte,@3ténèbres,@3dragon,@3fée,@3spectre,@3glace&!<dragon&!<psy"
@@ -620,14 +588,6 @@
       "lvl5": {
         "TAPU_LELE": "鋼,火,超能力&@1幽靈,@1毒,@1鋼&@2幽靈,@2毒,@2鋼,@3幽靈,@3毒,@3鋼&!<超能力&!<妖精"
       },
-      "lvl3": {
-        "ORTHWORM": "鋼,火,水,電&@1格鬥,@1火,@1地面&@2格鬥,@2火,@2地面,@3格鬥,@3火,@3地面&!<鋼"
-      },
-      "lvl1": {
-        "BELDUM": "鋼,火,水,電,超能力,惡&@1惡,@1火,@1幽靈,@1地面&@2惡,@2火,@2幽靈,@2地面,@3惡,@3火,@3幽靈,@3地面&!<鋼&!<超能力",
-        "SHIELDON": "格鬥,地面,鋼,水,電&@1格鬥,@1地面,@1水&@2格鬥,@2地面,@2水,@3格鬥,@3地面,@3水&!<岩石&!<鋼",
-        "HONEDGE": "一般,鋼,火,水,電,惡&@1惡,@1火,@1幽靈,@1地面&@2惡,@2火,@2幽靈,@2地面,@3惡,@3火,@3幽靈,@3地面&!<鋼&!<幽靈"
-      },
       "shadow_lvl5": {
         "LATIOS": "鋼,超能力,惡,妖精&@1蟲,@1惡,@1龍,@1妖精,@1幽靈,@1冰&@2蟲,@2惡,@2龍,@2妖精,@2幽靈,@2冰,@3蟲,@3惡,@3龍,@3妖精,@3幽靈,@3冰&!<龍&!<超能力"
       },
@@ -770,14 +730,6 @@
       "lvl5": {
         "TAPU_LELE": "टल,फ़ायर,साइकक&@1घोट,@1पॉइज़न,@1टल&@2घोट,@2पॉइज़न,@2टल,@3घोट,@3पॉइज़न,@3टल&!<साइकक&!<फ़ेर"
       },
-      "lvl3": {
-        "ORTHWORM": "टल,फ़ायर,वॉटर,इलटक&@1फ़ाइटंग,@1फ़ायर,@1ाउंड&@2फ़ाइटंग,@2फ़ायर,@2ाउंड,@3फ़ाइटंग,@3फ़ायर,@3ाउंड&!<टल"
-      },
-      "lvl1": {
-        "BELDUM": "टल,फ़ायर,वॉटर,इलटक,साइकक,डाक&@1डाक,@1फ़ायर,@1घोट,@1ाउंड&@2डाक,@2फ़ायर,@2घोट,@2ाउंड,@3डाक,@3फ़ायर,@3घोट,@3ाउंड&!<टल&!<साइकक",
-        "SHIELDON": "फ़ाइटंग,ाउंड,टल,वॉटर,इलटक&@1फ़ाइटंग,@1ाउंड,@1वॉटर&@2फ़ाइटंग,@2ाउंड,@2वॉटर,@3फ़ाइटंग,@3ाउंड,@3वॉटर&!<रॉक&!<टल",
-        "HONEDGE": "नॉमल,टल,फ़ायर,वॉटर,इलटक,डाक&@1डाक,@1फ़ायर,@1घोट,@1ाउंड&@2डाक,@2फ़ायर,@2घोट,@2ाउंड,@3डाक,@3फ़ायर,@3घोट,@3ाउंड&!<टल&!<घोट"
-      },
       "shadow_lvl5": {
         "LATIOS": "टल,साइकक,डाक,फ़ेर&@1बग,@1डाक,@1डैगन,@1फ़ेर,@1घोट,@1आइस&@2बग,@2डाक,@2डैगन,@2फ़ेर,@2घोट,@2आइस,@3बग,@3डाक,@3डैगन,@3फ़ेर,@3घोट,@3आइस&!<डैगन&!<साइकक"
       },
@@ -919,14 +871,6 @@
       },
       "lvl5": {
         "TAPU_LELE": "はがね,ほのお,エスパー&@1ゴースト,@1どく,@1はがね&@2ゴースト,@2どく,@2はがね,@3ゴースト,@3どく,@3はがね&!<エスパー&!<フェアリー"
-      },
-      "lvl3": {
-        "ORTHWORM": "はがね,ほのお,みず,でんき&@1かくとう,@1ほのお,@1じめん&@2かくとう,@2ほのお,@2じめん,@3かくとう,@3ほのお,@3じめん&!<はがね"
-      },
-      "lvl1": {
-        "BELDUM": "はがね,ほのお,みず,でんき,エスパー,あく&@1あく,@1ほのお,@1ゴースト,@1じめん&@2あく,@2ほのお,@2ゴースト,@2じめん,@3あく,@3ほのお,@3ゴースト,@3じめん&!<はがね&!<エスパー",
-        "SHIELDON": "かくとう,じめん,はがね,みず,でんき&@1かくとう,@1じめん,@1みず&@2かくとう,@2じめん,@2みず,@3かくとう,@3じめん,@3みず&!<いわ&!<はがね",
-        "HONEDGE": "ノーマル,はがね,ほのお,みず,でんき,あく&@1あく,@1ほのお,@1ゴースト,@1じめん&@2あく,@2ほのお,@2ゴースト,@2じめん,@3あく,@3ほのお,@3ゴースト,@3じめん&!<はがね&!<ゴースト"
       },
       "shadow_lvl5": {
         "LATIOS": "はがね,エスパー,あく,フェアリー&@1むし,@1あく,@1ドラゴン,@1フェアリー,@1ゴースト,@1こおり&@2むし,@2あく,@2ドラゴン,@2フェアリー,@2ゴースト,@2こおり,@3むし,@3あく,@3ドラゴン,@3フェアリー,@3ゴースト,@3こおり&!<ドラゴン&!<エスパー"
