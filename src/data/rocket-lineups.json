@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-04T10:25:51.335Z",
+  "fetchedAt": "2026-05-06T10:27:54.351Z",
   "trainers": [
     {
       "name": "Giovanni",
@@ -651,7 +651,7 @@
               ]
             },
             {
-              "name": "Tentacruel",
+              "name": "Tentacool",
               "types": [
                 "water",
                 "poison"
@@ -712,12 +712,6 @@
               "types": [
                 "water"
               ]
-            },
-            {
-              "name": "Feebas",
-              "types": [
-                "water"
-              ]
             }
           ]
         },
@@ -761,7 +755,7 @@
         "electric",
         "grass"
       ],
-      "lineupSize": 5
+      "lineupSize": 4
     },
     {
       "name": "Electric-type Female Grunt",
