@@ -14,25 +14,33 @@
     "megaEvolve": "megaevolve&mega1-2,evolvenew",
     "pilotLong": "distance1000-&!traded&!4*&!legendary&!mythical&!shiny",
     "raidFilters": {
-      "mega": {
-        "BANETTE": "normal,dark&@1dark,@1ghost&@2dark,@2ghost,@3dark,@3ghost&!<ghost"
+      "ultra_beast": {
+        "NIHILEGO": "fighting,poison,ground,rock,ghost,steel&@1ground,@1psychic,@1steel,@1water&@2ground,@2psychic,@2steel,@2water,@3ground,@3psychic,@3steel,@3water&!<rock&!<poison"
       },
-      "lvl5": {
-        "TAPU_LELE": "steel,fire,psychic&@1ghost,@1poison,@1steel&@2ghost,@2poison,@2steel,@3ghost,@3poison,@3steel&!<psychic&!<fairy"
+      "lvl3": {
+        "NIDOQUEEN": "flying,ground,bug,ghost&@1ground,@1ice,@1psychic,@1water&@2ground,@2ice,@2psychic,@2water,@3ground,@3ice,@3psychic,@3water&!<poison&!<ground",
+        "STARMIE": "steel,water,grass,psychic,dragon,dark&@1bug,@1dark,@1electric,@1ghost,@1grass&@2bug,@2dark,@2electric,@2ghost,@2grass,@3bug,@3dark,@3electric,@3ghost,@3grass&!<water&!<psychic",
+        "DRUDDIGON": "steel,fairy&@1dragon,@1fairy,@1ice&@2dragon,@2fairy,@2ice,@3dragon,@3fairy,@3ice&!<dragon"
+      },
+      "lvl1": {
+        "VOLTORB": "poison,bug,steel,fire,grass,electric,dragon&@1bug,@1fire,@1ice,@1poison&@2bug,@2fire,@2ice,@2poison,@3bug,@3fire,@3ice,@3poison&!<electric&!<grass",
+        "BAGON": "steel,fairy&@1dragon,@1fairy,@1ice&@2dragon,@2fairy,@2ice,@3dragon,@3fairy,@3ice&!<dragon",
+        "SHIELDON": "fighting,ground,steel,water,electric&@1fighting,@1ground,@1water&@2fighting,@2ground,@2water,@3fighting,@3ground,@3water&!<rock&!<steel",
+        "ESPURR": "steel,psychic,dark&@1bug,@1dark,@1ghost&@2bug,@2dark,@2ghost,@3bug,@3dark,@3ghost&!<psychic"
       },
       "shadow_lvl5": {
-        "LATIOS": "steel,psychic,dark,fairy&@1bug,@1dark,@1dragon,@1fairy,@1ghost,@1ice&@2bug,@2dark,@2dragon,@2fairy,@2ghost,@2ice,@3bug,@3dark,@3dragon,@3fairy,@3ghost,@3ice&!<dragon&!<psychic"
+        "CRESSELIA": "steel,psychic,dark&@1bug,@1dark,@1ghost&@2bug,@2dark,@2ghost,@3bug,@3dark,@3ghost&!<psychic"
       },
       "shadow_lvl3": {
-        "MAROWAK": "normal,rock,fire,water,dragon,dark&@1dark,@1ghost,@1ground,@1rock,@1water&@2dark,@2ghost,@2ground,@2rock,@2water,@3dark,@3ghost,@3ground,@3rock,@3water&!<fire&!<ghost",
-        "LAPRAS": "steel,water,ice&@1electric,@1fighting,@1grass,@1rock&@2electric,@2fighting,@2grass,@2rock,@3electric,@3fighting,@3grass,@3rock&!<water&!<ice",
-        "STANTLER": "rock,ghost,steel&@1fighting&@2fighting,@3fighting&!<normal"
+        "NINETALES": "rock,fire,water,dragon&@1ground,@1rock,@1water&@2ground,@2rock,@2water,@3ground,@3rock,@3water&!<fire",
+        "PRIMEAPE": "flying,poison,bug,ghost,psychic,fairy&@1fairy,@1flying,@1psychic&@2fairy,@2flying,@2psychic,@3fairy,@3flying,@3psychic&!<fighting",
+        "ONIX": "fighting,ground,grass&@1grass,@1water,@1fighting,@1ground,@1ice,@1steel&@2grass,@2water,@2fighting,@2ground,@2ice,@2steel,@3grass,@3water,@3fighting,@3ground,@3ice,@3steel&!<rock&!<ground"
       },
       "shadow_lvl1": {
-        "DRATINI": "steel,fairy&@1dragon,@1fairy,@1ice&@2dragon,@2fairy,@2ice,@3dragon,@3fairy,@3ice&!<dragon",
-        "GLIGAR": "flying&@1ice,@1water&@2ice,@2water,@3ice,@3water&!<ground&!<flying",
-        "CACNEA": "flying,poison,bug,steel,fire,grass,dragon&@1bug,@1fire,@1flying,@1ice,@1poison&@2bug,@2fire,@2flying,@2ice,@2poison,@3bug,@3fire,@3flying,@3ice,@3poison&!<grass",
-        "JOLTIK": "fighting,poison,ground,ghost,steel,fire,electric,dragon,fairy&@1fire,@1rock&@2fire,@2rock,@3fire,@3rock&!<bug&!<electric"
+        "LARVITAR": "fighting,ground,grass&@1grass,@1water,@1fighting,@1ground,@1ice,@1steel&@2grass,@2water,@2fighting,@2ground,@2ice,@2steel,@3grass,@3water,@3fighting,@3ground,@3ice,@3steel&!<rock&!<ground",
+        "SABLEYE": "normal,fighting,dark,fairy&@1fairy&@2fairy,@3fairy&!<dark&!<ghost",
+        "SPHEAL": "steel,water,ice&@1electric,@1fighting,@1grass,@1rock&@2electric,@2fighting,@2grass,@2rock,@3electric,@3fighting,@3grass,@3rock&!<ice&!<water",
+        "INKAY": "steel,dark,fairy&@1bug,@1fairy&@2bug,@2fairy,@3bug,@3fairy&!<dark&!<psychic"
       }
     },
     "maxBattleFilters": {
@@ -156,25 +164,33 @@
     "megaEvolve": "megaentwicklung&mega1-2,neueentwicklung",
     "pilotLong": "entfernung1000-&!getauscht&!4*&!legendär&!mysteriös&!schillernd",
     "raidFilters": {
-      "mega": {
-        "BANETTE": "normal,unlicht&@1unlicht,@1geist&@2unlicht,@2geist,@3unlicht,@3geist&!<geist"
+      "ultra_beast": {
+        "NIHILEGO": "kampf,gift,boden,gestein,geist,stahl&@1boden,@1psycho,@1stahl,@1wasser&@2boden,@2psycho,@2stahl,@2wasser,@3boden,@3psycho,@3stahl,@3wasser&!<gestein&!<gift"
       },
-      "lvl5": {
-        "TAPU_LELE": "stahl,feuer,psycho&@1geist,@1gift,@1stahl&@2geist,@2gift,@2stahl,@3geist,@3gift,@3stahl&!<psycho&!<fee"
+      "lvl3": {
+        "NIDOQUEEN": "flug,boden,käfer,geist&@1boden,@1eis,@1psycho,@1wasser&@2boden,@2eis,@2psycho,@2wasser,@3boden,@3eis,@3psycho,@3wasser&!<gift&!<boden",
+        "STARMIE": "stahl,wasser,pflanze,psycho,drache,unlicht&@1käfer,@1unlicht,@1elektro,@1geist,@1pflanze&@2käfer,@2unlicht,@2elektro,@2geist,@2pflanze,@3käfer,@3unlicht,@3elektro,@3geist,@3pflanze&!<wasser&!<psycho",
+        "DRUDDIGON": "stahl,fee&@1drache,@1fee,@1eis&@2drache,@2fee,@2eis,@3drache,@3fee,@3eis&!<drache"
+      },
+      "lvl1": {
+        "VOLTORB": "gift,käfer,stahl,feuer,pflanze,elektro,drache&@1käfer,@1feuer,@1eis,@1gift&@2käfer,@2feuer,@2eis,@2gift,@3käfer,@3feuer,@3eis,@3gift&!<elektro&!<pflanze",
+        "BAGON": "stahl,fee&@1drache,@1fee,@1eis&@2drache,@2fee,@2eis,@3drache,@3fee,@3eis&!<drache",
+        "SHIELDON": "kampf,boden,stahl,wasser,elektro&@1kampf,@1boden,@1wasser&@2kampf,@2boden,@2wasser,@3kampf,@3boden,@3wasser&!<gestein&!<stahl",
+        "ESPURR": "stahl,psycho,unlicht&@1käfer,@1unlicht,@1geist&@2käfer,@2unlicht,@2geist,@3käfer,@3unlicht,@3geist&!<psycho"
       },
       "shadow_lvl5": {
-        "LATIOS": "stahl,psycho,unlicht,fee&@1käfer,@1unlicht,@1drache,@1fee,@1geist,@1eis&@2käfer,@2unlicht,@2drache,@2fee,@2geist,@2eis,@3käfer,@3unlicht,@3drache,@3fee,@3geist,@3eis&!<drache&!<psycho"
+        "CRESSELIA": "stahl,psycho,unlicht&@1käfer,@1unlicht,@1geist&@2käfer,@2unlicht,@2geist,@3käfer,@3unlicht,@3geist&!<psycho"
       },
       "shadow_lvl3": {
-        "MAROWAK": "normal,gestein,feuer,wasser,drache,unlicht&@1unlicht,@1geist,@1boden,@1gestein,@1wasser&@2unlicht,@2geist,@2boden,@2gestein,@2wasser,@3unlicht,@3geist,@3boden,@3gestein,@3wasser&!<feuer&!<geist",
-        "LAPRAS": "stahl,wasser,eis&@1elektro,@1kampf,@1pflanze,@1gestein&@2elektro,@2kampf,@2pflanze,@2gestein,@3elektro,@3kampf,@3pflanze,@3gestein&!<wasser&!<eis",
-        "STANTLER": "gestein,geist,stahl&@1kampf&@2kampf,@3kampf&!<normal"
+        "NINETALES": "gestein,feuer,wasser,drache&@1boden,@1gestein,@1wasser&@2boden,@2gestein,@2wasser,@3boden,@3gestein,@3wasser&!<feuer",
+        "PRIMEAPE": "flug,gift,käfer,geist,psycho,fee&@1fee,@1flug,@1psycho&@2fee,@2flug,@2psycho,@3fee,@3flug,@3psycho&!<kampf",
+        "ONIX": "kampf,boden,pflanze&@1pflanze,@1wasser,@1kampf,@1boden,@1eis,@1stahl&@2pflanze,@2wasser,@2kampf,@2boden,@2eis,@2stahl,@3pflanze,@3wasser,@3kampf,@3boden,@3eis,@3stahl&!<gestein&!<boden"
       },
       "shadow_lvl1": {
-        "DRATINI": "stahl,fee&@1drache,@1fee,@1eis&@2drache,@2fee,@2eis,@3drache,@3fee,@3eis&!<drache",
-        "GLIGAR": "flug&@1eis,@1wasser&@2eis,@2wasser,@3eis,@3wasser&!<boden&!<flug",
-        "CACNEA": "flug,gift,käfer,stahl,feuer,pflanze,drache&@1käfer,@1feuer,@1flug,@1eis,@1gift&@2käfer,@2feuer,@2flug,@2eis,@2gift,@3käfer,@3feuer,@3flug,@3eis,@3gift&!<pflanze",
-        "JOLTIK": "kampf,gift,boden,geist,stahl,feuer,elektro,drache,fee&@1feuer,@1gestein&@2feuer,@2gestein,@3feuer,@3gestein&!<käfer&!<elektro"
+        "LARVITAR": "kampf,boden,pflanze&@1pflanze,@1wasser,@1kampf,@1boden,@1eis,@1stahl&@2pflanze,@2wasser,@2kampf,@2boden,@2eis,@2stahl,@3pflanze,@3wasser,@3kampf,@3boden,@3eis,@3stahl&!<gestein&!<boden",
+        "SABLEYE": "normal,kampf,unlicht,fee&@1fee&@2fee,@3fee&!<unlicht&!<geist",
+        "SPHEAL": "stahl,wasser,eis&@1elektro,@1kampf,@1pflanze,@1gestein&@2elektro,@2kampf,@2pflanze,@2gestein,@3elektro,@3kampf,@3pflanze,@3gestein&!<eis&!<wasser",
+        "INKAY": "stahl,unlicht,fee&@1käfer,@1fee&@2käfer,@2fee,@3käfer,@3fee&!<unlicht&!<psycho"
       }
     },
     "maxBattleFilters": {
@@ -298,25 +314,33 @@
     "megaEvolve": "megaevoluciona&mega1-2,nuevaevolución",
     "pilotLong": "distancia1000-&!intercambiados&!4*&!legendario&!singular&!variocolor",
     "raidFilters": {
-      "mega": {
-        "BANETTE": "normal,siniestro&@1siniestro,@1fantasma&@2siniestro,@2fantasma,@3siniestro,@3fantasma&!<fantasma"
+      "ultra_beast": {
+        "NIHILEGO": "lucha,veneno,tierra,roca,fantasma,acero&@1tierra,@1psíquico,@1acero,@1agua&@2tierra,@2psíquico,@2acero,@2agua,@3tierra,@3psíquico,@3acero,@3agua&!<roca&!<veneno"
       },
-      "lvl5": {
-        "TAPU_LELE": "acero,fuego,psíquico&@1fantasma,@1veneno,@1acero&@2fantasma,@2veneno,@2acero,@3fantasma,@3veneno,@3acero&!<psíquico&!<hada"
+      "lvl3": {
+        "NIDOQUEEN": "volador,tierra,bicho,fantasma&@1tierra,@1hielo,@1psíquico,@1agua&@2tierra,@2hielo,@2psíquico,@2agua,@3tierra,@3hielo,@3psíquico,@3agua&!<veneno&!<tierra",
+        "STARMIE": "acero,agua,planta,psíquico,dragón,siniestro&@1bicho,@1siniestro,@1eléctrico,@1fantasma,@1planta&@2bicho,@2siniestro,@2eléctrico,@2fantasma,@2planta,@3bicho,@3siniestro,@3eléctrico,@3fantasma,@3planta&!<agua&!<psíquico",
+        "DRUDDIGON": "acero,hada&@1dragón,@1hada,@1hielo&@2dragón,@2hada,@2hielo,@3dragón,@3hada,@3hielo&!<dragón"
+      },
+      "lvl1": {
+        "VOLTORB": "veneno,bicho,acero,fuego,planta,eléctrico,dragón&@1bicho,@1fuego,@1hielo,@1veneno&@2bicho,@2fuego,@2hielo,@2veneno,@3bicho,@3fuego,@3hielo,@3veneno&!<eléctrico&!<planta",
+        "BAGON": "acero,hada&@1dragón,@1hada,@1hielo&@2dragón,@2hada,@2hielo,@3dragón,@3hada,@3hielo&!<dragón",
+        "SHIELDON": "lucha,tierra,acero,agua,eléctrico&@1lucha,@1tierra,@1agua&@2lucha,@2tierra,@2agua,@3lucha,@3tierra,@3agua&!<roca&!<acero",
+        "ESPURR": "acero,psíquico,siniestro&@1bicho,@1siniestro,@1fantasma&@2bicho,@2siniestro,@2fantasma,@3bicho,@3siniestro,@3fantasma&!<psíquico"
       },
       "shadow_lvl5": {
-        "LATIOS": "acero,psíquico,siniestro,hada&@1bicho,@1siniestro,@1dragón,@1hada,@1fantasma,@1hielo&@2bicho,@2siniestro,@2dragón,@2hada,@2fantasma,@2hielo,@3bicho,@3siniestro,@3dragón,@3hada,@3fantasma,@3hielo&!<dragón&!<psíquico"
+        "CRESSELIA": "acero,psíquico,siniestro&@1bicho,@1siniestro,@1fantasma&@2bicho,@2siniestro,@2fantasma,@3bicho,@3siniestro,@3fantasma&!<psíquico"
       },
       "shadow_lvl3": {
-        "MAROWAK": "normal,roca,fuego,agua,dragón,siniestro&@1siniestro,@1fantasma,@1tierra,@1roca,@1agua&@2siniestro,@2fantasma,@2tierra,@2roca,@2agua,@3siniestro,@3fantasma,@3tierra,@3roca,@3agua&!<fuego&!<fantasma",
-        "LAPRAS": "acero,agua,hielo&@1eléctrico,@1lucha,@1planta,@1roca&@2eléctrico,@2lucha,@2planta,@2roca,@3eléctrico,@3lucha,@3planta,@3roca&!<agua&!<hielo",
-        "STANTLER": "roca,fantasma,acero&@1lucha&@2lucha,@3lucha&!<normal"
+        "NINETALES": "roca,fuego,agua,dragón&@1tierra,@1roca,@1agua&@2tierra,@2roca,@2agua,@3tierra,@3roca,@3agua&!<fuego",
+        "PRIMEAPE": "volador,veneno,bicho,fantasma,psíquico,hada&@1hada,@1volador,@1psíquico&@2hada,@2volador,@2psíquico,@3hada,@3volador,@3psíquico&!<lucha",
+        "ONIX": "lucha,tierra,planta&@1planta,@1agua,@1lucha,@1tierra,@1hielo,@1acero&@2planta,@2agua,@2lucha,@2tierra,@2hielo,@2acero,@3planta,@3agua,@3lucha,@3tierra,@3hielo,@3acero&!<roca&!<tierra"
       },
       "shadow_lvl1": {
-        "DRATINI": "acero,hada&@1dragón,@1hada,@1hielo&@2dragón,@2hada,@2hielo,@3dragón,@3hada,@3hielo&!<dragón",
-        "GLIGAR": "volador&@1hielo,@1agua&@2hielo,@2agua,@3hielo,@3agua&!<tierra&!<volador",
-        "CACNEA": "volador,veneno,bicho,acero,fuego,planta,dragón&@1bicho,@1fuego,@1volador,@1hielo,@1veneno&@2bicho,@2fuego,@2volador,@2hielo,@2veneno,@3bicho,@3fuego,@3volador,@3hielo,@3veneno&!<planta",
-        "JOLTIK": "lucha,veneno,tierra,fantasma,acero,fuego,eléctrico,dragón,hada&@1fuego,@1roca&@2fuego,@2roca,@3fuego,@3roca&!<bicho&!<eléctrico"
+        "LARVITAR": "lucha,tierra,planta&@1planta,@1agua,@1lucha,@1tierra,@1hielo,@1acero&@2planta,@2agua,@2lucha,@2tierra,@2hielo,@2acero,@3planta,@3agua,@3lucha,@3tierra,@3hielo,@3acero&!<roca&!<tierra",
+        "SABLEYE": "normal,lucha,siniestro,hada&@1hada&@2hada,@3hada&!<siniestro&!<fantasma",
+        "SPHEAL": "acero,agua,hielo&@1eléctrico,@1lucha,@1planta,@1roca&@2eléctrico,@2lucha,@2planta,@2roca,@3eléctrico,@3lucha,@3planta,@3roca&!<hielo&!<agua",
+        "INKAY": "acero,siniestro,hada&@1bicho,@1hada&@2bicho,@2hada,@3bicho,@3hada&!<siniestro&!<psíquico"
       }
     },
     "maxBattleFilters": {
@@ -440,25 +464,33 @@
     "megaEvolve": "mégaévolue&méga1-2,nouvelleévolution",
     "pilotLong": "distance1000-&!échangé&!4*&!légendaire&!fabuleux&!chromatique",
     "raidFilters": {
-      "mega": {
-        "BANETTE": "normal,ténèbres&@1ténèbres,@1spectre&@2ténèbres,@2spectre,@3ténèbres,@3spectre&!<spectre"
+      "ultra_beast": {
+        "NIHILEGO": "combat,poison,sol,roche,spectre,acier&@1sol,@1psy,@1acier,@1eau&@2sol,@2psy,@2acier,@2eau,@3sol,@3psy,@3acier,@3eau&!<roche&!<poison"
       },
-      "lvl5": {
-        "TAPU_LELE": "acier,feu,psy&@1spectre,@1poison,@1acier&@2spectre,@2poison,@2acier,@3spectre,@3poison,@3acier&!<psy&!<fée"
+      "lvl3": {
+        "NIDOQUEEN": "vol,sol,insecte,spectre&@1sol,@1glace,@1psy,@1eau&@2sol,@2glace,@2psy,@2eau,@3sol,@3glace,@3psy,@3eau&!<poison&!<sol",
+        "STARMIE": "acier,eau,plante,psy,dragon,ténèbres&@1insecte,@1ténèbres,@1électrik,@1spectre,@1plante&@2insecte,@2ténèbres,@2électrik,@2spectre,@2plante,@3insecte,@3ténèbres,@3électrik,@3spectre,@3plante&!<eau&!<psy",
+        "DRUDDIGON": "acier,fée&@1dragon,@1fée,@1glace&@2dragon,@2fée,@2glace,@3dragon,@3fée,@3glace&!<dragon"
+      },
+      "lvl1": {
+        "VOLTORB": "poison,insecte,acier,feu,plante,électrik,dragon&@1insecte,@1feu,@1glace,@1poison&@2insecte,@2feu,@2glace,@2poison,@3insecte,@3feu,@3glace,@3poison&!<électrik&!<plante",
+        "BAGON": "acier,fée&@1dragon,@1fée,@1glace&@2dragon,@2fée,@2glace,@3dragon,@3fée,@3glace&!<dragon",
+        "SHIELDON": "combat,sol,acier,eau,électrik&@1combat,@1sol,@1eau&@2combat,@2sol,@2eau,@3combat,@3sol,@3eau&!<roche&!<acier",
+        "ESPURR": "acier,psy,ténèbres&@1insecte,@1ténèbres,@1spectre&@2insecte,@2ténèbres,@2spectre,@3insecte,@3ténèbres,@3spectre&!<psy"
       },
       "shadow_lvl5": {
-        "LATIOS": "acier,psy,ténèbres,fée&@1insecte,@1ténèbres,@1dragon,@1fée,@1spectre,@1glace&@2insecte,@2ténèbres,@2dragon,@2fée,@2spectre,@2glace,@3insecte,@3ténèbres,@3dragon,@3fée,@3spectre,@3glace&!<dragon&!<psy"
+        "CRESSELIA": "acier,psy,ténèbres&@1insecte,@1ténèbres,@1spectre&@2insecte,@2ténèbres,@2spectre,@3insecte,@3ténèbres,@3spectre&!<psy"
       },
       "shadow_lvl3": {
-        "MAROWAK": "normal,roche,feu,eau,dragon,ténèbres&@1ténèbres,@1spectre,@1sol,@1roche,@1eau&@2ténèbres,@2spectre,@2sol,@2roche,@2eau,@3ténèbres,@3spectre,@3sol,@3roche,@3eau&!<feu&!<spectre",
-        "LAPRAS": "acier,eau,glace&@1électrik,@1combat,@1plante,@1roche&@2électrik,@2combat,@2plante,@2roche,@3électrik,@3combat,@3plante,@3roche&!<eau&!<glace",
-        "STANTLER": "roche,spectre,acier&@1combat&@2combat,@3combat&!<normal"
+        "NINETALES": "roche,feu,eau,dragon&@1sol,@1roche,@1eau&@2sol,@2roche,@2eau,@3sol,@3roche,@3eau&!<feu",
+        "PRIMEAPE": "vol,poison,insecte,spectre,psy,fée&@1fée,@1vol,@1psy&@2fée,@2vol,@2psy,@3fée,@3vol,@3psy&!<combat",
+        "ONIX": "combat,sol,plante&@1plante,@1eau,@1combat,@1sol,@1glace,@1acier&@2plante,@2eau,@2combat,@2sol,@2glace,@2acier,@3plante,@3eau,@3combat,@3sol,@3glace,@3acier&!<roche&!<sol"
       },
       "shadow_lvl1": {
-        "DRATINI": "acier,fée&@1dragon,@1fée,@1glace&@2dragon,@2fée,@2glace,@3dragon,@3fée,@3glace&!<dragon",
-        "GLIGAR": "vol&@1glace,@1eau&@2glace,@2eau,@3glace,@3eau&!<sol&!<vol",
-        "CACNEA": "vol,poison,insecte,acier,feu,plante,dragon&@1insecte,@1feu,@1vol,@1glace,@1poison&@2insecte,@2feu,@2vol,@2glace,@2poison,@3insecte,@3feu,@3vol,@3glace,@3poison&!<plante",
-        "JOLTIK": "combat,poison,sol,spectre,acier,feu,électrik,dragon,fée&@1feu,@1roche&@2feu,@2roche,@3feu,@3roche&!<insecte&!<électrik"
+        "LARVITAR": "combat,sol,plante&@1plante,@1eau,@1combat,@1sol,@1glace,@1acier&@2plante,@2eau,@2combat,@2sol,@2glace,@2acier,@3plante,@3eau,@3combat,@3sol,@3glace,@3acier&!<roche&!<sol",
+        "SABLEYE": "normal,combat,ténèbres,fée&@1fée&@2fée,@3fée&!<ténèbres&!<spectre",
+        "SPHEAL": "acier,eau,glace&@1électrik,@1combat,@1plante,@1roche&@2électrik,@2combat,@2plante,@2roche,@3électrik,@3combat,@3plante,@3roche&!<glace&!<eau",
+        "INKAY": "acier,ténèbres,fée&@1insecte,@1fée&@2insecte,@2fée,@3insecte,@3fée&!<ténèbres&!<psy"
       }
     },
     "maxBattleFilters": {
@@ -582,25 +614,33 @@
     "megaEvolve": "超級進化&超級1-2,未登錄",
     "pilotLong": "距離1000-&!交換&!4*&!傳說的寶可夢&!幻&!異色",
     "raidFilters": {
-      "mega": {
-        "BANETTE": "一般,惡&@1惡,@1幽靈&@2惡,@2幽靈,@3惡,@3幽靈&!<幽靈"
+      "ultra_beast": {
+        "NIHILEGO": "格鬥,毒,地面,岩石,幽靈,鋼&@1地面,@1超能力,@1鋼,@1水&@2地面,@2超能力,@2鋼,@2水,@3地面,@3超能力,@3鋼,@3水&!<岩石&!<毒"
       },
-      "lvl5": {
-        "TAPU_LELE": "鋼,火,超能力&@1幽靈,@1毒,@1鋼&@2幽靈,@2毒,@2鋼,@3幽靈,@3毒,@3鋼&!<超能力&!<妖精"
+      "lvl3": {
+        "NIDOQUEEN": "飛行,地面,蟲,幽靈&@1地面,@1冰,@1超能力,@1水&@2地面,@2冰,@2超能力,@2水,@3地面,@3冰,@3超能力,@3水&!<毒&!<地面",
+        "STARMIE": "鋼,水,草,超能力,龍,惡&@1蟲,@1惡,@1電,@1幽靈,@1草&@2蟲,@2惡,@2電,@2幽靈,@2草,@3蟲,@3惡,@3電,@3幽靈,@3草&!<水&!<超能力",
+        "DRUDDIGON": "鋼,妖精&@1龍,@1妖精,@1冰&@2龍,@2妖精,@2冰,@3龍,@3妖精,@3冰&!<龍"
+      },
+      "lvl1": {
+        "VOLTORB": "毒,蟲,鋼,火,草,電,龍&@1蟲,@1火,@1冰,@1毒&@2蟲,@2火,@2冰,@2毒,@3蟲,@3火,@3冰,@3毒&!<電&!<草",
+        "BAGON": "鋼,妖精&@1龍,@1妖精,@1冰&@2龍,@2妖精,@2冰,@3龍,@3妖精,@3冰&!<龍",
+        "SHIELDON": "格鬥,地面,鋼,水,電&@1格鬥,@1地面,@1水&@2格鬥,@2地面,@2水,@3格鬥,@3地面,@3水&!<岩石&!<鋼",
+        "ESPURR": "鋼,超能力,惡&@1蟲,@1惡,@1幽靈&@2蟲,@2惡,@2幽靈,@3蟲,@3惡,@3幽靈&!<超能力"
       },
       "shadow_lvl5": {
-        "LATIOS": "鋼,超能力,惡,妖精&@1蟲,@1惡,@1龍,@1妖精,@1幽靈,@1冰&@2蟲,@2惡,@2龍,@2妖精,@2幽靈,@2冰,@3蟲,@3惡,@3龍,@3妖精,@3幽靈,@3冰&!<龍&!<超能力"
+        "CRESSELIA": "鋼,超能力,惡&@1蟲,@1惡,@1幽靈&@2蟲,@2惡,@2幽靈,@3蟲,@3惡,@3幽靈&!<超能力"
       },
       "shadow_lvl3": {
-        "MAROWAK": "一般,岩石,火,水,龍,惡&@1惡,@1幽靈,@1地面,@1岩石,@1水&@2惡,@2幽靈,@2地面,@2岩石,@2水,@3惡,@3幽靈,@3地面,@3岩石,@3水&!<火&!<幽靈",
-        "LAPRAS": "鋼,水,冰&@1電,@1格鬥,@1草,@1岩石&@2電,@2格鬥,@2草,@2岩石,@3電,@3格鬥,@3草,@3岩石&!<水&!<冰",
-        "STANTLER": "岩石,幽靈,鋼&@1格鬥&@2格鬥,@3格鬥&!<一般"
+        "NINETALES": "岩石,火,水,龍&@1地面,@1岩石,@1水&@2地面,@2岩石,@2水,@3地面,@3岩石,@3水&!<火",
+        "PRIMEAPE": "飛行,毒,蟲,幽靈,超能力,妖精&@1妖精,@1飛行,@1超能力&@2妖精,@2飛行,@2超能力,@3妖精,@3飛行,@3超能力&!<格鬥",
+        "ONIX": "格鬥,地面,草&@1草,@1水,@1格鬥,@1地面,@1冰,@1鋼&@2草,@2水,@2格鬥,@2地面,@2冰,@2鋼,@3草,@3水,@3格鬥,@3地面,@3冰,@3鋼&!<岩石&!<地面"
       },
       "shadow_lvl1": {
-        "DRATINI": "鋼,妖精&@1龍,@1妖精,@1冰&@2龍,@2妖精,@2冰,@3龍,@3妖精,@3冰&!<龍",
-        "GLIGAR": "飛行&@1冰,@1水&@2冰,@2水,@3冰,@3水&!<地面&!<飛行",
-        "CACNEA": "飛行,毒,蟲,鋼,火,草,龍&@1蟲,@1火,@1飛行,@1冰,@1毒&@2蟲,@2火,@2飛行,@2冰,@2毒,@3蟲,@3火,@3飛行,@3冰,@3毒&!<草",
-        "JOLTIK": "格鬥,毒,地面,幽靈,鋼,火,電,龍,妖精&@1火,@1岩石&@2火,@2岩石,@3火,@3岩石&!<蟲&!<電"
+        "LARVITAR": "格鬥,地面,草&@1草,@1水,@1格鬥,@1地面,@1冰,@1鋼&@2草,@2水,@2格鬥,@2地面,@2冰,@2鋼,@3草,@3水,@3格鬥,@3地面,@3冰,@3鋼&!<岩石&!<地面",
+        "SABLEYE": "一般,格鬥,惡,妖精&@1妖精&@2妖精,@3妖精&!<惡&!<幽靈",
+        "SPHEAL": "鋼,水,冰&@1電,@1格鬥,@1草,@1岩石&@2電,@2格鬥,@2草,@2岩石,@3電,@3格鬥,@3草,@3岩石&!<冰&!<水",
+        "INKAY": "鋼,惡,妖精&@1蟲,@1妖精&@2蟲,@2妖精,@3蟲,@3妖精&!<惡&!<超能力"
       }
     },
     "maxBattleFilters": {
@@ -724,25 +764,33 @@
     "megaEvolve": "मेगा एवॉव&मेगा1-2,नया वकास करं",
     "pilotLong": "दूर1000-&!टड कये गए&!4*&!लजेंडर&!मथकल&!शाइनी",
     "raidFilters": {
-      "mega": {
-        "BANETTE": "नॉमल,डाक&@1डाक,@1घोट&@2डाक,@2घोट,@3डाक,@3घोट&!<घोट"
+      "ultra_beast": {
+        "NIHILEGO": "फ़ाइटंग,पॉइज़न,ाउंड,रॉक,घोट,टल&@1ाउंड,@1साइकक,@1टल,@1वॉटर&@2ाउंड,@2साइकक,@2टल,@2वॉटर,@3ाउंड,@3साइकक,@3टल,@3वॉटर&!<रॉक&!<पॉइज़न"
       },
-      "lvl5": {
-        "TAPU_LELE": "टल,फ़ायर,साइकक&@1घोट,@1पॉइज़न,@1टल&@2घोट,@2पॉइज़न,@2टल,@3घोट,@3पॉइज़न,@3टल&!<साइकक&!<फ़ेर"
+      "lvl3": {
+        "NIDOQUEEN": "़लाइंग,ाउंड,बग,घोट&@1ाउंड,@1आइस,@1साइकक,@1वॉटर&@2ाउंड,@2आइस,@2साइकक,@2वॉटर,@3ाउंड,@3आइस,@3साइकक,@3वॉटर&!<पॉइज़न&!<ाउंड",
+        "STARMIE": "टल,वॉटर,ास,साइकक,डैगन,डाक&@1बग,@1डाक,@1इलटक,@1घोट,@1ास&@2बग,@2डाक,@2इलटक,@2घोट,@2ास,@3बग,@3डाक,@3इलटक,@3घोट,@3ास&!<वॉटर&!<साइकक",
+        "DRUDDIGON": "टल,फ़ेर&@1डैगन,@1फ़ेर,@1आइस&@2डैगन,@2फ़ेर,@2आइस,@3डैगन,@3फ़ेर,@3आइस&!<डैगन"
+      },
+      "lvl1": {
+        "VOLTORB": "पॉइज़न,बग,टल,फ़ायर,ास,इलटक,डैगन&@1बग,@1फ़ायर,@1आइस,@1पॉइज़न&@2बग,@2फ़ायर,@2आइस,@2पॉइज़न,@3बग,@3फ़ायर,@3आइस,@3पॉइज़न&!<इलटक&!<ास",
+        "BAGON": "टल,फ़ेर&@1डैगन,@1फ़ेर,@1आइस&@2डैगन,@2फ़ेर,@2आइस,@3डैगन,@3फ़ेर,@3आइस&!<डैगन",
+        "SHIELDON": "फ़ाइटंग,ाउंड,टल,वॉटर,इलटक&@1फ़ाइटंग,@1ाउंड,@1वॉटर&@2फ़ाइटंग,@2ाउंड,@2वॉटर,@3फ़ाइटंग,@3ाउंड,@3वॉटर&!<रॉक&!<टल",
+        "ESPURR": "टल,साइकक,डाक&@1बग,@1डाक,@1घोट&@2बग,@2डाक,@2घोट,@3बग,@3डाक,@3घोट&!<साइकक"
       },
       "shadow_lvl5": {
-        "LATIOS": "टल,साइकक,डाक,फ़ेर&@1बग,@1डाक,@1डैगन,@1फ़ेर,@1घोट,@1आइस&@2बग,@2डाक,@2डैगन,@2फ़ेर,@2घोट,@2आइस,@3बग,@3डाक,@3डैगन,@3फ़ेर,@3घोट,@3आइस&!<डैगन&!<साइकक"
+        "CRESSELIA": "टल,साइकक,डाक&@1बग,@1डाक,@1घोट&@2बग,@2डाक,@2घोट,@3बग,@3डाक,@3घोट&!<साइकक"
       },
       "shadow_lvl3": {
-        "MAROWAK": "नॉमल,रॉक,फ़ायर,वॉटर,डैगन,डाक&@1डाक,@1घोट,@1ाउंड,@1रॉक,@1वॉटर&@2डाक,@2घोट,@2ाउंड,@2रॉक,@2वॉटर,@3डाक,@3घोट,@3ाउंड,@3रॉक,@3वॉटर&!<फ़ायर&!<घोट",
-        "LAPRAS": "टल,वॉटर,आइस&@1इलटक,@1फ़ाइटंग,@1ास,@1रॉक&@2इलटक,@2फ़ाइटंग,@2ास,@2रॉक,@3इलटक,@3फ़ाइटंग,@3ास,@3रॉक&!<वॉटर&!<आइस",
-        "STANTLER": "रॉक,घोट,टल&@1फ़ाइटंग&@2फ़ाइटंग,@3फ़ाइटंग&!<नॉमल"
+        "NINETALES": "रॉक,फ़ायर,वॉटर,डैगन&@1ाउंड,@1रॉक,@1वॉटर&@2ाउंड,@2रॉक,@2वॉटर,@3ाउंड,@3रॉक,@3वॉटर&!<फ़ायर",
+        "PRIMEAPE": "़लाइंग,पॉइज़न,बग,घोट,साइकक,फ़ेर&@1फ़ेर,@1़लाइंग,@1साइकक&@2फ़ेर,@2़लाइंग,@2साइकक,@3फ़ेर,@3़लाइंग,@3साइकक&!<फ़ाइटंग",
+        "ONIX": "फ़ाइटंग,ाउंड,ास&@1ास,@1वॉटर,@1फ़ाइटंग,@1ाउंड,@1आइस,@1टल&@2ास,@2वॉटर,@2फ़ाइटंग,@2ाउंड,@2आइस,@2टल,@3ास,@3वॉटर,@3फ़ाइटंग,@3ाउंड,@3आइस,@3टल&!<रॉक&!<ाउंड"
       },
       "shadow_lvl1": {
-        "DRATINI": "टल,फ़ेर&@1डैगन,@1फ़ेर,@1आइस&@2डैगन,@2फ़ेर,@2आइस,@3डैगन,@3फ़ेर,@3आइस&!<डैगन",
-        "GLIGAR": "़लाइंग&@1आइस,@1वॉटर&@2आइस,@2वॉटर,@3आइस,@3वॉटर&!<ाउंड&!<़लाइंग",
-        "CACNEA": "़लाइंग,पॉइज़न,बग,टल,फ़ायर,ास,डैगन&@1बग,@1फ़ायर,@1़लाइंग,@1आइस,@1पॉइज़न&@2बग,@2फ़ायर,@2़लाइंग,@2आइस,@2पॉइज़न,@3बग,@3फ़ायर,@3़लाइंग,@3आइस,@3पॉइज़न&!<ास",
-        "JOLTIK": "फ़ाइटंग,पॉइज़न,ाउंड,घोट,टल,फ़ायर,इलटक,डैगन,फ़ेर&@1फ़ायर,@1रॉक&@2फ़ायर,@2रॉक,@3फ़ायर,@3रॉक&!<बग&!<इलटक"
+        "LARVITAR": "फ़ाइटंग,ाउंड,ास&@1ास,@1वॉटर,@1फ़ाइटंग,@1ाउंड,@1आइस,@1टल&@2ास,@2वॉटर,@2फ़ाइटंग,@2ाउंड,@2आइस,@2टल,@3ास,@3वॉटर,@3फ़ाइटंग,@3ाउंड,@3आइस,@3टल&!<रॉक&!<ाउंड",
+        "SABLEYE": "नॉमल,फ़ाइटंग,डाक,फ़ेर&@1फ़ेर&@2फ़ेर,@3फ़ेर&!<डाक&!<घोट",
+        "SPHEAL": "टल,वॉटर,आइस&@1इलटक,@1फ़ाइटंग,@1ास,@1रॉक&@2इलटक,@2फ़ाइटंग,@2ास,@2रॉक,@3इलटक,@3फ़ाइटंग,@3ास,@3रॉक&!<आइस&!<वॉटर",
+        "INKAY": "टल,डाक,फ़ेर&@1बग,@1फ़ेर&@2बग,@2फ़ेर,@3बग,@3फ़ेर&!<डाक&!<साइकक"
       }
     },
     "maxBattleFilters": {
@@ -866,25 +914,33 @@
     "megaEvolve": "めがしんか&メガ1-2,みとうろく",
     "pilotLong": "きょり1000-&!こうかん&!4*&!伝説のポケモン&!まぼろし&!色違い",
     "raidFilters": {
-      "mega": {
-        "BANETTE": "ノーマル,あく&@1あく,@1ゴースト&@2あく,@2ゴースト,@3あく,@3ゴースト&!<ゴースト"
+      "ultra_beast": {
+        "NIHILEGO": "かくとう,どく,じめん,いわ,ゴースト,はがね&@1じめん,@1エスパー,@1はがね,@1みず&@2じめん,@2エスパー,@2はがね,@2みず,@3じめん,@3エスパー,@3はがね,@3みず&!<いわ&!<どく"
       },
-      "lvl5": {
-        "TAPU_LELE": "はがね,ほのお,エスパー&@1ゴースト,@1どく,@1はがね&@2ゴースト,@2どく,@2はがね,@3ゴースト,@3どく,@3はがね&!<エスパー&!<フェアリー"
+      "lvl3": {
+        "NIDOQUEEN": "ひこう,じめん,むし,ゴースト&@1じめん,@1こおり,@1エスパー,@1みず&@2じめん,@2こおり,@2エスパー,@2みず,@3じめん,@3こおり,@3エスパー,@3みず&!<どく&!<じめん",
+        "STARMIE": "はがね,みず,くさ,エスパー,ドラゴン,あく&@1むし,@1あく,@1でんき,@1ゴースト,@1くさ&@2むし,@2あく,@2でんき,@2ゴースト,@2くさ,@3むし,@3あく,@3でんき,@3ゴースト,@3くさ&!<みず&!<エスパー",
+        "DRUDDIGON": "はがね,フェアリー&@1ドラゴン,@1フェアリー,@1こおり&@2ドラゴン,@2フェアリー,@2こおり,@3ドラゴン,@3フェアリー,@3こおり&!<ドラゴン"
+      },
+      "lvl1": {
+        "VOLTORB": "どく,むし,はがね,ほのお,くさ,でんき,ドラゴン&@1むし,@1ほのお,@1こおり,@1どく&@2むし,@2ほのお,@2こおり,@2どく,@3むし,@3ほのお,@3こおり,@3どく&!<でんき&!<くさ",
+        "BAGON": "はがね,フェアリー&@1ドラゴン,@1フェアリー,@1こおり&@2ドラゴン,@2フェアリー,@2こおり,@3ドラゴン,@3フェアリー,@3こおり&!<ドラゴン",
+        "SHIELDON": "かくとう,じめん,はがね,みず,でんき&@1かくとう,@1じめん,@1みず&@2かくとう,@2じめん,@2みず,@3かくとう,@3じめん,@3みず&!<いわ&!<はがね",
+        "ESPURR": "はがね,エスパー,あく&@1むし,@1あく,@1ゴースト&@2むし,@2あく,@2ゴースト,@3むし,@3あく,@3ゴースト&!<エスパー"
       },
       "shadow_lvl5": {
-        "LATIOS": "はがね,エスパー,あく,フェアリー&@1むし,@1あく,@1ドラゴン,@1フェアリー,@1ゴースト,@1こおり&@2むし,@2あく,@2ドラゴン,@2フェアリー,@2ゴースト,@2こおり,@3むし,@3あく,@3ドラゴン,@3フェアリー,@3ゴースト,@3こおり&!<ドラゴン&!<エスパー"
+        "CRESSELIA": "はがね,エスパー,あく&@1むし,@1あく,@1ゴースト&@2むし,@2あく,@2ゴースト,@3むし,@3あく,@3ゴースト&!<エスパー"
       },
       "shadow_lvl3": {
-        "MAROWAK": "ノーマル,いわ,ほのお,みず,ドラゴン,あく&@1あく,@1ゴースト,@1じめん,@1いわ,@1みず&@2あく,@2ゴースト,@2じめん,@2いわ,@2みず,@3あく,@3ゴースト,@3じめん,@3いわ,@3みず&!<ほのお&!<ゴースト",
-        "LAPRAS": "はがね,みず,こおり&@1でんき,@1かくとう,@1くさ,@1いわ&@2でんき,@2かくとう,@2くさ,@2いわ,@3でんき,@3かくとう,@3くさ,@3いわ&!<みず&!<こおり",
-        "STANTLER": "いわ,ゴースト,はがね&@1かくとう&@2かくとう,@3かくとう&!<ノーマル"
+        "NINETALES": "いわ,ほのお,みず,ドラゴン&@1じめん,@1いわ,@1みず&@2じめん,@2いわ,@2みず,@3じめん,@3いわ,@3みず&!<ほのお",
+        "PRIMEAPE": "ひこう,どく,むし,ゴースト,エスパー,フェアリー&@1フェアリー,@1ひこう,@1エスパー&@2フェアリー,@2ひこう,@2エスパー,@3フェアリー,@3ひこう,@3エスパー&!<かくとう",
+        "ONIX": "かくとう,じめん,くさ&@1くさ,@1みず,@1かくとう,@1じめん,@1こおり,@1はがね&@2くさ,@2みず,@2かくとう,@2じめん,@2こおり,@2はがね,@3くさ,@3みず,@3かくとう,@3じめん,@3こおり,@3はがね&!<いわ&!<じめん"
       },
       "shadow_lvl1": {
-        "DRATINI": "はがね,フェアリー&@1ドラゴン,@1フェアリー,@1こおり&@2ドラゴン,@2フェアリー,@2こおり,@3ドラゴン,@3フェアリー,@3こおり&!<ドラゴン",
-        "GLIGAR": "ひこう&@1こおり,@1みず&@2こおり,@2みず,@3こおり,@3みず&!<じめん&!<ひこう",
-        "CACNEA": "ひこう,どく,むし,はがね,ほのお,くさ,ドラゴン&@1むし,@1ほのお,@1ひこう,@1こおり,@1どく&@2むし,@2ほのお,@2ひこう,@2こおり,@2どく,@3むし,@3ほのお,@3ひこう,@3こおり,@3どく&!<くさ",
-        "JOLTIK": "かくとう,どく,じめん,ゴースト,はがね,ほのお,でんき,ドラゴン,フェアリー&@1ほのお,@1いわ&@2ほのお,@2いわ,@3ほのお,@3いわ&!<むし&!<でんき"
+        "LARVITAR": "かくとう,じめん,くさ&@1くさ,@1みず,@1かくとう,@1じめん,@1こおり,@1はがね&@2くさ,@2みず,@2かくとう,@2じめん,@2こおり,@2はがね,@3くさ,@3みず,@3かくとう,@3じめん,@3こおり,@3はがね&!<いわ&!<じめん",
+        "SABLEYE": "ノーマル,かくとう,あく,フェアリー&@1フェアリー&@2フェアリー,@3フェアリー&!<あく&!<ゴースト",
+        "SPHEAL": "はがね,みず,こおり&@1でんき,@1かくとう,@1くさ,@1いわ&@2でんき,@2かくとう,@2くさ,@2いわ,@3でんき,@3かくとう,@3くさ,@3いわ&!<こおり&!<みず",
+        "INKAY": "はがね,あく,フェアリー&@1むし,@1フェアリー&@2むし,@2フェアリー,@3むし,@3フェアリー&!<あく&!<エスパー"
       }
     },
     "maxBattleFilters": {
