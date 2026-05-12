@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-07T10:05:09.307Z",
+  "fetchedAt": "2026-05-12T10:11:34.366Z",
   "raids": {
     "ultra_beast": [
       {
@@ -883,37 +883,6 @@
         "seMoveTypes": [
           "water",
           "grass",
-          "ice"
-        ]
-      },
-      {
-        "id": "COTTONEE",
-        "names": {
-          "en": "Cottonee",
-          "de": "Waumboll",
-          "fr": "Doudouvet",
-          "it": "Cottonee",
-          "ja": "モンメン",
-          "ko": "소미안",
-          "es": "Cottonee"
-        },
-        "types": [
-          "grass",
-          "fairy"
-        ],
-        "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
-          "steel",
-          "fire",
-          "grass"
-        ],
-        "seMoveTypes": [
-          "flying",
-          "poison",
-          "steel",
-          "fire",
           "ice"
         ]
       },
