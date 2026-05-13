@@ -1528,36 +1528,6 @@
   },
   "eventRaids": [
     {
-      "eventID": "mega-camerupt-in-mega-raids-may-2026",
-      "name": "Mega Camerupt in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-05-06T06:00:00.000",
-      "end": "2026-05-13T06:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "CAMERUPT",
-          "names": {
-            "en": "Camerupt"
-          },
-          "types": [
-            "fire",
-            "ground"
-          ],
-          "resistorTypes": [
-            "flying",
-            "water",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "ground",
-            "water"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "buzzwole-pheromosa-xurkitree-in-5-star-raid-battles-may-2026",
       "name": "Buzzwole, Pheromosa, and Xurkitree in 5-star Raid Battles",
       "eventType": "raid-battles",
@@ -1743,6 +1713,75 @@
           ],
           "seMoveTypes": [
             "ground"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "tapu-bulu-in-5-star-raid-battles-may-2026",
+      "name": "Tapu Bulu in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-05-20T06:00:00.000",
+      "end": "2026-05-26T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "TAPU_BULU",
+          "names": {
+            "en": "Tapu Bulu"
+          },
+          "types": [
+            "grass",
+            "fairy"
+          ],
+          "resistorTypes": [
+            "flying",
+            "poison",
+            "bug",
+            "steel",
+            "fire",
+            "grass"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "poison",
+            "steel",
+            "fire",
+            "ice"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-altaria-in-mega-raids-may-2026",
+      "name": "Mega Altaria in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-05-20T06:00:00.000",
+      "end": "2026-05-27T06:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "ALTARIA",
+          "names": {
+            "en": "Altaria"
+          },
+          "types": [
+            "dragon",
+            "flying"
+          ],
+          "resistorTypes": [
+            "rock",
+            "steel",
+            "electric",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "ice",
+            "dragon",
+            "fairy"
           ]
         }
       ]
