@@ -1639,85 +1639,6 @@
       ]
     },
     {
-      "eventID": "raidhour20260513",
-      "name": "Buzzwole, Pheromosa, and Xurkitree Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-05-13T18:00:00.000",
-      "end": "2026-05-13T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "BUZZWOLE",
-          "names": {
-            "en": "Buzzwole"
-          },
-          "types": [
-            "bug",
-            "fighting"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "flying",
-            "poison",
-            "bug",
-            "ghost",
-            "fire",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "fire",
-            "psychic",
-            "fairy"
-          ]
-        },
-        {
-          "id": "PHEROMOSA",
-          "names": {
-            "en": "Pheromosa"
-          },
-          "types": [
-            "bug",
-            "fighting"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "flying",
-            "poison",
-            "bug",
-            "ghost",
-            "fire",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "fire",
-            "psychic",
-            "fairy"
-          ]
-        },
-        {
-          "id": "XURKITREE",
-          "names": {
-            "en": "Xurkitree"
-          },
-          "types": [
-            "electric"
-          ],
-          "resistorTypes": [
-            "ground",
-            "grass",
-            "electric",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "ground"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "tapu-bulu-in-5-star-raid-battles-may-2026",
       "name": "Tapu Bulu in 5-star Raid Battles",
       "eventType": "raid-battles",
@@ -1782,6 +1703,42 @@
             "ice",
             "dragon",
             "fairy"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20260520",
+      "name": "Tapu Bulu Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-05-20T18:00:00.000",
+      "end": "2026-05-20T19:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "TAPU_BULU",
+          "names": {
+            "en": "Tapu Bulu"
+          },
+          "types": [
+            "grass",
+            "fairy"
+          ],
+          "resistorTypes": [
+            "flying",
+            "poison",
+            "bug",
+            "steel",
+            "fire",
+            "grass"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "poison",
+            "steel",
+            "fire",
+            "ice"
           ]
         }
       ]
