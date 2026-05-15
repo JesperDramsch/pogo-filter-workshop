@@ -359,6 +359,12 @@ const REGIONAL_GROUPS = {
       "Nigiragi",      // Tatsugiri — Curly/Droopy/Stretchy
       "Schalellos", "Gastrodon",  // West/Ost forms not separately searchable
       "Barschuft",     // Basculin — red/blue stripe forms not separately searchable
+      // Regional-by-form species we *can't* distinguish in PoGo's search syntax —
+      // even when home is in the region of one form, the bag holds all forms under
+      // the same name. Better to keep the whole species and trade duplicates to
+      // friends than to trash a rare remote form by accident. (Bring flowers.)
+      "Flabébé", "Floette", "Florges",   // Red/Yellow/Blue flowers
+      "Choreogel",                       // Oricorio (Pom-Pom/Sensu/Baile/Pa'u)
     ],
   },
 };
@@ -1611,9 +1617,32 @@ const PAIRED_LINE = {
   // (so winding stays consistent), then wraps back via the antimeridian.
   west: [...PAIRED_LINE_REV, [-180, 85], [-180, -85], [-100, -85], [-30, -85], PAIRED_LINE_REV[0]],
 };
+// KMZ Chatot polygon top edge, traced verbatim. Used as the canonical N/S
+// boundary for hemispheric Ultra Beasts (Celesteela south / Kartana north)
+// so the dividing line matches the same KMZ source as everything else.
+// Slight variation (±0.01°) — DO NOT round.
+const EQUATOR_KMZ_VERTICES = [
+  [-180,         -0.0655574],
+  [-120.5886795, -0.0690087],
+  [-28.6095949,  -0.0750637],
+  [78.4737327,   -0.0655574],
+  [145.7979514,  -0.0655574],
+  [180,          -0.0655574],
+];
+const EQUATOR_KMZ_VERTICES_REV = [...EQUATOR_KMZ_VERTICES].reverse();
 const EQUATOR_SPLIT = {
-  north: [[-180, 0], [-90, 0], [0, 0], [90, 0], [180, 0], [180, 85], [90, 85], [0, 85], [-90, 85], [-180, 85], [-180, 0]],
-  south: [[-180, -85], [-90, -85], [0, -85], [90, -85], [180, -85], [180, 0], [90, 0], [0, 0], [-90, 0], [-180, 0], [-180, -85]],
+  // Northern hemisphere — above the Chatot top edge to lat 85.
+  north: [
+    ...EQUATOR_KMZ_VERTICES,
+    [180, 85], [90, 85], [0, 85], [-90, 85], [-180, 85],
+    EQUATOR_KMZ_VERTICES[0],
+  ],
+  // Southern hemisphere — below the Chatot top edge to lat -85.
+  south: [
+    ...EQUATOR_KMZ_VERTICES_REV,
+    [-180, -85], [-90, -85], [0, -85], [90, -85], [180, -85],
+    EQUATOR_KMZ_VERTICES_REV[0],
+  ],
 };
 const POGO_REGIONS_ROTATING = [
   {
