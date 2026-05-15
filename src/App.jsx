@@ -346,6 +346,21 @@ const REGIONAL_GROUPS = {
     labelKey: "app.regional.collectibles.label",
     descriptionKey: "app.regional.collectibles.description",
     typeChecks: [],
+    // Per-collector notes. Used as the tooltip on the editor toggle so the user
+    // can see WHY this species is in collectibles (typically: forms can't be
+    // distinguished in PoGo's search syntax, so we protect the whole species
+    // and the user trades local-form duplicates to friends).
+    collectorNotes: {
+      "Coiffwaff":  "app.regional.collectibles.notes.furfrou_forms",
+      "Nigiragi":   "app.regional.collectibles.notes.tatsugiri_forms",
+      "Schalellos": "app.regional.collectibles.notes.shellos_forms",
+      "Gastrodon":  "app.regional.collectibles.notes.shellos_forms",
+      "Barschuft":  "app.regional.collectibles.notes.basculin_forms",
+      "Flabébé":    "app.regional.collectibles.notes.flabebe_forms",
+      "Floette":    "app.regional.collectibles.notes.flabebe_forms",
+      "Florges":    "app.regional.collectibles.notes.flabebe_forms",
+      "Choreogel":  "app.regional.collectibles.notes.oricorio_forms",
+    },
     collectors: [
       // Vivillon-line — flat collectors; collapses to +Purmel if all 3 selected
       "Purmel", "Puponcho", "Vivillon",
@@ -4361,13 +4376,14 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
                   // Home-locals are auto-removed by effectiveConfig regardless of `on`,
                   // so render them as "off" visually with a ⌂ marker.
                   const effectivelyOn = on && !isHomeLocal;
+                  const noteKey = group.collectorNotes?.[sp];
                   return (
                     <button key={sp}
                       onClick={() => toggleCol(sp)}
                       disabled={!state.enabled || isHomeLocal}
                       title={isHomeLocal
                         ? t("app.regional_editor.home_local_title")
-                        : undefined}
+                        : (noteKey ? t(noteKey) : undefined)}
                       className={`mono text-[11px] px-2 py-0.5 rounded transition ${
                         effectivelyOn
                           ? "bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/40"
@@ -4377,6 +4393,9 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
                       }`}>
                       {isHomeLocal && <span className="not-italic no-underline mr-0.5">⌂</span>}
                       {sp}
+                      {noteKey && !isHomeLocal && (
+                        <span className="not-italic no-underline ml-1 opacity-60" aria-hidden="true">ⓘ</span>
+                      )}
                     </button>
                   );
                 })}
