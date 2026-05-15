@@ -431,6 +431,8 @@
   "app.regional_editor.disabled": "deaktiviert",
   "app.regional_editor.home_extra": "(+{count} via ⌂)",
   "app.regional_editor.select_all": "alle auswählen",
+  "app.regional_editor.select_recommended": "empfohlen",
+  "app.regional_editor.select_recommended_title": "Zurück zu sinnvollen Voreinstellungen — nur S/A-Tier-Formen (überspringt die häufigen Alola/Galar-Basisformen wie Diglett/Makabaja). ★ = chase-würdig; · = von „empfohlen“ ausgeblendet.",
   "app.regional_editor.select_none": "keine",
   "app.regional_editor.type_check_label": "Form-Schutz (Type-Check)",
   "app.regional_editor.collectors_label": "Sammler (Spezies-Schutz)",

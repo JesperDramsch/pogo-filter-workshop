@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-14T10:39:09.085Z",
+  "fetchedAt": "2026-05-15T10:41:45.303Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -46,12 +46,12 @@
           "name": "Azumarill"
         },
         {
-          "dex": 40,
-          "name": "Wigglytuff"
-        },
-        {
           "dex": 618,
           "name": "Stunfisk"
+        },
+        {
+          "dex": 40,
+          "name": "Wigglytuff"
         },
         {
           "dex": 823,
@@ -74,12 +74,12 @@
           "name": "Malamar"
         },
         {
-          "dex": 765,
-          "name": "Oranguru"
-        },
-        {
           "dex": 131,
           "name": "Lapras"
+        },
+        {
+          "dex": 765,
+          "name": "Oranguru"
         },
         {
           "dex": 302,
@@ -90,8 +90,16 @@
           "name": "Sealeo"
         },
         {
+          "dex": 979,
+          "name": "Annihilape"
+        },
+        {
           "dex": 351,
           "name": "Castform (Sunny)"
+        },
+        {
+          "dex": 980,
+          "name": "Clodsire"
         },
         {
           "dex": 356,
@@ -100,18 +108,6 @@
         {
           "dex": 38,
           "name": "Ninetales"
-        },
-        {
-          "dex": 979,
-          "name": "Annihilape"
-        },
-        {
-          "dex": 980,
-          "name": "Clodsire"
-        },
-        {
-          "dex": 799,
-          "name": "Guzzlord"
         },
         {
           "dex": 9,
@@ -124,6 +120,10 @@
         {
           "dex": 452,
           "name": "Drapion (Shadow)"
+        },
+        {
+          "dex": 799,
+          "name": "Guzzlord"
         }
       ]
     },
@@ -171,12 +171,12 @@
           "name": "Dondozo"
         },
         {
-          "dex": 895,
-          "name": "Regidrago"
-        },
-        {
           "dex": 640,
           "name": "Virizion"
+        },
+        {
+          "dex": 895,
+          "name": "Regidrago"
         },
         {
           "dex": 463,
@@ -203,16 +203,16 @@
           "name": "Zygarde (Complete Forme)"
         },
         {
-          "dex": 365,
-          "name": "Walrein"
-        },
-        {
           "dex": 477,
           "name": "Dusknoir (Shadow)"
         },
         {
           "dex": 38,
           "name": "Ninetales (Alolan)"
+        },
+        {
+          "dex": 365,
+          "name": "Walrein"
         },
         {
           "dex": 452,
@@ -227,12 +227,12 @@
           "name": "Annihilape (Shadow)"
         },
         {
-          "dex": 230,
-          "name": "Kingdra"
-        },
-        {
           "dex": 487,
           "name": "Giratina (Altered)"
+        },
+        {
+          "dex": 230,
+          "name": "Kingdra"
         },
         {
           "dex": 939,

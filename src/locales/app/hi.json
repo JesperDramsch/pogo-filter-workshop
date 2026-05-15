@@ -431,6 +431,8 @@
   "app.regional_editor.disabled": "बंद",
   "app.regional_editor.home_extra": "(+{count} ⌂ से)",
   "app.regional_editor.select_all": "सब चुनें",
+  "app.regional_editor.select_recommended": "अनुशंसित",
+  "app.regional_editor.select_recommended_title": "अच्छे डिफ़ॉल्ट पर रीसेट करें — केवल S/A टियर फ़ॉर्म (Diglett/Yamask जैसे आम Alolan/Galarian बेस फ़ॉर्म छोड़ देता है)। ★ = ज़रूर पकड़ें; · = «अनुशंसित» में छूट जाता है।",
   "app.regional_editor.select_none": "कुछ नहीं",
   "app.regional_editor.type_check_label": "फॉर्म प्रोटेक्शन (टाइप-चेक)",
   "app.regional_editor.collectors_label": "कलेक्टर (प्रजाति प्रोटेक्शन)",

@@ -263,20 +263,26 @@ export const DEFAULT_CONFIG = {
 // Pure-name entries protect the species outright; if all members of a known
 // "form trio" (e.g. all 3 Vivillon patterns) are enabled, we auto-collapse
 // to "+Family" syntax to save chars and protect the whole evolution line.
+//
+// `tier` controls the "Recommended" default:
+//   "S" — genuinely chase-worthy (regional locks, sub-1% spawns, evolution-gated rares)
+//   "A" — worth keeping good ones (event-locked starters, soft regionals, meta attackers)
+//   "C" — common base-form Alolan/Galarian junk most collectors don't bother with
+// Entries without a tier are treated as "A" (default-on).
 
 const REGIONAL_GROUPS = {
   alolan: {
     labelKey: "app.regional.alolan.label",
     descriptionKey: "app.regional.alolan.description",
     typeChecks: [
-      { species: "Raichu",     type: "psychic",  noteKey: "app.regional.alolan.notes.raichu_psychic" },
-      { species: "Sandan",     type: "ice",      noteKey: "app.regional.alolan.notes.sandan_ice" },
-      { species: "Vulpix",     type: "ice",      noteKey: "app.regional.alolan.notes.vulpix_ice" },
-      { species: "Digda",      type: "steel",    noteKey: "app.regional.alolan.notes.digda_steel" },
-      { species: "Mauzi",      type: "dark",     noteKey: "app.regional.alolan.notes.mauzi_dark" },
-      { species: "Kleinstein", type: "electric", noteKey: "app.regional.alolan.notes.kleinstein_electric" },
-      { species: "Kokowei",    type: "dragon",   noteKey: "app.regional.alolan.notes.kokowei_dragon" },
-      { species: "Knogga",     type: "ghost",    noteKey: "app.regional.alolan.notes.knogga_ghost" },
+      { species: "Raichu",     type: "psychic",  tier: "A", noteKey: "app.regional.alolan.notes.raichu_psychic" },
+      { species: "Sandan",     type: "ice",      tier: "C", noteKey: "app.regional.alolan.notes.sandan_ice" },
+      { species: "Vulpix",     type: "ice",      tier: "C", noteKey: "app.regional.alolan.notes.vulpix_ice" },
+      { species: "Digda",      type: "steel",    tier: "C", noteKey: "app.regional.alolan.notes.digda_steel" },
+      { species: "Mauzi",      type: "dark",     tier: "C", noteKey: "app.regional.alolan.notes.mauzi_dark" },
+      { species: "Kleinstein", type: "electric", tier: "C", noteKey: "app.regional.alolan.notes.kleinstein_electric" },
+      { species: "Kokowei",    type: "dragon",   tier: "A", noteKey: "app.regional.alolan.notes.kokowei_dragon" },
+      { species: "Knogga",     type: "ghost",    tier: "A", noteKey: "app.regional.alolan.notes.knogga_ghost" },
     ],
     collectors: [],
   },
@@ -284,11 +290,11 @@ const REGIONAL_GROUPS = {
     labelKey: "app.regional.galarian.label",
     descriptionKey: "app.regional.galarian.description",
     typeChecks: [
-      { species: "Smogmog",  type: "fairy",    noteKey: "app.regional.galarian.notes.smogmog_fairy" },
-      { species: "Pantimos", type: "ice",      noteKey: "app.regional.galarian.notes.pantimos_ice" },
-      { species: "Makabaja", type: "ground",   noteKey: "app.regional.galarian.notes.makabaja_ground" },
-      { species: "Porenta",  type: "fighting", noteKey: "app.regional.galarian.notes.porenta_fighting" },
-      { species: "Corasonn", type: "ghost",    noteKey: "app.regional.galarian.notes.corasonn_ghost" },
+      { species: "Smogmog",  type: "fairy",    tier: "A", noteKey: "app.regional.galarian.notes.smogmog_fairy" },
+      { species: "Pantimos", type: "ice",      tier: "S", noteKey: "app.regional.galarian.notes.pantimos_ice" },
+      { species: "Makabaja", type: "ground",   tier: "C", noteKey: "app.regional.galarian.notes.makabaja_ground" },
+      { species: "Porenta",  type: "fighting", tier: "A", noteKey: "app.regional.galarian.notes.porenta_fighting" },
+      { species: "Corasonn", type: "ghost",    tier: "A", noteKey: "app.regional.galarian.notes.corasonn_ghost" },
     ],
     collectors: [],
   },
@@ -296,14 +302,14 @@ const REGIONAL_GROUPS = {
     labelKey: "app.regional.hisuian.label",
     descriptionKey: "app.regional.hisuian.description",
     typeChecks: [
-      { species: "Tornupto",  type: "ghost",    noteKey: "app.regional.hisuian.notes.tornupto_ghost" },
-      { species: "Admurai",   type: "dark",     noteKey: "app.regional.hisuian.notes.admurai_dark" },
-      { species: "Dressella", type: "fighting", noteKey: "app.regional.hisuian.notes.dressella_fighting" },
-      { species: "Arktilas",  type: "rock",     noteKey: "app.regional.hisuian.notes.arktilas_rock" },
-      { species: "Silvarro",  type: "fighting", noteKey: "app.regional.hisuian.notes.silvarro_fighting" },
-      { species: "Voltobal",  type: "grass",    noteKey: "app.regional.hisuian.notes.voltobal_grass" },
-      { species: "Lektrobal", type: "grass",    noteKey: "app.regional.hisuian.notes.lektrobal_grass" },
-      { species: "Sichlor",   type: "rock",     noteKey: "app.regional.hisuian.notes.sichlor_rock" },
+      { species: "Tornupto",  type: "ghost",    tier: "A", noteKey: "app.regional.hisuian.notes.tornupto_ghost" },
+      { species: "Admurai",   type: "dark",     tier: "S", noteKey: "app.regional.hisuian.notes.admurai_dark" },
+      { species: "Dressella", type: "fighting", tier: "A", noteKey: "app.regional.hisuian.notes.dressella_fighting" },
+      { species: "Arktilas",  type: "rock",     tier: "A", noteKey: "app.regional.hisuian.notes.arktilas_rock" },
+      { species: "Silvarro",  type: "fighting", tier: "A", noteKey: "app.regional.hisuian.notes.silvarro_fighting" },
+      { species: "Voltobal",  type: "grass",    tier: "A", noteKey: "app.regional.hisuian.notes.voltobal_grass" },
+      { species: "Lektrobal", type: "grass",    tier: "A", noteKey: "app.regional.hisuian.notes.lektrobal_grass" },
+      { species: "Sichlor",   type: "rock",     tier: "A", noteKey: "app.regional.hisuian.notes.sichlor_rock" },
     ],
     collectors: [],
   },
@@ -311,9 +317,9 @@ const REGIONAL_GROUPS = {
     labelKey: "app.regional.paldean.label",
     descriptionKey: "app.regional.paldean.description",
     typeChecks: [
-      { species: "Tauros", type: "fighting", noteKey: "app.regional.paldean.notes.tauros_fighting" },
-      { species: "Tauros", type: "fire",     noteKey: "app.regional.paldean.notes.tauros_fire" },
-      { species: "Tauros", type: "water",    noteKey: "app.regional.paldean.notes.tauros_water" },
+      { species: "Tauros", type: "fighting", tier: "S", noteKey: "app.regional.paldean.notes.tauros_fighting" },
+      { species: "Tauros", type: "fire",     tier: "S", noteKey: "app.regional.paldean.notes.tauros_fire" },
+      { species: "Tauros", type: "water",    tier: "S", noteKey: "app.regional.paldean.notes.tauros_water" },
     ],
     collectors: [],
   },
@@ -390,14 +396,34 @@ const FAMILY_COLLAPSES = {
   "+Purmel": ["Purmel", "Puponcho", "Vivillon"],
 };
 
-// Default: all enabled, but each can be toggled or filtered down to specific species.
+// Tier filter: which typeCheck species count as "recommended" defaults.
+// "C" tier (common Alolan/Galarian base-form junk like Diglett/Yamask) is
+// off by default — collectors typically don't bother. Entries without a
+// `tier` field are treated as "A" (default-on).
+function recommendedTypeCheckSpecies(group) {
+  return group.typeChecks
+    .filter(tc => (tc.tier || "A") !== "C")
+    .map(tc => tc.species);
+}
+
+// Default: all groups enabled, typeChecks default to the "recommended" set
+// (S + A tier — S = chase-worthy regional locks; A = worth-keeping rares).
+// Collectors default to all (null) — the regionals/collectibles groups
+// don't have tiering since those are uniformly worth protecting.
 function defaultRegionalToggles() {
   const out = {};
   for (const [key, group] of Object.entries(REGIONAL_GROUPS)) {
+    const recommended = recommendedTypeCheckSpecies(group);
+    const allSpecies = group.typeChecks.map(tc => tc.species);
+    // If every typeCheck is recommended (no C-tier entries), use null
+    // sentinel so "select all" stays the canonical "all on" state.
+    const typeChecksEnabled = recommended.length === allSpecies.length
+      ? null
+      : recommended;
     out[key] = {
       enabled: true,
       // null = all species in group are protected; if array, only listed species
-      typeChecksEnabled: null,
+      typeChecksEnabled,
       collectorsEnabled: null,
     };
   }
@@ -3940,8 +3966,14 @@ const PRESETS = {
     labelKey: "app.preset.collector.label",
     descriptionKey: "app.preset.collector.description",
     apply: (cfg) => {
+      // Maximalist preset: every regional form on, including C-tier base
+      // Alolan/Galarian junk that the recommended default skips.
       const groups = defaultRegionalToggles();
-      for (const k of Object.keys(groups)) groups[k].enabled = true;
+      for (const k of Object.keys(groups)) {
+        groups[k].enabled = true;
+        groups[k].typeChecksEnabled = null;
+        groups[k].collectorsEnabled = null;
+      }
       return { ...cfg,
         pvpMode: "none",
         protectFavorites: true, protectShinies: true, protectLuckies: true,
@@ -4360,9 +4392,15 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
   function selectAll() {
     setGroup({ enabled: true, typeChecksEnabled: null, collectorsEnabled: null });
   }
+  function selectRecommended() {
+    const recommended = recommendedTypeCheckSpecies(group);
+    const typeChecksEnabled = recommended.length === allTC.length ? null : recommended;
+    setGroup({ enabled: true, typeChecksEnabled, collectorsEnabled: null });
+  }
   function selectNone() {
     setGroup({ typeChecksEnabled: [], collectorsEnabled: [] });
   }
+  const hasTiers = group.typeChecks.some(tc => tc.tier === "C");
 
   return (
     <div className={`border rounded transition ${state.enabled ? "border-[#2D3A47]" : "border-[#1F2933] opacity-60"}`}>
@@ -4397,6 +4435,16 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
             <button onClick={selectAll} className="mono text-[10px] text-[#5EAFC5] hover:text-[#7FCFE5] transition">
               {t("app.regional_editor.select_all")}
             </button>
+            {hasTiers && (
+              <>
+                <span className="text-[#8090A0]">·</span>
+                <button onClick={selectRecommended}
+                  title={t("app.regional_editor.select_recommended_title")}
+                  className="mono text-[10px] text-[#F5B82E] hover:text-[#F8C95B] transition">
+                  {t("app.regional_editor.select_recommended")}
+                </button>
+              </>
+            )}
             <span className="text-[#8090A0]">·</span>
             <button onClick={selectNone} className="mono text-[10px] text-[#8090A0] hover:text-[#E74C3C] transition">
               {t("app.regional_editor.select_none")}
@@ -4411,6 +4459,10 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
                 {group.typeChecks.map(tc => {
                   const on = tcEnabled.includes(tc.species);
                   const isHomeLocal = tcLocalSet.has(`${tc.species}|${tc.type}`);
+                  const tierBadge = tc.tier === "S" ? "★" : tc.tier === "C" ? "·" : null;
+                  const tierColor = tc.tier === "S" ? "text-[#F5B82E]"
+                                  : tc.tier === "C" ? "text-[#8090A0]"
+                                  : "text-[#5EAFC5]";
                   return (
                     <button key={`${tc.species}_${tc.type}`}
                       onClick={() => toggleTC(tc.species)}
@@ -4424,6 +4476,9 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
                             : "bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]"
                       }`}>
                       {isHomeLocal && <span className="not-italic no-underline mr-0.5">⌂</span>}
+                      {tierBadge && !isHomeLocal && (
+                        <span className={`${tierColor} mr-0.5`}>{tierBadge}</span>
+                      )}
                       {tc.species} <span className="opacity-70">/ !{tc.type}</span>
                     </button>
                   );

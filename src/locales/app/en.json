@@ -431,6 +431,8 @@
   "app.regional_editor.disabled": "disabled",
   "app.regional_editor.home_extra": "(+{count} via ⌂)",
   "app.regional_editor.select_all": "select all",
+  "app.regional_editor.select_recommended": "recommended",
+  "app.regional_editor.select_recommended_title": "Reset to good defaults — only S/A tier forms (skips common Alolan/Galarian base-form junk like Diglett/Yamask). ★ = chase-worthy; · = skipped by recommended.",
   "app.regional_editor.select_none": "none",
   "app.regional_editor.type_check_label": "Form protection (type-check)",
   "app.regional_editor.collectors_label": "Collectors (species protection)",
