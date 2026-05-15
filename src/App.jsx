@@ -1576,13 +1576,40 @@ const POGO_REGIONS_KMZ = JSON.parse(`[{"folder":"Type 5 [Trios (Big Three Region
 // Polygons add intermediate vertices along the top/bottom edges so every
 // consecutive lon step stays under 180° — otherwise unwrapRing flips the
 // polygon inside-out across the antimeridian.
+
+// Exact KMZ "Type 3 [Paired Regional Line]" vertices, traced top→south so the
+// polygons below can splice them in either order without resampling. Source:
+// POGO_REGIONS_KMZ entry of the same name (community KMZ by u/zoglandboy /
+// u/Mattman243 / pokemoncalendar.com). DO NOT round — these are the canonical
+// dividing-line coordinates and anyone right on the Mediterranean coast or in
+// eastern Iran lands differently for a tenth of a degree.
+const PAIRED_LINE_VERTICES = [
+  [-29.0478436, 85.0397427],
+  [-29.1357322, 33.3213485],
+  [-21.3835305, 33.3385554],
+  [-14.5557243, 33.3327905],
+  [-6.5154841,  33.496424],
+  [1.1645508,   33.5413946],
+  [9.3965509,   33.5230259],
+  [17.5122071,  33.3947592],
+  [26.916504,   33.3764123],
+  [36.2400056,  33.3935447],
+  [43.59375,    33.4497766],
+  [49.5074177,  33.4598794],
+  [54.5800781,  33.4864354],
+  [53.437502,  -85.0207077],
+];
+const PAIRED_LINE_REV = [...PAIRED_LINE_VERTICES].reverse();
 const PAIRED_LINE = {
-  // Europe (above 33.4°N from -29°W to 180°E) + Asia + Oceania (east of 54°E
-  // south of 33.4°N). Closed via the antimeridian and the top of the world.
-  east: [[-29, 33.4], [54, 33.4], [54, -85], [180, -85], [180, 85], [90, 85], [0, 85], [-29, 85], [-29, 33.4]],
-  // Complement: Americas + Greenland (west of -29°W above 33.4°N) + Africa +
-  // S. Atlantic (west of 54°E below 33.4°N).
-  west: [[-180, 85], [-29, 85], [-29, 33.4], [54, 33.4], [54, -85], [-30, -85], [-100, -85], [-180, -85], [-180, 85]],
+  // Europe (above the line from -29°W to +54°E) + Asia + Oceania (east of the
+  // line from +54°E south). Traces the KMZ vertices, then wraps back via the
+  // antimeridian. Intermediate vertices on the top edge keep every consecutive
+  // lon step under 180°.
+  east: [...PAIRED_LINE_VERTICES, [180, -85], [180, 85], [90, 85], [0, 85], PAIRED_LINE_VERTICES[0]],
+  // Complement: Americas + Greenland (west of the line above 33°N) + Africa +
+  // S. Atlantic (west of the line below 33°N). Walks the KMZ line bottom→top
+  // (so winding stays consistent), then wraps back via the antimeridian.
+  west: [...PAIRED_LINE_REV, [-180, 85], [-180, -85], [-100, -85], [-30, -85], PAIRED_LINE_REV[0]],
 };
 const EQUATOR_SPLIT = {
   north: [[-180, 0], [-90, 0], [0, 0], [90, 0], [180, 0], [180, 85], [90, 85], [0, 85], [-90, 85], [-180, 85], [-180, 0]],

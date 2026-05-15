@@ -69,6 +69,14 @@ const C = {
   Nuuk:          [-51.74,  64.18],
   Moscow:        [37.62,  55.76],
   Yakutsk:       [129.74, 62.04],
+  // Boundary-zone cities — within the precision band of the KMZ L-line vertices
+  // (lat 33.32-33.49°N, lon 53.4-54.6°E). If we ever round the polygon back
+  // down to simple integers, these should flip side.
+  Tunis:         [10.18, 36.81],   // Mediterranean coast just N of line — must be East
+  Algiers:       [ 3.06, 36.75],   // Mediterranean coast just N of line — must be East
+  Tripoli:       [13.19, 32.89],   // Libyan coast just S of line — must be West (Africa)
+  Casablanca:    [-7.59, 33.57],   // Just N of line at -7°W (KMZ 33.50) — must be East
+  Marrakech:     [-7.99, 31.63],   // S of line — must be West (Africa)
 };
 
 // Canonical regional table from the user, normalized into:
@@ -99,10 +107,12 @@ const TESTS = [
   // #0324 Torkoal — India / SE Asia
   // (Singapore at 1.35°N falls just south of the KMZ polygon's ~1.7°N southern edge — known KMZ limit.)
   { id: "0324", german: "Qurtel",      in: ["Mumbai", "Delhi", "Bangkok"], out: ["Berlin", "NewYork", "Sydney"] },
-  // #0335 Zangoose — Europe/Asia/Oceania (rotating, East)
-  { id: "0335", german: "Sengo",       in: ["Berlin", "Tokyo", "Sydney", "Mumbai"], out: ["NewYork", "SaoPaulo", "Cairo", "Lagos"] },
-  // #0336 Seviper — NA/SA/Africa (rotating, West)
-  { id: "0336", german: "Vipitis",     in: ["NewYork", "SaoPaulo", "Cairo", "Lagos"], out: ["Berlin", "Tokyo", "Sydney"] },
+  // #0335 Zangoose — Europe/Asia/Oceania (rotating, East). Boundary-zone cities:
+  // Tunis/Algiers (just N of L-line, Mediterranean), Casablanca (33.57°N) are East;
+  // Tripoli (32.89°N, Libya) + Marrakech (31.63°N, S. Morocco) are West (Africa).
+  { id: "0335", german: "Sengo",       in: ["Berlin", "Tokyo", "Sydney", "Mumbai", "Tunis", "Algiers", "Casablanca"], out: ["NewYork", "SaoPaulo", "Cairo", "Lagos", "Tripoli", "Marrakech"] },
+  // #0336 Seviper — NA/SA/Africa (rotating, West). Inverse of Sengo on the boundary.
+  { id: "0336", german: "Vipitis",     in: ["NewYork", "SaoPaulo", "Cairo", "Lagos", "Tripoli", "Marrakech"], out: ["Berlin", "Tokyo", "Sydney", "Tunis", "Algiers", "Casablanca"] },
   // #0337 Lunatone — Europe/Asia/Oceania (rotating, East)
   { id: "0337", german: "Lunastein",   in: ["Berlin", "Tokyo", "Sydney"], out: ["NewYork", "SaoPaulo", "Cairo"] },
   // #0338 Solrock — NA/SA/Africa (rotating, West)
