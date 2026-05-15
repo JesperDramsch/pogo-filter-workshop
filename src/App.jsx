@@ -550,7 +550,7 @@ function capFirst(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", tFn = (k) => k) {
+export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", tFn = (k) => k, homeLocalTypeChecks = []) {
   const kw = pogoKeywords(outputLocale);
 
   // Hundos are stored in the user's output-locale lowercase form. Re-render in
@@ -698,6 +698,11 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     if (!state || !state.enabled) continue;
     for (const tc of group.typeChecks) {
       if (state.typeChecksEnabled !== null && !state.typeChecksEnabled.includes(tc.species)) continue;
+      // Auto-drop type-form protection when home is in this form's region —
+      // e.g. Madrid user catches Paldean Tauros (Combat = Fighting) locally,
+      // so the fighting clause shouldn't sit in trash. Mirrors the
+      // homeLocals-based auto-drop for bare collectors.
+      if (homeLocalTypeChecks.some(l => l.species === tc.species && l.type === tc.type)) continue;
       const speciesOut = speciesForOutput(tc.species, outputLocale);
       const speciesDisplay = capFirst(speciesOut);
       const typeOut = kw.type[tc.type] || tc.type;
@@ -1665,6 +1670,8 @@ const POGO_REGIONS_ROTATING = [
     name: "Eastern paired/hemispheric (Europe + Asia + Oceania)",
     english: ["Zangoose", "Sawk",      "Lunatone",  "Heatmor",   "Volbeat", "Stakataka"],
     german:  ["Sengo",    "Karadonis", "Lunastein", "Furnifraß", "Volbeat", "Muramura"],
+    // Paldean Tauros (Blaze, Fighting/Fire) — eastern hemisphere local
+    typeChecks: [{ species: "Tauros", type: "fire" }],
     geometry: { type: "Polygon", coordinates: [PAIRED_LINE.east] },
   },
   {
@@ -1672,6 +1679,8 @@ const POGO_REGIONS_ROTATING = [
     name: "Western paired/hemispheric (Americas + Africa)",
     english: ["Seviper", "Throh",    "Solrock", "Durant",    "Illumise", "Blacephalon"],
     german:  ["Vipitis", "Jiutesto", "Sonnfel", "Fermicula", "Illumise", "Kopplosio"],
+    // Paldean Tauros (Aqua, Fighting/Water) — western hemisphere local
+    typeChecks: [{ species: "Tauros", type: "water" }],
     geometry: { type: "Polygon", coordinates: [PAIRED_LINE.west] },
   },
   {
@@ -1687,6 +1696,32 @@ const POGO_REGIONS_ROTATING = [
     english: ["Celesteela"],
     german:  ["Kaguron"],
     geometry: { type: "Polygon", coordinates: [EQUATOR_SPLIT.south] },
+  },
+  {
+    folder: "Type 1 [Sub-regional] (manually maintained)",
+    name: "Iberian Peninsula — Paldean Tauros (Combat)",
+    english: [],
+    german:  [],
+    // Paldean Tauros (Combat, Fighting only) — Iberian local. No bare-species
+    // entry: the base "Tauros" name lives in the regionals group with the
+    // North-American polygon; this entry only tags the form-by-type identity.
+    typeChecks: [{ species: "Tauros", type: "fighting" }],
+    geometry: { type: "Polygon", coordinates: [[
+      [-9.6, 43.8],   // NW Spain (Galicia)
+      [-1.8, 43.5],   // Bay of Biscay (Bilbao)
+      [ 0.5, 42.9],   // Pyrenees / Andorra
+      [ 3.3, 42.5],   // NE Spain (Costa Brava)
+      [ 0.2, 39.0],   // Valencia
+      [-0.9, 37.6],   // SE Spain
+      [-2.0, 36.7],   // Almeria
+      [-5.4, 36.0],   // Gibraltar
+      [-7.4, 37.0],   // S Portugal (Faro)
+      [-9.0, 37.0],   // SW Portugal (Sagres)
+      [-9.6, 38.5],   // Lisbon coast (Cabo Espichel)
+      [-9.6, 41.0],   // W Portugal coast
+      [-9.0, 43.0],   // NW Portugal
+      [-9.6, 43.8],   // close
+    ]] },
   },
 ];
 
@@ -1704,6 +1739,28 @@ export function computeHomeLocals(homeLocation) {
     }
   }
   return [...out];
+}
+
+// Locally-active typeCheck identities ({species, type} pairs) at home.
+// Used to auto-drop region-specific form protections — e.g. Paldean Tauros
+// (Combat = Fighting) is local on the Iberian Peninsula but remote elsewhere,
+// so a Spanish user keeps protection on Blaze/Aqua but lets Combat go to trash.
+export function computeHomeLocalTypeChecks(homeLocation) {
+  if (!homeLocation) return [];
+  const out = [];
+  const seen = new Set();
+  for (const r of POGO_REGIONS) {
+    if (!r.typeChecks || r.typeChecks.length === 0) continue;
+    if (r.geometry.type !== "Polygon" && r.geometry.type !== "MultiPolygon") continue;
+    if (!pointInRegionGeom(homeLocation, r.geometry)) continue;
+    for (const tc of r.typeChecks) {
+      const key = `${tc.species}|${tc.type}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({ species: tc.species, type: tc.type });
+    }
+  }
+  return out;
 }
 
 const KEY_LASTPIN = "pogo:lastpin";
@@ -1914,6 +1971,7 @@ export default function App() {
 
   // Locals at home location (drives auto-drop from Regionals protection + bazaar suggestions)
   const homeLocals = useMemo(() => computeHomeLocals(homeLocation), [homeLocation]);
+  const homeLocalTypeChecks = useMemo(() => computeHomeLocalTypeChecks(homeLocation), [homeLocation]);
 
   // Build effective config: home-locals get auto-removed from collector protections
   // across ALL regional groups (so e.g. Sengo in collectibles also gets dropped if Bonn is home).
@@ -1952,8 +2010,8 @@ export default function App() {
           rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
           rocketTypeLabels,
           pvpFilters, pvpRankingsFetchedAt, cupFilters } = useMemo(
-    () => buildFilters(hundos, { ...effectiveConfig, topAttackers, topMaxAttackers }, homeLocals, effectiveOutputLocale, t),
-    [hundos, effectiveConfig, homeLocals, effectiveOutputLocale, topAttackers, topMaxAttackers, t]
+    () => buildFilters(hundos, { ...effectiveConfig, topAttackers, topMaxAttackers }, homeLocals, effectiveOutputLocale, t, homeLocalTypeChecks),
+    [hundos, effectiveConfig, homeLocals, homeLocalTypeChecks, effectiveOutputLocale, topAttackers, topMaxAttackers, t]
   );
 
   function addHundo() {
@@ -2231,7 +2289,7 @@ export default function App() {
               onNext={() => gotoStep(3)}
               nextLabel={t("app.step.what.next_label")}
             >
-              <ConfigPanel config={config} setConfig={setConfig} homeLocals={homeLocals} />
+              <ConfigPanel config={config} setConfig={setConfig} homeLocals={homeLocals} homeLocalTypeChecks={homeLocalTypeChecks} />
             </StepWrapper>
           )}
 
@@ -3964,7 +4022,7 @@ const EXPERT_ONLY_KEYS = new Set([
   "luckyEligibleYear",
 ]);
 
-function ConfigPanel({ config, setConfig, homeLocals = [] }) {
+function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks = [] }) {
   const { t, outputLocale } = useTranslation();
   // Any individual change in ConfigPanel clears the preset marker — the
   // marker means "this preset is currently in effect"; the moment the
@@ -4150,6 +4208,7 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
               state={config.regionalGroups?.[key] || { enabled: true, typeChecksEnabled: null, collectorsEnabled: null }}
               setGroup={(partial) => setGroup(key, partial)}
               homeLocals={homeLocals}
+              homeLocalTypeChecks={homeLocalTypeChecks}
             />
           )}
         </div>
@@ -4267,7 +4326,7 @@ function ToggleRow({ k, label, why, checked, onChange, expertBadge, requireConfi
 }
 
 
-function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = [] }) {
+function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = [], homeLocalTypeChecks = [] }) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const allTC = group.typeChecks.map(tc => tc.species);
@@ -4275,14 +4334,18 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
   const tcEnabled = state.typeChecksEnabled === null ? allTC : state.typeChecksEnabled;
   const colEnabled = state.collectorsEnabled === null ? allCol : state.collectorsEnabled;
   // Home-locals are auto-dropped by effectiveConfig — exclude them from the counter
-  // so the displayed "X/Y aktiv" matches the actual filter output.
+  // so the displayed "X/Y aktiv" matches the actual filter output. typeChecks
+  // need the {species,type} pair to match — same species with different types
+  // (e.g. Paldean Tauros Combat vs Blaze) is the wrong granularity.
   const homeSet = new Set(homeLocals);
+  const tcLocalSet = new Set(homeLocalTypeChecks.map(l => `${l.species}|${l.type}`));
+  const tcLocalCount = group.typeChecks.filter(tc => tcLocalSet.has(`${tc.species}|${tc.type}`)).length;
   const tcEffective = tcEnabled.filter(sp => !homeSet.has(sp));
   const colEffective = colEnabled.filter(sp => !homeSet.has(sp));
-  const totalEffective = allTC.filter(sp => !homeSet.has(sp)).length
+  const totalEffective = allTC.filter(sp => !homeSet.has(sp)).length - tcLocalCount
                        + allCol.filter(sp => !homeSet.has(sp)).length;
-  const droppedByHome = (tcEnabled.length + colEnabled.length) - (tcEffective.length + colEffective.length);
-  const enabledCount = state.enabled ? (tcEffective.length + colEffective.length) : 0;
+  const droppedByHome = (tcEnabled.length + colEnabled.length) - (tcEffective.length + colEffective.length) + tcLocalCount;
+  const enabledCount = state.enabled ? (tcEffective.length + colEffective.length - tcLocalCount) : 0;
 
   function toggleTC(species) {
     const cur = tcEnabled;
@@ -4347,16 +4410,20 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
               <div className="flex flex-wrap gap-1">
                 {group.typeChecks.map(tc => {
                   const on = tcEnabled.includes(tc.species);
+                  const isHomeLocal = tcLocalSet.has(`${tc.species}|${tc.type}`);
                   return (
                     <button key={`${tc.species}_${tc.type}`}
                       onClick={() => toggleTC(tc.species)}
-                      title={t(tc.noteKey)}
-                      disabled={!state.enabled}
+                      title={isHomeLocal ? t("app.regional_editor.home_local_title") : t(tc.noteKey)}
+                      disabled={!state.enabled || isHomeLocal}
                       className={`mono text-[11px] px-2 py-0.5 rounded transition ${
-                        on
-                          ? "bg-[#5EAFC5]/20 text-[#5EAFC5] border border-[#5EAFC5]/40"
-                          : "bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]"
+                        isHomeLocal
+                          ? "bg-[#27AE60]/10 text-[#27AE60] border border-[#27AE60]/30 line-through opacity-60"
+                          : on
+                            ? "bg-[#5EAFC5]/20 text-[#5EAFC5] border border-[#5EAFC5]/40"
+                            : "bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]"
                       }`}>
+                      {isHomeLocal && <span className="not-italic no-underline mr-0.5">⌂</span>}
                       {tc.species} <span className="opacity-70">/ !{tc.type}</span>
                     </button>
                   );

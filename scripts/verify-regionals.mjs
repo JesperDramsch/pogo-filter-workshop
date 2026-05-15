@@ -9,7 +9,7 @@
 // Output is one line per Pokemon: PASS / FAIL / NOT-IN-DATA, with details
 // on any mismatch so we can fix the underlying polygon or rotation entry.
 
-import { computeHomeLocals } from "../src/App.jsx";
+import { computeHomeLocals, computeHomeLocalTypeChecks } from "../src/App.jsx";
 
 // Representative cities — [lon, lat] matches the App's homeLocation shape.
 const C = {
@@ -207,10 +207,50 @@ for (const t of TESTS) {
   }
 }
 
+// ─── Paldean Tauros region-aware typeCheck tests ──────────────────────────
+// The Paldean group uses {species, type} typeChecks. Each of the 3 forms
+// (Combat = Fighting, Blaze = Fighting+Fire, Aqua = Fighting+Water) is local
+// in exactly one region. We expect computeHomeLocalTypeChecks to return the
+// matching {species, type} when home is inside that region and nothing for
+// that pair when home is outside.
+const PALDEAN_TESTS = [
+  // Combat — Iberian Peninsula
+  { id: "0128", form: "Combat",  type: "fighting", in: ["Madrid", "Lisbon"], out: ["Paris", "Berlin", "NewYork", "Tokyo", "Sydney", "Casablanca"] },
+  // Blaze — Eastern Hemisphere (excl. Iberian since Combat takes priority there)
+  { id: "0128", form: "Blaze",   type: "fire",     in: ["Berlin", "Tokyo", "Sydney", "Athens"], out: ["NewYork", "SaoPaulo", "Cairo", "Lagos"] },
+  // Aqua — Western Hemisphere
+  { id: "0128", form: "Aqua",    type: "water",    in: ["NewYork", "SaoPaulo", "Cairo", "Lagos", "Marrakech"], out: ["Berlin", "Tokyo", "Sydney", "Madrid"] },
+];
+
+let paldeanPassed = 0, paldeanFailed = 0;
+for (const t of PALDEAN_TESTS) {
+  const errors = [];
+  for (const city of t.in) {
+    const tcs = computeHomeLocalTypeChecks(C[city]);
+    const hit = tcs.some(tc => tc.species === "Tauros" && tc.type === t.type);
+    if (!hit) errors.push(`  MISSING: Tauros+${t.type} not in typeChecks(${city})`);
+  }
+  for (const city of t.out) {
+    const tcs = computeHomeLocalTypeChecks(C[city]);
+    const leak = tcs.some(tc => tc.species === "Tauros" && tc.type === t.type);
+    if (leak) errors.push(`  LEAKED:  Tauros+${t.type} unexpectedly in typeChecks(${city})`);
+  }
+  if (errors.length === 0) {
+    paldeanPassed++;
+    console.log(`✓  #${t.id} Paldean ${t.form.padEnd(7)} (fighting+${t.type.padEnd(5)})  PASS  (${t.in.length} in, ${t.out.length} out)`);
+  } else {
+    paldeanFailed++;
+    console.log(`✗  #${t.id} Paldean ${t.form.padEnd(7)} (fighting+${t.type.padEnd(5)})  FAIL`);
+    for (const e of errors) console.log(e);
+  }
+}
+
 console.log();
-console.log(`Summary: ${passed} pass, ${failed} fail, ${skipped} skip (not in code)`);
-if (failed > 0) {
-  console.log(`\nFailures:`);
-  for (const f of failures) console.log(`  #${f.id} ${f.german}: ${f.errors.length} issue(s)`);
+console.log(`Summary: ${passed} pass, ${failed} fail, ${skipped} skip (not in code) | Paldean typeChecks: ${paldeanPassed} pass, ${paldeanFailed} fail`);
+if (failed > 0 || paldeanFailed > 0) {
+  if (failed > 0) {
+    console.log(`\nCollector/typeCheck failures:`);
+    for (const f of failures) console.log(`  #${f.id} ${f.german}: ${f.errors.length} issue(s)`);
+  }
   process.exit(1);
 }
