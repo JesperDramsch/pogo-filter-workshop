@@ -155,6 +155,14 @@ export const DEFAULT_CONFIG = {
   protectFavorites: true,
   protectFourStar: true,       // never toss any 4★ hundo (Regel 1) — expert can disable with confirmation
   protectTradeEvos: true,      // protect trade-evolution candidates from trash (free evos via tausch)
+  // Once a regional has been traded, the "keep it for trade" rationale is
+  // spent — bad-IV traded Alolan Raichu (Psychic) etc. fall into trash like
+  // any other dupe. Mirrors the trade-evo carve-out above (`,traded` token).
+  // Trade-buddy stockpiles tagged with a configured buddy's prefix (e.g.
+  // #Auri:abra) are still auto-protected by the per-buddy `!#${prefix}`
+  // clause; ad-hoc keepers use #Trade / #Fern-Tausch / custom tags. Off =
+  // legacy unconditional protection for every regional form.
+  trashTradedRegionals: true,
   protectAnyTag: true,         // protects ANY tagged Pokémon (catch-all !# clause)
   protectShinies: true,
   protectLuckies: true,
@@ -744,10 +752,14 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
       // Without this, the bare !Tauros,!fighting clause would umbrella-protect
       // Blaze and Aqua too (both have Fighting), defeating their own region-aware drops.
       const excludeParts = (tc.excludeTypes || []).map(t => kw.type[t] || t);
-      const clause = excludeParts.length > 0
-        ? `!${speciesDisplay},!${typeOut},${excludeParts.join(",")}`
-        : `!${speciesDisplay},!${typeOut}`;
-      push(trashClauses, clause, `${tFn(group.labelKey)}: ${tFn(tc.noteKey)}`);
+      const excludePart = excludeParts.length > 0 ? `,${excludeParts.join(",")}` : "";
+      // OR-binds-tighter: appending `,traded` keeps anything that isn't this
+      // regional form OR has already been traded — i.e. the clause only
+      // protects *untraded* regionals. Traded duplicates fall through to the
+      // rest of the trash pipeline (bad-IV checks, etc.).
+      const tradedCarve = cfg.trashTradedRegionals ? `,${kw.flag.traded}` : "";
+      const whyCarve = cfg.trashTradedRegionals ? ` (${tFn("app.clause_why.except_traded_short")})` : "";
+      push(trashClauses, `!${speciesDisplay},!${typeOut}${excludePart}${tradedCarve}`, `${tFn(group.labelKey)}: ${tFn(tc.noteKey)}${whyCarve}`);
     }
     // Collectors — resolve each to outputLocale, then collapse families
     const enabledCollectorsOut = group.collectors
@@ -784,6 +796,13 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     push(trashClauses, `${kw.numeric.year}${cfg.luckyEligibleYear}-,${kw.flag.traded}`, tFn("app.clause_why.lucky_eligible", { params: { year: cfg.luckyEligibleYear } }));
 
   const trash = trashClauses.map(c => c.clause).join("&");
+
+  // "Traded trash review" — narrows the trash filter to traded mons only,
+  // so the user can flip through traded candidates before bulk-trashing
+  // them. Effectively `trash & traded`. Mostly useful with
+  // trashTradedRegionals on (otherwise the only traded mons in trash come
+  // through the age/distance/lucky scope clauses).
+  const tradedTrashSort = trash ? `${trash}&${kw.flag.traded}` : "";
 
   // ── TRADE ──────────────────────────────────────────────────────────────
   push(tradeClauses, [S012, TE_trim_str, H].filter(Boolean).join(","), tFn("app.clause_why.h_s012_te"));
@@ -1488,7 +1507,7 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     }
   }
 
-  return { trash, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
+  return { trash, tradedTrashSort, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
            trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses,
            // Aux pro-tools
            shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
@@ -2012,6 +2031,7 @@ export default function App() {
   const [copied, setCopied] = useState({
     trash: false, trade: false, sort: false, prestaged: false, gift: false,
     // Aux pro-tools
+    tradedTrashSort: false,
     shadowCheap: false, shadowSafe: false, shadowHundoCandidates: false, shadowFrustration: false,
     evoSwapCandy: false, evoSwapItem: false,
     cheapEvolve: false, dexPlus: false, megaEvolve: false, pilotLong: false,
@@ -2087,7 +2107,7 @@ export default function App() {
   // explicitly picked a different one (e.g. their PoGo client is set to a
   // different language than their browser).
   const effectiveOutputLocale = effectiveConfig.expertMode ? outputLocale : locale;
-  const { trash, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
+  const { trash, tradedTrashSort, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
           trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses,
           shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
           evoSwapCandy, evoSwapItem,
@@ -2519,6 +2539,16 @@ export default function App() {
                           copied={copied.prestaged}
                           onCopy={() => copyToClipboard("prestaged", prestaged)}
                           hint={t("app.filter.prestaged_hint", { params: { tags: [effectiveConfig.basarTagName, effectiveConfig.fernTauschTagName].filter(Boolean).map(tag => `#${tag}`).join(", ") } })}
+                        />
+                      )}
+                      {tradedTrashSort && (
+                        <FilterBox
+                          label={t("app.filter.traded_trash_sort_label")}
+                          accent="#E67E22"
+                          filterStr={tradedTrashSort}
+                          copied={copied.tradedTrashSort}
+                          onCopy={() => copyToClipboard("tradedTrashSort", tradedTrashSort)}
+                          hint={t("app.filter.traded_trash_sort_hint")}
                         />
                       )}
                       {gift && (
@@ -4109,6 +4139,7 @@ const EXPERT_ONLY_KEYS = new Set([
   "protectBuddies",
   "protectDynamax",
   "protectLuckyEligible",
+  "trashTradedRegionals",
   "leagueTags",
   "customProtectedTags",
   "cpCap",
@@ -4145,6 +4176,7 @@ function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks =
     ["protectFourStar",       "app.protect.four_star",      { expertOnly: true, requireConfirmOff: true }],
     ["protectAnyTag",         "app.protect.any_tag"],
     ["protectTradeEvos",      "app.protect.trade_evos"],
+    ["trashTradedRegionals",  "app.protect.trash_traded_regionals", { expertOnly: true }],
     ["protectShinies",        "app.protect.shinies",        { expertOnly: true }],
     ["protectLuckies",        "app.protect.luckies",        { expertOnly: true }],
     ["protectLegendaries",    "app.protect.legendaries"],
