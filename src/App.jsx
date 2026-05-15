@@ -1729,8 +1729,8 @@ const POGO_REGIONS_ROTATING = [
   {
     folder: "Type 3/4 [Paired/Hemispheric] (E side, manually maintained)",
     name: "Eastern paired/hemispheric (Europe + Asia + Oceania)",
-    english: ["Zangoose", "Sawk",      "Lunatone",  "Heatmor",   "Volbeat", "Stakataka"],
-    german:  ["Sengo",    "Karadonis", "Lunastein", "Furnifraß", "Volbeat", "Muramura"],
+    english: ["Zangoose", "Sawk",      "Solrock", "Heatmor",   "Volbeat", "Stakataka"],
+    german:  ["Sengo",    "Karadonis", "Sonnfel", "Furnifraß", "Volbeat", "Muramura"],
     // Paired/hemispheric species DO cover Iberian per the canonical table —
     // Madrid catches Sengo/Karadonis/etc. locally. No Iberian carve-out here.
     geometry: { type: "Polygon", coordinates: [PAIRED_LINE.east] },
@@ -1750,8 +1750,8 @@ const POGO_REGIONS_ROTATING = [
   {
     folder: "Type 3/4 [Paired/Hemispheric] (W side, manually maintained)",
     name: "Western paired/hemispheric (Americas + Africa)",
-    english: ["Seviper", "Throh",    "Solrock", "Durant",    "Illumise", "Blacephalon"],
-    german:  ["Vipitis", "Jiutesto", "Sonnfel", "Fermicula", "Illumise", "Kopplosio"],
+    english: ["Seviper", "Throh",    "Lunatone",  "Durant",    "Illumise", "Blacephalon"],
+    german:  ["Vipitis", "Jiutesto", "Lunastein", "Fermicula", "Illumise", "Kopplosio"],
     // Paldean Tauros (Aqua, Fighting/Water) — western hemisphere local. No
     // sub-regional carve-out for the Americas (the base Tauros region IS
     // inside, but base Tauros uses {Tauros, normal} not {Tauros, water}, so

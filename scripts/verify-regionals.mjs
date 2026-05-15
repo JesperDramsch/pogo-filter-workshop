@@ -113,10 +113,10 @@ const TESTS = [
   { id: "0335", german: "Sengo",       in: ["Berlin", "Tokyo", "Sydney", "Mumbai", "Tunis", "Algiers", "Casablanca"], out: ["NewYork", "SaoPaulo", "Cairo", "Lagos", "Tripoli", "Marrakech"] },
   // #0336 Seviper — NA/SA/Africa (rotating, West). Inverse of Sengo on the boundary.
   { id: "0336", german: "Vipitis",     in: ["NewYork", "SaoPaulo", "Cairo", "Lagos", "Tripoli", "Marrakech"], out: ["Berlin", "Tokyo", "Sydney", "Tunis", "Algiers", "Casablanca"] },
-  // #0337 Lunatone — Europe/Asia/Oceania (rotating, East)
-  { id: "0337", german: "Lunastein",   in: ["Berlin", "Tokyo", "Sydney"], out: ["NewYork", "SaoPaulo", "Cairo"] },
-  // #0338 Solrock — NA/SA/Africa (rotating, West)
-  { id: "0338", german: "Sonnfel",     in: ["NewYork", "SaoPaulo", "Cairo"], out: ["Berlin", "Tokyo", "Sydney"] },
+  // #0337 Lunatone — NA/SA/Africa (rotating, West)
+  { id: "0337", german: "Lunastein",   in: ["NewYork", "SaoPaulo", "Cairo"], out: ["Berlin", "Tokyo", "Sydney"] },
+  // #0338 Solrock — Europe/Asia/Oceania (rotating, East)
+  { id: "0338", german: "Sonnfel",     in: ["Berlin", "Tokyo", "Sydney"], out: ["NewYork", "SaoPaulo", "Cairo"] },
   // #0357 Tropius — Africa
   { id: "0357", german: "Tropius",     in: ["Lagos", "Nairobi", "Cairo", "CapeTown"], out: ["Berlin", "NewYork", "Tokyo"] },
   // #0369 Relicanth — NZ
