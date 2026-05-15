@@ -472,6 +472,7 @@
   "app.regional.paldean.notes.tauros_water": "Paldean Tauros (Aquarasse) — westliche Hemisphäre",
   "app.regional.regionals.label": "Regionale Pokémon",
   "app.regional.regionals.description": "Kontinent-exklusive Spezies — alle paired/hemispheric/trio Regionalen",
+  "app.regional.regionals.notes.tauros_normal": "Basis-Tauros (Normal) — Nordamerika-Regional. Typ-basiert, damit die Paldea-Formen (Kampf/Feuer/Wasser) nicht mit erfasst werden.",
   "app.regional.collectibles.label": "Sammler-Pokémon",
   "app.regional.collectibles.description": "Multi-Form / Muster-Sammlungen — Formen sind in PoGo nicht separat suchbar",
   "app.regional.collectibles.notes.flabebe_forms": "Schützt alle Flabébé / Floette / Florges vor dem Trash — wir können rote / gelbe / blaue Blüten nicht per Typ unterscheiden. Bring deinen Freunden mal Blumen mit!",

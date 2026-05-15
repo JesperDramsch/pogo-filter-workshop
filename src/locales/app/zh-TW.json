@@ -472,6 +472,7 @@
   "app.regional.paldean.notes.tauros_water": "帕底亞肯泰羅(水流種) — 西半球",
   "app.regional.regionals.label": "地區限定寶可夢",
   "app.regional.regionals.description": "大陸限定種類 — 所有成對/半球/三組地區限定",
+  "app.regional.regionals.notes.tauros_normal": "原始肯泰羅 (一般屬性) — 北美地區限定。以類型指定,避免把帕底亞肯泰羅 (格鬥/火/水) 一併包含。",
   "app.regional.collectibles.label": "收藏品",
   "app.regional.collectibles.description": "多形態 / 圖樣收藏 — PoGo 中無法分別搜尋形態",
   "app.regional.collectibles.notes.flabebe_forms": "將所有花蓓蓓 / 花葉蒂 / 花潔夫人從垃圾箱中移除 — 無法依類型區分紅/黃/藍色花。記得帶些花給朋友！",
