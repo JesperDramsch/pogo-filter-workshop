@@ -92,10 +92,10 @@ const TESTS = [
   { id: "0214", german: "Skaraborn",   in: ["MexicoCity", "SaoPaulo", "Miami", "Cancun", "BuenosAires"], out: ["NewYork", "Berlin", "Tokyo"] },
   // #0222 Corsola — equatorial band (KMZ polygon covers latitude ~22-31)
   { id: "0222", german: "Corasonn",    in: ["Cancun", "Honolulu"], out: ["Berlin", "Sydney", "SaoPaulo"] },
-  // #0313 Volbeat — Europe/Asia/Oceania (NOT IN CODE)
-  { id: "0313", german: "Volbeat",     in: ["Berlin", "Tokyo", "Sydney"], out: ["NewYork", "SaoPaulo", "Cairo"], status: "skip-not-in-code" },
-  // #0314 Illumise — NA/SA/Africa (NOT IN CODE)
-  { id: "0314", german: "Illumise",    in: ["NewYork", "SaoPaulo", "Cairo"], out: ["Berlin", "Tokyo", "Sydney"], status: "skip-not-in-code" },
+  // #0313 Volbeat — Europe/Asia/Oceania
+  { id: "0313", german: "Volbeat",     in: ["Berlin", "Tokyo", "Sydney"], out: ["NewYork", "SaoPaulo", "Cairo"] },
+  // #0314 Illumise — NA/SA/Africa
+  { id: "0314", german: "Illumise",    in: ["NewYork", "SaoPaulo", "Cairo"], out: ["Berlin", "Tokyo", "Sydney"] },
   // #0324 Torkoal — India / SE Asia
   // (Singapore at 1.35°N falls just south of the KMZ polygon's ~1.7°N southern edge — known KMZ limit.)
   { id: "0324", german: "Qurtel",      in: ["Mumbai", "Delhi", "Bangkok"], out: ["Berlin", "NewYork", "Sydney"] },
@@ -151,14 +151,14 @@ const TESTS = [
   { id: "0707", german: "Clavion",     in: ["Paris"], out: ["Berlin", "London", "NewYork"] },
   // #0764 Comfey — Hawaii
   { id: "0764", german: "Curelei",     in: ["Honolulu"], out: ["LosAngeles", "Berlin", "Tokyo"] },
-  // #0797 Celesteela — Southern Hemisphere (NOT IN CODE — Ultra Beast)
-  { id: "0797", german: "Kaguron",     in: ["Sydney", "SaoPaulo", "CapeTown"], out: ["Berlin", "NewYork", "Tokyo"], status: "skip-not-in-code" },
-  // #0798 Kartana — Northern Hemisphere (NOT IN CODE — Ultra Beast)
-  { id: "0798", german: "Katagami",    in: ["Berlin", "NewYork", "Tokyo"], out: ["Sydney", "SaoPaulo", "CapeTown"], status: "skip-not-in-code" },
-  // #0805 Stakataka — Eastern Hemisphere (NOT IN CODE — Ultra Beast)
-  { id: "0805", german: "Muramura",    in: ["Berlin", "Tokyo", "Sydney"], out: ["NewYork", "SaoPaulo", "Cairo"], status: "skip-not-in-code" },
-  // #0806 Blacephalon — Western Hemisphere (NOT IN CODE — Ultra Beast)
-  { id: "0806", german: "Kopplosio",   in: ["NewYork", "SaoPaulo", "Cairo"], out: ["Berlin", "Tokyo", "Sydney"], status: "skip-not-in-code" },
+  // #0797 Celesteela — Southern Hemisphere (Ultra Beast, fixed)
+  { id: "0797", german: "Kaguron",     in: ["Sydney", "SaoPaulo", "CapeTown", "BuenosAires"], out: ["Berlin", "NewYork", "Tokyo"] },
+  // #0798 Kartana — Northern Hemisphere (Ultra Beast, fixed)
+  { id: "0798", german: "Katagami",    in: ["Berlin", "NewYork", "Tokyo"], out: ["Sydney", "SaoPaulo", "CapeTown"] },
+  // #0805 Stakataka — Eastern Hemisphere (Ultra Beast, fixed)
+  { id: "0805", german: "Muramura",    in: ["Berlin", "Tokyo", "Sydney"], out: ["NewYork", "SaoPaulo", "Cairo"] },
+  // #0806 Blacephalon — Western Hemisphere (Ultra Beast, fixed)
+  { id: "0806", german: "Kopplosio",   in: ["NewYork", "SaoPaulo", "Cairo"], out: ["Berlin", "Tokyo", "Sydney"] },
   // #0874 Stonjourner — UK
   { id: "0874", german: "Humanolith",  in: ["London"], out: ["Paris", "Berlin", "NewYork"] },
 ];
