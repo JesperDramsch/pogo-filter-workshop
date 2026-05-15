@@ -431,6 +431,8 @@
   "app.regional_editor.disabled": "無効",
   "app.regional_editor.home_extra": "(+{count} ⌂ 経由)",
   "app.regional_editor.select_all": "すべて選択",
+  "app.regional_editor.select_recommended": "おすすめ",
+  "app.regional_editor.select_recommended_title": "推奨デフォルトに戻す — S/Aティアのみ（ディグダやデスマスのようなアローラ/ガラルの一般的な基本フォームは除外）。★ = 必須レア、· = 「おすすめ」では除外。",
   "app.regional_editor.select_none": "なし",
   "app.regional_editor.type_check_label": "フォーム保護 (タイプチェック)",
   "app.regional_editor.collectors_label": "コレクター (種族保護)",

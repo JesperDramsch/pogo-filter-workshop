@@ -431,6 +431,8 @@
   "app.regional_editor.disabled": "已停用",
   "app.regional_editor.home_extra": "(+{count} 透過 ⌂)",
   "app.regional_editor.select_all": "全選",
+  "app.regional_editor.select_recommended": "推薦",
+  "app.regional_editor.select_recommended_title": "回到合理預設 — 只保留 S/A 等級形態（跳過地鼠、哭哭面具等常見阿羅拉/伽勒爾基礎形態）。★ = 必抓; · = 「推薦」會略過。",
   "app.regional_editor.select_none": "無",
   "app.regional_editor.type_check_label": "形態保護(屬性檢查)",
   "app.regional_editor.collectors_label": "收藏家(種類保護)",
