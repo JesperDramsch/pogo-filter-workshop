@@ -476,6 +476,7 @@
   "app.regional.paldean.notes.tauros_water": "Paldean Tauros (Aqua) — western hemisphere",
   "app.regional.regionals.label": "Regional Pokémon",
   "app.regional.regionals.description": "Continent-exclusive species — all paired/hemispheric/trio regionals",
+  "app.regional.regionals.notes.tauros_normal": "Base Tauros (Normal) — North America regional. Type-keyed so Paldean forms (Fighting/Fire/Water) aren't lumped in.",
   "app.regional.collectibles.label": "Collectibles",
   "app.regional.collectibles.description": "Multi-form / pattern collections — forms aren't separately searchable in PoGo",
   "app.regional.collectibles.notes.flabebe_forms": "Switches all Flabébé / Floette / Florges out of trash — we can't distinguish red / yellow / blue flowers by type. Bring your friends some flowers!",

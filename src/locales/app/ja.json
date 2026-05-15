@@ -476,6 +476,7 @@
   "app.regional.paldean.notes.tauros_water": "パルデアケンタロス (ウォーター種) — 西半球",
   "app.regional.regionals.label": "リージョン限定ポケモン",
   "app.regional.regionals.description": "大陸限定種族 — すべてのペア型/半球型/トリオ型リージョン",
+  "app.regional.regionals.notes.tauros_normal": "ベースのケンタロス (ノーマル) — 北米限定。タイプで指定することで、パルデアの姿 (かくとう/ほのお/みず) を巻き込まないようにします。",
   "app.regional.collectibles.label": "コレクション",
   "app.regional.collectibles.description": "複数フォーム/模様コレクション — フォームは PoGo で個別検索できません",
   "app.regional.collectibles.notes.flabebe_forms": "Flabébé / Floette / Florges を全てゴミ箱から除外します — 赤/黄/青の花をタイプで区別できません。お友達に花を持っていきましょう！",

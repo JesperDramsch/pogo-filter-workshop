@@ -9,7 +9,7 @@
 // Output is one line per Pokemon: PASS / FAIL / NOT-IN-DATA, with details
 // on any mismatch so we can fix the underlying polygon or rotation entry.
 
-import { computeHomeLocals, computeHomeLocalTypeChecks } from "../src/App.jsx";
+import { buildFilters, computeHomeLocals, computeHomeLocalTypeChecks, mergeImportedConfig, DEFAULT_CONFIG, DEFAULT_HUNDOS } from "../src/App.jsx";
 
 // Representative cities — [lon, lat] matches the App's homeLocation shape.
 const C = {
@@ -216,10 +216,15 @@ for (const t of TESTS) {
 const PALDEAN_TESTS = [
   // Combat — Iberian Peninsula
   { id: "0128", form: "Combat",  type: "fighting", in: ["Madrid", "Lisbon"], out: ["Paris", "Berlin", "NewYork", "Tokyo", "Sydney", "Casablanca"] },
-  // Blaze — Eastern Hemisphere (excl. Iberian since Combat takes priority there)
-  { id: "0128", form: "Blaze",   type: "fire",     in: ["Berlin", "Tokyo", "Sydney", "Athens"], out: ["NewYork", "SaoPaulo", "Cairo", "Lagos"] },
+  // Blaze — Eastern Hemisphere MINUS Iberian (Combat takes priority in Iberian per the
+  // canonical table — Madrid/Lisbon must NOT drop Blaze even though they're geographically in East).
+  { id: "0128", form: "Blaze",   type: "fire",     in: ["Berlin", "Tokyo", "Sydney", "Athens"], out: ["NewYork", "SaoPaulo", "Cairo", "Lagos", "Madrid", "Lisbon"] },
   // Aqua — Western Hemisphere
   { id: "0128", form: "Aqua",    type: "water",    in: ["NewYork", "SaoPaulo", "Cairo", "Lagos", "Marrakech"], out: ["Berlin", "Tokyo", "Sydney", "Madrid"] },
+  // Base Tauros (Normal) — North America regional. Auto-drops for US/Canada users,
+  // stays protected everywhere else (including Madrid — a Spanish user who catches
+  // a base Tauros via trade should still keep it).
+  { id: "0128", form: "Base",    type: "normal",   in: ["NewYork", "LosAngeles", "Chicago", "Toronto"], out: ["Madrid", "Berlin", "Tokyo", "SaoPaulo", "Cairo", "Sydney"] },
 ];
 
 let paldeanPassed = 0, paldeanFailed = 0;
@@ -245,9 +250,82 @@ for (const t of PALDEAN_TESTS) {
   }
 }
 
+// ─── End-to-end Paldean filter behavior ─────────────────────────────────────
+// Walks the actual trash-filter output for each city and confirms each Paldean
+// form (and base Tauros) is protected/trashed correctly. Tests the umbrella
+// fix — without excludeTypes on the Combat clause, !Tauros,!fighting would
+// over-protect Blaze and Aqua even when their local-drop fires.
+//
+// Logic: in PoGo trash search, each comma-separated clause is OR-of-modifiers,
+// clauses are AND-joined via &. A clause `!A,!B` = NOT (A AND B). The item is
+// trashed iff EVERY clause matches (i.e. every clause's predicate is true).
+// So a form is "protected" iff some Tauros clause's predicate is FALSE for it.
+const PALDEAN_FORMS = [
+  { form: "Combat", types: ["fighting"] },
+  { form: "Blaze",  types: ["fighting", "fire"] },
+  { form: "Aqua",   types: ["fighting", "water"] },
+  { form: "Base",   types: ["normal"] },
+];
+function clauseMatches(clauseStr, formTypes) {
+  // Parse clause like "!Tauros,!fighting,fire,water" into terms (OR-joined in PoGo syntax).
+  // The form is always Tauros here (we test Tauros forms), so `!Tauros` is FALSE.
+  // `!fire` is TRUE if form lacks Fire; `fire` (no !) is TRUE if form has Fire.
+  // Clause's predicate = OR over all term predicates.
+  const terms = clauseStr.split(",").map(s => s.trim());
+  return terms.some(t => {
+    if (t === "!Tauros") return false; // form IS Tauros → NOT Tauros is false
+    if (t.startsWith("!")) return !formTypes.includes(t.slice(1));
+    return formTypes.includes(t);
+  });
+}
+function isFormProtected(trashStr, formTypes) {
+  const tauroClauses = trashStr.split("&").filter(c => /tauros/i.test(c));
+  // Trash filter is AND of all clauses — form is trashed iff EVERY clause is true.
+  // Form is protected iff SOME clause is false. With only Tauros clauses scanned
+  // (the filter has many non-Tauros clauses too, but a form being a Tauros means
+  // the non-Tauros clauses depend on its other attributes — we just check the
+  // Tauros gate here).
+  return tauroClauses.some(c => !clauseMatches(c, formTypes));
+}
+
+const E2E_TESTS = [
+  // city, expected: form → protected?
+  { city: "Madrid",  expect: { Combat: false, Blaze: true,  Aqua: true,  Base: true  } },
+  { city: "Lisbon",  expect: { Combat: false, Blaze: true,  Aqua: true,  Base: true  } },
+  { city: "Berlin",  expect: { Combat: true,  Blaze: false, Aqua: true,  Base: true  } },
+  { city: "Tokyo",   expect: { Combat: true,  Blaze: false, Aqua: true,  Base: true  } },
+  { city: "NewYork", expect: { Combat: true,  Blaze: true,  Aqua: false, Base: false } },
+  { city: "SaoPaulo",expect: { Combat: true,  Blaze: true,  Aqua: false, Base: true  } },
+  { city: "Cairo",   expect: { Combat: true,  Blaze: true,  Aqua: false, Base: true  } },
+];
+const merged = mergeImportedConfig(DEFAULT_CONFIG);
+let e2ePassed = 0, e2eFailed = 0;
+for (const t of E2E_TESTS) {
+  const loc = C[t.city];
+  const hl  = computeHomeLocals(loc);
+  const htc = computeHomeLocalTypeChecks(loc);
+  const r = buildFilters(DEFAULT_HUNDOS, merged, hl, "en", (k) => k, htc);
+  const errors = [];
+  for (const f of PALDEAN_FORMS) {
+    const expected = t.expect[f.form];
+    const actual = isFormProtected(r.trash, f.types);
+    if (actual !== expected) {
+      errors.push(`  ${f.form}: expected ${expected ? "protected" : "trashable"}, got ${actual ? "protected" : "trashable"}`);
+    }
+  }
+  if (errors.length === 0) {
+    e2ePassed++;
+    console.log(`✓  E2E ${t.city.padEnd(10)} Paldean Tauros forms behave correctly`);
+  } else {
+    e2eFailed++;
+    console.log(`✗  E2E ${t.city.padEnd(10)} FAIL`);
+    for (const e of errors) console.log(e);
+  }
+}
+
 console.log();
-console.log(`Summary: ${passed} pass, ${failed} fail, ${skipped} skip (not in code) | Paldean typeChecks: ${paldeanPassed} pass, ${paldeanFailed} fail`);
-if (failed > 0 || paldeanFailed > 0) {
+console.log(`Summary: ${passed} pass, ${failed} fail, ${skipped} skip | Paldean typeChecks: ${paldeanPassed} pass, ${paldeanFailed} fail | E2E filter: ${e2ePassed} pass, ${e2eFailed} fail`);
+if (failed > 0 || paldeanFailed > 0 || e2eFailed > 0) {
   if (failed > 0) {
     console.log(`\nCollector/typeCheck failures:`);
     for (const f of failures) console.log(`  #${f.id} ${f.german}: ${f.errors.length} issue(s)`);
