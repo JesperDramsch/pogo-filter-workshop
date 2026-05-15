@@ -317,7 +317,7 @@ const REGIONAL_GROUPS = {
     labelKey: "app.regional.paldean.label",
     descriptionKey: "app.regional.paldean.description",
     typeChecks: [
-      { species: "Tauros", type: "fighting", tier: "S", noteKey: "app.regional.paldean.notes.tauros_fighting" },
+      { species: "Tauros", type: "fighting", excludeTypes: ["fire", "water"], tier: "S", noteKey: "app.regional.paldean.notes.tauros_fighting" },
       { species: "Tauros", type: "fire",     tier: "S", noteKey: "app.regional.paldean.notes.tauros_fire" },
       { species: "Tauros", type: "water",    tier: "S", noteKey: "app.regional.paldean.notes.tauros_water" },
     ],
@@ -326,10 +326,16 @@ const REGIONAL_GROUPS = {
   regionals: {
     labelKey: "app.regional.regionals.label",
     descriptionKey: "app.regional.regionals.description",
-    typeChecks: [],
+    // Base Tauros uses a typeCheck (Normal type) instead of a bare-species
+    // collector so it doesn't umbrella-protect the Paldean forms (which the
+    // paldean group handles with their own Fighting/Fire/Water typeChecks).
+    // Auto-drops for US/Canada users via the Tauros KMZ polygon's typeChecks.
+    typeChecks: [
+      { species: "Tauros", type: "normal", tier: "S", noteKey: "app.regional.regionals.notes.tauros_normal" },
+    ],
     collectors: [
       // Kontinent-exklusiv (Type 1 polygons in KMZ)
-      "Kangama", "Tauros", "Skaraborn", "Corasonn", "Qurtel",
+      "Kangama", "Skaraborn", "Corasonn", "Qurtel",
       "Tropius", "Relicanth", "Pachirisu", "Plaudagei",
       "Venuflibis", "Maracamba", "Symvolara", "Bisofank", "Humanolith",
       "Resladero", "Clavion", "Curelei",
@@ -732,7 +738,16 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
       const speciesOut = speciesForOutput(tc.species, outputLocale);
       const speciesDisplay = capFirst(speciesOut);
       const typeOut = kw.type[tc.type] || tc.type;
-      push(trashClauses, `!${speciesDisplay},!${typeOut}`, `${tFn(group.labelKey)}: ${tFn(tc.noteKey)}`);
+      // Optional excludeTypes carves additional negative-type modifiers into the
+      // clause, e.g. Paldean Combat = Fighting only (not Fire, not Water):
+      //   !Tauros,!fighting,fire,water  →  protect (Tauros AND Fighting AND NOT Fire AND NOT Water)
+      // Without this, the bare !Tauros,!fighting clause would umbrella-protect
+      // Blaze and Aqua too (both have Fighting), defeating their own region-aware drops.
+      const excludeParts = (tc.excludeTypes || []).map(t => kw.type[t] || t);
+      const clause = excludeParts.length > 0
+        ? `!${speciesDisplay},!${typeOut},${excludeParts.join(",")}`
+        : `!${speciesDisplay},!${typeOut}`;
+      push(trashClauses, clause, `${tFn(group.labelKey)}: ${tFn(tc.noteKey)}`);
     }
     // Collectors — resolve each to outputLocale, then collapse families
     const enabledCollectorsOut = group.collectors
@@ -1690,22 +1705,57 @@ const EQUATOR_SPLIT = {
     EQUATOR_KMZ_VERTICES_REV[0],
   ],
 };
+// Iberian Peninsula ring — used standalone for Paldean Combat AND as a hole in
+// the "Eastern minus Iberian" polygon below so Paldean Blaze auto-drops for
+// Europe/Asia/Oceania users except in Iberian (where Combat takes priority).
+const IBERIAN_RING = [
+  [-9.6, 43.8],   // NW Spain (Galicia)
+  [-1.8, 43.5],   // Bay of Biscay (Bilbao)
+  [ 0.5, 42.9],   // Pyrenees / Andorra
+  [ 3.3, 42.5],   // NE Spain (Costa Brava)
+  [ 0.2, 39.0],   // Valencia
+  [-0.9, 37.6],   // SE Spain
+  [-2.0, 36.7],   // Almeria
+  [-5.4, 36.0],   // Gibraltar
+  [-7.4, 37.0],   // S Portugal (Faro)
+  [-9.0, 37.0],   // SW Portugal (Sagres)
+  [-9.6, 38.5],   // Lisbon coast (Cabo Espichel)
+  [-9.6, 41.0],   // W Portugal coast
+  [-9.0, 43.0],   // NW Portugal
+  [-9.6, 43.8],   // close
+];
+
 const POGO_REGIONS_ROTATING = [
   {
     folder: "Type 3/4 [Paired/Hemispheric] (E side, manually maintained)",
     name: "Eastern paired/hemispheric (Europe + Asia + Oceania)",
     english: ["Zangoose", "Sawk",      "Lunatone",  "Heatmor",   "Volbeat", "Stakataka"],
     german:  ["Sengo",    "Karadonis", "Lunastein", "Furnifraß", "Volbeat", "Muramura"],
-    // Paldean Tauros (Blaze, Fighting/Fire) — eastern hemisphere local
-    typeChecks: [{ species: "Tauros", type: "fire" }],
+    // Paired/hemispheric species DO cover Iberian per the canonical table —
+    // Madrid catches Sengo/Karadonis/etc. locally. No Iberian carve-out here.
     geometry: { type: "Polygon", coordinates: [PAIRED_LINE.east] },
+  },
+  {
+    folder: "Type 4 [Paldean Blaze region] (manually maintained)",
+    name: "Eastern Hemisphere minus Iberian — Paldean Tauros (Blaze)",
+    english: [],
+    german:  [],
+    // Paldean Blaze (Fighting/Fire) is locally caught throughout Eastern
+    // Hemisphere EXCEPT Iberian Peninsula, where Combat takes priority. The
+    // Iberian ring sits as an inner ring (hole) so Madrid/Lisbon land in the
+    // outer-but-not-inner band and don't drop Blaze protection.
+    typeChecks: [{ species: "Tauros", type: "fire" }],
+    geometry: { type: "Polygon", coordinates: [PAIRED_LINE.east, IBERIAN_RING] },
   },
   {
     folder: "Type 3/4 [Paired/Hemispheric] (W side, manually maintained)",
     name: "Western paired/hemispheric (Americas + Africa)",
     english: ["Seviper", "Throh",    "Solrock", "Durant",    "Illumise", "Blacephalon"],
     german:  ["Vipitis", "Jiutesto", "Sonnfel", "Fermicula", "Illumise", "Kopplosio"],
-    // Paldean Tauros (Aqua, Fighting/Water) — western hemisphere local
+    // Paldean Tauros (Aqua, Fighting/Water) — western hemisphere local. No
+    // sub-regional carve-out for the Americas (the base Tauros region IS
+    // inside, but base Tauros uses {Tauros, normal} not {Tauros, water}, so
+    // there's no typeCheck conflict — both drop independently for a NY user).
     typeChecks: [{ species: "Tauros", type: "water" }],
     geometry: { type: "Polygon", coordinates: [PAIRED_LINE.west] },
   },
@@ -1728,30 +1778,27 @@ const POGO_REGIONS_ROTATING = [
     name: "Iberian Peninsula — Paldean Tauros (Combat)",
     english: [],
     german:  [],
-    // Paldean Tauros (Combat, Fighting only) — Iberian local. No bare-species
-    // entry: the base "Tauros" name lives in the regionals group with the
-    // North-American polygon; this entry only tags the form-by-type identity.
+    // Paldean Tauros (Combat, Fighting only) — Iberian-local. No bare-species
+    // entry: the base "Tauros" lives as a typeCheck {Tauros, normal} in the
+    // regionals group, region-aware via the Tauros KMZ polygon below.
     typeChecks: [{ species: "Tauros", type: "fighting" }],
-    geometry: { type: "Polygon", coordinates: [[
-      [-9.6, 43.8],   // NW Spain (Galicia)
-      [-1.8, 43.5],   // Bay of Biscay (Bilbao)
-      [ 0.5, 42.9],   // Pyrenees / Andorra
-      [ 3.3, 42.5],   // NE Spain (Costa Brava)
-      [ 0.2, 39.0],   // Valencia
-      [-0.9, 37.6],   // SE Spain
-      [-2.0, 36.7],   // Almeria
-      [-5.4, 36.0],   // Gibraltar
-      [-7.4, 37.0],   // S Portugal (Faro)
-      [-9.0, 37.0],   // SW Portugal (Sagres)
-      [-9.6, 38.5],   // Lisbon coast (Cabo Espichel)
-      [-9.6, 41.0],   // W Portugal coast
-      [-9.0, 43.0],   // NW Portugal
-      [-9.6, 43.8],   // close
-    ]] },
+    geometry: { type: "Polygon", coordinates: [IBERIAN_RING] },
   },
 ];
 
-const POGO_REGIONS = [...POGO_REGIONS_KMZ, ...POGO_REGIONS_ROTATING];
+// Inject form-by-type typeChecks onto specific KMZ entries so the bare-species
+// collector for that region can be replaced with a region-aware typeCheck.
+// Keyed by KMZ "name" field — see POGO_REGIONS_KMZ above.
+const KMZ_TYPE_CHECKS = {
+  // Base Tauros (Normal type) is local in the US+Canada Tauros polygon; this
+  // lets us protect it via a typeCheck {Tauros, normal} in the regionals group
+  // instead of a bare "Tauros" collector that would over-protect Paldean forms.
+  "Tauros": [{ species: "Tauros", type: "normal" }],
+};
+const POGO_REGIONS_KMZ_TAGGED = POGO_REGIONS_KMZ.map(r =>
+  KMZ_TYPE_CHECKS[r.name] ? { ...r, typeChecks: KMZ_TYPE_CHECKS[r.name] } : r
+);
+const POGO_REGIONS = [...POGO_REGIONS_KMZ_TAGGED, ...POGO_REGIONS_ROTATING];
 
 // Exported so scripts/verify-regionals.mjs can run the exact production code
 // path against the canonical regional table.
@@ -1835,14 +1882,30 @@ function pointInRing(pt, ring) {
   return inside;
 }
 function pointInRegionGeom(pt, geom) {
+  // GeoJSON Polygon: coordinates[0] is the outer ring, coordinates[1..] are holes.
+  // Point is "inside" iff it's inside the outer ring AND not inside any hole.
   if (geom.type === "Polygon") {
-    const ring = unwrapRing(geom.coordinates[0]);
-    return pointInRing(shiftPointToRing(pt, ring), ring);
+    const rings = geom.coordinates;
+    if (!rings.length) return false;
+    const outer = unwrapRing(rings[0]);
+    if (!pointInRing(shiftPointToRing(pt, outer), outer)) return false;
+    for (let i = 1; i < rings.length; i++) {
+      const hole = unwrapRing(rings[i]);
+      if (pointInRing(shiftPointToRing(pt, hole), hole)) return false;
+    }
+    return true;
   }
   if (geom.type === "MultiPolygon") {
     for (const poly of geom.coordinates) {
-      const ring = unwrapRing(poly[0]);
-      if (pointInRing(shiftPointToRing(pt, ring), ring)) return true;
+      if (!poly.length) continue;
+      const outer = unwrapRing(poly[0]);
+      if (!pointInRing(shiftPointToRing(pt, outer), outer)) continue;
+      let inHole = false;
+      for (let i = 1; i < poly.length; i++) {
+        const hole = unwrapRing(poly[i]);
+        if (pointInRing(shiftPointToRing(pt, hole), hole)) { inHole = true; break; }
+      }
+      if (!inHole) return true;
     }
     return false;
   }

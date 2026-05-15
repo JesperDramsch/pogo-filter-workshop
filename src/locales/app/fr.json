@@ -472,6 +472,7 @@
   "app.regional.paldean.notes.tauros_water": "Tauros de Paldea (Aquatique) — hémisphère ouest",
   "app.regional.regionals.label": "Pokémon régionaux",
   "app.regional.regionals.description": "Espèces exclusives par continent — tous les régionaux par paires/hémisphères/trios",
+  "app.regional.regionals.notes.tauros_normal": "Tauros de base (Normal) — régional Amérique du Nord. Par type, pour ne pas englober les formes de Paldea (Combat/Feu/Eau).",
   "app.regional.collectibles.label": "Collectionnables",
   "app.regional.collectibles.description": "Collections multi-formes / motifs — les formes ne sont pas séparément cherchables dans PoGo",
   "app.regional.collectibles.notes.flabebe_forms": "Sort tous les Flabébé / Floette / Florges de la corbeille — on ne distingue pas les fleurs rouges/jaunes/bleues par type. Apporte des fleurs à tes amis !",
