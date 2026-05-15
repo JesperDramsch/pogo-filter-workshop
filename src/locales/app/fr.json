@@ -431,6 +431,8 @@
   "app.regional_editor.disabled": "désactivé",
   "app.regional_editor.home_extra": "(+{count} via ⌂)",
   "app.regional_editor.select_all": "tout sélectionner",
+  "app.regional_editor.select_recommended": "recommandé",
+  "app.regional_editor.select_recommended_title": "Réinitialiser aux valeurs par défaut — uniquement les formes S/A (ignore les formes de base communes d'Alola/Galar comme Taupiqueur/Tutafeh). ★ = à chasser ; · = ignoré par « recommandé ».",
   "app.regional_editor.select_none": "aucun",
   "app.regional_editor.type_check_label": "Protection des formes (vérification de type)",
   "app.regional_editor.collectors_label": "Collectionneurs (protection d'espèce)",
