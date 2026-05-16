@@ -1,29 +1,33 @@
 {
-  "fetchedAt": "2026-05-04T14:46:52.827Z",
+  "fetchedAt": "2026-05-15T10:41:45.303Z",
   "topN": 30,
   "leagues": {
     "great": {
       "cpCap": 1500,
       "species": [
         {
+          "dex": 463,
+          "name": "Lickilicky"
+        },
+        {
           "dex": 195,
           "name": "Quagsire"
         },
         {
-          "dex": 959,
-          "name": "Tinkaton"
-        },
-        {
-          "dex": 823,
-          "name": "Corviknight"
+          "dex": 160,
+          "name": "Feraligatr"
         },
         {
           "dex": 593,
           "name": "Jellicent"
         },
         {
-          "dex": 395,
-          "name": "Empoleon"
+          "dex": 959,
+          "name": "Tinkaton"
+        },
+        {
+          "dex": 222,
+          "name": "Corsola (Galarian)"
         },
         {
           "dex": 205,
@@ -34,44 +38,64 @@
           "name": "Altaria"
         },
         {
+          "dex": 395,
+          "name": "Empoleon"
+        },
+        {
           "dex": 184,
           "name": "Azumarill"
+        },
+        {
+          "dex": 618,
+          "name": "Stunfisk"
         },
         {
           "dex": 40,
           "name": "Wigglytuff"
         },
         {
-          "dex": 160,
-          "name": "Feraligatr"
+          "dex": 823,
+          "name": "Corviknight"
         },
         {
-          "dex": 463,
-          "name": "Lickilicky"
+          "dex": 820,
+          "name": "Greedent"
         },
         {
           "dex": 308,
           "name": "Medicham"
         },
         {
-          "dex": 222,
-          "name": "Corsola (Galarian)"
-        },
-        {
           "dex": 663,
           "name": "Talonflame"
+        },
+        {
+          "dex": 687,
+          "name": "Malamar"
         },
         {
           "dex": 131,
           "name": "Lapras"
         },
         {
+          "dex": 765,
+          "name": "Oranguru"
+        },
+        {
+          "dex": 302,
+          "name": "Sableye (Shadow)"
+        },
+        {
           "dex": 364,
           "name": "Sealeo"
         },
         {
-          "dex": 687,
-          "name": "Malamar"
+          "dex": 979,
+          "name": "Annihilape"
+        },
+        {
+          "dex": 351,
+          "name": "Castform (Sunny)"
         },
         {
           "dex": 980,
@@ -82,8 +106,12 @@
           "name": "Dusclops"
         },
         {
-          "dex": 618,
-          "name": "Stunfisk"
+          "dex": 38,
+          "name": "Ninetales"
+        },
+        {
+          "dex": 9,
+          "name": "Blastoise"
         },
         {
           "dex": 36,
@@ -94,36 +122,8 @@
           "name": "Drapion (Shadow)"
         },
         {
-          "dex": 979,
-          "name": "Annihilape"
-        },
-        {
-          "dex": 9,
-          "name": "Blastoise"
-        },
-        {
-          "dex": 671,
-          "name": "Florges"
-        },
-        {
-          "dex": 346,
-          "name": "Cradily"
-        },
-        {
-          "dex": 186,
-          "name": "Politoed (Shadow)"
-        },
-        {
-          "dex": 681,
-          "name": "Aegislash (Blade)"
-        },
-        {
-          "dex": 737,
-          "name": "Charjabug"
-        },
-        {
-          "dex": 820,
-          "name": "Greedent"
+          "dex": 799,
+          "name": "Guzzlord"
         }
       ]
     },
@@ -215,24 +215,24 @@
           "name": "Walrein"
         },
         {
-          "dex": 776,
-          "name": "Turtonator"
-        },
-        {
           "dex": 452,
           "name": "Drapion"
+        },
+        {
+          "dex": 776,
+          "name": "Turtonator"
         },
         {
           "dex": 979,
           "name": "Annihilape (Shadow)"
         },
         {
-          "dex": 230,
-          "name": "Kingdra"
-        },
-        {
           "dex": 487,
           "name": "Giratina (Altered)"
+        },
+        {
+          "dex": 230,
+          "name": "Kingdra"
         },
         {
           "dex": 939,
@@ -379,260 +379,6 @@
     }
   },
   "cups": {
-    "fantasy": {
-      "id": "fantasy",
-      "name": "Fantasy Cup",
-      "cpCap": 1500,
-      "species": [
-        {
-          "dex": 618,
-          "name": "Stunfisk (Galarian)"
-        },
-        {
-          "dex": 110,
-          "name": "Weezing (Galarian) (Shadow)"
-        },
-        {
-          "dex": 681,
-          "name": "Aegislash (Shield)"
-        },
-        {
-          "dex": 205,
-          "name": "Forretress"
-        },
-        {
-          "dex": 776,
-          "name": "Turtonator"
-        },
-        {
-          "dex": 823,
-          "name": "Corviknight"
-        },
-        {
-          "dex": 680,
-          "name": "Doublade"
-        },
-        {
-          "dex": 968,
-          "name": "Orthworm"
-        },
-        {
-          "dex": 395,
-          "name": "Empoleon"
-        },
-        {
-          "dex": 530,
-          "name": "Excadrill (Shadow)"
-        },
-        {
-          "dex": 448,
-          "name": "Lucario"
-        },
-        {
-          "dex": 959,
-          "name": "Tinkaton"
-        },
-        {
-          "dex": 485,
-          "name": "Heatran (Shadow)"
-        },
-        {
-          "dex": 28,
-          "name": "Sandslash (Alolan)"
-        },
-        {
-          "dex": 379,
-          "name": "Registeel"
-        },
-        {
-          "dex": 208,
-          "name": "Steelix (Shadow)"
-        },
-        {
-          "dex": 334,
-          "name": "Altaria"
-        },
-        {
-          "dex": 809,
-          "name": "Melmetal"
-        },
-        {
-          "dex": 702,
-          "name": "Dedenne"
-        },
-        {
-          "dex": 730,
-          "name": "Primarina"
-        },
-        {
-          "dex": 184,
-          "name": "Azumarill"
-        },
-        {
-          "dex": 385,
-          "name": "Jirachi"
-        },
-        {
-          "dex": 468,
-          "name": "Togekiss"
-        },
-        {
-          "dex": 487,
-          "name": "Giratina (Altered) (Shadow)"
-        },
-        {
-          "dex": 176,
-          "name": "Togetic"
-        },
-        {
-          "dex": 330,
-          "name": "Flygon (Shadow)"
-        },
-        {
-          "dex": 788,
-          "name": "Tapu Fini"
-        },
-        {
-          "dex": 707,
-          "name": "Klefki"
-        },
-        {
-          "dex": 376,
-          "name": "Metagross"
-        },
-        {
-          "dex": 860,
-          "name": "Morgrem"
-        }
-      ]
-    },
-    "jungle": {
-      "id": "jungle",
-      "name": "Jungle Cup",
-      "cpCap": 1500,
-      "species": [
-        {
-          "dex": 221,
-          "name": "Piloswine"
-        },
-        {
-          "dex": 660,
-          "name": "Diggersby"
-        },
-        {
-          "dex": 205,
-          "name": "Forretress"
-        },
-        {
-          "dex": 980,
-          "name": "Clodsire"
-        },
-        {
-          "dex": 618,
-          "name": "Stunfisk (Galarian)"
-        },
-        {
-          "dex": 558,
-          "name": "Crustle"
-        },
-        {
-          "dex": 823,
-          "name": "Corviknight"
-        },
-        {
-          "dex": 334,
-          "name": "Altaria"
-        },
-        {
-          "dex": 317,
-          "name": "Swalot"
-        },
-        {
-          "dex": 346,
-          "name": "Cradily"
-        },
-        {
-          "dex": 206,
-          "name": "Dunsparce"
-        },
-        {
-          "dex": 473,
-          "name": "Mamoswine"
-        },
-        {
-          "dex": 463,
-          "name": "Lickilicky"
-        },
-        {
-          "dex": 144,
-          "name": "Articuno"
-        },
-        {
-          "dex": 733,
-          "name": "Toucannon (Shadow)"
-        },
-        {
-          "dex": 472,
-          "name": "Gliscor"
-        },
-        {
-          "dex": 460,
-          "name": "Abomasnow (Shadow)"
-        },
-        {
-          "dex": 442,
-          "name": "Spiritomb"
-        },
-        {
-          "dex": 468,
-          "name": "Togekiss"
-        },
-        {
-          "dex": 207,
-          "name": "Gligar (Shadow)"
-        },
-        {
-          "dex": 195,
-          "name": "Quagsire (Shadow)"
-        },
-        {
-          "dex": 630,
-          "name": "Mandibuzz"
-        },
-        {
-          "dex": 413,
-          "name": "Wormadam (Trash)"
-        },
-        {
-          "dex": 634,
-          "name": "Zweilous"
-        },
-        {
-          "dex": 635,
-          "name": "Hydreigon (Shadow)"
-        },
-        {
-          "dex": 176,
-          "name": "Togetic"
-        },
-        {
-          "dex": 860,
-          "name": "Morgrem"
-        },
-        {
-          "dex": 302,
-          "name": "Sableye"
-        },
-        {
-          "dex": 799,
-          "name": "Guzzlord"
-        },
-        {
-          "dex": 208,
-          "name": "Steelix"
-        }
-      ]
-    },
     "catch": {
       "id": "catch",
       "name": "Catch Cup",
@@ -762,24 +508,6 @@
     }
   },
   "gblEvents": [
-    {
-      "eventID": "gbl-memories-in-motion_great-league_fantasy-cup-great-league-edition",
-      "name": "Great League and Fantasy Cup: Great League Edition | Memories in Motion",
-      "start": "2026-04-28T20:00:00.000Z",
-      "end": "2026-05-05T20:00:00.000Z",
-      "cups": [
-        "fantasy"
-      ]
-    },
-    {
-      "eventID": "gbl-memories-in-motion_ultra-league_jungle-cup-great-league-edition",
-      "name": "Ultra League and Jungle Cup: Great League Edition | Memories in Motion",
-      "start": "2026-05-05T20:00:00.000Z",
-      "end": "2026-05-12T20:00:00.000Z",
-      "cups": [
-        "jungle"
-      ]
-    },
     {
       "eventID": "gbl-memories-in-motion_master-league_catch-cup-memories-in-motion-great-league-edition",
       "name": "Master League and Catch Cup: Memories in Motion: Great League Edition | Memories in Motion",

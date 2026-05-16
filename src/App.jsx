@@ -162,6 +162,14 @@ export const DEFAULT_CONFIG = {
   protectFavorites: true,
   protectFourStar: true,       // never toss any 4★ hundo (Regel 1) — expert can disable with confirmation
   protectTradeEvos: true,      // protect trade-evolution candidates from trash (free evos via tausch)
+  // Once a regional has been traded, the "keep it for trade" rationale is
+  // spent — bad-IV traded Alolan Raichu (Psychic) etc. fall into trash like
+  // any other dupe. Mirrors the trade-evo carve-out above (`,traded` token).
+  // Trade-buddy stockpiles tagged with a configured buddy's prefix (e.g.
+  // #Auri:abra) are still auto-protected by the per-buddy `!#${prefix}`
+  // clause; ad-hoc keepers use #Trade / #Fern-Tausch / custom tags. Off =
+  // legacy unconditional protection for every regional form.
+  trashTradedRegionals: true,
   protectAnyTag: true,         // protects ANY tagged Pokémon (catch-all !# clause)
   protectShinies: true,
   protectLuckies: true,
@@ -270,20 +278,26 @@ export const DEFAULT_CONFIG = {
 // Pure-name entries protect the species outright; if all members of a known
 // "form trio" (e.g. all 3 Vivillon patterns) are enabled, we auto-collapse
 // to "+Family" syntax to save chars and protect the whole evolution line.
+//
+// `tier` controls the "Recommended" default:
+//   "S" — genuinely chase-worthy (regional locks, sub-1% spawns, evolution-gated rares)
+//   "A" — worth keeping good ones (event-locked starters, soft regionals, meta attackers)
+//   "C" — common base-form Alolan/Galarian junk most collectors don't bother with
+// Entries without a tier are treated as "A" (default-on).
 
 const REGIONAL_GROUPS = {
   alolan: {
     labelKey: "app.regional.alolan.label",
     descriptionKey: "app.regional.alolan.description",
     typeChecks: [
-      { species: "Raichu",     type: "psychic",  noteKey: "app.regional.alolan.notes.raichu_psychic" },
-      { species: "Sandan",     type: "ice",      noteKey: "app.regional.alolan.notes.sandan_ice" },
-      { species: "Vulpix",     type: "ice",      noteKey: "app.regional.alolan.notes.vulpix_ice" },
-      { species: "Digda",      type: "steel",    noteKey: "app.regional.alolan.notes.digda_steel" },
-      { species: "Mauzi",      type: "dark",     noteKey: "app.regional.alolan.notes.mauzi_dark" },
-      { species: "Kleinstein", type: "electric", noteKey: "app.regional.alolan.notes.kleinstein_electric" },
-      { species: "Kokowei",    type: "dragon",   noteKey: "app.regional.alolan.notes.kokowei_dragon" },
-      { species: "Knogga",     type: "ghost",    noteKey: "app.regional.alolan.notes.knogga_ghost" },
+      { species: "Raichu",     type: "psychic",  tier: "A", noteKey: "app.regional.alolan.notes.raichu_psychic" },
+      { species: "Sandan",     type: "ice",      tier: "C", noteKey: "app.regional.alolan.notes.sandan_ice" },
+      { species: "Vulpix",     type: "ice",      tier: "C", noteKey: "app.regional.alolan.notes.vulpix_ice" },
+      { species: "Digda",      type: "steel",    tier: "C", noteKey: "app.regional.alolan.notes.digda_steel" },
+      { species: "Mauzi",      type: "dark",     tier: "C", noteKey: "app.regional.alolan.notes.mauzi_dark" },
+      { species: "Kleinstein", type: "electric", tier: "C", noteKey: "app.regional.alolan.notes.kleinstein_electric" },
+      { species: "Kokowei",    type: "dragon",   tier: "A", noteKey: "app.regional.alolan.notes.kokowei_dragon" },
+      { species: "Knogga",     type: "ghost",    tier: "A", noteKey: "app.regional.alolan.notes.knogga_ghost" },
     ],
     collectors: [],
   },
@@ -291,11 +305,11 @@ const REGIONAL_GROUPS = {
     labelKey: "app.regional.galarian.label",
     descriptionKey: "app.regional.galarian.description",
     typeChecks: [
-      { species: "Smogmog",  type: "fairy",    noteKey: "app.regional.galarian.notes.smogmog_fairy" },
-      { species: "Pantimos", type: "ice",      noteKey: "app.regional.galarian.notes.pantimos_ice" },
-      { species: "Makabaja", type: "ground",   noteKey: "app.regional.galarian.notes.makabaja_ground" },
-      { species: "Porenta",  type: "fighting", noteKey: "app.regional.galarian.notes.porenta_fighting" },
-      { species: "Corasonn", type: "ghost",    noteKey: "app.regional.galarian.notes.corasonn_ghost" },
+      { species: "Smogmog",  type: "fairy",    tier: "A", noteKey: "app.regional.galarian.notes.smogmog_fairy" },
+      { species: "Pantimos", type: "ice",      tier: "S", noteKey: "app.regional.galarian.notes.pantimos_ice" },
+      { species: "Makabaja", type: "ground",   tier: "C", noteKey: "app.regional.galarian.notes.makabaja_ground" },
+      { species: "Porenta",  type: "fighting", tier: "A", noteKey: "app.regional.galarian.notes.porenta_fighting" },
+      { species: "Corasonn", type: "ghost",    tier: "A", noteKey: "app.regional.galarian.notes.corasonn_ghost" },
     ],
     collectors: [],
   },
@@ -303,14 +317,14 @@ const REGIONAL_GROUPS = {
     labelKey: "app.regional.hisuian.label",
     descriptionKey: "app.regional.hisuian.description",
     typeChecks: [
-      { species: "Tornupto",  type: "ghost",    noteKey: "app.regional.hisuian.notes.tornupto_ghost" },
-      { species: "Admurai",   type: "dark",     noteKey: "app.regional.hisuian.notes.admurai_dark" },
-      { species: "Dressella", type: "fighting", noteKey: "app.regional.hisuian.notes.dressella_fighting" },
-      { species: "Arktilas",  type: "rock",     noteKey: "app.regional.hisuian.notes.arktilas_rock" },
-      { species: "Silvarro",  type: "fighting", noteKey: "app.regional.hisuian.notes.silvarro_fighting" },
-      { species: "Voltobal",  type: "grass",    noteKey: "app.regional.hisuian.notes.voltobal_grass" },
-      { species: "Lektrobal", type: "grass",    noteKey: "app.regional.hisuian.notes.lektrobal_grass" },
-      { species: "Sichlor",   type: "rock",     noteKey: "app.regional.hisuian.notes.sichlor_rock" },
+      { species: "Tornupto",  type: "ghost",    tier: "A", noteKey: "app.regional.hisuian.notes.tornupto_ghost" },
+      { species: "Admurai",   type: "dark",     tier: "S", noteKey: "app.regional.hisuian.notes.admurai_dark" },
+      { species: "Dressella", type: "fighting", tier: "A", noteKey: "app.regional.hisuian.notes.dressella_fighting" },
+      { species: "Arktilas",  type: "rock",     tier: "A", noteKey: "app.regional.hisuian.notes.arktilas_rock" },
+      { species: "Silvarro",  type: "fighting", tier: "A", noteKey: "app.regional.hisuian.notes.silvarro_fighting" },
+      { species: "Voltobal",  type: "grass",    tier: "A", noteKey: "app.regional.hisuian.notes.voltobal_grass" },
+      { species: "Lektrobal", type: "grass",    tier: "A", noteKey: "app.regional.hisuian.notes.lektrobal_grass" },
+      { species: "Sichlor",   type: "rock",     tier: "A", noteKey: "app.regional.hisuian.notes.sichlor_rock" },
     ],
     collectors: [],
   },
@@ -318,22 +332,32 @@ const REGIONAL_GROUPS = {
     labelKey: "app.regional.paldean.label",
     descriptionKey: "app.regional.paldean.description",
     typeChecks: [
-      { species: "Tauros", type: "fighting", noteKey: "app.regional.paldean.notes.tauros_fighting" },
-      { species: "Tauros", type: "fire",     noteKey: "app.regional.paldean.notes.tauros_fire" },
-      { species: "Tauros", type: "water",    noteKey: "app.regional.paldean.notes.tauros_water" },
+      { species: "Tauros", type: "fighting", excludeTypes: ["fire", "water"], tier: "S", noteKey: "app.regional.paldean.notes.tauros_fighting" },
+      { species: "Tauros", type: "fire",     tier: "S", noteKey: "app.regional.paldean.notes.tauros_fire" },
+      { species: "Tauros", type: "water",    tier: "S", noteKey: "app.regional.paldean.notes.tauros_water" },
     ],
     collectors: [],
   },
   regionals: {
     labelKey: "app.regional.regionals.label",
     descriptionKey: "app.regional.regionals.description",
-    typeChecks: [],
+    // Base Tauros uses a typeCheck (Normal type) instead of a bare-species
+    // collector so it doesn't umbrella-protect the Paldean forms (which the
+    // paldean group handles with their own Fighting/Fire/Water typeChecks).
+    // Auto-drops for US/Canada users via the Tauros KMZ polygon's typeChecks.
+    typeChecks: [
+      { species: "Tauros", type: "normal", tier: "S", noteKey: "app.regional.regionals.notes.tauros_normal" },
+    ],
     collectors: [
       // Kontinent-exklusiv (Type 1 polygons in KMZ)
-      "Kangama", "Tauros", "Skaraborn", "Corasonn", "Qurtel",
+      "Kangama", "Skaraborn", "Corasonn", "Qurtel",
       "Tropius", "Relicanth", "Pachirisu", "Plaudagei",
       "Venuflibis", "Maracamba", "Symvolara", "Bisofank", "Humanolith",
       "Resladero", "Clavion", "Curelei",
+      "Pantimos", "Pantimimi", "Porenta",  // Mr. Mime / Mime Jr. / Farfetch'd
+      "Volbeat", "Illumise",              // Type 3 paired (E/W)
+      "Muramura", "Kopplosio",            // Stakataka / Blacephalon (E/W)
+      "Katagami", "Kaguron",              // Kartana / Celesteela (N/S)
       // Type 3 paired (Zangoose/Seviper, Lunatone/Solrock — swap regions periodically)
       "Sengo", "Vipitis",     // Zangoose / Seviper
       "Lunastein", "Sonnfel", // Lunatone / Solrock
@@ -349,6 +373,21 @@ const REGIONAL_GROUPS = {
     labelKey: "app.regional.collectibles.label",
     descriptionKey: "app.regional.collectibles.description",
     typeChecks: [],
+    // Per-collector notes. Used as the tooltip on the editor toggle so the user
+    // can see WHY this species is in collectibles (typically: forms can't be
+    // distinguished in PoGo's search syntax, so we protect the whole species
+    // and the user trades local-form duplicates to friends).
+    collectorNotes: {
+      "Coiffwaff":  "app.regional.collectibles.notes.furfrou_forms",
+      "Nigiragi":   "app.regional.collectibles.notes.tatsugiri_forms",
+      "Schalellos": "app.regional.collectibles.notes.shellos_forms",
+      "Gastrodon":  "app.regional.collectibles.notes.shellos_forms",
+      "Barschuft":  "app.regional.collectibles.notes.basculin_forms",
+      "Flabébé":    "app.regional.collectibles.notes.flabebe_forms",
+      "Floette":    "app.regional.collectibles.notes.flabebe_forms",
+      "Florges":    "app.regional.collectibles.notes.flabebe_forms",
+      "Choreogel":  "app.regional.collectibles.notes.oricorio_forms",
+    },
     collectors: [
       // Vivillon-line — flat collectors; collapses to +Purmel if all 3 selected
       "Purmel", "Puponcho", "Vivillon",
@@ -362,6 +401,12 @@ const REGIONAL_GROUPS = {
       "Nigiragi",      // Tatsugiri — Curly/Droopy/Stretchy
       "Schalellos", "Gastrodon",  // West/Ost forms not separately searchable
       "Barschuft",     // Basculin — red/blue stripe forms not separately searchable
+      // Regional-by-form species we *can't* distinguish in PoGo's search syntax —
+      // even when home is in the region of one form, the bag holds all forms under
+      // the same name. Better to keep the whole species and trade duplicates to
+      // friends than to trash a rare remote form by accident. (Bring flowers.)
+      "Flabébé", "Floette", "Florges",   // Red/Yellow/Blue flowers
+      "Choreogel",                       // Oricorio (Pom-Pom/Sensu/Baile/Pa'u)
     ],
   },
 };
@@ -372,14 +417,34 @@ const FAMILY_COLLAPSES = {
   "+Purmel": ["Purmel", "Puponcho", "Vivillon"],
 };
 
-// Default: all enabled, but each can be toggled or filtered down to specific species.
+// Tier filter: which typeCheck species count as "recommended" defaults.
+// "C" tier (common Alolan/Galarian base-form junk like Diglett/Yamask) is
+// off by default — collectors typically don't bother. Entries without a
+// `tier` field are treated as "A" (default-on).
+function recommendedTypeCheckSpecies(group) {
+  return group.typeChecks
+    .filter(tc => (tc.tier || "A") !== "C")
+    .map(tc => tc.species);
+}
+
+// Default: all groups enabled, typeChecks default to the "recommended" set
+// (S + A tier — S = chase-worthy regional locks; A = worth-keeping rares).
+// Collectors default to all (null) — the regionals/collectibles groups
+// don't have tiering since those are uniformly worth protecting.
 function defaultRegionalToggles() {
   const out = {};
   for (const [key, group] of Object.entries(REGIONAL_GROUPS)) {
+    const recommended = recommendedTypeCheckSpecies(group);
+    const allSpecies = group.typeChecks.map(tc => tc.species);
+    // If every typeCheck is recommended (no C-tier entries), use null
+    // sentinel so "select all" stays the canonical "all on" state.
+    const typeChecksEnabled = recommended.length === allSpecies.length
+      ? null
+      : recommended;
     out[key] = {
       enabled: true,
       // null = all species in group are protected; if array, only listed species
-      typeChecksEnabled: null,
+      typeChecksEnabled,
       collectorsEnabled: null,
     };
   }
@@ -533,7 +598,7 @@ function capFirst(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale = "de", tFn = (k) => k) {
+export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale = "de", tFn = (k) => k, homeLocalTypeChecks = []) {
   const kw = pogoKeywords(outputLocale);
 
   // Hundos are stored in the user's output-locale lowercase form. Re-render in
@@ -693,10 +758,28 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     if (!state || !state.enabled) continue;
     for (const tc of group.typeChecks) {
       if (state.typeChecksEnabled !== null && !state.typeChecksEnabled.includes(tc.species)) continue;
+      // Auto-drop type-form protection when home is in this form's region —
+      // e.g. Madrid user catches Paldean Tauros (Combat = Fighting) locally,
+      // so the fighting clause shouldn't sit in trash. Mirrors the
+      // homeLocals-based auto-drop for bare collectors.
+      if (homeLocalTypeChecks.some(l => l.species === tc.species && l.type === tc.type)) continue;
       const speciesOut = speciesForOutput(tc.species, outputLocale);
       const speciesDisplay = capFirst(speciesOut);
       const typeOut = kw.type[tc.type] || tc.type;
-      push(trashClauses, `!${speciesDisplay},!${typeOut}`, `${tFn(group.labelKey)}: ${tFn(tc.noteKey)}`);
+      // Optional excludeTypes carves additional negative-type modifiers into the
+      // clause, e.g. Paldean Combat = Fighting only (not Fire, not Water):
+      //   !Tauros,!fighting,fire,water  →  protect (Tauros AND Fighting AND NOT Fire AND NOT Water)
+      // Without this, the bare !Tauros,!fighting clause would umbrella-protect
+      // Blaze and Aqua too (both have Fighting), defeating their own region-aware drops.
+      const excludeParts = (tc.excludeTypes || []).map(t => kw.type[t] || t);
+      const excludePart = excludeParts.length > 0 ? `,${excludeParts.join(",")}` : "";
+      // OR-binds-tighter: appending `,traded` keeps anything that isn't this
+      // regional form OR has already been traded — i.e. the clause only
+      // protects *untraded* regionals. Traded duplicates fall through to the
+      // rest of the trash pipeline (bad-IV checks, etc.).
+      const tradedCarve = cfg.trashTradedRegionals ? `,${kw.flag.traded}` : "";
+      const whyCarve = cfg.trashTradedRegionals ? ` (${tFn("app.clause_why.except_traded_short")})` : "";
+      push(trashClauses, `!${speciesDisplay},!${typeOut}${excludePart}${tradedCarve}`, `${tFn(group.labelKey)}: ${tFn(tc.noteKey)}${whyCarve}`);
     }
     // Collectors — resolve each to outputLocale, then collapse families
     const enabledCollectorsOut = group.collectors
@@ -733,6 +816,13 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     push(trashClauses, `${kw.numeric.year}${cfg.luckyEligibleYear}-,${kw.flag.traded}`, tFn("app.clause_why.lucky_eligible", { params: { year: cfg.luckyEligibleYear } }));
 
   const trash = trashClauses.map(c => c.clause).join("&");
+
+  // "Traded trash review" — narrows the trash filter to traded mons only,
+  // so the user can flip through traded candidates before bulk-trashing
+  // them. Effectively `trash & traded`. Mostly useful with
+  // trashTradedRegionals on (otherwise the only traded mons in trash come
+  // through the age/distance/lucky scope clauses).
+  const tradedTrashSort = trash ? `${trash}&${kw.flag.traded}` : "";
 
   // ── TRADE ──────────────────────────────────────────────────────────────
   // H_trade = H − (H ∩ L). Species the user has both a hundo and a lucky of
@@ -1461,7 +1551,7 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     }
   }
 
-  return { trash, trade, sort, luckySort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
+  return { trash, tradedTrashSort, trade, sort, luckySort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
            luckyHundoSet,
            trashClauses, tradeClauses, sortClauses, luckySortClauses, prestagedClauses, giftClauses,
            // Aux pro-tools
@@ -1605,7 +1695,211 @@ const VIEW_W = 800, VIEW_H = 400;
 
 // Real polygon geometry from PoGo Regional Map KMZ. NOT rendered visually —
 // used only for point-in-polygon hit testing when the user taps the map.
-const POGO_REGIONS = JSON.parse(`[{"folder":"Type 5 [Trios (Big Three Regions)]","name":"Pom-Pom Oricorio/Yellow Flabébé/Panpour/Azelf","english":["Pom-Pom Oricorio","Yellow Flabébé","Panpour","Azelf"],"german":["Choreogel (Cheerleading)","Flabébé (gelb)","Sodamak","Tobutz"],"geometry":{"type":"Polygon","coordinates":[[[179.9788423,85.0371116],[179.4930617,-84.9676454],[-26.1197931,-85.0824329],[-23.203125,85.0207077],[179.9788423,85.0371116]]]}},{"folder":"Type 5 [Trios (Big Three Regions)]","name":"Sensu Oricorio/Blue Flabébé/Pansage/Uxie","english":["Sensu Oricorio","Blue Flabébé","Pansage","Uxie"],"german":["Choreogel (Buyo)","Flabébé (blau)","Vegimak","Selfe"],"geometry":{"type":"Polygon","coordinates":[[[90.9771923,85.0570722],[90.1036767,64.613503],[90.0457357,54.6777412],[89.9924066,48.9758687],[89.9896598,48.7599692],[89.9855392,48.6085576],[89.9842279,48.3717998],[90.0020807,22.0296934],[86.8261326,-85.0575818],[179.4930617,-84.9676454],[179.9788423,85.0371116],[90.9771923,85.0570722]]]}},{"folder":"Type 5 [Trios (Big Three Regions)]","name":"Baile Oricorio/Red Flabébé/Pansear/Mesprit","english":["Baile Oricorio","Red Flabébé","Pansear","Mesprit"],"german":["Choreogel (Flamenco)","Flabébé (rot)","Grillmak","Vesprit"],"geometry":{"type":"Polygon","coordinates":[[[86.8261326,-85.0575818],[89.9918303,48.9656349],[90.0462269,56.2339545],[90.9771923,85.0570722],[-23.203125,85.0207077],[-23.1787953,84.9056643],[-24.2386427,65.8003482],[-26.1197931,-85.0824329],[86.8261326,-85.0575818]]]}},{"folder":"Type 4 [Hemispheric Regionals]","name":"Chatot - Type 4 [Hemispheric Regional]","english":["Chatot"],"german":["Plaudagei"],"geometry":{"type":"Polygon","coordinates":[[[78.4737327,-0.0655574],[77.0587661,-65.8269101],[83.4967544,-65.9536888],[92.0660904,-65.9536888],[102.4371841,-65.9536888],[114.7858169,-65.9536888],[125.6403091,-65.9536888],[137.4933308,-65.9705568],[171.7706746,-65.9705568],[-152.1941692,-65.9705568],[-114.4012004,-65.9705568],[-85.0457317,-65.9705568],[-49.0105754,-65.9705568],[-12.9754192,-65.9705568],[12.9523152,-65.7909809],[27.4542683,-65.7909809],[50.8331746,-65.718798],[77.0245808,-65.8269967],[78.4692215,-0.066183],[-28.6095949,-0.0750637],[-120.5886795,-0.0690087],[145.7979514,-0.0655574],[78.4737327,-0.0655574]]]}},{"folder":"Type 3 [Paired Regional Line]","name":"Type 3 [Paired Regional Line]","english":["Type 3 [Paired Regional Line]"],"german":["Type 3 [Paired Regional Line]"],"geometry":{"type":"LineString","coordinates":[[-29.0478436,85.0397427],[-29.1357322,33.3213485],[-21.3835305,33.3385554],[-14.5557243,33.3327905],[-6.5154841,33.496424],[1.1645508,33.5413946],[9.3965509,33.5230259],[17.5122071,33.3947592],[26.916504,33.3764123],[36.2400056,33.3935447],[43.59375,33.4497766],[49.5074177,33.4598794],[54.5800781,33.4864354],[53.437502,-85.0207077]]}},{"folder":"Type 3 [Paired Regional Line]","name":"Type 3 [Paired Meridian Line]","english":["Type 3 [Paired Meridian Line]"],"german":["Type 3 [Paired Meridian Line]"],"geometry":{"type":"LineString","coordinates":[[-0.0015,-85.051],[-0.0015,51.4779],[-0.0015,85.05]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Maractus/Heracross","english":["Maractus","Heracross"],"german":["Maracamba","Skaraborn"],"geometry":{"type":"Polygon","coordinates":[[[-28.7126839,-60.8079488],[-29.0003358,28.8387285],[-31.0039204,28.8426785],[-33.0184819,28.8445857],[-35.0099838,28.8333665],[-37.0025528,28.8387736],[-39.0055406,28.8446463],[-41.002899,28.8384495],[-43.0042338,28.8359558],[-45.0014522,28.8457198],[-46.9920227,28.8428544],[-49.0138632,28.8378503],[-51.0134117,28.8391466],[-53.0015012,28.8433519],[-56.9979247,28.8399738],[-57.9907668,28.8371582],[-59.0015822,28.8384688],[-60.005754,28.8350249],[-60.9975612,28.8427744],[-61.9998994,28.8399356],[-62.9998658,28.839383],[-63.9996692,28.8398557],[-65.0000689,28.8399257],[-65.9992077,28.8401876],[-67.0000958,28.8401086],[-68.0000649,28.8399587],[-68.9999796,28.8402988],[-70.0003426,28.8401009],[-71.4878807,28.844786],[-72.4378771,28.8476871],[-73.4042996,28.8390047],[-76.3887972,28.8366705],[-79.2558588,28.8595511],[-81.0000026,28.8405108],[-82.0008589,28.8382549],[-83.5955598,28.8437688],[-85.5989242,28.8407351],[-87.1683985,28.8478368],[-88.7602735,28.8450618],[-90.2696907,28.8437939],[-91.5015451,28.8435616],[-92.7155388,28.8431238],[-93.7681432,28.8423097],[-95.1296132,28.8414159],[-96.9952763,28.8486886],[-99.5711717,28.8373746],[-100.7334133,28.8302342],[-101.8403142,28.83693],[-103.0372329,28.8386833],[-104.0691416,28.8168433],[-106.1237099,28.838453],[-107.9099433,28.8397707],[-108.4255453,28.8395984],[-108.8930633,28.8433065],[-109.811583,28.8412668],[-111.6679274,28.8419586],[-113.4914062,28.8465438],[-116.0492626,28.8602196],[-117.6440143,28.8458629],[-119.1353522,28.845896],[-120.9994904,28.8407632],[-123.9999279,28.8391765],[-125.0000215,28.8373549],[-125.9963467,28.8409241],[-127.0080506,28.8337881],[-128.0006884,28.8302599],[-128.9933704,28.8288623],[-129.2406481,-60.4394174],[-123.3079167,-60.5951658],[-115.2413217,-60.6442764],[-106.8736263,-60.6542888],[-97.5777026,-60.6538503],[-91.1512129,-60.8224591],[-86.1420809,-60.8023277],[-78.4595209,-60.8445596],[-68.6119016,-60.8928151],[-61.8343977,-60.8234963],[-50.4218225,-60.7841079],[-40.5706879,-60.9342487],[-28.7126839,-60.8079488]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Kangaskhan","english":["Kangaskhan"],"german":["Kangama"],"geometry":{"type":"Polygon","coordinates":[[[154.6435546,-50.0359736],[154.2480469,-0.3955047],[139.7460938,-0.5273363],[139.7460938,-10.9196178],[124.9907865,-11.1567369],[118.1733601,-10.983058],[111.6210938,-11.0921659],[111.4453125,-50.0641917],[120.7617188,-50.0641917],[124.994723,-50.1057947],[129.3750001,-50.0641917],[136.7578125,-49.9512199],[144.6679688,-50.0641917],[150.6445313,-50.0641917],[154.6435546,-50.0359736]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Relicanth","english":["Relicanth"],"german":["Relicanth"],"geometry":{"type":"Polygon","coordinates":[[[154.6435546,-50.0359736],[158.0273438,-50.0641917],[162.3779297,-50.1768981],[165.1068748,-50.2661105],[168.0029297,-50.1768982],[171.5185547,-50.2893392],[175.78125,-50.2893393],[-179.1142346,-50.2654442],[-172.6369959,-50.3012819],[-167.1034055,-50.2131875],[-162.4912283,-50.2328883],[-156.4453165,-50.0641918],[-156.7749163,-13.132979],[-163.0334483,-13.1266564],[-167.4799992,-13.0095058],[-175.1374124,-13.0690463],[175.7153341,-12.9403221],[169.2334025,-12.8867798],[162.1911662,-12.8867798],[154.2919942,-12.8010882],[154.6435546,-50.0359736]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Torkoal","english":["Torkoal"],"german":["Qurtel"],"geometry":{"type":"Polygon","coordinates":[[[52.7453632,1.9661667],[60.3815883,1.8864211],[71.2804828,1.9915931],[79.7167969,1.845384],[91.3472203,1.8333542],[98.5787908,1.7590192],[100.4509769,1.7386207],[102.4442077,1.711366],[103.5193966,1.7166697],[104.4545042,1.7215441],[106.5938691,1.7132064],[109.9302184,1.7321508],[111.9561768,1.7067483],[112.1704141,44.4494676],[112.1173677,50.5577109],[105.4840983,50.5324609],[99.148713,50.5162291],[92.1655657,50.5085978],[86.3053298,50.4299745],[79.371408,50.3882202],[73.5753126,50.416405],[67.9900495,50.3808714],[62.567102,50.3851389],[57.6802124,50.3430302],[53.2122924,50.3769995],[52.7453632,1.9661667]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Tropius","english":["Tropius"],"german":["Tropius"],"geometry":{"type":"Polygon","coordinates":[[[-29.1432522,36.7850711],[-28.8147581,-49.4355627],[-21.433732,-49.5437028],[-12.8320312,-49.6107099],[-3.5617921,-49.7415299],[4.921875,-49.6107099],[15.6445313,-49.6107099],[23.203125,-49.2678046],[31.1132813,-49.2678046],[39.6936035,-49.3752201],[46.6918945,-49.4109732],[52.157406,-49.2734073],[53.0914729,36.6774152],[52.097168,36.7300795],[50.690918,36.7036596],[46.7028809,36.7388841],[43.2476807,36.7432861],[39.7595215,36.7388841],[36.0351563,36.7212739],[32.1459961,36.7212739],[29.0017068,36.7002903],[25.452919,36.7245761],[21.9946289,36.7388841],[17.7319336,36.7388841],[13.458252,36.7124672],[10.8764648,36.7476877],[7.0000631,36.7002758],[3.3837891,36.7124672],[-0.3405762,36.7300795],[-2.2638135,36.7122808],[-4.0934758,36.722256],[-5.6855589,36.7460958],[-7.2729492,36.7608913],[-10.5194092,36.7608913],[-13.5406494,36.782892],[-16.8035888,36.7960895],[-20.5718994,36.782892],[-24.3951416,36.7916906],[-29.1432522,36.7850711]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Farfetch'd","english":["Farfetch'd"],"german":["Porenta"],"geometry":{"type":"Polygon","coordinates":[[[112.2363707,21.0724084],[116.267753,21.041066],[120.2716707,21.0755242],[124.1547096,21.0782104],[128.3788226,21.0698857],[132.7239722,21.0913307],[137.2781571,21.1321598],[141.227315,21.1515131],[146.3094692,21.1897179],[149.8515658,21.2484025],[152.4695452,21.2458494],[154.7355133,21.2638365],[154.5874152,48.478032],[150.1594106,48.4052644],[145.6498147,48.3771996],[139.770296,48.3925578],[134.487265,48.3680023],[129.748832,48.367673],[124.9151903,48.3664688],[119.8363995,48.3635568],[116.0626359,48.3723472],[112.0959005,48.3707026],[112.2363707,21.0724084]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Sigilyph","english":["Sigilyph"],"german":["Symvolara"],"geometry":{"type":"Polygon","coordinates":[[[19.3452587,39.811537],[19.332032,38.8462217],[25.1577296,31.6611084],[25.0973048,31.6260348],[25.0780787,31.5535073],[24.8583521,31.4012506],[24.885818,31.2651819],[24.8693385,31.1712268],[25.0286402,30.7708791],[24.9297633,30.487273],[24.7100367,30.1458518],[24.9901881,29.2487944],[24.9943556,21.9964122],[31.3005079,22.0065984],[31.4488234,22.2406793],[31.5092482,22.1898253],[31.4048781,22.0065984],[37.0247159,21.9759484],[36.1375357,27.3199596],[35.9178091,29.5035957],[35.945275,31.5709639],[35.891936,31.9680917],[34.8616611,32.3582582],[31.5425417,33.8918277],[26.9118043,37.1918091],[26.4271827,37.8239696],[26.6455318,39.0216347],[26.4342401,40.1524457],[25.9672679,40.6711027],[26.3435497,40.9164648],[26.354536,41.2477097],[26.6182079,41.3302599],[26.6291942,41.5937186],[26.2227001,41.7496405],[26.0579051,41.729146],[25.816206,41.7332454],[25.4756298,41.7250464],[24.9592724,41.7332455],[24.6846142,41.7414435],[24.3330517,41.7250463],[23.5475292,41.7209464],[22.7674999,41.7209465],[22.2181835,41.7332455],[21.6242351,42.053723],[21.4222728,42.0567402],[20.8256664,41.8970075],[20.4977198,41.7584865],[20.0813427,41.7004428],[19.2024364,41.6963413],[19.1914501,41.3385092],[19.2024365,41.0988561],[19.1914501,40.8500155],[19.2134227,40.6335948],[19.2463817,40.5000631],[19.2683544,40.316022],[19.323286,40.0726541],[19.3452587,39.811537]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Tauros","english":["Tauros"],"german":["Tauros"],"geometry":{"type":"Polygon","coordinates":[[[-62.6981825,28.8445398],[-62.8481171,52.0054047],[-63.2573713,52.0037827],[-63.7378819,51.9994762],[-64.4194369,51.9990793],[-64.9109279,52.0016288],[-65.429802,52.0062566],[-66.4145651,51.9994221],[-67.6554899,51.9969],[-68.4822449,52.0026605],[-69.5116346,52.0133904],[-69.9579592,52.0137245],[-70.6946856,51.9932767],[-71.8748781,51.9975447],[-73.9580435,51.9804658],[-75.3060432,51.9804309],[-76.1178445,51.9878938],[-77.1583682,51.9957354],[-77.9075456,52.0016725],[-78.3071278,52.0001727],[-78.6905126,51.9981522],[-79.45816,52.0049625],[-80.3506581,52.0192006],[-81.0746939,52.0267377],[-82.0307286,52.0174783],[-82.8914443,52.0089162],[-83.7152743,52.0184946],[-84.9422433,52.0146625],[-85.924956,52.0034694],[-87.1295952,52.0017378],[-88.2514299,52.0117435],[-89.4583413,52.0204869],[-90.7548885,52.0101238],[-92.1496536,51.9931606],[-93.2990015,51.9993943],[-93.9371159,52.0044191],[-94.551186,51.9950674],[-94.9074249,51.9904954],[-95.582477,51.9973399],[-96.0395531,51.994354],[-96.6505118,51.9965269],[-97.5041855,52.0078736],[-98.6142635,52.0231562],[-99.9904715,52.0284745],[-100.5386593,52.0183937],[-100.9741831,52.0159875],[-101.5111785,52.0178867],[-101.7818663,52.0141983],[-102.5375993,52.0091147],[-103.478188,52.0134692],[-103.9638903,52.0104674],[-104.3410526,52.0128156],[-104.7649122,52.017303],[-105.1346408,52.0228441],[-105.4455277,52.0226371],[-105.8277341,52.0216675],[-106.3306878,52.0185641],[-106.663113,52.0182406],[-107.4608763,52.0178845],[-107.8954091,52.0197334],[-109.0594264,52.0064121],[-109.7367911,52.0090744],[-110.7663496,52.0099515],[-111.3946285,52.0068604],[-112.6145388,52.0085099],[-113.8198416,52.0185119],[-115.409954,52.0228131],[-116.9985247,52.0108539],[-118.9132609,52.0096775],[-120.9591053,52.0103634],[-124.1664122,52.0220991],[-126.4804707,52.0083551],[-129.406906,52.0470712],[-128.9843308,28.8320727],[-127.9916179,28.8335311],[-126.9989489,28.8371191],[-125.9872129,28.844315],[-124.9908547,28.8408038],[-123.9907278,28.8426825],[-120.9901869,28.8444342],[-119.9917111,28.8444044],[-118.9895013,28.8437919],[-117.9900646,28.8439095],[-116.9919012,28.8452754],[-115.9932549,28.8480304],[-114.9942208,28.8458381],[-113.9912996,28.8458027],[-109.9919722,28.8445069],[-105.9911669,28.8441653],[-103.9907051,28.8432564],[-99.990369,28.8417632],[-98.0287243,28.8486587],[-97.0061875,28.8470795],[-95.9901076,28.8452835],[-91.9897197,28.8446589],[-87.9894034,28.84468],[-83.9896595,28.8446139],[-82.0008589,28.8382549],[-81.0000026,28.8405108],[-77.9885192,28.8449496],[-73.9886869,28.8447182],[-70.0003426,28.8401009],[-65.9992077,28.8401876],[-65.9875305,28.8447962],[-63.9879039,28.8444177],[-62.6981825,28.8445398]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Pachirisu","english":["Pachirisu"],"german":["Pachirisu"],"geometry":{"type":"Polygon","coordinates":[[[-51.2465545,70.2484435],[-64.318617,70.3891648],[-73.3124088,70.4963258],[-83.0549535,70.498633],[-92.9226511,70.5052488],[-100.2965151,70.5568918],[-114.2409737,70.3642874],[-126.9825731,70.2723088],[-139.1951946,70.1513385],[-152.8194494,70.2245787],[-164.3310537,70.2225052],[-177.2391023,70.2155618],[169.8505556,70.2061816],[157.6624196,70.2417241],[146.9690404,70.2415726],[137.3397908,70.2083194],[129.301766,70.1948432],[119.8298713,70.1754445],[108.1946569,70.0935009],[97.1380316,69.9378562],[86.9395483,70.0742043],[79.1749259,70.1927158],[68.6184122,70.2211917],[60.8457833,70.2036538],[53.6408717,70.2347072],[53.2232787,51.7372346],[61.8584701,51.7334294],[69.8364621,51.720933],[76.9254962,51.6799256],[83.1343521,51.7040547],[89.4013995,51.6432551],[96.4844281,51.7116091],[101.0014975,51.657683],[106.3918914,51.6283886],[111.8448624,51.6665148],[116.5778169,51.7157428],[120.8849629,51.7813005],[125.7690167,51.72023],[130.5228836,51.7631141],[138.7502881,51.7933421],[144.3377356,51.8291829],[150.9179817,51.826963],[157.5879027,51.6997998],[166.25318,51.7300823],[175.249209,51.912705],[-176.4702637,51.9280344],[-168.7749605,52.031642],[-160.7222092,52.1029519],[-150.5437768,52.0746591],[-142.9613354,52.0542054],[-136.2307457,52.003468],[-129.406906,52.0470712],[-125.2192777,52.0625262],[-120.8680013,52.0422204],[-117.3698897,52.0471706],[-113.3858473,52.0687081],[-110.1157983,52.0559769],[-105.7257016,52.054004],[-100.5252026,52.0435328],[-94.4411182,52.0262978],[-88.5626004,52.0575712],[-84.542311,52.0543008],[-79.3380562,52.0328387],[-73.4900913,52.0057617],[-69.9579592,52.0137245],[-66.3853772,52.0143383],[-63.2573713,52.0037827],[-60.3623456,51.9494106],[-54.8736641,51.9172342],[-51.0543203,51.90911],[-51.2465545,70.2484435]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Mr Mime/Mime Jr.","english":["Mr Mime","Mime Jr."],"german":["Pantimos","Pam-Pam"],"geometry":{"type":"Polygon","coordinates":[[[-29.1405056,36.7850711],[-24.1671733,36.7784924],[-19.404602,36.7784924],[-14.6200562,36.7784924],[-10.5743409,36.7718924],[-7.9623413,36.7608913],[-6.7513612,36.7485787],[-5.5674779,36.7399849],[-4.79987,36.7291205],[-3.9561467,36.7178529],[-2.2391428,36.7040322],[-0.1730346,36.7124672],[4.2214966,36.7036596],[7.5723267,36.6948509],[12.9336548,36.6948509],[17.5369263,36.7124672],[21.0025277,36.7000656],[24.9964148,36.7326622],[28.7539673,36.7124672],[36.6531372,36.6948509],[43.1130982,36.7179913],[48.8699341,36.6948509],[53.0942195,36.6774152],[53.5557277,67.5813142],[47.9251099,67.6008493],[42.3220825,67.5547538],[37.0156861,67.5463631],[31.1929321,67.5337716],[25.8425904,67.5421667],[19.4155884,67.6050353],[12.9666138,67.6426763],[4.6060181,67.6593864],[-3.3082463,67.7418725],[-12.2909546,67.7261082],[-19.6847534,67.7011097],[-27.2323608,67.6802573],[-29.012146,67.7261082],[-29.1405056,36.7850711]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Bouffalant","english":["Bouffalant"],"german":["Bisofank"],"geometry":{"type":"Polygon","coordinates":[[[-73.8062973,42.7501784],[-77.7804633,42.7497062],[-77.7805706,38.299451],[-69.6122202,38.2765677],[-69.5682748,42.7692939],[-73.8062973,42.7501784]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Klefki","english":["Klefki"],"german":["Klefki"],"geometry":{"type":"Polygon","coordinates":[[[4.9043716,51.1396041],[2.5811475,51.1555567],[0.2602515,51.1479171],[-0.327061,51.139914],[-0.3253782,51.0626544],[-0.3194154,50.5075184],[-1.0124062,50.4947919],[-2.3486183,50.0100913],[-4.9414772,48.7116759],[-4.9854226,42.1948049],[-2.7442117,42.1948049],[-0.2832742,42.2110815],[0.8072301,42.2147195],[1.2569872,42.2171207],[1.4637488,42.5194975],[1.5735335,42.5176965],[1.9020399,42.2095219],[2.7709251,42.1948049],[8.5497337,42.3249009],[8.359721,49.6485873],[4.9043716,51.1396041]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Comfey","english":["Comfey"],"german":["Curelei"],"geometry":{"type":"Polygon","coordinates":[[[-160.9057817,23.0554244],[-161.015645,23.0503699],[-161.0376177,22.2239737],[-161.0705767,20.772501],[-161.0705767,19.0682984],[-161.081563,17.5560065],[-160.0598345,17.5036259],[-158.4887896,17.493148],[-156.4343462,17.493148],[-154.4018755,17.5350561],[-152.7539263,17.5560065],[-152.7978716,18.9020792],[-152.7868853,20.4434354],[-152.8198442,22.0204229],[-152.8198442,23.0857474],[-154.116231,23.0857474],[-155.2697954,23.0958536],[-156.5112505,23.0857474],[-158.1042681,23.0958536],[-159.4775591,23.0655328],[-160.9057817,23.0554244]]]}},{"folder":"Type 2 [Habitat-Based Regionals]","name":"Corsola/Pa’u Oricorio","english":["Corsola","Pa’u Oricorio"],"german":["Corasonn","Choreogel (Hula)"],"geometry":{"type":"Polygon","coordinates":[[[-9.8730602,31.1405201],[-15.9403397,30.9844594],[-20.189579,30.8801952],[-23.802537,30.9342908],[-28.64567,31.0092758],[-34.0963484,30.8901409],[-39.426738,30.828582],[-44.6014742,30.9156176],[-49.6031406,30.8120615],[-53.3472016,30.8296243],[-55.8638853,30.818043],[-58.8068607,30.7929712],[-61.8283727,30.7815837],[-64.1057336,30.8240551],[-66.2843656,30.8256618],[-68.3964003,30.8415856],[-71.1216886,30.8648288],[-73.8922327,30.9036423],[-76.6061928,30.9021854],[-79.6780482,30.930443],[-82.1168898,30.932255],[-84.2487434,30.9835443],[-86.8523484,30.9883056],[-89.2438965,31.0050124],[-91.0297149,31.0043649],[-92.8164803,31.0011573],[-94.2435175,30.9957742],[-95.4522558,30.9903655],[-97.4799473,30.9876793],[-98.7757055,30.9959298],[-100.9234648,27.0096587],[-100.0400649,22.3826332],[-101.2687294,20.9937268],[-104.2592833,24.474896],[-106.8102442,27.8625293],[-111.2273666,31.0519459],[-115.3513697,31.081647],[-117.3939438,31.0874676],[-119.1984618,31.1222558],[-122.3722559,31.1319945],[-126.1960924,31.1624648],[-131.4947178,31.1922318],[-139.8822028,31.2843323],[-145.4591375,31.2839777],[-155.2020422,31.312575],[-162.7126005,31.3995877],[-167.4612609,31.3617441],[-171.4315472,31.2318951],[-176.4400706,31.2135856],[179.1692626,31.173936],[174.0524992,31.2160826],[165.4890964,31.0286072],[160.4342741,30.9597223],[155.5141738,30.8661785],[150.0901759,30.8175575],[145.3815998,30.8292284],[141.4061321,30.8501124],[137.6676859,30.8552472],[133.9763724,30.866859],[130.1320517,30.895796],[126.6151981,30.9277537],[123.9974778,30.9565044],[121.7315405,30.9774533],[119.9762153,30.9791843],[119.4822065,29.2348055],[117.928279,27.1142978],[116.4967885,25.9576725],[115.2193979,24.7522335],[113.7492959,24.1417649],[111.7776431,23.7140653],[109.8817007,23.561248],[92.7431808,24.0928872],[90.3978269,24.4591837],[87.6307239,24.7685212],[85.6999548,24.1574274],[73.7226059,24.2159078],[72.0647136,24.9659701],[67.6514684,27.1955854],[62.3471546,27.9932575],[60.1037347,27.9522144],[57.2315282,28.561835],[54.176727,29.1549615],[52.5606432,31.0079201],[49.7380794,30.8439855],[44.7438127,30.7820179],[45.9741178,27.5570092],[48.768518,23.3022446],[52.2153465,21.1561647],[55.5309196,22.2955058],[54.6632579,20.3844527],[51.0451227,18.8237121],[45.8143578,16.948764],[44.8821521,18.0995502],[41.6638374,22.5410451],[38.6189052,26.0933813],[36.8434551,28.4869537],[35.258142,29.7517315],[33.5406249,31.1790328],[30.3539301,31.0598979],[27.6323001,31.1174246],[26.362672,31.192921],[23.704193,31.2472629],[21.0012214,31.2715175],[18.3919199,31.2726521],[15.8626621,31.2437797],[13.82018,31.2426341],[9.9582717,31.0975627],[11.8449804,30.8195168],[13.3757519,30.502565],[14.3954242,29.6490472],[16.1912139,29.0631292],[18.7789897,28.0479114],[20.6440146,28.0554983],[22.2545047,29.2621584],[22.8185884,30.4967223],[25.1016404,29.5437103],[28.9783511,28.8947811],[30.1158967,28.0202289],[32.0642181,23.9313349],[34.230276,20.1698059],[36.2115913,16.0309512],[41.2219555,8.5632616],[43.3809818,7.3593591],[44.090565,5.6629187],[40.0646189,2.7352649],[36.3951438,0.2568017],[35.8592962,-2.3905462],[36.8831946,-11.1572569],[37.0007472,-13.8184392],[33.8380723,-16.7348841],[31.7758851,-19.553338],[32.6872899,-22.6865188],[30.9055821,-23.9340014],[30.0281674,-25.7798741],[33.9431073,-25.8378162],[37.2509118,-25.8407001],[40.8028922,-25.8473073],[43.9081896,-25.8941862],[45.6245026,-25.9193263],[47.6947949,-25.9561292],[49.4898176,-25.9353591],[53.3486982,-25.9739475],[55.2132596,-26.0123918],[59.2452843,-26.0220039],[62.6465338,-26.011137],[66.299694,-25.8854081],[69.3405539,-25.9684893],[72.9738702,-25.7732303],[77.8478919,-25.7889412],[87.2241138,-25.9011762],[92.5305345,-26.1447776],[97.3919282,-26.2469562],[101.4153377,-26.0607277],[105.6521469,-26.1545034],[109.3609172,-26.1413373],[113.6090926,-26.0635771],[114.9633694,-26.0691184],[114.8896323,-22.9591519],[119.7889378,-21.3915166],[123.6841364,-17.9149865],[126.9228351,-15.9903977],[130.6806572,-15.9714886],[134.9236675,-15.5879592],[138.1647282,-17.6821249],[141.3681879,-18.4767463],[145.5715547,-18.7497148],[148.0921879,-21.7502209],[150.6500166,-24.1988793],[151.853642,-25.8026412],[153.0472339,-27.0721797],[156.873194,-27.0393387],[160.3934371,-27.0391951],[164.3315572,-27.1710527],[168.1206229,-27.1942641],[172.1627062,-27.0857387],[176.9902805,-26.9382684],[-172.2956982,-27.2560217],[-165.4342248,-27.0839054],[-157.1180891,-27.3828246],[-147.7651953,-27.2019117],[-133.7622327,-26.9706395],[-119.5669501,-26.7038461],[-106.9411339,-26.5642586],[-92.7051728,-26.6555626],[-82.2009483,-26.491401],[-77.0479595,-26.3582221],[-74.4724702,-26.3506146],[-70.4805681,-26.2021512],[-67.730384,-26.0516216],[-67.2426696,-22.0095771],[-67.699906,-16.22921],[-70.7117075,-13.7030529],[-74.6058639,-8.351967],[-76.3632214,-4.3242599],[-75.0591351,0.4602624],[-72.9448494,5.2373984],[-69.6291923,6.7288898],[-65.9274051,6.6565043],[-62.3645572,5.0828222],[-59.3131786,3.5354593],[-55.7854924,1.0547215],[-53.7318478,-1.1392688],[-50.8845203,-3.4198878],[-46.2468024,-4.6854824],[-37.4326971,-5.0147754],[-31.4062199,-5.0241429],[-25.30721,-5.0119669],[-18.7225409,-4.987044],[-13.3548468,-5.0002811],[-9.8725249,-4.8987376],[1.5368346,-4.5982864],[11.3112549,-4.4354411],[12.3565641,-4.4150876],[10.1557311,-1.0447361],[11.0848511,2.5290932],[10.1852768,5.8438644],[7.0741069,7.6479433],[2.7268913,9.0455965],[-4.4269965,6.9624321],[-10.0933303,9.2060823],[-12.0053514,11.0537785],[-12.8358667,13.4404954],[-13.1039698,14.3954109],[-13.110911,16.2011545],[-13.2036401,21.3364108],[-13.0046678,22.6730186],[-12.0904078,24.3326327],[-11.6732044,25.3200941],[-9.7877374,26.3047469],[-9.8730602,31.1405201]]]}},{"folder":"Type 2 [Habitat-Based Regionals]","name":"Carnivine","english":["Carnivine"],"german":["Venuflibis"],"geometry":{"type":"Polygon","coordinates":[[[-87.0406486,36.638558],[-87.2245764,24.8972135],[-79.8857092,24.777572],[-75.0956701,24.7775719],[-75.0216056,36.5591767],[-79.6907951,36.5503515],[-84.4039299,36.576824],[-87.0406486,36.638558]]]}},{"folder":"Type 1 [Geographical Regionals] (Future Region Predictions)","name":"Indian Ocean","english":["Indian Ocean"],"german":["Indian Ocean"],"geometry":{"type":"Polygon","coordinates":[[[52.8222675,1.9332268],[52.03125,-61.7731229],[59.765625,-61.7731229],[66.796875,-61.9389504],[74.53125,-61.9389504],[82.7929688,-61.9389505],[91.7578125,-61.7731229],[101.25,-61.7731229],[108.6328125,-61.6063964],[111.796875,-61.522695],[111.9561768,1.7067483],[103.0078125,1.7575368],[92.109375,1.9771466],[83.3203125,2.1088987],[76.3561664,2.0794282],[69.8737758,2.1060142],[61.2597656,1.9771466],[52.8222675,1.9332268]]]}},{"folder":"Type 1 [Geographical Regionals] (Future Region Predictions)","name":"Malay Archipelago","english":["Malay Archipelago"],"german":["Malay Archipelago"],"geometry":{"type":"Polygon","coordinates":[[[112.0222351,20.8938841],[111.6210938,-11.0921659],[118.1733601,-10.983058],[123.75,-11.0059045],[130.078125,-10.833306],[135.703125,-10.660608],[139.7460938,-10.9196178],[139.7460978,20.9614396],[133.7695333,20.9614396],[128.5620178,20.9409197],[123.0249063,20.9203969],[117.8173868,20.8177411],[112.0222351,20.8938841]]]}},{"folder":"Type 1 [Geographical Regionals] (Future Region Predictions)","name":"Greenland","english":["Greenland"],"german":["Greenland"],"geometry":{"type":"Polygon","coordinates":[[[-62.8899613,29.0921022],[-56.8652344,29.0753752],[-48.8671875,28.9216313],[-37.8768593,29.0766214],[-28.1397269,29.1436267],[-28.0780564,67.6930404],[-22.2964334,67.6464554],[-13.2877821,67.6968464],[-0.4255646,67.7617242],[9.4021206,67.6848782],[19.0294378,67.6281471],[27.8880865,67.5133968],[36.5751531,67.5613206],[44.9819703,67.5219765],[53.5529811,67.5813142],[51.9433614,85.0288468],[41.2207071,85.0359415],[29.8828125,85.0511288],[21.4453125,85.0207077],[11.6015625,85.0511288],[4.1524615,85.0806101],[-5.625,85.0511288],[-15.46875,85.0511288],[-23.203125,85.0207077],[-31.640625,85.0511288],[-39.2983701,85.0620929],[-49.5703125,85.0207077],[-56.25,85.0435409],[-62.9296875,85.0511288],[-62.8899613,29.0921022]]]}},{"folder":"Type 1 [Geographical Regionals] (Future Region Predictions)","name":"Eastern Pacific","english":["Eastern Pacific"],"german":["Eastern Pacific"],"geometry":{"type":"Polygon","coordinates":[[[-129.7049052,51.9163929],[-139.0429687,51.7270282],[-147.7001953,51.9442648],[-156.796875,52.0524905],[-172.7929687,51.5087425],[-177.1899046,51.6927994],[178.7695373,51.3443387],[179.4726563,-12.8546489],[-156.7749163,-13.132979],[-156.4453165,-50.0641918],[-143.0859375,-50.7364551],[-129.0234375,-50.7364552],[-129.7049052,51.9163929]]]}},{"folder":"Type 1 [Geographical Regionals] (Future Region Predictions)","name":"Western Pacific","english":["Western Pacific"],"german":["Western Pacific"],"geometry":{"type":"Polygon","coordinates":[[[178.7695373,51.3443387],[173.2763793,51.2344073],[167.3437521,51.3443387],[159.8730489,51.179343],[154.2476615,50.6799],[154.4676551,21.0836313],[139.7460958,20.9614396],[139.7460958,-0.5273363],[154.2480489,-0.3955047],[154.2919962,-12.8010882],[166.7147588,-12.8679333],[179.4726563,-12.8546489],[178.7695373,51.3443387]]]}},{"folder":"Type 1 [Geographical Regionals] (Future Region Predictions)","name":"Arctic","english":["Arctic"],"german":["Arctic"],"geometry":{"type":"Polygon","coordinates":[[[59.5656778,67.66648],[87.206391,67.5169917],[105.1411255,67.9642187],[123.4321834,67.9628762],[144.7952752,67.9310079],[154.8191355,68.0714537],[169.1494251,68.0950643],[-179.3346701,68.0662897],[-163.0147619,67.9028756],[-145.1916138,67.9678554],[-122.2691713,67.8123225],[-99.0510473,67.8127055],[-87.3749088,67.8100953],[-71.3334416,68.0944105],[-54.1980242,68.1040319],[-34.9641471,67.9635529],[-16.1833516,68.0693841],[-3.3109929,67.7418725],[6.8686002,68.0725594],[19.4128418,67.6050353],[37.0129395,67.5463631],[59.5656778,67.66648]]]}},{"folder":"Geoblock Region","name":"China Geoblock","english":["China Geoblock"],"german":["China Geoblock"],"geometry":{"type":"Polygon","coordinates":[[[118.599704,24.325883],[120.228212,24.0531],[120.395501,26.623242],[124.833977,26.249418],[124.361565,38.044059],[124.85595,38.044059],[125.482171,37.357356],[128.811028,39.550936],[98.408684,46.114308],[97.771477,44.975614],[96.431145,45.037754],[96.079582,43.877239],[94.255852,43.924735],[94.124016,42.693673],[85.12409,31.214182],[84.992254,28.624521],[87.27741,28.605232],[87.299382,27.811356],[92.682683,28.04432],[94.748113,29.316549],[96.37409,29.220711],[96.615789,28.566643],[97.714422,28.508734],[97.604558,23.676191],[100.59284,21.127004],[101.581609,22.939646],[104.503972,22.838434],[104.679754,23.625874],[106.789129,23.162048],[106.613347,21.842603],[114.090645,20.859728],[114.137337,21.872605],[113.474257,22.046109],[113.482031,22.258102],[113.592581,22.330529],[113.773842,22.469042],[113.94825,22.448102],[113.95855,22.515989],[114.041671,22.504941],[114.049224,22.502245],[114.055233,22.503118],[114.05755,22.505734],[114.057722,22.509382],[114.059352,22.513346],[114.062013,22.515329],[114.065189,22.516994],[114.068966,22.517152],[114.072055,22.517945],[114.074459,22.520244],[114.077841,22.529056],[114.079472,22.530563],[114.082004,22.531038],[114.084364,22.532109],[114.086896,22.534011],[114.088398,22.536192],[114.091531,22.537064],[114.093806,22.536271],[114.096123,22.534289],[114.097968,22.534289],[114.102346,22.534804],[114.104105,22.535121],[114.107667,22.533694],[114.109126,22.531356],[114.111787,22.529492],[114.114276,22.530523],[114.115993,22.531554],[114.116036,22.532902],[114.116422,22.534091],[114.117237,22.534447],[114.119297,22.534527],[114.120628,22.535478],[114.121786,22.537262],[114.125134,22.538926],[114.130687,22.541551],[114.138841,22.543216],[114.144248,22.54171],[114.14545,22.540838],[114.14854,22.542027],[114.148368,22.543374],[114.1506,22.546228],[114.151716,22.546704],[114.151458,22.547497],[114.150342,22.54718],[114.14957,22.548448],[114.149827,22.550905],[114.151544,22.550905],[114.15163,22.554948],[114.15635,22.554393],[114.159354,22.560576],[114.161586,22.562002],[114.163474,22.559228],[114.166049,22.559307],[114.167508,22.561368],[114.169654,22.561051],[114.170942,22.559387],[114.176521,22.560179],[114.177551,22.558515],[114.177722,22.555582],[114.181156,22.554234],[114.181842,22.555582],[114.18682,22.554551],[114.187078,22.555978],[114.195747,22.55582],[114.196433,22.557326],[114.201412,22.557564],[114.201669,22.556216],[114.207248,22.556533],[114.20905,22.557246],[114.213428,22.554948],[114.217977,22.555978],[114.221238,22.553045],[114.222097,22.55146],[114.227247,22.547814],[114.225616,22.545673],[114.226474,22.544167],[114.23716,22.545356],[114.246601,22.556097],[114.24952,22.5536],[114.299461,22.563223],[114.312164,22.578916],[114.426035,22.561983],[114.430155,22.389402],[114.511179,22.381783],[114.512553,21.760733],[114.144511,21.870378],[114.100848,20.857276],[118.451434,20.033746],[118.599704,24.325883]]]}},{"folder":"Confirmed Spawn Points","name":"Pansage Spawn","english":["Pansage Spawn"],"german":["Pansage Spawn"],"geometry":{"type":"Point","coordinates":[90.4858278,56.2348717]}},{"folder":"Confirmed Spawn Points","name":"Pansear Spawn","english":["Pansear Spawn"],"german":["Pansear Spawn"],"geometry":{"type":"Point","coordinates":[82.9378939,55.009464]}},{"folder":"Type 1 [Geographical Regionals]","name":"Hawlucha","english":["Hawlucha"],"german":["Hawlucha"],"geometry":{"type":"Polygon","coordinates":[[[-117.4,32.7],[-114.8,32.7],[-110.5,31.4],[-106.5,31.8],[-103.0,29.0],[-100.0,28.7],[-99.5,27.5],[-97.4,25.9],[-97.2,21.5],[-94.8,18.5],[-92.0,18.5],[-90.4,21.5],[-86.7,21.5],[-86.7,19.5],[-87.5,17.8],[-88.3,17.8],[-89.2,17.5],[-91.4,16.0],[-92.2,14.5],[-95.5,16.2],[-100.0,16.7],[-104.3,19.5],[-105.5,20.0],[-106.5,23.2],[-108.5,22.5],[-110.3,22.7],[-110.5,23.5],[-112.5,27.0],[-114.5,29.5],[-115.5,30.5],[-116.5,31.5],[-117.4,32.7]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Stonjourner","english":["Stonjourner"],"german":["Stonjourner"],"geometry":{"type":"Polygon","coordinates":[[[-7.6,55.2],[-5.5,54.3],[-6.0,50.0],[-3.0,50.6],[0.5,50.9],[1.8,52.5],[0.0,53.7],[-1.5,55.0],[-1.7,56.0],[-2.0,57.7],[-3.5,58.7],[-5.0,58.6],[-6.5,58.0],[-7.5,57.0],[-6.4,55.9],[-5.3,54.8],[-7.6,55.2]]]}}]`);
+const POGO_REGIONS_KMZ = JSON.parse(`[{"folder":"Type 5 [Trios (Big Three Regions)]","name":"Pom-Pom Oricorio/Yellow Flabébé/Panpour/Azelf","english":["Pom-Pom Oricorio","Yellow Flabébé","Panpour","Azelf"],"german":["Choreogel (Cheerleading)","Flabébé (gelb)","Sodamak","Tobutz"],"geometry":{"type":"Polygon","coordinates":[[[179.9788423,85.0371116],[179.4930617,-84.9676454],[-26.1197931,-85.0824329],[-23.203125,85.0207077],[179.9788423,85.0371116]]]}},{"folder":"Type 5 [Trios (Big Three Regions)]","name":"Sensu Oricorio/Blue Flabébé/Pansage/Uxie","english":["Sensu Oricorio","Blue Flabébé","Pansage","Uxie"],"german":["Choreogel (Buyo)","Flabébé (blau)","Vegimak","Selfe"],"geometry":{"type":"Polygon","coordinates":[[[90.9771923,85.0570722],[90.1036767,64.613503],[90.0457357,54.6777412],[89.9924066,48.9758687],[89.9896598,48.7599692],[89.9855392,48.6085576],[89.9842279,48.3717998],[90.0020807,22.0296934],[86.8261326,-85.0575818],[179.4930617,-84.9676454],[179.9788423,85.0371116],[90.9771923,85.0570722]]]}},{"folder":"Type 5 [Trios (Big Three Regions)]","name":"Baile Oricorio/Red Flabébé/Pansear/Mesprit","english":["Baile Oricorio","Red Flabébé","Pansear","Mesprit"],"german":["Choreogel (Flamenco)","Flabébé (rot)","Grillmak","Vesprit"],"geometry":{"type":"Polygon","coordinates":[[[86.8261326,-85.0575818],[89.9918303,48.9656349],[90.0462269,56.2339545],[90.9771923,85.0570722],[-23.203125,85.0207077],[-23.1787953,84.9056643],[-24.2386427,65.8003482],[-26.1197931,-85.0824329],[86.8261326,-85.0575818]]]}},{"folder":"Type 4 [Hemispheric Regionals]","name":"Chatot - Type 4 [Hemispheric Regional]","english":["Chatot"],"german":["Plaudagei"],"geometry":{"type":"Polygon","coordinates":[[[78.4737327,-0.0655574],[77.0587661,-65.8269101],[83.4967544,-65.9536888],[92.0660904,-65.9536888],[102.4371841,-65.9536888],[114.7858169,-65.9536888],[125.6403091,-65.9536888],[137.4933308,-65.9705568],[171.7706746,-65.9705568],[-152.1941692,-65.9705568],[-114.4012004,-65.9705568],[-85.0457317,-65.9705568],[-49.0105754,-65.9705568],[-12.9754192,-65.9705568],[12.9523152,-65.7909809],[27.4542683,-65.7909809],[50.8331746,-65.718798],[77.0245808,-65.8269967],[78.4692215,-0.066183],[-28.6095949,-0.0750637],[-120.5886795,-0.0690087],[145.7979514,-0.0655574],[78.4737327,-0.0655574]]]}},{"folder":"Type 3 [Paired Regional Line]","name":"Type 3 [Paired Regional Line]","english":["Type 3 [Paired Regional Line]"],"german":["Type 3 [Paired Regional Line]"],"geometry":{"type":"LineString","coordinates":[[-29.0478436,85.0397427],[-29.1357322,33.3213485],[-21.3835305,33.3385554],[-14.5557243,33.3327905],[-6.5154841,33.496424],[1.1645508,33.5413946],[9.3965509,33.5230259],[17.5122071,33.3947592],[26.916504,33.3764123],[36.2400056,33.3935447],[43.59375,33.4497766],[49.5074177,33.4598794],[54.5800781,33.4864354],[53.437502,-85.0207077]]}},{"folder":"Type 3 [Paired Regional Line]","name":"Type 3 [Paired Meridian Line]","english":["Type 3 [Paired Meridian Line]"],"german":["Type 3 [Paired Meridian Line]"],"geometry":{"type":"LineString","coordinates":[[-0.0015,-85.051],[-0.0015,51.4779],[-0.0015,85.05]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Maractus/Heracross","english":["Maractus","Heracross"],"german":["Maracamba","Skaraborn"],"geometry":{"type":"Polygon","coordinates":[[[-28.7126839,-60.8079488],[-29.0003358,28.8387285],[-31.0039204,28.8426785],[-33.0184819,28.8445857],[-35.0099838,28.8333665],[-37.0025528,28.8387736],[-39.0055406,28.8446463],[-41.002899,28.8384495],[-43.0042338,28.8359558],[-45.0014522,28.8457198],[-46.9920227,28.8428544],[-49.0138632,28.8378503],[-51.0134117,28.8391466],[-53.0015012,28.8433519],[-56.9979247,28.8399738],[-57.9907668,28.8371582],[-59.0015822,28.8384688],[-60.005754,28.8350249],[-60.9975612,28.8427744],[-61.9998994,28.8399356],[-62.9998658,28.839383],[-63.9996692,28.8398557],[-65.0000689,28.8399257],[-65.9992077,28.8401876],[-67.0000958,28.8401086],[-68.0000649,28.8399587],[-68.9999796,28.8402988],[-70.0003426,28.8401009],[-71.4878807,28.844786],[-72.4378771,28.8476871],[-73.4042996,28.8390047],[-76.3887972,28.8366705],[-79.2558588,28.8595511],[-81.0000026,28.8405108],[-82.0008589,28.8382549],[-83.5955598,28.8437688],[-85.5989242,28.8407351],[-87.1683985,28.8478368],[-88.7602735,28.8450618],[-90.2696907,28.8437939],[-91.5015451,28.8435616],[-92.7155388,28.8431238],[-93.7681432,28.8423097],[-95.1296132,28.8414159],[-96.9952763,28.8486886],[-99.5711717,28.8373746],[-100.7334133,28.8302342],[-101.8403142,28.83693],[-103.0372329,28.8386833],[-104.0691416,28.8168433],[-106.1237099,28.838453],[-107.9099433,28.8397707],[-108.4255453,28.8395984],[-108.8930633,28.8433065],[-109.811583,28.8412668],[-111.6679274,28.8419586],[-113.4914062,28.8465438],[-116.0492626,28.8602196],[-117.6440143,28.8458629],[-119.1353522,28.845896],[-120.9994904,28.8407632],[-123.9999279,28.8391765],[-125.0000215,28.8373549],[-125.9963467,28.8409241],[-127.0080506,28.8337881],[-128.0006884,28.8302599],[-128.9933704,28.8288623],[-129.2406481,-60.4394174],[-123.3079167,-60.5951658],[-115.2413217,-60.6442764],[-106.8736263,-60.6542888],[-97.5777026,-60.6538503],[-91.1512129,-60.8224591],[-86.1420809,-60.8023277],[-78.4595209,-60.8445596],[-68.6119016,-60.8928151],[-61.8343977,-60.8234963],[-50.4218225,-60.7841079],[-40.5706879,-60.9342487],[-28.7126839,-60.8079488]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Kangaskhan","english":["Kangaskhan"],"german":["Kangama"],"geometry":{"type":"Polygon","coordinates":[[[154.6435546,-50.0359736],[154.2480469,-0.3955047],[139.7460938,-0.5273363],[139.7460938,-10.9196178],[124.9907865,-11.1567369],[118.1733601,-10.983058],[111.6210938,-11.0921659],[111.4453125,-50.0641917],[120.7617188,-50.0641917],[124.994723,-50.1057947],[129.3750001,-50.0641917],[136.7578125,-49.9512199],[144.6679688,-50.0641917],[150.6445313,-50.0641917],[154.6435546,-50.0359736]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Relicanth","english":["Relicanth"],"german":["Relicanth"],"geometry":{"type":"Polygon","coordinates":[[[154.6435546,-50.0359736],[158.0273438,-50.0641917],[162.3779297,-50.1768981],[165.1068748,-50.2661105],[168.0029297,-50.1768982],[171.5185547,-50.2893392],[175.78125,-50.2893393],[-179.1142346,-50.2654442],[-172.6369959,-50.3012819],[-167.1034055,-50.2131875],[-162.4912283,-50.2328883],[-156.4453165,-50.0641918],[-156.7749163,-13.132979],[-163.0334483,-13.1266564],[-167.4799992,-13.0095058],[-175.1374124,-13.0690463],[175.7153341,-12.9403221],[169.2334025,-12.8867798],[162.1911662,-12.8867798],[154.2919942,-12.8010882],[154.6435546,-50.0359736]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Torkoal","english":["Torkoal"],"german":["Qurtel"],"geometry":{"type":"Polygon","coordinates":[[[52.7453632,1.9661667],[60.3815883,1.8864211],[71.2804828,1.9915931],[79.7167969,1.845384],[91.3472203,1.8333542],[98.5787908,1.7590192],[100.4509769,1.7386207],[102.4442077,1.711366],[103.5193966,1.7166697],[104.4545042,1.7215441],[106.5938691,1.7132064],[109.9302184,1.7321508],[111.9561768,1.7067483],[112.1704141,44.4494676],[112.1173677,50.5577109],[105.4840983,50.5324609],[99.148713,50.5162291],[92.1655657,50.5085978],[86.3053298,50.4299745],[79.371408,50.3882202],[73.5753126,50.416405],[67.9900495,50.3808714],[62.567102,50.3851389],[57.6802124,50.3430302],[53.2122924,50.3769995],[52.7453632,1.9661667]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Tropius","english":["Tropius"],"german":["Tropius"],"geometry":{"type":"Polygon","coordinates":[[[-29.1432522,36.7850711],[-28.8147581,-49.4355627],[-21.433732,-49.5437028],[-12.8320312,-49.6107099],[-3.5617921,-49.7415299],[4.921875,-49.6107099],[15.6445313,-49.6107099],[23.203125,-49.2678046],[31.1132813,-49.2678046],[39.6936035,-49.3752201],[46.6918945,-49.4109732],[52.157406,-49.2734073],[53.0914729,36.6774152],[52.097168,36.7300795],[50.690918,36.7036596],[46.7028809,36.7388841],[43.2476807,36.7432861],[39.7595215,36.7388841],[36.0351563,36.7212739],[32.1459961,36.7212739],[29.0017068,36.7002903],[25.452919,36.7245761],[21.9946289,36.7388841],[17.7319336,36.7388841],[13.458252,36.7124672],[10.8764648,36.7476877],[7.0000631,36.7002758],[3.3837891,36.7124672],[-0.3405762,36.7300795],[-2.2638135,36.7122808],[-4.0934758,36.722256],[-5.6855589,36.7460958],[-7.2729492,36.7608913],[-10.5194092,36.7608913],[-13.5406494,36.782892],[-16.8035888,36.7960895],[-20.5718994,36.782892],[-24.3951416,36.7916906],[-29.1432522,36.7850711]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Farfetch'd","english":["Farfetch'd"],"german":["Porenta"],"geometry":{"type":"Polygon","coordinates":[[[112.2363707,21.0724084],[116.267753,21.041066],[120.2716707,21.0755242],[124.1547096,21.0782104],[128.3788226,21.0698857],[132.7239722,21.0913307],[137.2781571,21.1321598],[141.227315,21.1515131],[146.3094692,21.1897179],[149.8515658,21.2484025],[152.4695452,21.2458494],[154.7355133,21.2638365],[154.5874152,48.478032],[150.1594106,48.4052644],[145.6498147,48.3771996],[139.770296,48.3925578],[134.487265,48.3680023],[129.748832,48.367673],[124.9151903,48.3664688],[119.8363995,48.3635568],[116.0626359,48.3723472],[112.0959005,48.3707026],[112.2363707,21.0724084]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Sigilyph","english":["Sigilyph"],"german":["Symvolara"],"geometry":{"type":"Polygon","coordinates":[[[19.3452587,39.811537],[19.332032,38.8462217],[25.1577296,31.6611084],[25.0973048,31.6260348],[25.0780787,31.5535073],[24.8583521,31.4012506],[24.885818,31.2651819],[24.8693385,31.1712268],[25.0286402,30.7708791],[24.9297633,30.487273],[24.7100367,30.1458518],[24.9901881,29.2487944],[24.9943556,21.9964122],[31.3005079,22.0065984],[31.4488234,22.2406793],[31.5092482,22.1898253],[31.4048781,22.0065984],[37.0247159,21.9759484],[36.1375357,27.3199596],[35.9178091,29.5035957],[35.945275,31.5709639],[35.891936,31.9680917],[34.8616611,32.3582582],[31.5425417,33.8918277],[26.9118043,37.1918091],[26.4271827,37.8239696],[26.6455318,39.0216347],[26.4342401,40.1524457],[25.9672679,40.6711027],[26.3435497,40.9164648],[26.354536,41.2477097],[26.6182079,41.3302599],[26.6291942,41.5937186],[26.2227001,41.7496405],[26.0579051,41.729146],[25.816206,41.7332454],[25.4756298,41.7250464],[24.9592724,41.7332455],[24.6846142,41.7414435],[24.3330517,41.7250463],[23.5475292,41.7209464],[22.7674999,41.7209465],[22.2181835,41.7332455],[21.6242351,42.053723],[21.4222728,42.0567402],[20.8256664,41.8970075],[20.4977198,41.7584865],[20.0813427,41.7004428],[19.2024364,41.6963413],[19.1914501,41.3385092],[19.2024365,41.0988561],[19.1914501,40.8500155],[19.2134227,40.6335948],[19.2463817,40.5000631],[19.2683544,40.316022],[19.323286,40.0726541],[19.3452587,39.811537]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Tauros","english":["Tauros"],"german":["Tauros"],"geometry":{"type":"Polygon","coordinates":[[[-62.6981825,28.8445398],[-62.8481171,52.0054047],[-63.2573713,52.0037827],[-63.7378819,51.9994762],[-64.4194369,51.9990793],[-64.9109279,52.0016288],[-65.429802,52.0062566],[-66.4145651,51.9994221],[-67.6554899,51.9969],[-68.4822449,52.0026605],[-69.5116346,52.0133904],[-69.9579592,52.0137245],[-70.6946856,51.9932767],[-71.8748781,51.9975447],[-73.9580435,51.9804658],[-75.3060432,51.9804309],[-76.1178445,51.9878938],[-77.1583682,51.9957354],[-77.9075456,52.0016725],[-78.3071278,52.0001727],[-78.6905126,51.9981522],[-79.45816,52.0049625],[-80.3506581,52.0192006],[-81.0746939,52.0267377],[-82.0307286,52.0174783],[-82.8914443,52.0089162],[-83.7152743,52.0184946],[-84.9422433,52.0146625],[-85.924956,52.0034694],[-87.1295952,52.0017378],[-88.2514299,52.0117435],[-89.4583413,52.0204869],[-90.7548885,52.0101238],[-92.1496536,51.9931606],[-93.2990015,51.9993943],[-93.9371159,52.0044191],[-94.551186,51.9950674],[-94.9074249,51.9904954],[-95.582477,51.9973399],[-96.0395531,51.994354],[-96.6505118,51.9965269],[-97.5041855,52.0078736],[-98.6142635,52.0231562],[-99.9904715,52.0284745],[-100.5386593,52.0183937],[-100.9741831,52.0159875],[-101.5111785,52.0178867],[-101.7818663,52.0141983],[-102.5375993,52.0091147],[-103.478188,52.0134692],[-103.9638903,52.0104674],[-104.3410526,52.0128156],[-104.7649122,52.017303],[-105.1346408,52.0228441],[-105.4455277,52.0226371],[-105.8277341,52.0216675],[-106.3306878,52.0185641],[-106.663113,52.0182406],[-107.4608763,52.0178845],[-107.8954091,52.0197334],[-109.0594264,52.0064121],[-109.7367911,52.0090744],[-110.7663496,52.0099515],[-111.3946285,52.0068604],[-112.6145388,52.0085099],[-113.8198416,52.0185119],[-115.409954,52.0228131],[-116.9985247,52.0108539],[-118.9132609,52.0096775],[-120.9591053,52.0103634],[-124.1664122,52.0220991],[-126.4804707,52.0083551],[-129.406906,52.0470712],[-128.9843308,28.8320727],[-127.9916179,28.8335311],[-126.9989489,28.8371191],[-125.9872129,28.844315],[-124.9908547,28.8408038],[-123.9907278,28.8426825],[-120.9901869,28.8444342],[-119.9917111,28.8444044],[-118.9895013,28.8437919],[-117.9900646,28.8439095],[-116.9919012,28.8452754],[-115.9932549,28.8480304],[-114.9942208,28.8458381],[-113.9912996,28.8458027],[-109.9919722,28.8445069],[-105.9911669,28.8441653],[-103.9907051,28.8432564],[-99.990369,28.8417632],[-98.0287243,28.8486587],[-97.0061875,28.8470795],[-95.9901076,28.8452835],[-91.9897197,28.8446589],[-87.9894034,28.84468],[-83.9896595,28.8446139],[-82.0008589,28.8382549],[-81.0000026,28.8405108],[-77.9885192,28.8449496],[-73.9886869,28.8447182],[-70.0003426,28.8401009],[-65.9992077,28.8401876],[-65.9875305,28.8447962],[-63.9879039,28.8444177],[-62.6981825,28.8445398]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Pachirisu","english":["Pachirisu"],"german":["Pachirisu"],"geometry":{"type":"Polygon","coordinates":[[[-51.2465545,70.2484435],[-64.318617,70.3891648],[-73.3124088,70.4963258],[-83.0549535,70.498633],[-92.9226511,70.5052488],[-100.2965151,70.5568918],[-114.2409737,70.3642874],[-126.9825731,70.2723088],[-139.1951946,70.1513385],[-152.8194494,70.2245787],[-164.3310537,70.2225052],[-177.2391023,70.2155618],[169.8505556,70.2061816],[157.6624196,70.2417241],[146.9690404,70.2415726],[137.3397908,70.2083194],[129.301766,70.1948432],[119.8298713,70.1754445],[108.1946569,70.0935009],[97.1380316,69.9378562],[86.9395483,70.0742043],[79.1749259,70.1927158],[68.6184122,70.2211917],[60.8457833,70.2036538],[53.6408717,70.2347072],[53.2232787,51.7372346],[61.8584701,51.7334294],[69.8364621,51.720933],[76.9254962,51.6799256],[83.1343521,51.7040547],[89.4013995,51.6432551],[96.4844281,51.7116091],[101.0014975,51.657683],[106.3918914,51.6283886],[111.8448624,51.6665148],[116.5778169,51.7157428],[120.8849629,51.7813005],[125.7690167,51.72023],[130.5228836,51.7631141],[138.7502881,51.7933421],[144.3377356,51.8291829],[150.9179817,51.826963],[157.5879027,51.6997998],[166.25318,51.7300823],[175.249209,51.912705],[-176.4702637,51.9280344],[-168.7749605,52.031642],[-160.7222092,52.1029519],[-150.5437768,52.0746591],[-142.9613354,52.0542054],[-136.2307457,52.003468],[-129.406906,52.0470712],[-125.2192777,52.0625262],[-120.8680013,52.0422204],[-117.3698897,52.0471706],[-113.3858473,52.0687081],[-110.1157983,52.0559769],[-105.7257016,52.054004],[-100.5252026,52.0435328],[-94.4411182,52.0262978],[-88.5626004,52.0575712],[-84.542311,52.0543008],[-79.3380562,52.0328387],[-73.4900913,52.0057617],[-69.9579592,52.0137245],[-66.3853772,52.0143383],[-63.2573713,52.0037827],[-60.3623456,51.9494106],[-54.8736641,51.9172342],[-51.0543203,51.90911],[-51.2465545,70.2484435]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Mr Mime/Mime Jr.","english":["Mr Mime","Mime Jr."],"german":["Pantimos","Pantimimi"],"geometry":{"type":"Polygon","coordinates":[[[-29.1405056,36.7850711],[-24.1671733,36.7784924],[-19.404602,36.7784924],[-14.6200562,36.7784924],[-10.5743409,36.7718924],[-7.9623413,36.7608913],[-6.7513612,36.7485787],[-5.5674779,36.7399849],[-4.79987,36.7291205],[-3.9561467,36.7178529],[-2.2391428,36.7040322],[-0.1730346,36.7124672],[4.2214966,36.7036596],[7.5723267,36.6948509],[12.9336548,36.6948509],[17.5369263,36.7124672],[21.0025277,36.7000656],[24.9964148,36.7326622],[28.7539673,36.7124672],[36.6531372,36.6948509],[43.1130982,36.7179913],[48.8699341,36.6948509],[53.0942195,36.6774152],[53.5557277,67.5813142],[47.9251099,67.6008493],[42.3220825,67.5547538],[37.0156861,67.5463631],[31.1929321,67.5337716],[25.8425904,67.5421667],[19.4155884,67.6050353],[12.9666138,67.6426763],[4.6060181,67.6593864],[-3.3082463,67.7418725],[-12.2909546,67.7261082],[-19.6847534,67.7011097],[-27.2323608,67.6802573],[-29.012146,67.7261082],[-29.1405056,36.7850711]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Bouffalant","english":["Bouffalant"],"german":["Bisofank"],"geometry":{"type":"Polygon","coordinates":[[[-73.8062973,42.7501784],[-77.7804633,42.7497062],[-77.7805706,38.299451],[-69.6122202,38.2765677],[-69.5682748,42.7692939],[-73.8062973,42.7501784]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Klefki","english":["Klefki"],"german":["Clavion"],"geometry":{"type":"Polygon","coordinates":[[[4.9043716,51.1396041],[2.5811475,51.1555567],[0.2602515,51.1479171],[-0.327061,51.139914],[-0.3253782,51.0626544],[-0.3194154,50.5075184],[-1.0124062,50.4947919],[-2.3486183,50.0100913],[-4.9414772,48.7116759],[-4.9854226,42.1948049],[-2.7442117,42.1948049],[-0.2832742,42.2110815],[0.8072301,42.2147195],[1.2569872,42.2171207],[1.4637488,42.5194975],[1.5735335,42.5176965],[1.9020399,42.2095219],[2.7709251,42.1948049],[8.5497337,42.3249009],[8.359721,49.6485873],[4.9043716,51.1396041]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Comfey","english":["Comfey"],"german":["Curelei"],"geometry":{"type":"Polygon","coordinates":[[[-160.9057817,23.0554244],[-161.015645,23.0503699],[-161.0376177,22.2239737],[-161.0705767,20.772501],[-161.0705767,19.0682984],[-161.081563,17.5560065],[-160.0598345,17.5036259],[-158.4887896,17.493148],[-156.4343462,17.493148],[-154.4018755,17.5350561],[-152.7539263,17.5560065],[-152.7978716,18.9020792],[-152.7868853,20.4434354],[-152.8198442,22.0204229],[-152.8198442,23.0857474],[-154.116231,23.0857474],[-155.2697954,23.0958536],[-156.5112505,23.0857474],[-158.1042681,23.0958536],[-159.4775591,23.0655328],[-160.9057817,23.0554244]]]}},{"folder":"Type 2 [Habitat-Based Regionals]","name":"Corsola/Pa’u Oricorio","english":["Corsola","Pa’u Oricorio"],"german":["Corasonn","Choreogel (Hula)"],"geometry":{"type":"Polygon","coordinates":[[[-9.8730602,31.1405201],[-15.9403397,30.9844594],[-20.189579,30.8801952],[-23.802537,30.9342908],[-28.64567,31.0092758],[-34.0963484,30.8901409],[-39.426738,30.828582],[-44.6014742,30.9156176],[-49.6031406,30.8120615],[-53.3472016,30.8296243],[-55.8638853,30.818043],[-58.8068607,30.7929712],[-61.8283727,30.7815837],[-64.1057336,30.8240551],[-66.2843656,30.8256618],[-68.3964003,30.8415856],[-71.1216886,30.8648288],[-73.8922327,30.9036423],[-76.6061928,30.9021854],[-79.6780482,30.930443],[-82.1168898,30.932255],[-84.2487434,30.9835443],[-86.8523484,30.9883056],[-89.2438965,31.0050124],[-91.0297149,31.0043649],[-92.8164803,31.0011573],[-94.2435175,30.9957742],[-95.4522558,30.9903655],[-97.4799473,30.9876793],[-98.7757055,30.9959298],[-100.9234648,27.0096587],[-100.0400649,22.3826332],[-101.2687294,20.9937268],[-104.2592833,24.474896],[-106.8102442,27.8625293],[-111.2273666,31.0519459],[-115.3513697,31.081647],[-117.3939438,31.0874676],[-119.1984618,31.1222558],[-122.3722559,31.1319945],[-126.1960924,31.1624648],[-131.4947178,31.1922318],[-139.8822028,31.2843323],[-145.4591375,31.2839777],[-155.2020422,31.312575],[-162.7126005,31.3995877],[-167.4612609,31.3617441],[-171.4315472,31.2318951],[-176.4400706,31.2135856],[179.1692626,31.173936],[174.0524992,31.2160826],[165.4890964,31.0286072],[160.4342741,30.9597223],[155.5141738,30.8661785],[150.0901759,30.8175575],[145.3815998,30.8292284],[141.4061321,30.8501124],[137.6676859,30.8552472],[133.9763724,30.866859],[130.1320517,30.895796],[126.6151981,30.9277537],[123.9974778,30.9565044],[121.7315405,30.9774533],[119.9762153,30.9791843],[119.4822065,29.2348055],[117.928279,27.1142978],[116.4967885,25.9576725],[115.2193979,24.7522335],[113.7492959,24.1417649],[111.7776431,23.7140653],[109.8817007,23.561248],[92.7431808,24.0928872],[90.3978269,24.4591837],[87.6307239,24.7685212],[85.6999548,24.1574274],[73.7226059,24.2159078],[72.0647136,24.9659701],[67.6514684,27.1955854],[62.3471546,27.9932575],[60.1037347,27.9522144],[57.2315282,28.561835],[54.176727,29.1549615],[52.5606432,31.0079201],[49.7380794,30.8439855],[44.7438127,30.7820179],[45.9741178,27.5570092],[48.768518,23.3022446],[52.2153465,21.1561647],[55.5309196,22.2955058],[54.6632579,20.3844527],[51.0451227,18.8237121],[45.8143578,16.948764],[44.8821521,18.0995502],[41.6638374,22.5410451],[38.6189052,26.0933813],[36.8434551,28.4869537],[35.258142,29.7517315],[33.5406249,31.1790328],[30.3539301,31.0598979],[27.6323001,31.1174246],[26.362672,31.192921],[23.704193,31.2472629],[21.0012214,31.2715175],[18.3919199,31.2726521],[15.8626621,31.2437797],[13.82018,31.2426341],[9.9582717,31.0975627],[11.8449804,30.8195168],[13.3757519,30.502565],[14.3954242,29.6490472],[16.1912139,29.0631292],[18.7789897,28.0479114],[20.6440146,28.0554983],[22.2545047,29.2621584],[22.8185884,30.4967223],[25.1016404,29.5437103],[28.9783511,28.8947811],[30.1158967,28.0202289],[32.0642181,23.9313349],[34.230276,20.1698059],[36.2115913,16.0309512],[41.2219555,8.5632616],[43.3809818,7.3593591],[44.090565,5.6629187],[40.0646189,2.7352649],[36.3951438,0.2568017],[35.8592962,-2.3905462],[36.8831946,-11.1572569],[37.0007472,-13.8184392],[33.8380723,-16.7348841],[31.7758851,-19.553338],[32.6872899,-22.6865188],[30.9055821,-23.9340014],[30.0281674,-25.7798741],[33.9431073,-25.8378162],[37.2509118,-25.8407001],[40.8028922,-25.8473073],[43.9081896,-25.8941862],[45.6245026,-25.9193263],[47.6947949,-25.9561292],[49.4898176,-25.9353591],[53.3486982,-25.9739475],[55.2132596,-26.0123918],[59.2452843,-26.0220039],[62.6465338,-26.011137],[66.299694,-25.8854081],[69.3405539,-25.9684893],[72.9738702,-25.7732303],[77.8478919,-25.7889412],[87.2241138,-25.9011762],[92.5305345,-26.1447776],[97.3919282,-26.2469562],[101.4153377,-26.0607277],[105.6521469,-26.1545034],[109.3609172,-26.1413373],[113.6090926,-26.0635771],[114.9633694,-26.0691184],[114.8896323,-22.9591519],[119.7889378,-21.3915166],[123.6841364,-17.9149865],[126.9228351,-15.9903977],[130.6806572,-15.9714886],[134.9236675,-15.5879592],[138.1647282,-17.6821249],[141.3681879,-18.4767463],[145.5715547,-18.7497148],[148.0921879,-21.7502209],[150.6500166,-24.1988793],[151.853642,-25.8026412],[153.0472339,-27.0721797],[156.873194,-27.0393387],[160.3934371,-27.0391951],[164.3315572,-27.1710527],[168.1206229,-27.1942641],[172.1627062,-27.0857387],[176.9902805,-26.9382684],[-172.2956982,-27.2560217],[-165.4342248,-27.0839054],[-157.1180891,-27.3828246],[-147.7651953,-27.2019117],[-133.7622327,-26.9706395],[-119.5669501,-26.7038461],[-106.9411339,-26.5642586],[-92.7051728,-26.6555626],[-82.2009483,-26.491401],[-77.0479595,-26.3582221],[-74.4724702,-26.3506146],[-70.4805681,-26.2021512],[-67.730384,-26.0516216],[-67.2426696,-22.0095771],[-67.699906,-16.22921],[-70.7117075,-13.7030529],[-74.6058639,-8.351967],[-76.3632214,-4.3242599],[-75.0591351,0.4602624],[-72.9448494,5.2373984],[-69.6291923,6.7288898],[-65.9274051,6.6565043],[-62.3645572,5.0828222],[-59.3131786,3.5354593],[-55.7854924,1.0547215],[-53.7318478,-1.1392688],[-50.8845203,-3.4198878],[-46.2468024,-4.6854824],[-37.4326971,-5.0147754],[-31.4062199,-5.0241429],[-25.30721,-5.0119669],[-18.7225409,-4.987044],[-13.3548468,-5.0002811],[-9.8725249,-4.8987376],[1.5368346,-4.5982864],[11.3112549,-4.4354411],[12.3565641,-4.4150876],[10.1557311,-1.0447361],[11.0848511,2.5290932],[10.1852768,5.8438644],[7.0741069,7.6479433],[2.7268913,9.0455965],[-4.4269965,6.9624321],[-10.0933303,9.2060823],[-12.0053514,11.0537785],[-12.8358667,13.4404954],[-13.1039698,14.3954109],[-13.110911,16.2011545],[-13.2036401,21.3364108],[-13.0046678,22.6730186],[-12.0904078,24.3326327],[-11.6732044,25.3200941],[-9.7877374,26.3047469],[-9.8730602,31.1405201]]]}},{"folder":"Type 2 [Habitat-Based Regionals]","name":"Carnivine","english":["Carnivine"],"german":["Venuflibis"],"geometry":{"type":"Polygon","coordinates":[[[-87.0406486,36.638558],[-87.2245764,24.8972135],[-79.8857092,24.777572],[-75.0956701,24.7775719],[-75.0216056,36.5591767],[-79.6907951,36.5503515],[-84.4039299,36.576824],[-87.0406486,36.638558]]]}},{"folder":"Type 1 [Geographical Regionals] (Future Region Predictions)","name":"Indian Ocean","english":["Indian Ocean"],"german":["Indian Ocean"],"geometry":{"type":"Polygon","coordinates":[[[52.8222675,1.9332268],[52.03125,-61.7731229],[59.765625,-61.7731229],[66.796875,-61.9389504],[74.53125,-61.9389504],[82.7929688,-61.9389505],[91.7578125,-61.7731229],[101.25,-61.7731229],[108.6328125,-61.6063964],[111.796875,-61.522695],[111.9561768,1.7067483],[103.0078125,1.7575368],[92.109375,1.9771466],[83.3203125,2.1088987],[76.3561664,2.0794282],[69.8737758,2.1060142],[61.2597656,1.9771466],[52.8222675,1.9332268]]]}},{"folder":"Type 1 [Geographical Regionals] (Future Region Predictions)","name":"Malay Archipelago","english":["Malay Archipelago"],"german":["Malay Archipelago"],"geometry":{"type":"Polygon","coordinates":[[[112.0222351,20.8938841],[111.6210938,-11.0921659],[118.1733601,-10.983058],[123.75,-11.0059045],[130.078125,-10.833306],[135.703125,-10.660608],[139.7460938,-10.9196178],[139.7460978,20.9614396],[133.7695333,20.9614396],[128.5620178,20.9409197],[123.0249063,20.9203969],[117.8173868,20.8177411],[112.0222351,20.8938841]]]}},{"folder":"Type 1 [Geographical Regionals] (Future Region Predictions)","name":"Greenland","english":["Greenland"],"german":["Greenland"],"geometry":{"type":"Polygon","coordinates":[[[-62.8899613,29.0921022],[-56.8652344,29.0753752],[-48.8671875,28.9216313],[-37.8768593,29.0766214],[-28.1397269,29.1436267],[-28.0780564,67.6930404],[-22.2964334,67.6464554],[-13.2877821,67.6968464],[-0.4255646,67.7617242],[9.4021206,67.6848782],[19.0294378,67.6281471],[27.8880865,67.5133968],[36.5751531,67.5613206],[44.9819703,67.5219765],[53.5529811,67.5813142],[51.9433614,85.0288468],[41.2207071,85.0359415],[29.8828125,85.0511288],[21.4453125,85.0207077],[11.6015625,85.0511288],[4.1524615,85.0806101],[-5.625,85.0511288],[-15.46875,85.0511288],[-23.203125,85.0207077],[-31.640625,85.0511288],[-39.2983701,85.0620929],[-49.5703125,85.0207077],[-56.25,85.0435409],[-62.9296875,85.0511288],[-62.8899613,29.0921022]]]}},{"folder":"Type 1 [Geographical Regionals] (Future Region Predictions)","name":"Eastern Pacific","english":["Eastern Pacific"],"german":["Eastern Pacific"],"geometry":{"type":"Polygon","coordinates":[[[-129.7049052,51.9163929],[-139.0429687,51.7270282],[-147.7001953,51.9442648],[-156.796875,52.0524905],[-172.7929687,51.5087425],[-177.1899046,51.6927994],[178.7695373,51.3443387],[179.4726563,-12.8546489],[-156.7749163,-13.132979],[-156.4453165,-50.0641918],[-143.0859375,-50.7364551],[-129.0234375,-50.7364552],[-129.7049052,51.9163929]]]}},{"folder":"Type 1 [Geographical Regionals] (Future Region Predictions)","name":"Western Pacific","english":["Western Pacific"],"german":["Western Pacific"],"geometry":{"type":"Polygon","coordinates":[[[178.7695373,51.3443387],[173.2763793,51.2344073],[167.3437521,51.3443387],[159.8730489,51.179343],[154.2476615,50.6799],[154.4676551,21.0836313],[139.7460958,20.9614396],[139.7460958,-0.5273363],[154.2480489,-0.3955047],[154.2919962,-12.8010882],[166.7147588,-12.8679333],[179.4726563,-12.8546489],[178.7695373,51.3443387]]]}},{"folder":"Type 1 [Geographical Regionals] (Future Region Predictions)","name":"Arctic","english":["Arctic"],"german":["Arctic"],"geometry":{"type":"Polygon","coordinates":[[[59.5656778,67.66648],[87.206391,67.5169917],[105.1411255,67.9642187],[123.4321834,67.9628762],[144.7952752,67.9310079],[154.8191355,68.0714537],[169.1494251,68.0950643],[-179.3346701,68.0662897],[-163.0147619,67.9028756],[-145.1916138,67.9678554],[-122.2691713,67.8123225],[-99.0510473,67.8127055],[-87.3749088,67.8100953],[-71.3334416,68.0944105],[-54.1980242,68.1040319],[-34.9641471,67.9635529],[-16.1833516,68.0693841],[-3.3109929,67.7418725],[6.8686002,68.0725594],[19.4128418,67.6050353],[37.0129395,67.5463631],[59.5656778,67.66648]]]}},{"folder":"Geoblock Region","name":"China Geoblock","english":["China Geoblock"],"german":["China Geoblock"],"geometry":{"type":"Polygon","coordinates":[[[118.599704,24.325883],[120.228212,24.0531],[120.395501,26.623242],[124.833977,26.249418],[124.361565,38.044059],[124.85595,38.044059],[125.482171,37.357356],[128.811028,39.550936],[98.408684,46.114308],[97.771477,44.975614],[96.431145,45.037754],[96.079582,43.877239],[94.255852,43.924735],[94.124016,42.693673],[85.12409,31.214182],[84.992254,28.624521],[87.27741,28.605232],[87.299382,27.811356],[92.682683,28.04432],[94.748113,29.316549],[96.37409,29.220711],[96.615789,28.566643],[97.714422,28.508734],[97.604558,23.676191],[100.59284,21.127004],[101.581609,22.939646],[104.503972,22.838434],[104.679754,23.625874],[106.789129,23.162048],[106.613347,21.842603],[114.090645,20.859728],[114.137337,21.872605],[113.474257,22.046109],[113.482031,22.258102],[113.592581,22.330529],[113.773842,22.469042],[113.94825,22.448102],[113.95855,22.515989],[114.041671,22.504941],[114.049224,22.502245],[114.055233,22.503118],[114.05755,22.505734],[114.057722,22.509382],[114.059352,22.513346],[114.062013,22.515329],[114.065189,22.516994],[114.068966,22.517152],[114.072055,22.517945],[114.074459,22.520244],[114.077841,22.529056],[114.079472,22.530563],[114.082004,22.531038],[114.084364,22.532109],[114.086896,22.534011],[114.088398,22.536192],[114.091531,22.537064],[114.093806,22.536271],[114.096123,22.534289],[114.097968,22.534289],[114.102346,22.534804],[114.104105,22.535121],[114.107667,22.533694],[114.109126,22.531356],[114.111787,22.529492],[114.114276,22.530523],[114.115993,22.531554],[114.116036,22.532902],[114.116422,22.534091],[114.117237,22.534447],[114.119297,22.534527],[114.120628,22.535478],[114.121786,22.537262],[114.125134,22.538926],[114.130687,22.541551],[114.138841,22.543216],[114.144248,22.54171],[114.14545,22.540838],[114.14854,22.542027],[114.148368,22.543374],[114.1506,22.546228],[114.151716,22.546704],[114.151458,22.547497],[114.150342,22.54718],[114.14957,22.548448],[114.149827,22.550905],[114.151544,22.550905],[114.15163,22.554948],[114.15635,22.554393],[114.159354,22.560576],[114.161586,22.562002],[114.163474,22.559228],[114.166049,22.559307],[114.167508,22.561368],[114.169654,22.561051],[114.170942,22.559387],[114.176521,22.560179],[114.177551,22.558515],[114.177722,22.555582],[114.181156,22.554234],[114.181842,22.555582],[114.18682,22.554551],[114.187078,22.555978],[114.195747,22.55582],[114.196433,22.557326],[114.201412,22.557564],[114.201669,22.556216],[114.207248,22.556533],[114.20905,22.557246],[114.213428,22.554948],[114.217977,22.555978],[114.221238,22.553045],[114.222097,22.55146],[114.227247,22.547814],[114.225616,22.545673],[114.226474,22.544167],[114.23716,22.545356],[114.246601,22.556097],[114.24952,22.5536],[114.299461,22.563223],[114.312164,22.578916],[114.426035,22.561983],[114.430155,22.389402],[114.511179,22.381783],[114.512553,21.760733],[114.144511,21.870378],[114.100848,20.857276],[118.451434,20.033746],[118.599704,24.325883]]]}},{"folder":"Confirmed Spawn Points","name":"Pansage Spawn","english":["Pansage Spawn"],"german":["Pansage Spawn"],"geometry":{"type":"Point","coordinates":[90.4858278,56.2348717]}},{"folder":"Confirmed Spawn Points","name":"Pansear Spawn","english":["Pansear Spawn"],"german":["Pansear Spawn"],"geometry":{"type":"Point","coordinates":[82.9378939,55.009464]}},{"folder":"Type 1 [Geographical Regionals]","name":"Hawlucha","english":["Hawlucha"],"german":["Resladero"],"geometry":{"type":"Polygon","coordinates":[[[-117.4,32.7],[-114.8,32.7],[-110.5,31.4],[-106.5,31.8],[-103.0,29.0],[-100.0,28.7],[-99.5,27.5],[-97.4,25.9],[-97.2,21.5],[-94.8,18.5],[-92.0,18.5],[-90.4,21.5],[-86.7,21.5],[-86.7,19.5],[-87.5,17.8],[-88.3,17.8],[-89.2,17.5],[-91.4,16.0],[-92.2,14.5],[-95.5,16.2],[-100.0,16.7],[-104.3,19.5],[-105.5,20.0],[-106.5,23.2],[-108.5,22.5],[-110.3,22.7],[-110.5,23.5],[-112.5,27.0],[-114.5,29.5],[-115.5,30.5],[-116.5,31.5],[-117.4,32.7]]]}},{"folder":"Type 1 [Geographical Regionals]","name":"Stonjourner","english":["Stonjourner"],"german":["Humanolith"],"geometry":{"type":"Polygon","coordinates":[[[-7.6,55.2],[-5.5,54.3],[-6.0,50.0],[-3.0,50.6],[0.5,50.9],[1.8,52.5],[0.0,53.7],[-1.5,55.0],[-1.7,56.0],[-2.0,57.7],[-3.5,58.7],[-5.0,58.6],[-6.5,58.0],[-7.5,57.0],[-6.4,55.9],[-5.3,54.8],[-7.6,55.2]]]}}]`);
+
+// Hemispheric regionals not covered by a KMZ polygon. Two families:
+//   - Type 3 paired (Zangoose/Seviper, Lunatone/Solrock) + Type 4 hemispheric
+//     (Sawk/Throh, Heatmor/Durant) — KMZ ships only a LineString. Species
+//     assignments here track the current Niantic rotation; update when Niantic
+//     announces a swap (Leek Duck / GO Hub post the day-of). Last verified May 2026.
+//   - Fixed hemispheric (Volbeat/Illumise + Ultra Beasts). No rotation —
+//     Volbeat/Illumise + Stakataka/Blacephalon ride the same E/W L-line,
+//     Celesteela/Kartana ride a N/S split at the equator.
+// Polygons add intermediate vertices along the top/bottom edges so every
+// consecutive lon step stays under 180° — otherwise unwrapRing flips the
+// polygon inside-out across the antimeridian.
+
+// Exact KMZ "Type 3 [Paired Regional Line]" vertices, traced top→south so the
+// polygons below can splice them in either order without resampling. Source:
+// POGO_REGIONS_KMZ entry of the same name (community KMZ by u/zoglandboy /
+// u/Mattman243 / pokemoncalendar.com). DO NOT round — these are the canonical
+// dividing-line coordinates and anyone right on the Mediterranean coast or in
+// eastern Iran lands differently for a tenth of a degree.
+const PAIRED_LINE_VERTICES = [
+  [-29.0478436, 85.0397427],
+  [-29.1357322, 33.3213485],
+  [-21.3835305, 33.3385554],
+  [-14.5557243, 33.3327905],
+  [-6.5154841,  33.496424],
+  [1.1645508,   33.5413946],
+  [9.3965509,   33.5230259],
+  [17.5122071,  33.3947592],
+  [26.916504,   33.3764123],
+  [36.2400056,  33.3935447],
+  [43.59375,    33.4497766],
+  [49.5074177,  33.4598794],
+  [54.5800781,  33.4864354],
+  [53.437502,  -85.0207077],
+];
+const PAIRED_LINE_REV = [...PAIRED_LINE_VERTICES].reverse();
+const PAIRED_LINE = {
+  // Europe (above the line from -29°W to +54°E) + Asia + Oceania (east of the
+  // line from +54°E south). Traces the KMZ vertices, then wraps back via the
+  // antimeridian. Intermediate vertices on the top edge keep every consecutive
+  // lon step under 180°.
+  east: [...PAIRED_LINE_VERTICES, [180, -85], [180, 85], [90, 85], [0, 85], PAIRED_LINE_VERTICES[0]],
+  // Complement: Americas + Greenland (west of the line above 33°N) + Africa +
+  // S. Atlantic (west of the line below 33°N). Walks the KMZ line bottom→top
+  // (so winding stays consistent), then wraps back via the antimeridian.
+  west: [...PAIRED_LINE_REV, [-180, 85], [-180, -85], [-100, -85], [-30, -85], PAIRED_LINE_REV[0]],
+};
+// KMZ Chatot polygon top edge, traced verbatim. Used as the canonical N/S
+// boundary for hemispheric Ultra Beasts (Celesteela south / Kartana north)
+// so the dividing line matches the same KMZ source as everything else.
+// Slight variation (±0.01°) — DO NOT round.
+const EQUATOR_KMZ_VERTICES = [
+  [-180,         -0.0655574],
+  [-120.5886795, -0.0690087],
+  [-28.6095949,  -0.0750637],
+  [78.4737327,   -0.0655574],
+  [145.7979514,  -0.0655574],
+  [180,          -0.0655574],
+];
+const EQUATOR_KMZ_VERTICES_REV = [...EQUATOR_KMZ_VERTICES].reverse();
+const EQUATOR_SPLIT = {
+  // Northern hemisphere — above the Chatot top edge to lat 85.
+  north: [
+    ...EQUATOR_KMZ_VERTICES,
+    [180, 85], [90, 85], [0, 85], [-90, 85], [-180, 85],
+    EQUATOR_KMZ_VERTICES[0],
+  ],
+  // Southern hemisphere — below the Chatot top edge to lat -85.
+  south: [
+    ...EQUATOR_KMZ_VERTICES_REV,
+    [-180, -85], [-90, -85], [0, -85], [90, -85], [180, -85],
+    EQUATOR_KMZ_VERTICES_REV[0],
+  ],
+};
+// Iberian Peninsula ring — used standalone for Paldean Combat AND as a hole in
+// the "Eastern minus Iberian" polygon below so Paldean Blaze auto-drops for
+// Europe/Asia/Oceania users except in Iberian (where Combat takes priority).
+const IBERIAN_RING = [
+  [-9.6, 43.8],   // NW Spain (Galicia)
+  [-1.8, 43.5],   // Bay of Biscay (Bilbao)
+  [ 0.5, 42.9],   // Pyrenees / Andorra
+  [ 3.3, 42.5],   // NE Spain (Costa Brava)
+  [ 0.2, 39.0],   // Valencia
+  [-0.9, 37.6],   // SE Spain
+  [-2.0, 36.7],   // Almeria
+  [-5.4, 36.0],   // Gibraltar
+  [-7.4, 37.0],   // S Portugal (Faro)
+  [-9.0, 37.0],   // SW Portugal (Sagres)
+  [-9.6, 38.5],   // Lisbon coast (Cabo Espichel)
+  [-9.6, 41.0],   // W Portugal coast
+  [-9.0, 43.0],   // NW Portugal
+  [-9.6, 43.8],   // close
+];
+
+const POGO_REGIONS_ROTATING = [
+  {
+    folder: "Type 3/4 [Paired/Hemispheric] (E side, manually maintained)",
+    name: "Eastern paired/hemispheric (Europe + Asia + Oceania)",
+    english: ["Zangoose", "Sawk",      "Solrock", "Heatmor",   "Volbeat", "Stakataka"],
+    german:  ["Sengo",    "Karadonis", "Sonnfel", "Furnifraß", "Volbeat", "Muramura"],
+    // Paired/hemispheric species DO cover Iberian per the canonical table —
+    // Madrid catches Sengo/Karadonis/etc. locally. No Iberian carve-out here.
+    geometry: { type: "Polygon", coordinates: [PAIRED_LINE.east] },
+  },
+  {
+    folder: "Type 4 [Paldean Blaze region] (manually maintained)",
+    name: "Eastern Hemisphere minus Iberian — Paldean Tauros (Blaze)",
+    english: [],
+    german:  [],
+    // Paldean Blaze (Fighting/Fire) is locally caught throughout Eastern
+    // Hemisphere EXCEPT Iberian Peninsula, where Combat takes priority. The
+    // Iberian ring sits as an inner ring (hole) so Madrid/Lisbon land in the
+    // outer-but-not-inner band and don't drop Blaze protection.
+    typeChecks: [{ species: "Tauros", type: "fire" }],
+    geometry: { type: "Polygon", coordinates: [PAIRED_LINE.east, IBERIAN_RING] },
+  },
+  {
+    folder: "Type 3/4 [Paired/Hemispheric] (W side, manually maintained)",
+    name: "Western paired/hemispheric (Americas + Africa)",
+    english: ["Seviper", "Throh",    "Lunatone",  "Durant",    "Illumise", "Blacephalon"],
+    german:  ["Vipitis", "Jiutesto", "Lunastein", "Fermicula", "Illumise", "Kopplosio"],
+    // Paldean Tauros (Aqua, Fighting/Water) — western hemisphere local. No
+    // sub-regional carve-out for the Americas (the base Tauros region IS
+    // inside, but base Tauros uses {Tauros, normal} not {Tauros, water}, so
+    // there's no typeCheck conflict — both drop independently for a NY user).
+    typeChecks: [{ species: "Tauros", type: "water" }],
+    geometry: { type: "Polygon", coordinates: [PAIRED_LINE.west] },
+  },
+  {
+    folder: "Ultra Beast [Hemispheric N/S] (manually maintained)",
+    name: "Northern Hemisphere Ultra Beast",
+    english: ["Kartana"],
+    german:  ["Katagami"],
+    geometry: { type: "Polygon", coordinates: [EQUATOR_SPLIT.north] },
+  },
+  {
+    folder: "Ultra Beast [Hemispheric N/S] (manually maintained)",
+    name: "Southern Hemisphere Ultra Beast",
+    english: ["Celesteela"],
+    german:  ["Kaguron"],
+    geometry: { type: "Polygon", coordinates: [EQUATOR_SPLIT.south] },
+  },
+  {
+    folder: "Type 1 [Sub-regional] (manually maintained)",
+    name: "Iberian Peninsula — Paldean Tauros (Combat)",
+    english: [],
+    german:  [],
+    // Paldean Tauros (Combat, Fighting only) — Iberian-local. No bare-species
+    // entry: the base "Tauros" lives as a typeCheck {Tauros, normal} in the
+    // regionals group, region-aware via the Tauros KMZ polygon below.
+    typeChecks: [{ species: "Tauros", type: "fighting" }],
+    geometry: { type: "Polygon", coordinates: [IBERIAN_RING] },
+  },
+];
+
+// Inject form-by-type typeChecks onto specific KMZ entries so the bare-species
+// collector for that region can be replaced with a region-aware typeCheck.
+// Keyed by KMZ "name" field — see POGO_REGIONS_KMZ above.
+const KMZ_TYPE_CHECKS = {
+  // Base Tauros (Normal type) is local in the US+Canada Tauros polygon; this
+  // lets us protect it via a typeCheck {Tauros, normal} in the regionals group
+  // instead of a bare "Tauros" collector that would over-protect Paldean forms.
+  "Tauros": [{ species: "Tauros", type: "normal" }],
+};
+const POGO_REGIONS_KMZ_TAGGED = POGO_REGIONS_KMZ.map(r =>
+  KMZ_TYPE_CHECKS[r.name] ? { ...r, typeChecks: KMZ_TYPE_CHECKS[r.name] } : r
+);
+const POGO_REGIONS = [...POGO_REGIONS_KMZ_TAGGED, ...POGO_REGIONS_ROTATING];
+
+// Exported so scripts/verify-regionals.mjs can run the exact production code
+// path against the canonical regional table.
+export function computeHomeLocals(homeLocation) {
+  if (!homeLocation) return [];
+  const out = new Set();
+  for (const r of POGO_REGIONS) {
+    if (r.geometry.type !== "Polygon" && r.geometry.type !== "MultiPolygon") continue;
+    if (pointInRegionGeom(homeLocation, r.geometry)) {
+      r.german.forEach(n => out.add(n));
+    }
+  }
+  return [...out];
+}
+
+// Locally-active typeCheck identities ({species, type} pairs) at home.
+// Used to auto-drop region-specific form protections — e.g. Paldean Tauros
+// (Combat = Fighting) is local on the Iberian Peninsula but remote elsewhere,
+// so a Spanish user keeps protection on Blaze/Aqua but lets Combat go to trash.
+export function computeHomeLocalTypeChecks(homeLocation) {
+  if (!homeLocation) return [];
+  const out = [];
+  const seen = new Set();
+  for (const r of POGO_REGIONS) {
+    if (!r.typeChecks || r.typeChecks.length === 0) continue;
+    if (r.geometry.type !== "Polygon" && r.geometry.type !== "MultiPolygon") continue;
+    if (!pointInRegionGeom(homeLocation, r.geometry)) continue;
+    for (const tc of r.typeChecks) {
+      const key = `${tc.species}|${tc.type}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({ species: tc.species, type: tc.type });
+    }
+  }
+  return out;
+}
 
 const KEY_LASTPIN = "pogo:lastpin";
 const KEY_BAZAARTAGS = "pogo:bazaartags";
@@ -1653,14 +1947,30 @@ function pointInRing(pt, ring) {
   return inside;
 }
 function pointInRegionGeom(pt, geom) {
+  // GeoJSON Polygon: coordinates[0] is the outer ring, coordinates[1..] are holes.
+  // Point is "inside" iff it's inside the outer ring AND not inside any hole.
   if (geom.type === "Polygon") {
-    const ring = unwrapRing(geom.coordinates[0]);
-    return pointInRing(shiftPointToRing(pt, ring), ring);
+    const rings = geom.coordinates;
+    if (!rings.length) return false;
+    const outer = unwrapRing(rings[0]);
+    if (!pointInRing(shiftPointToRing(pt, outer), outer)) return false;
+    for (let i = 1; i < rings.length; i++) {
+      const hole = unwrapRing(rings[i]);
+      if (pointInRing(shiftPointToRing(pt, hole), hole)) return false;
+    }
+    return true;
   }
   if (geom.type === "MultiPolygon") {
     for (const poly of geom.coordinates) {
-      const ring = unwrapRing(poly[0]);
-      if (pointInRing(shiftPointToRing(pt, ring), ring)) return true;
+      if (!poly.length) continue;
+      const outer = unwrapRing(poly[0]);
+      if (!pointInRing(shiftPointToRing(pt, outer), outer)) continue;
+      let inHole = false;
+      for (let i = 1; i < poly.length; i++) {
+        const hole = unwrapRing(poly[i]);
+        if (pointInRing(shiftPointToRing(pt, hole), hole)) { inHole = true; break; }
+      }
+      if (!inHole) return true;
     }
     return false;
   }
@@ -1769,6 +2079,7 @@ export default function App() {
   const [copied, setCopied] = useState({
     trash: false, trade: false, sort: false, luckySort: false, prestaged: false, gift: false,
     // Aux pro-tools
+    tradedTrashSort: false,
     shadowCheap: false, shadowSafe: false, shadowHundoCandidates: false, shadowFrustration: false,
     evoSwapCandy: false, evoSwapItem: false,
     cheapEvolve: false, dexPlus: false, megaEvolve: false, pilotLong: false,
@@ -1819,17 +2130,8 @@ export default function App() {
   useEffect(() => { if (loaded) saveJSON(KEY_STEP, currentStep); }, [currentStep, loaded]);
 
   // Locals at home location (drives auto-drop from Regionals protection + bazaar suggestions)
-  const homeLocals = useMemo(() => {
-    if (!homeLocation) return [];
-    const out = new Set();
-    for (const r of POGO_REGIONS) {
-      if (r.geometry.type !== "Polygon" && r.geometry.type !== "MultiPolygon") continue;
-      if (pointInRegionGeom(homeLocation, r.geometry)) {
-        r.german.forEach(n => out.add(n));
-      }
-    }
-    return [...out];
-  }, [homeLocation]);
+  const homeLocals = useMemo(() => computeHomeLocals(homeLocation), [homeLocation]);
+  const homeLocalTypeChecks = useMemo(() => computeHomeLocalTypeChecks(homeLocation), [homeLocation]);
 
   // Build effective config: home-locals get auto-removed from collector protections
   // across ALL regional groups (so e.g. Sengo in collectibles also gets dropped if Bonn is home).
@@ -1856,7 +2158,7 @@ export default function App() {
   // explicitly picked a different one (e.g. their PoGo client is set to a
   // different language than their browser).
   const effectiveOutputLocale = effectiveConfig.expertMode ? outputLocale : locale;
-  const { trash, trade, sort, luckySort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
+  const { trash, tradedTrashSort, trade, sort, luckySort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
           luckyHundoSet,
           trashClauses, tradeClauses, sortClauses, luckySortClauses, prestagedClauses, giftClauses,
           shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
@@ -1869,8 +2171,8 @@ export default function App() {
           rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
           rocketTypeLabels,
           pvpFilters, pvpRankingsFetchedAt, cupFilters } = useMemo(
-    () => buildFilters(hundos, luckies, { ...effectiveConfig, topAttackers, topMaxAttackers }, homeLocals, effectiveOutputLocale, t),
-    [hundos, luckies, effectiveConfig, homeLocals, effectiveOutputLocale, topAttackers, topMaxAttackers, t]
+    () => buildFilters(hundos, luckies, { ...effectiveConfig, topAttackers, topMaxAttackers }, homeLocals, effectiveOutputLocale, t, homeLocalTypeChecks),
+    [hundos, luckies, effectiveConfig, homeLocals, homeLocalTypeChecks, effectiveOutputLocale, topAttackers, topMaxAttackers, t]
   );
 
   function addHundo() {
@@ -2168,7 +2470,7 @@ export default function App() {
               onNext={() => gotoStep(3)}
               nextLabel={t("app.step.what.next_label")}
             >
-              <ConfigPanel config={config} setConfig={setConfig} homeLocals={homeLocals} />
+              <ConfigPanel config={config} setConfig={setConfig} homeLocals={homeLocals} homeLocalTypeChecks={homeLocalTypeChecks} />
             </StepWrapper>
           )}
 
@@ -2346,6 +2648,16 @@ export default function App() {
                           copied={copied.prestaged}
                           onCopy={() => copyToClipboard("prestaged", prestaged)}
                           hint={t("app.filter.prestaged_hint", { params: { tags: [effectiveConfig.basarTagName, effectiveConfig.fernTauschTagName].filter(Boolean).map(tag => `#${tag}`).join(", ") } })}
+                        />
+                      )}
+                      {tradedTrashSort && (
+                        <FilterBox
+                          label={t("app.filter.traded_trash_sort_label")}
+                          accent="#E67E22"
+                          filterStr={tradedTrashSort}
+                          copied={copied.tradedTrashSort}
+                          onCopy={() => copyToClipboard("tradedTrashSort", tradedTrashSort)}
+                          hint={t("app.filter.traded_trash_sort_hint")}
                         />
                       )}
                       {gift && (
@@ -3865,8 +4177,14 @@ const PRESETS = {
     labelKey: "app.preset.collector.label",
     descriptionKey: "app.preset.collector.description",
     apply: (cfg) => {
+      // Maximalist preset: every regional form on, including C-tier base
+      // Alolan/Galarian junk that the recommended default skips.
       const groups = defaultRegionalToggles();
-      for (const k of Object.keys(groups)) groups[k].enabled = true;
+      for (const k of Object.keys(groups)) {
+        groups[k].enabled = true;
+        groups[k].typeChecksEnabled = null;
+        groups[k].collectorsEnabled = null;
+      }
       return { ...cfg,
         pvpMode: "none",
         protectFavorites: true, protectShinies: true, protectLuckies: true,
@@ -3939,6 +4257,7 @@ const EXPERT_ONLY_KEYS = new Set([
   "protectBuddies",
   "protectDynamax",
   "protectLuckyEligible",
+  "trashTradedRegionals",
   "leagueTags",
   "customProtectedTags",
   "cpCap",
@@ -3947,7 +4266,7 @@ const EXPERT_ONLY_KEYS = new Set([
   "luckyEligibleYear",
 ]);
 
-function ConfigPanel({ config, setConfig, homeLocals = [] }) {
+function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks = [] }) {
   const { t, outputLocale } = useTranslation();
   // Any individual change in ConfigPanel clears the preset marker — the
   // marker means "this preset is currently in effect"; the moment the
@@ -3975,6 +4294,7 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
     ["protectFourStar",       "app.protect.four_star",      { expertOnly: true, requireConfirmOff: true }],
     ["protectAnyTag",         "app.protect.any_tag"],
     ["protectTradeEvos",      "app.protect.trade_evos"],
+    ["trashTradedRegionals",  "app.protect.trash_traded_regionals", { expertOnly: true }],
     ["protectShinies",        "app.protect.shinies",        { expertOnly: true }],
     ["protectLuckies",        "app.protect.luckies",        { expertOnly: true }],
     ["protectLegendaries",    "app.protect.legendaries"],
@@ -4133,6 +4453,7 @@ function ConfigPanel({ config, setConfig, homeLocals = [] }) {
               state={config.regionalGroups?.[key] || { enabled: true, typeChecksEnabled: null, collectorsEnabled: null }}
               setGroup={(partial) => setGroup(key, partial)}
               homeLocals={homeLocals}
+              homeLocalTypeChecks={homeLocalTypeChecks}
             />
           )}
         </div>
@@ -4250,7 +4571,7 @@ function ToggleRow({ k, label, why, checked, onChange, expertBadge, requireConfi
 }
 
 
-function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = [] }) {
+function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = [], homeLocalTypeChecks = [] }) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const allTC = group.typeChecks.map(tc => tc.species);
@@ -4258,14 +4579,18 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
   const tcEnabled = state.typeChecksEnabled === null ? allTC : state.typeChecksEnabled;
   const colEnabled = state.collectorsEnabled === null ? allCol : state.collectorsEnabled;
   // Home-locals are auto-dropped by effectiveConfig — exclude them from the counter
-  // so the displayed "X/Y aktiv" matches the actual filter output.
+  // so the displayed "X/Y aktiv" matches the actual filter output. typeChecks
+  // need the {species,type} pair to match — same species with different types
+  // (e.g. Paldean Tauros Combat vs Blaze) is the wrong granularity.
   const homeSet = new Set(homeLocals);
+  const tcLocalSet = new Set(homeLocalTypeChecks.map(l => `${l.species}|${l.type}`));
+  const tcLocalCount = group.typeChecks.filter(tc => tcLocalSet.has(`${tc.species}|${tc.type}`)).length;
   const tcEffective = tcEnabled.filter(sp => !homeSet.has(sp));
   const colEffective = colEnabled.filter(sp => !homeSet.has(sp));
-  const totalEffective = allTC.filter(sp => !homeSet.has(sp)).length
+  const totalEffective = allTC.filter(sp => !homeSet.has(sp)).length - tcLocalCount
                        + allCol.filter(sp => !homeSet.has(sp)).length;
-  const droppedByHome = (tcEnabled.length + colEnabled.length) - (tcEffective.length + colEffective.length);
-  const enabledCount = state.enabled ? (tcEffective.length + colEffective.length) : 0;
+  const droppedByHome = (tcEnabled.length + colEnabled.length) - (tcEffective.length + colEffective.length) + tcLocalCount;
+  const enabledCount = state.enabled ? (tcEffective.length + colEffective.length - tcLocalCount) : 0;
 
   function toggleTC(species) {
     const cur = tcEnabled;
@@ -4280,9 +4605,15 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
   function selectAll() {
     setGroup({ enabled: true, typeChecksEnabled: null, collectorsEnabled: null });
   }
+  function selectRecommended() {
+    const recommended = recommendedTypeCheckSpecies(group);
+    const typeChecksEnabled = recommended.length === allTC.length ? null : recommended;
+    setGroup({ enabled: true, typeChecksEnabled, collectorsEnabled: null });
+  }
   function selectNone() {
     setGroup({ typeChecksEnabled: [], collectorsEnabled: [] });
   }
+  const hasTiers = group.typeChecks.some(tc => tc.tier === "C");
 
   return (
     <div className={`border rounded transition ${state.enabled ? "border-[#2D3A47]" : "border-[#1F2933] opacity-60"}`}>
@@ -4317,6 +4648,16 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
             <button onClick={selectAll} className="mono text-[10px] text-[#5EAFC5] hover:text-[#7FCFE5] transition">
               {t("app.regional_editor.select_all")}
             </button>
+            {hasTiers && (
+              <>
+                <span className="text-[#8090A0]">·</span>
+                <button onClick={selectRecommended}
+                  title={t("app.regional_editor.select_recommended_title")}
+                  className="mono text-[10px] text-[#F5B82E] hover:text-[#F8C95B] transition">
+                  {t("app.regional_editor.select_recommended")}
+                </button>
+              </>
+            )}
             <span className="text-[#8090A0]">·</span>
             <button onClick={selectNone} className="mono text-[10px] text-[#8090A0] hover:text-[#E74C3C] transition">
               {t("app.regional_editor.select_none")}
@@ -4330,16 +4671,27 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
               <div className="flex flex-wrap gap-1">
                 {group.typeChecks.map(tc => {
                   const on = tcEnabled.includes(tc.species);
+                  const isHomeLocal = tcLocalSet.has(`${tc.species}|${tc.type}`);
+                  const tierBadge = tc.tier === "S" ? "★" : tc.tier === "C" ? "·" : null;
+                  const tierColor = tc.tier === "S" ? "text-[#F5B82E]"
+                                  : tc.tier === "C" ? "text-[#8090A0]"
+                                  : "text-[#5EAFC5]";
                   return (
                     <button key={`${tc.species}_${tc.type}`}
                       onClick={() => toggleTC(tc.species)}
-                      title={t(tc.noteKey)}
-                      disabled={!state.enabled}
+                      title={isHomeLocal ? t("app.regional_editor.home_local_title") : t(tc.noteKey)}
+                      disabled={!state.enabled || isHomeLocal}
                       className={`mono text-[11px] px-2 py-0.5 rounded transition ${
-                        on
-                          ? "bg-[#5EAFC5]/20 text-[#5EAFC5] border border-[#5EAFC5]/40"
-                          : "bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]"
+                        isHomeLocal
+                          ? "bg-[#27AE60]/10 text-[#27AE60] border border-[#27AE60]/30 line-through opacity-60"
+                          : on
+                            ? "bg-[#5EAFC5]/20 text-[#5EAFC5] border border-[#5EAFC5]/40"
+                            : "bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]"
                       }`}>
+                      {isHomeLocal && <span className="not-italic no-underline mr-0.5">⌂</span>}
+                      {tierBadge && !isHomeLocal && (
+                        <span className={`${tierColor} mr-0.5`}>{tierBadge}</span>
+                      )}
                       {tc.species} <span className="opacity-70">/ !{tc.type}</span>
                     </button>
                   );
@@ -4359,13 +4711,14 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
                   // Home-locals are auto-removed by effectiveConfig regardless of `on`,
                   // so render them as "off" visually with a ⌂ marker.
                   const effectivelyOn = on && !isHomeLocal;
+                  const noteKey = group.collectorNotes?.[sp];
                   return (
                     <button key={sp}
                       onClick={() => toggleCol(sp)}
                       disabled={!state.enabled || isHomeLocal}
                       title={isHomeLocal
                         ? t("app.regional_editor.home_local_title")
-                        : undefined}
+                        : (noteKey ? t(noteKey) : undefined)}
                       className={`mono text-[11px] px-2 py-0.5 rounded transition ${
                         effectivelyOn
                           ? "bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/40"
@@ -4375,6 +4728,9 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
                       }`}>
                       {isHomeLocal && <span className="not-italic no-underline mr-0.5">⌂</span>}
                       {sp}
+                      {noteKey && !isHomeLocal && (
+                        <span className="not-italic no-underline ml-1 opacity-60" aria-hidden="true">ⓘ</span>
+                      )}
                     </button>
                   );
                 })}
