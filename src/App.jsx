@@ -90,6 +90,13 @@ function navigateView(target) {
 // ─── DATA ──────────────────────────────────────────────────────────────────
 
 export const DEFAULT_HUNDOS = [];
+// Personal "lucky Pokémon" roster — species the user has at least one
+// lucky of. Where this overlaps with DEFAULT_HUNDOS, duplicate copies
+// have no remaining purpose (neither IV-chasing nor lucky-friend
+// trading) and get swept into trash, never trade. L \ H still keeps
+// the standard trash/trade behaviour. Stored as lowercase species
+// names; canonicalized on load via `resolveSpecies`.
+export const DEFAULT_LUCKIES = [];
 // Personal "top raid attackers" — species the user trusts to bring to a raid
 // regardless of typing. Used as an OR-allowlist alongside the type-resistor /
 // SE-move clauses, so e.g. Mewtwo always surfaces even when its Psychic
@@ -454,6 +461,7 @@ export function prepareImport(envelope) {
   const canonicalize = (arr) => (arr || []).map(s => resolveSpecies(s) || s);
   const out = {};
   if (Array.isArray(d.hundos))          out.hundos = d.hundos;
+  if (Array.isArray(d.luckies))         out.luckies = canonicalize(d.luckies);
   if (Array.isArray(d.topAttackers))    out.topAttackers = canonicalize(d.topAttackers);
   if (Array.isArray(d.topMaxAttackers)) out.topMaxAttackers = canonicalize(d.topMaxAttackers);
   if (d.config && typeof d.config === "object") out.config = mergeImportedConfig(d.config);
@@ -525,13 +533,25 @@ function capFirst(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", tFn = (k) => k) {
+export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale = "de", tFn = (k) => k) {
   const kw = pogoKeywords(outputLocale);
 
   // Hundos are stored in the user's output-locale lowercase form. Re-render in
   // case the locale changed since they were typed (resolveSpecies normalizes).
   const hundosOut = hundos.map(h => speciesForOutput(h, outputLocale));
   const H = hundosOut.map(h => `+${h}`).join(",");
+
+  // Lucky-hundo intersection: species the user has BOTH a hundo AND a lucky
+  // of. Duplicates of these families have no remaining purpose — neither
+  // IV-chasing nor lucky-friend-trading — so they belong in trash but NOT
+  // in trade. Members of L \ H stay tradeable (the user might still chase
+  // a hundo). Members of H \ L stay tradeable for lucky-friend trades.
+  const luckySet = new Set((luckies || []).map(s => String(s).toLowerCase()));
+  const luckyHundoSet = new Set(hundos.filter(h => luckySet.has(String(h).toLowerCase())));
+  const hundosForTrade = hundos.filter(h => !luckyHundoSet.has(h));
+  const H_trade = hundosForTrade
+    .map(h => `+${speciesForOutput(h, outputLocale)}`)
+    .join(",");
 
   // Personal allowlists for the two PvE-counter contexts. Different rosters
   // because most raid meta attackers (Mewtwo, Rayquaza, Garchomp, …) aren't
@@ -715,7 +735,13 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
   const trash = trashClauses.map(c => c.clause).join("&");
 
   // ── TRADE ──────────────────────────────────────────────────────────────
-  push(tradeClauses, [S012, TE_trim_str, H].filter(Boolean).join(","), tFn("app.clause_why.h_s012_te"));
+  // H_trade = H − (H ∩ L). Species the user has both a hundo and a lucky of
+  // fall out here: trash still surfaces them via the full H clause, but
+  // trade skips them — every duplicate is already redundant.
+  push(tradeClauses, [S012, TE_trim_str, H_trade].filter(Boolean).join(","),
+    luckyHundoSet.size > 0
+      ? tFn("app.clause_why.h_s012_te_lucky_excluded")
+      : tFn("app.clause_why.h_s012_te"));
   push(tradeClauses, [S012, TE_full_str, ivK1Bad].filter(Boolean).join(","), tFn("app.clause_why.not_k1_te"));
   push(tradeClauses, [S012, TE_full_str, ivK2Bad].filter(Boolean).join(","), tFn("app.clause_why.not_k2_te"));
   push(tradeClauses, [S012, TE_full_str, ivK3Bad].filter(Boolean).join(","), tFn("app.clause_why.not_k3_te"));
@@ -817,6 +843,24 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     if (cfg.protectLuckies)  push(sortClauses, `!${kw.flag.lucky}`, tFn("app.clause_why.luckies_protected"));
   }
   const sort = sortClauses.map(c => c.clause).join("&");
+
+  // ── LUCKY-HUNDO-SORT ───────────────────────────────────────────────────
+  // Narrower variant of HUNDO-SORT for the H ∩ L set: species where both
+  // the IV chase and the lucky-friend chase are done. Surface duplicates
+  // so the user can bulk-review and trash. Same protections — the original
+  // hundo/lucky copies stay hidden (they carry favorite / lucky / shiny flags).
+  const luckySortClauses = [];
+  if (luckyHundoSet.size > 0) {
+    const H_lucky = [...luckyHundoSet]
+      .map(h => `+${speciesForOutput(h, outputLocale)}`)
+      .join(",");
+    push(luckySortClauses, H_lucky, tFn("app.clause_why.all_lucky_hundo_families"));
+    if (cfg.protectAnyTag)   push(luckySortClauses, "!#", tFn("app.clause_why.all_tags_protected"));
+    if (cfg.protectFavorites) push(luckySortClauses, `!${kw.flag.favorite}`, tFn("app.clause_why.favorites_protected"));
+    if (cfg.protectShinies)  push(luckySortClauses, `!${kw.flag.shiny}`, tFn("app.clause_why.shinies_protected"));
+    if (cfg.protectLuckies)  push(luckySortClauses, `!${kw.flag.lucky}`, tFn("app.clause_why.luckies_protected"));
+  }
+  const luckySort = luckySortClauses.map(c => c.clause).join("&");
 
   // ── GIFT FILTER ────────────────────────────────────────────────────────
   const giftClauses = [];
@@ -1417,8 +1461,9 @@ export function buildFilters(hundos, cfg, homeLocals = [], outputLocale = "de", 
     }
   }
 
-  return { trash, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
-           trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses,
+  return { trash, trade, sort, luckySort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
+           luckyHundoSet,
+           trashClauses, tradeClauses, sortClauses, luckySortClauses, prestagedClauses, giftClauses,
            // Aux pro-tools
            shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
            evoSwapCandy, evoSwapItem,
@@ -1536,6 +1581,7 @@ function evalTerm(t, mon, kw, outputLocale) {
 // ─── STORAGE ──────────────────────────────────────────────────────────────
 
 const KEY_HUNDOS = "pogo:hundos";
+const KEY_LUCKIES = "pogo:luckies";
 const KEY_TOP_ATTACKERS = "pogo:topAttackers";
 const KEY_TOP_MAX_ATTACKERS = "pogo:topMaxAttackers";
 const KEY_CONFIG = "pogo:config";
@@ -1660,10 +1706,12 @@ function decodeTopo(topology, objectName) {
 export default function App() {
   const { t, locale, outputLocale } = useTranslation();
   const [hundos, setHundos] = useState(DEFAULT_HUNDOS);
+  const [luckies, setLuckies] = useState(DEFAULT_LUCKIES);
   const [topAttackers, setTopAttackers] = useState(DEFAULT_TOP_ATTACKERS);
   const [topMaxAttackers, setTopMaxAttackers] = useState(DEFAULT_TOP_MAX_ATTACKERS);
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [newHundo, setNewHundo] = useState("");
+  const [newLucky, setNewLucky] = useState("");
   const [newTopAttacker, setNewTopAttacker] = useState("");
   const [newTopMaxAttacker, setNewTopMaxAttacker] = useState("");
   const [newMyth, setNewMyth] = useState("");
@@ -1719,7 +1767,7 @@ export default function App() {
   const [lastPin, setLastPin] = useState(null);             // [lon, lat] — inspector
   const [bazaarTags, setBazaarTags] = useState([]);
   const [copied, setCopied] = useState({
-    trash: false, trade: false, sort: false, prestaged: false, gift: false,
+    trash: false, trade: false, sort: false, luckySort: false, prestaged: false, gift: false,
     // Aux pro-tools
     shadowCheap: false, shadowSafe: false, shadowHundoCandidates: false, shadowFrustration: false,
     evoSwapCandy: false, evoSwapItem: false,
@@ -1737,6 +1785,7 @@ export default function App() {
   useEffect(() => {
     (async () => {
       const h = await loadJSON(KEY_HUNDOS, DEFAULT_HUNDOS);
+      const l = await loadJSON(KEY_LUCKIES, DEFAULT_LUCKIES);
       const ta = await loadJSON(KEY_TOP_ATTACKERS, DEFAULT_TOP_ATTACKERS);
       const tma = await loadJSON(KEY_TOP_MAX_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS);
       const c = await loadJSON(KEY_CONFIG, DEFAULT_CONFIG);
@@ -1747,6 +1796,7 @@ export default function App() {
       setHundos(h);
       setConfig(mergeImportedConfig(c));
       const canonicalize = (arr) => (arr || []).map(s => resolveSpecies(s) || s);
+      setLuckies(canonicalize(l));
       setTopAttackers(canonicalize(ta));
       setTopMaxAttackers(canonicalize(tma));
       setHomeLocation(home);
@@ -1759,6 +1809,7 @@ export default function App() {
 
   // Persist on change
   useEffect(() => { if (loaded) saveJSON(KEY_HUNDOS, hundos); }, [hundos, loaded]);
+  useEffect(() => { if (loaded) saveJSON(KEY_LUCKIES, luckies); }, [luckies, loaded]);
   useEffect(() => { if (loaded) saveJSON(KEY_TOP_ATTACKERS, topAttackers); }, [topAttackers, loaded]);
   useEffect(() => { if (loaded) saveJSON(KEY_TOP_MAX_ATTACKERS, topMaxAttackers); }, [topMaxAttackers, loaded]);
   useEffect(() => { if (loaded) saveJSON(KEY_CONFIG, config); }, [config, loaded]);
@@ -1805,8 +1856,9 @@ export default function App() {
   // explicitly picked a different one (e.g. their PoGo client is set to a
   // different language than their browser).
   const effectiveOutputLocale = effectiveConfig.expertMode ? outputLocale : locale;
-  const { trash, trade, sort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
-          trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses,
+  const { trash, trade, sort, luckySort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
+          luckyHundoSet,
+          trashClauses, tradeClauses, sortClauses, luckySortClauses, prestagedClauses, giftClauses,
           shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
           evoSwapCandy, evoSwapItem,
           cheapEvolve, dexPlus, megaEvolve, pilotLong,
@@ -1817,8 +1869,8 @@ export default function App() {
           rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
           rocketTypeLabels,
           pvpFilters, pvpRankingsFetchedAt, cupFilters } = useMemo(
-    () => buildFilters(hundos, { ...effectiveConfig, topAttackers, topMaxAttackers }, homeLocals, effectiveOutputLocale, t),
-    [hundos, effectiveConfig, homeLocals, effectiveOutputLocale, topAttackers, topMaxAttackers, t]
+    () => buildFilters(hundos, luckies, { ...effectiveConfig, topAttackers, topMaxAttackers }, homeLocals, effectiveOutputLocale, t),
+    [hundos, luckies, effectiveConfig, homeLocals, effectiveOutputLocale, topAttackers, topMaxAttackers, t]
   );
 
   function addHundo() {
@@ -1848,6 +1900,23 @@ export default function App() {
     }
   }
   function removeHundo(h) { setHundos(hundos.filter(x => x !== h)); }
+  function addLucky() {
+    // Same parser as addHundo: comma/space/semicolon-split, multi-locale
+    // species resolution, dupes silently ignored, unresolved tokens kept
+    // in the input so the user can fix typos.
+    const tokens = newLucky.split(/[,;\s]+/).filter(Boolean);
+    if (tokens.length === 0) return;
+    const set = new Set(luckies);
+    const unresolved = [];
+    for (const tok of tokens) {
+      const resolved = resolveSpecies(tok);
+      if (resolved) set.add(resolved);
+      else unresolved.push(tok);
+    }
+    setLuckies([...set].sort());
+    setNewLucky(unresolved.length > 0 ? unresolved.join(", ") : "");
+  }
+  function removeLucky(s) { setLuckies(luckies.filter(x => x !== s)); }
   function addTopAttacker() {
     // Same parser as addHundo: comma/space/semicolon-split, multi-locale
     // species resolution, dupes silently ignored, unresolved tokens kept
@@ -1939,6 +2008,7 @@ export default function App() {
       return;
     }
     setHundos(DEFAULT_HUNDOS);
+    setLuckies(DEFAULT_LUCKIES);
     setTopAttackers(DEFAULT_TOP_ATTACKERS);
     setTopMaxAttackers(DEFAULT_TOP_MAX_ATTACKERS);
     setConfig(DEFAULT_CONFIG);
@@ -1957,6 +2027,7 @@ export default function App() {
       exportedAt: new Date().toISOString(),
       data: {
         hundos,
+        luckies,
         topAttackers,
         topMaxAttackers,
         config,
@@ -1990,6 +2061,7 @@ export default function App() {
   function applyImportEnvelope(envelope) {
     const prepared = prepareImport(envelope);
     if ("hundos" in prepared)          setHundos(prepared.hundos);
+    if ("luckies" in prepared)         setLuckies(prepared.luckies);
     if ("topAttackers" in prepared)    setTopAttackers(prepared.topAttackers);
     if ("topMaxAttackers" in prepared) setTopMaxAttackers(prepared.topMaxAttackers);
     if ("config" in prepared)          setConfig(prepared.config);
@@ -2109,62 +2181,89 @@ export default function App() {
               onNext={() => gotoStep(4)}
               nextLabel={t("app.step.have.next_label")}
             >
-              <HundosEditor
-                hundos={hundos}
-                setHundos={setHundos}
-                newHundo={newHundo}
-                setNewHundo={setNewHundo}
-                addHundo={addHundo}
-                removeHundo={removeHundo}
-              />
-              {effectiveConfig.expertMode && (
-                <>
-                  {effectiveConfig.protectMythicals && (
-                    <>
-                      <hr className="my-8 border-[#1F2933]" />
-                      <SpeciesListEditor
-                        items={config.mythTooManyOf || []}
-                        newItem={newMyth}
-                        setNewItem={setNewMyth}
-                        addItem={() => addToConfigList("mythTooManyOf", newMyth, setNewMyth)}
-                        removeItem={(s) => removeFromConfigList("mythTooManyOf", s)}
-                        titleKey="app.protect.myth_carve"
-                        accent="#E91E63"
-                      />
-                    </>
-                  )}
-                  <hr className="my-8 border-[#1F2933]" />
-                  <SpeciesListEditor
-                    items={config.shadowKeeperSpecies || []}
-                    newItem={newKeeper}
-                    setNewItem={setNewKeeper}
-                    addItem={() => addToConfigList("shadowKeeperSpecies", newKeeper, setNewKeeper)}
-                    removeItem={(s) => removeFromConfigList("shadowKeeperSpecies", s)}
-                    titleKey="app.protect.shadow_keepers"
-                    accent="#9B59B6"
+              <div className="space-y-12">
+                <div>
+                  <h3 className="mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4">
+                    {t("app.step.have.section_completions")}
+                  </h3>
+                  <HundosEditor
+                    hundos={hundos}
+                    setHundos={setHundos}
+                    newHundo={newHundo}
+                    setNewHundo={setNewHundo}
+                    addHundo={addHundo}
+                    removeHundo={removeHundo}
                   />
                   <hr className="my-8 border-[#1F2933]" />
                   <SpeciesListEditor
-                    items={topAttackers}
-                    newItem={newTopAttacker}
-                    setNewItem={setNewTopAttacker}
-                    addItem={addTopAttacker}
-                    removeItem={removeTopAttacker}
-                    titleKey="app.top_attackers"
-                    accent="#5EAFC5"
+                    items={luckies}
+                    newItem={newLucky}
+                    setNewItem={setNewLucky}
+                    addItem={addLucky}
+                    removeItem={removeLucky}
+                    titleKey="app.luckies"
+                    accent="#F5B82E"
                   />
-                  <hr className="my-8 border-[#1F2933]" />
-                  <SpeciesListEditor
-                    items={topMaxAttackers}
-                    newItem={newTopMaxAttacker}
-                    setNewItem={setNewTopMaxAttacker}
-                    addItem={addTopMaxAttacker}
-                    removeItem={removeTopMaxAttacker}
-                    titleKey="app.top_max_attackers"
-                    accent="#F39C12"
-                  />
-                </>
-              )}
+                </div>
+                {effectiveConfig.expertMode && effectiveConfig.protectMythicals && (
+                  <div>
+                    <h3 className="mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4">
+                      {t("app.step.have.section_carve_outs")}
+                    </h3>
+                    <SpeciesListEditor
+                      items={config.mythTooManyOf || []}
+                      newItem={newMyth}
+                      setNewItem={setNewMyth}
+                      addItem={() => addToConfigList("mythTooManyOf", newMyth, setNewMyth)}
+                      removeItem={(s) => removeFromConfigList("mythTooManyOf", s)}
+                      titleKey="app.protect.myth_carve"
+                      accent="#E91E63"
+                    />
+                  </div>
+                )}
+                {effectiveConfig.expertMode && (
+                  <div>
+                    <h3 className="mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4">
+                      {t("app.step.have.section_purify_policy")}
+                    </h3>
+                    <SpeciesListEditor
+                      items={config.shadowKeeperSpecies || []}
+                      newItem={newKeeper}
+                      setNewItem={setNewKeeper}
+                      addItem={() => addToConfigList("shadowKeeperSpecies", newKeeper, setNewKeeper)}
+                      removeItem={(s) => removeFromConfigList("shadowKeeperSpecies", s)}
+                      titleKey="app.protect.shadow_keepers"
+                      accent="#9B59B6"
+                    />
+                  </div>
+                )}
+                {effectiveConfig.expertMode && (
+                  <div>
+                    <h3 className="mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4">
+                      {t("app.step.have.section_raid_roster")}
+                    </h3>
+                    <SpeciesListEditor
+                      items={topAttackers}
+                      newItem={newTopAttacker}
+                      setNewItem={setNewTopAttacker}
+                      addItem={addTopAttacker}
+                      removeItem={removeTopAttacker}
+                      titleKey="app.top_attackers"
+                      accent="#5EAFC5"
+                    />
+                    <hr className="my-8 border-[#1F2933]" />
+                    <SpeciesListEditor
+                      items={topMaxAttackers}
+                      newItem={newTopMaxAttacker}
+                      setNewItem={setNewTopMaxAttacker}
+                      addItem={addTopMaxAttacker}
+                      removeItem={removeTopMaxAttacker}
+                      titleKey="app.top_max_attackers"
+                      accent="#F39C12"
+                    />
+                  </div>
+                )}
+              </div>
             </StepWrapper>
           )}
 
@@ -2200,6 +2299,16 @@ export default function App() {
                     copied={copied.sort}
                     onCopy={() => copyToClipboard("sort", sort)}
                     hint={t("app.filter.sort_hint")}
+                  />
+                )}
+                {luckySort && (
+                  <FilterBox
+                    label={t("app.filter.lucky_sort_label")}
+                    accent="#F5B82E"
+                    filterStr={luckySort}
+                    copied={copied.luckySort}
+                    onCopy={() => copyToClipboard("luckySort", luckySort)}
+                    hint={t("app.filter.lucky_sort_hint")}
                   />
                 )}
                 {buddyCatchFilters.length > 0 && (
@@ -2456,7 +2565,7 @@ export default function App() {
                     label={t("app.collapsible.set_theory")}
                     open={showSetTheory}
                     onToggle={() => setShowSetTheory(s => !s)}>
-                    <SetTheory hundos={hundos} TE_full={TE_full} TE_trim={TE_trim} cfg={effectiveConfig} />
+                    <SetTheory hundos={hundos} luckies={luckies} luckyHundoSet={luckyHundoSet} TE_full={TE_full} TE_trim={TE_trim} cfg={effectiveConfig} />
                   </Collapsible>
 
                   <Collapsible
@@ -2464,7 +2573,7 @@ export default function App() {
                     label={t("app.collapsible.raw_clauses")}
                     open={showRawClauses}
                     onToggle={() => setShowRawClauses(s => !s)}>
-                    <RawClausesPanel trashClauses={trashClauses} tradeClauses={tradeClauses} sortClauses={sortClauses} prestagedClauses={prestagedClauses} giftClauses={giftClauses} buddyCatchFilters={buddyCatchFilters} />
+                    <RawClausesPanel trashClauses={trashClauses} tradeClauses={tradeClauses} sortClauses={sortClauses} luckySortClauses={luckySortClauses} prestagedClauses={prestagedClauses} giftClauses={giftClauses} buddyCatchFilters={buddyCatchFilters} />
                   </Collapsible>
 
                   <Collapsible
@@ -3517,18 +3626,24 @@ function RocketCollapsible({
   );
 }
 
-function SetTheory({ hundos, TE_full, TE_trim, cfg }) {
+function SetTheory({ hundos, luckies, luckyHundoSet, TE_full, TE_trim, cfg }) {
   const { t } = useTranslation();
   const Pdesc = cfg.pvpMode === "loose" ? "(0-1, 3-4, 3-4)"
             : cfg.pvpMode === "strict" ? "(0, 3-4, 3-4)" : t("app.set_theory.p_disabled");
   // Rule-1 help splits around the bold {auto} marker so we keep it styled as <em>.
   const autoMarker = t("app.set_theory.rule1_help_auto");
   const ruleParts = t("app.set_theory.rule1_help", { params: { auto: autoMarker } }).split(autoMarker);
+  const luckyCount = (luckies || []).length;
+  const hlCount = luckyHundoSet ? luckyHundoSet.size : 0;
   return (
     <div className="mono text-xs text-[#A8B3BD] leading-relaxed space-y-3">
       <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
         <span className="text-[#5EAFC5]">H</span>
         <span>= {`{${t("app.set_theory.h_value", { params: { count: hundos.length } })}}`} → {t("app.set_theory.h_note")} <code className="text-[#E6EDF3]">+species</code></span>
+        <span className="text-[#F5B82E]">L</span>
+        <span>= {`{${t("app.set_theory.l_value", { params: { count: luckyCount } })}}`} <span className="text-[#8090A0]">— {t("app.set_theory.l_note")}</span></span>
+        <span className="text-[#F5B82E]">H ∩ L</span>
+        <span>= {`{${t("app.set_theory.hl_value", { params: { count: hlCount } })}}`} <span className="text-[#8090A0]">— {t("app.set_theory.hl_note")}</span></span>
         <span className="text-[#5EAFC5]">K</span>
         <span>= (4,4,3-4) ∪ (4,3-4,4) ∪ (3-4,4,4) <span className="text-[#8090A0]">— {t("app.set_theory.k_note")}</span></span>
         <span className="text-[#5EAFC5]">P</span>
@@ -3541,7 +3656,7 @@ function SetTheory({ hundos, TE_full, TE_trim, cfg }) {
       <hr className="border-[#1F2933]" />
       <div className="space-y-1.5">
         <div className="text-[#E74C3C]">{t("app.set_theory.trash_label")}<span className="text-[#8090A0]"> = (S012 ∪ (H ∩ ¬K)) ∩ ¬P ∩ ¬Prot</span></div>
-        <div className="text-[#5EAFC5]">{t("app.set_theory.trade_label")}<span className="text-[#8090A0]"> = (S012 ∪ TE ∪ (H ∩ ¬K)) ∩ ¬P ∩ ¬S4 ∩ ¬Prot ∩ ¬Traded</span></div>
+        <div className="text-[#5EAFC5]">{t("app.set_theory.trade_label")}<span className="text-[#8090A0]"> = (S012 ∪ TE ∪ ((H − (H ∩ L)) ∩ ¬K)) ∩ ¬P ∩ ¬S4 ∩ ¬Prot ∩ ¬Traded</span></div>
       </div>
       <div className="text-[#8090A0] text-[10.5px] leading-relaxed pt-2">
         <span className="text-[#F5B82E]">▲</span> {ruleParts[0]}<em>{autoMarker}</em>{ruleParts[1] || ""}
@@ -3550,7 +3665,7 @@ function SetTheory({ hundos, TE_full, TE_trim, cfg }) {
   );
 }
 
-function RawClausesPanel({ trashClauses, tradeClauses, sortClauses, prestagedClauses, giftClauses, buddyCatchFilters }) {
+function RawClausesPanel({ trashClauses, tradeClauses, sortClauses, luckySortClauses, prestagedClauses, giftClauses, buddyCatchFilters }) {
   const { t } = useTranslation();
   return (
     <div className="space-y-5 mono text-xs">
@@ -3562,6 +3677,9 @@ function RawClausesPanel({ trashClauses, tradeClauses, sortClauses, prestagedCla
       <ClauseList title={t("app.clauses.trade_title")} accent="#5EAFC5" clauses={tradeClauses} />
       {sortClauses && sortClauses.length > 0 && (
         <ClauseList title={t("app.clauses.sort_title")} accent="#F5B82E" clauses={sortClauses} />
+      )}
+      {luckySortClauses && luckySortClauses.length > 0 && (
+        <ClauseList title={t("app.clauses.lucky_sort_title")} accent="#F5B82E" clauses={luckySortClauses} />
       )}
       {prestagedClauses && prestagedClauses.length > 0 && (
         <ClauseList title={t("app.clauses.prestaged_title")} accent="#9B59B6" clauses={prestagedClauses} />
@@ -5125,6 +5243,7 @@ function BackupRestoreSection({ onExport, onImport }) {
     const d = env.data || {};
     return {
       hundos: Array.isArray(d.hundos) ? d.hundos.length : 0,
+      luckies: Array.isArray(d.luckies) ? d.luckies.length : 0,
       topAttackers: Array.isArray(d.topAttackers) ? d.topAttackers.length : 0,
       topMaxAttackers: Array.isArray(d.topMaxAttackers) ? d.topMaxAttackers.length : 0,
       configFields: d.config && typeof d.config === "object" ? Object.keys(d.config).length : 0,
@@ -5185,6 +5304,7 @@ function BackupRestoreSection({ onExport, onImport }) {
 
   const summaryParts = pending ? [
     t("app.modal.backup.summary_hundos", { params: { count: pending.summary.hundos } }),
+    pending.summary.luckies > 0 ? t("app.modal.backup.summary_luckies", { params: { count: pending.summary.luckies } }) : null,
     t("app.modal.backup.summary_attackers", { params: { count: pending.summary.topAttackers + pending.summary.topMaxAttackers } }),
     t("app.modal.backup.summary_config", { params: { count: pending.summary.configFields } }),
     pending.summary.hasHome ? t("app.modal.backup.summary_home") : null,

@@ -5,7 +5,7 @@
 // Run with: npx vite-node scripts/generate-fixtures.mjs
 
 import { writeFileSync } from "node:fs";
-import { buildFilters, DEFAULT_CONFIG, DEFAULT_HUNDOS } from "../src/App.jsx";
+import { buildFilters, DEFAULT_CONFIG, DEFAULT_HUNDOS, DEFAULT_LUCKIES } from "../src/App.jsx";
 import { LOCALES } from "../src/i18n/index.js";
 
 // Mimic the in-app `t()` lookup so fixture output matches what users see.
@@ -36,7 +36,7 @@ function flattenBossMap(byTier) {
 const fixture = {};
 for (const locale of Object.keys(LOCALES)) {
   const tFn = makeTFn(locale);
-  const result = buildFilters(DEFAULT_HUNDOS, DEFAULT_CONFIG, [], locale, tFn);
+  const result = buildFilters(DEFAULT_HUNDOS, DEFAULT_LUCKIES, DEFAULT_CONFIG, [], locale, tFn);
   fixture[locale] = {
     trash: result.trash,
     trade: result.trade,

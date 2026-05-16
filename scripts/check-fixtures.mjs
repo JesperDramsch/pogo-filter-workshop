@@ -2,7 +2,7 @@
 // Fails CI if anything drifts. Run with: npx vite-node scripts/check-fixtures.mjs
 
 import { readFileSync } from "node:fs";
-import { buildFilters, DEFAULT_CONFIG, DEFAULT_HUNDOS } from "../src/App.jsx";
+import { buildFilters, DEFAULT_CONFIG, DEFAULT_HUNDOS, DEFAULT_LUCKIES } from "../src/App.jsx";
 import { LOCALES } from "../src/i18n/index.js";
 
 function makeTFn(locale) {
@@ -25,7 +25,7 @@ const expected = JSON.parse(readFileSync("src/__fixtures__/default-filter-output
 let failures = 0;
 for (const locale of Object.keys(LOCALES)) {
   const tFn = makeTFn(locale);
-  const result = buildFilters(DEFAULT_HUNDOS, DEFAULT_CONFIG, [], locale, tFn);
+  const result = buildFilters(DEFAULT_HUNDOS, DEFAULT_LUCKIES, DEFAULT_CONFIG, [], locale, tFn);
   const actual = {
     trash: result.trash,
     trade: result.trade,
