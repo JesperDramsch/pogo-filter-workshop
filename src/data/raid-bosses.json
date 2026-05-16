@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-12T10:11:34.366Z",
+  "fetchedAt": "2026-05-16T09:14:38.311Z",
   "raids": {
     "ultra_beast": [
       {
@@ -559,6 +559,30 @@
           "flying",
           "rock",
           "fire"
+        ]
+      },
+      {
+        "id": "PIKACHU",
+        "names": {
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground"
         ]
       },
       {
@@ -1279,34 +1303,6 @@
       }
     ],
     "tier_3": [
-      {
-        "id": "HITMONLEE",
-        "names": {
-          "en": "Hitmonlee",
-          "de": "Kicklee",
-          "fr": "Kicklee",
-          "it": "Hitmonlee",
-          "ja": "サワムラー",
-          "ko": "시라소몬",
-          "es": "Hitmonlee"
-        },
-        "types": [
-          "fighting"
-        ],
-        "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
-          "ghost",
-          "psychic",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "flying",
-          "psychic",
-          "fairy"
-        ]
-      },
       {
         "id": "HITMONCHAN",
         "names": {
