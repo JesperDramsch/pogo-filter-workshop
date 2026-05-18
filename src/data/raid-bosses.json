@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-17T09:22:32.298Z",
+  "fetchedAt": "2026-05-18T11:31:51.552Z",
   "raids": {
     "ultra_beast": [
       {
@@ -1524,6 +1524,34 @@
           "flying",
           "psychic",
           "fairy"
+        ]
+      }
+    ],
+    "tier_5": [
+      {
+        "id": "REGISTEEL",
+        "names": {
+          "en": "Registeel",
+          "de": "Registeel",
+          "fr": "Registeel",
+          "it": "Registeel",
+          "ja": "レジスチル",
+          "ko": "레지스틸",
+          "es": "Registeel"
+        },
+        "types": [
+          "steel"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "electric"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "ground",
+          "fire"
         ]
       }
     ]

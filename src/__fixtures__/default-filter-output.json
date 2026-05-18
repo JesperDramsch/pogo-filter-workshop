@@ -91,6 +91,9 @@
         "PASSIMIAN": "flying,poison,bug,ghost,psychic,fairy&@1flying,@1psychic,@1fairy&@2flying,@2psychic,@2fairy,@3flying,@3psychic,@3fairy&maxmove1-&!<fighting",
         "DRAMPA": "rock,ghost,steel,fairy&@1fighting,@1ice,@1dragon,@1fairy&@2fighting,@2ice,@2dragon,@2fairy,@3fighting,@3ice,@3dragon,@3fairy&maxmove1-&!<normal&!<dragon",
         "FALINKS": "flying,poison,bug,ghost,psychic,fairy&@1flying,@1psychic,@1fairy&@2flying,@2psychic,@2fairy,@3flying,@3psychic,@3fairy&maxmove1-&!<fighting"
+      },
+      "tier_5": {
+        "REGISTEEL": "steel,fire,water,electric&@1fighting,@1ground,@1fire&@2fighting,@2ground,@2fire,@3fighting,@3ground,@3fire&maxmove1-&!<steel"
       }
     },
     "maxTank": "@1bite,@1bugbite,@1cut,@1dragonbreath,@1furycutter,@1leafage,@1lick,@1lock-on,@1lowkick,@1metalclaw,@1mudshot,@1poisonsting,@1pound,@1psychocut,@1scratch,@1shadowclaw,@1spark,@1suckerpunch,@1tackle,@1thundershock,@1vinewhip,@1watergun&maxmove1-",
@@ -242,6 +245,9 @@
         "PASSIMIAN": "flug,gift,käfer,geist,psycho,fee&@1flug,@1psycho,@1fee&@2flug,@2psycho,@2fee,@3flug,@3psycho,@3fee&dynaattacke1-&!<kampf",
         "DRAMPA": "gestein,geist,stahl,fee&@1kampf,@1eis,@1drache,@1fee&@2kampf,@2eis,@2drache,@2fee,@3kampf,@3eis,@3drache,@3fee&dynaattacke1-&!<normal&!<drache",
         "FALINKS": "flug,gift,käfer,geist,psycho,fee&@1flug,@1psycho,@1fee&@2flug,@2psycho,@2fee,@3flug,@3psycho,@3fee&dynaattacke1-&!<kampf"
+      },
+      "tier_5": {
+        "REGISTEEL": "stahl,feuer,wasser,elektro&@1kampf,@1boden,@1feuer&@2kampf,@2boden,@2feuer,@3kampf,@3boden,@3feuer&dynaattacke1-&!<stahl"
       }
     },
     "maxTank": "@1biss,@1käferbiss,@1zerschneider,@1feuerodem,@1zornklinge,@1blattwerk,@1schlecker,@1zielschuss,@1fußkick,@1metallklaue,@1lehmschuss,@1giftstachel,@1klaps,@1psychoklinge,@1kratzer,@1dunkelklaue,@1funkensprung,@1tiefschlag,@1tackle,@1donnerschock,@1rankenhieb,@1aquaknarre&dynaattacke1-",
@@ -393,6 +399,9 @@
         "PASSIMIAN": "volador,veneno,bicho,fantasma,psíquico,hada&@1volador,@1psíquico,@1hada&@2volador,@2psíquico,@2hada,@3volador,@3psíquico,@3hada&movimientomax1-&!<lucha",
         "DRAMPA": "roca,fantasma,acero,hada&@1lucha,@1hielo,@1dragón,@1hada&@2lucha,@2hielo,@2dragón,@2hada,@3lucha,@3hielo,@3dragón,@3hada&movimientomax1-&!<normal&!<dragón",
         "FALINKS": "volador,veneno,bicho,fantasma,psíquico,hada&@1volador,@1psíquico,@1hada&@2volador,@2psíquico,@2hada,@3volador,@3psíquico,@3hada&movimientomax1-&!<lucha"
+      },
+      "tier_5": {
+        "REGISTEEL": "acero,fuego,agua,eléctrico&@1lucha,@1tierra,@1fuego&@2lucha,@2tierra,@2fuego,@3lucha,@3tierra,@3fuego&movimientomax1-&!<acero"
       }
     },
     "maxTank": "@1mordisco,@1picadura,@1corte,@1dragoaliento,@1cortefuria,@1follaje,@1lengüetazo,@1fijarblanco,@1patadabaja,@1garrametal,@1disparolodo,@1picotazoveneno,@1destructor,@1psicocorte,@1arañazo,@1garraumbría,@1chispa,@1golpebajo,@1placaje,@1impactrueno,@1látigocepa,@1pistolaagua&movimientomax1-",
@@ -544,6 +553,9 @@
         "PASSIMIAN": "vol,poison,insecte,spectre,psy,fée&@1vol,@1psy,@1fée&@2vol,@2psy,@2fée,@3vol,@3psy,@3fée&capacitédynamax1-&!<combat",
         "DRAMPA": "roche,spectre,acier,fée&@1combat,@1glace,@1dragon,@1fée&@2combat,@2glace,@2dragon,@2fée,@3combat,@3glace,@3dragon,@3fée&capacitédynamax1-&!<normal&!<dragon",
         "FALINKS": "vol,poison,insecte,spectre,psy,fée&@1vol,@1psy,@1fée&@2vol,@2psy,@2fée,@3vol,@3psy,@3fée&capacitédynamax1-&!<combat"
+      },
+      "tier_5": {
+        "REGISTEEL": "acier,feu,eau,électrik&@1combat,@1sol,@1feu&@2combat,@2sol,@2feu,@3combat,@3sol,@3feu&capacitédynamax1-&!<acier"
       }
     },
     "maxTank": "@1morsure,@1piqûre,@1coupe,@1draco-souffle,@1taillade,@1feuillage,@1léchouille,@1verrouillage,@1balayage,@1griffeacier,@1tirdeboue,@1dard-venin,@1écras’face,@1coupepsycho,@1griffe,@1griffeombre,@1étincelle,@1coupbas,@1charge,@1éclair,@1fouetlianes,@1pistoletào&capacitédynamax1-",
@@ -695,6 +707,9 @@
         "PASSIMIAN": "飛行,毒,蟲,幽靈,超能力,妖精&@1飛行,@1超能力,@1妖精&@2飛行,@2超能力,@2妖精,@3飛行,@3超能力,@3妖精&極巨招式1-&!<格鬥",
         "DRAMPA": "岩石,幽靈,鋼,妖精&@1格鬥,@1冰,@1龍,@1妖精&@2格鬥,@2冰,@2龍,@2妖精,@3格鬥,@3冰,@3龍,@3妖精&極巨招式1-&!<一般&!<龍",
         "FALINKS": "飛行,毒,蟲,幽靈,超能力,妖精&@1飛行,@1超能力,@1妖精&@2飛行,@2超能力,@2妖精,@3飛行,@3超能力,@3妖精&極巨招式1-&!<格鬥"
+      },
+      "tier_5": {
+        "REGISTEEL": "鋼,火,水,電&@1格鬥,@1地面,@1火&@2格鬥,@2地面,@2火,@3格鬥,@3地面,@3火&極巨招式1-&!<鋼"
       }
     },
     "maxTank": "@1咬住,@1蟲咬,@1居合斬,@1龍息,@1連斬,@1樹葉,@1舌舔,@1鎖定,@1踢倒,@1金屬爪,@1泥巴射擊,@1毒針,@1拍擊,@1精神利刃,@1抓,@1暗影爪,@1電光,@1突襲,@1撞擊,@1電擊,@1藤鞭,@1水槍&極巨招式1-",
@@ -846,6 +861,9 @@
         "PASSIMIAN": "़लाइंग,पॉइज़न,बग,घोट,साइकक,फ़ेर&@1़लाइंग,@1साइकक,@1फ़ेर&@2़लाइंग,@2साइकक,@2फ़ेर,@3़लाइंग,@3साइकक,@3फ़ेर&मैसमूव1-&!<फ़ाइटंग",
         "DRAMPA": "रॉक,घोट,टल,फ़ेर&@1फ़ाइटंग,@1आइस,@1डैगन,@1फ़ेर&@2फ़ाइटंग,@2आइस,@2डैगन,@2फ़ेर,@3फ़ाइटंग,@3आइस,@3डैगन,@3फ़ेर&मैसमूव1-&!<नॉमल&!<डैगन",
         "FALINKS": "़लाइंग,पॉइज़न,बग,घोट,साइकक,फ़ेर&@1़लाइंग,@1साइकक,@1फ़ेर&@2़लाइंग,@2साइकक,@2फ़ेर,@3़लाइंग,@3साइकक,@3फ़ेर&मैसमूव1-&!<फ़ाइटंग"
+      },
+      "tier_5": {
+        "REGISTEEL": "टल,फ़ायर,वॉटर,इलटक&@1फ़ाइटंग,@1ाउंड,@1फ़ायर&@2फ़ाइटंग,@2ाउंड,@2फ़ायर,@3फ़ाइटंग,@3ाउंड,@3फ़ायर&मैसमूव1-&!<टल"
       }
     },
     "maxTank": "@1बाइट,@1बगबाईट,@1कट,@1डैगनेथ,@1युरकटर,@1लफ़ेज,@1लक,@1लॉक-ऑन,@1अड़ंगी,@1मेटललॉ,@1मडशॉट,@1पॉइज़नटंग,@1पाउंड,@1साइकोकट,@1ैच,@1शैडोलॉ,@1पाक,@1सर्ाइज़पंच,@1टैकल,@1थंडरशॉक,@1वाइनवप,@1वॉटरगन&मैसमूव1-",
@@ -997,6 +1015,9 @@
         "PASSIMIAN": "ひこう,どく,むし,ゴースト,エスパー,フェアリー&@1ひこう,@1エスパー,@1フェアリー&@2ひこう,@2エスパー,@2フェアリー,@3ひこう,@3エスパー,@3フェアリー&まっくすわざ1-&!<かくとう",
         "DRAMPA": "いわ,ゴースト,はがね,フェアリー&@1かくとう,@1こおり,@1ドラゴン,@1フェアリー&@2かくとう,@2こおり,@2ドラゴン,@2フェアリー,@3かくとう,@3こおり,@3ドラゴン,@3フェアリー&まっくすわざ1-&!<ノーマル&!<ドラゴン",
         "FALINKS": "ひこう,どく,むし,ゴースト,エスパー,フェアリー&@1ひこう,@1エスパー,@1フェアリー&@2ひこう,@2エスパー,@2フェアリー,@3ひこう,@3エスパー,@3フェアリー&まっくすわざ1-&!<かくとう"
+      },
+      "tier_5": {
+        "REGISTEEL": "はがね,ほのお,みず,でんき&@1かくとう,@1じめん,@1ほのお&@2かくとう,@2じめん,@2ほのお,@3かくとう,@3じめん,@3ほのお&まっくすわざ1-&!<はがね"
       }
     },
     "maxTank": "@1かみつく,@1むしくい,@1いあいぎり,@1りゅうのいぶき,@1れんぞくぎり,@1このは,@1したでなめる,@1ロックオン,@1けたぐり,@1メタルクロー,@1マッドショット,@1どくばり,@1はたく,@1サイコカッター,@1ひっかく,@1シャドークロー,@1スパーク,@1ふいうち,@1たいあたり,@1でんきショック,@1つるのムチ,@1みずでっぽう&まっくすわざ1-",
