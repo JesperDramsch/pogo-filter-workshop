@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-15T10:41:45.303Z",
+  "fetchedAt": "2026-05-20T11:24:11.408Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -508,15 +508,6 @@
     }
   },
   "gblEvents": [
-    {
-      "eventID": "gbl-memories-in-motion_master-league_catch-cup-memories-in-motion-great-league-edition",
-      "name": "Master League and Catch Cup: Memories in Motion: Great League Edition | Memories in Motion",
-      "start": "2026-05-12T20:00:00.000Z",
-      "end": "2026-05-19T20:00:00.000Z",
-      "cups": [
-        "catch"
-      ]
-    },
     {
       "eventID": "gbl-memories-in-motion_great-league_ultra-league_master-league-split-3",
       "name": "Great League, Ultra League, and Master League | Memories in Motion",
