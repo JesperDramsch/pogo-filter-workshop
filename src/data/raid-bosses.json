@@ -1562,7 +1562,7 @@
       "name": "Tapu Bulu in 5-star Raid Battles",
       "eventType": "raid-battles",
       "start": "2026-05-20T06:00:00.000",
-      "end": "2026-05-26T22:00:00.000",
+      "end": "2026-05-24T20:00:00.000",
       "isShadow": false,
       "isMega": false,
       "bosses": [
@@ -1690,6 +1690,71 @@
           "seMoveTypes": [
             "flying",
             "psychic",
+            "fairy"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "tapu-fini-in-5-star-raid-battles-may-june-2026",
+      "name": "Tapu Fini in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-05-27T06:00:00.000",
+      "end": "2026-06-02T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "TAPU_FINI",
+          "names": {
+            "en": "Tapu Fini"
+          },
+          "types": [
+            "water",
+            "fairy"
+          ],
+          "resistorTypes": [
+            "poison",
+            "steel",
+            "water",
+            "grass"
+          ],
+          "seMoveTypes": [
+            "poison",
+            "grass",
+            "electric"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-medicham-in-mega-raids-may-june-2026",
+      "name": "Mega Medicham in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-05-27T06:00:00.000",
+      "end": "2026-06-03T06:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "MEDICHAM",
+          "names": {
+            "en": "Medicham"
+          },
+          "types": [
+            "fighting",
+            "psychic"
+          ],
+          "resistorTypes": [
+            "flying",
+            "bug",
+            "ghost",
+            "psychic",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "ghost",
             "fairy"
           ]
         }
