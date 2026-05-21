@@ -1562,7 +1562,7 @@
       "name": "Tapu Bulu in 5-star Raid Battles",
       "eventType": "raid-battles",
       "start": "2026-05-20T06:00:00.000",
-      "end": "2026-05-24T20:00:00.000",
+      "end": "2026-05-26T22:00:00.000",
       "isShadow": false,
       "isMega": false,
       "bosses": [
@@ -1622,42 +1622,6 @@
             "ice",
             "dragon",
             "fairy"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20260520",
-      "name": "Tapu Bulu Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-05-20T18:00:00.000",
-      "end": "2026-05-20T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "TAPU_BULU",
-          "names": {
-            "en": "Tapu Bulu"
-          },
-          "types": [
-            "grass",
-            "fairy"
-          ],
-          "resistorTypes": [
-            "flying",
-            "poison",
-            "bug",
-            "steel",
-            "fire",
-            "grass"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "poison",
-            "steel",
-            "fire",
-            "ice"
           ]
         }
       ]
@@ -1756,6 +1720,38 @@
             "flying",
             "ghost",
             "fairy"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20260527",
+      "name": "Tapu Fini Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-05-27T18:00:00.000",
+      "end": "2026-05-27T19:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "TAPU_FINI",
+          "names": {
+            "en": "Tapu Fini"
+          },
+          "types": [
+            "water",
+            "fairy"
+          ],
+          "resistorTypes": [
+            "poison",
+            "steel",
+            "water",
+            "grass"
+          ],
+          "seMoveTypes": [
+            "poison",
+            "grass",
+            "electric"
           ]
         }
       ]
