@@ -1,273 +1,135 @@
 {
-  "fetchedAt": "2026-05-18T11:31:51.552Z",
+  "fetchedAt": "2026-05-22T10:36:01.873Z",
   "raids": {
-    "ultra_beast": [
+    "mega": [
       {
-        "id": "BUZZWOLE",
+        "id": "ALTARIA",
         "names": {
-          "en": "Buzzwole",
-          "de": "Masskito",
-          "fr": "Mouscoto",
-          "it": "Buzzwole",
-          "ja": "マッシブーン",
-          "ko": "매시붕",
-          "es": "Buzzwole"
+          "en": "Mega Altaria",
+          "de": "Mega-Altaria",
+          "fr": "Méga-Altaria",
+          "it": "MegaAltaria",
+          "ja": "メガチルタリス",
+          "ko": "메가파비코리",
+          "es": "Mega-Altaria"
         },
         "types": [
-          "bug",
-          "fighting"
+          "dragon",
+          "fairy"
         ],
         "resistorTypes": [
-          "fighting",
-          "flying",
           "poison",
-          "bug",
-          "ghost",
+          "steel",
           "fire",
           "fairy"
         ],
         "seMoveTypes": [
-          "flying",
           "fairy",
-          "fire",
-          "psychic"
-        ]
-      },
-      {
-        "id": "PHEROMOSA",
-        "names": {
-          "en": "Pheromosa",
-          "de": "Schabelle",
-          "fr": "Cancrelove",
-          "it": "Pheromosa",
-          "ja": "フェローチェ",
-          "ko": "페로코체",
-          "es": "Pheromosa"
-        },
-        "types": [
-          "bug",
-          "fighting"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "flying",
+          "ice",
           "poison",
-          "bug",
-          "ghost",
-          "fire",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "flying",
-          "fairy",
-          "fire",
-          "psychic"
-        ]
-      },
-      {
-        "id": "XURKITREE",
-        "names": {
-          "en": "Xurkitree",
-          "de": "Voltriant",
-          "fr": "Câblifère",
-          "it": "Xurkitree",
-          "ja": "デンジュモク",
-          "ko": "전수목",
-          "es": "Xurkitree"
-        },
-        "types": [
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "ground"
+          "steel"
         ]
       }
     ],
-    "mega": [
+    "lvl5": [
       {
-        "id": "GLALIE",
+        "id": "TAPU_BULU",
         "names": {
-          "en": "Mega Glalie",
-          "de": "Mega-Firnontor",
-          "fr": "Méga-Oniglali",
-          "it": "MegaGlalie",
-          "ja": "メガオニゴーリ",
-          "ko": "메가얼음귀신",
-          "es": "Mega-Glalie"
+          "en": "Tapu Bulu",
+          "de": "Kapu-Toro",
+          "fr": "Tokotoro",
+          "it": "Tapu Bulu",
+          "ja": "カプ・ブルル",
+          "ko": "카푸브루루",
+          "es": "Tapu Bulu"
         },
         "types": [
-          "ice"
+          "grass",
+          "fairy"
         ],
         "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
           "steel",
           "fire",
-          "water",
-          "ice"
+          "grass"
         ],
         "seMoveTypes": [
-          "fighting",
+          "poison",
           "fire",
-          "rock",
+          "flying",
+          "ice",
           "steel"
         ]
       }
     ],
     "lvl3": [
       {
-        "id": "RAPIDASH",
+        "id": "PILOSWINE",
         "names": {
-          "en": "Rapidash",
-          "de": "Gallopa",
-          "fr": "Galopa",
-          "it": "Rapidash",
-          "ja": "ギャロップ",
-          "ko": "날쌩마",
-          "es": "Rapidash"
+          "en": "Piloswine",
+          "de": "Keifel",
+          "fr": "Cochignon",
+          "it": "Piloswine",
+          "ja": "イノムー",
+          "ko": "메꾸리",
+          "es": "Piloswine"
         },
         "types": [
-          "fire"
+          "ice",
+          "ground"
+        ],
+        "resistorTypes": [
+          "bug",
+          "water",
+          "ice"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "fire",
+          "grass",
+          "steel",
+          "water"
+        ]
+      },
+      {
+        "id": "TURTONATOR",
+        "names": {
+          "en": "Turtonator",
+          "de": "Tortunator",
+          "fr": "Boumata",
+          "it": "Turtonator",
+          "ja": "バクガメス",
+          "ko": "폭거북스",
+          "es": "Turtonator"
+        },
+        "types": [
+          "fire",
+          "dragon"
         ],
         "resistorTypes": [
           "rock",
           "fire",
           "water",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "ground",
-          "rock",
-          "water"
-        ]
-      },
-      {
-        "id": "ZEBSTRIKA",
-        "names": {
-          "en": "Zebstrika",
-          "de": "Zebritz",
-          "fr": "Zéblitz",
-          "it": "Zebstrika",
-          "ja": "ゼブライカ",
-          "ko": "제브라이카",
-          "es": "Zebstrika"
-        },
-        "types": [
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "ground"
-        ]
-      },
-      {
-        "id": "SCOLIPEDE",
-        "names": {
-          "en": "Scolipede",
-          "de": "Cerapendra",
-          "fr": "Brutapode",
-          "it": "Scolipede",
-          "ja": "ペンドラー",
-          "ko": "펜드라",
-          "es": "Scolipede"
-        },
-        "types": [
-          "bug",
-          "poison"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "flying",
-          "poison",
-          "ground",
-          "rock",
-          "ghost",
-          "steel",
-          "fire"
-        ],
-        "seMoveTypes": [
-          "fire",
-          "flying",
-          "psychic",
-          "rock"
-        ]
-      }
-    ],
-    "lvl1": [
-      {
-        "id": "MACHOP",
-        "names": {
-          "en": "Machop",
-          "de": "Machollo",
-          "fr": "Machoc",
-          "it": "Machop",
-          "ja": "ワンリキー",
-          "ko": "알통몬",
-          "es": "Machop"
-        },
-        "types": [
-          "fighting"
-        ],
-        "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
-          "ghost",
-          "psychic",
           "fairy"
         ],
         "seMoveTypes": [
-          "fairy",
-          "flying",
-          "psychic"
-        ]
-      },
-      {
-        "id": "DODUO",
-        "names": {
-          "en": "Doduo",
-          "de": "Dodu",
-          "fr": "Doduo",
-          "it": "Doduo",
-          "ja": "ドードー",
-          "ko": "두두",
-          "es": "Doduo"
-        },
-        "types": [
-          "normal",
-          "flying"
-        ],
-        "resistorTypes": [
-          "rock",
-          "ghost",
-          "steel",
-          "electric"
-        ],
-        "seMoveTypes": [
-          "electric",
-          "ice",
+          "dragon",
+          "ground",
           "rock"
         ]
       },
       {
-        "id": "ROCKRUFF",
+        "id": "KLAWF",
         "names": {
-          "en": "Rockruff",
-          "de": "Wuffels",
-          "fr": "Rocabot",
-          "it": "Rockruff",
-          "ja": "イワンコ",
-          "ko": "암멍이",
-          "es": "Rockruff"
+          "en": "Klawf",
+          "de": "Klibbe",
+          "fr": "Craparoi",
+          "it": "Klawf",
+          "ja": "ガケガニ",
+          "ko": "절벼게",
+          "es": "Klawf"
         },
         "types": [
           "rock"
@@ -283,6 +145,117 @@
           "ground",
           "steel",
           "water"
+        ]
+      }
+    ],
+    "lvl1": [
+      {
+        "id": "CLEFAIRY",
+        "names": {
+          "en": "Clefairy",
+          "de": "Piepi",
+          "fr": "Mélofée",
+          "it": "Clefairy",
+          "ja": "ピッピ",
+          "ko": "삐삐",
+          "es": "Clefairy"
+        },
+        "types": [
+          "fairy"
+        ],
+        "resistorTypes": [
+          "poison",
+          "steel",
+          "fire"
+        ],
+        "seMoveTypes": [
+          "poison",
+          "steel"
+        ]
+      },
+      {
+        "id": "GRIMER",
+        "names": {
+          "en": "Alolan Grimer",
+          "de": "Alola-Sleima",
+          "fr": "Tadmorv d'Alola",
+          "it": "Grimer di Alola",
+          "ja": "アローラ ベトベター",
+          "ko": "알로라 질퍽이",
+          "es": "Grimer de Alola"
+        },
+        "types": [
+          "poison",
+          "dark"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "poison",
+          "ground",
+          "rock",
+          "steel",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "ground"
+        ]
+      },
+      {
+        "id": "GIBLE",
+        "names": {
+          "en": "Gible",
+          "de": "Kaumalat",
+          "fr": "Griknot",
+          "it": "Gible",
+          "ja": "フカマル",
+          "ko": "딥상어동",
+          "es": "Gible"
+        },
+        "types": [
+          "dragon",
+          "ground"
+        ],
+        "resistorTypes": [
+          "flying",
+          "bug",
+          "grass",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "ice",
+          "dragon",
+          "fairy"
+        ]
+      },
+      {
+        "id": "WIMPOD",
+        "names": {
+          "en": "Wimpod",
+          "de": "Reißlaus",
+          "fr": "Sovkipou",
+          "it": "Wimpod",
+          "ja": "コソクムシ",
+          "ko": "꼬시레",
+          "es": "Wimpod"
+        },
+        "types": [
+          "bug",
+          "water"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "flying",
+          "poison",
+          "ghost",
+          "steel",
+          "water",
+          "dragon",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "electric",
+          "flying",
+          "rock"
         ]
       }
     ],
@@ -1557,75 +1530,6 @@
     ]
   },
   "eventRaids": [
-    {
-      "eventID": "tapu-bulu-in-5-star-raid-battles-may-2026",
-      "name": "Tapu Bulu in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-05-20T06:00:00.000",
-      "end": "2026-05-26T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "TAPU_BULU",
-          "names": {
-            "en": "Tapu Bulu"
-          },
-          "types": [
-            "grass",
-            "fairy"
-          ],
-          "resistorTypes": [
-            "flying",
-            "poison",
-            "bug",
-            "steel",
-            "fire",
-            "grass"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "poison",
-            "steel",
-            "fire",
-            "ice"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "mega-altaria-in-mega-raids-may-2026",
-      "name": "Mega Altaria in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-05-20T06:00:00.000",
-      "end": "2026-05-27T06:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "ALTARIA",
-          "names": {
-            "en": "Altaria"
-          },
-          "types": [
-            "dragon",
-            "flying"
-          ],
-          "resistorTypes": [
-            "rock",
-            "steel",
-            "electric",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "rock",
-            "ice",
-            "dragon",
-            "fairy"
-          ]
-        }
-      ]
-    },
     {
       "eventID": "falinks-super-mega-raid-day-2026",
       "name": "Falinks Super Mega Raid Day",
