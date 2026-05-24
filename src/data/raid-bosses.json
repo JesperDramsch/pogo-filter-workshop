@@ -1531,39 +1531,6 @@
   },
   "eventRaids": [
     {
-      "eventID": "falinks-super-mega-raid-day-2026",
-      "name": "Falinks Super Mega Raid Day",
-      "eventType": "raid-day",
-      "start": "2026-05-23T14:00:00.000",
-      "end": "2026-05-23T17:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "FALINKS",
-          "names": {
-            "en": "Falinks"
-          },
-          "types": [
-            "fighting"
-          ],
-          "resistorTypes": [
-            "flying",
-            "poison",
-            "bug",
-            "ghost",
-            "psychic",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "psychic",
-            "fairy"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "tapu-fini-in-5-star-raid-battles-may-june-2026",
       "name": "Tapu Fini in 5-star Raid Battles",
       "eventType": "raid-battles",
