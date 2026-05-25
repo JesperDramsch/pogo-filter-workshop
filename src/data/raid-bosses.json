@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-22T10:36:01.873Z",
+  "fetchedAt": "2026-05-25T11:37:43.555Z",
   "raids": {
     "mega": [
       {
@@ -806,6 +806,39 @@
           "rock",
           "grass",
           "electric"
+        ]
+      },
+      {
+        "id": "COMBEE",
+        "names": {
+          "en": "Combee",
+          "de": "Wadribie",
+          "fr": "Apitrini",
+          "it": "Combee",
+          "ja": "ミツハニー",
+          "ko": "세꿀버리",
+          "es": "Combee"
+        },
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "rock",
+          "ghost",
+          "steel",
+          "fire",
+          "electric",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "rock",
+          "fire",
+          "electric",
+          "ice"
         ]
       },
       {
