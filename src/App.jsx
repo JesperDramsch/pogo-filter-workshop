@@ -161,6 +161,10 @@ export const DEFAULT_CONFIG = {
   // Universal protections (most always-on in normal mode; visible in expert)
   protectFavorites: true,
   protectFourStar: true,       // never toss any 4★ hundo (Regel 1) — expert can disable with confirmation
+  // Treat 0/0/0 IV catches as collectibles: AND-guards in trash/trade/shadow
+  // keep them safe, and an nundoSort FilterBox surfaces them for browsing.
+  // Default off — most users don't care; expert opt-in only.
+  protectNundos: false,
   protectTradeEvos: true,      // protect trade-evolution candidates from trash (free evos via tausch)
   // Once a regional has been traded, the "keep it for trade" rationale is
   // spent — bad-IV traded Alolan Raichu (Psychic) etc. fall into trash like
@@ -687,6 +691,14 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
   if (cfg.protectFourStar) {
     push(trashClauses, "!4*", tFn("app.clause_why.rule1_no_4star"));
   }
+  if (cfg.protectNundos) {
+    // ANDed into trash → must have at least one non-zero IV bucket → 0/0/0
+    // slips past every trash clause. Uses positive contrapositive because
+    // PoGo silently ignores !N negation on IV tokens (see line 646 comment).
+    push(trashClauses,
+      `1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`,
+      tFn("app.clause_why.protect_nundos_trash"));
+  }
 
   // Tag protections
   const activeBuddies = (cfg.buddies || []).filter(b => b.active !== false && b.tagPrefix);
@@ -860,6 +872,11 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
   if (cfg.protectBackgrounds)  push(tradeClauses, `!${kw.flag.background}`, tFn("app.clause_why.backgrounds_trade"));
   if (cfg.protectFavorites)    push(tradeClauses, `!${kw.flag.favorite}`, tFn("app.clause_why.favorites"));
   push(tradeClauses, "!4*", tFn("app.clause_why.rule1_no_4star_trade"));
+  if (cfg.protectNundos) {
+    push(tradeClauses,
+      `1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`,
+      tFn("app.clause_why.protect_nundos_trade"));
+  }
   for (const t of leagueTags)  push(tradeClauses, `!${t}`, tFn("app.clause_why.league_tag", { params: { tag: t } }));
   if (cfg.protectDoubleMoved)  push(tradeClauses, "@3move", tFn("app.clause_why.double_moved_trade"));
   if (cfg.protectDynamax)      push(tradeClauses, `!${kw.flag.dynamax_move}1-`, tFn("app.clause_why.dynamax"));
@@ -952,6 +969,19 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
   }
   const luckySort = luckySortClauses.map(c => c.clause).join("&");
 
+  // ── NUNDO-SORT ─────────────────────────────────────────────────────────
+  // Surface every 0/0/0 IV catch. PoGo's storage UI doesn't expose appraisal
+  // results as a filter, so this is the only way to bulk-browse Nundos for
+  // the collection wall. No favorite/tag exclusions — the whole point is
+  // finding every 0/0/0, including ones already starred or tagged.
+  const nundoSortClauses = [];
+  if (cfg.protectNundos) {
+    push(nundoSortClauses, `0-0${kw.iv.atk}`, tFn("app.clause_why.nundo_atk_zero"));
+    push(nundoSortClauses, `0-0${kw.iv.def}`, tFn("app.clause_why.nundo_def_zero"));
+    push(nundoSortClauses, `0-0${kw.iv.hp}`,  tFn("app.clause_why.nundo_hp_zero"));
+  }
+  const nundoSort = nundoSortClauses.map(c => c.clause).join("&");
+
   // ── GIFT FILTER ────────────────────────────────────────────────────────
   const giftClauses = [];
   const valuables = [kw.flag.shiny, kw.flag.legendary, kw.flag.ultra_beast, kw.flag.costume, kw.flag.background];
@@ -1010,6 +1040,11 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
   push(shadowCheapClauses, `@${kw.flag.frustration}`,               tFn("app.clause_why.frustration_unmoved", { params: { move: kw.flag.frustration } }));
   push(shadowCheapClauses, `!${kw.flag.favorite}`,                  tFn("app.clause_why.favorites"));
   push(shadowCheapClauses, "!#",                                    tFn("app.clause_why.tags_protected_short"));
+  if (cfg.protectNundos) {
+    push(shadowCheapClauses,
+      `1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`,
+      tFn("app.clause_why.protect_nundos_shadow"));
+  }
   const shadowCheap = shadowCheapClauses.map(c => c.clause).join("&");
 
   // -- SHADOW · safe purify (mass purify, keep raid attackers) ---------
@@ -1036,6 +1071,11 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
   push(shadowSafeClauses, "!#",                                     tFn("app.clause_why.tags_protected_short"));
   for (const sp of keeperResolved) {
     push(shadowSafeClauses, `!+${sp}`, tFn("app.clause_why.shadow_keeper_species", { params: { species: sp } }));
+  }
+  if (cfg.protectNundos) {
+    push(shadowSafeClauses,
+      `1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`,
+      tFn("app.clause_why.protect_nundos_shadow"));
   }
   const shadowSafe = shadowSafeClauses.map(c => c.clause).join("&");
 
@@ -1551,9 +1591,9 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     }
   }
 
-  return { trash, tradedTrashSort, trade, sort, luckySort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
+  return { trash, tradedTrashSort, trade, sort, luckySort, nundoSort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
            luckyHundoSet,
-           trashClauses, tradeClauses, sortClauses, luckySortClauses, prestagedClauses, giftClauses,
+           trashClauses, tradeClauses, sortClauses, luckySortClauses, nundoSortClauses, prestagedClauses, giftClauses,
            // Aux pro-tools
            shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
            evoSwapCandy, evoSwapItem,
@@ -2077,7 +2117,7 @@ export default function App() {
   const [lastPin, setLastPin] = useState(null);             // [lon, lat] — inspector
   const [bazaarTags, setBazaarTags] = useState([]);
   const [copied, setCopied] = useState({
-    trash: false, trade: false, sort: false, luckySort: false, prestaged: false, gift: false,
+    trash: false, trade: false, sort: false, luckySort: false, nundoSort: false, prestaged: false, gift: false,
     // Aux pro-tools
     tradedTrashSort: false,
     shadowCheap: false, shadowSafe: false, shadowHundoCandidates: false, shadowFrustration: false,
@@ -2158,9 +2198,9 @@ export default function App() {
   // explicitly picked a different one (e.g. their PoGo client is set to a
   // different language than their browser).
   const effectiveOutputLocale = effectiveConfig.expertMode ? outputLocale : locale;
-  const { trash, tradedTrashSort, trade, sort, luckySort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
+  const { trash, tradedTrashSort, trade, sort, luckySort, nundoSort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
           luckyHundoSet,
-          trashClauses, tradeClauses, sortClauses, luckySortClauses, prestagedClauses, giftClauses,
+          trashClauses, tradeClauses, sortClauses, luckySortClauses, nundoSortClauses, prestagedClauses, giftClauses,
           shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
           evoSwapCandy, evoSwapItem,
           cheapEvolve, dexPlus, megaEvolve, pilotLong,
@@ -2613,6 +2653,16 @@ export default function App() {
                     hint={t("app.filter.lucky_sort_hint")}
                   />
                 )}
+                {nundoSort && (
+                  <FilterBox
+                    label={t("app.filter.nundo_sort_label")}
+                    accent="#F5B82E"
+                    filterStr={nundoSort}
+                    copied={copied.nundoSort}
+                    onCopy={() => copyToClipboard("nundoSort", nundoSort)}
+                    hint={t("app.filter.nundo_sort_hint")}
+                  />
+                )}
                 {buddyCatchFilters.length > 0 && (
                   <BuddyCatchSection
                     buddyCatchFilters={buddyCatchFilters}
@@ -2885,7 +2935,7 @@ export default function App() {
                     label={t("app.collapsible.raw_clauses")}
                     open={showRawClauses}
                     onToggle={() => setShowRawClauses(s => !s)}>
-                    <RawClausesPanel trashClauses={trashClauses} tradeClauses={tradeClauses} sortClauses={sortClauses} luckySortClauses={luckySortClauses} prestagedClauses={prestagedClauses} giftClauses={giftClauses} buddyCatchFilters={buddyCatchFilters} />
+                    <RawClausesPanel trashClauses={trashClauses} tradeClauses={tradeClauses} sortClauses={sortClauses} luckySortClauses={luckySortClauses} nundoSortClauses={nundoSortClauses} prestagedClauses={prestagedClauses} giftClauses={giftClauses} buddyCatchFilters={buddyCatchFilters} />
                   </Collapsible>
 
                   <Collapsible
@@ -3977,7 +4027,7 @@ function SetTheory({ hundos, luckies, luckyHundoSet, TE_full, TE_trim, cfg }) {
   );
 }
 
-function RawClausesPanel({ trashClauses, tradeClauses, sortClauses, luckySortClauses, prestagedClauses, giftClauses, buddyCatchFilters }) {
+function RawClausesPanel({ trashClauses, tradeClauses, sortClauses, luckySortClauses, nundoSortClauses, prestagedClauses, giftClauses, buddyCatchFilters }) {
   const { t } = useTranslation();
   return (
     <div className="space-y-5 mono text-xs">
@@ -3992,6 +4042,9 @@ function RawClausesPanel({ trashClauses, tradeClauses, sortClauses, luckySortCla
       )}
       {luckySortClauses && luckySortClauses.length > 0 && (
         <ClauseList title={t("app.clauses.lucky_sort_title")} accent="#F5B82E" clauses={luckySortClauses} />
+      )}
+      {nundoSortClauses && nundoSortClauses.length > 0 && (
+        <ClauseList title={t("app.clauses.nundo_sort_title")} accent="#F5B82E" clauses={nundoSortClauses} />
       )}
       {prestagedClauses && prestagedClauses.length > 0 && (
         <ClauseList title={t("app.clauses.prestaged_title")} accent="#9B59B6" clauses={prestagedClauses} />
@@ -4264,6 +4317,7 @@ const EXPERT_ONLY_KEYS = new Set([
   "ageScopeDays",
   "distanceProtect",
   "luckyEligibleYear",
+  "protectNundos",
 ]);
 
 function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks = [] }) {
@@ -4292,6 +4346,7 @@ function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks =
   const settings = [
     ["protectFavorites",      "app.protect.favorites"],
     ["protectFourStar",       "app.protect.four_star",      { expertOnly: true, requireConfirmOff: true }],
+    ["protectNundos",         "app.protect.nundos",         { expertOnly: true, requireConfirmOff: true }],
     ["protectAnyTag",         "app.protect.any_tag"],
     ["protectTradeEvos",      "app.protect.trade_evos"],
     ["trashTradedRegionals",  "app.protect.trash_traded_regionals", { expertOnly: true }],
