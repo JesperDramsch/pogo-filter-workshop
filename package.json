@@ -12,6 +12,7 @@
     "fetch-pvp-rankings": "node scripts/fetch-pvp-rankings.mjs",
     "fetch-meta-rankings": "node scripts/fetch-meta-rankings.mjs",
     "fetch-evolution-costs": "node scripts/fetch-evolution-costs.mjs",
+    "generate-pwa-assets": "pwa-assets-generator",
     "prebuild": "node scripts/fetch-translations.mjs --offline-ok && node scripts/fetch-raid-bosses.mjs --offline-ok && node scripts/fetch-rocket-lineups.mjs --offline-ok && node scripts/fetch-rocket-grunt-quotes.mjs --offline-ok && node scripts/fetch-pvp-rankings.mjs --offline-ok && node scripts/fetch-meta-rankings.mjs --offline-ok && node scripts/fetch-evolution-costs.mjs --offline-ok",
     "build": "vite build",
     "test:fixtures": "vite-node scripts/check-fixtures.mjs",
@@ -26,18 +27,21 @@
     "lucide-react": "^0.454.0",
     "motion": "^12.0.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "vite-plugin-pwa": "^1.3.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "@vite-pwa/assets-generator": "^1.0.2",
     "@vitejs/plugin-react": "^5.2.0",
     "autoprefixer": "^10.4.20",
     "csv-parse": "^6.2.1",
-    "vite-node": "^3.2.4",
     "gh-pages": "^6.2.0",
     "postcss": "^8.4.49",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.15",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "vite-node": "^3.2.4"
   }
 }
