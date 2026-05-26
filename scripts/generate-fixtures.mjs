@@ -77,6 +77,12 @@ for (const locale of Object.keys(LOCALES)) {
     pvpFilters: Object.fromEntries(
       Object.entries(result.pvpFilters || {}).map(([k, v]) => [k, v.clause || ""])
     ),
+    // Event shiny-grind filters. Only the stable pools (eggs + research) are
+    // snapshotted; the combined + per-event spawn strings are time-windowed
+    // (filtered by `now`), so they're excluded to avoid daily fixture churn —
+    // same rationale as eventRaidFilters above.
+    eventEggsShiny: result.eventSpawns?.eggs || "",
+    eventResearchShiny: result.eventSpawns?.research || "",
     trashClauseCount: result.trashClauses.length,
     tradeClauseCount: result.tradeClauses.length,
   };

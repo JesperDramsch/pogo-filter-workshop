@@ -1,0 +1,1307 @@
+{
+  "fetchedAt": "2026-05-26T18:22:10.662Z",
+  "events": [
+    {
+      "eventID": "june-communityday2026",
+      "name": "Frigibax Community Day",
+      "eventType": "community-day",
+      "start": "2026-06-20T14:00:00.000",
+      "end": "2026-06-20T17:00:00.000",
+      "spawns": [
+        {
+          "dex": 996,
+          "name": "Frigibax",
+          "canBeShiny": true
+        }
+      ]
+    }
+  ],
+  "eggs": [
+    {
+      "dex": 1,
+      "name": "Bulbasaur",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 4,
+      "name": "Charmander",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 7,
+      "name": "Squirtle",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 152,
+      "name": "Chikorita",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 155,
+      "name": "Cyndaquil",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 158,
+      "name": "Totodile",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 252,
+      "name": "Treecko",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 255,
+      "name": "Torchic",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 258,
+      "name": "Mudkip",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 387,
+      "name": "Turtwig",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 390,
+      "name": "Chimchar",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 393,
+      "name": "Piplup",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 495,
+      "name": "Snivy",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 498,
+      "name": "Tepig",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 501,
+      "name": "Oshawott",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 650,
+      "name": "Chespin",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 653,
+      "name": "Fennekin",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 656,
+      "name": "Froakie",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 722,
+      "name": "Rowlet",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 725,
+      "name": "Litten",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 728,
+      "name": "Popplio",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 810,
+      "name": "Grookey",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 813,
+      "name": "Scorbunny",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 816,
+      "name": "Sobble",
+      "canBeShiny": false,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 906,
+      "name": "Sprigatito",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 909,
+      "name": "Fuecoco",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 912,
+      "name": "Quaxly",
+      "canBeShiny": true,
+      "eggType": "1 km"
+    },
+    {
+      "dex": 443,
+      "name": "Gible",
+      "canBeShiny": true,
+      "eggType": "10 km"
+    },
+    {
+      "dex": 633,
+      "name": "Deino",
+      "canBeShiny": true,
+      "eggType": "10 km"
+    },
+    {
+      "dex": 636,
+      "name": "Larvesta",
+      "canBeShiny": true,
+      "eggType": "10 km"
+    },
+    {
+      "dex": 679,
+      "name": "Honedge",
+      "canBeShiny": true,
+      "eggType": "10 km"
+    },
+    {
+      "dex": 704,
+      "name": "Goomy",
+      "canBeShiny": true,
+      "eggType": "10 km"
+    },
+    {
+      "dex": 776,
+      "name": "Turtonator",
+      "canBeShiny": true,
+      "eggType": "10 km"
+    },
+    {
+      "dex": 848,
+      "name": "Toxel",
+      "canBeShiny": true,
+      "eggType": "10 km"
+    },
+    {
+      "dex": 859,
+      "name": "Impidimp",
+      "canBeShiny": true,
+      "eggType": "10 km"
+    },
+    {
+      "dex": 885,
+      "name": "Dreepy",
+      "canBeShiny": false,
+      "eggType": "10 km"
+    },
+    {
+      "dex": 935,
+      "name": "Charcadet",
+      "canBeShiny": true,
+      "eggType": "10 km"
+    },
+    {
+      "dex": 955,
+      "name": "Flittle",
+      "canBeShiny": false,
+      "eggType": "10 km"
+    },
+    {
+      "dex": 957,
+      "name": "Tinkatink",
+      "canBeShiny": true,
+      "eggType": "10 km"
+    },
+    {
+      "dex": 551,
+      "name": "Sandile",
+      "canBeShiny": true,
+      "eggType": "12 km"
+    },
+    {
+      "dex": 629,
+      "name": "Vullaby",
+      "canBeShiny": true,
+      "eggType": "12 km"
+    },
+    {
+      "dex": 674,
+      "name": "Pancham",
+      "canBeShiny": true,
+      "eggType": "12 km"
+    },
+    {
+      "dex": 757,
+      "name": "Salandit",
+      "canBeShiny": true,
+      "eggType": "12 km"
+    },
+    {
+      "dex": 944,
+      "name": "Shroodle",
+      "canBeShiny": false,
+      "eggType": "12 km"
+    },
+    {
+      "dex": 965,
+      "name": "Varoom",
+      "canBeShiny": true,
+      "eggType": "12 km"
+    },
+    {
+      "dex": 173,
+      "name": "Cleffa",
+      "canBeShiny": true,
+      "eggType": "2 km"
+    },
+    {
+      "dex": 174,
+      "name": "Igglybuff",
+      "canBeShiny": true,
+      "eggType": "2 km"
+    },
+    {
+      "dex": 206,
+      "name": "Dunsparce",
+      "canBeShiny": true,
+      "eggType": "2 km"
+    },
+    {
+      "dex": 238,
+      "name": "Smoochum",
+      "canBeShiny": true,
+      "eggType": "2 km"
+    },
+    {
+      "dex": 636,
+      "name": "Larvesta",
+      "canBeShiny": true,
+      "eggType": "2 km"
+    },
+    {
+      "dex": 767,
+      "name": "Wimpod",
+      "canBeShiny": true,
+      "eggType": "2 km"
+    },
+    {
+      "dex": 938,
+      "name": "Tadbulb",
+      "canBeShiny": true,
+      "eggType": "2 km"
+    },
+    {
+      "dex": 227,
+      "name": "Skarmory",
+      "canBeShiny": true,
+      "eggType": "5 km"
+    },
+    {
+      "dex": 433,
+      "name": "Chingling",
+      "canBeShiny": true,
+      "eggType": "5 km"
+    },
+    {
+      "dex": 440,
+      "name": "Happiny",
+      "canBeShiny": true,
+      "eggType": "5 km"
+    },
+    {
+      "dex": 446,
+      "name": "Munchlax",
+      "canBeShiny": true,
+      "eggType": "5 km"
+    },
+    {
+      "dex": 447,
+      "name": "Riolu",
+      "canBeShiny": true,
+      "eggType": "5 km"
+    },
+    {
+      "dex": 531,
+      "name": "Audino",
+      "canBeShiny": true,
+      "eggType": "5 km"
+    },
+    {
+      "dex": 636,
+      "name": "Larvesta",
+      "canBeShiny": true,
+      "eggType": "5 km"
+    },
+    {
+      "dex": 850,
+      "name": "Sizzlipede",
+      "canBeShiny": true,
+      "eggType": "5 km"
+    },
+    {
+      "dex": 872,
+      "name": "Snom",
+      "canBeShiny": false,
+      "eggType": "5 km"
+    },
+    {
+      "dex": 876,
+      "name": "Indeedee (Male)",
+      "canBeShiny": true,
+      "eggType": "5 km"
+    },
+    {
+      "dex": 926,
+      "name": "Fidough",
+      "canBeShiny": true,
+      "eggType": "5 km"
+    },
+    {
+      "dex": 50,
+      "name": "Alolan Diglett",
+      "canBeShiny": true,
+      "eggType": "7 km"
+    },
+    {
+      "dex": 52,
+      "name": "Galarian Meowth",
+      "canBeShiny": true,
+      "eggType": "7 km"
+    },
+    {
+      "dex": 58,
+      "name": "Hisuian Growlithe",
+      "canBeShiny": true,
+      "eggType": "7 km"
+    },
+    {
+      "dex": 74,
+      "name": "Alolan Geodude",
+      "canBeShiny": true,
+      "eggType": "7 km"
+    },
+    {
+      "dex": 79,
+      "name": "Galarian Slowpoke",
+      "canBeShiny": true,
+      "eggType": "7 km"
+    },
+    {
+      "dex": 215,
+      "name": "Hisuian Sneasel",
+      "canBeShiny": true,
+      "eggType": "7 km"
+    },
+    {
+      "dex": 222,
+      "name": "Galarian Corsola",
+      "canBeShiny": true,
+      "eggType": "7 km"
+    },
+    {
+      "dex": 263,
+      "name": "Galarian Zigzagoon",
+      "canBeShiny": true,
+      "eggType": "7 km"
+    },
+    {
+      "dex": 550,
+      "name": "Basculin (White Striped)",
+      "canBeShiny": true,
+      "eggType": "7 km"
+    },
+    {
+      "dex": 554,
+      "name": "Galarian Darumaka",
+      "canBeShiny": true,
+      "eggType": "7 km"
+    },
+    {
+      "dex": 618,
+      "name": "Galarian Stunfisk",
+      "canBeShiny": true,
+      "eggType": "7 km"
+    }
+  ],
+  "research": [
+    {
+      "dex": 1,
+      "name": "Bulbasaur",
+      "canBeShiny": true
+    },
+    {
+      "dex": 2,
+      "name": "Ivysaur",
+      "canBeShiny": true
+    },
+    {
+      "dex": 3,
+      "name": "Venusaur",
+      "canBeShiny": true
+    },
+    {
+      "dex": 4,
+      "name": "Charmander",
+      "canBeShiny": true
+    },
+    {
+      "dex": 5,
+      "name": "Charmeleon",
+      "canBeShiny": true
+    },
+    {
+      "dex": 6,
+      "name": "Charizard",
+      "canBeShiny": true
+    },
+    {
+      "dex": 7,
+      "name": "Squirtle",
+      "canBeShiny": true
+    },
+    {
+      "dex": 8,
+      "name": "Wartortle",
+      "canBeShiny": true
+    },
+    {
+      "dex": 9,
+      "name": "Blastoise",
+      "canBeShiny": true
+    },
+    {
+      "dex": 18,
+      "name": "Pidgeot",
+      "canBeShiny": true
+    },
+    {
+      "dex": 24,
+      "name": "Arbok",
+      "canBeShiny": true
+    },
+    {
+      "dex": 27,
+      "name": "Alolan Sandshrew",
+      "canBeShiny": true
+    },
+    {
+      "dex": 30,
+      "name": "Nidorina",
+      "canBeShiny": true
+    },
+    {
+      "dex": 33,
+      "name": "Nidorino",
+      "canBeShiny": true
+    },
+    {
+      "dex": 35,
+      "name": "Clefairy",
+      "canBeShiny": true
+    },
+    {
+      "dex": 37,
+      "name": "Alolan Vulpix",
+      "canBeShiny": true
+    },
+    {
+      "dex": 39,
+      "name": "Jigglypuff",
+      "canBeShiny": true
+    },
+    {
+      "dex": 46,
+      "name": "Paras",
+      "canBeShiny": true
+    },
+    {
+      "dex": 50,
+      "name": "Diglett",
+      "canBeShiny": true
+    },
+    {
+      "dex": 52,
+      "name": "Meowth",
+      "canBeShiny": true
+    },
+    {
+      "dex": 54,
+      "name": "Psyduck",
+      "canBeShiny": true
+    },
+    {
+      "dex": 56,
+      "name": "Mankey",
+      "canBeShiny": true
+    },
+    {
+      "dex": 58,
+      "name": "Growlithe",
+      "canBeShiny": true
+    },
+    {
+      "dex": 60,
+      "name": "Poliwag",
+      "canBeShiny": true
+    },
+    {
+      "dex": 66,
+      "name": "Machop",
+      "canBeShiny": true
+    },
+    {
+      "dex": 74,
+      "name": "Alolan Geodude",
+      "canBeShiny": true
+    },
+    {
+      "dex": 79,
+      "name": "Galarian Slowpoke",
+      "canBeShiny": true
+    },
+    {
+      "dex": 84,
+      "name": "Doduo",
+      "canBeShiny": true
+    },
+    {
+      "dex": 95,
+      "name": "Onix",
+      "canBeShiny": true
+    },
+    {
+      "dex": 98,
+      "name": "Krabby",
+      "canBeShiny": true
+    },
+    {
+      "dex": 103,
+      "name": "Alolan Exeggutor",
+      "canBeShiny": true
+    },
+    {
+      "dex": 104,
+      "name": "Cubone",
+      "canBeShiny": true
+    },
+    {
+      "dex": 105,
+      "name": "Alolan Marowak",
+      "canBeShiny": true
+    },
+    {
+      "dex": 110,
+      "name": "Weezing",
+      "canBeShiny": true
+    },
+    {
+      "dex": 114,
+      "name": "Tangela",
+      "canBeShiny": true
+    },
+    {
+      "dex": 116,
+      "name": "Horsea",
+      "canBeShiny": true
+    },
+    {
+      "dex": 117,
+      "name": "Seadra",
+      "canBeShiny": true
+    },
+    {
+      "dex": 119,
+      "name": "Seaking",
+      "canBeShiny": true
+    },
+    {
+      "dex": 120,
+      "name": "Staryu",
+      "canBeShiny": true
+    },
+    {
+      "dex": 121,
+      "name": "Starmie",
+      "canBeShiny": true
+    },
+    {
+      "dex": 123,
+      "name": "Scyther",
+      "canBeShiny": true
+    },
+    {
+      "dex": 125,
+      "name": "Electabuzz",
+      "canBeShiny": true
+    },
+    {
+      "dex": 126,
+      "name": "Magmar",
+      "canBeShiny": true
+    },
+    {
+      "dex": 129,
+      "name": "Magikarp",
+      "canBeShiny": true
+    },
+    {
+      "dex": 131,
+      "name": "Lapras",
+      "canBeShiny": true
+    },
+    {
+      "dex": 133,
+      "name": "Eevee",
+      "canBeShiny": true
+    },
+    {
+      "dex": 134,
+      "name": "Vaporeon",
+      "canBeShiny": true
+    },
+    {
+      "dex": 135,
+      "name": "Jolteon",
+      "canBeShiny": true
+    },
+    {
+      "dex": 136,
+      "name": "Flareon",
+      "canBeShiny": true
+    },
+    {
+      "dex": 138,
+      "name": "Omanyte",
+      "canBeShiny": true
+    },
+    {
+      "dex": 140,
+      "name": "Kabuto",
+      "canBeShiny": true
+    },
+    {
+      "dex": 142,
+      "name": "Aerodactyl",
+      "canBeShiny": true
+    },
+    {
+      "dex": 143,
+      "name": "Snorlax",
+      "canBeShiny": true
+    },
+    {
+      "dex": 147,
+      "name": "Dratini",
+      "canBeShiny": true
+    },
+    {
+      "dex": 164,
+      "name": "Noctowl",
+      "canBeShiny": true
+    },
+    {
+      "dex": 176,
+      "name": "Togetic",
+      "canBeShiny": true
+    },
+    {
+      "dex": 183,
+      "name": "Marill",
+      "canBeShiny": true
+    },
+    {
+      "dex": 185,
+      "name": "Sudowoodo",
+      "canBeShiny": true
+    },
+    {
+      "dex": 191,
+      "name": "Sunkern",
+      "canBeShiny": true
+    },
+    {
+      "dex": 206,
+      "name": "Dunsparce",
+      "canBeShiny": true
+    },
+    {
+      "dex": 215,
+      "name": "Sneasel",
+      "canBeShiny": true
+    },
+    {
+      "dex": 216,
+      "name": "Teddiursa",
+      "canBeShiny": true
+    },
+    {
+      "dex": 219,
+      "name": "Magcargo",
+      "canBeShiny": true
+    },
+    {
+      "dex": 221,
+      "name": "Piloswine",
+      "canBeShiny": true
+    },
+    {
+      "dex": 223,
+      "name": "Remoraid",
+      "canBeShiny": true
+    },
+    {
+      "dex": 226,
+      "name": "Mantine",
+      "canBeShiny": true
+    },
+    {
+      "dex": 228,
+      "name": "Houndour",
+      "canBeShiny": true
+    },
+    {
+      "dex": 246,
+      "name": "Larvitar",
+      "canBeShiny": true
+    },
+    {
+      "dex": 271,
+      "name": "Lombre",
+      "canBeShiny": true
+    },
+    {
+      "dex": 274,
+      "name": "Nuzleaf",
+      "canBeShiny": true
+    },
+    {
+      "dex": 278,
+      "name": "Wingull",
+      "canBeShiny": true
+    },
+    {
+      "dex": 280,
+      "name": "Ralts",
+      "canBeShiny": true
+    },
+    {
+      "dex": 290,
+      "name": "Nincada",
+      "canBeShiny": true
+    },
+    {
+      "dex": 296,
+      "name": "Makuhita",
+      "canBeShiny": true
+    },
+    {
+      "dex": 302,
+      "name": "Sableye",
+      "canBeShiny": true
+    },
+    {
+      "dex": 303,
+      "name": "Mawile",
+      "canBeShiny": true
+    },
+    {
+      "dex": 304,
+      "name": "Aron",
+      "canBeShiny": true
+    },
+    {
+      "dex": 320,
+      "name": "Wailmer",
+      "canBeShiny": true
+    },
+    {
+      "dex": 322,
+      "name": "Numel",
+      "canBeShiny": true
+    },
+    {
+      "dex": 326,
+      "name": "Grumpig",
+      "canBeShiny": true
+    },
+    {
+      "dex": 327,
+      "name": "Spinda 1",
+      "canBeShiny": true
+    },
+    {
+      "dex": 328,
+      "name": "Trapinch",
+      "canBeShiny": true
+    },
+    {
+      "dex": 333,
+      "name": "Swablu",
+      "canBeShiny": true
+    },
+    {
+      "dex": 343,
+      "name": "Baltoy",
+      "canBeShiny": true
+    },
+    {
+      "dex": 345,
+      "name": "Lileep",
+      "canBeShiny": true
+    },
+    {
+      "dex": 347,
+      "name": "Anorith",
+      "canBeShiny": true
+    },
+    {
+      "dex": 349,
+      "name": "Feebas",
+      "canBeShiny": true
+    },
+    {
+      "dex": 356,
+      "name": "Dusclops",
+      "canBeShiny": true
+    },
+    {
+      "dex": 361,
+      "name": "Snorunt",
+      "canBeShiny": true
+    },
+    {
+      "dex": 364,
+      "name": "Sealeo",
+      "canBeShiny": true
+    },
+    {
+      "dex": 366,
+      "name": "Clamperl",
+      "canBeShiny": true
+    },
+    {
+      "dex": 371,
+      "name": "Bagon",
+      "canBeShiny": true
+    },
+    {
+      "dex": 374,
+      "name": "Beldum",
+      "canBeShiny": true
+    },
+    {
+      "dex": 375,
+      "name": "Metang",
+      "canBeShiny": true
+    },
+    {
+      "dex": 397,
+      "name": "Staravia",
+      "canBeShiny": true
+    },
+    {
+      "dex": 399,
+      "name": "Bidoof",
+      "canBeShiny": true
+    },
+    {
+      "dex": 404,
+      "name": "Luxio",
+      "canBeShiny": true
+    },
+    {
+      "dex": 415,
+      "name": "Combee",
+      "canBeShiny": true
+    },
+    {
+      "dex": 427,
+      "name": "Buneary",
+      "canBeShiny": true
+    },
+    {
+      "dex": 431,
+      "name": "Glameow",
+      "canBeShiny": true
+    },
+    {
+      "dex": 434,
+      "name": "Stunky",
+      "canBeShiny": true
+    },
+    {
+      "dex": 443,
+      "name": "Gible",
+      "canBeShiny": true
+    },
+    {
+      "dex": 444,
+      "name": "Gabite",
+      "canBeShiny": true
+    },
+    {
+      "dex": 449,
+      "name": "Hippopotas",
+      "canBeShiny": true
+    },
+    {
+      "dex": 453,
+      "name": "Croagunk",
+      "canBeShiny": true
+    },
+    {
+      "dex": 459,
+      "name": "Snover",
+      "canBeShiny": true
+    },
+    {
+      "dex": 495,
+      "name": "Snivy",
+      "canBeShiny": true
+    },
+    {
+      "dex": 498,
+      "name": "Tepig",
+      "canBeShiny": true
+    },
+    {
+      "dex": 501,
+      "name": "Oshawott",
+      "canBeShiny": true
+    },
+    {
+      "dex": 507,
+      "name": "Herdier",
+      "canBeShiny": true
+    },
+    {
+      "dex": 510,
+      "name": "Liepard",
+      "canBeShiny": true
+    },
+    {
+      "dex": 520,
+      "name": "Tranquill",
+      "canBeShiny": true
+    },
+    {
+      "dex": 524,
+      "name": "Roggenrola",
+      "canBeShiny": true
+    },
+    {
+      "dex": 525,
+      "name": "Boldore",
+      "canBeShiny": true
+    },
+    {
+      "dex": 531,
+      "name": "Audino",
+      "canBeShiny": true
+    },
+    {
+      "dex": 533,
+      "name": "Gurdurr",
+      "canBeShiny": true
+    },
+    {
+      "dex": 536,
+      "name": "Palpitoad",
+      "canBeShiny": true
+    },
+    {
+      "dex": 544,
+      "name": "Whirlipede",
+      "canBeShiny": true
+    },
+    {
+      "dex": 546,
+      "name": "Cottonee",
+      "canBeShiny": true
+    },
+    {
+      "dex": 554,
+      "name": "Darumaka",
+      "canBeShiny": true
+    },
+    {
+      "dex": 564,
+      "name": "Tirtouga",
+      "canBeShiny": true
+    },
+    {
+      "dex": 566,
+      "name": "Archen",
+      "canBeShiny": true
+    },
+    {
+      "dex": 568,
+      "name": "Trubbish",
+      "canBeShiny": true
+    },
+    {
+      "dex": 572,
+      "name": "Minccino",
+      "canBeShiny": true
+    },
+    {
+      "dex": 580,
+      "name": "Ducklett",
+      "canBeShiny": true
+    },
+    {
+      "dex": 582,
+      "name": "Vanillite",
+      "canBeShiny": true
+    },
+    {
+      "dex": 587,
+      "name": "Emolga",
+      "canBeShiny": true
+    },
+    {
+      "dex": 597,
+      "name": "Ferroseed",
+      "canBeShiny": true
+    },
+    {
+      "dex": 603,
+      "name": "Eelektrik",
+      "canBeShiny": true
+    },
+    {
+      "dex": 605,
+      "name": "Elgyem",
+      "canBeShiny": true
+    },
+    {
+      "dex": 608,
+      "name": "Lampent",
+      "canBeShiny": true
+    },
+    {
+      "dex": 610,
+      "name": "Axew",
+      "canBeShiny": true
+    },
+    {
+      "dex": 613,
+      "name": "Cubchoo",
+      "canBeShiny": true
+    },
+    {
+      "dex": 618,
+      "name": "Stunfisk",
+      "canBeShiny": true
+    },
+    {
+      "dex": 659,
+      "name": "Bunnelby",
+      "canBeShiny": true
+    },
+    {
+      "dex": 660,
+      "name": "Diggersby",
+      "canBeShiny": true
+    },
+    {
+      "dex": 662,
+      "name": "Fletchinder",
+      "canBeShiny": true
+    },
+    {
+      "dex": 667,
+      "name": "Litleo",
+      "canBeShiny": true
+    },
+    {
+      "dex": 688,
+      "name": "Binacle",
+      "canBeShiny": true
+    },
+    {
+      "dex": 690,
+      "name": "Skrelp",
+      "canBeShiny": true
+    },
+    {
+      "dex": 692,
+      "name": "Clauncher",
+      "canBeShiny": true
+    },
+    {
+      "dex": 696,
+      "name": "Tyrunt",
+      "canBeShiny": true
+    },
+    {
+      "dex": 698,
+      "name": "Amaura",
+      "canBeShiny": true
+    },
+    {
+      "dex": 702,
+      "name": "Dedenne",
+      "canBeShiny": true
+    },
+    {
+      "dex": 708,
+      "name": "Phantump",
+      "canBeShiny": true
+    },
+    {
+      "dex": 722,
+      "name": "Rowlet",
+      "canBeShiny": true
+    },
+    {
+      "dex": 725,
+      "name": "Litten",
+      "canBeShiny": true
+    },
+    {
+      "dex": 728,
+      "name": "Popplio",
+      "canBeShiny": true
+    },
+    {
+      "dex": 732,
+      "name": "Trumbeak",
+      "canBeShiny": true
+    },
+    {
+      "dex": 742,
+      "name": "Cutiefly",
+      "canBeShiny": true
+    },
+    {
+      "dex": 747,
+      "name": "Mareanie",
+      "canBeShiny": true
+    },
+    {
+      "dex": 751,
+      "name": "Dewpider",
+      "canBeShiny": true
+    },
+    {
+      "dex": 759,
+      "name": "Stufful",
+      "canBeShiny": true
+    },
+    {
+      "dex": 761,
+      "name": "Bounsweet",
+      "canBeShiny": true
+    },
+    {
+      "dex": 767,
+      "name": "Wimpod",
+      "canBeShiny": true
+    },
+    {
+      "dex": 782,
+      "name": "Jangmo-o",
+      "canBeShiny": true
+    },
+    {
+      "dex": 827,
+      "name": "Nickit",
+      "canBeShiny": false
+    },
+    {
+      "dex": 831,
+      "name": "Wooloo",
+      "canBeShiny": true
+    },
+    {
+      "dex": 835,
+      "name": "Yamper",
+      "canBeShiny": false
+    },
+    {
+      "dex": 854,
+      "name": "Sinistea",
+      "canBeShiny": true
+    },
+    {
+      "dex": 915,
+      "name": "Lechonk",
+      "canBeShiny": true
+    },
+    {
+      "dex": 917,
+      "name": "Tarountula",
+      "canBeShiny": false
+    },
+    {
+      "dex": 919,
+      "name": "Nymble",
+      "canBeShiny": true
+    },
+    {
+      "dex": 921,
+      "name": "Pawmi",
+      "canBeShiny": true
+    },
+    {
+      "dex": 924,
+      "name": "Tandemaus",
+      "canBeShiny": true
+    },
+    {
+      "dex": 926,
+      "name": "Fidough",
+      "canBeShiny": true
+    },
+    {
+      "dex": 928,
+      "name": "Smoliv",
+      "canBeShiny": true
+    },
+    {
+      "dex": 932,
+      "name": "Nacli",
+      "canBeShiny": false
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+name: Sync event spawns
+
+on:
+  schedule:
+    - cron: "53 7 * * *" # daily at 07:53 UTC (offset from other syncs)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Exits 1 on real failure (fetch error, all three feeds empty). A failed
+      # run shows up as a red workflow + GitHub notification — the only
+      # intervention the user wants.
+      - name: Fetch event spawns + egg pool + research from ScrapedDuck
+        run: npm run fetch-event-spawns
+      - name: Regenerate fixture snapshot
+        run: npx vite-node scripts/generate-fixtures.mjs
+      - name: Commit + push if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- src/data/event-spawns.json src/__fixtures__/default-filter-output.json; then
+            echo "No event-spawn changes — skipping commit."
+            exit 0
+          fi
+          git add src/data/event-spawns.json src/__fixtures__/default-filter-output.json
+          git commit -m "chore(events): sync spawn/egg/research snapshot from ScrapedDuck"
+          git push

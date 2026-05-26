@@ -13,6 +13,7 @@ import ROCKET_LINEUPS from "./data/rocket-lineups.json";
 import ROCKET_GRUNT_QUOTES from "./data/rocket-grunt-quotes.json";
 import RocketQuoteLookup from "./explain/RocketQuoteLookup.jsx";
 import PVP_RANKINGS from "./data/pvp-rankings.json";
+import EVENT_SPAWNS from "./data/event-spawns.json";
 import META_RANKINGS from "./data/meta-rankings.json";
 import EVOLUTION_COSTS from "./data/evolution-costs.json";
 import { useTranslation } from "./i18n/I18nProvider.jsx";
@@ -1591,6 +1592,69 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     }
   }
 
+  // -- EVENTS · "what's catchable right now" shiny-grind filters -------
+  // Three sources from ScrapedDuck (events / eggs / research), pre-derived
+  // in scripts/fetch-event-spawns.mjs into src/data/event-spawns.json. We
+  // build family OR-searches (`+frigibax,+squirtle,…`) so a user can paste
+  // one string into PoGo and scan their collection for which featured
+  // species they're still missing a shiny of. Shiny-eligible species only —
+  // that's the stated use case (decide what to grind during the event).
+  //
+  // Identity is the base dex number; `pokemonNameFor` localizes it to the
+  // PoGo client's language. A base-dex family token catches every form, so a
+  // single `+vulpix` covers Alolan too.
+  const familyTokenFor = (mon) => {
+    const name = pokemonNameFor(String(mon.dex), outputLocale) || mon.name?.toLowerCase();
+    return name ? `+${name}` : null;
+  };
+  // Dedupe by dex across a flat species list, keep only shiny-eligible, and
+  // join into a single family OR-clause. Returns "" when nothing qualifies.
+  const shinyFamilyFilter = (mons) => {
+    const seen = new Set();
+    const tokens = [];
+    for (const m of (mons || [])) {
+      if (!m?.canBeShiny || seen.has(m.dex)) continue;
+      seen.add(m.dex);
+      const tok = familyTokenFor(m);
+      if (tok) tokens.push(tok);
+    }
+    return tokens.join(",");
+  };
+
+  const eventEggsShiny = shinyFamilyFilter(EVENT_SPAWNS.eggs);
+  const eventResearchShiny = shinyFamilyFilter(EVENT_SPAWNS.research);
+  // Per-event spawn filters — re-filter by `now` so events that expired since
+  // the snapshot was taken drop out (the committed file carries a 30-day
+  // lookahead from fetch time). Only events whose shiny-spawn list is
+  // non-empty survive.
+  const nowEventMs = Date.now();
+  const eventSpawnGroups = (EVENT_SPAWNS.events || [])
+    .filter(e => Date.parse(e.end) >= nowEventMs)
+    .map(e => ({
+      eventID: e.eventID,
+      name: e.name,
+      eventType: e.eventType,
+      start: e.start,
+      end: e.end,
+      filter: shinyFamilyFilter(e.spawns),
+    }))
+    .filter(e => e.filter);
+  // Combined "everything shiny-grindable now" — events + eggs + research,
+  // deduped across all three so the user gets one paste-and-scan string.
+  const eventCombinedShiny = shinyFamilyFilter([
+    ...eventSpawnGroups.flatMap(g =>
+      (EVENT_SPAWNS.events.find(e => e.eventID === g.eventID)?.spawns) || []),
+    ...(EVENT_SPAWNS.eggs || []),
+    ...(EVENT_SPAWNS.research || []),
+  ]);
+  const eventSpawns = {
+    fetchedAt: EVENT_SPAWNS.fetchedAt || null,
+    combined: eventCombinedShiny,
+    eggs: eventEggsShiny,
+    research: eventResearchShiny,
+    events: eventSpawnGroups,
+  };
+
   return { trash, tradedTrashSort, trade, sort, luckySort, nundoSort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
            luckyHundoSet,
            trashClauses, tradeClauses, sortClauses, luckySortClauses, nundoSortClauses, prestagedClauses, giftClauses,
@@ -1607,7 +1671,9 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
            rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
            rocketTypeLabels,
            // PvP league meta filters
-           pvpFilters, pvpRankingsFetchedAt, cupFilters };
+           pvpFilters, pvpRankingsFetchedAt, cupFilters,
+           // Event / egg / research shiny-grind filters
+           eventSpawns };
 }
 
 // ─── PARSER (for verification panel) ──────────────────────────────────────
@@ -2076,6 +2142,7 @@ export default function App() {
   const [showAuxMaxBattles, setShowAuxMaxBattles] = useState(false);
   const [showAuxRocket, setShowAuxRocket] = useState(false);
   const [showAuxPvp, setShowAuxPvp] = useState(false);
+  const [showAuxEvents, setShowAuxEvents] = useState(false);
   const [showRawClauses, setShowRawClauses] = useState(false);
   const [showVerify, setShowVerify] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -2210,7 +2277,8 @@ export default function App() {
           raidFilters, eventRaidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
           rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
           rocketTypeLabels,
-          pvpFilters, pvpRankingsFetchedAt, cupFilters } = useMemo(
+          pvpFilters, pvpRankingsFetchedAt, cupFilters,
+          eventSpawns } = useMemo(
     () => buildFilters(hundos, luckies, { ...effectiveConfig, topAttackers, topMaxAttackers }, homeLocals, effectiveOutputLocale, t, homeLocalTypeChecks),
     [hundos, luckies, effectiveConfig, homeLocals, homeLocalTypeChecks, effectiveOutputLocale, topAttackers, topMaxAttackers, t]
   );
@@ -2894,6 +2962,30 @@ export default function App() {
                     copied={copied}
                     copyToClipboard={copyToClipboard}
                     t={t}
+                  />
+                </div>
+
+                {/* Events section — shiny-grind targets currently catchable
+                    via event spawns, the egg pool, and field-research rewards.
+                    Sourced from ScrapedDuck; sync via
+                    .github/workflows/sync-event-spawns.yml. */}
+                <div className="space-y-3 pt-4">
+                  <h3 className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0]">
+                    {t("app.collapsible.aux_section_events")}
+                  </h3>
+                  <EventSpawnsCollapsible
+                    fetchedAt={eventSpawns.fetchedAt}
+                    combined={eventSpawns.combined}
+                    eggs={eventSpawns.eggs}
+                    research={eventSpawns.research}
+                    events={eventSpawns.events}
+                    accent="#1ABC9C"
+                    open={showAuxEvents}
+                    onToggle={() => setShowAuxEvents((s) => !s)}
+                    copied={copied}
+                    copyToClipboard={copyToClipboard}
+                    t={t}
+                    locale={locale}
                   />
                 </div>
 
@@ -3583,6 +3675,87 @@ function BossCollapsible({
             </TrainerAccordion>
           );
         })}
+      </div>
+      <p className="mono text-[10.5px] text-[#8090A0] mt-4 pt-3 border-t border-[#1F2933]">
+        {footerLabel}
+      </p>
+    </Collapsible>
+  );
+}
+
+// Shiny-grind filters for what's catchable right now: a combined "everything"
+// string, per-event wild spawns (Community Day / Spotlight Hour, when upstream
+// lists them), the current egg pool, and field-research rewards. Each box is a
+// family OR-search of shiny-eligible species — paste into PoGo and scan for the
+// ones with no shiny copy yet. Empty state nudges a snapshot refresh.
+function EventSpawnsCollapsible({
+  fetchedAt, combined, eggs, research, events, accent,
+  open, onToggle, copied, copyToClipboard, t, locale,
+}) {
+  const eventBoxes = (events || []).filter(e => e.filter);
+  const total =
+    (combined ? 1 : 0) + (eggs ? 1 : 0) + (research ? 1 : 0) + eventBoxes.length;
+  const age = formatSyncAge(fetchedAt, t);
+  const headerLabel = t("app.collapsible.aux_events");
+  const countLabel = t("app.collapsible.aux_events_count", { params: { count: total } });
+  const footerLabel = age
+    ? t("app.collapsible.aux_footer", { params: { count: countLabel, age } })
+    : t("app.collapsible.aux_footer_no_age", { params: { count: countLabel } });
+  if (total === 0) {
+    return (
+      <Collapsible icon="✨" label={headerLabel} open={open} onToggle={onToggle}>
+        <p className="text-xs italic text-[#8B98A5]">{t("app.filter.aux_events_empty")}</p>
+      </Collapsible>
+    );
+  }
+  return (
+    <Collapsible icon="✨" label={headerLabel} open={open} onToggle={onToggle}>
+      <div className="space-y-4">
+        {combined && (
+          <FilterBox
+            label={t("app.filter.event_combined_label")}
+            accent={accent}
+            filterStr={combined}
+            copied={copied.eventCombined}
+            onCopy={() => copyToClipboard("eventCombined", combined)}
+            hint={t("app.filter.event_combined_hint")}
+          />
+        )}
+        {eventBoxes.map((e) => {
+          const teaser = formatEventWindow(e.start, e.end, t, locale);
+          const key = `eventSpawn_${e.eventID}`;
+          return (
+            <FilterBox
+              key={key}
+              label={e.name}
+              accent={accent}
+              filterStr={e.filter}
+              copied={copied[key]}
+              onCopy={() => copyToClipboard(key, e.filter)}
+              hint={t("app.filter.event_spawns_hint", { params: { window: teaser } })}
+            />
+          );
+        })}
+        {eggs && (
+          <FilterBox
+            label={t("app.filter.event_eggs_label")}
+            accent={accent}
+            filterStr={eggs}
+            copied={copied.eventEggs}
+            onCopy={() => copyToClipboard("eventEggs", eggs)}
+            hint={t("app.filter.event_eggs_hint")}
+          />
+        )}
+        {research && (
+          <FilterBox
+            label={t("app.filter.event_research_label")}
+            accent={accent}
+            filterStr={research}
+            copied={copied.eventResearch}
+            onCopy={() => copyToClipboard("eventResearch", research)}
+            hint={t("app.filter.event_research_hint")}
+          />
+        )}
       </div>
       <p className="mono text-[10.5px] text-[#8090A0] mt-4 pt-3 border-t border-[#1F2933]">
         {footerLabel}
