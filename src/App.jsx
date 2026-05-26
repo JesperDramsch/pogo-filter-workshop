@@ -5478,6 +5478,12 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
               API isn't available. */}
           <StoragePersistenceSection />
 
+          {/* Home screen — surface PWA install when the browser exposes
+              beforeinstallprompt, otherwise point to the manual install
+              menu. Sits next to Storage Persistence because both help
+              Firefox Mobile keep state across sessions. */}
+          <HomeScreenSection />
+
           {/* Backup & Restore — JSON file round-trip for cross-device / browser-wipe recovery */}
           <BackupRestoreSection onExport={onExport} onImport={onImport} />
 
@@ -5570,6 +5576,86 @@ function StoragePersistenceSection() {
             {t("app.modal.storage.help")}
           </div>
         </>
+      )}
+    </div>
+  );
+}
+
+// Mirrors StoragePersistenceSection: surfaces the PWA install affordance
+// when the browser fires beforeinstallprompt (Chromium / Edge / Android
+// Chrome). iOS Safari and desktop Firefox never fire the event, so we fall
+// back to a one-line pointer at the browser's own install menu. Listening
+// for `appinstalled` lets us flip to the success state without a reload.
+function HomeScreenSection() {
+  const { t } = useTranslation();
+  const [installed, setInstalled] = useState(
+    () =>
+      (typeof window !== "undefined" &&
+        window.matchMedia?.("(display-mode: standalone)").matches) ||
+      window.navigator.standalone === true
+  );
+  const [installPrompt, setInstallPrompt] = useState(null);
+  const [installing, setInstalling] = useState(false);
+
+  useEffect(() => {
+    function onBeforeInstallPrompt(e) {
+      e.preventDefault();
+      setInstallPrompt(e);
+    }
+    function onAppInstalled() {
+      setInstalled(true);
+      setInstallPrompt(null);
+    }
+    window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
+    window.addEventListener("appinstalled", onAppInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", onAppInstalled);
+    };
+  }, []);
+
+  async function install() {
+    if (!installPrompt) return;
+    setInstalling(true);
+    try {
+      await installPrompt.prompt();
+      await installPrompt.userChoice;
+    } catch {
+      // user dismiss / browser-level reject — nothing to recover, the
+      // event is single-use either way
+    } finally {
+      setInstalling(false);
+      setInstallPrompt(null);
+    }
+  }
+
+  return (
+    <div className="pt-4 border-t border-[#1F2933]">
+      <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
+        {t("app.modal.home_screen.section_title")}
+      </div>
+      {installed ? (
+        <div className="mono text-xs text-[#3FB67A]">
+          {t("app.modal.home_screen.installed_status")}
+        </div>
+      ) : installPrompt ? (
+        <>
+          <button
+            onClick={install}
+            disabled={installing}
+            className="mono text-xs px-3 py-1.5 rounded transition bg-[#1F2933] text-[#5EAFC5] hover:bg-[#2D3A47] disabled:opacity-50">
+            {installing
+              ? t("app.modal.home_screen.installing")
+              : t("app.modal.home_screen.install_button")}
+          </button>
+          <div className="mono text-[10px] text-[#8090A0] mt-1.5">
+            {t("app.modal.home_screen.install_help")}
+          </div>
+        </>
+      ) : (
+        <div className="mono text-[10px] text-[#8090A0]">
+          {t("app.modal.home_screen.fallback_help")}
+        </div>
       )}
     </div>
   );
