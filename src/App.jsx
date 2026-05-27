@@ -976,9 +976,9 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
   // finding every 0/0/0, including ones already starred or tagged.
   const nundoSortClauses = [];
   if (cfg.protectNundos) {
-    push(nundoSortClauses, `0-0${kw.iv.atk}`, tFn("app.clause_why.nundo_atk_zero"));
-    push(nundoSortClauses, `0-0${kw.iv.def}`, tFn("app.clause_why.nundo_def_zero"));
-    push(nundoSortClauses, `0-0${kw.iv.hp}`,  tFn("app.clause_why.nundo_hp_zero"));
+    push(nundoSortClauses, `0${kw.iv.atk}`, tFn("app.clause_why.nundo_atk_zero"));
+    push(nundoSortClauses, `0${kw.iv.def}`, tFn("app.clause_why.nundo_def_zero"));
+    push(nundoSortClauses, `0${kw.iv.hp}`,  tFn("app.clause_why.nundo_hp_zero"));
   }
   const nundoSort = nundoSortClauses.map(c => c.clause).join("&");
 
