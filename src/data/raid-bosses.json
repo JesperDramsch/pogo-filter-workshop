@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-25T11:37:43.555Z",
+  "fetchedAt": "2026-05-27T11:06:00.988Z",
   "raids": {
     "mega": [
       {
@@ -1532,34 +1532,6 @@
           "fairy"
         ]
       }
-    ],
-    "tier_5": [
-      {
-        "id": "REGISTEEL",
-        "names": {
-          "en": "Registeel",
-          "de": "Registeel",
-          "fr": "Registeel",
-          "it": "Registeel",
-          "ja": "レジスチル",
-          "ko": "레지스틸",
-          "es": "Registeel"
-        },
-        "types": [
-          "steel"
-        ],
-        "resistorTypes": [
-          "steel",
-          "fire",
-          "water",
-          "electric"
-        ],
-        "seMoveTypes": [
-          "fighting",
-          "ground",
-          "fire"
-        ]
-      }
     ]
   },
   "eventRaids": [
@@ -1656,6 +1628,97 @@
             "poison",
             "grass",
             "electric"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "shadow-dialga-in-shadow-raids-june-2026",
+      "name": "Shadow Dialga in Shadow Raids",
+      "eventType": "raid-battles",
+      "start": "2026-06-02T06:00:00.000",
+      "end": "2026-06-30T22:00:00.000",
+      "isShadow": true,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "DIALGA",
+          "names": {
+            "en": "Dialga"
+          },
+          "types": [
+            "steel",
+            "dragon"
+          ],
+          "resistorTypes": [
+            "steel",
+            "fire",
+            "water",
+            "electric"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "ground"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "reshiram-in-5-star-raid-battles-june-2026",
+      "name": "Reshiram in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-06-03T06:00:00.000",
+      "end": "2026-06-09T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "RESHIRAM",
+          "names": {
+            "en": "Reshiram"
+          },
+          "types": [
+            "dragon",
+            "fire"
+          ],
+          "resistorTypes": [
+            "rock",
+            "fire",
+            "water",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "ground",
+            "rock",
+            "dragon"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-audino-in-mega-raids-june-2026",
+      "name": "Mega Audino in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-06-03T06:00:00.000",
+      "end": "2026-06-10T06:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "AUDINO",
+          "names": {
+            "en": "Audino"
+          },
+          "types": [
+            "normal"
+          ],
+          "resistorTypes": [
+            "rock",
+            "ghost",
+            "steel"
+          ],
+          "seMoveTypes": [
+            "fighting"
           ]
         }
       ]
