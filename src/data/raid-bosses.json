@@ -1,261 +1,259 @@
 {
-  "fetchedAt": "2026-05-27T11:06:00.988Z",
+  "fetchedAt": "2026-05-28T11:07:32.115Z",
   "raids": {
     "mega": [
       {
-        "id": "ALTARIA",
+        "id": "MEDICHAM",
         "names": {
-          "en": "Mega Altaria",
-          "de": "Mega-Altaria",
-          "fr": "Méga-Altaria",
-          "it": "MegaAltaria",
-          "ja": "メガチルタリス",
-          "ko": "메가파비코리",
-          "es": "Mega-Altaria"
+          "en": "Mega Medicham",
+          "de": "Mega-Meditalis",
+          "fr": "Méga-Charmina",
+          "it": "MegaMedicham",
+          "ja": "メガチャーレム",
+          "ko": "메가요가램",
+          "es": "Mega-Medicham"
         },
         "types": [
-          "dragon",
-          "fairy"
+          "fighting",
+          "psychic"
         ],
         "resistorTypes": [
-          "poison",
-          "steel",
-          "fire",
+          "flying",
+          "bug",
+          "ghost",
+          "psychic",
           "fairy"
         ],
         "seMoveTypes": [
           "fairy",
-          "ice",
-          "poison",
-          "steel"
+          "flying",
+          "ghost"
         ]
       }
     ],
     "lvl5": [
       {
-        "id": "TAPU_BULU",
+        "id": "TAPU_FINI",
         "names": {
-          "en": "Tapu Bulu",
-          "de": "Kapu-Toro",
-          "fr": "Tokotoro",
-          "it": "Tapu Bulu",
-          "ja": "カプ・ブルル",
-          "ko": "카푸브루루",
-          "es": "Tapu Bulu"
+          "en": "Tapu Fini",
+          "de": "Kapu-Kime",
+          "fr": "Tokopisco",
+          "it": "Tapu Fini",
+          "ja": "カプ・レヒレ",
+          "ko": "카푸느지느",
+          "es": "Tapu Fini"
         },
         "types": [
-          "grass",
+          "water",
           "fairy"
         ],
         "resistorTypes": [
-          "flying",
           "poison",
-          "bug",
           "steel",
-          "fire",
+          "water",
           "grass"
         ],
         "seMoveTypes": [
-          "poison",
-          "fire",
-          "flying",
-          "ice",
-          "steel"
+          "electric",
+          "grass",
+          "poison"
         ]
       }
     ],
     "lvl3": [
       {
-        "id": "PILOSWINE",
+        "id": "SCYTHER",
         "names": {
-          "en": "Piloswine",
-          "de": "Keifel",
-          "fr": "Cochignon",
-          "it": "Piloswine",
-          "ja": "イノムー",
-          "ko": "메꾸리",
-          "es": "Piloswine"
+          "en": "Scyther",
+          "de": "Sichlor",
+          "fr": "Insécateur",
+          "it": "Scyther",
+          "ja": "ストライク",
+          "ko": "스라크",
+          "es": "Scyther"
         },
         "types": [
-          "ice",
-          "ground"
+          "bug",
+          "flying"
         ],
         "resistorTypes": [
-          "bug",
+          "flying",
+          "poison",
+          "rock",
+          "ghost",
+          "steel",
+          "fire",
+          "electric",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "rock",
+          "electric",
+          "fire",
+          "flying",
+          "ice"
+        ]
+      },
+      {
+        "id": "LAPRAS",
+        "names": {
+          "en": "Lapras",
+          "de": "Lapras",
+          "fr": "Lokhlass",
+          "it": "Lapras",
+          "ja": "ラプラス",
+          "ko": "라프라스",
+          "es": "Lapras"
+        },
+        "types": [
+          "water",
+          "ice"
+        ],
+        "resistorTypes": [
+          "steel",
           "water",
           "ice"
         ],
         "seMoveTypes": [
+          "electric",
           "fighting",
-          "fire",
           "grass",
-          "steel",
-          "water"
+          "rock"
         ]
       },
       {
-        "id": "TURTONATOR",
+        "id": "HOUNDOOM",
         "names": {
-          "en": "Turtonator",
-          "de": "Tortunator",
-          "fr": "Boumata",
-          "it": "Turtonator",
-          "ja": "バクガメス",
-          "ko": "폭거북스",
-          "es": "Turtonator"
+          "en": "Houndoom",
+          "de": "Hundemon",
+          "fr": "Démolosse",
+          "it": "Houndoom",
+          "ja": "ヘルガー",
+          "ko": "헬가",
+          "es": "Houndoom"
         },
         "types": [
-          "fire",
-          "dragon"
+          "dark",
+          "fire"
         ],
         "resistorTypes": [
+          "fighting",
           "rock",
           "fire",
           "water",
+          "dragon",
+          "dark",
           "fairy"
         ],
         "seMoveTypes": [
-          "dragon",
-          "ground",
-          "rock"
-        ]
-      },
-      {
-        "id": "KLAWF",
-        "names": {
-          "en": "Klawf",
-          "de": "Klibbe",
-          "fr": "Craparoi",
-          "it": "Klawf",
-          "ja": "ガケガニ",
-          "ko": "절벼게",
-          "es": "Klawf"
-        },
-        "types": [
-          "rock"
-        ],
-        "resistorTypes": [
           "fighting",
           "ground",
-          "steel"
-        ],
-        "seMoveTypes": [
-          "fighting",
-          "grass",
-          "ground",
-          "steel",
+          "rock",
           "water"
         ]
       }
     ],
     "lvl1": [
       {
-        "id": "CLEFAIRY",
+        "id": "MEOWTH",
         "names": {
-          "en": "Clefairy",
-          "de": "Piepi",
-          "fr": "Mélofée",
-          "it": "Clefairy",
-          "ja": "ピッピ",
-          "ko": "삐삐",
-          "es": "Clefairy"
+          "en": "Meowth",
+          "de": "Mauzi",
+          "fr": "Miaouss",
+          "it": "Meowth",
+          "ja": "ニャース",
+          "ko": "나옹",
+          "es": "Meowth"
         },
         "types": [
-          "fairy"
+          "normal"
         ],
         "resistorTypes": [
-          "poison",
-          "steel",
+          "rock",
+          "ghost",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "fighting"
+        ]
+      },
+      {
+        "id": "PONYTA",
+        "names": {
+          "en": "Ponyta",
+          "de": "Ponita",
+          "fr": "Ponyta",
+          "it": "Ponyta",
+          "ja": "ポニータ",
+          "ko": "포니타",
+          "es": "Ponyta"
+        },
+        "types": [
           "fire"
         ],
-        "seMoveTypes": [
-          "poison",
-          "steel"
-        ]
-      },
-      {
-        "id": "GRIMER",
-        "names": {
-          "en": "Alolan Grimer",
-          "de": "Alola-Sleima",
-          "fr": "Tadmorv d'Alola",
-          "it": "Grimer di Alola",
-          "ja": "アローラ ベトベター",
-          "ko": "알로라 질퍽이",
-          "es": "Grimer de Alola"
-        },
-        "types": [
-          "poison",
-          "dark"
-        ],
         "resistorTypes": [
-          "fighting",
-          "poison",
+          "rock",
+          "fire",
+          "water",
+          "dragon"
+        ],
+        "seMoveTypes": [
           "ground",
           "rock",
-          "steel",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "ground"
+          "water"
         ]
       },
       {
-        "id": "GIBLE",
+        "id": "ELECTABUZZ",
         "names": {
-          "en": "Gible",
-          "de": "Kaumalat",
-          "fr": "Griknot",
-          "it": "Gible",
-          "ja": "フカマル",
-          "ko": "딥상어동",
-          "es": "Gible"
+          "en": "Electabuzz",
+          "de": "Elektek",
+          "fr": "Élektek",
+          "it": "Electabuzz",
+          "ja": "エレブー",
+          "ko": "에레브",
+          "es": "Electabuzz"
         },
         "types": [
-          "dragon",
-          "ground"
+          "electric"
         ],
         "resistorTypes": [
-          "flying",
-          "bug",
+          "ground",
           "grass",
-          "fairy"
+          "electric",
+          "dragon"
         ],
         "seMoveTypes": [
-          "ice",
-          "dragon",
-          "fairy"
+          "ground"
         ]
       },
       {
-        "id": "WIMPOD",
+        "id": "LARVITAR",
         "names": {
-          "en": "Wimpod",
-          "de": "Reißlaus",
-          "fr": "Sovkipou",
-          "it": "Wimpod",
-          "ja": "コソクムシ",
-          "ko": "꼬시레",
-          "es": "Wimpod"
+          "en": "Larvitar",
+          "de": "Larvitar",
+          "fr": "Embrylex",
+          "it": "Larvitar",
+          "ja": "ヨーギラス",
+          "ko": "애버라스",
+          "es": "Larvitar"
         },
         "types": [
-          "bug",
-          "water"
+          "rock",
+          "ground"
         ],
         "resistorTypes": [
           "fighting",
-          "flying",
-          "poison",
-          "ghost",
-          "steel",
-          "water",
-          "dragon",
-          "fairy"
+          "ground",
+          "grass"
         ],
         "seMoveTypes": [
-          "electric",
-          "flying",
-          "rock"
+          "grass",
+          "water",
+          "fighting",
+          "ground",
+          "ice",
+          "steel"
         ]
       }
     ],
@@ -593,6 +591,30 @@
         ]
       },
       {
+        "id": "PIKACHU",
+        "names": {
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground"
+        ]
+      },
+      {
         "id": "GROWLITHE",
         "names": {
           "en": "Growlithe",
@@ -782,6 +804,31 @@
         ]
       },
       {
+        "id": "TRAPINCH",
+        "names": {
+          "en": "Trapinch",
+          "de": "Knacklion",
+          "fr": "Kraknoix",
+          "it": "Trapinch",
+          "ja": "ナックラー",
+          "ko": "톱치",
+          "es": "Trapinch"
+        },
+        "types": [
+          "ground"
+        ],
+        "resistorTypes": [
+          "flying",
+          "bug",
+          "grass"
+        ],
+        "seMoveTypes": [
+          "water",
+          "grass",
+          "ice"
+        ]
+      },
+      {
         "id": "SPHEAL",
         "names": {
           "en": "Spheal",
@@ -947,6 +994,37 @@
         "seMoveTypes": [
           "water",
           "grass",
+          "ice"
+        ]
+      },
+      {
+        "id": "COTTONEE",
+        "names": {
+          "en": "Cottonee",
+          "de": "Waumboll",
+          "fr": "Doudouvet",
+          "it": "Cottonee",
+          "ja": "モンメン",
+          "ko": "소미안",
+          "es": "Cottonee"
+        },
+        "types": [
+          "grass",
+          "fairy"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "steel",
+          "fire",
+          "grass"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "poison",
+          "steel",
+          "fire",
           "ice"
         ]
       },
@@ -1344,6 +1422,62 @@
     ],
     "tier_3": [
       {
+        "id": "HITMONLEE",
+        "names": {
+          "en": "Hitmonlee",
+          "de": "Kicklee",
+          "fr": "Kicklee",
+          "it": "Hitmonlee",
+          "ja": "サワムラー",
+          "ko": "시라소몬",
+          "es": "Hitmonlee"
+        },
+        "types": [
+          "fighting"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "psychic",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "psychic",
+          "fairy"
+        ]
+      },
+      {
+        "id": "HITMONCHAN",
+        "names": {
+          "en": "Hitmonchan",
+          "de": "Nockchan",
+          "fr": "Tygnon",
+          "it": "Hitmonchan",
+          "ja": "エビワラー",
+          "ko": "홍수몬",
+          "es": "Hitmonchan"
+        },
+        "types": [
+          "fighting"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "psychic",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "psychic",
+          "fairy"
+        ]
+      },
+      {
         "id": "CHANSEY",
         "names": {
           "en": "Chansey",
@@ -1536,103 +1670,6 @@
   },
   "eventRaids": [
     {
-      "eventID": "tapu-fini-in-5-star-raid-battles-may-june-2026",
-      "name": "Tapu Fini in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-05-27T06:00:00.000",
-      "end": "2026-06-02T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "TAPU_FINI",
-          "names": {
-            "en": "Tapu Fini"
-          },
-          "types": [
-            "water",
-            "fairy"
-          ],
-          "resistorTypes": [
-            "poison",
-            "steel",
-            "water",
-            "grass"
-          ],
-          "seMoveTypes": [
-            "poison",
-            "grass",
-            "electric"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "mega-medicham-in-mega-raids-may-june-2026",
-      "name": "Mega Medicham in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-05-27T06:00:00.000",
-      "end": "2026-06-03T06:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "MEDICHAM",
-          "names": {
-            "en": "Medicham"
-          },
-          "types": [
-            "fighting",
-            "psychic"
-          ],
-          "resistorTypes": [
-            "flying",
-            "bug",
-            "ghost",
-            "psychic",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "ghost",
-            "fairy"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20260527",
-      "name": "Tapu Fini Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-05-27T18:00:00.000",
-      "end": "2026-05-27T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "TAPU_FINI",
-          "names": {
-            "en": "Tapu Fini"
-          },
-          "types": [
-            "water",
-            "fairy"
-          ],
-          "resistorTypes": [
-            "poison",
-            "steel",
-            "water",
-            "grass"
-          ],
-          "seMoveTypes": [
-            "poison",
-            "grass",
-            "electric"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "shadow-dialga-in-shadow-raids-june-2026",
       "name": "Shadow Dialga in Shadow Raids",
       "eventType": "raid-battles",
@@ -1719,6 +1756,38 @@
           ],
           "seMoveTypes": [
             "fighting"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20260603",
+      "name": "Reshiram Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-06-03T18:00:00.000",
+      "end": "2026-06-03T19:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "RESHIRAM",
+          "names": {
+            "en": "Reshiram"
+          },
+          "types": [
+            "dragon",
+            "fire"
+          ],
+          "resistorTypes": [
+            "rock",
+            "fire",
+            "water",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "ground",
+            "rock",
+            "dragon"
           ]
         }
       ]
