@@ -414,6 +414,7 @@
   "app.modal.storage.request_button": "Persistenten Speicher anfordern",
   "app.modal.storage.requesting": "Anfrage läuft…",
   "app.modal.storage.help": "Best-Effort-Speicher kann vom Browser unter Druck oder durch Privatsphäre-Einstellungen gelöscht werden (z.B. \"Daten beim Schließen löschen\"). Persistenten Speicher anzufordern sagt dem Browser, dass er deine Einstellungen behalten soll. Manche Browser fragen nach, andere gewähren still oder verschieben die Entscheidung.",
+  "app.modal.storage.ios_safari_hint": "Auf iOS Safari ist persistenter Speicher in einem Browser-Tab nicht verfügbar — Einstellungen können nach ca. 7 Tagen Inaktivität gelöscht werden. Um sie dauerhaft zu behalten, nutze unten \"Zum Startbildschirm hinzufügen\".",
   "app.modal.home_screen.section_title": "Startbildschirm",
   "app.modal.home_screen.installed_status": "✓ installiert — läuft als eigenständige App.",
   "app.modal.home_screen.install_button": "Zum Startbildschirm hinzufügen",

@@ -1716,6 +1716,25 @@ const KEY_TOP_ATTACKERS = "pogo:topAttackers";
 const KEY_TOP_MAX_ATTACKERS = "pogo:topMaxAttackers";
 const KEY_CONFIG = "pogo:config";
 
+// iOS Safari (regular tab) refuses Storage API persistence at the WebKit
+// level: navigator.storage.persist() resolves with false immediately, no
+// prompt. The only durable-storage path on iOS is Add to Home Screen
+// (standalone), which switches WebKit to a different storage policy.
+// iPadOS in desktop-mode reports as "Macintosh" but exposes touch — that's
+// why we also probe maxTouchPoints.
+function isIOSNonStandalone() {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  const isIOS =
+    /iPad|iPhone|iPod/.test(ua) ||
+    (ua.includes("Macintosh") && navigator.maxTouchPoints > 1);
+  if (!isIOS) return false;
+  const standalone =
+    window.matchMedia?.("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true;
+  return !standalone;
+}
+
 // Storage shim: was window.storage in the Claude.ai artifact runtime.
 // In the standalone app we use localStorage directly. Same async API for
 // minimal code change.
@@ -2105,6 +2124,7 @@ export default function App() {
     if (persistRequestedRef.current) return;
     persistRequestedRef.current = true;
     if (!navigator.storage?.persist || !navigator.storage?.persisted) return;
+    if (isIOSNonStandalone()) return;
     (async () => {
       try {
         const already = await navigator.storage.persisted();
@@ -5616,6 +5636,10 @@ function StoragePersistenceSection() {
       {persisted ? (
         <div className="mono text-xs text-[#3FB67A]">
           {t("app.modal.storage.persisted_status")}
+        </div>
+      ) : isIOSNonStandalone() ? (
+        <div className="mono text-xs text-[#D89A4A]">
+          {t("app.modal.storage.ios_safari_hint")}
         </div>
       ) : (
         <>

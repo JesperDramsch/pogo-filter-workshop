@@ -414,6 +414,7 @@
   "app.modal.storage.request_button": "Request persistent storage",
   "app.modal.storage.requesting": "Requesting…",
   "app.modal.storage.help": "Best-effort storage may be cleared by the browser under pressure or by privacy settings (e.g. \"delete site data on quit\"). Asking for persistent storage tells the browser to keep your settings around. Some browsers prompt; others grant silently or defer.",
+  "app.modal.storage.ios_safari_hint": "On iOS Safari, persistent storage isn't available in a browser tab — settings may be cleared after ~7 days of inactivity. To keep them durably, use \"Add to Home Screen\" below.",
   "app.modal.home_screen.section_title": "home screen",
   "app.modal.home_screen.installed_status": "✓ installed — running from the home screen.",
   "app.modal.home_screen.install_button": "Add to home screen",
