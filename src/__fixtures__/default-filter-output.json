@@ -148,8 +148,8 @@
       "Decoy Female Grunt": "@1fighting,@1fire,@1flying&@2fighting,@2fire,@2flying,@3fighting,@3fire,@3flying&!<grass&!<normal&!<poison"
     },
     "pvpFilters": {
-      "great": "+lickilicky,+quagsire,+feraligatr,+jellicent,+tinkaton,+corsola,+forretress,+altaria,+empoleon,+azumarill,+stunfisk,+wigglytuff,+corviknight,+aegislash,+greedent,+medicham,+sableye,+talonflame,+malamar,+castform,+lapras,+sealeo,+oranguru,+dondozo,+ninetales,+annihilape,+clodsire,+drapion,+dusclops,+blastoise&cp-1500&0-1attack&3-4defense&3-4hp",
-      "ultra": "+jellicent,+corviknight,+lapras,+tinkaton,+empoleon,+moltres,+feraligatr,+malamar,+florges,+dondozo,+virizion,+regidrago,+lickilicky,+ludicolo,+clefable,+blastoise,+oranguru,+zygarde,+dusknoir,+ninetales,+walrein,+drapion,+turtonator,+annihilape,+giratina,+kingdra,+bellibolt,+cresselia,+forretress,+togekiss&cp-2500&0-1attack&3-4defense&3-4hp",
+      "great": "+lickilicky,+quagsire,+feraligatr,+jellicent,+tinkaton,+corsola,+forretress,+altaria,+empoleon,+azumarill,+stunfisk,+wigglytuff,+corviknight,+aegislash,+greedent,+medicham,+sableye,+talonflame,+malamar,+lapras,+oranguru,+sealeo,+castform,+annihilape,+dondozo,+clodsire,+drapion,+dusclops,+guzzlord,+ninetales&cp-1500&0-1attack&3-4defense&3-4hp",
+      "ultra": "+jellicent,+corviknight,+lapras,+tinkaton,+empoleon,+moltres,+feraligatr,+malamar,+dondozo,+florges,+regidrago,+virizion,+lickilicky,+ludicolo,+clefable,+oranguru,+blastoise,+zygarde,+walrein,+dusknoir,+ninetales,+turtonator,+drapion,+annihilape,+kingdra,+giratina,+bellibolt,+cresselia,+forretress,+togekiss&cp-2500&0-1attack&3-4defense&3-4hp",
       "master": "+zacian,+palkia,+metagross,+xerneas,+zamazenta,+kyurem,+dialga,+lunala,+reshiram,+zekrom,+marshadow,+kyogre,+lugia,+eternatus,+necrozma,+yveltal,+ho-oh,+garchomp,+groudon,+meloetta,+latios,+gholdengo,+solgaleo,+florges,+gyarados,+mewtwo,+jirachi,+keldeo,+zygarde,+latias"
     },
     "trashClauseCount": 31,
@@ -304,8 +304,8 @@
       "Decoy Female Grunt": "@1kampf,@1feuer,@1flug&@2kampf,@2feuer,@2flug,@3kampf,@3feuer,@3flug&!<pflanze&!<normal&!<gift"
     },
     "pvpFilters": {
-      "great": "+schlurplek,+morlord,+impergator,+apoquallyp,+granforgita,+corasonn,+forstellka,+altaria,+impoleon,+azumarill,+flunschlik,+knuddeluff,+krarmor,+durengard,+schlaraffel,+meditalis,+zobiris,+fiaro,+calamanero,+formeo,+lapras,+seejong,+kommandutan,+heerashai,+vulnona,+epitaff,+suelord,+piondragi,+zwirrklop,+turtok&wp-1500&0-1angriffs-wert&3-4verteidigungs-wert&3-4kp",
-      "ultra": "+apoquallyp,+krarmor,+lapras,+granforgita,+impoleon,+lavados,+impergator,+calamanero,+florges,+heerashai,+viridium,+regidrago,+schlurplek,+kappalores,+pixi,+turtok,+kommandutan,+zygarde,+zwirrfinst,+vulnona,+walraisa,+piondragi,+tortunator,+epitaff,+giratina,+seedraking,+wampitz,+cresselia,+forstellka,+togekiss&wp-2500&0-1angriffs-wert&3-4verteidigungs-wert&3-4kp",
+      "great": "+schlurplek,+morlord,+impergator,+apoquallyp,+granforgita,+corasonn,+forstellka,+altaria,+impoleon,+azumarill,+flunschlik,+knuddeluff,+krarmor,+durengard,+schlaraffel,+meditalis,+zobiris,+fiaro,+calamanero,+lapras,+kommandutan,+seejong,+formeo,+epitaff,+heerashai,+suelord,+piondragi,+zwirrklop,+schlingking,+vulnona&wp-1500&0-1angriffs-wert&3-4verteidigungs-wert&3-4kp",
+      "ultra": "+apoquallyp,+krarmor,+lapras,+granforgita,+impoleon,+lavados,+impergator,+calamanero,+heerashai,+florges,+regidrago,+viridium,+schlurplek,+kappalores,+pixi,+kommandutan,+turtok,+zygarde,+walraisa,+zwirrfinst,+vulnona,+tortunator,+piondragi,+epitaff,+seedraking,+giratina,+wampitz,+cresselia,+forstellka,+togekiss&wp-2500&0-1angriffs-wert&3-4verteidigungs-wert&3-4kp",
       "master": "+zacian,+palkia,+metagross,+xerneas,+zamazenta,+kyurem,+dialga,+lunala,+reshiram,+zekrom,+marshadow,+kyogre,+lugia,+endynalos,+necrozma,+yveltal,+ho-oh,+knakrack,+groudon,+meloetta,+latios,+monetigo,+solgaleo,+florges,+garados,+mewtu,+jirachi,+keldeo,+zygarde,+latias"
     },
     "trashClauseCount": 31,
@@ -460,8 +460,8 @@
       "Decoy Female Grunt": "@1lucha,@1fuego,@1volador&@2lucha,@2fuego,@2volador,@3lucha,@3fuego,@3volador&!<planta&!<normal&!<veneno"
     },
     "pvpFilters": {
-      "great": "+lickilicky,+quagsire,+feraligatr,+jellicent,+tinkaton,+corsola,+forretress,+altaria,+empoleon,+azumarill,+stunfisk,+wigglytuff,+corviknight,+aegislash,+greedent,+medicham,+sableye,+talonflame,+malamar,+castform,+lapras,+sealeo,+oranguru,+dondozo,+ninetales,+annihilape,+clodsire,+drapion,+dusclops,+blastoise&pc-1500&0-1ataque&3-4defensa&3-4ps",
-      "ultra": "+jellicent,+corviknight,+lapras,+tinkaton,+empoleon,+moltres,+feraligatr,+malamar,+florges,+dondozo,+virizion,+regidrago,+lickilicky,+ludicolo,+clefable,+blastoise,+oranguru,+zygarde,+dusknoir,+ninetales,+walrein,+drapion,+turtonator,+annihilape,+giratina,+kingdra,+bellibolt,+cresselia,+forretress,+togekiss&pc-2500&0-1ataque&3-4defensa&3-4ps",
+      "great": "+lickilicky,+quagsire,+feraligatr,+jellicent,+tinkaton,+corsola,+forretress,+altaria,+empoleon,+azumarill,+stunfisk,+wigglytuff,+corviknight,+aegislash,+greedent,+medicham,+sableye,+talonflame,+malamar,+lapras,+oranguru,+sealeo,+castform,+annihilape,+dondozo,+clodsire,+drapion,+dusclops,+guzzlord,+ninetales&pc-1500&0-1ataque&3-4defensa&3-4ps",
+      "ultra": "+jellicent,+corviknight,+lapras,+tinkaton,+empoleon,+moltres,+feraligatr,+malamar,+dondozo,+florges,+regidrago,+virizion,+lickilicky,+ludicolo,+clefable,+oranguru,+blastoise,+zygarde,+walrein,+dusknoir,+ninetales,+turtonator,+drapion,+annihilape,+kingdra,+giratina,+bellibolt,+cresselia,+forretress,+togekiss&pc-2500&0-1ataque&3-4defensa&3-4ps",
       "master": "+zacian,+palkia,+metagross,+xerneas,+zamazenta,+kyurem,+dialga,+lunala,+reshiram,+zekrom,+marshadow,+kyogre,+lugia,+eternatus,+necrozma,+yveltal,+ho-oh,+garchomp,+groudon,+meloetta,+latios,+gholdengo,+solgaleo,+florges,+gyarados,+mewtwo,+jirachi,+keldeo,+zygarde,+latias"
     },
     "trashClauseCount": 31,
@@ -616,8 +616,8 @@
       "Decoy Female Grunt": "@1combat,@1feu,@1vol&@2combat,@2feu,@2vol,@3combat,@3feu,@3vol&!<plante&!<normal&!<poison"
     },
     "pvpFilters": {
-      "great": "+coudlangue,+maraiste,+aligatueur,+moyade,+forgelina,+corayon,+foretress,+altaria,+pingoléon,+azumarill,+limonde,+grodoudou,+corvaillus,+exagide,+rongrigou,+charmina,+ténéfix,+flambusard,+sepiatroce,+morphéo,+lokhlass,+phogleur,+gouroutan,+oyacata,+feunard,+courrousinge,+terraiste,+drascore,+téraclope,+tortank&pc-1500&0-1attaque&3-4défense&3-4pv",
-      "ultra": "+moyade,+corvaillus,+lokhlass,+forgelina,+pingoléon,+sulfura,+aligatueur,+sepiatroce,+florges,+oyacata,+viridium,+regidrago,+coudlangue,+ludicolo,+mélodelfe,+tortank,+gouroutan,+zygarde,+noctunoir,+feunard,+kaimorse,+drascore,+boumata,+courrousinge,+giratina,+hyporoi,+ampibidou,+cresselia,+foretress,+togekiss&pc-2500&0-1attaque&3-4défense&3-4pv",
+      "great": "+coudlangue,+maraiste,+aligatueur,+moyade,+forgelina,+corayon,+foretress,+altaria,+pingoléon,+azumarill,+limonde,+grodoudou,+corvaillus,+exagide,+rongrigou,+charmina,+ténéfix,+flambusard,+sepiatroce,+lokhlass,+gouroutan,+phogleur,+morphéo,+courrousinge,+oyacata,+terraiste,+drascore,+téraclope,+engloutyran,+feunard&pc-1500&0-1attaque&3-4défense&3-4pv",
+      "ultra": "+moyade,+corvaillus,+lokhlass,+forgelina,+pingoléon,+sulfura,+aligatueur,+sepiatroce,+oyacata,+florges,+regidrago,+viridium,+coudlangue,+ludicolo,+mélodelfe,+gouroutan,+tortank,+zygarde,+kaimorse,+noctunoir,+feunard,+boumata,+drascore,+courrousinge,+hyporoi,+giratina,+ampibidou,+cresselia,+foretress,+togekiss&pc-2500&0-1attaque&3-4défense&3-4pv",
       "master": "+zacian,+palkia,+métalosse,+xerneas,+zamazenta,+kyurem,+dialga,+lunala,+reshiram,+zekrom,+marshadow,+kyogre,+lugia,+éthernatos,+necrozma,+yveltal,+ho-oh,+carchacrok,+groudon,+meloetta,+latios,+gromago,+solgaleo,+florges,+léviator,+mewtwo,+jirachi,+keldeo,+zygarde,+latias"
     },
     "trashClauseCount": 31,
@@ -772,8 +772,8 @@
       "Decoy Female Grunt": "@1格鬥,@1火,@1飛行&@2格鬥,@2火,@2飛行,@3格鬥,@3火,@3飛行&!<草&!<一般&!<毒"
     },
     "pvpFilters": {
-      "great": "+大舌舔,+沼王,+大力鱷,+胖嘟嘟,+巨鍛匠,+太陽珊瑚,+佛烈托斯,+七夕青鳥,+帝王拿波,+瑪力露麗,+泥巴魚,+胖可丁,+鋼鎧鴉,+堅盾劍怪,+藏飽栗鼠,+恰雷姆,+勾魂眼,+烈箭鷹,+烏賊王,+飄浮泡泡,+拉普拉斯,+海魔獅,+智揮猩,+吃吼霸,+九尾,+棄世猴,+土王,+龍王蠍,+彷徨夜靈,+水箭龜&cp-1500&0-1攻擊&3-4防禦&3-4hp",
-      "ultra": "+胖嘟嘟,+鋼鎧鴉,+拉普拉斯,+巨鍛匠,+帝王拿波,+火焰鳥,+大力鱷,+烏賊王,+花潔夫人,+吃吼霸,+畢力吉翁,+雷吉鐸拉戈,+大舌舔,+樂天河童,+皮可西,+水箭龜,+智揮猩,+基格爾德,+黑夜魔靈,+九尾,+帝牙海獅,+龍王蠍,+爆焰龜獸,+棄世猴,+騎拉帝納,+刺龍王,+電肚蛙,+克雷色利亞,+佛烈托斯,+波克基斯&cp-2500&0-1攻擊&3-4防禦&3-4hp",
+      "great": "+大舌舔,+沼王,+大力鱷,+胖嘟嘟,+巨鍛匠,+太陽珊瑚,+佛烈托斯,+七夕青鳥,+帝王拿波,+瑪力露麗,+泥巴魚,+胖可丁,+鋼鎧鴉,+堅盾劍怪,+藏飽栗鼠,+恰雷姆,+勾魂眼,+烈箭鷹,+烏賊王,+拉普拉斯,+智揮猩,+海魔獅,+飄浮泡泡,+棄世猴,+吃吼霸,+土王,+龍王蠍,+彷徨夜靈,+惡食大王,+九尾&cp-1500&0-1攻擊&3-4防禦&3-4hp",
+      "ultra": "+胖嘟嘟,+鋼鎧鴉,+拉普拉斯,+巨鍛匠,+帝王拿波,+火焰鳥,+大力鱷,+烏賊王,+吃吼霸,+花潔夫人,+雷吉鐸拉戈,+畢力吉翁,+大舌舔,+樂天河童,+皮可西,+智揮猩,+水箭龜,+基格爾德,+帝牙海獅,+黑夜魔靈,+九尾,+爆焰龜獸,+龍王蠍,+棄世猴,+刺龍王,+騎拉帝納,+電肚蛙,+克雷色利亞,+佛烈托斯,+波克基斯&cp-2500&0-1攻擊&3-4防禦&3-4hp",
       "master": "+蒼響,+帕路奇亞,+巨金怪,+哲爾尼亞斯,+藏瑪然特,+酋雷姆,+帝牙盧卡,+露奈雅拉,+萊希拉姆,+捷克羅姆,+瑪夏多,+蓋歐卡,+洛奇亞,+無極汰那,+奈克洛茲瑪,+伊裴爾塔爾,+鳳王,+烈咬陸鯊,+固拉多,+美洛耶塔,+拉帝歐斯,+賽富豪,+索爾迦雷歐,+花潔夫人,+暴鯉龍,+超夢,+基拉祈,+凱路迪歐,+基格爾德,+拉帝亞斯"
     },
     "trashClauseCount": 31,
@@ -928,8 +928,8 @@
       "Decoy Female Grunt": "@1फ़ाइटंग,@1फ़ायर,@1़लाइंग&@2फ़ाइटंग,@2फ़ायर,@2़लाइंग,@3फ़ाइटंग,@3फ़ायर,@3़लाइंग&!<ास&!<नॉमल&!<पॉइज़न"
     },
     "pvpFilters": {
-      "great": "+लकलक,+वैगसायर,+फ़रैलगेटर,+जेलसेंट,+टंकाटन,+कॉसला,+फ़ॉरटस,+ऑटारया,+एपोलयॉन,+अज़ूमैरल,+टनफ़क,+वलटफ़,+कोवनाइट,+ईजलैश,+ीडेट,+मेडीचैम,+सेबलआई,+टैलनलम,+मैलामार,+कटफ़ॉम,+लैस,+सीलयो,+ओरैंगु,+डॉनडोज़ो,+नाइनटस,+अनायलप,+लॉडसायर,+डािपयॉन,+डलॉस,+लाटॉइस&cp-1500&0-1अटैक&3-4डफ़ेंस&3-4hp",
-      "ultra": "+जेलसेंट,+कोवनाइट,+लैस,+टंकाटन,+एपोलयॉन,+मोटस,+फ़रैलगेटर,+मैलामार,+लोजेस,+डॉनडोज़ो,+वराइिज़यन,+रजीडेगो,+लकलक,+लुडकोलो,+लफ़ेबल,+लाटॉइस,+ओरैंगु,+ज़ाइगाड,+डकनुआर,+नाइनटस,+वॉलरन,+डािपयॉन,+टटोनेटर,+अनायलप,+गराटना,+कंगडा,+बेलबोट,+सेलया,+फ़ॉरटस,+टोगेकस&cp-2500&0-1अटैक&3-4डफ़ेंस&3-4hp",
+      "great": "+लकलक,+वैगसायर,+फ़रैलगेटर,+जेलसेंट,+टंकाटन,+कॉसला,+फ़ॉरटस,+ऑटारया,+एपोलयॉन,+अज़ूमैरल,+टनफ़क,+वलटफ़,+कोवनाइट,+ईजलैश,+ीडेट,+मेडीचैम,+सेबलआई,+टैलनलम,+मैलामार,+लैस,+ओरैंगु,+सीलयो,+कटफ़ॉम,+अनायलप,+डॉनडोज़ो,+लॉडसायर,+डािपयॉन,+डलॉस,+गज़लॉड,+नाइनटस&cp-1500&0-1अटैक&3-4डफ़ेंस&3-4hp",
+      "ultra": "+जेलसेंट,+कोवनाइट,+लैस,+टंकाटन,+एपोलयॉन,+मोटस,+फ़रैलगेटर,+मैलामार,+डॉनडोज़ो,+लोजेस,+रजीडेगो,+वराइिज़यन,+लकलक,+लुडकोलो,+लफ़ेबल,+ओरैंगु,+लाटॉइस,+ज़ाइगाड,+वॉलरन,+डकनुआर,+नाइनटस,+टटोनेटर,+डािपयॉन,+अनायलप,+कंगडा,+गराटना,+बेलबोट,+सेलया,+फ़ॉरटस,+टोगेकस&cp-2500&0-1अटैक&3-4डफ़ेंस&3-4hp",
       "master": "+ज़ाशयन,+पाकया,+मेटाोस,+ज़नयस,+ज़ामाज़ैंटा,+यूरम,+डयागा,+लुनाला,+रशरैम,+ज़ेोम,+माशैडो,+कायोगर,+लूगया,+इटनेटस,+नैॉ़मा,+इवेटाल,+हो-ओह,+गारचॉप,+ाउडॉन,+मेलोएटा,+लाटयोस,+गोडनगो,+सोलगलयो,+लोजेस,+गैराडोस,+यूटू,+जराची,+कडयो,+ज़ाइगाड,+लाटयास"
     },
     "trashClauseCount": 31,
@@ -1084,8 +1084,8 @@
       "Decoy Female Grunt": "@1かくとう,@1ほのお,@1ひこう&@2かくとう,@2ほのお,@2ひこう,@3かくとう,@3ほのお,@3ひこう&!<くさ&!<ノーマル&!<どく"
     },
     "pvpFilters": {
-      "great": "+ベロベルト,+ヌオー,+オーダイル,+ブルンゲル,+デカヌチャン,+サニーゴ,+フォレトス,+チルタリス,+エンペルト,+マリルリ,+マッギョ,+プクリン,+アーマーガア,+ギルガルド,+ヨクバリス,+チャーレム,+ヤミラミ,+ファイアロー,+カラマネロ,+ポワルン,+ラプラス,+トドグラー,+ヤレユータン,+ヘイラッシャ,+キュウコン,+コノヨザル,+ドオー,+ドラピオン,+サマヨール,+カメックス&cp-1500&0-1こうげき&3-4ぼうぎょ&3-4hp",
-      "ultra": "+ブルンゲル,+アーマーガア,+ラプラス,+デカヌチャン,+エンペルト,+ファイヤー,+オーダイル,+カラマネロ,+フラージェス,+ヘイラッシャ,+ビリジオン,+レジドラゴ,+ベロベルト,+ルンパッパ,+ピクシー,+カメックス,+ヤレユータン,+ジガルデ,+ヨノワール,+キュウコン,+トドゼルガ,+ドラピオン,+バクガメス,+コノヨザル,+ギラティナ,+キングドラ,+ハラバリー,+クレセリア,+フォレトス,+トゲキッス&cp-2500&0-1こうげき&3-4ぼうぎょ&3-4hp",
+      "great": "+ベロベルト,+ヌオー,+オーダイル,+ブルンゲル,+デカヌチャン,+サニーゴ,+フォレトス,+チルタリス,+エンペルト,+マリルリ,+マッギョ,+プクリン,+アーマーガア,+ギルガルド,+ヨクバリス,+チャーレム,+ヤミラミ,+ファイアロー,+カラマネロ,+ラプラス,+ヤレユータン,+トドグラー,+ポワルン,+コノヨザル,+ヘイラッシャ,+ドオー,+ドラピオン,+サマヨール,+アクジキング,+キュウコン&cp-1500&0-1こうげき&3-4ぼうぎょ&3-4hp",
+      "ultra": "+ブルンゲル,+アーマーガア,+ラプラス,+デカヌチャン,+エンペルト,+ファイヤー,+オーダイル,+カラマネロ,+ヘイラッシャ,+フラージェス,+レジドラゴ,+ビリジオン,+ベロベルト,+ルンパッパ,+ピクシー,+ヤレユータン,+カメックス,+ジガルデ,+トドゼルガ,+ヨノワール,+キュウコン,+バクガメス,+ドラピオン,+コノヨザル,+キングドラ,+ギラティナ,+ハラバリー,+クレセリア,+フォレトス,+トゲキッス&cp-2500&0-1こうげき&3-4ぼうぎょ&3-4hp",
       "master": "+ザシアン,+パルキア,+メタグロス,+ゼルネアス,+ザマゼンタ,+キュレム,+ディアルガ,+ルナアーラ,+レシラム,+ゼクロム,+マーシャドー,+カイオーガ,+ルギア,+ムゲンダイナ,+ネクロズマ,+イベルタル,+ホウオウ,+ガブリアス,+グラードン,+メロエッタ,+ラティオス,+サーフゴー,+ソルガレオ,+フラージェス,+ギャラドス,+ミュウツー,+ジラーチ,+ケルディオ,+ジガルデ,+ラティアス"
     },
     "trashClauseCount": 31,
