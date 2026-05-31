@@ -9333,6 +9333,15 @@
     "zh-TW": "超級雷丘Ｘ"
   },
   "26_2": {
+    "de": "Mega-Raichu X",
+    "en": "Mega Raichu X",
+    "es": "Mega-Raichu X",
+    "fr": "Méga-Raichu X",
+    "hi": "मेगा राइचू X",
+    "ja": "メガライチュウＸ",
+    "zh-TW": "超級雷丘Ｘ"
+  },
+  "26_3": {
     "de": "Mega-Raichu Y",
     "en": "Mega Raichu Y",
     "es": "Mega-Raichu Y",
@@ -9863,6 +9872,15 @@
     "ja": "メガルカリオＺ",
     "zh-TW": "超級路卡利歐Ｚ"
   },
+  "448_5": {
+    "de": "Mega-Lucario Z",
+    "en": "Mega Lucario Z",
+    "es": "Mega-Lucario Z",
+    "fr": "Méga-Lucario Z",
+    "hi": "मेगा लुकारियो Z",
+    "ja": "メガルカリオＺ",
+    "zh-TW": "超級路卡利歐Ｚ"
+  },
   "460_1": {
     "de": "Mega-Rexblisar",
     "en": "Mega Abomasnow",
@@ -10368,12 +10386,12 @@
     "zh-TW": "超級米立龍"
   },
   "998_1": {
-    "de": "Seine Rückenflossenklinge wurde durch die Mega-Entwicklung noch größer. Aus dem Griff an seinem Magen feuert es Strahlen ab.",
-    "en": "Baxcalibur’s dorsal blade has grown even more massive thanks to Mega Evolution. This Pokémon fires beams from the hilt at its solar plexus.",
-    "es": "Tras la megaevolución, la hoja de su placa dorsal adquiere un tamaño descomunal. Dispara rayos por la empuñadura del plexo solar.",
-    "fr": "La Méga-Évolution a considérablement augmenté la taille de sa lame dorsale. Il peut tirer des lasers depuis la “poignée” sur son plexus solaire.",
-    "hi": "मेगा एवोलूशन क कारण इसक पीठ का लड और भी वशालकाय हो गया है। यह अपने सोलर-लसस पर बने हट से बीम छोड़ता है।",
-    "ja": "メガシンカにより背びれの剣がさらに巨大化。みぞおちのグリップからビーム技を放つ。",
-    "zh-TW": "背鰭的劍因超級進化而變得更巨大。會從上腹部的劍柄射出光束招式。"
+    "de": "Mega-Espinodon",
+    "en": "Mega Baxcalibur",
+    "es": "Mega-Baxcalibur",
+    "fr": "Méga-Glaivodo",
+    "hi": "मेगा बैकस्कैलीबर",
+    "ja": "メガセグレイブ",
+    "zh-TW": "超級戟脊龍"
   }
 }
