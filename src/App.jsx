@@ -932,6 +932,21 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     push(catchClauses, `!${kw.flag.mythical},808,809`, tFn("app.clause_why.must_mythical_short"));
     push(catchClauses, `!${kw.flag.shiny}`, tFn("app.clause_why.shinies_keep"));
     push(catchClauses, `!${kw.flag.legendary}`, tFn("app.clause_why.legendaries_keep"));
+    if (cfg.protectUltraBeasts) push(catchClauses, `!${kw.flag.ultra_beast}`, tFn("app.clause_why.ultra_beasts"));
+    if (cfg.protectCostumes)    push(catchClauses, `!${kw.flag.costume}`, tFn("app.clause_why.costumes_trade"));
+    if (cfg.protectPurified)    push(catchClauses, `!${kw.flag.purified}`, tFn("app.clause_why.purified"));
+    if (cfg.protectBackgrounds) push(catchClauses, `!${kw.flag.background}`, tFn("app.clause_why.backgrounds_trade"));
+    if (cfg.protectNundos) {
+      push(catchClauses,
+        `1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`,
+        tFn("app.clause_why.protect_nundos_trade"));
+    }
+    if (cfg.protectDoubleMoved) push(catchClauses, "@3move", tFn("app.clause_why.double_moved_trade"));
+    if (cfg.protectDynamax)     push(catchClauses, `!${kw.flag.dynamax_move}1-`, tFn("app.clause_why.dynamax"));
+    if (cfg.protectXXL)         push(catchClauses, `!${kw.flag.xxl}`, tFn("app.clause_why.xxl_trade"));
+    if (cfg.protectXL)          push(catchClauses, `!${kw.flag.xl}`,  tFn("app.clause_why.xl_trade"));
+    if (cfg.protectXXS)         push(catchClauses, `!${kw.flag.xxs}`, tFn("app.clause_why.xxs"));
+    if (cfg.protectLegacyMoves) push(catchClauses, `!@${kw.flag.special_move},@${kw.flag.return},@${kw.flag.frustration}`, tFn("app.clause_why.legacy_moves"));
     buddyCatchFilters.push({
       buddyName: b.name,
       prefix,
