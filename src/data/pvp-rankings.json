@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-30T10:20:17.559Z",
+  "fetchedAt": "2026-06-03T12:53:04.253Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -10,32 +10,32 @@
           "name": "Lickilicky"
         },
         {
-          "dex": 195,
-          "name": "Quagsire"
-        },
-        {
           "dex": 160,
           "name": "Feraligatr"
         },
         {
-          "dex": 593,
-          "name": "Jellicent"
-        },
-        {
-          "dex": 959,
-          "name": "Tinkaton"
+          "dex": 334,
+          "name": "Altaria"
         },
         {
           "dex": 222,
           "name": "Corsola (Galarian)"
         },
         {
-          "dex": 205,
-          "name": "Forretress"
+          "dex": 593,
+          "name": "Jellicent"
         },
         {
-          "dex": 334,
-          "name": "Altaria"
+          "dex": 195,
+          "name": "Quagsire"
+        },
+        {
+          "dex": 959,
+          "name": "Tinkaton"
+        },
+        {
+          "dex": 205,
+          "name": "Forretress"
         },
         {
           "dex": 395,
@@ -46,12 +46,8 @@
           "name": "Azumarill"
         },
         {
-          "dex": 618,
-          "name": "Stunfisk"
-        },
-        {
-          "dex": 40,
-          "name": "Wigglytuff"
+          "dex": 230,
+          "name": "Kingdra"
         },
         {
           "dex": 823,
@@ -62,74 +58,90 @@
           "name": "Aegislash (Blade)"
         },
         {
-          "dex": 820,
-          "name": "Greedent"
+          "dex": 226,
+          "name": "Mantine"
         },
         {
           "dex": 308,
           "name": "Medicham"
         },
         {
+          "dex": 38,
+          "name": "Ninetales"
+        },
+        {
+          "dex": 189,
+          "name": "Jumpluff"
+        },
+        {
           "dex": 302,
           "name": "Sableye (Shadow)"
         },
         {
-          "dex": 663,
-          "name": "Talonflame"
-        },
-        {
-          "dex": 687,
-          "name": "Malamar"
-        },
-        {
-          "dex": 131,
-          "name": "Lapras"
-        },
-        {
-          "dex": 765,
-          "name": "Oranguru"
-        },
-        {
-          "dex": 364,
-          "name": "Sealeo"
-        },
-        {
-          "dex": 351,
-          "name": "Castform (Sunny)"
-        },
-        {
-          "dex": 979,
-          "name": "Annihilape"
-        },
-        {
-          "dex": 977,
-          "name": "Dondozo"
-        },
-        {
-          "dex": 980,
-          "name": "Clodsire"
-        },
-        {
-          "dex": 452,
-          "name": "Drapion (Shadow)"
-        },
-        {
-          "dex": 356,
-          "name": "Dusclops"
+          "dex": 119,
+          "name": "Seaking"
         },
         {
           "dex": 799,
           "name": "Guzzlord"
         },
         {
-          "dex": 38,
-          "name": "Ninetales"
+          "dex": 687,
+          "name": "Malamar"
+        },
+        {
+          "dex": 618,
+          "name": "Stunfisk"
+        },
+        {
+          "dex": 663,
+          "name": "Talonflame"
+        },
+        {
+          "dex": 980,
+          "name": "Clodsire"
+        },
+        {
+          "dex": 705,
+          "name": "Sliggoo"
+        },
+        {
+          "dex": 131,
+          "name": "Lapras"
+        },
+        {
+          "dex": 148,
+          "name": "Dragonair (Shadow)"
+        },
+        {
+          "dex": 356,
+          "name": "Dusclops"
+        },
+        {
+          "dex": 364,
+          "name": "Sealeo"
+        },
+        {
+          "dex": 820,
+          "name": "Greedent"
         }
       ]
     },
     "ultra": {
       "cpCap": 2500,
       "species": [
+        {
+          "dex": 959,
+          "name": "Tinkaton"
+        },
+        {
+          "dex": 463,
+          "name": "Lickilicky"
+        },
+        {
+          "dex": 718,
+          "name": "Zygarde (Complete Forme)"
+        },
         {
           "dex": 593,
           "name": "Jellicent"
@@ -139,52 +151,52 @@
           "name": "Corviknight"
         },
         {
-          "dex": 131,
-          "name": "Lapras"
-        },
-        {
-          "dex": 959,
-          "name": "Tinkaton"
-        },
-        {
-          "dex": 395,
-          "name": "Empoleon"
-        },
-        {
-          "dex": 146,
-          "name": "Moltres (Galarian)"
+          "dex": 671,
+          "name": "Florges"
         },
         {
           "dex": 160,
           "name": "Feraligatr (Shadow)"
         },
         {
-          "dex": 687,
-          "name": "Malamar (Shadow)"
-        },
-        {
-          "dex": 977,
-          "name": "Dondozo"
-        },
-        {
-          "dex": 671,
-          "name": "Florges"
-        },
-        {
-          "dex": 895,
-          "name": "Regidrago"
-        },
-        {
           "dex": 640,
           "name": "Virizion"
         },
         {
-          "dex": 463,
-          "name": "Lickilicky"
+          "dex": 395,
+          "name": "Empoleon (Shadow)"
         },
         {
-          "dex": 272,
-          "name": "Ludicolo"
+          "dex": 146,
+          "name": "Moltres (Galarian)"
+        },
+        {
+          "dex": 230,
+          "name": "Kingdra"
+        },
+        {
+          "dex": 9,
+          "name": "Blastoise"
+        },
+        {
+          "dex": 205,
+          "name": "Forretress"
+        },
+        {
+          "dex": 687,
+          "name": "Malamar"
+        },
+        {
+          "dex": 979,
+          "name": "Annihilape"
+        },
+        {
+          "dex": 346,
+          "name": "Cradily"
+        },
+        {
+          "dex": 38,
+          "name": "Ninetales (Alolan)"
         },
         {
           "dex": 36,
@@ -195,60 +207,48 @@
           "name": "Oranguru"
         },
         {
-          "dex": 9,
-          "name": "Blastoise"
+          "dex": 379,
+          "name": "Registeel"
         },
         {
-          "dex": 718,
-          "name": "Zygarde (Complete Forme)"
-        },
-        {
-          "dex": 365,
-          "name": "Walrein"
+          "dex": 131,
+          "name": "Lapras"
         },
         {
           "dex": 477,
-          "name": "Dusknoir (Shadow)"
+          "name": "Dusknoir"
         },
         {
-          "dex": 38,
-          "name": "Ninetales (Alolan)"
+          "dex": 119,
+          "name": "Seaking"
         },
         {
           "dex": 776,
           "name": "Turtonator"
         },
         {
-          "dex": 452,
-          "name": "Drapion"
-        },
-        {
-          "dex": 979,
-          "name": "Annihilape (Shadow)"
-        },
-        {
-          "dex": 230,
-          "name": "Kingdra"
+          "dex": 977,
+          "name": "Dondozo"
         },
         {
           "dex": 487,
           "name": "Giratina (Altered)"
         },
         {
-          "dex": 939,
-          "name": "Bellibolt"
+          "dex": 350,
+          "name": "Milotic"
         },
         {
-          "dex": 488,
-          "name": "Cresselia"
+          "dex": 895,
+          "name": "Regidrago"
         },
         {
-          "dex": 205,
-          "name": "Forretress"
+          "dex": 260,
+          "name": "Swampert"
         },
         {
-          "dex": 468,
-          "name": "Togekiss"
+          "dex": 663,
+          "name": "Talonflame"
         }
       ]
     },
@@ -268,28 +268,32 @@
           "name": "Metagross"
         },
         {
-          "dex": 716,
-          "name": "Xerneas"
-        },
-        {
-          "dex": 889,
-          "name": "Zamazenta (Crowned Shield)"
-        },
-        {
           "dex": 646,
           "name": "Kyurem (White)"
-        },
-        {
-          "dex": 483,
-          "name": "Dialga (Origin)"
         },
         {
           "dex": 792,
           "name": "Lunala"
         },
         {
+          "dex": 716,
+          "name": "Xerneas"
+        },
+        {
           "dex": 643,
           "name": "Reshiram"
+        },
+        {
+          "dex": 483,
+          "name": "Dialga (Origin)"
+        },
+        {
+          "dex": 889,
+          "name": "Zamazenta (Crowned Shield)"
+        },
+        {
+          "dex": 382,
+          "name": "Kyogre"
         },
         {
           "dex": 644,
@@ -300,16 +304,16 @@
           "name": "Marshadow"
         },
         {
-          "dex": 382,
-          "name": "Kyogre"
+          "dex": 890,
+          "name": "Eternatus"
         },
         {
           "dex": 249,
           "name": "Lugia"
         },
         {
-          "dex": 890,
-          "name": "Eternatus"
+          "dex": 445,
+          "name": "Garchomp (Shadow)"
         },
         {
           "dex": 800,
@@ -324,12 +328,8 @@
           "name": "Ho-Oh"
         },
         {
-          "dex": 445,
-          "name": "Garchomp"
-        },
-        {
-          "dex": 383,
-          "name": "Groudon"
+          "dex": 718,
+          "name": "Zygarde (Complete Forme)"
         },
         {
           "dex": 648,
@@ -340,36 +340,36 @@
           "name": "Latios (Shadow)"
         },
         {
-          "dex": 1000,
-          "name": "Gholdengo"
-        },
-        {
-          "dex": 791,
-          "name": "Solgaleo"
-        },
-        {
-          "dex": 671,
-          "name": "Florges"
+          "dex": 383,
+          "name": "Groudon"
         },
         {
           "dex": 130,
           "name": "Gyarados (Shadow)"
         },
         {
+          "dex": 671,
+          "name": "Florges"
+        },
+        {
+          "dex": 1000,
+          "name": "Gholdengo"
+        },
+        {
           "dex": 150,
           "name": "Mewtwo (Shadow)"
         },
         {
-          "dex": 385,
-          "name": "Jirachi"
+          "dex": 791,
+          "name": "Solgaleo"
+        },
+        {
+          "dex": 809,
+          "name": "Melmetal"
         },
         {
           "dex": 647,
           "name": "Keldeo (Resolute)"
-        },
-        {
-          "dex": 718,
-          "name": "Zygarde (Complete Forme)"
         },
         {
           "dex": 380,
@@ -379,133 +379,6 @@
     }
   },
   "cups": {
-    "fantasy": {
-      "id": "fantasy",
-      "name": "Fantasy Cup",
-      "cpCap": 1500,
-      "species": [
-        {
-          "dex": 618,
-          "name": "Stunfisk (Galarian)"
-        },
-        {
-          "dex": 110,
-          "name": "Weezing (Galarian) (Shadow)"
-        },
-        {
-          "dex": 681,
-          "name": "Aegislash (Shield)"
-        },
-        {
-          "dex": 205,
-          "name": "Forretress"
-        },
-        {
-          "dex": 776,
-          "name": "Turtonator"
-        },
-        {
-          "dex": 823,
-          "name": "Corviknight"
-        },
-        {
-          "dex": 680,
-          "name": "Doublade"
-        },
-        {
-          "dex": 968,
-          "name": "Orthworm"
-        },
-        {
-          "dex": 395,
-          "name": "Empoleon"
-        },
-        {
-          "dex": 530,
-          "name": "Excadrill (Shadow)"
-        },
-        {
-          "dex": 448,
-          "name": "Lucario"
-        },
-        {
-          "dex": 959,
-          "name": "Tinkaton"
-        },
-        {
-          "dex": 485,
-          "name": "Heatran (Shadow)"
-        },
-        {
-          "dex": 28,
-          "name": "Sandslash (Alolan)"
-        },
-        {
-          "dex": 379,
-          "name": "Registeel"
-        },
-        {
-          "dex": 208,
-          "name": "Steelix (Shadow)"
-        },
-        {
-          "dex": 334,
-          "name": "Altaria"
-        },
-        {
-          "dex": 809,
-          "name": "Melmetal"
-        },
-        {
-          "dex": 702,
-          "name": "Dedenne"
-        },
-        {
-          "dex": 730,
-          "name": "Primarina"
-        },
-        {
-          "dex": 184,
-          "name": "Azumarill"
-        },
-        {
-          "dex": 385,
-          "name": "Jirachi"
-        },
-        {
-          "dex": 468,
-          "name": "Togekiss"
-        },
-        {
-          "dex": 487,
-          "name": "Giratina (Altered) (Shadow)"
-        },
-        {
-          "dex": 176,
-          "name": "Togetic"
-        },
-        {
-          "dex": 330,
-          "name": "Flygon (Shadow)"
-        },
-        {
-          "dex": 788,
-          "name": "Tapu Fini"
-        },
-        {
-          "dex": 707,
-          "name": "Klefki"
-        },
-        {
-          "dex": 376,
-          "name": "Metagross"
-        },
-        {
-          "dex": 860,
-          "name": "Morgrem"
-        }
-      ]
-    },
     "retro": {
       "id": "retro",
       "name": "Retro Cup",
@@ -636,13 +509,6 @@
   },
   "gblEvents": [
     {
-      "eventID": "gbl-memories-in-motion_great-league_ultra-league_master-league-split-4",
-      "name": "Great League, Ultra League, and Master League | Memories in Motion",
-      "start": "2026-05-26T20:00:00.000Z",
-      "end": "2026-06-02T20:00:00.000Z",
-      "cups": []
-    },
-    {
       "eventID": "gbl-forever-forward_great-league_pokemon-north-america-international-championships-2026-cup-great-league-edition",
       "name": "Great League and Pokémon North America International Championships 2026 Cup: Great League Edition | Forever Forward",
       "start": "2026-06-02T20:00:00.000Z",
@@ -682,9 +548,7 @@
       "name": "Ultra League and Fantasy Cup: Ultra League Edition | Forever Forward",
       "start": "2026-07-07T20:00:00.000Z",
       "end": "2026-07-14T20:00:00.000Z",
-      "cups": [
-        "fantasy"
-      ]
+      "cups": []
     },
     {
       "eventID": "gbl-forever-forward_master-league_retro-cup-great-league-edition",
