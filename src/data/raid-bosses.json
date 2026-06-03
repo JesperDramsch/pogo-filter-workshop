@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-28T11:07:32.115Z",
+  "fetchedAt": "2026-06-03T12:24:13.507Z",
   "raids": {
     "mega": [
       {
@@ -259,68 +259,74 @@
     ],
     "shadow_lvl5": [
       {
-        "id": "CRESSELIA",
+        "id": "DIALGA",
         "names": {
-          "en": "Cresselia",
-          "de": "Cresselia",
-          "fr": "Cresselia",
-          "it": "Cresselia",
-          "ja": "クレセリア",
-          "ko": "크레세리아",
-          "es": "Cresselia"
+          "en": "Dialga",
+          "de": "Dialga",
+          "fr": "Dialga",
+          "it": "Dialga",
+          "ja": "ディアルガ",
+          "ko": "디아루가",
+          "es": "Dialga"
         },
         "types": [
-          "psychic"
+          "steel",
+          "dragon"
         ],
         "resistorTypes": [
           "steel",
-          "psychic",
-          "dark"
+          "fire",
+          "water",
+          "electric"
         ],
         "seMoveTypes": [
-          "bug",
-          "dark",
-          "ghost"
+          "fighting",
+          "ground"
         ]
       }
     ],
     "shadow_lvl3": [
       {
-        "id": "NINETALES",
+        "id": "MAROWAK",
         "names": {
-          "en": "Ninetales",
-          "de": "Vulnona",
-          "fr": "Feunard",
-          "it": "Ninetales",
-          "ja": "キュウコン",
-          "ko": "나인테일",
-          "es": "Ninetales"
+          "en": "Alolan Marowak",
+          "de": "Alola-Knogga",
+          "fr": "Ossatueur d'Alola",
+          "it": "Marowak di Alola",
+          "ja": "アローラ ガラガラ",
+          "ko": "알로라 텅구리",
+          "es": "Marowak de Alola"
         },
         "types": [
-          "fire"
+          "fire",
+          "ghost"
         ],
         "resistorTypes": [
+          "normal",
           "rock",
           "fire",
           "water",
-          "dragon"
+          "dragon",
+          "dark"
         ],
         "seMoveTypes": [
+          "dark",
+          "ghost",
           "ground",
           "rock",
           "water"
         ]
       },
       {
-        "id": "PRIMEAPE",
+        "id": "HITMONLEE",
         "names": {
-          "en": "Primeape",
-          "de": "Rasaff",
-          "fr": "Colossinge",
-          "it": "Primeape",
-          "ja": "オコリザル",
-          "ko": "성원숭",
-          "es": "Primeape"
+          "en": "Hitmonlee",
+          "de": "Kicklee",
+          "fr": "Kicklee",
+          "it": "Hitmonlee",
+          "ja": "サワムラー",
+          "ko": "시라소몬",
+          "es": "Hitmonlee"
         },
         "types": [
           "fighting"
@@ -340,140 +346,135 @@
         ]
       },
       {
-        "id": "ONIX",
+        "id": "GLIGAR",
         "names": {
-          "en": "Onix",
-          "de": "Onix",
-          "fr": "Onix",
-          "it": "Onix",
-          "ja": "イワーク",
-          "ko": "롱스톤",
-          "es": "Onix"
+          "en": "Gligar",
+          "de": "Skorgla",
+          "fr": "Scorplane",
+          "it": "Gligar",
+          "ja": "グライガー",
+          "ko": "글라이거",
+          "es": "Gligar"
         },
         "types": [
-          "rock",
-          "ground"
+          "ground",
+          "flying"
         ],
         "resistorTypes": [
-          "fighting",
-          "ground",
-          "grass"
+          "flying"
         ],
         "seMoveTypes": [
-          "grass",
-          "water",
-          "fighting",
-          "ground",
           "ice",
-          "steel"
+          "water"
         ]
       }
     ],
     "shadow_lvl1": [
       {
-        "id": "LARVITAR",
+        "id": "HORSEA",
         "names": {
-          "en": "Larvitar",
-          "de": "Larvitar",
-          "fr": "Embrylex",
-          "it": "Larvitar",
-          "ja": "ヨーギラス",
-          "ko": "애버라스",
-          "es": "Larvitar"
+          "en": "Horsea",
+          "de": "Seeper",
+          "fr": "Hypotrempe",
+          "it": "Horsea",
+          "ja": "タッツー",
+          "ko": "쏘드라",
+          "es": "Horsea"
         },
         "types": [
-          "rock",
-          "ground"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "ground",
-          "grass"
-        ],
-        "seMoveTypes": [
-          "grass",
-          "water",
-          "fighting",
-          "ground",
-          "ice",
-          "steel"
-        ]
-      },
-      {
-        "id": "SABLEYE",
-        "names": {
-          "en": "Sableye",
-          "de": "Zobiris",
-          "fr": "Ténéfix",
-          "it": "Sableye",
-          "ja": "ヤミラミ",
-          "ko": "깜까미",
-          "es": "Sableye"
-        },
-        "types": [
-          "dark",
-          "ghost"
-        ],
-        "resistorTypes": [
-          "normal",
-          "fighting",
-          "dark",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "fairy"
-        ]
-      },
-      {
-        "id": "SPHEAL",
-        "names": {
-          "en": "Spheal",
-          "de": "Seemops",
-          "fr": "Obalie",
-          "it": "Spheal",
-          "ja": "タマザラシ",
-          "ko": "대굴레오",
-          "es": "Spheal"
-        },
-        "types": [
-          "ice",
           "water"
         ],
         "resistorTypes": [
-          "steel",
           "water",
-          "ice"
+          "grass",
+          "dragon"
         ],
         "seMoveTypes": [
           "electric",
-          "fighting",
-          "grass",
-          "rock"
+          "grass"
         ]
       },
       {
-        "id": "INKAY",
+        "id": "PORYGON",
         "names": {
-          "en": "Inkay",
-          "de": "Iscalar",
-          "fr": "Sepiatop",
-          "it": "Inkay",
-          "ja": "マーイーカ",
-          "ko": "오케이징",
-          "es": "Inkay"
+          "en": "Porygon",
+          "de": "Porygon",
+          "fr": "Porygon",
+          "it": "Porygon",
+          "ja": "ポリゴン",
+          "ko": "폴리곤",
+          "es": "Porygon"
         },
         "types": [
-          "dark",
+          "normal"
+        ],
+        "resistorTypes": [
+          "rock",
+          "ghost",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "fighting"
+        ]
+      },
+      {
+        "id": "BELDUM",
+        "names": {
+          "en": "Beldum",
+          "de": "Tanhel",
+          "fr": "Terhal",
+          "it": "Beldum",
+          "ja": "ダンバル",
+          "ko": "메탕",
+          "es": "Beldum"
+        },
+        "types": [
+          "steel",
           "psychic"
         ],
         "resistorTypes": [
           "steel",
-          "dark",
-          "fairy"
+          "fire",
+          "water",
+          "electric",
+          "psychic",
+          "dark"
         ],
         "seMoveTypes": [
+          "dark",
+          "fire",
+          "ghost",
+          "ground"
+        ]
+      },
+      {
+        "id": "GOLETT",
+        "names": {
+          "en": "Golett",
+          "de": "Golbit",
+          "fr": "Gringolem",
+          "it": "Golett",
+          "ja": "ゴビット",
+          "ko": "골비람",
+          "es": "Golett"
+        },
+        "types": [
+          "ground",
+          "ghost"
+        ],
+        "resistorTypes": [
+          "normal",
+          "flying",
           "bug",
-          "fairy"
+          "grass",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "ghost",
+          "grass",
+          "ice",
+          "water"
         ]
       }
     ]
@@ -1670,37 +1671,6 @@
   },
   "eventRaids": [
     {
-      "eventID": "shadow-dialga-in-shadow-raids-june-2026",
-      "name": "Shadow Dialga in Shadow Raids",
-      "eventType": "raid-battles",
-      "start": "2026-06-02T06:00:00.000",
-      "end": "2026-06-30T22:00:00.000",
-      "isShadow": true,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "DIALGA",
-          "names": {
-            "en": "Dialga"
-          },
-          "types": [
-            "steel",
-            "dragon"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "electric"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "ground"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "reshiram-in-5-star-raid-battles-june-2026",
       "name": "Reshiram in 5-star Raid Battles",
       "eventType": "raid-battles",
@@ -1788,6 +1758,68 @@
             "ground",
             "rock",
             "dragon"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "zekrom-in-5-star-raid-battles-june-2026",
+      "name": "Zekrom in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-06-10T06:00:00.000",
+      "end": "2026-06-16T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "ZEKROM",
+          "names": {
+            "en": "Zekrom"
+          },
+          "types": [
+            "dragon",
+            "electric"
+          ],
+          "resistorTypes": [
+            "ground",
+            "steel",
+            "grass",
+            "electric",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "ground",
+            "ice",
+            "dragon",
+            "fairy"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-lopunny-in-mega-raids-june-2026",
+      "name": "Mega Lopunny in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-06-10T06:00:00.000",
+      "end": "2026-06-17T06:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "LOPUNNY",
+          "names": {
+            "en": "Lopunny"
+          },
+          "types": [
+            "normal"
+          ],
+          "resistorTypes": [
+            "rock",
+            "ghost",
+            "steel"
+          ],
+          "seMoveTypes": [
+            "fighting"
           ]
         }
       ]
