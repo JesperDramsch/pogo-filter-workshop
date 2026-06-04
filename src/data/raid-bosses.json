@@ -1,155 +1,122 @@
 {
-  "fetchedAt": "2026-06-03T12:24:13.507Z",
+  "fetchedAt": "2026-06-04T10:49:56.000Z",
   "raids": {
     "mega": [
       {
-        "id": "MEDICHAM",
+        "id": "AUDINO",
         "names": {
-          "en": "Mega Medicham",
-          "de": "Mega-Meditalis",
-          "fr": "Méga-Charmina",
-          "it": "MegaMedicham",
-          "ja": "メガチャーレム",
-          "ko": "메가요가램",
-          "es": "Mega-Medicham"
+          "en": "Mega Audino",
+          "de": "Mega-Ohrdoch",
+          "fr": "Méga-Nanméouïe",
+          "it": "MegaAudino",
+          "ja": "メガタブンネ",
+          "ko": "메가다부니",
+          "es": "Mega-Audino"
         },
         "types": [
-          "fighting",
-          "psychic"
-        ],
-        "resistorTypes": [
-          "flying",
-          "bug",
-          "ghost",
-          "psychic",
+          "normal",
           "fairy"
         ],
+        "resistorTypes": [
+          "poison",
+          "rock",
+          "ghost",
+          "steel",
+          "fire"
+        ],
         "seMoveTypes": [
-          "fairy",
-          "flying",
-          "ghost"
+          "poison",
+          "steel"
         ]
       }
     ],
     "lvl5": [
       {
-        "id": "TAPU_FINI",
+        "id": "RESHIRAM",
         "names": {
-          "en": "Tapu Fini",
-          "de": "Kapu-Kime",
-          "fr": "Tokopisco",
-          "it": "Tapu Fini",
-          "ja": "カプ・レヒレ",
-          "ko": "카푸느지느",
-          "es": "Tapu Fini"
+          "en": "Reshiram",
+          "de": "Reshiram",
+          "fr": "Reshiram",
+          "it": "Reshiram",
+          "ja": "レシラム",
+          "ko": "레시라무",
+          "es": "Reshiram"
         },
         "types": [
+          "dragon",
+          "fire"
+        ],
+        "resistorTypes": [
+          "rock",
+          "fire",
           "water",
           "fairy"
         ],
-        "resistorTypes": [
-          "poison",
-          "steel",
-          "water",
-          "grass"
-        ],
         "seMoveTypes": [
-          "electric",
-          "grass",
-          "poison"
+          "dragon",
+          "ground",
+          "rock"
         ]
       }
     ],
     "lvl3": [
       {
-        "id": "SCYTHER",
+        "id": "WEEZING",
         "names": {
-          "en": "Scyther",
-          "de": "Sichlor",
-          "fr": "Insécateur",
-          "it": "Scyther",
-          "ja": "ストライク",
-          "ko": "스라크",
-          "es": "Scyther"
+          "en": "Galarian Weezing",
+          "de": "Galar-Smogmog",
+          "fr": "Smogogo de Galar",
+          "it": "Weezing di Galar",
+          "ja": "ガラル マタドガス",
+          "ko": "가라르 또도가스",
+          "es": "Weezing de Galar"
         },
         "types": [
-          "bug",
-          "flying"
+          "poison",
+          "fairy"
         ],
         "resistorTypes": [
-          "flying",
           "poison",
+          "ground",
           "rock",
           "ghost",
           "steel",
-          "fire",
-          "electric",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "rock",
-          "electric",
-          "fire",
-          "flying",
-          "ice"
-        ]
-      },
-      {
-        "id": "LAPRAS",
-        "names": {
-          "en": "Lapras",
-          "de": "Lapras",
-          "fr": "Lokhlass",
-          "it": "Lapras",
-          "ja": "ラプラス",
-          "ko": "라프라스",
-          "es": "Lapras"
-        },
-        "types": [
-          "water",
-          "ice"
-        ],
-        "resistorTypes": [
-          "steel",
-          "water",
-          "ice"
-        ],
-        "seMoveTypes": [
-          "electric",
-          "fighting",
-          "grass",
-          "rock"
-        ]
-      },
-      {
-        "id": "HOUNDOOM",
-        "names": {
-          "en": "Houndoom",
-          "de": "Hundemon",
-          "fr": "Démolosse",
-          "it": "Houndoom",
-          "ja": "ヘルガー",
-          "ko": "헬가",
-          "es": "Houndoom"
-        },
-        "types": [
-          "dark",
           "fire"
         ],
+        "seMoveTypes": [
+          "ground",
+          "psychic",
+          "steel"
+        ]
+      },
+      {
+        "id": "TOGETIC",
+        "names": {
+          "en": "Togetic",
+          "de": "Togetic",
+          "fr": "Togetic",
+          "it": "Togetic",
+          "ja": "トゲチック",
+          "ko": "토게틱",
+          "es": "Togetic"
+        },
+        "types": [
+          "fairy",
+          "flying"
+        ],
         "resistorTypes": [
-          "fighting",
+          "poison",
           "rock",
+          "steel",
           "fire",
-          "water",
-          "dragon",
-          "dark",
-          "fairy"
+          "electric"
         ],
         "seMoveTypes": [
-          "fighting",
-          "ground",
+          "electric",
+          "ice",
+          "poison",
           "rock",
-          "water"
+          "steel"
         ]
       }
     ],
@@ -157,103 +124,105 @@
       {
         "id": "MEOWTH",
         "names": {
-          "en": "Meowth",
-          "de": "Mauzi",
-          "fr": "Miaouss",
-          "it": "Meowth",
-          "ja": "ニャース",
-          "ko": "나옹",
-          "es": "Meowth"
+          "en": "Galarian Meowth",
+          "de": "Galar-Mauzi",
+          "fr": "Miaouss de Galar",
+          "it": "Meowth di Galar",
+          "ja": "ガラル ニャース",
+          "ko": "가라르 나옹",
+          "es": "Meowth de Galar"
         },
         "types": [
-          "normal"
-        ],
-        "resistorTypes": [
-          "rock",
-          "ghost",
           "steel"
         ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "electric"
+        ],
         "seMoveTypes": [
-          "fighting"
+          "fighting",
+          "fire",
+          "ground"
         ]
       },
       {
-        "id": "PONYTA",
+        "id": "CHIMECHO",
         "names": {
-          "en": "Ponyta",
-          "de": "Ponita",
-          "fr": "Ponyta",
-          "it": "Ponyta",
-          "ja": "ポニータ",
-          "ko": "포니타",
-          "es": "Ponyta"
+          "en": "Chimecho",
+          "de": "Palimpalim",
+          "fr": "Éoko",
+          "it": "Chimecho",
+          "ja": "チリーン",
+          "ko": "치렁",
+          "es": "Chimecho"
         },
         "types": [
-          "fire"
+          "psychic"
         ],
         "resistorTypes": [
-          "rock",
-          "fire",
-          "water",
-          "dragon"
+          "steel",
+          "psychic",
+          "dark"
         ],
         "seMoveTypes": [
+          "bug",
+          "dark",
+          "ghost"
+        ]
+      },
+      {
+        "id": "STUNFISK",
+        "names": {
+          "en": "Galarian Stunfisk",
+          "de": "Galar-Flunschlik",
+          "fr": "Limonde de Galar",
+          "it": "Stunfisk di Galar",
+          "ja": "ガラル マッギョ",
+          "ko": "가라르 메더",
+          "es": "Stunfisk de Galar"
+        },
+        "types": [
           "ground",
-          "rock",
+          "steel"
+        ],
+        "resistorTypes": [
+          "flying",
+          "bug",
+          "water",
+          "grass"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "fire",
+          "ground",
           "water"
         ]
       },
       {
-        "id": "ELECTABUZZ",
+        "id": "HATENNA",
         "names": {
-          "en": "Electabuzz",
-          "de": "Elektek",
-          "fr": "Élektek",
-          "it": "Electabuzz",
-          "ja": "エレブー",
-          "ko": "에레브",
-          "es": "Electabuzz"
+          "en": "Hatenna",
+          "de": "Brimova",
+          "fr": "Bibichut",
+          "it": "Hatenna",
+          "ja": "ミブリム",
+          "ko": "몸지브림",
+          "es": "Hatenna"
         },
         "types": [
-          "electric"
+          "psychic"
         ],
         "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
-          "dragon"
+          "steel",
+          "psychic",
+          "dark"
         ],
         "seMoveTypes": [
-          "ground"
-        ]
-      },
-      {
-        "id": "LARVITAR",
-        "names": {
-          "en": "Larvitar",
-          "de": "Larvitar",
-          "fr": "Embrylex",
-          "it": "Larvitar",
-          "ja": "ヨーギラス",
-          "ko": "애버라스",
-          "es": "Larvitar"
-        },
-        "types": [
-          "rock",
-          "ground"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "ground",
-          "grass"
-        ],
-        "seMoveTypes": [
-          "grass",
-          "water",
-          "fighting",
-          "ground",
-          "ice",
-          "steel"
+          "bug",
+          "dark",
+          "ghost"
         ]
       }
     ],
@@ -1671,98 +1640,6 @@
   },
   "eventRaids": [
     {
-      "eventID": "reshiram-in-5-star-raid-battles-june-2026",
-      "name": "Reshiram in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-06-03T06:00:00.000",
-      "end": "2026-06-09T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "RESHIRAM",
-          "names": {
-            "en": "Reshiram"
-          },
-          "types": [
-            "dragon",
-            "fire"
-          ],
-          "resistorTypes": [
-            "rock",
-            "fire",
-            "water",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "ground",
-            "rock",
-            "dragon"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "mega-audino-in-mega-raids-june-2026",
-      "name": "Mega Audino in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-06-03T06:00:00.000",
-      "end": "2026-06-10T06:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "AUDINO",
-          "names": {
-            "en": "Audino"
-          },
-          "types": [
-            "normal"
-          ],
-          "resistorTypes": [
-            "rock",
-            "ghost",
-            "steel"
-          ],
-          "seMoveTypes": [
-            "fighting"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20260603",
-      "name": "Reshiram Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-06-03T18:00:00.000",
-      "end": "2026-06-03T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "RESHIRAM",
-          "names": {
-            "en": "Reshiram"
-          },
-          "types": [
-            "dragon",
-            "fire"
-          ],
-          "resistorTypes": [
-            "rock",
-            "fire",
-            "water",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "ground",
-            "rock",
-            "dragon"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "zekrom-in-5-star-raid-battles-june-2026",
       "name": "Zekrom in 5-star Raid Battles",
       "eventType": "raid-battles",
@@ -1820,6 +1697,40 @@
           ],
           "seMoveTypes": [
             "fighting"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20260610",
+      "name": "Zekrom Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-06-10T18:00:00.000",
+      "end": "2026-06-10T19:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "ZEKROM",
+          "names": {
+            "en": "Zekrom"
+          },
+          "types": [
+            "dragon",
+            "electric"
+          ],
+          "resistorTypes": [
+            "ground",
+            "steel",
+            "grass",
+            "electric",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "ground",
+            "ice",
+            "dragon",
+            "fairy"
           ]
         }
       ]
