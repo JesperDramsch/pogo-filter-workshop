@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-06-04T10:49:56.000Z",
+  "fetchedAt": "2026-06-08T12:15:54.881Z",
   "raids": {
     "mega": [
       {
@@ -1468,6 +1468,30 @@
         ],
         "seMoveTypes": [
           "fighting"
+        ]
+      },
+      {
+        "id": "ELECTABUZZ",
+        "names": {
+          "en": "Electabuzz",
+          "de": "Elektek",
+          "fr": "Élektek",
+          "it": "Electabuzz",
+          "ja": "エレブー",
+          "ko": "에레브",
+          "es": "Electabuzz"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground"
         ]
       },
       {
