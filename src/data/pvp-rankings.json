@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-06-03T12:53:04.253Z",
+  "fetchedAt": "2026-06-09T11:35:11.823Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -10,16 +10,12 @@
           "name": "Lickilicky"
         },
         {
-          "dex": 160,
-          "name": "Feraligatr"
-        },
-        {
           "dex": 334,
           "name": "Altaria"
         },
         {
-          "dex": 222,
-          "name": "Corsola (Galarian)"
+          "dex": 395,
+          "name": "Empoleon"
         },
         {
           "dex": 593,
@@ -27,23 +23,47 @@
         },
         {
           "dex": 195,
-          "name": "Quagsire"
+          "name": "Quagsire (Shadow)"
+        },
+        {
+          "dex": 222,
+          "name": "Corsola (Galarian)"
         },
         {
           "dex": 959,
           "name": "Tinkaton"
         },
         {
-          "dex": 205,
-          "name": "Forretress"
+          "dex": 38,
+          "name": "Ninetales"
         },
         {
-          "dex": 395,
-          "name": "Empoleon"
+          "dex": 119,
+          "name": "Seaking"
         },
         {
           "dex": 184,
           "name": "Azumarill"
+        },
+        {
+          "dex": 205,
+          "name": "Forretress"
+        },
+        {
+          "dex": 160,
+          "name": "Feraligatr"
+        },
+        {
+          "dex": 799,
+          "name": "Guzzlord"
+        },
+        {
+          "dex": 226,
+          "name": "Mantine"
+        },
+        {
+          "dex": 687,
+          "name": "Malamar"
         },
         {
           "dex": 230,
@@ -54,76 +74,56 @@
           "name": "Corviknight"
         },
         {
-          "dex": 681,
-          "name": "Aegislash (Blade)"
-        },
-        {
-          "dex": 226,
-          "name": "Mantine"
-        },
-        {
-          "dex": 308,
-          "name": "Medicham"
-        },
-        {
-          "dex": 38,
-          "name": "Ninetales"
-        },
-        {
-          "dex": 189,
-          "name": "Jumpluff"
-        },
-        {
-          "dex": 302,
-          "name": "Sableye (Shadow)"
-        },
-        {
-          "dex": 119,
-          "name": "Seaking"
-        },
-        {
-          "dex": 799,
-          "name": "Guzzlord"
-        },
-        {
-          "dex": 687,
-          "name": "Malamar"
-        },
-        {
-          "dex": 618,
-          "name": "Stunfisk"
-        },
-        {
-          "dex": 663,
-          "name": "Talonflame"
-        },
-        {
-          "dex": 980,
-          "name": "Clodsire"
-        },
-        {
-          "dex": 705,
-          "name": "Sliggoo"
-        },
-        {
-          "dex": 131,
-          "name": "Lapras"
+          "dex": 22,
+          "name": "Fearow"
         },
         {
           "dex": 148,
           "name": "Dragonair (Shadow)"
         },
         {
-          "dex": 356,
-          "name": "Dusclops"
+          "dex": 308,
+          "name": "Medicham"
         },
         {
-          "dex": 364,
-          "name": "Sealeo"
+          "dex": 681,
+          "name": "Aegislash (Blade)"
         },
         {
-          "dex": 820,
-          "name": "Greedent"
+          "dex": 302,
+          "name": "Sableye (Shadow)"
+        },
+        {
+          "dex": 372,
+          "name": "Shelgon"
+        },
+        {
+          "dex": 705,
+          "name": "Sliggoo"
+        },
+        {
+          "dex": 189,
+          "name": "Jumpluff"
+        },
+        {
+          "dex": 618,
+          "name": "Stunfisk (Galarian)"
+        },
+        {
+          "dex": 537,
+          "name": "Seismitoad"
+        },
+        {
+          "dex": 980,
+          "name": "Clodsire"
+        },
+        {
+          "dex": 162,
+          "name": "Furret"
+        },
+        {
+          "dex": 131,
+          "name": "Lapras"
         }
       ]
     },
