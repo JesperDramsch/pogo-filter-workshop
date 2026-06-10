@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-06-09T11:35:11.823Z",
+  "fetchedAt": "2026-06-10T11:50:33.789Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -379,6 +379,133 @@
     }
   },
   "cups": {
+    "sunshine": {
+      "id": "sunshine",
+      "name": "Sunshine Cup",
+      "cpCap": 1500,
+      "species": [
+        {
+          "dex": 346,
+          "name": "Cradily"
+        },
+        {
+          "dex": 839,
+          "name": "Coalossal"
+        },
+        {
+          "dex": 733,
+          "name": "Toucannon (Shadow)"
+        },
+        {
+          "dex": 765,
+          "name": "Oranguru"
+        },
+        {
+          "dex": 980,
+          "name": "Clodsire"
+        },
+        {
+          "dex": 162,
+          "name": "Furret"
+        },
+        {
+          "dex": 241,
+          "name": "Miltank"
+        },
+        {
+          "dex": 257,
+          "name": "Blaziken (Shadow)"
+        },
+        {
+          "dex": 18,
+          "name": "Pidgeot"
+        },
+        {
+          "dex": 207,
+          "name": "Gligar (Shadow)"
+        },
+        {
+          "dex": 776,
+          "name": "Turtonator"
+        },
+        {
+          "dex": 463,
+          "name": "Lickilicky"
+        },
+        {
+          "dex": 38,
+          "name": "Ninetales (Shadow)"
+        },
+        {
+          "dex": 472,
+          "name": "Gliscor"
+        },
+        {
+          "dex": 732,
+          "name": "Trumbeak (Shadow)"
+        },
+        {
+          "dex": 85,
+          "name": "Dodrio"
+        },
+        {
+          "dex": 780,
+          "name": "Drampa"
+        },
+        {
+          "dex": 324,
+          "name": "Torkoal"
+        },
+        {
+          "dex": 22,
+          "name": "Fearow"
+        },
+        {
+          "dex": 195,
+          "name": "Quagsire"
+        },
+        {
+          "dex": 832,
+          "name": "Dubwool"
+        },
+        {
+          "dex": 221,
+          "name": "Piloswine"
+        },
+        {
+          "dex": 219,
+          "name": "Magcargo"
+        },
+        {
+          "dex": 345,
+          "name": "Lileep"
+        },
+        {
+          "dex": 260,
+          "name": "Swampert (Shadow)"
+        },
+        {
+          "dex": 916,
+          "name": "Oinkologne (Female)"
+        },
+        {
+          "dex": 660,
+          "name": "Diggersby"
+        },
+        {
+          "dex": 820,
+          "name": "Greedent"
+        },
+        {
+          "dex": 206,
+          "name": "Dunsparce"
+        },
+        {
+          "dex": 105,
+          "name": "Marowak (Alolan) (Shadow)"
+        }
+      ]
+    },
     "retro": {
       "id": "retro",
       "name": "Retro Cup",
@@ -509,13 +636,6 @@
   },
   "gblEvents": [
     {
-      "eventID": "gbl-forever-forward_great-league_pokemon-north-america-international-championships-2026-cup-great-league-edition",
-      "name": "Great League and Pokémon North America International Championships 2026 Cup: Great League Edition | Forever Forward",
-      "start": "2026-06-02T20:00:00.000Z",
-      "end": "2026-06-09T20:00:00.000Z",
-      "cups": []
-    },
-    {
       "eventID": "gbl-forever-forward_ultra-league_pokemon-north-america-international-championships-2026-cup-great-league-edition",
       "name": "Ultra League and Pokémon North America International Championships 2026 Cup: Great League Edition | Forever Forward",
       "start": "2026-06-09T20:00:00.000Z",
@@ -527,7 +647,9 @@
       "name": "Master League: Mega Edition and Sunshine Cup: Great League Edition | Forever Forward",
       "start": "2026-06-16T20:00:00.000Z",
       "end": "2026-06-23T20:00:00.000Z",
-      "cups": []
+      "cups": [
+        "sunshine"
+      ]
     },
     {
       "eventID": "gbl-forever-forward_great-league_ultra-league_master-league-split-1",
