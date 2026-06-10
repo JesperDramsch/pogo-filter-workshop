@@ -1758,6 +1758,70 @@
           ]
         }
       ]
+    },
+    {
+      "eventID": "necrozma-in-5-star-raid-battles-june-2026",
+      "name": "Necrozma in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-06-17T06:00:00.000",
+      "end": "2026-06-23T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "NECROZMA",
+          "names": {
+            "en": "Necrozma"
+          },
+          "types": [
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "ghost",
+            "dark"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-scizor-in-mega-raids-june-2026",
+      "name": "Mega Scizor in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-06-17T06:00:00.000",
+      "end": "2026-06-24T06:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "SCIZOR",
+          "names": {
+            "en": "Scizor"
+          },
+          "types": [
+            "bug",
+            "steel"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "flying",
+            "poison",
+            "ghost",
+            "steel",
+            "fire",
+            "water",
+            "electric"
+          ],
+          "seMoveTypes": [
+            "fire"
+          ]
+        }
+      ]
     }
   ]
 }
