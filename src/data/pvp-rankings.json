@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-06-10T11:50:33.789Z",
+  "fetchedAt": "2026-06-17T12:33:02.663Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -635,13 +635,6 @@
     }
   },
   "gblEvents": [
-    {
-      "eventID": "gbl-forever-forward_ultra-league_pokemon-north-america-international-championships-2026-cup-great-league-edition",
-      "name": "Ultra League and Pokémon North America International Championships 2026 Cup: Great League Edition | Forever Forward",
-      "start": "2026-06-09T20:00:00.000Z",
-      "end": "2026-06-16T20:00:00.000Z",
-      "cups": []
-    },
     {
       "eventID": "gbl-forever-forward_master-league-mega-edition_sunshine-cup-great-league-edition",
       "name": "Master League: Mega Edition and Sunshine Cup: Great League Edition | Forever Forward",
