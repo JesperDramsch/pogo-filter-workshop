@@ -615,8 +615,15 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
   // IV-chasing nor lucky-friend-trading — so they belong in trash but NOT
   // in trade. Members of L \ H stay tradeable (the user might still chase
   // a hundo). Members of H \ L stay tradeable for lucky-friend trades.
-  const luckySet = new Set((luckies || []).map(s => String(s).toLowerCase()));
-  const luckyHundoSet = new Set(hundos.filter(h => luckySet.has(String(h).toLowerCase())));
+  // Canonicalize both sides before the H/L set math — matching how hundoOutSet
+  // and the regional drops resolve via resolveSpecies. Plain lowercasing breaks
+  // when a hundo and its lucky were stored in different locales (e.g. imported
+  // hundo "Charizard" + lucky "glurak" are the same species): they'd no longer
+  // match and the lucky-hundo would leak into trade. luckyHundoSet still holds
+  // raw `hundos` entries so the identity filter on the next line stays correct.
+  const canonKey = (s) => resolveSpecies(s) || String(s).toLowerCase();
+  const luckySet = new Set((luckies || []).map(canonKey));
+  const luckyHundoSet = new Set(hundos.filter(h => luckySet.has(canonKey(h))));
   const hundosForTrade = hundos.filter(h => !luckyHundoSet.has(h));
   const H_trade = hundosForTrade
     .map(h => `+${speciesForOutput(h, outputLocale)}`)
@@ -672,6 +679,23 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
   const trashClauses = [];
   const tradeClauses = [];
   const push = (arr, clause, why) => arr.push({ clause, why });
+
+  // Legacy-move protection clause, shared by trash / trade / buddy-catch so the
+  // Smeargle carve-out stays consistent across all three (it used to live only
+  // in trash, so trade/buddy over-protected every Smeargle). Each Smeargle has
+  // @special-flagged Sketched moves, so without the trailing species name the
+  // clause umbrella-protects all of them. With OR-binding-tighter precedence,
+  // `!@special,smeargle` parses as (!@special ∪ smeargle) — keep is "@special
+  // AND NOT smeargle". The same OR trick peels off purified-Return junk and
+  // still-Frustration shadows. protectSmeargleLegacy (default false) keeps
+  // regular Smeargles releasable/tradeable.
+  const smeargleName = pokemonNameFor("235", outputLocale)?.toLowerCase() || "smeargle";
+  const legacyMovesClause = () => {
+    const suffix = `,@${kw.flag.return},@${kw.flag.frustration}`;
+    return cfg.protectSmeargleLegacy
+      ? `!@${kw.flag.special_move}${suffix}`
+      : `!@${kw.flag.special_move}${suffix},${smeargleName}`;
+  };
 
   // ── TRASH ──────────────────────────────────────────────────────────────
   push(trashClauses, [S012, H].filter(Boolean).join(","), tFn("app.clause_why.h_union_s012"));
@@ -736,22 +760,7 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
   if (cfg.protectBackgrounds)  push(trashClauses, `!${kw.flag.background}`, tFn("app.clause_why.backgrounds"));
   if (cfg.protectDynamax)      push(trashClauses, `!${kw.flag.dynamax_move}1-`, tFn("app.clause_why.dynamax"));
   if (cfg.protectNewEvolutions) push(trashClauses, `!${kw.flag.new_evo},${kw.flag.mega}0`, tFn("app.clause_why.new_evolutions"));
-  if (cfg.protectLegacyMoves) {
-    // Carve out Smeargle by default: every Smeargle has @special-flagged
-    // Sketched moves, so without ',smeargle' the clause would protect them
-    // all. With OR-binding-tighter precedence, `!@special,smeargle` parses
-    // as (!@special ∪ smeargle) — i.e. keep is "@special AND NOT smeargle".
-    //
-    // Same OR trick peels off purified-Return junk and still-Frustration
-    // shadows: `!@special,@return,@frustration` trashes them despite the
-    // @special flag PoGo paints on Return/Frustration carriers.
-    const smeargleName = pokemonNameFor("235", outputLocale)?.toLowerCase() || "smeargle";
-    const legacySuffix = `,@${kw.flag.return},@${kw.flag.frustration}`;
-    const clause = cfg.protectSmeargleLegacy
-      ? `!@${kw.flag.special_move}${legacySuffix}`
-      : `!@${kw.flag.special_move}${legacySuffix},${smeargleName}`;
-    push(trashClauses, clause, tFn("app.clause_why.legacy_moves"));
-  }
+  if (cfg.protectLegacyMoves) push(trashClauses, legacyMovesClause(), tFn("app.clause_why.legacy_moves"));
   if (cfg.protectBabies)       push(trashClauses, `!${kw.flag.baby}`, tFn("app.clause_why.babies"));
   if (cfg.distanceProtect && cfg.distanceProtect > 0)
     push(trashClauses, `!${kw.numeric.distance}${cfg.distanceProtect}-,${kw.flag.traded}`, tFn("app.clause_why.distance", { params: { km: cfg.distanceProtect } }));
@@ -776,6 +785,14 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
       // homeLocals-based auto-drop for bare collectors.
       if (homeLocalTypeChecks.some(l => l.species === tc.species && l.type === tc.type)) continue;
       const speciesOut = speciesForOutput(tc.species, outputLocale);
+      // Hundo carve-out parity with the bare-collector loop below (L800): if
+      // the user owns a hundo of this species, its duplicates are redundant and
+      // should fall through to trash instead of being re-protected here — the
+      // same intent as the `+H` carve-out on trash clause 1. The hundo list is
+      // form-agnostic (PoGo can't search by regional form), so — exactly like
+      // collectors — we drop by species, which covers multi-form species too
+      // (e.g. owning a hundo Tauros surfaces every Paldean form's dupes).
+      if (hundoOutSet.has(speciesOut)) continue;
       const speciesDisplay = capFirst(speciesOut);
       const typeOut = kw.type[tc.type] || tc.type;
       // Optional excludeTypes carves additional negative-type modifiers into the
@@ -862,6 +879,14 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
       tFn("app.clause_why.bazaar_tag_trade", { params: { tag: basarTag } }));
     if (fernTauschTag) push(tradeClauses, `!#${fernTauschTag}`, tFn("app.clause_why.fern_tausch_tag_trade", { params: { tag: fernTauschTag } }));
     for (const t of customTags) push(tradeClauses, `!#${t}`, tFn("app.clause_why.custom_tag", { params: { tag: t } }));
+    // Buddy stockpiles are staged for a *specific* friend — keep them out of the
+    // general trade filter (mirrors the trash protection at L711-714 and makes
+    // buddy tags behave exactly like the basar/fern trade tags above). The
+    // prestaged filter surfaces them for the actual hand-off.
+    for (const b of activeBuddies) {
+      const prefix = b.tagPrefix.replace(/^#/, "");
+      push(tradeClauses, `!#${prefix}`, tFn("app.clause_why.buddy_tag", { params: { name: b.name, prefix } }));
+    }
   }
 
   if (cfg.protectLegendaries)  push(tradeClauses, `!${kw.flag.legendary}`, tFn("app.clause_why.legendaries"));
@@ -878,16 +903,31 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
       tFn("app.clause_why.protect_nundos_trade"));
   }
   for (const t of leagueTags)  push(tradeClauses, `!${t}`, tFn("app.clause_why.league_tag", { params: { tag: t } }));
+  // Trading away a former buddy forfeits the walked-distance/affection history;
+  // mirror the trash protection (search for cfg.protectBuddies above).
+  if (cfg.protectBuddies)      push(tradeClauses, `!${kw.numeric.buddy}1-`, tFn("app.clause_why.buddies_were"));
   if (cfg.protectDoubleMoved)  push(tradeClauses, "@3move", tFn("app.clause_why.double_moved_trade"));
   if (cfg.protectDynamax)      push(tradeClauses, `!${kw.flag.dynamax_move}1-`, tFn("app.clause_why.dynamax"));
+  // Trading away a would-be new-dex evolution costs you the registration; mirror
+  // the trash protection (L738) so it isn't bulk-traded.
+  if (cfg.protectNewEvolutions) push(tradeClauses, `!${kw.flag.new_evo},${kw.flag.mega}0`, tFn("app.clause_why.new_evolutions"));
   if (cfg.protectXXL)          push(tradeClauses, `!${kw.flag.xxl}`, tFn("app.clause_why.xxl_trade"));
   if (cfg.protectXL)           push(tradeClauses, `!${kw.flag.xl}`,  tFn("app.clause_why.xl_trade"));
-  if (cfg.protectLegacyMoves)  push(tradeClauses, `!@${kw.flag.special_move},@${kw.flag.return},@${kw.flag.frustration}`, tFn("app.clause_why.legacy_moves"));
+  // XXS completes the size-medal triplet — trash (L760) and buddyCatch already
+  // protect it; trade protected only XXL/XL. Reuses the shared `xxs` why-key.
+  if (cfg.protectXXS)          push(tradeClauses, `!${kw.flag.xxs}`, tFn("app.clause_why.xxs"));
+  if (cfg.protectLegacyMoves)  push(tradeClauses, legacyMovesClause(), tFn("app.clause_why.legacy_moves"));
   if (cfg.ageScopeDays && cfg.ageScopeDays > 0)
     push(tradeClauses, `${kw.numeric.age}-${cfg.ageScopeDays},${kw.flag.purified}`, tFn("app.clause_why.age_only", { params: { days: cfg.ageScopeDays } }));
   if (cfg.protectLuckyEligible && cfg.luckyEligibleYear && cfg.luckyEligibleYear > 0)
     push(tradeClauses, `${kw.numeric.year}${cfg.luckyEligibleYear}-`, tFn("app.clause_why.lucky_eligible", { params: { year: cfg.luckyEligibleYear } }));
   push(tradeClauses, `${kw.numeric.distance}0-`, tFn("app.clause_why.distance_zero"));
+  // Deliberate trash/trade asymmetry: babies (cfg.protectBabies) and regional
+  // collectibles/customCollectibles are protected in trash but intentionally
+  // NOT mirrored here — trading duplicates away (including regional dupes to a
+  // friend who needs the dex entry) is a feature, not a loss. Size medals,
+  // new-dex evolutions, and the other keepers above ARE mirrored because
+  // trading them away forfeits something unrecoverable.
 
   const trade = tradeClauses.map(c => c.clause).join("&");
 
@@ -896,8 +936,14 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
   const tagList = [];
   if (basarTag)      tagList.push(`#${basarTag}`);
   if (fernTauschTag) tagList.push(`#${fernTauschTag}`);
+  // Buddy stockpiles are the hand-off pile: once a mon is tagged #buddyname the
+  // buddy *catch* filter (which gates on `!#`) no longer surfaces it, so without
+  // this it would never appear in any filter for the actual meet-up trade.
+  // Including the prefixes here makes #buddyname behave like the basar/fern
+  // trade tags — protected in trade, surfaced here when staged.
+  for (const b of activeBuddies) tagList.push(`#${b.tagPrefix.replace(/^#/, "")}`);
   if (tagList.length > 0) {
-    push(prestagedClauses, tagList.join(","), tFn("app.clause_why.prestaged_marked", { params: { tags: `#${basarTag}${fernTauschTag ? ` oder #${fernTauschTag}` : ""}` } }));
+    push(prestagedClauses, tagList.join(","), tFn("app.clause_why.prestaged_marked", { params: { tags: tagList.join(", ") } }));
     push(prestagedClauses, `!${kw.flag.traded}`, tFn("app.clause_why.must_traded_short"));
     push(prestagedClauses, `!${kw.flag.shadow}`, tFn("app.clause_why.must_shadow_short"));
     push(prestagedClauses, `!${kw.flag.lucky}`, tFn("app.clause_why.must_lucky_short"));
@@ -946,7 +992,7 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     if (cfg.protectXXL)         push(catchClauses, `!${kw.flag.xxl}`, tFn("app.clause_why.xxl_trade"));
     if (cfg.protectXL)          push(catchClauses, `!${kw.flag.xl}`,  tFn("app.clause_why.xl_trade"));
     if (cfg.protectXXS)         push(catchClauses, `!${kw.flag.xxs}`, tFn("app.clause_why.xxs"));
-    if (cfg.protectLegacyMoves) push(catchClauses, `!@${kw.flag.special_move},@${kw.flag.return},@${kw.flag.frustration}`, tFn("app.clause_why.legacy_moves"));
+    if (cfg.protectLegacyMoves) push(catchClauses, legacyMovesClause(), tFn("app.clause_why.legacy_moves"));
     buddyCatchFilters.push({
       buddyName: b.name,
       prefix,

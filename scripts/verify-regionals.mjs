@@ -304,7 +304,7 @@ for (const t of E2E_TESTS) {
   const loc = C[t.city];
   const hl  = computeHomeLocals(loc);
   const htc = computeHomeLocalTypeChecks(loc);
-  const r = buildFilters(DEFAULT_HUNDOS, merged, hl, "en", (k) => k, htc);
+  const r = buildFilters(DEFAULT_HUNDOS, [], merged, hl, "en", (k) => k, htc);
   const errors = [];
   for (const f of PALDEAN_FORMS) {
     const expected = t.expect[f.form];
