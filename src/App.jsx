@@ -969,7 +969,19 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
       wantsTE ? tFn("app.clause_why.buddy_te_count", { params: { count: TE_full.length } }) : null,
     ].filter(Boolean).join(" + ");
     push(catchClauses, speciesParts.join(","), `${b.name}: ${why}`);
-    push(catchClauses, "0*,1*,2*", tFn("app.clause_why.trashable_stars"));
+    // Stars to catch fresh — plus a carve-out for spare dupes worth handing over.
+    // If the buddy wants a species you already own a hundo of, surface its 3★+
+    // copies too (you don't need them once the 4★ is in the bag), guarded by
+    // `!4*` so you never give away the hundo itself. Lucky copies stay protected
+    // by the `!lucky` clause below. Without this, a spare 3★ of a maxed species
+    // is stuck in lucky-sort with no path to the friend who asked for it.
+    const spareTargets = targets.filter(s => hundoOutSet.has(s));
+    if (spareTargets.length > 0) {
+      push(catchClauses, ["0*,1*,2*", ...spareTargets.map(s => `+${s}`)].join(","), tFn("app.clause_why.buddy_catch_or_spare"));
+      push(catchClauses, "!4*", tFn("app.clause_why.never_gift_4star"));
+    } else {
+      push(catchClauses, "0*,1*,2*", tFn("app.clause_why.trashable_stars"));
+    }
     push(catchClauses, "!#", tFn("app.clause_why.not_tagged"));
     push(catchClauses, `!${kw.flag.favorite}`, tFn("app.clause_why.favorites_protected"));
     push(catchClauses, `!${kw.flag.traded}`, tFn("app.clause_why.must_traded_short"));

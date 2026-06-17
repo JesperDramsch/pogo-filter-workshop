@@ -590,6 +590,7 @@
   "app.clause_why.buddy_targets_count": "{count} 種の希望種族",
   "app.clause_why.buddy_te_count": "{count} 通信進化系統",
   "app.clause_why.trashable_stars": "ゴミ箱対象の星のみ (0-2★) — 3★ 以上は自分で保持",
+  "app.clause_why.buddy_catch_or_spare": "0-2★ は新規捕獲、または既に完璧個体(4★)を持つ種の余り — 4★ は手元に残す",
   "app.clause_why.not_tagged": "まだ何のタグも付いていない",
   "app.clause_why.favorites_protected": "お気に入り保護",
   "app.clause_why.shinies_keep": "色違いは自分で保持",

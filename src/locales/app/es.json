@@ -590,6 +590,7 @@
   "app.clause_why.buddy_targets_count": "{count} especies deseadas",
   "app.clause_why.buddy_te_count": "{count} familias evo-intercambio",
   "app.clause_why.trashable_stars": "solo estrellas descartables (0-2★) — los 3★+ los conservas tú",
+  "app.clause_why.buddy_catch_or_spare": "0-2★ para capturar, o un duplicado de una especie de la que ya tienes un 100% — tu 4★ se queda contigo",
   "app.clause_why.not_tagged": "aún no etiquetado de ninguna forma",
   "app.clause_why.favorites_protected": "Favoritos protegidos",
   "app.clause_why.shinies_keep": "Variocolor que conservas tú",

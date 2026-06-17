@@ -590,6 +590,7 @@
   "app.clause_why.buddy_targets_count": "{count} Wunsch-Spezies",
   "app.clause_why.buddy_te_count": "{count} Tausch-Evo-Familien",
   "app.clause_why.trashable_stars": "nur trashbare Sterne (0-2★) — 3★+ behältst du selbst",
+  "app.clause_why.buddy_catch_or_spare": "0-2★ frisch fangen oder eine Dublette einer Art, von der du schon einen Hundo hast — dein 4★ bleibt deins",
   "app.clause_why.not_tagged": "nicht schon irgendwie getaggt",
   "app.clause_why.favorites_protected": "Favoriten geschützt",
   "app.clause_why.shinies_keep": "Schillernde behältst du selbst",

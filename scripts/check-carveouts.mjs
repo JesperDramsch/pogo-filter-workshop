@@ -9,7 +9,7 @@
 //   B2b — buddy tag prefixes are surfaced in the PRESTAGED filter, so the
 //         hand-off pile has an output filter at all.
 
-import { buildFilters, mergeImportedConfig, DEFAULT_CONFIG } from "../src/App.jsx";
+import { buildFilters, evalFilter, mergeImportedConfig, DEFAULT_CONFIG } from "../src/App.jsx";
 
 const tFn = (k) => k;
 let failures = 0;
@@ -136,6 +136,42 @@ console.log("\nLucky-hundo set canonicalizes across locales");
   check("lucky-hundo excluded from trade", !r.trade.includes("+charizard"));
   check("lucky-hundo still in trash (full H clause)", r.trash.includes("+charizard"));
   check("lucky-hundo surfaced in luckySort", r.luckySort.includes("+charizard"));
+}
+
+console.log("\nBuddy spare-dupe surfacing (you own a hundo of a species the buddy wants)");
+{
+  // Julia wants corasonn (you have a 4★ + lucky of it) and dratini (no hundo).
+  const julia = { id: "j", name: "Julia", tagPrefix: "#julia", active: true, targetSpecies: ["corasonn", "dratini"] };
+  const cfg = mergeImportedConfig({ buddies: [julia] });
+  const r = buildFilters(["corasonn"], ["corasonn"], cfg, [], "de", tFn);
+  const f = r.buddyCatchFilters.find(b => b.buddyName === "Julia").filter;
+  const base = {
+    families: ["corasonn"], types: ["ghost"], year: 2024, ageDays: 5, distance: 0, wp: 1500,
+    flags: { traded:false, shadow:false, lucky:false, favorite:false, shiny:false, legendary:false,
+             mythical:false, ultrabeast:false, costume:false, purified:false, background:false,
+             dynamaxCapable:false, doubleMoved:false, xxl:false, xl:false, xxs:false, tagged:false,
+             legacyMove:false, newDexEvo:false, eggOnly:false, buddy:false, megaEvolved:false },
+  };
+  const mon = (o = {}) => ({ ...base, dex: 222, atk: 3, def: 3, hp: 3, star: 3, ...o,
+    flags: { ...base.flags, ...(o.flags || {}) } });
+  const shows = (m) => evalFilter(f, m, "de");
+
+  check("spare 3★ corasonn (have hundo) SHOWS for Julia", shows(mon({ star: 3 })));
+  check("4★ corasonn (your hundo) hidden", !shows(mon({ star: 4, atk: 4, def: 4, hp: 4 })));
+  check("lucky corasonn hidden (keep your lucky)", !shows(mon({ star: 3, flags: { lucky: true } })));
+  check("0★/2★ corasonn still show (normal catch)", shows(mon({ star: 0 })) && shows(mon({ star: 2 })));
+  check("shiny 3★ corasonn hidden (don't gift collectibles)", !shows(mon({ star: 3, flags: { shiny: true } })));
+  check("already-tagged 3★ corasonn hidden", !shows(mon({ star: 3, flags: { tagged: true } })));
+  check("3★ dratini hidden (no hundo of it — keep it)",
+    !shows(mon({ dex: 147, families: ["dratini"], types: ["dragon"], star: 3 })));
+  check("2★ dratini still shows (normal catch)",
+    shows(mon({ dex: 147, families: ["dratini"], types: ["dragon"], star: 2 })));
+
+  // No-spare case stays byte-identical: a buddy wanting only a non-hundo species
+  // gets the plain 0*,1*,2* clause and no !4* guard.
+  const r2 = buildFilters([], [], mergeImportedConfig({ buddies: [{ id: "k", name: "Kai", tagPrefix: "#kai", active: true, targetSpecies: ["dratini"] }] }), [], "de", tFn);
+  const fk = r2.buddyCatchFilters.find(b => b.buddyName === "Kai").filter;
+  check("no-hundo buddy: plain 0*,1*,2* clause, no !4*", clauses(fk).includes("0*,1*,2*") && !clauses(fk).includes("!4*"));
 }
 
 console.log(`\n${failures === 0 ? "✓ All carve-out checks passed." : `✗ ${failures} failure(s).`}`);

@@ -590,6 +590,7 @@
   "app.clause_why.buddy_targets_count": "{count} wish species",
   "app.clause_why.buddy_te_count": "{count} trade-evo families",
   "app.clause_why.trashable_stars": "only trashable stars (0-2★) — you keep 3★+ yourself",
+  "app.clause_why.buddy_catch_or_spare": "0-2★ to catch fresh, or a spare of a species you already have a hundo of — your 4★ stays yours",
   "app.clause_why.not_tagged": "not already tagged in any way",
   "app.clause_why.favorites_protected": "Favorites protected",
   "app.clause_why.shinies_keep": "Shinies you keep yourself",
