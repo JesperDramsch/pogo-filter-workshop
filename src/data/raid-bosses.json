@@ -1,229 +1,48 @@
 {
-  "fetchedAt": "2026-06-17T12:06:38.547Z",
+  "fetchedAt": "2026-06-18T11:38:13.328Z",
   "raids": {
     "mega": [
       {
-        "id": "LOPUNNY",
+        "id": "SCIZOR",
         "names": {
-          "en": "Mega Lopunny",
-          "de": "Mega-Schlapor",
-          "fr": "Méga-Lockpin",
-          "it": "MegaLopunny",
-          "ja": "メガミミロップ",
-          "ko": "메가이어롭",
-          "es": "Mega-Lopunny"
+          "en": "Mega Scizor",
+          "de": "Mega-Scherox",
+          "fr": "Méga-Cizayox",
+          "it": "MegaScizor",
+          "ja": "メガハッサム",
+          "ko": "메가핫삼",
+          "es": "Mega-Scizor"
         },
         "types": [
-          "normal",
-          "fighting"
+          "bug",
+          "steel"
         ],
         "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
-          "ghost",
-          "psychic",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "fairy",
           "fighting",
           "flying",
-          "psychic"
+          "poison",
+          "ghost",
+          "steel",
+          "fire",
+          "water",
+          "electric"
+        ],
+        "seMoveTypes": [
+          "fire"
         ]
       }
     ],
     "lvl5": [
       {
-        "id": "ZEKROM",
+        "id": "NECROZMA",
         "names": {
-          "en": "Zekrom",
-          "de": "Zekrom",
-          "fr": "Zekrom",
-          "it": "Zekrom",
-          "ja": "ゼクロム",
-          "ko": "제크로무",
-          "es": "Zekrom"
-        },
-        "types": [
-          "dragon",
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
-          "steel",
-          "grass",
-          "electric",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "dragon",
-          "fairy",
-          "ground",
-          "ice"
-        ]
-      }
-    ],
-    "lvl3": [
-      {
-        "id": "RAICHU",
-        "names": {
-          "en": "Alolan Raichu",
-          "de": "Alola-Raichu",
-          "fr": "Raichu d'Alola",
-          "it": "Raichu di Alola",
-          "ja": "アローラ ライチュウ",
-          "ko": "알로라 라이츄",
-          "es": "Raichu de Alola"
-        },
-        "types": [
-          "electric",
-          "psychic"
-        ],
-        "resistorTypes": [
-          "ground",
-          "steel",
-          "grass",
-          "electric",
-          "psychic",
-          "dragon",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "bug",
-          "dark",
-          "ghost",
-          "ground"
-        ]
-      },
-      {
-        "id": "MAGCARGO",
-        "names": {
-          "en": "Magcargo",
-          "de": "Magcargo",
-          "fr": "Volcaropod",
-          "it": "Magcargo",
-          "ja": "マグカルゴ",
-          "ko": "마그카르고",
-          "es": "Magcargo"
-        },
-        "types": [
-          "fire",
-          "rock"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "ground",
-          "rock",
-          "water",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "ground",
-          "water",
-          "fighting",
-          "rock"
-        ]
-      },
-      {
-        "id": "FLYGON",
-        "names": {
-          "en": "Flygon",
-          "de": "Libelldra",
-          "fr": "Libégon",
-          "it": "Flygon",
-          "ja": "フライゴン",
-          "ko": "플라이곤",
-          "es": "Flygon"
-        },
-        "types": [
-          "ground",
-          "dragon"
-        ],
-        "resistorTypes": [
-          "flying",
-          "bug",
-          "grass",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "ice",
-          "dragon",
-          "fairy"
-        ]
-      }
-    ],
-    "lvl1": [
-      {
-        "id": "RHYHORN",
-        "names": {
-          "en": "Rhyhorn",
-          "de": "Rihorn",
-          "fr": "Rhinocorne",
-          "it": "Rhyhorn",
-          "ja": "サイホーン",
-          "ko": "뿔카노",
-          "es": "Rhyhorn"
-        },
-        "types": [
-          "ground",
-          "rock"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "ground",
-          "grass"
-        ],
-        "seMoveTypes": [
-          "grass",
-          "water",
-          "fighting",
-          "ground",
-          "ice",
-          "steel"
-        ]
-      },
-      {
-        "id": "SKIDDO",
-        "names": {
-          "en": "Skiddo",
-          "de": "Mähikel",
-          "fr": "Cabriolaine",
-          "it": "Skiddo",
-          "ja": "メェークル",
-          "ko": "메이클",
-          "es": "Skiddo"
-        },
-        "types": [
-          "grass"
-        ],
-        "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
-          "steel",
-          "fire",
-          "grass",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "bug",
-          "fire",
-          "flying",
-          "ice",
-          "poison"
-        ]
-      },
-      {
-        "id": "ESPURR",
-        "names": {
-          "en": "Espurr",
-          "de": "Psiau",
-          "fr": "Psystigri",
-          "it": "Espurr",
-          "ja": "ニャスパー",
-          "ko": "냐스퍼",
-          "es": "Espurr"
+          "en": "Necrozma",
+          "de": "Necrozma",
+          "fr": "Necrozma",
+          "it": "Necrozma",
+          "ja": "ネクロズマ",
+          "ko": "네크로즈마",
+          "es": "Necrozma"
         },
         "types": [
           "psychic"
@@ -238,29 +57,212 @@
           "dark",
           "ghost"
         ]
-      },
+      }
+    ],
+    "lvl3": [
       {
-        "id": "FIDOUGH",
+        "id": "AERODACTYL",
         "names": {
-          "en": "Fidough",
-          "de": "Hefel",
-          "fr": "Pâtachiot",
-          "it": "Fidough",
-          "ja": "パピモッチ",
-          "ko": "쫀도기",
-          "es": "Fidough"
+          "en": "Aerodactyl",
+          "de": "Aerodactyl",
+          "fr": "Ptéra",
+          "it": "Aerodactyl",
+          "ja": "プテラ",
+          "ko": "프테라",
+          "es": "Aerodactyl"
         },
         "types": [
-          "fairy"
+          "rock",
+          "flying"
         ],
         "resistorTypes": [
-          "poison",
+          "ground",
+          "rock",
           "steel",
-          "fire"
+          "electric"
         ],
         "seMoveTypes": [
+          "electric",
+          "ice",
+          "rock",
+          "steel",
+          "water"
+        ]
+      },
+      {
+        "id": "DRUDDIGON",
+        "names": {
+          "en": "Druddigon",
+          "de": "Shardrago",
+          "fr": "Drakkarmin",
+          "it": "Druddigon",
+          "ja": "クリムガン",
+          "ko": "크리만",
+          "es": "Druddigon"
+        },
+        "types": [
+          "dragon"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "dragon",
+          "fairy",
+          "ice"
+        ]
+      },
+      {
+        "id": "DECIDUEYE",
+        "names": {
+          "en": "Hisuian Decidueye",
+          "de": "Hisuian-Silvarro",
+          "fr": "Archéduc de Hisuian",
+          "it": "Decidueye di Hisuian",
+          "ja": "ジュナイパー",
+          "ko": "모크나이퍼",
+          "es": "Decidueye de Galar"
+        },
+        "types": [
+          "grass",
+          "fighting"
+        ],
+        "resistorTypes": [
+          "flying",
           "poison",
+          "bug",
+          "ghost",
+          "fire",
+          "grass",
+          "psychic",
+          "dragon",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "fairy",
+          "fire",
+          "ice",
+          "poison",
+          "psychic"
+        ]
+      }
+    ],
+    "lvl1": [
+      {
+        "id": "OMANYTE",
+        "names": {
+          "en": "Omanyte",
+          "de": "Amonitas",
+          "fr": "Amonita",
+          "it": "Omanyte",
+          "ja": "オムナイト",
+          "ko": "암나이트",
+          "es": "Omanyte"
+        },
+        "types": [
+          "rock",
+          "water"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "steel",
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "grass",
+          "electric",
+          "fighting",
+          "ground"
+        ]
+      },
+      {
+        "id": "KABUTO",
+        "names": {
+          "en": "Kabuto",
+          "de": "Kabuto",
+          "fr": "Kabuto",
+          "it": "Kabuto",
+          "ja": "カブト",
+          "ko": "투구",
+          "es": "Kabuto"
+        },
+        "types": [
+          "rock",
+          "water"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "steel",
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "grass",
+          "electric",
+          "fighting",
+          "ground"
+        ]
+      },
+      {
+        "id": "BELDUM",
+        "names": {
+          "en": "Beldum",
+          "de": "Tanhel",
+          "fr": "Terhal",
+          "it": "Beldum",
+          "ja": "ダンバル",
+          "ko": "메탕",
+          "es": "Beldum"
+        },
+        "types": [
+          "steel",
+          "psychic"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "electric",
+          "psychic",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "fire",
+          "ghost",
+          "ground"
+        ]
+      },
+      {
+        "id": "ROCKRUFF",
+        "names": {
+          "en": "Rockruff",
+          "de": "Wuffels",
+          "fr": "Rocabot",
+          "it": "Rockruff",
+          "ja": "イワンコ",
+          "ko": "암멍이",
+          "es": "Rockruff"
+        },
+        "types": [
+          "rock"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "ground",
           "steel"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "grass",
+          "ground",
+          "steel",
+          "water"
         ]
       }
     ],
@@ -489,100 +491,6 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "necrozma-in-5-star-raid-battles-june-2026",
-      "name": "Necrozma in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-06-17T06:00:00.000",
-      "end": "2026-06-23T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "NECROZMA",
-          "names": {
-            "en": "Necrozma"
-          },
-          "types": [
-            "psychic"
-          ],
-          "resistorTypes": [
-            "steel",
-            "psychic",
-            "dark"
-          ],
-          "seMoveTypes": [
-            "bug",
-            "ghost",
-            "dark"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "mega-scizor-in-mega-raids-june-2026",
-      "name": "Mega Scizor in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-06-17T06:00:00.000",
-      "end": "2026-06-24T06:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "SCIZOR",
-          "names": {
-            "en": "Scizor"
-          },
-          "types": [
-            "bug",
-            "steel"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "flying",
-            "poison",
-            "ghost",
-            "steel",
-            "fire",
-            "water",
-            "electric"
-          ],
-          "seMoveTypes": [
-            "fire"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20260617",
-      "name": "Necrozma Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-06-17T18:00:00.000",
-      "end": "2026-06-17T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "NECROZMA",
-          "names": {
-            "en": "Necrozma"
-          },
-          "types": [
-            "psychic"
-          ],
-          "resistorTypes": [
-            "steel",
-            "psychic",
-            "dark"
-          ],
-          "seMoveTypes": [
-            "bug",
-            "ghost",
-            "dark"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "celesteela-kartana-in-5-star-raid-battles-june-2026",
       "name": "Celesteela and Kartana in 5-star Raid Battles",
       "eventType": "raid-battles",
@@ -665,6 +573,61 @@
             "rock",
             "electric",
             "ice"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20260624",
+      "name": "Celesteela and Kartana Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-06-24T18:00:00.000",
+      "end": "2026-06-24T19:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "CELESTEELA",
+          "names": {
+            "en": "Celesteela"
+          },
+          "types": [
+            "steel",
+            "flying"
+          ],
+          "resistorTypes": [
+            "steel",
+            "fire",
+            "water",
+            "electric"
+          ],
+          "seMoveTypes": [
+            "fire",
+            "electric"
+          ]
+        },
+        {
+          "id": "KARTANA",
+          "names": {
+            "en": "Kartana"
+          },
+          "types": [
+            "grass",
+            "steel"
+          ],
+          "resistorTypes": [
+            "flying",
+            "poison",
+            "bug",
+            "steel",
+            "fire",
+            "grass",
+            "electric",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "fire"
           ]
         }
       ]
