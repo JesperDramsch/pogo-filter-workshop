@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-06-17T12:33:02.663Z",
+  "fetchedAt": "2026-06-18T12:03:06.567Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -106,12 +106,16 @@
           "name": "Jumpluff"
         },
         {
-          "dex": 618,
-          "name": "Stunfisk (Galarian)"
+          "dex": 131,
+          "name": "Lapras"
         },
         {
           "dex": 537,
           "name": "Seismitoad"
+        },
+        {
+          "dex": 618,
+          "name": "Stunfisk (Galarian)"
         },
         {
           "dex": 980,
@@ -120,10 +124,6 @@
         {
           "dex": 162,
           "name": "Furret"
-        },
-        {
-          "dex": 131,
-          "name": "Lapras"
         }
       ]
     },
@@ -135,16 +135,16 @@
           "name": "Tinkaton"
         },
         {
+          "dex": 593,
+          "name": "Jellicent"
+        },
+        {
           "dex": 463,
           "name": "Lickilicky"
         },
         {
           "dex": 718,
           "name": "Zygarde (Complete Forme)"
-        },
-        {
-          "dex": 593,
-          "name": "Jellicent"
         },
         {
           "dex": 823,
@@ -191,16 +191,16 @@
           "name": "Annihilape"
         },
         {
-          "dex": 346,
-          "name": "Cradily"
-        },
-        {
           "dex": 38,
           "name": "Ninetales (Alolan)"
         },
         {
           "dex": 36,
           "name": "Clefable"
+        },
+        {
+          "dex": 346,
+          "name": "Cradily"
         },
         {
           "dex": 765,
@@ -223,16 +223,16 @@
           "name": "Seaking"
         },
         {
+          "dex": 487,
+          "name": "Giratina (Altered)"
+        },
+        {
           "dex": 776,
           "name": "Turtonator"
         },
         {
           "dex": 977,
           "name": "Dondozo"
-        },
-        {
-          "dex": 487,
-          "name": "Giratina (Altered)"
         },
         {
           "dex": 350,
@@ -312,12 +312,12 @@
           "name": "Lugia"
         },
         {
-          "dex": 445,
-          "name": "Garchomp (Shadow)"
-        },
-        {
           "dex": 800,
           "name": "Necrozma (Dawn Wings)"
+        },
+        {
+          "dex": 445,
+          "name": "Garchomp (Shadow)"
         },
         {
           "dex": 717,
@@ -337,19 +337,15 @@
         },
         {
           "dex": 381,
-          "name": "Latios (Shadow)"
-        },
-        {
-          "dex": 383,
-          "name": "Groudon"
+          "name": "Latios"
         },
         {
           "dex": 130,
           "name": "Gyarados (Shadow)"
         },
         {
-          "dex": 671,
-          "name": "Florges"
+          "dex": 383,
+          "name": "Groudon"
         },
         {
           "dex": 1000,
@@ -360,6 +356,10 @@
           "name": "Mewtwo (Shadow)"
         },
         {
+          "dex": 671,
+          "name": "Florges"
+        },
+        {
           "dex": 791,
           "name": "Solgaleo"
         },
@@ -368,12 +368,12 @@
           "name": "Melmetal"
         },
         {
-          "dex": 647,
-          "name": "Keldeo (Resolute)"
-        },
-        {
           "dex": 380,
           "name": "Latias (Shadow)"
+        },
+        {
+          "dex": 647,
+          "name": "Keldeo (Resolute)"
         }
       ]
     }
