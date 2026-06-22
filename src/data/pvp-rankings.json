@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-06-18T12:03:06.567Z",
+  "fetchedAt": "2026-06-22T14:09:33.284Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -62,12 +62,12 @@
           "name": "Mantine"
         },
         {
-          "dex": 687,
-          "name": "Malamar"
-        },
-        {
           "dex": 230,
           "name": "Kingdra"
+        },
+        {
+          "dex": 687,
+          "name": "Malamar"
         },
         {
           "dex": 823,
@@ -106,16 +106,16 @@
           "name": "Jumpluff"
         },
         {
+          "dex": 618,
+          "name": "Stunfisk (Galarian)"
+        },
+        {
           "dex": 131,
           "name": "Lapras"
         },
         {
           "dex": 537,
           "name": "Seismitoad"
-        },
-        {
-          "dex": 618,
-          "name": "Stunfisk (Galarian)"
         },
         {
           "dex": 980,
@@ -506,6 +506,133 @@
         }
       ]
     },
+    "summer": {
+      "id": "summer",
+      "name": "Summer Cup",
+      "cpCap": 1500,
+      "species": [
+        {
+          "dex": 346,
+          "name": "Cradily"
+        },
+        {
+          "dex": 230,
+          "name": "Kingdra"
+        },
+        {
+          "dex": 205,
+          "name": "Forretress"
+        },
+        {
+          "dex": 162,
+          "name": "Furret"
+        },
+        {
+          "dex": 748,
+          "name": "Toxapex"
+        },
+        {
+          "dex": 395,
+          "name": "Empoleon"
+        },
+        {
+          "dex": 463,
+          "name": "Lickilicky"
+        },
+        {
+          "dex": 780,
+          "name": "Drampa"
+        },
+        {
+          "dex": 131,
+          "name": "Lapras"
+        },
+        {
+          "dex": 558,
+          "name": "Crustle"
+        },
+        {
+          "dex": 776,
+          "name": "Turtonator"
+        },
+        {
+          "dex": 189,
+          "name": "Jumpluff"
+        },
+        {
+          "dex": 206,
+          "name": "Dunsparce"
+        },
+        {
+          "dex": 765,
+          "name": "Oranguru"
+        },
+        {
+          "dex": 241,
+          "name": "Miltank"
+        },
+        {
+          "dex": 820,
+          "name": "Greedent"
+        },
+        {
+          "dex": 737,
+          "name": "Charjabug"
+        },
+        {
+          "dex": 593,
+          "name": "Jellicent"
+        },
+        {
+          "dex": 916,
+          "name": "Oinkologne (Female)"
+        },
+        {
+          "dex": 226,
+          "name": "Mantine"
+        },
+        {
+          "dex": 877,
+          "name": "Morpeko (Hangry)"
+        },
+        {
+          "dex": 733,
+          "name": "Toucannon (Shadow)"
+        },
+        {
+          "dex": 365,
+          "name": "Walrein"
+        },
+        {
+          "dex": 243,
+          "name": "Raikou"
+        },
+        {
+          "dex": 345,
+          "name": "Lileep"
+        },
+        {
+          "dex": 417,
+          "name": "Pachirisu"
+        },
+        {
+          "dex": 832,
+          "name": "Dubwool"
+        },
+        {
+          "dex": 752,
+          "name": "Araquanid"
+        },
+        {
+          "dex": 587,
+          "name": "Emolga"
+        },
+        {
+          "dex": 119,
+          "name": "Seaking"
+        }
+      ]
+    },
     "retro": {
       "id": "retro",
       "name": "Retro Cup",
@@ -656,7 +783,9 @@
       "name": "Great League and Summer Cup: Great League Edition | Forever Forward",
       "start": "2026-06-30T20:00:00.000Z",
       "end": "2026-07-07T20:00:00.000Z",
-      "cups": []
+      "cups": [
+        "summer"
+      ]
     },
     {
       "eventID": "gbl-forever-forward_ultra-league_fantasy-cup-ultra-league-edition",
