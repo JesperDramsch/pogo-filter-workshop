@@ -1525,26 +1525,36 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
   }));
 
   // -- EVENT WILD SPAWNS · per-event curation workflow -----------------
-  // Each event's spawn species (dex numbers from src/data/events.json) become
-  // a comma-OR clause that intersects the user's collection. We hang the
-  // standing high-value lenses off that intersection so an event becomes a
-  // three-step triage: ① favourite the keepers, ② see what's still unsorted,
-  // ③ clear the trashable rest. Reuses the same IV/flag tokens and the already-
+  // Each event's spawn species render as family-expanded German names
+  // (+taubsi,+habitak,…) and become a comma-OR clause that intersects the
+  // user's collection. We hang a small set of lenses off that intersection:
+  // an overview, souvenirs, one exact IV-keeper filter, what's still unsorted,
+  // and the trashable rest. Reuses the existing IV/flag tokens and the already-
   // built `trash` string so event filters stay consistent with the main output.
-  // Spawn dex is form-agnostic on purpose ("show me all my Squawkabilly").
   const eventCollectibles = (cfg.customCollectibles || [])
     .map(s => speciesForOutput(s, outputLocale))
     .filter(Boolean);
   const eventsFetchedAt = EVENTS.fetchedAt || null;
   const eventFilters = (EVENTS.events || []).map(ev => {
-    const list = (ev.spawnDex || []).join(",");
-    if (!list) return null;
-    // ① KEEP — collectibles + hundos collapse into one comma-OR clause (each is
-    // a single token, so precedence is safe). PvP / nundo / top-IV each need
-    // their own AND-group, so they ship as separate lines.
-    const collectTokens = ["4*", kw.flag.shiny, kw.flag.costume, kw.flag.background, ...eventCollectibles]
+    // "+name" expands to the whole evolution family; names localised from dex.
+    const fams = (ev.spawnDex || [])
+      .map(d => pokemonNameFor(String(d), outputLocale))
+      .filter(Boolean)
+      .map(n => `+${n}`)
+      .join(",");
+    if (!fams) return null;
+    // Souvenirs — single-token collectible flags (shiny / costume / background)
+    // plus the user's custom collectibles. Hundos now live in the IV filter.
+    const souvenirTokens = [kw.flag.shiny, kw.flag.costume, kw.flag.background, ...eventCollectibles]
       .filter(Boolean);
-    const pvpAtk = cfg.pvpMode === "strict" ? `0${kw.iv.atk}` : `0-1${kw.iv.atk}`;
+    // One exact IV-keeper filter = hundos ∪ "two 15s + one 11-14" keepers.
+    // "≥2 of three stats are 15" is the CNF threshold (a∨b)∧(a∨c)∧(b∨c); the
+    // three 3-4 clauses force every bar ≥11. Together that is exactly hundo ∪
+    // keeper. Nundo (opposite extreme) and PvP (wants low attack) can't share
+    // this flat clause, so by design they get no event box.
+    const a = `4${kw.iv.atk}`, d = `4${kw.iv.def}`, h = `4${kw.iv.hp}`;
+    const keepIv = `${fams}&${a},${d}&${a},${h}&${d},${h}`
+      + `&3-4${kw.iv.atk}&3-4${kw.iv.def}&3-4${kw.iv.hp}`;
     return {
       id: ev.id,
       title: ev.title,
@@ -1553,25 +1563,15 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
       end: ev.end,
       isLocalTime: !!ev.isLocalTime,
       spawnDex: ev.spawnDex || [],
+      // overview — every event spawn family, no other constraint
+      overview: fams,
       // ① keep
-      keepCollect: `${list}&${collectTokens.join(",")}`,
-      keepPvp: cfg.pvpMode === "none" ? null
-        : `${list}&${pvpAtk}&3-4${kw.iv.def}&3-4${kw.iv.hp}`,
-      // Exact "two perfect bars + one 11-14 bar" keepers — the literal
-      // two-iv4-plus-one-iv3 appraisal. PoGo's flat syntax can't OR three
-      // AND-triples into one string, so we emit one clause per which bar is the
-      // non-perfect (bucket-3) one. Hundos (all three 15) sit in keepCollect.
-      keepIv: [
-        { stat: "hp",  clause: `${list}&4${kw.iv.atk}&4${kw.iv.def}&3${kw.iv.hp}` },
-        { stat: "def", clause: `${list}&4${kw.iv.atk}&3${kw.iv.def}&4${kw.iv.hp}` },
-        { stat: "atk", clause: `${list}&3${kw.iv.atk}&4${kw.iv.def}&4${kw.iv.hp}` },
-      ],
-      keepNundo: cfg.protectNundos
-        ? `${list}&0${kw.iv.atk}&0${kw.iv.def}&0${kw.iv.hp}` : null,
+      souvenirs: `${fams}&${souvenirTokens.join(",")}`,
+      keepIv,
       // ② still to sort — spawns you haven't favourited or tagged yet
-      sort: `${list}&!${kw.flag.favorite}&!#`,
+      sort: `${fams}&!${kw.flag.favorite}&!#`,
       // ③ trash — your full trash logic, scoped to this event's spawns
-      trash: `${list}&${trash}`,
+      trash: `${fams}&${trash}`,
     };
   }).filter(Boolean);
 
@@ -3958,14 +3958,10 @@ function EventSpawnCollapsible({
               accent={accent}
               highlight={isActive}
             >
+              {box("overview", "app.events.overview_label", "app.events.overview_hint", ev.overview)}
               {subHeading("app.events.group_keep")}
-              {box("keep_collect", "app.events.keep_collect_label", "app.events.keep_collect_hint", ev.keepCollect)}
-              {box("keep_pvp", "app.events.keep_pvp_label", "app.events.keep_pvp_hint", ev.keepPvp)}
-              {(ev.keepIv || []).map(k => box(
-                `keep_iv_${k.stat}`, "app.events.keep_iv_label", "app.events.keep_iv_hint",
-                k.clause, { stat: t(`app.events.stat_${k.stat}`) }
-              ))}
-              {box("keep_nundo", "app.events.keep_nundo_label", "app.events.keep_nundo_hint", ev.keepNundo)}
+              {box("souvenirs", "app.events.souvenirs_label", "app.events.souvenirs_hint", ev.souvenirs)}
+              {box("keep_iv", "app.events.keep_iv_label", "app.events.keep_iv_hint", ev.keepIv)}
               {subHeading("app.events.group_sort")}
               {box("sort", "app.events.sort_label", "app.events.sort_hint", ev.sort)}
               {subHeading("app.events.group_trash")}
