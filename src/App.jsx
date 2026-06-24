@@ -9,6 +9,7 @@ import {
 } from "./data/species.js";
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from "./i18n/pogo-keywords.js";
 import RAID_BOSSES from "./data/raid-bosses.json";
+import EVENTS from "./data/events.json";
 import ROCKET_LINEUPS from "./data/rocket-lineups.json";
 import ROCKET_GRUNT_QUOTES from "./data/rocket-grunt-quotes.json";
 import RocketQuoteLookup from "./explain/RocketQuoteLookup.jsx";
@@ -1556,6 +1557,57 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     bosses: (event.bosses || []).map(b => buildBossEntry(b)),
   }));
 
+  // -- EVENT WILD SPAWNS · per-event curation workflow -----------------
+  // Each event's spawn species render as family-expanded German names
+  // (+taubsi,+habitak,…) and become a comma-OR clause that intersects the
+  // user's collection. We hang a small set of lenses off that intersection:
+  // an overview, souvenirs, one exact IV-keeper filter, what's still unsorted,
+  // and the trashable rest. Reuses the existing IV/flag tokens and the already-
+  // built `trash` string so event filters stay consistent with the main output.
+  const eventCollectibles = (cfg.customCollectibles || [])
+    .map(s => speciesForOutput(s, outputLocale))
+    .filter(Boolean);
+  const eventsFetchedAt = EVENTS.fetchedAt || null;
+  const eventFilters = (EVENTS.events || []).map(ev => {
+    // "+name" expands to the whole evolution family; names localised from dex.
+    const fams = (ev.spawnDex || [])
+      .map(d => pokemonNameFor(String(d), outputLocale))
+      .filter(Boolean)
+      .map(n => `+${n}`)
+      .join(",");
+    if (!fams) return null;
+    // Souvenirs — single-token collectible flags (shiny / costume / background)
+    // plus the user's custom collectibles. Hundos now live in the IV filter.
+    const souvenirTokens = [kw.flag.shiny, kw.flag.costume, kw.flag.background, ...eventCollectibles]
+      .filter(Boolean);
+    // One exact IV-keeper filter = hundos ∪ "two 15s + one 11-14" keepers.
+    // "≥2 of three stats are 15" is the CNF threshold (a∨b)∧(a∨c)∧(b∨c); the
+    // three 3-4 clauses force every bar ≥11. Together that is exactly hundo ∪
+    // keeper. Nundo (opposite extreme) and PvP (wants low attack) can't share
+    // this flat clause, so by design they get no event box.
+    const a = `4${kw.iv.atk}`, d = `4${kw.iv.def}`, h = `4${kw.iv.hp}`;
+    const keepIv = `${fams}&${a},${d}&${a},${h}&${d},${h}`
+      + `&3-4${kw.iv.atk}&3-4${kw.iv.def}&3-4${kw.iv.hp}`;
+    return {
+      id: ev.id,
+      title: ev.title,
+      category: ev.category,
+      start: ev.start,
+      end: ev.end,
+      isLocalTime: !!ev.isLocalTime,
+      spawnDex: ev.spawnDex || [],
+      // overview — every event spawn family, no other constraint
+      overview: fams,
+      // ① keep
+      souvenirs: `${fams}&${souvenirTokens.join(",")}`,
+      keepIv,
+      // ② still to sort — spawns you haven't favourited or tagged yet
+      sort: `${fams}&!${kw.flag.favorite}&!#`,
+      // ③ trash — your full trash logic, scoped to this event's spawns
+      trash: `${fams}&${trash}`,
+    };
+  }).filter(Boolean);
+
   // -- MAX BATTLE TANKS / CHARGERS · universal 0.5s-fast-move filter ---
   // Max Battle meta hinges on Max Meter charging speed: only the 0.5s-tier
   // fast moves fill the meter optimally (per Pokémon GO Hub's per-attack
@@ -1839,6 +1891,8 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
            cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
            // Per-boss raid + max-battle counters
            raidFilters, eventRaidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
+           // Event wild-spawn curation filters
+           eventFilters, eventsFetchedAt,
            // Team Rocket counters (leaders / typed grunts / generic grunts)
            rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
            rocketTypeLabels,
@@ -2327,6 +2381,7 @@ export default function App() {
   const [showAuxEvos, setShowAuxEvos] = useState(false);
   const [showAuxTrades, setShowAuxTrades] = useState(false);
   const [showAuxMegas, setShowAuxMegas] = useState(false);
+  const [showAuxEvents, setShowAuxEvents] = useState(false);
   const [showAuxRaids, setShowAuxRaids] = useState(false);
   const [showAuxMaxBattles, setShowAuxMaxBattles] = useState(false);
   const [showAuxRocket, setShowAuxRocket] = useState(false);
@@ -2464,6 +2519,7 @@ export default function App() {
           evoSwapCandyClauses, evoSwapItemClauses,
           cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
           raidFilters, eventRaidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
+          eventFilters, eventsFetchedAt,
           rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
           rocketTypeLabels,
           pvpFilters, pvpRankingsFetchedAt, cupFilters } = useMemo(
@@ -3114,6 +3170,27 @@ export default function App() {
                       )}
                     </div>
                   </Collapsible>
+                </div>
+
+                {/* Events section — wild spawns during current / upcoming
+                    events, pulled from leak-duck; run `npm run fetch-events`
+                    to refresh the snapshot. */}
+                <div className="space-y-3 pt-4">
+                  <h3 className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0]">
+                    {t("app.collapsible.aux_section_events")}
+                  </h3>
+                  <EventSpawnCollapsible
+                    icon="🌿"
+                    fetchedAt={eventsFetchedAt}
+                    events={eventFilters}
+                    accent="#27AE60"
+                    open={showAuxEvents}
+                    onToggle={() => setShowAuxEvents((s) => !s)}
+                    copied={copied}
+                    copyToClipboard={copyToClipboard}
+                    t={t}
+                    locale={locale}
+                  />
                 </div>
 
                 {/* Raids section — current bosses pulled from lily-dex-api;
@@ -3839,6 +3916,89 @@ function BossCollapsible({
               highlight={false}
             >
               {list.map((boss) => renderBossBox(boss))}
+            </TrainerAccordion>
+          );
+        })}
+      </div>
+      <p className="mono text-[10.5px] text-[#8090A0] mt-4 pt-3 border-t border-[#1F2933]">
+        {footerLabel}
+      </p>
+    </Collapsible>
+  );
+}
+
+// Renders the event wild-spawn curation card. Each in-window event becomes a
+// TrainerAccordion (active ones open by default, just-ended ones flagged for
+// tidy-up) holding a three-step triage: ① keepers to favourite, ② what's still
+// unsorted, ③ the trashable rest. Mirrors BossCollapsible's shape so the aux
+// section stays visually consistent.
+function EventSpawnCollapsible({
+  icon, fetchedAt, events, accent, open, onToggle, copied, copyToClipboard, t, locale,
+}) {
+  const list = events || [];
+  const age = formatSyncAge(fetchedAt, t);
+  const headerLabel = t("app.collapsible.aux_events");
+  const countLabel = t("app.collapsible.aux_events_count", { params: { count: list.length } });
+  const footerLabel = age
+    ? t("app.collapsible.aux_footer", { params: { count: countLabel, age } })
+    : t("app.collapsible.aux_footer_no_age", { params: { count: countLabel } });
+  if (list.length === 0) {
+    return (
+      <Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
+        <p className="text-xs italic text-[#8B98A5]">{t("app.events.empty")}</p>
+      </Collapsible>
+    );
+  }
+  const fmtDow = new Intl.DateTimeFormat(locale, { weekday: "short" });
+  return (
+    <Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
+      <div className="space-y-5">
+        {list.map((ev) => {
+          const startMs = Date.parse(ev.start);
+          const endMs = Date.parse(ev.end);
+          const now = Date.now();
+          const isActive = now >= startMs && now <= endMs;
+          const isEnded = now > endMs;
+          const teaser = isEnded
+            ? t("app.events.window_ended", { params: { dow: fmtDow.format(endMs) } })
+            : formatEventWindow(ev.start, ev.end, t, locale);
+          // One FilterBox per non-null triage string; copy keys namespaced per
+          // event so two events sharing a species don't share copy state.
+          const box = (suffix, labelKey, hintKey, str, params) => {
+            if (!str) return null;
+            const copyKey = `event_${ev.id}_${suffix}`;
+            const opts = params ? { params } : undefined;
+            return (
+              <FilterBox
+                key={suffix}
+                label={t(labelKey, opts)}
+                accent={accent}
+                filterStr={str}
+                copied={copied[copyKey]}
+                onCopy={() => copyToClipboard(copyKey, str)}
+                hint={t(hintKey, opts)}
+              />
+            );
+          };
+          const subHeading = (key) => (
+            <h5 className="mono text-[11px] uppercase tracking-wide text-[#8090A0]">{t(key)}</h5>
+          );
+          return (
+            <TrainerAccordion
+              key={ev.id}
+              name={ev.title}
+              teaser={teaser}
+              accent={accent}
+              highlight={isActive}
+            >
+              {box("overview", "app.events.overview_label", "app.events.overview_hint", ev.overview)}
+              {subHeading("app.events.group_keep")}
+              {box("souvenirs", "app.events.souvenirs_label", "app.events.souvenirs_hint", ev.souvenirs)}
+              {box("keep_iv", "app.events.keep_iv_label", "app.events.keep_iv_hint", ev.keepIv)}
+              {subHeading("app.events.group_sort")}
+              {box("sort", "app.events.sort_label", "app.events.sort_hint", ev.sort)}
+              {subHeading("app.events.group_trash")}
+              {box("trash", "app.events.trash_label", "app.events.trash_hint", ev.trash)}
             </TrainerAccordion>
           );
         })}
