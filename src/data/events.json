@@ -1,0 +1,68 @@
+{
+  "fetchedAt": "2026-06-24T11:56:06.982Z",
+  "events": [
+    {
+      "id": "event-flying-taxi-2026-06-23t10-00-00",
+      "title": "Flying Taxi",
+      "category": "Event",
+      "start": "2026-06-23T10:00:00",
+      "end": "2026-06-29T20:00:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        16,
+        21,
+        163,
+        519,
+        731,
+        821,
+        931,
+        940
+      ],
+      "spawns": [
+        "Hoothoot",
+        "Pidgey",
+        "Pidove",
+        "Pikipek",
+        "Rookidee",
+        "Spearow",
+        "Squawkabilly",
+        "Wattrel"
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "event-10th-anniversary-party-2026-07-04t10-00-00",
+      "title": "10th Anniversary Party",
+      "category": "Event",
+      "start": "2026-07-04T10:00:00",
+      "end": "2026-07-06T20:00:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        25,
+        133,
+        265
+      ],
+      "spawns": [
+        "Eevee",
+        "Pikachu",
+        "Wurmple"
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "community-day-sobble-community-day-2026-07-04t14-00-00",
+      "title": "Sobble Community Day",
+      "category": "Community Day",
+      "start": "2026-07-04T14:00:00",
+      "end": "2026-07-04T17:00:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        816
+      ],
+      "spawns": [
+        "Sobble"
+      ],
+      "unresolved": []
+    }
+  ]
+}
