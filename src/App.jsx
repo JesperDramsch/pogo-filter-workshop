@@ -9,6 +9,7 @@ import {
 } from "./data/species.js";
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from "./i18n/pogo-keywords.js";
 import RAID_BOSSES from "./data/raid-bosses.json";
+import EVENTS from "./data/events.json";
 import ROCKET_LINEUPS from "./data/rocket-lineups.json";
 import ROCKET_GRUNT_QUOTES from "./data/rocket-grunt-quotes.json";
 import RocketQuoteLookup from "./explain/RocketQuoteLookup.jsx";
@@ -1523,6 +1524,57 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     bosses: (event.bosses || []).map(b => buildBossEntry(b)),
   }));
 
+  // -- EVENT WILD SPAWNS · per-event curation workflow -----------------
+  // Each event's spawn species (dex numbers from src/data/events.json) become
+  // a comma-OR clause that intersects the user's collection. We hang the
+  // standing high-value lenses off that intersection so an event becomes a
+  // three-step triage: ① favourite the keepers, ② see what's still unsorted,
+  // ③ clear the trashable rest. Reuses the same IV/flag tokens and the already-
+  // built `trash` string so event filters stay consistent with the main output.
+  // Spawn dex is form-agnostic on purpose ("show me all my Squawkabilly").
+  const eventCollectibles = (cfg.customCollectibles || [])
+    .map(s => speciesForOutput(s, outputLocale))
+    .filter(Boolean);
+  const eventsFetchedAt = EVENTS.fetchedAt || null;
+  const eventFilters = (EVENTS.events || []).map(ev => {
+    const list = (ev.spawnDex || []).join(",");
+    if (!list) return null;
+    // ① KEEP — collectibles + hundos collapse into one comma-OR clause (each is
+    // a single token, so precedence is safe). PvP / nundo / top-IV each need
+    // their own AND-group, so they ship as separate lines.
+    const collectTokens = ["4*", kw.flag.shiny, kw.flag.costume, kw.flag.background, ...eventCollectibles]
+      .filter(Boolean);
+    const pvpAtk = cfg.pvpMode === "strict" ? `0${kw.iv.atk}` : `0-1${kw.iv.atk}`;
+    return {
+      id: ev.id,
+      title: ev.title,
+      category: ev.category,
+      start: ev.start,
+      end: ev.end,
+      isLocalTime: !!ev.isLocalTime,
+      spawnDex: ev.spawnDex || [],
+      // ① keep
+      keepCollect: `${list}&${collectTokens.join(",")}`,
+      keepPvp: cfg.pvpMode === "none" ? null
+        : `${list}&${pvpAtk}&3-4${kw.iv.def}&3-4${kw.iv.hp}`,
+      // Exact "two perfect bars + one 11-14 bar" keepers — the literal
+      // two-iv4-plus-one-iv3 appraisal. PoGo's flat syntax can't OR three
+      // AND-triples into one string, so we emit one clause per which bar is the
+      // non-perfect (bucket-3) one. Hundos (all three 15) sit in keepCollect.
+      keepIv: [
+        { stat: "hp",  clause: `${list}&4${kw.iv.atk}&4${kw.iv.def}&3${kw.iv.hp}` },
+        { stat: "def", clause: `${list}&4${kw.iv.atk}&3${kw.iv.def}&4${kw.iv.hp}` },
+        { stat: "atk", clause: `${list}&3${kw.iv.atk}&4${kw.iv.def}&4${kw.iv.hp}` },
+      ],
+      keepNundo: cfg.protectNundos
+        ? `${list}&0${kw.iv.atk}&0${kw.iv.def}&0${kw.iv.hp}` : null,
+      // ② still to sort — spawns you haven't favourited or tagged yet
+      sort: `${list}&!${kw.flag.favorite}&!#`,
+      // ③ trash — your full trash logic, scoped to this event's spawns
+      trash: `${list}&${trash}`,
+    };
+  }).filter(Boolean);
+
   // -- MAX BATTLE TANKS / CHARGERS · universal 0.5s-fast-move filter ---
   // Max Battle meta hinges on Max Meter charging speed: only the 0.5s-tier
   // fast moves fill the meter optimally (per Pokémon GO Hub's per-attack
@@ -1806,6 +1858,8 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
            cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
            // Per-boss raid + max-battle counters
            raidFilters, eventRaidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
+           // Event wild-spawn curation filters
+           eventFilters, eventsFetchedAt,
            // Team Rocket counters (leaders / typed grunts / generic grunts)
            rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
            rocketTypeLabels,
@@ -2294,6 +2348,7 @@ export default function App() {
   const [showAuxEvos, setShowAuxEvos] = useState(false);
   const [showAuxTrades, setShowAuxTrades] = useState(false);
   const [showAuxMegas, setShowAuxMegas] = useState(false);
+  const [showAuxEvents, setShowAuxEvents] = useState(false);
   const [showAuxRaids, setShowAuxRaids] = useState(false);
   const [showAuxMaxBattles, setShowAuxMaxBattles] = useState(false);
   const [showAuxRocket, setShowAuxRocket] = useState(false);
@@ -2431,6 +2486,7 @@ export default function App() {
           evoSwapCandyClauses, evoSwapItemClauses,
           cheapEvolveClauses, dexPlusClauses, megaEvolveClauses, pilotLongClauses,
           raidFilters, eventRaidFilters, maxBattleFilters, raidBossesFetchedAt, maxTank,
+          eventFilters, eventsFetchedAt,
           rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, rocketLineupsFetchedAt,
           rocketTypeLabels,
           pvpFilters, pvpRankingsFetchedAt, cupFilters } = useMemo(
@@ -3081,6 +3137,27 @@ export default function App() {
                       )}
                     </div>
                   </Collapsible>
+                </div>
+
+                {/* Events section — wild spawns during current / upcoming
+                    events, pulled from leak-duck; run `npm run fetch-events`
+                    to refresh the snapshot. */}
+                <div className="space-y-3 pt-4">
+                  <h3 className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0]">
+                    {t("app.collapsible.aux_section_events")}
+                  </h3>
+                  <EventSpawnCollapsible
+                    icon="🌿"
+                    fetchedAt={eventsFetchedAt}
+                    events={eventFilters}
+                    accent="#27AE60"
+                    open={showAuxEvents}
+                    onToggle={() => setShowAuxEvents((s) => !s)}
+                    copied={copied}
+                    copyToClipboard={copyToClipboard}
+                    t={t}
+                    locale={locale}
+                  />
                 </div>
 
                 {/* Raids section — current bosses pulled from lily-dex-api;
@@ -3806,6 +3883,93 @@ function BossCollapsible({
               highlight={false}
             >
               {list.map((boss) => renderBossBox(boss))}
+            </TrainerAccordion>
+          );
+        })}
+      </div>
+      <p className="mono text-[10.5px] text-[#8090A0] mt-4 pt-3 border-t border-[#1F2933]">
+        {footerLabel}
+      </p>
+    </Collapsible>
+  );
+}
+
+// Renders the event wild-spawn curation card. Each in-window event becomes a
+// TrainerAccordion (active ones open by default, just-ended ones flagged for
+// tidy-up) holding a three-step triage: ① keepers to favourite, ② what's still
+// unsorted, ③ the trashable rest. Mirrors BossCollapsible's shape so the aux
+// section stays visually consistent.
+function EventSpawnCollapsible({
+  icon, fetchedAt, events, accent, open, onToggle, copied, copyToClipboard, t, locale,
+}) {
+  const list = events || [];
+  const age = formatSyncAge(fetchedAt, t);
+  const headerLabel = t("app.collapsible.aux_events");
+  const countLabel = t("app.collapsible.aux_events_count", { params: { count: list.length } });
+  const footerLabel = age
+    ? t("app.collapsible.aux_footer", { params: { count: countLabel, age } })
+    : t("app.collapsible.aux_footer_no_age", { params: { count: countLabel } });
+  if (list.length === 0) {
+    return (
+      <Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
+        <p className="text-xs italic text-[#8B98A5]">{t("app.events.empty")}</p>
+      </Collapsible>
+    );
+  }
+  const fmtDow = new Intl.DateTimeFormat(locale, { weekday: "short" });
+  return (
+    <Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
+      <div className="space-y-5">
+        {list.map((ev) => {
+          const startMs = Date.parse(ev.start);
+          const endMs = Date.parse(ev.end);
+          const now = Date.now();
+          const isActive = now >= startMs && now <= endMs;
+          const isEnded = now > endMs;
+          const teaser = isEnded
+            ? t("app.events.window_ended", { params: { dow: fmtDow.format(endMs) } })
+            : formatEventWindow(ev.start, ev.end, t, locale);
+          // One FilterBox per non-null triage string; copy keys namespaced per
+          // event so two events sharing a species don't share copy state.
+          const box = (suffix, labelKey, hintKey, str, params) => {
+            if (!str) return null;
+            const copyKey = `event_${ev.id}_${suffix}`;
+            const opts = params ? { params } : undefined;
+            return (
+              <FilterBox
+                key={suffix}
+                label={t(labelKey, opts)}
+                accent={accent}
+                filterStr={str}
+                copied={copied[copyKey]}
+                onCopy={() => copyToClipboard(copyKey, str)}
+                hint={t(hintKey, opts)}
+              />
+            );
+          };
+          const subHeading = (key) => (
+            <h5 className="mono text-[11px] uppercase tracking-wide text-[#8090A0]">{t(key)}</h5>
+          );
+          return (
+            <TrainerAccordion
+              key={ev.id}
+              name={ev.title}
+              teaser={teaser}
+              accent={accent}
+              highlight={isActive}
+            >
+              {subHeading("app.events.group_keep")}
+              {box("keep_collect", "app.events.keep_collect_label", "app.events.keep_collect_hint", ev.keepCollect)}
+              {box("keep_pvp", "app.events.keep_pvp_label", "app.events.keep_pvp_hint", ev.keepPvp)}
+              {(ev.keepIv || []).map(k => box(
+                `keep_iv_${k.stat}`, "app.events.keep_iv_label", "app.events.keep_iv_hint",
+                k.clause, { stat: t(`app.events.stat_${k.stat}`) }
+              ))}
+              {box("keep_nundo", "app.events.keep_nundo_label", "app.events.keep_nundo_hint", ev.keepNundo)}
+              {subHeading("app.events.group_sort")}
+              {box("sort", "app.events.sort_label", "app.events.sort_hint", ev.sort)}
+              {subHeading("app.events.group_trash")}
+              {box("trash", "app.events.trash_label", "app.events.trash_hint", ev.trash)}
             </TrainerAccordion>
           );
         })}

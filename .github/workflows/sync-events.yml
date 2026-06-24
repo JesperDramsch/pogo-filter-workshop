@@ -1,0 +1,38 @@
+name: Sync events
+
+on:
+  schedule:
+    - cron: "17 8 * * *" # daily at 08:17 UTC (offset from other syncs)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Exits 1 on real failure (fetch error, empty upstream response). A failed
+      # run shows up as a red workflow + GitHub notification, which is the only
+      # intervention the user wants. Event spawn filters are time-windowed and
+      # excluded from the fixture snapshot (like event raids), so no fixture
+      # regeneration is needed here.
+      - name: Fetch wild-spawn events from leak-duck
+        run: npm run fetch-events
+      - name: Commit + push if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- src/data/events.json; then
+            echo "No event changes — skipping commit."
+            exit 0
+          fi
+          git add src/data/events.json
+          git commit -m "chore(events): sync wildspawn snapshot from leak-duck"
+          git push
