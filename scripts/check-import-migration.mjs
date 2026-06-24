@@ -104,6 +104,97 @@ console.log("\nUser values win over defaults");
   check("pvpMode: loose from import", out.pvpMode === "loose");
 }
 
+console.log("\nBuddy targets: legacy string[] → structured Target[]");
+{
+  const out = mergeImportedConfig({
+    buddies: [
+      {
+        id: "a", name: "Auri", tagPrefix: "Auri",
+        targetSpecies: [
+          "habitak",                                   // legacy string → exact
+          { species: "mauzi", type: "unlicht" },       // localized type word
+          { species: "sandan", type: "ice", expand: true }, // key + expand
+          { species: "pikachu" },                      // object, no type
+          null, 42, {},                                // junk → dropped
+        ],
+      },
+    ],
+  });
+  const ts = out.buddies[0].targetSpecies;
+  check("legacy string → exact no-type target",
+    JSON.stringify(ts[0]) === JSON.stringify({ species: "habitak", expand: false, type: null }),
+    `got ${JSON.stringify(ts[0])}`);
+  check("localized type 'unlicht' coerced to key 'dark'",
+    ts[1]?.species === "mauzi" && ts[1]?.type === "dark" && ts[1]?.expand === false,
+    `got ${JSON.stringify(ts[1])}`);
+  check("type key preserved + expand honored",
+    ts[2]?.species === "sandan" && ts[2]?.type === "ice" && ts[2]?.expand === true);
+  check("object without type → type null, expand false",
+    ts[3]?.species === "pikachu" && ts[3]?.type === null && ts[3]?.expand === false);
+  check("junk entries (null, number, {}) dropped", ts.length === 4, `got length ${ts.length}`);
+  check("rawAppend backfilled to ''", out.buddies[0].rawAppend === "");
+}
+
+console.log("\nBuddy targets: migration is idempotent");
+{
+  const once = mergeImportedConfig({
+    buddies: [{ id: "a", name: "Auri", tagPrefix: "Auri",
+      targetSpecies: ["habitak", { species: "mauzi", type: "dark", expand: true }] }],
+  });
+  const twice = mergeImportedConfig({ buddies: once.buddies });
+  check("second merge leaves targets unchanged",
+    JSON.stringify(twice.buddies[0].targetSpecies) === JSON.stringify(once.buddies[0].targetSpecies),
+    `got ${JSON.stringify(twice.buddies[0].targetSpecies)}`);
+  check("rawAppend preserved on re-merge", twice.buddies[0].rawAppend === "");
+}
+
+console.log("\nBuddy targets: duplicate (species|type) entries collapsed");
+{
+  const out = mergeImportedConfig({
+    buddies: [{ id: "a", name: "Auri", tagPrefix: "Auri",
+      targetSpecies: [
+        "habitak", "habitak",                              // dup plain
+        { species: "mauzi", type: "dark" },
+        { species: "mauzi", type: "unlicht" },             // same as dark after coercion
+        { species: "mauzi", type: "normal" },              // distinct form → kept
+      ] }],
+  });
+  const ts = out.buddies[0].targetSpecies;
+  check("collapses to 3 distinct targets", ts.length === 3, `got ${ts.length}`);
+  check("keeps one habitak", ts.filter(t => t.species === "habitak").length === 1);
+  check("keeps mauzi/dark and mauzi/normal only",
+    ts.filter(t => t.species === "mauzi").map(t => t.type).sort().join(",") === "dark,normal",
+    JSON.stringify(ts.filter(t => t.species === "mauzi")));
+}
+
+console.log("\nBuddy list: junk entries (null/scalar) don't crash the merge");
+{
+  let out, threw = false;
+  try {
+    out = mergeImportedConfig({
+      buddies: [null, 42, "x", undefined,
+        { id: "a", name: "Auri", tagPrefix: "Auri", targetSpecies: ["habitak"] }],
+    });
+  } catch { threw = true; }
+  check("merge does not throw on junk buddy entries", !threw);
+  check("junk buddies dropped, real one kept", threw ? false : out.buddies.length === 1,
+    threw ? "threw" : `got ${out?.buddies?.length}`);
+}
+
+console.log("\nBuddy targets: survive prepareImport (config round-trip)");
+{
+  const env = { schema: SCHEMA_CURRENT, data: { config: {
+    buddies: [{ id: "a", name: "Auri", tagPrefix: "Auri",
+      targetSpecies: ["habitak", { species: "mauzi", type: "unlicht" }] }],
+  } } };
+  const prepared = prepareImport(env);
+  const ts = prepared.config.buddies[0].targetSpecies;
+  check("habitak → exact via prepareImport",
+    ts[0]?.species === "habitak" && ts[0]?.expand === false && ts[0]?.type === null);
+  check("mauzi unlicht → dark via prepareImport",
+    ts[1]?.species === "mauzi" && ts[1]?.type === "dark");
+}
+
 console.log("\nSchema validation: missing schema");
 {
   const r = validateImportEnvelope({ data: {} });
