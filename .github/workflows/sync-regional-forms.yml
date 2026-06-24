@@ -1,0 +1,36 @@
+name: Sync regional forms
+
+on:
+  schedule:
+    - cron: "11 9 * * 1" # weekly Monday 09:11 UTC — regional forms change rarely
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Exits 1 on real failure (fetch error, empty/changed-shape upstream — the
+      # script self-validates known forms). The regional-form catalog isn't part
+      # of the fixture snapshot, so no fixture regeneration is needed here.
+      - name: Fetch regional-form catalog from pogoapi
+        run: npm run fetch-regional-forms
+      - name: Commit + push if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- src/data/regional-forms.json; then
+            echo "No regional-form changes — skipping commit."
+            exit 0
+          fi
+          git add src/data/regional-forms.json
+          git commit -m "chore(forms): sync regional-form catalog from pogoapi"
+          git push

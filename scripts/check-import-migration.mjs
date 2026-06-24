@@ -121,16 +121,21 @@ console.log("\nBuddy targets: legacy string[] → structured Target[]");
     ],
   });
   const ts = out.buddies[0].targetSpecies;
-  check("legacy string → exact no-type target",
-    JSON.stringify(ts[0]) === JSON.stringify({ species: "habitak", expand: false, type: null }),
+  check("legacy string → whole-species target (empty dropForms)",
+    JSON.stringify(ts[0]) === JSON.stringify({ species: "habitak", expand: false, dropForms: [] }),
     `got ${JSON.stringify(ts[0])}`);
-  check("localized type 'unlicht' coerced to key 'dark'",
-    ts[1]?.species === "mauzi" && ts[1]?.type === "dark" && ts[1]?.expand === false,
+  check("legacy type 'unlicht' migrates to keep only Alolan Mauzi",
+    ts[1]?.species === "mauzi" && ts[1]?.expand === false
+    && !ts[1].dropForms.includes("alola")
+    && ts[1].dropForms.includes("base") && ts[1].dropForms.includes("galar"),
     `got ${JSON.stringify(ts[1])}`);
-  check("type key preserved + expand honored",
-    ts[2]?.species === "sandan" && ts[2]?.type === "ice" && ts[2]?.expand === true);
-  check("object without type → type null, expand false",
-    ts[3]?.species === "pikachu" && ts[3]?.type === null && ts[3]?.expand === false);
+  check("legacy type 'ice' + expand → keep only Alolan Sandan, +family",
+    ts[2]?.species === "sandan" && ts[2]?.expand === true
+    && ts[2].dropForms.includes("base") && !ts[2].dropForms.includes("alola"),
+    `got ${JSON.stringify(ts[2])}`);
+  check("object without type → whole-species, expand false",
+    ts[3]?.species === "pikachu" && ts[3]?.expand === false
+    && Array.isArray(ts[3]?.dropForms) && ts[3].dropForms.length === 0);
   check("junk entries (null, number, {}) dropped", ts.length === 4, `got length ${ts.length}`);
   check("rawAppend backfilled to ''", out.buddies[0].rawAppend === "");
 }
@@ -148,22 +153,22 @@ console.log("\nBuddy targets: migration is idempotent");
   check("rawAppend preserved on re-merge", twice.buddies[0].rawAppend === "");
 }
 
-console.log("\nBuddy targets: duplicate (species|type) entries collapsed");
+console.log("\nBuddy targets: duplicate species collapse to one (form selection is per-species)");
 {
   const out = mergeImportedConfig({
     buddies: [{ id: "a", name: "Auri", tagPrefix: "Auri",
       targetSpecies: [
-        "habitak", "habitak",                              // dup plain
+        "habitak", "habitak",                  // dup plain
         { species: "mauzi", type: "dark" },
-        { species: "mauzi", type: "unlicht" },             // same as dark after coercion
-        { species: "mauzi", type: "normal" },              // distinct form → kept
+        { species: "mauzi", type: "unlicht" }, // same species → collapses
+        { species: "mauzi", type: "normal" },  // same species → collapses
       ] }],
   });
   const ts = out.buddies[0].targetSpecies;
-  check("collapses to 3 distinct targets", ts.length === 3, `got ${ts.length}`);
+  check("collapses to one target per species (habitak + mauzi)", ts.length === 2, `got ${ts.length}`);
   check("keeps one habitak", ts.filter(t => t.species === "habitak").length === 1);
-  check("keeps mauzi/dark and mauzi/normal only",
-    ts.filter(t => t.species === "mauzi").map(t => t.type).sort().join(",") === "dark,normal",
+  check("keeps one mauzi (first form selection wins)",
+    ts.filter(t => t.species === "mauzi").length === 1,
     JSON.stringify(ts.filter(t => t.species === "mauzi")));
 }
 
@@ -189,10 +194,12 @@ console.log("\nBuddy targets: survive prepareImport (config round-trip)");
   } } };
   const prepared = prepareImport(env);
   const ts = prepared.config.buddies[0].targetSpecies;
-  check("habitak → exact via prepareImport",
-    ts[0]?.species === "habitak" && ts[0]?.expand === false && ts[0]?.type === null);
-  check("mauzi unlicht → dark via prepareImport",
-    ts[1]?.species === "mauzi" && ts[1]?.type === "dark");
+  check("habitak → whole-species via prepareImport",
+    ts[0]?.species === "habitak" && ts[0]?.expand === false
+    && Array.isArray(ts[0]?.dropForms) && ts[0].dropForms.length === 0);
+  check("mauzi unlicht → keeps only Alola via prepareImport",
+    ts[1]?.species === "mauzi" && ts[1].dropForms.includes("base")
+    && ts[1].dropForms.includes("galar") && !ts[1].dropForms.includes("alola"));
 }
 
 console.log("\nSchema validation: missing schema");
