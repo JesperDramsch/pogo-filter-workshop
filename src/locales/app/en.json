@@ -931,5 +931,15 @@
   "app.explain.nav.next": "Next",
   "app.explain.nav.landing": "Home",
   "app.explain.nav.explainer": "Explainer",
-  "app.explain.nav.workshop": "Workshop"
+  "app.explain.nav.workshop": "Workshop",
+  "app.buddy_targets.form_region.base": "Base",
+  "app.buddy_targets.form_region.alola": "Alola",
+  "app.buddy_targets.form_region.galar": "Galar",
+  "app.buddy_targets.form_region.hisui": "Hisui",
+  "app.buddy_targets.form_region.paldea": "Paldea",
+  "app.buddy_targets.form_variant.combat": "Combat",
+  "app.buddy_targets.form_variant.blaze": "Blaze",
+  "app.buddy_targets.form_variant.aqua": "Aqua",
+  "app.buddy_targets.forms_help": "Catches all regional forms by default — click a form to stop catching it for this buddy. Hidden for species with no regional forms.",
+  "app.clause_why.buddy_drop_form": "excludes the {region} form"
 }

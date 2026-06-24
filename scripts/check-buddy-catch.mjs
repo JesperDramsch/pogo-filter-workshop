@@ -1,15 +1,16 @@
-// Verifies the per-buddy catch-filter generation in buildFilters: the
-// expansion toggle (bare vs +family), the per-form filter lines (species and
-// type as SEPARATE &-clauses), the spare-hundo carve-out, and the expert raw
-// escape hatch. The default-fixture snapshot (check-fixtures.mjs) deliberately
-// ignores buddyCatchFilters and DEFAULT_CONFIG has no buddies, so this is the
-// only coverage for that code path.
+// Verifies the per-buddy catch-filter generation in buildFilters: the expansion
+// toggle (bare vs +family), the regional-form picker (each dropped form becomes
+// one De Morgan &-clause), whole-species targets sharing one selector line, the
+// spare-hundo carve-out, and the expert raw escape hatch. The default-fixture
+// snapshot (check-fixtures.mjs) deliberately ignores buddyCatchFilters and
+// DEFAULT_CONFIG has no buddies, so this is the only coverage for that path.
 //
 // Run with: npm run test:buddy  (or npx vite-node scripts/check-buddy-catch.mjs)
 
 import { buildFilters, DEFAULT_CONFIG } from "../src/App.jsx";
 import { LOCALES } from "../src/i18n/index.js";
 import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
+import REGIONAL_FORMS from "../src/data/regional-forms.json";
 
 function makeTFn(locale) {
   const messages = LOCALES[locale]?.messages || LOCALES.en.messages;
@@ -33,21 +34,33 @@ function check(label, cond, detail = "") {
 const LOCALE = "de";
 const tFn = makeTFn(LOCALE);
 const kw = pogoKeywords(LOCALE);
-const DARK = kw.type.dark;  // "unlicht"
-const ICE = kw.type.ice;    // "eis"
 const segs = (f) => f.split("&");
 
-// Buddy with: an exact target (habitak), a family-expand target (pikachu),
-// a type-qualified target the user owns a hundo of (mauzi/Alola=dark), a
-// type-qualified target with no hundo (sandan/Alola=ice), plus a raw blob.
+// Expected De Morgan clause for dropping a catalog form (must match App.jsx).
+function form(dex, key) {
+  return REGIONAL_FORMS.species[String(dex)].forms.find(f => f.key === key);
+}
+function deMorgan(f) {
+  return [
+    ...(f.include || []).map(t => `!${kw.type[t]}`),
+    ...(f.exclude || []).map(t => kw.type[t]),
+  ].join(",");
+}
+const GALAR_DROP = deMorgan(form(52, "galar")); // Mauzi: drop Galar (Steel) → "!stahl"
+const BASE_DROP  = deMorgan(form(27, "base"));  // Sandan: drop Kanto base → "!boden"
+
+// habitak (exact, whole species), pikachu (+family, no regional forms),
+// raichu (catalog species but all forms kept → whole species), mauzi (drop
+// Galar, owns a hundo → spare carve-out), sandan (drop Kanto base, no hundo).
 const buddy = {
   id: "auri", name: "Auri", tagPrefix: "Auri", active: true, wantsTradeEvos: false,
   rawAppend: "mauzi&schillernd",
   targetSpecies: [
-    { species: "habitak", expand: false, type: null },
-    { species: "pikachu", expand: true,  type: null },
-    { species: "mauzi",   expand: false, type: "dark" },
-    { species: "sandan",  expand: false, type: "ice"  },
+    { species: "habitak", expand: false, dropForms: [] },
+    { species: "pikachu", expand: true,  dropForms: [] },
+    { species: "raichu",  expand: false, dropForms: [] },
+    { species: "mauzi",   expand: false, dropForms: ["galar"] },
+    { species: "sandan",  expand: false, dropForms: ["base"] },
   ],
 };
 
@@ -58,41 +71,41 @@ console.log("Buddy catch generation (expertMode ON, hundo of Mauzi owned)");
   const all = res.buddyCatchFilters;
 
   const shared = all.filter(b => !b.formKey);
-  const typed = all.filter(b => b.formKey && b.formKey !== "raw");
+  const formLines = all.filter(b => b.formKey && b.formKey !== "raw");
   const raw = all.filter(b => b.formKey === "raw");
 
   check("exactly one shared species-selector filter", shared.length === 1, `got ${shared.length}`);
-  check("exactly two per-form filter lines", typed.length === 2, `got ${typed.length}`);
+  check("exactly two form-restricted lines", formLines.length === 2, `got ${formLines.length}`);
   check("exactly one raw escape-hatch line", raw.length === 1, `got ${raw.length}`);
 
-  // Shared selector: bare habitak (exact) + +pikachu (family), no Ibitak, no +habitak.
+  // Shared selector: exact habitak + +pikachu + exact raichu (all whole-species).
   const sharedFilter = shared[0]?.filter || "";
-  check("shared selector is 'habitak,+pikachu'", sharedFilter.startsWith("habitak,+pikachu&"),
-    sharedFilter.slice(0, 40));
+  check("shared selector starts 'habitak,+pikachu,raichu'", sharedFilter.startsWith("habitak,+pikachu,raichu&"),
+    sharedFilter.slice(0, 50));
   check("exact target has no '+' (Habitak not Ibitak)", !sharedFilter.includes("+habitak"));
-  check("shared selector excludes the typed species", !segs(sharedFilter).includes("mauzi"));
+  check("whole-species raichu stays in the shared line (not its own)", !sharedFilter.includes("+raichu"));
+  check("shared selector excludes the form-restricted species",
+    !segs(sharedFilter).includes("mauzi") && !segs(sharedFilter).includes("sandan"));
 
-  // Mauzi (dark / Alola) — owns a hundo → spare carve-out present.
-  const mauzi = typed.find(b => b.formKey === "mauzi-dark");
-  check("mauzi-dark form line exists", !!mauzi);
+  // Mauzi: drop Galar, owns a hundo → spare carve-out + De Morgan !stahl.
+  const mauzi = formLines.find(b => b.formKey === "mauzi");
+  check("mauzi form line exists (formKey is the species)", !!mauzi);
   const mSegs = segs(mauzi?.filter || "");
   check("species 'mauzi' is its OWN &-segment", mSegs.includes("mauzi"));
-  check(`type '${DARK}' is its OWN &-segment`, mSegs.includes(DARK));
-  check("species and type NOT fused in one comma-run",
-    !mSegs.some(s => s.includes(",") && s.includes("mauzi") && s.includes(DARK)));
+  check(`dropped Galar is a De Morgan &-segment '${GALAR_DROP}'`, mSegs.includes(GALAR_DROP));
   check("spare carve-out present (owns Mauzi hundo): '!4*'", mSegs.includes("!4*"));
   check("spare stars line ORs in the species", mSegs.some(s => s === "0*,1*,2*,mauzi"));
 
-  // Sandan (ice / Alola) — no hundo → plain stars, no spare guard.
-  const sandan = typed.find(b => b.formKey === "sandan-ice");
-  check("sandan-ice form line exists", !!sandan);
+  // Sandan: drop Kanto base, no hundo → plain stars, De Morgan !boden, no !4*.
+  const sandan = formLines.find(b => b.formKey === "sandan");
+  check("sandan form line exists", !!sandan);
   const sSegs = segs(sandan?.filter || "");
   check("species 'sandan' is its OWN &-segment", sSegs.includes("sandan"));
-  check(`type '${ICE}' is its OWN &-segment`, sSegs.includes(ICE));
+  check(`dropped base is a De Morgan &-segment '${BASE_DROP}'`, sSegs.includes(BASE_DROP));
   check("no spare guard without a hundo (no '!4*')", !sSegs.includes("!4*"));
   check("plain trashable stars '0*,1*,2*' present", sSegs.includes("0*,1*,2*"));
 
-  // Every line carries the standard guards (not-tagged, favorites).
+  // Every guarded line carries the standard guards (not-tagged, favorites).
   check("all lines guarded by '!#' and favorites",
     [shared[0], mauzi, sandan].every(b => segs(b.filter).includes("!#")
       && b.filter.includes(`!${kw.flag.favorite}`)));
@@ -110,13 +123,23 @@ console.log("\nRaw escape hatch is expert-gated");
     !res.buddyCatchFilters.some(b => b.formKey === "raw"));
 }
 
-console.log("\nBuddy with only a typed target emits no empty shared line");
+console.log("\nBuddy with only a form-restricted target emits no empty shared line");
 {
-  const onlyTyped = { ...buddy, rawAppend: "", targetSpecies: [{ species: "mauzi", expand: false, type: "dark" }] };
-  const cfg = { ...DEFAULT_CONFIG, expertMode: true, buddies: [onlyTyped] };
+  const onlyForm = { ...buddy, rawAppend: "", targetSpecies: [{ species: "mauzi", expand: false, dropForms: ["galar"] }] };
+  const cfg = { ...DEFAULT_CONFIG, expertMode: true, buddies: [onlyForm] };
   const res = buildFilters([], [], cfg, [], LOCALE, tFn);
   check("no guards-only shared filter", !res.buddyCatchFilters.some(b => !b.formKey));
-  check("the single form line is present", res.buddyCatchFilters.some(b => b.formKey === "mauzi-dark"));
+  check("the single form line is present", res.buddyCatchFilters.some(b => b.formKey === "mauzi"));
+}
+
+console.log("\nDropping every form catches nothing → line is skipped");
+{
+  const allDropped = { ...buddy, rawAppend: "",
+    targetSpecies: [{ species: "mauzi", expand: false, dropForms: ["base", "alola", "galar"] }] };
+  const cfg = { ...DEFAULT_CONFIG, expertMode: true, buddies: [allDropped] };
+  const res = buildFilters([], [], cfg, [], LOCALE, tFn);
+  check("no line emitted when all forms are dropped", res.buddyCatchFilters.length === 0,
+    `got ${res.buddyCatchFilters.length}`);
 }
 
 console.log(`\n${failures === 0 ? "✓ All buddy-catch tests passed." : `✗ ${failures} test(s) failed.`}`);

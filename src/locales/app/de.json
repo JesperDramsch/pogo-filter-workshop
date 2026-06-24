@@ -931,5 +931,15 @@
   "app.explain.nav.next": "Weiter",
   "app.explain.nav.landing": "Start",
   "app.explain.nav.explainer": "Erklärung",
-  "app.explain.nav.workshop": "Werkstatt"
+  "app.explain.nav.workshop": "Werkstatt",
+  "app.buddy_targets.form_region.base": "Standard",
+  "app.buddy_targets.form_region.alola": "Alola",
+  "app.buddy_targets.form_region.galar": "Galar",
+  "app.buddy_targets.form_region.hisui": "Hisui",
+  "app.buddy_targets.form_region.paldea": "Paldea",
+  "app.buddy_targets.form_variant.combat": "Kampf",
+  "app.buddy_targets.form_variant.blaze": "Flamme",
+  "app.buddy_targets.form_variant.aqua": "Aqua",
+  "app.buddy_targets.forms_help": "Fängt standardmäßig alle regionalen Formen — klicke eine Form an, um sie für diesen Buddy auszulassen. Ausgeblendet bei Arten ohne regionale Formen.",
+  "app.clause_why.buddy_drop_form": "schließt die {region}-Form aus"
 }

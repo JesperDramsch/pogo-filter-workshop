@@ -1,0 +1,1106 @@
+{
+  "fetchedAt": "2026-06-24T13:36:45.996Z",
+  "species": {
+    "19": {
+      "name": "Rattata",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "dark"
+          ]
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "dark"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "20": {
+      "name": "Raticate",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "dark"
+          ]
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "dark"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "26": {
+      "name": "Raichu",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "psychic"
+          ]
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "psychic"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "27": {
+      "name": "Sandshrew",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "ground"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "ice"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "28": {
+      "name": "Sandslash",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "ground"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "ice"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "37": {
+      "name": "Vulpix",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "fire"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "ice"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "38": {
+      "name": "Ninetales",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "fire"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "ice"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "50": {
+      "name": "Diglett",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "steel"
+          ]
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "steel"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "51": {
+      "name": "Dugtrio",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "steel"
+          ]
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "steel"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "52": {
+      "name": "Meowth",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "normal"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "dark"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "steel"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "53": {
+      "name": "Persian",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "normal"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "dark"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "58": {
+      "name": "Growlithe",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "rock"
+          ]
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "rock"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "59": {
+      "name": "Arcanine",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "rock"
+          ]
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "rock"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "74": {
+      "name": "Geodude",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "ground"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "electric"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "75": {
+      "name": "Graveler",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "ground"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "electric"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "76": {
+      "name": "Golem",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "ground"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "electric"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "77": {
+      "name": "Ponyta",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "fire"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "psychic"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "78": {
+      "name": "Rapidash",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "fire"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "psychic"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "79": {
+      "name": "Slowpoke",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "water"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [],
+          "exclude": [
+            "water"
+          ]
+        }
+      ]
+    },
+    "80": {
+      "name": "Slowbro",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "water"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "poison"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "83": {
+      "name": "Farfetch’d",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "normal"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "fighting"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "88": {
+      "name": "Grimer",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "dark"
+          ]
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "dark"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "89": {
+      "name": "Muk",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "dark"
+          ]
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "dark"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "100": {
+      "name": "Voltorb",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "grass"
+          ]
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "grass"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "101": {
+      "name": "Electrode",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "grass"
+          ]
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "grass"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "103": {
+      "name": "Exeggutor",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "psychic"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "dragon"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "105": {
+      "name": "Marowak",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "ground"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "alola",
+          "region": "alola",
+          "include": [
+            "fire"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "110": {
+      "name": "Weezing",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "fairy"
+          ]
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "fairy"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "122": {
+      "name": "Mr. Mime",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "fairy"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "ice"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "128": {
+      "name": "Tauros",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "normal"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "paldea:aqua",
+          "region": "paldea",
+          "variant": "aqua",
+          "include": [
+            "water"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "paldea:blaze",
+          "region": "paldea",
+          "variant": "blaze",
+          "include": [
+            "fire"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "paldea:combat",
+          "region": "paldea",
+          "variant": "combat",
+          "include": [
+            "fighting"
+          ],
+          "exclude": [
+            "water",
+            "fire"
+          ]
+        }
+      ]
+    },
+    "144": {
+      "name": "Articuno",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "ice"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "psychic"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "145": {
+      "name": "Zapdos",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "electric"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "fighting"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "146": {
+      "name": "Moltres",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "fire"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "dark"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "157": {
+      "name": "Typhlosion",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "ghost"
+          ]
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "ghost"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "194": {
+      "name": "Wooper",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "water"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "paldea",
+          "region": "paldea",
+          "include": [
+            "poison"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "199": {
+      "name": "Slowking",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "water"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "poison"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "211": {
+      "name": "Qwilfish",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "water"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "dark"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "215": {
+      "name": "Sneasel",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "dark"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "fighting"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "222": {
+      "name": "Corsola",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "water"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "ghost"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "263": {
+      "name": "Zigzagoon",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "dark"
+          ]
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "dark"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "264": {
+      "name": "Linoone",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "dark"
+          ]
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "dark"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "503": {
+      "name": "Samurott",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "dark"
+          ]
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "dark"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "549": {
+      "name": "Lilligant",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "fighting"
+          ]
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "fighting"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "554": {
+      "name": "Darumaka",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "fire"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "ice"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "562": {
+      "name": "Yamask",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "ground"
+          ]
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "ground"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "570": {
+      "name": "Zorua",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "dark"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "normal"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "571": {
+      "name": "Zoroark",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "dark"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "normal"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "618": {
+      "name": "Stunfisk",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "electric"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "galar",
+          "region": "galar",
+          "include": [
+            "steel"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "628": {
+      "name": "Braviary",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "normal"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "psychic"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "713": {
+      "name": "Avalugg",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [],
+          "exclude": [
+            "rock"
+          ]
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "rock"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "724": {
+      "name": "Decidueye",
+      "forms": [
+        {
+          "key": "base",
+          "region": "base",
+          "include": [
+            "ghost"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "fighting"
+          ],
+          "exclude": []
+        }
+      ]
+    }
+  }
+}

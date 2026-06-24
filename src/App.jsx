@@ -15,6 +15,7 @@ import RocketQuoteLookup from "./explain/RocketQuoteLookup.jsx";
 import PVP_RANKINGS from "./data/pvp-rankings.json";
 import META_RANKINGS from "./data/meta-rankings.json";
 import EVOLUTION_COSTS from "./data/evolution-costs.json";
+import REGIONAL_FORMS from "./data/regional-forms.json";
 import { useTranslation } from "./i18n/I18nProvider.jsx";
 import Landing from "./Landing.jsx";
 import General from "./explain/General.jsx";
@@ -415,23 +416,27 @@ const REGIONAL_GROUPS = {
   },
 };
 
-// Reverse index: lowercase (German) species name → set of known regional-form
-// type keys, derived from REGIONAL_GROUPS typeChecks. Powers the buddy form-
-// picker's "known forms" suggestions — e.g. "mauzi" → {"dark"} (Alola Meowth).
-// Species names in REGIONAL_GROUPS are canonical German; buddy targets store the
-// same canonical German name, so the lowercased key matches regardless of the
-// user's UI/output locale. The full 18-type list is always offered as a fallback.
-const SPECIES_FORM_TYPES = (() => {
-  const map = new Map();
-  for (const group of Object.values(REGIONAL_GROUPS)) {
-    for (const tc of group.typeChecks) {
-      const key = tc.species.toLowerCase();
-      if (!map.has(key)) map.set(key, new Set());
-      map.get(key).add(tc.type);
-    }
-  }
-  return map;
-})();
+// Resolve a buddy-target species (any-locale name or dex) to its regional-form
+// catalog entry from src/data/regional-forms.json — the ordered list of forms
+// (Kanto base / Alola / Galar / Hisui / Paldea) each carrying the {include,
+// exclude} type predicate that isolates it in PoGo search. Returns null for
+// species with no type-distinguishable regional forms (single-form species, or
+// forms search can't separate) — those fall back to the plain exact/+family
+// target. Keyed by dex so the lookup is locale-independent.
+function regionalFormsFor(species) {
+  if (!species) return null;
+  const info = resolveSpeciesInfo(species);
+  if (!info) return null;
+  return REGIONAL_FORMS.species[String(info.dex)]?.forms || null;
+}
+
+// Localized label for a regional form (chip text + clause-why): "Base",
+// "Alola", "Paldea (Combat)" — region plus optional Paldean breed variant.
+function formRegionLabel(form, tFn) {
+  const region = tFn(`app.buddy_targets.form_region.${form.region}`);
+  if (form.variant) return `${region} (${tFn(`app.buddy_targets.form_variant.${form.variant}`)})`;
+  return region;
+}
 
 // Family expansion: when collectors include all members of a +family,
 // collapse to "+Family" instead of repeated entries (saves chars + protects whole line).
@@ -482,27 +487,35 @@ function defaultRegionalToggles() {
 const BUDDY_TYPE_KEYS = new Set(Object.keys(pogoKeywords("de").type));
 
 // Normalize one buddy target onto the structured shape
-//   { species, expand, type }
+//   { species, expand, dropForms }
 // where `species` is a canonical lowercase name, `expand` toggles +family
-// expansion (default off → exact species), and `type` is a semantic type KEY
-// (e.g. "dark") or null. Legacy string entries become exact, no-type targets.
-// Object entries coerce a localized type word ("unlicht") to its key via
-// typeKeyFromKeyword. Idempotent — a normalized target re-runs unchanged, which
-// matters because import re-runs the whole merge. Returns null for junk so the
-// caller can drop it.
+// expansion (default off → exact species), and `dropForms` is an array of
+// regional-form keys to EXCLUDE from the catch list (default [] → catch every
+// form). Legacy string entries become exact, catch-all targets. Legacy
+// `{type}` entries (the old single-form picker) migrate by keeping only the
+// form whose predicate includes that type and dropping the rest. Idempotent —
+// a normalized target re-runs unchanged. Returns null for junk so the caller
+// can drop it.
 export function normalizeBuddyTarget(entry) {
   if (typeof entry === "string") {
     const species = resolveSpecies(entry) || entry.toLowerCase();
-    return species ? { species, expand: false, type: null } : null;
+    return species ? { species, expand: false, dropForms: [] } : null;
   }
   if (entry && typeof entry === "object" && entry.species != null) {
     const species = resolveSpecies(entry.species) || String(entry.species).toLowerCase();
     if (!species) return null;
-    let type = null;
-    if (typeof entry.type === "string" && entry.type) {
-      type = BUDDY_TYPE_KEYS.has(entry.type) ? entry.type : typeKeyFromKeyword(entry.type, "de");
+    let dropForms = [];
+    if (Array.isArray(entry.dropForms)) {
+      // Keep only keys that still exist in the catalog (it can change over time).
+      const valid = new Set((regionalFormsFor(species) || []).map(f => f.key));
+      dropForms = entry.dropForms.filter(k => typeof k === "string" && valid.has(k));
+    } else if (typeof entry.type === "string" && entry.type) {
+      const key = BUDDY_TYPE_KEYS.has(entry.type) ? entry.type : typeKeyFromKeyword(entry.type, "de");
+      const forms = regionalFormsFor(species) || [];
+      const keep = key && forms.find(f => (f.include || []).includes(key));
+      if (keep) dropForms = forms.filter(f => f.key !== keep.key).map(f => f.key);
     }
-    return { species, expand: !!entry.expand, type: type || null };
+    return { species, expand: !!entry.expand, dropForms };
   }
   return null;
 }
@@ -555,9 +568,9 @@ export function mergeImportedConfig(raw) {
       .map(normalizeBuddyTarget)
       .filter(Boolean)
       .filter(t => {
-        const k = `${t.species}|${t.type || ""}`;
-        if (seen.has(k)) return false;
-        seen.add(k);
+        // One target per species now (form selection lives in dropForms).
+        if (seen.has(t.species)) return false;
+        seen.add(t.species);
         return true;
       });
     return { rawAppend: "", ...b, targetSpecies };
@@ -1065,25 +1078,32 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
 
   for (const b of activeBuddies) {
     const prefix = b.tagPrefix.replace(/^#/, "");
-    // targetSpecies entries are structured Targets { species, expand, type }
-    // (legacy strings are migrated to this shape on load). Resolve each to an
-    // output-locale display name, then split: plain targets share one comma-run
-    // selector; type-qualified targets each get their own precedence-safe line.
+    // targetSpecies entries are structured Targets { species, expand, dropForms }
+    // (legacy strings / typed targets are migrated to this shape on load).
+    // Resolve each to an output-locale display name and split: targets that
+    // catch every form (dropForms empty) share one comma-run selector; targets
+    // that exclude a regional form get their own line with one De Morgan clause
+    // per dropped form.
     const allTargets = (b.targetSpecies || [])
       .filter(t => t && t.species)
-      .map(t => ({ display: speciesForOutput(t.species, outputLocale), expand: !!t.expand, type: t.type || null }));
-    const plainTargets = allTargets.filter(t => !t.type);
-    const typedTargets = allTargets.filter(t => t.type);
+      .map(t => ({
+        species: t.species,
+        display: speciesForOutput(t.species, outputLocale),
+        expand: !!t.expand,
+        dropForms: Array.isArray(t.dropForms) ? t.dropForms : [],
+      }));
+    const plainTargets = allTargets.filter(t => t.dropForms.length === 0);
+    const formTargets = allTargets.filter(t => t.dropForms.length > 0);
     const wantsTE = !!b.wantsTradeEvos && TE_full.length > 0;
     const rawAppend = (b.rawAppend || "").trim();
     const hasRaw = !!cfg.expertMode && rawAppend.length > 0;
-    if (plainTargets.length === 0 && typedTargets.length === 0 && !wantsTE && !hasRaw) continue;
+    if (plainTargets.length === 0 && formTargets.length === 0 && !wantsTE && !hasRaw) continue;
 
     // Selector string for one target, honoring its +family expansion toggle.
     // expand=false → bare name (only that species); expand=true → +family.
     const sel = (t) => (t.expand ? `+${t.display}` : t.display);
 
-    // ── Shared species-selector filter (plain targets + trade-evo families) ──
+    // ── Shared species-selector filter (whole-species targets + trade evos) ──
     const speciesParts = [
       ...plainTargets.map(sel),
       ...(wantsTE ? TE_full.map(base => `+${teDisplay(base, outputLocale)}`) : []),
@@ -1105,23 +1125,36 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
       });
     }
 
-    // ── One self-contained filter line per type-qualified target ──
-    // The species and the type are pushed as SEPARATE &-clauses (e.g. `mauzi`
-    // then `unlicht`), never as one comma-run, so OR-binds-tighter can't
-    // distribute the type across other terms. Isolates a regional form
-    // (Alola Mauzi = Unlicht/Dark; Kanto Mauzi = Normal; Galar Mauzi = Stahl).
-    for (const t of typedTargets) {
-      const typeOut = kw.type[t.type] || t.type;
+    // ── One self-contained line per form-restricted target ──
+    // Each dropped regional form contributes a single De Morgan &-clause that
+    // negates that form's type predicate, e.g. drop Galar Mauzi {include:[steel]}
+    // → `&!stahl`; drop Kanto Mauzi {include:[normal]} → `&!normal`; drop Paldea
+    // combat Tauros {include:[fighting],exclude:[fire,water]} → `&!kampf,feuer,wasser`.
+    // Each is its own comma-OR `&`-clause, so OR-binds-tighter stays contained.
+    for (const t of formTargets) {
+      const forms = regionalFormsFor(t.species) || [];
+      const dropSet = new Set(t.dropForms);
+      const dropped = forms.filter(f => dropSet.has(f.key));
+      const kept = forms.filter(f => !dropSet.has(f.key));
+      if (dropped.length === 0 || kept.length === 0) continue; // nothing to narrow, or nothing left
       const catchClauses = [];
       pushStarsOrSpare(catchClauses, hundoOutSet.has(t.display) ? [sel(t)] : []);
-      push(catchClauses, sel(t), `${b.name}: ${capFirst(t.display)} & ${typeOut}`);
-      push(catchClauses, typeOut, tFn("app.clause_why.buddy_form_type", { params: { type: typeOut } }));
+      push(catchClauses, sel(t), `${b.name}: ${capFirst(t.display)}`);
+      for (const f of dropped) {
+        const deMorgan = [
+          ...(f.include || []).map(ty => `!${kw.type[ty] || ty}`),
+          ...(f.exclude || []).map(ty => kw.type[ty] || ty),
+        ].join(",");
+        if (!deMorgan) continue;
+        push(catchClauses, deMorgan,
+          tFn("app.clause_why.buddy_drop_form", { params: { region: formRegionLabel(f, tFn) } }));
+      }
       pushBuddyGuards(catchClauses);
       buddyCatchFilters.push({
         buddyName: b.name,
         prefix,
-        formKey: `${t.display}-${t.type}`,
-        label: `${b.name} · ${capFirst(t.display)} (${typeOut})`,
+        formKey: t.species,
+        label: `${b.name} · ${capFirst(t.display)}`,
         filter: catchClauses.map(c => c.clause).join("&"),
         clauses: catchClauses,
       });
@@ -6244,12 +6277,8 @@ function BuddyEventsEditor({ buddies, onUpdateBuddy, expertMode }) {
 function BuddyTargetsRow({ buddy, onChange, expertMode }) {
   const { t, locale } = useTranslation();
   const [input, setInput] = useState("");
-  // targetSpecies entries are structured Targets { species, expand, type }.
+  // targetSpecies entries are structured Targets { species, expand, dropForms }.
   const targets = buddy.targetSpecies || [];
-
-  // Localized type names for the form picker (semantic key → display word).
-  const typeNames = pogoKeywords(locale).type;
-  const allTypeKeys = Object.keys(typeNames).sort((a, b) => typeNames[a].localeCompare(typeNames[b]));
 
   const previewTokens = useMemo(() => {
     return input.split(/[,;\s]+/).filter(Boolean).map(tok => ({
@@ -6257,47 +6286,56 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
       info: resolveSpeciesInfo(tok),
     }));
   }, [input]);
-  // A token is "new" only if there is no plain (type-less) target for it yet —
-  // addAll only ever adds plain targets; form variants are added per-chip.
-  const hasPlain = (name) => targets.some(x => x.species === name && !x.type);
+  // One target per species now; a token is "new" only if that species isn't
+  // already a target.
+  const hasSpecies = (name) => targets.some(x => x.species === name);
   const resolved = previewTokens.filter(p => p.info);
-  const newResolved = resolved.filter(p => !hasPlain(p.info.names.de.toLowerCase()));
-  const dupes = resolved.filter(p => hasPlain(p.info.names.de.toLowerCase()));
+  const newResolved = resolved.filter(p => !hasSpecies(p.info.names.de.toLowerCase()));
+  const dupes = resolved.filter(p => hasSpecies(p.info.names.de.toLowerCase()));
   const unresolved = previewTokens.filter(p => !p.info);
 
-  const keyOf = (tg) => `${tg.species}|${tg.type || ""}`;
+  const keyOf = (tg) => tg.species;
   function addAll() {
     const tokens = input.split(/[,;\s]+/).filter(Boolean);
     if (tokens.length === 0) return;
-    const map = new Map(targets.map(tg => [keyOf(tg), tg]));
+    const map = new Map(targets.map(tg => [tg.species, tg]));
     const remaining = [];
     for (const tok of tokens) {
       const r = resolveSpecies(tok);
       if (r) {
-        const nt = { species: r, expand: false, type: null };
-        if (!map.has(keyOf(nt))) map.set(keyOf(nt), nt);
+        if (!map.has(r)) map.set(r, { species: r, expand: false, dropForms: [] });
       } else remaining.push(tok);
     }
-    const next = [...map.values()].sort((a, b) =>
-      a.species.localeCompare(b.species) || (a.type || "").localeCompare(b.type || ""));
+    const next = [...map.values()].sort((a, b) => a.species.localeCompare(b.species));
     onChange({ targetSpecies: next });
     setInput(remaining.join(", "));
   }
   function updateAt(i, patch) {
     const next = targets.map((tg, idx) => idx === i ? { ...tg, ...patch } : tg);
-    // An edit (e.g. setting a type) can collide with an existing target —
-    // collapse duplicate (species|type) keys so we never emit two identical
-    // form lines (which would also clash on formKey).
+    // Dedupe by species (defensive — edits shouldn't create collisions).
     const seen = new Set();
     onChange({ targetSpecies: next.filter(tg => {
-      const k = keyOf(tg);
-      if (seen.has(k)) return false;
-      seen.add(k);
+      if (seen.has(tg.species)) return false;
+      seen.add(tg.species);
       return true;
     }) });
   }
   function removeAt(i) {
     onChange({ targetSpecies: targets.filter((_, idx) => idx !== i) });
+  }
+  // Toggle a regional form in/out of the catch list. Never drops the last kept
+  // form (that would catch nothing — the family toggle covers "whole species").
+  function toggleForm(i, formKey) {
+    const tg = targets[i];
+    const drop = new Set(tg.dropForms || []);
+    if (drop.has(formKey)) {
+      drop.delete(formKey);
+    } else {
+      const forms = regionalFormsFor(tg.species) || [];
+      if (forms.filter(f => !drop.has(f.key)).length <= 1) return;
+      drop.add(formKey);
+    }
+    updateAt(i, { dropForms: [...drop] });
   }
 
   return (
@@ -6326,11 +6364,10 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
       {targets.length > 0 && (
         <div className="flex flex-col gap-1.5">
           {targets.map((tg, i) => {
-            const knownTypes = [...(SPECIES_FORM_TYPES.get(tg.species) || [])]
-              .sort((a, b) => typeNames[a].localeCompare(typeNames[b]));
-            const knownSet = new Set(knownTypes);
+            const forms = regionalFormsFor(tg.species);
+            const dropSet = new Set(tg.dropForms || []);
             return (
-              <div key={keyOf(tg)}
+              <div key={tg.species}
                 className="chip-enter mono text-[11px] bg-[#E67E22]/10 border border-[#E67E22]/30 rounded px-2 py-1 flex items-center gap-2 flex-wrap group">
                 <span className="text-[#E6EDF3]">{capFirst(tg.species)}</span>
                 {/* Family-expansion toggle: exact species vs entire +family. */}
@@ -6344,26 +6381,28 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
                   }`}>
                   {tg.expand ? t("app.buddy_targets.expand_family") : t("app.buddy_targets.expand_exact")}
                 </button>
-                {/* Form picker: known regional-form types first, then all 18. */}
-                <select
-                  value={tg.type || ""}
-                  onChange={e => updateAt(i, { type: e.target.value || null })}
-                  title={t("app.buddy_targets.type_label")}
-                  className="text-[10px] bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none rounded px-1 py-0.5 text-[#E6EDF3]">
-                  <option value="">{t("app.buddy_targets.type_none")}</option>
-                  {knownTypes.length > 0 && (
-                    <optgroup label={t("app.buddy_targets.type_known_forms")}>
-                      {knownTypes.map(tk => (
-                        <option key={tk} value={tk}>{capFirst(typeNames[tk])}</option>
-                      ))}
-                    </optgroup>
-                  )}
-                  <optgroup label={t("app.buddy_targets.type_all")}>
-                    {allTypeKeys.filter(tk => !knownSet.has(tk)).map(tk => (
-                      <option key={tk} value={tk}>{capFirst(typeNames[tk])}</option>
-                    ))}
-                  </optgroup>
-                </select>
+                {/* Regional-form picker: every form is catch-on by default; click
+                    a chip to drop that form (struck through). Hidden for species
+                    with no type-distinguishable regional forms. */}
+                {forms && forms.length > 0 && (
+                  <span className="flex items-center gap-1 flex-wrap" title={t("app.buddy_targets.forms_help")}>
+                    {forms.map(f => {
+                      const dropped = dropSet.has(f.key);
+                      return (
+                        <button
+                          key={f.key}
+                          onClick={() => toggleForm(i, f.key)}
+                          className={`text-[10px] px-1.5 py-0.5 rounded border transition ${
+                            dropped
+                              ? "bg-transparent border-[#2D3A47] text-[#5A6673] line-through"
+                              : "bg-[#E67E22]/25 border-[#E67E22]/50 text-[#E67E22]"
+                          }`}>
+                          {formRegionLabel(f, t)}
+                        </button>
+                      );
+                    })}
+                  </span>
+                )}
                 <button onClick={() => removeAt(i)}
                   className="ml-auto opacity-50 group-hover:opacity-100 hover:text-[#FF6B5B] transition text-[#E67E22]">
                   <X size={10} />
@@ -6402,7 +6441,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
                   ✗ {tok.input}
                 </span>
               );
-              const isDupe = hasPlain(tok.info.names.de.toLowerCase());
+              const isDupe = hasSpecies(tok.info.names.de.toLowerCase());
               const labelByType = { number: "#", en: "EN", de: "DE", es: "ES", fr: "FR", "zh-TW": "ZH", hi: "HI", ja: "JA" };
               return (
                 <span key={i}
