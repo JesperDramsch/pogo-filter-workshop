@@ -415,6 +415,24 @@ const REGIONAL_GROUPS = {
   },
 };
 
+// Reverse index: lowercase (German) species name → set of known regional-form
+// type keys, derived from REGIONAL_GROUPS typeChecks. Powers the buddy form-
+// picker's "known forms" suggestions — e.g. "mauzi" → {"dark"} (Alola Meowth).
+// Species names in REGIONAL_GROUPS are canonical German; buddy targets store the
+// same canonical German name, so the lowercased key matches regardless of the
+// user's UI/output locale. The full 18-type list is always offered as a fallback.
+const SPECIES_FORM_TYPES = (() => {
+  const map = new Map();
+  for (const group of Object.values(REGIONAL_GROUPS)) {
+    for (const tc of group.typeChecks) {
+      const key = tc.species.toLowerCase();
+      if (!map.has(key)) map.set(key, new Set());
+      map.get(key).add(tc.type);
+    }
+  }
+  return map;
+})();
+
 // Family expansion: when collectors include all members of a +family,
 // collapse to "+Family" instead of repeated entries (saves chars + protects whole line).
 const FAMILY_COLLAPSES = {
@@ -459,6 +477,36 @@ function defaultRegionalToggles() {
 // src/data/species.js (multi-locale, generated from the published Google
 // Sheet via scripts/fetch-translations.mjs at build time). Imported above.
 
+// The 18 semantic type keys ("dark", "normal", …). Keys are locale-independent;
+// only the localized value (kw.type.dark = "unlicht") changes by locale.
+const BUDDY_TYPE_KEYS = new Set(Object.keys(pogoKeywords("de").type));
+
+// Normalize one buddy target onto the structured shape
+//   { species, expand, type }
+// where `species` is a canonical lowercase name, `expand` toggles +family
+// expansion (default off → exact species), and `type` is a semantic type KEY
+// (e.g. "dark") or null. Legacy string entries become exact, no-type targets.
+// Object entries coerce a localized type word ("unlicht") to its key via
+// typeKeyFromKeyword. Idempotent — a normalized target re-runs unchanged, which
+// matters because import re-runs the whole merge. Returns null for junk so the
+// caller can drop it.
+export function normalizeBuddyTarget(entry) {
+  if (typeof entry === "string") {
+    const species = resolveSpecies(entry) || entry.toLowerCase();
+    return species ? { species, expand: false, type: null } : null;
+  }
+  if (entry && typeof entry === "object" && entry.species != null) {
+    const species = resolveSpecies(entry.species) || String(entry.species).toLowerCase();
+    if (!species) return null;
+    let type = null;
+    if (typeof entry.type === "string" && entry.type) {
+      type = BUDDY_TYPE_KEYS.has(entry.type) ? entry.type : typeKeyFromKeyword(entry.type, "de");
+    }
+    return { species, expand: !!entry.expand, type: type || null };
+  }
+  return null;
+}
+
 // Normalize a raw config blob (from localStorage on load OR from a JSON
 // import file) onto the current DEFAULT_CONFIG shape. Single source of
 // truth so any future field rename / removal automatically migrates both
@@ -496,6 +544,24 @@ export function mergeImportedConfig(raw) {
   const canonicalize = (arr) => (arr || []).map(s => resolveSpecies(s) || s);
   merged.mythTooManyOf = canonicalize(merged.mythTooManyOf);
   merged.shadowKeeperSpecies = canonicalize(merged.shadowKeeperSpecies);
+  // Buddy targets: migrate legacy string[] → structured Target[] and backfill
+  // the per-buddy raw escape hatch. `rawAppend` first so an existing value wins.
+  // Dedupe by species|type so a hand-edited import can't yield colliding lines.
+  // Drop non-object junk entries (null holes / scalars from a corrupt config or
+  // hand-edited import) up front so the map below can't throw on `b.targetSpecies`.
+  merged.buddies = (merged.buddies || []).filter(b => b && typeof b === "object").map(b => {
+    const seen = new Set();
+    const targetSpecies = (b.targetSpecies || [])
+      .map(normalizeBuddyTarget)
+      .filter(Boolean)
+      .filter(t => {
+        const k = `${t.species}|${t.type || ""}`;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+    return { rawAppend: "", ...b, targetSpecies };
+  });
   return merged;
 }
 
@@ -953,64 +1019,128 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
 
   // ── BUDDY FILTERS ──────────────────────────────────────────────────────
   const buddyCatchFilters = [];
-  for (const b of activeBuddies) {
-    const prefix = b.tagPrefix.replace(/^#/, "");
-    const targets = (b.targetSpecies || []).filter(Boolean).map(s => speciesForOutput(s, outputLocale));
-    const wantsTE = !!b.wantsTradeEvos && TE_full.length > 0;
-    if (targets.length === 0 && !wantsTE) continue;
-
-    const catchClauses = [];
-    const speciesParts = [
-      ...targets.map(s => `+${s}`),
-      ...(wantsTE ? TE_full.map(base => `+${teDisplay(base, outputLocale)}`) : []),
-    ];
-    const why = [
-      targets.length > 0 ? tFn("app.clause_why.buddy_targets_count", { params: { count: targets.length } }) : null,
-      wantsTE ? tFn("app.clause_why.buddy_te_count", { params: { count: TE_full.length } }) : null,
-    ].filter(Boolean).join(" + ");
-    push(catchClauses, speciesParts.join(","), `${b.name}: ${why}`);
-    // Stars to catch fresh — plus a carve-out for spare dupes worth handing over.
-    // If the buddy wants a species you already own a hundo of, surface its 3★+
-    // copies too (you don't need them once the 4★ is in the bag), guarded by
-    // `!4*` so you never give away the hundo itself. Lucky copies stay protected
-    // by the `!lucky` clause below. Without this, a spare 3★ of a maxed species
-    // is stuck in lucky-sort with no path to the friend who asked for it.
-    const spareTargets = targets.filter(s => hundoOutSet.has(s));
-    if (spareTargets.length > 0) {
-      push(catchClauses, ["0*,1*,2*", ...spareTargets.map(s => `+${s}`)].join(","), tFn("app.clause_why.buddy_catch_or_spare"));
-      push(catchClauses, "!4*", tFn("app.clause_why.never_gift_4star"));
-    } else {
-      push(catchClauses, "0*,1*,2*", tFn("app.clause_why.trashable_stars"));
-    }
-    push(catchClauses, "!#", tFn("app.clause_why.not_tagged"));
-    push(catchClauses, `!${kw.flag.favorite}`, tFn("app.clause_why.favorites_protected"));
-    push(catchClauses, `!${kw.flag.traded}`, tFn("app.clause_why.must_traded_short"));
-    push(catchClauses, `!${kw.flag.shadow}`, tFn("app.clause_why.must_shadow_short"));
-    push(catchClauses, `!${kw.flag.lucky}`, tFn("app.clause_why.must_lucky_short"));
-    push(catchClauses, `!${kw.flag.mythical},808,809`, tFn("app.clause_why.must_mythical_short"));
-    push(catchClauses, `!${kw.flag.shiny}`, tFn("app.clause_why.shinies_keep"));
-    push(catchClauses, `!${kw.flag.legendary}`, tFn("app.clause_why.legendaries_keep"));
-    if (cfg.protectUltraBeasts) push(catchClauses, `!${kw.flag.ultra_beast}`, tFn("app.clause_why.ultra_beasts"));
-    if (cfg.protectCostumes)    push(catchClauses, `!${kw.flag.costume}`, tFn("app.clause_why.costumes_trade"));
-    if (cfg.protectPurified)    push(catchClauses, `!${kw.flag.purified}`, tFn("app.clause_why.purified"));
-    if (cfg.protectBackgrounds) push(catchClauses, `!${kw.flag.background}`, tFn("app.clause_why.backgrounds_trade"));
+  // Guard clauses are identical for the shared species-selector filter and for
+  // every per-form filter line, so factor them into one closure. (A type-
+  // qualified target like `mauzi&unlicht` carries an `&` and therefore cannot
+  // live inside the comma-run species selector — it gets its own filter line.)
+  const pushBuddyGuards = (clauses) => {
+    push(clauses, "!#", tFn("app.clause_why.not_tagged"));
+    push(clauses, `!${kw.flag.favorite}`, tFn("app.clause_why.favorites_protected"));
+    push(clauses, `!${kw.flag.traded}`, tFn("app.clause_why.must_traded_short"));
+    push(clauses, `!${kw.flag.shadow}`, tFn("app.clause_why.must_shadow_short"));
+    push(clauses, `!${kw.flag.lucky}`, tFn("app.clause_why.must_lucky_short"));
+    push(clauses, `!${kw.flag.mythical},808,809`, tFn("app.clause_why.must_mythical_short"));
+    push(clauses, `!${kw.flag.shiny}`, tFn("app.clause_why.shinies_keep"));
+    push(clauses, `!${kw.flag.legendary}`, tFn("app.clause_why.legendaries_keep"));
+    if (cfg.protectUltraBeasts) push(clauses, `!${kw.flag.ultra_beast}`, tFn("app.clause_why.ultra_beasts"));
+    if (cfg.protectCostumes)    push(clauses, `!${kw.flag.costume}`, tFn("app.clause_why.costumes_trade"));
+    if (cfg.protectPurified)    push(clauses, `!${kw.flag.purified}`, tFn("app.clause_why.purified"));
+    if (cfg.protectBackgrounds) push(clauses, `!${kw.flag.background}`, tFn("app.clause_why.backgrounds_trade"));
     if (cfg.protectNundos) {
-      push(catchClauses,
+      push(clauses,
         `1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`,
         tFn("app.clause_why.protect_nundos_trade"));
     }
-    if (cfg.protectDoubleMoved) push(catchClauses, "@3move", tFn("app.clause_why.double_moved_trade"));
-    if (cfg.protectDynamax)     push(catchClauses, `!${kw.flag.dynamax_move}1-`, tFn("app.clause_why.dynamax"));
-    if (cfg.protectXXL)         push(catchClauses, `!${kw.flag.xxl}`, tFn("app.clause_why.xxl_trade"));
-    if (cfg.protectXL)          push(catchClauses, `!${kw.flag.xl}`,  tFn("app.clause_why.xl_trade"));
-    if (cfg.protectXXS)         push(catchClauses, `!${kw.flag.xxs}`, tFn("app.clause_why.xxs"));
-    if (cfg.protectLegacyMoves) push(catchClauses, legacyMovesClause(), tFn("app.clause_why.legacy_moves"));
-    buddyCatchFilters.push({
-      buddyName: b.name,
-      prefix,
-      filter: catchClauses.map(c => c.clause).join("&"),
-      clauses: catchClauses,
-    });
+    if (cfg.protectDoubleMoved) push(clauses, "@3move", tFn("app.clause_why.double_moved_trade"));
+    if (cfg.protectDynamax)     push(clauses, `!${kw.flag.dynamax_move}1-`, tFn("app.clause_why.dynamax"));
+    if (cfg.protectXXL)         push(clauses, `!${kw.flag.xxl}`, tFn("app.clause_why.xxl_trade"));
+    if (cfg.protectXL)          push(clauses, `!${kw.flag.xl}`,  tFn("app.clause_why.xl_trade"));
+    if (cfg.protectXXS)         push(clauses, `!${kw.flag.xxs}`, tFn("app.clause_why.xxs"));
+    if (cfg.protectLegacyMoves) push(clauses, legacyMovesClause(), tFn("app.clause_why.legacy_moves"));
+  };
+  // Stars-to-trash line, with the spare-hundo carve-out: if the buddy wants a
+  // species you already own a hundo of, surface its 3★+ copies too (you don't
+  // need them once the 4★ is in the bag), guarded by `!4*` so you never give
+  // away the hundo itself. Lucky copies stay protected by the `!lucky` guard.
+  // `spareSelectors` are the species selectors (bare or +family, matching the
+  // target's own expand flag) to OR into the stars line.
+  const pushStarsOrSpare = (clauses, spareSelectors) => {
+    if (spareSelectors.length > 0) {
+      push(clauses, ["0*,1*,2*", ...spareSelectors].join(","), tFn("app.clause_why.buddy_catch_or_spare"));
+      push(clauses, "!4*", tFn("app.clause_why.never_gift_4star"));
+    } else {
+      push(clauses, "0*,1*,2*", tFn("app.clause_why.trashable_stars"));
+    }
+  };
+
+  for (const b of activeBuddies) {
+    const prefix = b.tagPrefix.replace(/^#/, "");
+    // targetSpecies entries are structured Targets { species, expand, type }
+    // (legacy strings are migrated to this shape on load). Resolve each to an
+    // output-locale display name, then split: plain targets share one comma-run
+    // selector; type-qualified targets each get their own precedence-safe line.
+    const allTargets = (b.targetSpecies || [])
+      .filter(t => t && t.species)
+      .map(t => ({ display: speciesForOutput(t.species, outputLocale), expand: !!t.expand, type: t.type || null }));
+    const plainTargets = allTargets.filter(t => !t.type);
+    const typedTargets = allTargets.filter(t => t.type);
+    const wantsTE = !!b.wantsTradeEvos && TE_full.length > 0;
+    const rawAppend = (b.rawAppend || "").trim();
+    const hasRaw = !!cfg.expertMode && rawAppend.length > 0;
+    if (plainTargets.length === 0 && typedTargets.length === 0 && !wantsTE && !hasRaw) continue;
+
+    // Selector string for one target, honoring its +family expansion toggle.
+    // expand=false → bare name (only that species); expand=true → +family.
+    const sel = (t) => (t.expand ? `+${t.display}` : t.display);
+
+    // ── Shared species-selector filter (plain targets + trade-evo families) ──
+    const speciesParts = [
+      ...plainTargets.map(sel),
+      ...(wantsTE ? TE_full.map(base => `+${teDisplay(base, outputLocale)}`) : []),
+    ];
+    if (speciesParts.length > 0) {
+      const why = [
+        plainTargets.length > 0 ? tFn("app.clause_why.buddy_targets_count", { params: { count: plainTargets.length } }) : null,
+        wantsTE ? tFn("app.clause_why.buddy_te_count", { params: { count: TE_full.length } }) : null,
+      ].filter(Boolean).join(" + ");
+      const catchClauses = [];
+      push(catchClauses, speciesParts.join(","), `${b.name}: ${why}`);
+      pushStarsOrSpare(catchClauses, plainTargets.filter(t => hundoOutSet.has(t.display)).map(sel));
+      pushBuddyGuards(catchClauses);
+      buddyCatchFilters.push({
+        buddyName: b.name,
+        prefix,
+        filter: catchClauses.map(c => c.clause).join("&"),
+        clauses: catchClauses,
+      });
+    }
+
+    // ── One self-contained filter line per type-qualified target ──
+    // The species and the type are pushed as SEPARATE &-clauses (e.g. `mauzi`
+    // then `unlicht`), never as one comma-run, so OR-binds-tighter can't
+    // distribute the type across other terms. Isolates a regional form
+    // (Alola Mauzi = Unlicht/Dark; Kanto Mauzi = Normal; Galar Mauzi = Stahl).
+    for (const t of typedTargets) {
+      const typeOut = kw.type[t.type] || t.type;
+      const catchClauses = [];
+      pushStarsOrSpare(catchClauses, hundoOutSet.has(t.display) ? [sel(t)] : []);
+      push(catchClauses, sel(t), `${b.name}: ${capFirst(t.display)} & ${typeOut}`);
+      push(catchClauses, typeOut, tFn("app.clause_why.buddy_form_type", { params: { type: typeOut } }));
+      pushBuddyGuards(catchClauses);
+      buddyCatchFilters.push({
+        buddyName: b.name,
+        prefix,
+        formKey: `${t.display}-${t.type}`,
+        label: `${b.name} · ${capFirst(t.display)} (${typeOut})`,
+        filter: catchClauses.map(c => c.clause).join("&"),
+        clauses: catchClauses,
+      });
+    }
+
+    // ── Expert raw escape hatch — its OWN line, verbatim and UNGUARDED ──
+    // A stray comma in a raw blob could break precedence across a guarded
+    // clause set, so it never gets `&`-appended to one. Expert-only.
+    if (hasRaw) {
+      buddyCatchFilters.push({
+        buddyName: b.name,
+        prefix,
+        formKey: "raw",
+        label: `${b.name} · ${tFn("app.buddy_catch.raw_label")}`,
+        filter: rawAppend,
+        clauses: [{ clause: rawAppend, why: tFn("app.buddy_catch.raw_why") }],
+        raw: true,
+      });
+    }
   }
 
   // ── HUNDO-SORT ─────────────────────────────────────────────────────────
@@ -3116,11 +3246,14 @@ function BuddyCatchSection({ buddyCatchFilters, copied, onCopy }) {
         <span className="text-[#8090A0] normal-case">· {t("app.buddy_catch.section_subtitle")}</span>
       </div>
       {buddyCatchFilters.map(b => {
-        const key = `buddyCatch:${b.prefix}`;
+        // A buddy can now emit multiple lines (shared selector + one per form +
+        // optional raw), so the key/copy-id must include formKey to stay unique.
+        const uid = b.formKey ? `${b.prefix}-${b.formKey}` : b.prefix;
+        const key = `buddyCatch:${uid}`;
         return (
           <FilterBox
-            key={b.prefix}
-            label={t("app.buddy_catch.filter_label", { params: { name: b.buddyName } })}
+            key={uid}
+            label={b.label || t("app.buddy_catch.filter_label", { params: { name: b.buddyName } })}
             accent="#E67E22"
             filterStr={b.filter}
             copied={copied[key]}
@@ -4146,7 +4279,9 @@ function RawClausesPanel({ trashClauses, tradeClauses, sortClauses, luckySortCla
         <ClauseList title={t("app.clauses.gift_title")} accent="#27AE60" clauses={giftClauses} />
       )}
       {buddyCatchFilters && buddyCatchFilters.length > 0 && buddyCatchFilters.map(b => (
-        <ClauseList key={`catch:${b.prefix}`} title={t("app.buddy_catch.filter_label", { params: { name: b.buddyName } })} accent="#E67E22" clauses={b.clauses} />
+        <ClauseList key={`catch:${b.formKey ? `${b.prefix}-${b.formKey}` : b.prefix}`}
+          title={b.label || t("app.buddy_catch.filter_label", { params: { name: b.buddyName } })}
+          accent="#E67E22" clauses={b.clauses} />
       ))}
     </div>
   );
@@ -4614,6 +4749,7 @@ function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks =
         <>
           <BuddyEventsEditor
             buddies={(config.buddies || []).filter(b => b.active !== false)}
+            expertMode={!!config.expertMode}
             onUpdateBuddy={(id, partial) => {
               const all = config.buddies || [];
               set("buddies", all.map(b => b.id === id ? { ...b, ...partial } : b));
@@ -5983,7 +6119,7 @@ function BuddyManager({ buddies, onChange }) {
     const id = tagPrefix.toLowerCase() + "-" + Date.now().toString(36);
     onChange([
       ...buddies,
-      { id, name, tagPrefix, targetSpecies: [], wantsTradeEvos: false, active: true },
+      { id, name, tagPrefix, targetSpecies: [], wantsTradeEvos: false, rawAppend: "", active: true },
     ]);
     setNewName("");
   }
@@ -6074,7 +6210,7 @@ function BuddyManager({ buddies, onChange }) {
 
 // ─── BUDDY EVENTS EDITOR (in Step 2) ───────────────────────────────────────
 
-function BuddyEventsEditor({ buddies, onUpdateBuddy }) {
+function BuddyEventsEditor({ buddies, onUpdateBuddy, expertMode }) {
   const { t } = useTranslation();
   const filterName = t("app.buddy_events.section_help_filter_name");
   return (
@@ -6096,6 +6232,7 @@ function BuddyEventsEditor({ buddies, onUpdateBuddy }) {
           <BuddyTargetsRow
             key={b.id}
             buddy={b}
+            expertMode={expertMode}
             onChange={partial => onUpdateBuddy(b.id, partial)}
           />
         ))}
@@ -6104,10 +6241,15 @@ function BuddyEventsEditor({ buddies, onUpdateBuddy }) {
   );
 }
 
-function BuddyTargetsRow({ buddy, onChange }) {
-  const { t } = useTranslation();
+function BuddyTargetsRow({ buddy, onChange, expertMode }) {
+  const { t, locale } = useTranslation();
   const [input, setInput] = useState("");
+  // targetSpecies entries are structured Targets { species, expand, type }.
   const targets = buddy.targetSpecies || [];
+
+  // Localized type names for the form picker (semantic key → display word).
+  const typeNames = pogoKeywords(locale).type;
+  const allTypeKeys = Object.keys(typeNames).sort((a, b) => typeNames[a].localeCompare(typeNames[b]));
 
   const previewTokens = useMemo(() => {
     return input.split(/[,;\s]+/).filter(Boolean).map(tok => ({
@@ -6115,26 +6257,47 @@ function BuddyTargetsRow({ buddy, onChange }) {
       info: resolveSpeciesInfo(tok),
     }));
   }, [input]);
+  // A token is "new" only if there is no plain (type-less) target for it yet —
+  // addAll only ever adds plain targets; form variants are added per-chip.
+  const hasPlain = (name) => targets.some(x => x.species === name && !x.type);
   const resolved = previewTokens.filter(p => p.info);
-  const newResolved = resolved.filter(p => !targets.includes(p.info.names.de.toLowerCase()));
-  const dupes = resolved.filter(p => targets.includes(p.info.names.de.toLowerCase()));
+  const newResolved = resolved.filter(p => !hasPlain(p.info.names.de.toLowerCase()));
+  const dupes = resolved.filter(p => hasPlain(p.info.names.de.toLowerCase()));
   const unresolved = previewTokens.filter(p => !p.info);
 
+  const keyOf = (tg) => `${tg.species}|${tg.type || ""}`;
   function addAll() {
     const tokens = input.split(/[,;\s]+/).filter(Boolean);
     if (tokens.length === 0) return;
-    const set = new Set(targets);
+    const map = new Map(targets.map(tg => [keyOf(tg), tg]));
     const remaining = [];
     for (const tok of tokens) {
       const r = resolveSpecies(tok);
-      if (r) set.add(r);
-      else remaining.push(tok);
+      if (r) {
+        const nt = { species: r, expand: false, type: null };
+        if (!map.has(keyOf(nt))) map.set(keyOf(nt), nt);
+      } else remaining.push(tok);
     }
-    onChange({ targetSpecies: [...set].sort() });
+    const next = [...map.values()].sort((a, b) =>
+      a.species.localeCompare(b.species) || (a.type || "").localeCompare(b.type || ""));
+    onChange({ targetSpecies: next });
     setInput(remaining.join(", "));
   }
-  function remove(name) {
-    onChange({ targetSpecies: targets.filter(n => n !== name) });
+  function updateAt(i, patch) {
+    const next = targets.map((tg, idx) => idx === i ? { ...tg, ...patch } : tg);
+    // An edit (e.g. setting a type) can collide with an existing target —
+    // collapse duplicate (species|type) keys so we never emit two identical
+    // form lines (which would also clash on formKey).
+    const seen = new Set();
+    onChange({ targetSpecies: next.filter(tg => {
+      const k = keyOf(tg);
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    }) });
+  }
+  function removeAt(i) {
+    onChange({ targetSpecies: targets.filter((_, idx) => idx !== i) });
   }
 
   return (
@@ -6161,17 +6324,53 @@ function BuddyTargetsRow({ buddy, onChange }) {
       </label>
 
       {targets.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {targets.map(sp => (
-            <span key={sp}
-              className="chip-enter mono text-[11px] bg-[#E67E22]/15 text-[#E67E22] border border-[#E67E22]/40 pl-2 pr-1 py-0.5 rounded flex items-center gap-1.5 group">
-              {sp}
-              <button onClick={() => remove(sp)}
-                className="opacity-50 group-hover:opacity-100 hover:text-[#FF6B5B] transition">
-                <X size={10} />
-              </button>
-            </span>
-          ))}
+        <div className="flex flex-col gap-1.5">
+          {targets.map((tg, i) => {
+            const knownTypes = [...(SPECIES_FORM_TYPES.get(tg.species) || [])]
+              .sort((a, b) => typeNames[a].localeCompare(typeNames[b]));
+            const knownSet = new Set(knownTypes);
+            return (
+              <div key={keyOf(tg)}
+                className="chip-enter mono text-[11px] bg-[#E67E22]/10 border border-[#E67E22]/30 rounded px-2 py-1 flex items-center gap-2 flex-wrap group">
+                <span className="text-[#E6EDF3]">{capFirst(tg.species)}</span>
+                {/* Family-expansion toggle: exact species vs entire +family. */}
+                <button
+                  onClick={() => updateAt(i, { expand: !tg.expand })}
+                  title={t("app.buddy_targets.expand_toggle_title")}
+                  className={`text-[10px] px-1.5 py-0.5 rounded border transition ${
+                    tg.expand
+                      ? "bg-[#E67E22]/25 border-[#E67E22]/50 text-[#E67E22]"
+                      : "bg-transparent border-[#2D3A47] text-[#8090A0] hover:text-[#E6EDF3]"
+                  }`}>
+                  {tg.expand ? t("app.buddy_targets.expand_family") : t("app.buddy_targets.expand_exact")}
+                </button>
+                {/* Form picker: known regional-form types first, then all 18. */}
+                <select
+                  value={tg.type || ""}
+                  onChange={e => updateAt(i, { type: e.target.value || null })}
+                  title={t("app.buddy_targets.type_label")}
+                  className="text-[10px] bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none rounded px-1 py-0.5 text-[#E6EDF3]">
+                  <option value="">{t("app.buddy_targets.type_none")}</option>
+                  {knownTypes.length > 0 && (
+                    <optgroup label={t("app.buddy_targets.type_known_forms")}>
+                      {knownTypes.map(tk => (
+                        <option key={tk} value={tk}>{capFirst(typeNames[tk])}</option>
+                      ))}
+                    </optgroup>
+                  )}
+                  <optgroup label={t("app.buddy_targets.type_all")}>
+                    {allTypeKeys.filter(tk => !knownSet.has(tk)).map(tk => (
+                      <option key={tk} value={tk}>{capFirst(typeNames[tk])}</option>
+                    ))}
+                  </optgroup>
+                </select>
+                <button onClick={() => removeAt(i)}
+                  className="ml-auto opacity-50 group-hover:opacity-100 hover:text-[#FF6B5B] transition text-[#E67E22]">
+                  <X size={10} />
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -6203,7 +6402,7 @@ function BuddyTargetsRow({ buddy, onChange }) {
                   ✗ {tok.input}
                 </span>
               );
-              const isDupe = targets.includes(tok.info.names.de.toLowerCase());
+              const isDupe = hasPlain(tok.info.names.de.toLowerCase());
               const labelByType = { number: "#", en: "EN", de: "DE", es: "ES", fr: "FR", "zh-TW": "ZH", hi: "HI", ja: "JA" };
               return (
                 <span key={i}
@@ -6217,6 +6416,22 @@ function BuddyTargetsRow({ buddy, onChange }) {
               );
             })}
           </div>
+        </div>
+      )}
+
+      {/* Expert escape hatch: a verbatim, UNGUARDED filter line for this buddy. */}
+      {expertMode && (
+        <div className="border-t border-[#1F2933] pt-2 space-y-1">
+          <label className="mono text-[10px] uppercase tracking-wider text-[#8090A0]">
+            {t("app.buddy_targets.raw_label")}
+          </label>
+          <input
+            type="text"
+            value={buddy.rawAppend || ""}
+            onChange={e => onChange({ rawAppend: e.target.value })}
+            placeholder={t("app.buddy_targets.raw_placeholder")}
+            className="mono text-xs w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1 rounded text-[#E6EDF3] placeholder:text-[#8090A0]" />
+          <p className="mono text-[10px] text-[#8090A0] leading-relaxed">{t("app.buddy_targets.raw_help")}</p>
         </div>
       )}
     </div>
