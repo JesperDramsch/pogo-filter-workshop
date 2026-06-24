@@ -1,12 +1,12 @@
 {
-  "fetchedAt": "2026-06-24T13:36:45.996Z",
+  "fetchedAt": "2026-06-24T14:07:09.617Z",
   "species": {
     "19": {
       "name": "Rattata",
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [],
           "exclude": [
             "dark"
@@ -27,7 +27,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [],
           "exclude": [
             "dark"
@@ -48,7 +48,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [],
           "exclude": [
             "psychic"
@@ -69,7 +69,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "ground"
           ],
@@ -90,7 +90,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "ground"
           ],
@@ -111,7 +111,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "fire"
           ],
@@ -132,7 +132,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "fire"
           ],
@@ -153,7 +153,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [],
           "exclude": [
             "steel"
@@ -174,7 +174,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [],
           "exclude": [
             "steel"
@@ -195,7 +195,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "normal"
           ],
@@ -224,7 +224,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "normal"
           ],
@@ -245,7 +245,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [],
           "exclude": [
             "rock"
@@ -266,7 +266,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [],
           "exclude": [
             "rock"
@@ -287,7 +287,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "ground"
           ],
@@ -308,7 +308,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "ground"
           ],
@@ -329,7 +329,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "ground"
           ],
@@ -350,7 +350,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "fire"
           ],
@@ -371,7 +371,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "fire"
           ],
@@ -392,7 +392,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "water"
           ],
@@ -413,7 +413,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "water"
           ],
@@ -434,7 +434,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "normal"
           ],
@@ -455,7 +455,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [],
           "exclude": [
             "dark"
@@ -476,7 +476,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [],
           "exclude": [
             "dark"
@@ -497,7 +497,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [],
           "exclude": [
             "grass"
@@ -518,7 +518,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [],
           "exclude": [
             "grass"
@@ -539,7 +539,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "psychic"
           ],
@@ -560,7 +560,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "ground"
           ],
@@ -581,7 +581,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [],
           "exclude": [
             "fairy"
@@ -602,7 +602,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "fairy"
           ],
@@ -623,7 +623,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "normal"
           ],
@@ -666,7 +666,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "ice"
           ],
@@ -687,7 +687,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "electric"
           ],
@@ -708,7 +708,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kanto",
           "include": [
             "fire"
           ],
@@ -729,7 +729,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "johto",
           "include": [],
           "exclude": [
             "ghost"
@@ -750,7 +750,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "johto",
           "include": [
             "water"
           ],
@@ -771,7 +771,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "johto",
           "include": [
             "water"
           ],
@@ -792,7 +792,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "johto",
           "include": [
             "water"
           ],
@@ -813,7 +813,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "johto",
           "include": [
             "dark"
           ],
@@ -834,7 +834,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "johto",
           "include": [
             "water"
           ],
@@ -855,7 +855,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "hoenn",
           "include": [],
           "exclude": [
             "dark"
@@ -876,7 +876,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "hoenn",
           "include": [],
           "exclude": [
             "dark"
@@ -897,7 +897,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "unova",
           "include": [],
           "exclude": [
             "dark"
@@ -918,7 +918,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "unova",
           "include": [],
           "exclude": [
             "fighting"
@@ -939,7 +939,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "unova",
           "include": [
             "fire"
           ],
@@ -960,7 +960,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "unova",
           "include": [],
           "exclude": [
             "ground"
@@ -981,7 +981,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "unova",
           "include": [
             "dark"
           ],
@@ -1002,7 +1002,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "unova",
           "include": [
             "dark"
           ],
@@ -1023,7 +1023,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "unova",
           "include": [
             "electric"
           ],
@@ -1044,7 +1044,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "unova",
           "include": [
             "normal"
           ],
@@ -1065,7 +1065,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "kalos",
           "include": [],
           "exclude": [
             "rock"
@@ -1086,7 +1086,7 @@
       "forms": [
         {
           "key": "base",
-          "region": "base",
+          "region": "alola",
           "include": [
             "ghost"
           ],

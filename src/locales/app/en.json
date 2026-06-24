@@ -941,5 +941,11 @@
   "app.buddy_targets.form_variant.blaze": "Blaze",
   "app.buddy_targets.form_variant.aqua": "Aqua",
   "app.buddy_targets.forms_help": "Catches all regional forms by default — click a form to stop catching it for this buddy. Hidden for species with no regional forms.",
-  "app.clause_why.buddy_drop_form": "excludes the {region} form"
+  "app.clause_why.buddy_drop_form": "excludes the {region} form",
+  "app.buddy_targets.form_region.kanto": "Kanto",
+  "app.buddy_targets.form_region.johto": "Johto",
+  "app.buddy_targets.form_region.hoenn": "Hoenn",
+  "app.buddy_targets.form_region.sinnoh": "Sinnoh",
+  "app.buddy_targets.form_region.unova": "Unova",
+  "app.buddy_targets.form_region.kalos": "Kalos"
 }

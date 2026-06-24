@@ -25,10 +25,10 @@ const OUT_PATH = resolve(DATA_DIR, "regional-forms.json");
 
 const TYPES_URL = "https://pogoapi.net/api/v1/pokemon_types.json";
 
-// Region label + stable key + render order from a pogoapi `form` string. Returns
-// null for non-regional forms (costumes, weather, Unown letters, Deoxys, …) so
-// they're filtered out — only true regional variants reach the picker.
-const REGION_ORDER = { base: 0, alola: 1, galar: 2, hisui: 3, paldea: 4 };
+// Stable form key + region from a pogoapi `form` string. Returns null for
+// non-regional forms (costumes, weather, Unown letters, Deoxys, …) so they're
+// filtered out — only true regional variants reach the picker. The base form's
+// region is overwritten with its origin region (from dex) in buildCatalog.
 function regionForForm(form) {
   if (form === "Normal") return { key: "base", region: "base" };
   if (form === "Alola") return { key: "alola", region: "alola" };
@@ -40,6 +40,22 @@ function regionForForm(form) {
     return { key: `paldea:${variant}`, region: "paldea", variant };
   }
   return null;
+}
+
+// Render order: the base/origin form first, then the regional variants.
+const REGION_ORDER = { alola: 1, galar: 2, hisui: 3, paldea: 4 };
+const formOrder = (f) => (f.key === "base" ? 0 : (REGION_ORDER[f.region] ?? 9));
+
+// Base-form region = the species' origin generation's region (National Dex
+// ranges), so the picker shows "Kanto Meowth", "Johto Typhlosion", "Alola
+// Decidueye" instead of a generic "Base".
+const GEN_REGIONS = [
+  [151, "kanto"], [251, "johto"], [386, "hoenn"], [493, "sinnoh"],
+  [649, "unova"], [721, "kalos"], [809, "alola"], [905, "galar"], [1025, "paldea"],
+];
+function originRegion(dex) {
+  for (const [max, region] of GEN_REGIONS) if (dex <= max) return region;
+  return "base";
 }
 
 async function fetchJson(url) {
@@ -104,7 +120,7 @@ function buildCatalog(rows) {
     names.set(dex, row.pokemon_name);
     byDex.get(dex).set(reg.key, {
       key: reg.key,
-      region: reg.region,
+      region: reg.key === "base" ? originRegion(dex) : reg.region,
       ...(reg.variant ? { variant: reg.variant } : {}),
       types: new Set(row.type.map(t => t.toLowerCase())),
     });
@@ -114,8 +130,9 @@ function buildCatalog(rows) {
   let indistinctCount = 0;
   for (const [dex, formMap] of byDex) {
     const forms = [...formMap.values()];
-    // Need at least two forms AND at least one non-base form to be worth a picker.
-    if (forms.length < 2 || !forms.some(f => f.region !== "base")) continue;
+    // Need at least two forms AND at least one non-base form to be worth a
+    // picker. Guard on key, not region (base region is now an origin region).
+    if (forms.length < 2 || !forms.some(f => f.key !== "base")) continue;
 
     let indistinct = false;
     const out = [];
@@ -137,7 +154,7 @@ function buildCatalog(rows) {
       continue;
     }
     out.sort((a, b) =>
-      (REGION_ORDER[a.region] - REGION_ORDER[b.region]) ||
+      (formOrder(a) - formOrder(b)) ||
       (a.variant || "").localeCompare(b.variant || ""));
     species[String(dex)] = { name: names.get(dex), forms: out };
   }
@@ -162,6 +179,9 @@ function validate(species) {
     ["Raichu base",    () => check(26, "base", [], ["psychic"])],
     ["Slowpoke galar", () => check(79, "galar", [], ["water"])],
     ["Growlithe hisui",() => check(58, "hisui", ["rock"], [])],
+    ["Meowth base region",    () => find(52, "base")?.region === "kanto"],
+    ["Typhlosion base region",() => find(157, "base")?.region === "johto"],
+    ["Decidueye base region", () => find(724, "base")?.region === "alola"],
   ];
   const failures = checks.filter(([, fn]) => !fn()).map(([name]) => name);
   if (failures.length) {
