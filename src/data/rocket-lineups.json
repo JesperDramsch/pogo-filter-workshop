@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-06T10:27:54.351Z",
+  "fetchedAt": "2026-06-25T11:08:30.424Z",
   "trainers": [
     {
       "name": "Giovanni",
@@ -34,16 +34,17 @@
               ]
             },
             {
-              "name": "Machamp",
-              "types": [
-                "fighting"
-              ]
-            },
-            {
               "name": "Rhyperior",
               "types": [
                 "ground",
                 "rock"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
               ]
             }
           ],
@@ -51,39 +52,38 @@
             "fighting",
             "ground",
             "ghost",
-            "grass",
-            "psychic",
-            "fairy"
+            "grass"
           ],
           "seMoveTypes": [
             "fighting",
-            "flying",
             "ground",
             "steel",
             "water",
             "grass",
-            "psychic",
-            "ice",
-            "fairy"
+            "ice"
           ]
         },
         {
           "slot": 3,
           "pokemons": [
             {
-              "name": "Landorus (Incarnate)",
+              "name": "Reshiram",
               "types": [
-                "ground",
-                "flying"
+                "dragon",
+                "fire"
               ]
             }
           ],
           "resistorTypes": [
-            "flying"
+            "rock",
+            "fire",
+            "water",
+            "fairy"
           ],
           "seMoveTypes": [
-            "water",
-            "ice"
+            "ground",
+            "rock",
+            "dragon"
           ]
         }
       ]
@@ -96,8 +96,42 @@
           "slot": 1,
           "pokemons": [
             {
+              "name": "Axew",
+              "types": [
+                "dragon"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "steel",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "ice",
+            "dragon",
+            "fairy"
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
               "name": "Snorlax",
               "types": [
+                "normal"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
                 "normal"
               ]
             }
@@ -109,49 +143,6 @@
           ],
           "seMoveTypes": [
             "fighting"
-          ]
-        },
-        {
-          "slot": 2,
-          "pokemons": [
-            {
-              "name": "Gardevoir",
-              "types": [
-                "psychic",
-                "fairy"
-              ]
-            },
-            {
-              "name": "Golurk",
-              "types": [
-                "ground",
-                "ghost"
-              ]
-            },
-            {
-              "name": "Galarian Weezing",
-              "types": [
-                "poison",
-                "fairy"
-              ]
-            }
-          ],
-          "resistorTypes": [
-            "normal",
-            "flying",
-            "ground",
-            "bug"
-          ],
-          "seMoveTypes": [
-            "poison",
-            "ground",
-            "ghost",
-            "steel",
-            "water",
-            "grass",
-            "psychic",
-            "ice",
-            "dark"
           ]
         },
         {
@@ -207,25 +198,26 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Pineco",
+              "name": "Tyrunt",
               "types": [
-                "bug"
+                "rock",
+                "dragon"
               ]
             }
           ],
           "resistorTypes": [
             "fighting",
-            "flying",
-            "poison",
-            "ghost",
+            "ground",
             "steel",
-            "fire",
             "fairy"
           ],
           "seMoveTypes": [
-            "flying",
-            "rock",
-            "fire"
+            "fighting",
+            "ground",
+            "steel",
+            "ice",
+            "dragon",
+            "fairy"
           ]
         },
         {
@@ -239,9 +231,10 @@
               ]
             },
             {
-              "name": "Gigalith",
+              "name": "Golurk",
               "types": [
-                "rock"
+                "ground",
+                "ghost"
               ]
             },
             {
@@ -253,9 +246,11 @@
             }
           ],
           "resistorTypes": [
+            "normal",
+            "flying",
+            "bug",
             "water",
             "grass",
-            "psychic",
             "dragon",
             "dark"
           ],
@@ -264,24 +259,17 @@
             "ground",
             "bug",
             "ghost",
-            "steel",
             "fire",
             "water",
             "grass",
             "electric",
+            "ice",
             "dark"
           ]
         },
         {
           "slot": 3,
           "pokemons": [
-            {
-              "name": "Scizor",
-              "types": [
-                "bug",
-                "steel"
-              ]
-            },
             {
               "name": "Alakazam",
               "types": [
@@ -293,6 +281,13 @@
               "types": [
                 "fire",
                 "flying"
+              ]
+            },
+            {
+              "name": "Scizor",
+              "types": [
+                "bug",
+                "steel"
               ]
             }
           ],
@@ -324,31 +319,30 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Duskull",
+              "name": "Amaura",
               "types": [
-                "ghost"
+                "rock",
+                "ice"
               ]
             }
           ],
           "resistorTypes": [
-            "normal",
-            "dark"
+            "fighting",
+            "steel",
+            "water"
           ],
           "seMoveTypes": [
-            "ghost",
-            "dark"
+            "fighting",
+            "ground",
+            "rock",
+            "steel",
+            "water",
+            "grass"
           ]
         },
         {
           "slot": 2,
           "pokemons": [
-            {
-              "name": "Ferrothorn",
-              "types": [
-                "grass",
-                "steel"
-              ]
-            },
             {
               "name": "Blastoise",
               "types": [
@@ -360,6 +354,13 @@
               "types": [
                 "ground",
                 "dragon"
+              ]
+            },
+            {
+              "name": "Ferrothorn",
+              "types": [
+                "grass",
+                "steel"
               ]
             }
           ],
@@ -389,34 +390,34 @@
               ]
             },
             {
-              "name": "Steelix",
+              "name": "Placeholder",
               "types": [
-                "steel",
-                "ground"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Milotic",
+              "name": "Placeholder",
               "types": [
-                "water"
+                "normal",
+                "normal"
               ]
             }
           ],
           "resistorTypes": [
             "fighting",
-            "flying",
+            "rock",
+            "fire",
             "water",
             "dragon",
-            "dark"
+            "dark",
+            "fairy"
           ],
           "seMoveTypes": [
             "fighting",
             "ground",
             "rock",
-            "fire",
-            "water",
-            "grass",
-            "electric"
+            "water"
           ]
         }
       ]
@@ -430,23 +431,22 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Stufful",
-              "types": [
-                "normal",
-                "fighting"
-              ]
-            },
-            {
-              "name": "Meowth",
+              "name": "Teddiursa",
               "types": [
                 "normal"
               ]
             },
             {
-              "name": "Swablu",
+              "name": "Hoothoot",
               "types": [
                 "normal",
                 "flying"
+              ]
+            },
+            {
+              "name": "Porygon",
+              "types": [
+                "normal"
               ]
             }
           ]
@@ -455,9 +455,16 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Teddiursa",
+              "name": "Loudred",
               "types": [
                 "normal"
+              ]
+            },
+            {
+              "name": "Stufful",
+              "types": [
+                "normal",
+                "fighting"
               ]
             },
             {
@@ -466,18 +473,18 @@
                 "normal",
                 "flying"
               ]
-            },
-            {
-              "name": "Loudred",
-              "types": [
-                "normal"
-              ]
             }
           ]
         },
         {
           "slot": 3,
           "pokemons": [
+            {
+              "name": "Ursaring",
+              "types": [
+                "normal"
+              ]
+            },
             {
               "name": "Swellow",
               "types": [
@@ -487,12 +494,6 @@
             },
             {
               "name": "Kangaskhan",
-              "types": [
-                "normal"
-              ]
-            },
-            {
-              "name": "Ursaring",
               "types": [
                 "normal"
               ]
@@ -522,22 +523,22 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Vulpix",
+              "name": "Ponyta",
               "types": [
                 "fire"
               ]
             },
             {
-              "name": "Litwick",
+              "name": "Torchic",
               "types": [
-                "ghost",
                 "fire"
               ]
             },
             {
-              "name": "Fennekin",
+              "name": "Placeholder",
               "types": [
-                "fire"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -546,22 +547,24 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Magmar",
-              "types": [
-                "fire"
-              ]
-            },
-            {
-              "name": "Numel",
+              "name": "Blaziken",
               "types": [
                 "fire",
-                "ground"
+                "fighting"
               ]
             },
             {
-              "name": "Braixen",
+              "name": "Placeholder",
               "types": [
-                "fire"
+                "normal",
+                "normal"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -576,29 +579,34 @@
               ]
             },
             {
-              "name": "Darmanitan",
+              "name": "Placeholder",
               "types": [
-                "fire"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Delphox",
+              "name": "Placeholder",
               "types": [
-                "fire",
-                "psychic"
+                "normal",
+                "normal"
               ]
             }
           ]
         }
       ],
       "resistorTypes": [
-        "normal",
         "flying",
+        "poison",
+        "ghost",
+        "fire",
         "water",
+        "psychic",
         "dragon",
-        "dark"
+        "fairy"
       ],
       "seMoveTypes": [
+        "fighting",
         "ground",
         "rock",
         "water"
@@ -614,7 +622,7 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Froakie",
+              "name": "Mudkip",
               "types": [
                 "water"
               ]
@@ -626,10 +634,10 @@
               ]
             },
             {
-              "name": "Dewpider",
+              "name": "Placeholder",
               "types": [
-                "water",
-                "bug"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -638,23 +646,24 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Carvanha",
+              "name": "Sharpedo",
               "types": [
                 "water",
                 "dark"
               ]
             },
             {
-              "name": "Frogadier",
+              "name": "Placeholder",
               "types": [
-                "water"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Tentacool",
+              "name": "Placeholder",
               "types": [
-                "water",
-                "poison"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -670,17 +679,17 @@
               ]
             },
             {
-              "name": "Walrein",
+              "name": "Placeholder",
               "types": [
-                "ice",
-                "water"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Tentacruel",
+              "name": "Placeholder",
               "types": [
-                "water",
-                "poison"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -688,13 +697,16 @@
       ],
       "resistorTypes": [
         "fighting",
-        "poison",
         "steel",
         "water",
-        "ice"
+        "grass",
+        "dragon",
+        "dark",
+        "fairy"
       ],
       "seMoveTypes": [
         "electric",
+        "fighting",
         "grass"
       ],
       "lineupSize": 9
@@ -766,22 +778,23 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Helioptile",
+              "name": "Shinx",
               "types": [
-                "electric",
+                "electric"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
                 "normal"
               ]
             },
             {
-              "name": "Voltorb",
+              "name": "Placeholder",
               "types": [
-                "electric"
-              ]
-            },
-            {
-              "name": "Shinx",
-              "types": [
-                "electric"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -790,22 +803,23 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Electabuzz",
-              "types": [
-                "electric"
-              ]
-            },
-            {
               "name": "Voltorb",
               "types": [
                 "electric"
               ]
             },
             {
-              "name": "Alolan Geodude",
+              "name": "Placeholder",
               "types": [
-                "rock",
-                "electric"
+                "normal",
+                "normal"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -820,33 +834,33 @@
               ]
             },
             {
-              "name": "Galvantula",
+              "name": "Placeholder",
               "types": [
-                "bug",
-                "electric"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Ampharos",
+              "name": "Placeholder",
               "types": [
-                "electric"
+                "normal",
+                "normal"
               ]
             }
           ]
         }
       ],
       "resistorTypes": [
-        "fighting",
-        "poison",
         "ground",
         "rock",
         "ghost",
         "steel",
+        "grass",
         "electric",
-        "dragon",
-        "fairy"
+        "dragon"
       ],
       "seMoveTypes": [
+        "fighting",
         "ground"
       ],
       "lineupSize": 9
@@ -860,22 +874,22 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Chespin",
+              "name": "Treecko",
               "types": [
                 "grass"
               ]
             },
             {
-              "name": "Morelull",
+              "name": "Tangela",
               "types": [
-                "grass",
-                "fairy"
+                "grass"
               ]
             },
             {
-              "name": "Cacnea",
+              "name": "Placeholder",
               "types": [
-                "grass"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -884,6 +898,13 @@
           "slot": 2,
           "pokemons": [
             {
+              "name": "Morelull",
+              "types": [
+                "grass",
+                "fairy"
+              ]
+            },
+            {
               "name": "Phantump",
               "types": [
                 "ghost",
@@ -891,16 +912,10 @@
               ]
             },
             {
-              "name": "Lileep",
+              "name": "Placeholder",
               "types": [
-                "rock",
-                "grass"
-              ]
-            },
-            {
-              "name": "Quilladin",
-              "types": [
-                "grass"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -909,16 +924,8 @@
           "slot": 3,
           "pokemons": [
             {
-              "name": "Chesnaught",
+              "name": "Sceptile",
               "types": [
-                "grass",
-                "fighting"
-              ]
-            },
-            {
-              "name": "Cradily",
-              "types": [
-                "rock",
                 "grass"
               ]
             },
@@ -928,12 +935,22 @@
                 "ghost",
                 "grass"
               ]
+            },
+            {
+              "name": "Chesnaught",
+              "types": [
+                "grass",
+                "fighting"
+              ]
             }
           ]
         }
       ],
       "resistorTypes": [
+        "flying",
         "poison",
+        "bug",
+        "fire",
         "grass",
         "fairy"
       ],
@@ -955,24 +972,23 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Spheal",
+              "name": "Seel",
               "types": [
-                "ice",
                 "water"
               ]
             },
             {
-              "name": "Swinub",
+              "name": "Delibird",
               "types": [
                 "ice",
-                "ground"
+                "flying"
               ]
             },
             {
-              "name": "Sneasel",
+              "name": "Spheal",
               "types": [
-                "dark",
-                "ice"
+                "ice",
+                "water"
               ]
             }
           ]
@@ -981,6 +997,13 @@
           "slot": 2,
           "pokemons": [
             {
+              "name": "Sealeo",
+              "types": [
+                "ice",
+                "water"
+              ]
+            },
+            {
               "name": "Froslass",
               "types": [
                 "ice",
@@ -988,17 +1011,10 @@
               ]
             },
             {
-              "name": "Alolan Ninetales",
+              "name": "Placeholder",
               "types": [
-                "ice",
-                "fairy"
-              ]
-            },
-            {
-              "name": "Sealeo",
-              "types": [
-                "ice",
-                "water"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1006,12 +1022,6 @@
         {
           "slot": 3,
           "pokemons": [
-            {
-              "name": "Glalie",
-              "types": [
-                "ice"
-              ]
-            },
             {
               "name": "Aurorus",
               "types": [
@@ -1025,14 +1035,22 @@
                 "ice",
                 "ghost"
               ]
+            },
+            {
+              "name": "Glalie",
+              "types": [
+                "ice"
+              ]
             }
           ]
         }
       ],
       "resistorTypes": [
         "normal",
+        "steel",
         "water",
-        "fairy"
+        "electric",
+        "dark"
       ],
       "seMoveTypes": [
         "fighting",
@@ -1057,13 +1075,13 @@
               ]
             },
             {
-              "name": "Machop",
+              "name": "Mankey",
               "types": [
                 "fighting"
               ]
             },
             {
-              "name": "Mankey",
+              "name": "Machop",
               "types": [
                 "fighting"
               ]
@@ -1097,23 +1115,24 @@
           "slot": 3,
           "pokemons": [
             {
-              "name": "Annihilape",
+              "name": "Placeholder",
               "types": [
-                "fighting",
-                "ghost"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Conkeldurr",
+              "name": "Placeholder",
               "types": [
-                "fighting"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Infernape",
+              "name": "Placeholder",
               "types": [
-                "fire",
-                "fighting"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1122,9 +1141,9 @@
       "resistorTypes": [
         "flying",
         "poison",
-        "fire",
-        "water",
-        "dragon",
+        "bug",
+        "ghost",
+        "psychic",
         "fairy"
       ],
       "seMoveTypes": [
@@ -1143,13 +1162,6 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Oddish",
-              "types": [
-                "grass",
-                "poison"
-              ]
-            },
-            {
               "name": "Zubat",
               "types": [
                 "poison",
@@ -1162,6 +1174,13 @@
                 "water",
                 "poison"
               ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
+              ]
             }
           ]
         },
@@ -1169,22 +1188,23 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Nidorina",
-              "types": [
-                "poison"
-              ]
-            },
-            {
               "name": "Nidorino",
               "types": [
                 "poison"
               ]
             },
             {
-              "name": "Galarian Weezing",
+              "name": "Placeholder",
               "types": [
-                "poison",
-                "fairy"
+                "normal",
+                "normal"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1200,16 +1220,17 @@
               ]
             },
             {
-              "name": "Toxicroak",
+              "name": "Placeholder",
               "types": [
-                "poison",
-                "fighting"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Weezing",
+              "name": "Placeholder",
               "types": [
-                "poison"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1219,8 +1240,9 @@
         "flying",
         "poison",
         "ghost",
+        "steel",
         "electric",
-        "psychic"
+        "dragon"
       ],
       "seMoveTypes": [
         "ground",
@@ -1237,15 +1259,10 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Sandshrew",
+              "name": "Rhyhorn",
               "types": [
-                "ground"
-              ]
-            },
-            {
-              "name": "Trapinch",
-              "types": [
-                "ground"
+                "ground",
+                "rock"
               ]
             },
             {
@@ -1253,6 +1270,13 @@
               "types": [
                 "ground",
                 "flying"
+              ]
+            },
+            {
+              "name": "Golurk",
+              "types": [
+                "ground",
+                "ghost"
               ]
             }
           ]
@@ -1261,13 +1285,6 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Claydol",
-              "types": [
-                "ground",
-                "psychic"
-              ]
-            },
-            {
               "name": "Vibrava",
               "types": [
                 "ground",
@@ -1275,10 +1292,17 @@
               ]
             },
             {
-              "name": "Gligar",
+              "name": "Placeholder",
               "types": [
-                "ground",
-                "flying"
+                "normal",
+                "normal"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1287,13 +1311,6 @@
           "slot": 3,
           "pokemons": [
             {
-              "name": "Golurk",
-              "types": [
-                "ground",
-                "ghost"
-              ]
-            },
-            {
               "name": "Flygon",
               "types": [
                 "ground",
@@ -1301,9 +1318,17 @@
               ]
             },
             {
-              "name": "Hippowdon",
+              "name": "Placeholder",
               "types": [
-                "ground"
+                "normal",
+                "normal"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1311,11 +1336,12 @@
       ],
       "resistorTypes": [
         "normal",
-        "flying",
+        "ground",
         "dark",
         "fairy"
       ],
       "seMoveTypes": [
+        "fighting",
         "grass",
         "ice",
         "water"
@@ -1331,21 +1357,20 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Swablu",
-              "types": [
-                "normal",
-                "flying"
-              ]
-            },
-            {
-              "name": "Pidgey",
-              "types": [
-                "normal",
-                "flying"
-              ]
-            },
-            {
               "name": "Taillow",
+              "types": [
+                "normal",
+                "flying"
+              ]
+            },
+            {
+              "name": "Rookidee",
+              "types": [
+                "flying"
+              ]
+            },
+            {
+              "name": "Swablu",
               "types": [
                 "normal",
                 "flying"
@@ -1357,6 +1382,13 @@
           "slot": 2,
           "pokemons": [
             {
+              "name": "Scyther",
+              "types": [
+                "bug",
+                "flying"
+              ]
+            },
+            {
               "name": "Zubat",
               "types": [
                 "poison",
@@ -1364,17 +1396,10 @@
               ]
             },
             {
-              "name": "Gligar",
+              "name": "Placeholder",
               "types": [
-                "ground",
-                "flying"
-              ]
-            },
-            {
-              "name": "Scyther",
-              "types": [
-                "bug",
-                "flying"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1390,17 +1415,17 @@
               ]
             },
             {
-              "name": "Swanna",
-              "types": [
-                "water",
-                "flying"
-              ]
-            },
-            {
               "name": "Toucannon",
               "types": [
                 "normal",
                 "flying"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1408,8 +1433,13 @@
       ],
       "resistorTypes": [
         "flying",
+        "poison",
+        "ground",
+        "rock",
         "ghost",
-        "water"
+        "steel",
+        "fire",
+        "electric"
       ],
       "seMoveTypes": [
         "electric",
@@ -1427,6 +1457,12 @@
           "slot": 1,
           "pokemons": [
             {
+              "name": "Wobbuffet",
+              "types": [
+                "psychic"
+              ]
+            },
+            {
               "name": "Ralts",
               "types": [
                 "psychic",
@@ -1438,12 +1474,6 @@
               "types": [
                 "psychic"
               ]
-            },
-            {
-              "name": "Wobbuffet",
-              "types": [
-                "psychic"
-              ]
             }
           ]
         },
@@ -1451,21 +1481,23 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Duosion",
-              "types": [
-                "psychic"
-              ]
-            },
-            {
-              "name": "Drowzee",
-              "types": [
-                "psychic"
-              ]
-            },
-            {
               "name": "Wobbuffet",
               "types": [
                 "psychic"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1474,31 +1506,31 @@
           "slot": 3,
           "pokemons": [
             {
+              "name": "Malamar",
+              "types": [
+                "dark",
+                "psychic"
+              ]
+            },
+            {
               "name": "Reuniclus",
               "types": [
                 "psychic"
               ]
             },
             {
-              "name": "Gallade",
+              "name": "Placeholder",
               "types": [
-                "psychic",
-                "fighting"
-              ]
-            },
-            {
-              "name": "Malamar",
-              "types": [
-                "dark",
-                "psychic"
+                "normal",
+                "normal"
               ]
             }
           ]
         }
       ],
       "resistorTypes": [
-        "flying",
-        "bug",
+        "rock",
+        "steel",
         "fire",
         "fairy"
       ],
@@ -1518,22 +1550,23 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Venonat",
+              "name": "Weedle",
               "types": [
                 "bug",
                 "poison"
               ]
             },
             {
-              "name": "Shelmet",
+              "name": "Grubbin",
               "types": [
                 "bug"
               ]
             },
             {
-              "name": "Karrablast",
+              "name": "Placeholder",
               "types": [
-                "bug"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1542,23 +1575,24 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Pinsir",
-              "types": [
-                "bug"
-              ]
-            },
-            {
-              "name": "Dewpider",
-              "types": [
-                "water",
-                "bug"
-              ]
-            },
-            {
               "name": "Anorith",
               "types": [
                 "rock",
                 "bug"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1574,17 +1608,17 @@
               ]
             },
             {
-              "name": "Scizor",
+              "name": "Placeholder",
               "types": [
-                "bug",
-                "steel"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Scolipede",
+              "name": "Placeholder",
               "types": [
-                "bug",
-                "poison"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1593,6 +1627,8 @@
       "resistorTypes": [
         "fighting",
         "poison",
+        "ground",
+        "rock",
         "ghost",
         "steel",
         "electric",
@@ -1614,14 +1650,14 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Shuckle",
+              "name": "Onix",
               "types": [
-                "bug",
-                "rock"
+                "rock",
+                "ground"
               ]
             },
             {
-              "name": "Omanyte",
+              "name": "Kabuto",
               "types": [
                 "rock",
                 "water"
@@ -1639,17 +1675,17 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Graveler",
-              "types": [
-                "rock",
-                "ground"
-              ]
-            },
-            {
               "name": "Shieldon",
               "types": [
                 "rock",
                 "steel"
+              ]
+            },
+            {
+              "name": "Graveler",
+              "types": [
+                "rock",
+                "ground"
               ]
             },
             {
@@ -1664,13 +1700,6 @@
           "slot": 3,
           "pokemons": [
             {
-              "name": "Aurorus",
-              "types": [
-                "rock",
-                "ice"
-              ]
-            },
-            {
               "name": "Tyrantrum",
               "types": [
                 "rock",
@@ -1683,13 +1712,19 @@
                 "rock",
                 "ground"
               ]
+            },
+            {
+              "name": "Aurorus",
+              "types": [
+                "rock",
+                "ice"
+              ]
             }
           ]
         }
       ],
       "resistorTypes": [
         "fighting",
-        "ghost",
         "water"
       ],
       "seMoveTypes": [
@@ -1710,6 +1745,12 @@
           "slot": 1,
           "pokemons": [
             {
+              "name": "Duskull",
+              "types": [
+                "ghost"
+              ]
+            },
+            {
               "name": "Gastly",
               "types": [
                 "ghost",
@@ -1721,24 +1762,12 @@
               "types": [
                 "ghost"
               ]
-            },
-            {
-              "name": "Duskull",
-              "types": [
-                "ghost"
-              ]
             }
           ]
         },
         {
           "slot": 2,
           "pokemons": [
-            {
-              "name": "Dusclops",
-              "types": [
-                "ghost"
-              ]
-            },
             {
               "name": "Sableye",
               "types": [
@@ -1751,6 +1780,13 @@
               "types": [
                 "ghost"
               ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
+              ]
             }
           ]
         },
@@ -1758,23 +1794,24 @@
           "slot": 3,
           "pokemons": [
             {
-              "name": "Cofagrigus",
-              "types": [
-                "ghost"
-              ]
-            },
-            {
-              "name": "Gengar",
-              "types": [
-                "ghost",
-                "poison"
-              ]
-            },
-            {
               "name": "Froslass",
               "types": [
                 "ice",
                 "ghost"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1806,14 +1843,9 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Dratini",
+              "name": "Noibat",
               "types": [
-                "dragon"
-              ]
-            },
-            {
-              "name": "Bagon",
-              "types": [
+                "flying",
                 "dragon"
               ]
             },
@@ -1821,6 +1853,12 @@
               "name": "Deino",
               "types": [
                 "dark",
+                "dragon"
+              ]
+            },
+            {
+              "name": "Dratini",
+              "types": [
                 "dragon"
               ]
             }
@@ -1843,10 +1881,10 @@
               ]
             },
             {
-              "name": "Gabite",
+              "name": "Placeholder",
               "types": [
-                "dragon",
-                "ground"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1855,13 +1893,6 @@
           "slot": 3,
           "pokemons": [
             {
-              "name": "Salamence",
-              "types": [
-                "dragon",
-                "flying"
-              ]
-            },
-            {
               "name": "Dragonite",
               "types": [
                 "dragon",
@@ -1869,10 +1900,17 @@
               ]
             },
             {
-              "name": "Garchomp",
+              "name": "Placeholder",
               "types": [
-                "dragon",
-                "ground"
+                "normal",
+                "normal"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1880,6 +1918,10 @@
       ],
       "resistorTypes": [
         "flying",
+        "poison",
+        "steel",
+        "fire",
+        "electric",
         "dark",
         "fairy"
       ],
@@ -1899,10 +1941,10 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Alolan Rattata",
+              "name": "Carvanha",
               "types": [
-                "dark",
-                "normal"
+                "water",
+                "dark"
               ]
             },
             {
@@ -1912,10 +1954,10 @@
               ]
             },
             {
-              "name": "Carvanha",
+              "name": "Alolan Rattata",
               "types": [
-                "water",
-                "dark"
+                "dark",
+                "normal"
               ]
             }
           ]
@@ -1924,16 +1966,23 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Alolan Raticate",
+              "name": "Absol",
               "types": [
-                "dark",
+                "dark"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
                 "normal"
               ]
             },
             {
-              "name": "Mightyena",
+              "name": "Placeholder",
               "types": [
-                "dark"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1942,16 +1991,24 @@
           "slot": 3,
           "pokemons": [
             {
-              "name": "Liepard",
+              "name": "Placeholder",
               "types": [
-                "dark"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Hydreigon",
+              "name": "Placeholder",
               "types": [
-                "dark",
-                "dragon"
+                "normal",
+                "normal"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -1962,6 +2019,7 @@
         "steel",
         "water",
         "grass",
+        "dragon",
         "dark",
         "fairy"
       ],
@@ -1970,7 +2028,7 @@
         "fairy",
         "fighting"
       ],
-      "lineupSize": 7
+      "lineupSize": 9
     },
     {
       "name": "Steel-type Male Grunt",
@@ -1988,17 +2046,17 @@
               ]
             },
             {
-              "name": "Beldum",
-              "types": [
-                "steel",
-                "psychic"
-              ]
-            },
-            {
               "name": "Aron",
               "types": [
                 "steel",
                 "rock"
+              ]
+            },
+            {
+              "name": "Beldum",
+              "types": [
+                "steel",
+                "psychic"
               ]
             }
           ]
@@ -2007,24 +2065,24 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Skarmory",
+              "name": "Placeholder",
               "types": [
-                "steel",
-                "flying"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Metang",
+              "name": "Placeholder",
               "types": [
-                "steel",
-                "psychic"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Lairon",
+              "name": "Placeholder",
               "types": [
-                "steel",
-                "rock"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -2033,30 +2091,31 @@
           "slot": 3,
           "pokemons": [
             {
-              "name": "Alolan Sandslash",
+              "name": "Placeholder",
               "types": [
-                "ice",
-                "steel"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Probopass",
+              "name": "Placeholder",
               "types": [
-                "rock",
-                "steel"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Aggron",
+              "name": "Placeholder",
               "types": [
-                "steel",
-                "rock"
+                "normal",
+                "normal"
               ]
             }
           ]
         }
       ],
       "resistorTypes": [
+        "ghost",
         "steel",
         "water",
         "electric",
@@ -2079,22 +2138,23 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Snubbull",
-              "types": [
-                "fairy"
-              ]
-            },
-            {
               "name": "Alolan Vulpix",
               "types": [
                 "ice"
               ]
             },
             {
-              "name": "Ralts",
+              "name": "Placeholder",
               "types": [
-                "psychic",
-                "fairy"
+                "normal",
+                "normal"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -2110,16 +2170,17 @@
               ]
             },
             {
-              "name": "Snubbull",
+              "name": "Placeholder",
               "types": [
-                "fairy"
+                "normal",
+                "normal"
               ]
             },
             {
-              "name": "Galarian Weezing",
+              "name": "Placeholder",
               "types": [
-                "poison",
-                "fairy"
+                "normal",
+                "normal"
               ]
             }
           ]
@@ -2128,23 +2189,23 @@
           "slot": 3,
           "pokemons": [
             {
-              "name": "Alolan Ninetales",
-              "types": [
-                "ice",
-                "fairy"
-              ]
-            },
-            {
               "name": "Granbull",
               "types": [
                 "fairy"
               ]
             },
             {
-              "name": "Galarian Weezing",
+              "name": "Placeholder",
               "types": [
-                "poison",
-                "fairy"
+                "normal",
+                "normal"
+              ]
+            },
+            {
+              "name": "Placeholder",
+              "types": [
+                "normal",
+                "normal"
               ]
             }
           ]
