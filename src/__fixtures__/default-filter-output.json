@@ -14,11 +14,12 @@
     "megaEvolve": "megaevolve&mega1-2,evolvenew",
     "pilotLong": "distance1000-&!traded&!4*&!legendary&!mythical&!shiny",
     "raidFilters": {
-      "mega": {
-        "SCIZOR": "fighting,flying,poison,ghost,steel,fire,water,electric&@1fire&@2fire,@3fire&!<bug&!<steel"
+      "ultra_beast": {
+        "CELESTEELA": "steel,fire,water,electric&@1electric,@1fire&@2electric,@2fire,@3electric,@3fire&!<steel&!<flying",
+        "KARTANA": "flying,poison,bug,steel,fire,grass,electric,dragon&@1fire,@1fighting&@2fire,@2fighting,@3fire,@3fighting&!<grass&!<steel"
       },
-      "lvl5": {
-        "NECROZMA": "steel,psychic,dark&@1bug,@1dark,@1ghost&@2bug,@2dark,@2ghost,@3bug,@3dark,@3ghost&!<psychic"
+      "mega": {
+        "PIDGEOT": "rock,ghost,steel,electric&@1electric,@1ice,@1rock&@2electric,@2ice,@2rock,@3electric,@3ice,@3rock&!<normal&!<flying"
       },
       "lvl3": {
         "BRAVIARY": "rock,steel,electric,psychic,dark&@1dark,@1electric,@1ghost,@1ice,@1rock&@2dark,@2electric,@2ghost,@2ice,@2rock,@3dark,@3electric,@3ghost,@3ice,@3rock&!<psychic&!<flying",
@@ -118,11 +119,12 @@
     "megaEvolve": "megaentwicklung&mega1-2,neueentwicklung",
     "pilotLong": "entfernung1000-&!getauscht&!4*&!legendär&!mysteriös&!schillernd",
     "raidFilters": {
-      "mega": {
-        "SCIZOR": "kampf,flug,gift,geist,stahl,feuer,wasser,elektro&@1feuer&@2feuer,@3feuer&!<käfer&!<stahl"
+      "ultra_beast": {
+        "CELESTEELA": "stahl,feuer,wasser,elektro&@1elektro,@1feuer&@2elektro,@2feuer,@3elektro,@3feuer&!<stahl&!<flug",
+        "KARTANA": "flug,gift,käfer,stahl,feuer,pflanze,elektro,drache&@1feuer,@1kampf&@2feuer,@2kampf,@3feuer,@3kampf&!<pflanze&!<stahl"
       },
-      "lvl5": {
-        "NECROZMA": "stahl,psycho,unlicht&@1käfer,@1unlicht,@1geist&@2käfer,@2unlicht,@2geist,@3käfer,@3unlicht,@3geist&!<psycho"
+      "mega": {
+        "PIDGEOT": "gestein,geist,stahl,elektro&@1elektro,@1eis,@1gestein&@2elektro,@2eis,@2gestein,@3elektro,@3eis,@3gestein&!<normal&!<flug"
       },
       "lvl3": {
         "BRAVIARY": "gestein,stahl,elektro,psycho,unlicht&@1unlicht,@1elektro,@1geist,@1eis,@1gestein&@2unlicht,@2elektro,@2geist,@2eis,@2gestein,@3unlicht,@3elektro,@3geist,@3eis,@3gestein&!<psycho&!<flug",
@@ -222,11 +224,12 @@
     "megaEvolve": "megaevoluciona&mega1-2,nuevaevolución",
     "pilotLong": "distancia1000-&!intercambiados&!4*&!legendario&!singular&!variocolor",
     "raidFilters": {
-      "mega": {
-        "SCIZOR": "lucha,volador,veneno,fantasma,acero,fuego,agua,eléctrico&@1fuego&@2fuego,@3fuego&!<bicho&!<acero"
+      "ultra_beast": {
+        "CELESTEELA": "acero,fuego,agua,eléctrico&@1eléctrico,@1fuego&@2eléctrico,@2fuego,@3eléctrico,@3fuego&!<acero&!<volador",
+        "KARTANA": "volador,veneno,bicho,acero,fuego,planta,eléctrico,dragón&@1fuego,@1lucha&@2fuego,@2lucha,@3fuego,@3lucha&!<planta&!<acero"
       },
-      "lvl5": {
-        "NECROZMA": "acero,psíquico,siniestro&@1bicho,@1siniestro,@1fantasma&@2bicho,@2siniestro,@2fantasma,@3bicho,@3siniestro,@3fantasma&!<psíquico"
+      "mega": {
+        "PIDGEOT": "roca,fantasma,acero,eléctrico&@1eléctrico,@1hielo,@1roca&@2eléctrico,@2hielo,@2roca,@3eléctrico,@3hielo,@3roca&!<normal&!<volador"
       },
       "lvl3": {
         "BRAVIARY": "roca,acero,eléctrico,psíquico,siniestro&@1siniestro,@1eléctrico,@1fantasma,@1hielo,@1roca&@2siniestro,@2eléctrico,@2fantasma,@2hielo,@2roca,@3siniestro,@3eléctrico,@3fantasma,@3hielo,@3roca&!<psíquico&!<volador",
@@ -326,11 +329,12 @@
     "megaEvolve": "mégaévolue&méga1-2,nouvelleévolution",
     "pilotLong": "distance1000-&!échangé&!4*&!légendaire&!fabuleux&!chromatique",
     "raidFilters": {
-      "mega": {
-        "SCIZOR": "combat,vol,poison,spectre,acier,feu,eau,électrik&@1feu&@2feu,@3feu&!<insecte&!<acier"
+      "ultra_beast": {
+        "CELESTEELA": "acier,feu,eau,électrik&@1électrik,@1feu&@2électrik,@2feu,@3électrik,@3feu&!<acier&!<vol",
+        "KARTANA": "vol,poison,insecte,acier,feu,plante,électrik,dragon&@1feu,@1combat&@2feu,@2combat,@3feu,@3combat&!<plante&!<acier"
       },
-      "lvl5": {
-        "NECROZMA": "acier,psy,ténèbres&@1insecte,@1ténèbres,@1spectre&@2insecte,@2ténèbres,@2spectre,@3insecte,@3ténèbres,@3spectre&!<psy"
+      "mega": {
+        "PIDGEOT": "roche,spectre,acier,électrik&@1électrik,@1glace,@1roche&@2électrik,@2glace,@2roche,@3électrik,@3glace,@3roche&!<normal&!<vol"
       },
       "lvl3": {
         "BRAVIARY": "roche,acier,électrik,psy,ténèbres&@1ténèbres,@1électrik,@1spectre,@1glace,@1roche&@2ténèbres,@2électrik,@2spectre,@2glace,@2roche,@3ténèbres,@3électrik,@3spectre,@3glace,@3roche&!<psy&!<vol",
@@ -430,11 +434,12 @@
     "megaEvolve": "超級進化&超級1-2,未登錄",
     "pilotLong": "距離1000-&!交換&!4*&!傳說的寶可夢&!幻&!異色",
     "raidFilters": {
-      "mega": {
-        "SCIZOR": "格鬥,飛行,毒,幽靈,鋼,火,水,電&@1火&@2火,@3火&!<蟲&!<鋼"
+      "ultra_beast": {
+        "CELESTEELA": "鋼,火,水,電&@1電,@1火&@2電,@2火,@3電,@3火&!<鋼&!<飛行",
+        "KARTANA": "飛行,毒,蟲,鋼,火,草,電,龍&@1火,@1格鬥&@2火,@2格鬥,@3火,@3格鬥&!<草&!<鋼"
       },
-      "lvl5": {
-        "NECROZMA": "鋼,超能力,惡&@1蟲,@1惡,@1幽靈&@2蟲,@2惡,@2幽靈,@3蟲,@3惡,@3幽靈&!<超能力"
+      "mega": {
+        "PIDGEOT": "岩石,幽靈,鋼,電&@1電,@1冰,@1岩石&@2電,@2冰,@2岩石,@3電,@3冰,@3岩石&!<一般&!<飛行"
       },
       "lvl3": {
         "BRAVIARY": "岩石,鋼,電,超能力,惡&@1惡,@1電,@1幽靈,@1冰,@1岩石&@2惡,@2電,@2幽靈,@2冰,@2岩石,@3惡,@3電,@3幽靈,@3冰,@3岩石&!<超能力&!<飛行",
@@ -534,11 +539,12 @@
     "megaEvolve": "मेगा एवॉव&मेगा1-2,नया वकास करं",
     "pilotLong": "दूर1000-&!टड कये गए&!4*&!लजेंडर&!मथकल&!शाइनी",
     "raidFilters": {
-      "mega": {
-        "SCIZOR": "फ़ाइटंग,़लाइंग,पॉइज़न,घोट,टल,फ़ायर,वॉटर,इलटक&@1फ़ायर&@2फ़ायर,@3फ़ायर&!<बग&!<टल"
+      "ultra_beast": {
+        "CELESTEELA": "टल,फ़ायर,वॉटर,इलटक&@1इलटक,@1फ़ायर&@2इलटक,@2फ़ायर,@3इलटक,@3फ़ायर&!<टल&!<़लाइंग",
+        "KARTANA": "़लाइंग,पॉइज़न,बग,टल,फ़ायर,ास,इलटक,डैगन&@1फ़ायर,@1फ़ाइटंग&@2फ़ायर,@2फ़ाइटंग,@3फ़ायर,@3फ़ाइटंग&!<ास&!<टल"
       },
-      "lvl5": {
-        "NECROZMA": "टल,साइकक,डाक&@1बग,@1डाक,@1घोट&@2बग,@2डाक,@2घोट,@3बग,@3डाक,@3घोट&!<साइकक"
+      "mega": {
+        "PIDGEOT": "रॉक,घोट,टल,इलटक&@1इलटक,@1आइस,@1रॉक&@2इलटक,@2आइस,@2रॉक,@3इलटक,@3आइस,@3रॉक&!<नॉमल&!<़लाइंग"
       },
       "lvl3": {
         "BRAVIARY": "रॉक,टल,इलटक,साइकक,डाक&@1डाक,@1इलटक,@1घोट,@1आइस,@1रॉक&@2डाक,@2इलटक,@2घोट,@2आइस,@2रॉक,@3डाक,@3इलटक,@3घोट,@3आइस,@3रॉक&!<साइकक&!<़लाइंग",
@@ -638,11 +644,12 @@
     "megaEvolve": "めがしんか&メガ1-2,みとうろく",
     "pilotLong": "きょり1000-&!こうかん&!4*&!伝説のポケモン&!まぼろし&!色違い",
     "raidFilters": {
-      "mega": {
-        "SCIZOR": "かくとう,ひこう,どく,ゴースト,はがね,ほのお,みず,でんき&@1ほのお&@2ほのお,@3ほのお&!<むし&!<はがね"
+      "ultra_beast": {
+        "CELESTEELA": "はがね,ほのお,みず,でんき&@1でんき,@1ほのお&@2でんき,@2ほのお,@3でんき,@3ほのお&!<はがね&!<ひこう",
+        "KARTANA": "ひこう,どく,むし,はがね,ほのお,くさ,でんき,ドラゴン&@1ほのお,@1かくとう&@2ほのお,@2かくとう,@3ほのお,@3かくとう&!<くさ&!<はがね"
       },
-      "lvl5": {
-        "NECROZMA": "はがね,エスパー,あく&@1むし,@1あく,@1ゴースト&@2むし,@2あく,@2ゴースト,@3むし,@3あく,@3ゴースト&!<エスパー"
+      "mega": {
+        "PIDGEOT": "いわ,ゴースト,はがね,でんき&@1でんき,@1こおり,@1いわ&@2でんき,@2こおり,@2いわ,@3でんき,@3こおり,@3いわ&!<ノーマル&!<ひこう"
       },
       "lvl3": {
         "BRAVIARY": "いわ,はがね,でんき,エスパー,あく&@1あく,@1でんき,@1ゴースト,@1こおり,@1いわ&@2あく,@2でんき,@2ゴースト,@2こおり,@2いわ,@3あく,@3でんき,@3ゴースト,@3こおり,@3いわ&!<エスパー&!<ひこう",
