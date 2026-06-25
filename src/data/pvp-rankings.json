@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-06-24T11:20:57.033Z",
+  "fetchedAt": "2026-06-25T11:11:02.725Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -12,6 +12,10 @@
         {
           "dex": 463,
           "name": "Lickilicky"
+        },
+        {
+          "dex": 959,
+          "name": "Tinkaton"
         },
         {
           "dex": 334,
@@ -30,84 +34,20 @@
           "name": "Jellicent"
         },
         {
-          "dex": 959,
-          "name": "Tinkaton"
-        },
-        {
-          "dex": 222,
-          "name": "Corsola (Galarian)"
+          "dex": 205,
+          "name": "Forretress"
         },
         {
           "dex": 38,
           "name": "Ninetales"
         },
         {
-          "dex": 184,
-          "name": "Azumarill"
-        },
-        {
-          "dex": 205,
-          "name": "Forretress"
-        },
-        {
-          "dex": 799,
-          "name": "Guzzlord"
-        },
-        {
-          "dex": 230,
-          "name": "Kingdra"
+          "dex": 222,
+          "name": "Corsola (Galarian)"
         },
         {
           "dex": 160,
           "name": "Feraligatr"
-        },
-        {
-          "dex": 823,
-          "name": "Corviknight"
-        },
-        {
-          "dex": 681,
-          "name": "Aegislash (Blade)"
-        },
-        {
-          "dex": 22,
-          "name": "Fearow"
-        },
-        {
-          "dex": 148,
-          "name": "Dragonair (Shadow)"
-        },
-        {
-          "dex": 308,
-          "name": "Medicham"
-        },
-        {
-          "dex": 537,
-          "name": "Seismitoad"
-        },
-        {
-          "dex": 131,
-          "name": "Lapras"
-        },
-        {
-          "dex": 302,
-          "name": "Sableye (Shadow)"
-        },
-        {
-          "dex": 705,
-          "name": "Sliggoo"
-        },
-        {
-          "dex": 663,
-          "name": "Talonflame"
-        },
-        {
-          "dex": 197,
-          "name": "Umbreon"
-        },
-        {
-          "dex": 162,
-          "name": "Furret"
         },
         {
           "dex": 189,
@@ -118,12 +58,72 @@
           "name": "Clodsire"
         },
         {
-          "dex": 326,
-          "name": "Grumpig"
+          "dex": 823,
+          "name": "Corviknight"
+        },
+        {
+          "dex": 22,
+          "name": "Fearow"
+        },
+        {
+          "dex": 230,
+          "name": "Kingdra"
+        },
+        {
+          "dex": 184,
+          "name": "Azumarill"
+        },
+        {
+          "dex": 799,
+          "name": "Guzzlord"
+        },
+        {
+          "dex": 162,
+          "name": "Furret"
+        },
+        {
+          "dex": 131,
+          "name": "Lapras"
+        },
+        {
+          "dex": 197,
+          "name": "Umbreon"
+        },
+        {
+          "dex": 148,
+          "name": "Dragonair (Shadow)"
+        },
+        {
+          "dex": 302,
+          "name": "Sableye (Shadow)"
+        },
+        {
+          "dex": 537,
+          "name": "Seismitoad"
+        },
+        {
+          "dex": 308,
+          "name": "Medicham"
+        },
+        {
+          "dex": 663,
+          "name": "Talonflame"
+        },
+        {
+          "dex": 916,
+          "name": "Oinkologne (Female)"
+        },
+        {
+          "dex": 705,
+          "name": "Sliggoo"
         },
         {
           "dex": 364,
           "name": "Sealeo"
+        },
+        {
+          "dex": 820,
+          "name": "Greedent"
         }
       ]
     },
@@ -379,133 +379,6 @@
     }
   },
   "cups": {
-    "sunshine": {
-      "id": "sunshine",
-      "name": "Sunshine Cup",
-      "cpCap": 1500,
-      "species": [
-        {
-          "dex": 346,
-          "name": "Cradily"
-        },
-        {
-          "dex": 839,
-          "name": "Coalossal"
-        },
-        {
-          "dex": 733,
-          "name": "Toucannon (Shadow)"
-        },
-        {
-          "dex": 980,
-          "name": "Clodsire"
-        },
-        {
-          "dex": 765,
-          "name": "Oranguru"
-        },
-        {
-          "dex": 162,
-          "name": "Furret"
-        },
-        {
-          "dex": 241,
-          "name": "Miltank"
-        },
-        {
-          "dex": 18,
-          "name": "Pidgeot"
-        },
-        {
-          "dex": 257,
-          "name": "Blaziken (Shadow)"
-        },
-        {
-          "dex": 776,
-          "name": "Turtonator"
-        },
-        {
-          "dex": 207,
-          "name": "Gligar (Shadow)"
-        },
-        {
-          "dex": 463,
-          "name": "Lickilicky"
-        },
-        {
-          "dex": 472,
-          "name": "Gliscor"
-        },
-        {
-          "dex": 38,
-          "name": "Ninetales (Shadow)"
-        },
-        {
-          "dex": 732,
-          "name": "Trumbeak (Shadow)"
-        },
-        {
-          "dex": 85,
-          "name": "Dodrio"
-        },
-        {
-          "dex": 780,
-          "name": "Drampa"
-        },
-        {
-          "dex": 324,
-          "name": "Torkoal"
-        },
-        {
-          "dex": 22,
-          "name": "Fearow"
-        },
-        {
-          "dex": 195,
-          "name": "Quagsire"
-        },
-        {
-          "dex": 219,
-          "name": "Magcargo"
-        },
-        {
-          "dex": 221,
-          "name": "Piloswine"
-        },
-        {
-          "dex": 832,
-          "name": "Dubwool"
-        },
-        {
-          "dex": 345,
-          "name": "Lileep"
-        },
-        {
-          "dex": 260,
-          "name": "Swampert (Shadow)"
-        },
-        {
-          "dex": 663,
-          "name": "Talonflame"
-        },
-        {
-          "dex": 206,
-          "name": "Dunsparce"
-        },
-        {
-          "dex": 820,
-          "name": "Greedent"
-        },
-        {
-          "dex": 916,
-          "name": "Oinkologne (Female)"
-        },
-        {
-          "dex": 627,
-          "name": "Rufflet"
-        }
-      ]
-    },
     "summer": {
       "id": "summer",
       "name": "Summer Cup",
@@ -762,15 +635,6 @@
     }
   },
   "gblEvents": [
-    {
-      "eventID": "gbl-forever-forward_master-league-mega-edition_sunshine-cup-great-league-edition",
-      "name": "Master League: Mega Edition and Sunshine Cup: Great League Edition | Forever Forward",
-      "start": "2026-06-16T20:00:00.000Z",
-      "end": "2026-06-23T20:00:00.000Z",
-      "cups": [
-        "sunshine"
-      ]
-    },
     {
       "eventID": "gbl-forever-forward_great-league_ultra-league_master-league-split-1",
       "name": "Great League, Ultra League, and Master League | Forever Forward",
