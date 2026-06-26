@@ -941,7 +941,7 @@
   "app.buddy_targets.form_variant.blaze": "Flamme",
   "app.buddy_targets.form_variant.aqua": "Aqua",
   "app.buddy_targets.forms_help": "Fängt standardmäßig alle regionalen Formen — klicke eine Form an, um sie für diesen Buddy auszulassen. Ausgeblendet bei Arten ohne regionale Formen.",
-  "app.clause_why.buddy_drop_form": "schließt die {region}-Form aus",
+  "app.clause_why.buddy_drop_form": "schließt {species} · {region}-Form aus",
   "app.buddy_targets.form_region.kanto": "Kanto",
   "app.buddy_targets.form_region.johto": "Johto",
   "app.buddy_targets.form_region.hoenn": "Hoenn",

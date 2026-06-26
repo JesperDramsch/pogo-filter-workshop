@@ -1033,10 +1033,9 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
 
   // ── BUDDY FILTERS ──────────────────────────────────────────────────────
   const buddyCatchFilters = [];
-  // Guard clauses are identical for the shared species-selector filter and for
-  // every per-form filter line, so factor them into one closure. (A type-
-  // qualified target like `mauzi&unlicht` carries an `&` and therefore cannot
-  // live inside the comma-run species selector — it gets its own filter line.)
+  // One combined catch filter per buddy: a single species OR-list selects every
+  // wished species, and form-restricted targets add per-species type guards.
+  // The guard clauses below are shared by that filter, so factor them out.
   const pushBuddyGuards = (clauses) => {
     push(clauses, "!#", tFn("app.clause_why.not_tagged"));
     push(clauses, `!${kw.flag.favorite}`, tFn("app.clause_why.favorites_protected"));
@@ -1081,10 +1080,10 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     const prefix = b.tagPrefix.replace(/^#/, "");
     // targetSpecies entries are structured Targets { species, expand, dropForms }
     // (legacy strings / typed targets are migrated to this shape on load).
-    // Resolve each to an output-locale display name and split: targets that
-    // catch every form (dropForms empty) share one comma-run selector; targets
-    // that exclude a regional form get their own line with one De Morgan clause
-    // per dropped form.
+    // Resolve each to an output-locale display name. Whole-species targets
+    // (dropForms empty) and form-restricted targets both feed ONE combined
+    // filter: every species joins the union OR-list, and each dropped form adds
+    // a per-species type guard below.
     const allTargets = (b.targetSpecies || [])
       .filter(t => t && t.species)
       .map(t => ({
@@ -1104,58 +1103,59 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     // expand=false → bare name (only that species); expand=true → +family.
     const sel = (t) => (t.expand ? `+${t.display}` : t.display);
 
-    // ── Shared species-selector filter (whole-species targets + trade evos) ──
+    // Form-restricted targets that still keep ≥1 form. They join the union AND
+    // contribute drop guards. (A target with every form dropped catches nothing,
+    // so it's omitted entirely; the UI's picker won't let you drop the last form,
+    // but a hand-edited import could.) dropForms keys are pre-validated against
+    // the catalog in normalizeBuddyTarget, so any non-empty dropForms here means
+    // ≥1 real dropped form.
+    const liveFormTargets = formTargets.filter(t => {
+      const forms = regionalFormsFor(t.species) || [];
+      return forms.some(f => !new Set(t.dropForms).has(f.key));
+    });
+
+    // ── One combined catch filter per buddy ────────────────────────────────
+    // The species OR-list selects the union of every wished species (whole-
+    // species + form-restricted + trade-evo families). Each form-restricted
+    // target then adds, per dropped form, a guard of the shape
+    // `!<species>,<drop-types>` = "NOT this species OR NOT the dropped form" —
+    // an implication that constrains ONLY that species and leaves the rest of
+    // the union untouched (same `!+name,…` idiom the trash filter uses at L790).
+    // PoGo's comma-tighter-than-& precedence keeps each guard self-contained.
+    // Examples: drop Galar Mauzi {include:[steel]} → `!mauzi,!stahl`; drop Paldea
+    // combat Tauros {include:[fighting],exclude:[fire,water]} → `!tauros,!kampf,feuer,wasser`.
+    const unionTargets = [...plainTargets, ...liveFormTargets];
     const speciesParts = [
-      ...plainTargets.map(sel),
+      ...unionTargets.map(sel),
       ...(wantsTE ? TE_full.map(base => `+${teDisplay(base, outputLocale)}`) : []),
     ];
     if (speciesParts.length > 0) {
       const why = [
-        plainTargets.length > 0 ? tFn("app.clause_why.buddy_targets_count", { params: { count: plainTargets.length } }) : null,
+        unionTargets.length > 0 ? tFn("app.clause_why.buddy_targets_count", { params: { count: unionTargets.length } }) : null,
         wantsTE ? tFn("app.clause_why.buddy_te_count", { params: { count: TE_full.length } }) : null,
       ].filter(Boolean).join(" + ");
       const catchClauses = [];
       push(catchClauses, speciesParts.join(","), `${b.name}: ${why}`);
-      pushStarsOrSpare(catchClauses, plainTargets.filter(t => hundoOutSet.has(t.display)).map(sel));
-      pushBuddyGuards(catchClauses);
-      buddyCatchFilters.push({
-        buddyName: b.name,
-        prefix,
-        filter: catchClauses.map(c => c.clause).join("&"),
-        clauses: catchClauses,
-      });
-    }
-
-    // ── One self-contained line per form-restricted target ──
-    // Each dropped regional form contributes a single De Morgan &-clause that
-    // negates that form's type predicate, e.g. drop Galar Mauzi {include:[steel]}
-    // → `&!stahl`; drop Kanto Mauzi {include:[normal]} → `&!normal`; drop Paldea
-    // combat Tauros {include:[fighting],exclude:[fire,water]} → `&!kampf,feuer,wasser`.
-    // Each is its own comma-OR `&`-clause, so OR-binds-tighter stays contained.
-    for (const t of formTargets) {
-      const forms = regionalFormsFor(t.species) || [];
-      const dropSet = new Set(t.dropForms);
-      const dropped = forms.filter(f => dropSet.has(f.key));
-      const kept = forms.filter(f => !dropSet.has(f.key));
-      if (dropped.length === 0 || kept.length === 0) continue; // nothing to narrow, or nothing left
-      const catchClauses = [];
-      pushStarsOrSpare(catchClauses, hundoOutSet.has(t.display) ? [sel(t)] : []);
-      push(catchClauses, sel(t), `${b.name}: ${capFirst(t.display)}`);
-      for (const f of dropped) {
-        const deMorgan = [
-          ...(f.include || []).map(ty => `!${kw.type[ty] || ty}`),
-          ...(f.exclude || []).map(ty => kw.type[ty] || ty),
-        ].join(",");
-        if (!deMorgan) continue;
-        push(catchClauses, deMorgan,
-          tFn("app.clause_why.buddy_drop_form", { params: { region: formRegionLabel(f, tFn) } }));
+      pushStarsOrSpare(catchClauses, unionTargets.filter(t => hundoOutSet.has(t.display)).map(sel));
+      // Per-species form guards — one comma-OR `&`-clause per dropped form.
+      for (const t of liveFormTargets) {
+        const forms = regionalFormsFor(t.species) || [];
+        const dropSet = new Set(t.dropForms);
+        for (const f of forms.filter(x => dropSet.has(x.key))) {
+          const deMorgan = [
+            ...(f.include || []).map(ty => `!${kw.type[ty] || ty}`),
+            ...(f.exclude || []).map(ty => kw.type[ty] || ty),
+          ].join(",");
+          if (!deMorgan) continue;
+          push(catchClauses, `!${sel(t)},${deMorgan}`,
+            tFn("app.clause_why.buddy_drop_form", {
+              params: { species: capFirst(t.display), region: formRegionLabel(f, tFn) } }));
+        }
       }
       pushBuddyGuards(catchClauses);
       buddyCatchFilters.push({
         buddyName: b.name,
         prefix,
-        formKey: t.species,
-        label: `${b.name} · ${capFirst(t.display)}`,
         filter: catchClauses.map(c => c.clause).join("&"),
         clauses: catchClauses,
       });
