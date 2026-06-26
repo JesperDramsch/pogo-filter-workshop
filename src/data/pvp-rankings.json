@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-06-25T11:11:02.725Z",
+  "fetchedAt": "2026-06-26T11:19:56.676Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -86,10 +86,6 @@
           "name": "Lapras"
         },
         {
-          "dex": 197,
-          "name": "Umbreon"
-        },
-        {
           "dex": 148,
           "name": "Dragonair (Shadow)"
         },
@@ -100,6 +96,10 @@
         {
           "dex": 537,
           "name": "Seismitoad"
+        },
+        {
+          "dex": 197,
+          "name": "Umbreon"
         },
         {
           "dex": 308,
@@ -151,24 +151,24 @@
           "name": "Florges"
         },
         {
-          "dex": 395,
-          "name": "Empoleon (Shadow)"
-        },
-        {
           "dex": 640,
           "name": "Virizion"
+        },
+        {
+          "dex": 395,
+          "name": "Empoleon (Shadow)"
         },
         {
           "dex": 146,
           "name": "Moltres (Galarian)"
         },
         {
-          "dex": 593,
-          "name": "Jellicent"
-        },
-        {
           "dex": 205,
           "name": "Forretress"
+        },
+        {
+          "dex": 593,
+          "name": "Jellicent"
         },
         {
           "dex": 718,
@@ -203,52 +203,52 @@
           "name": "Blastoise"
         },
         {
-          "dex": 663,
-          "name": "Talonflame"
-        },
-        {
           "dex": 687,
-          "name": "Malamar (Shadow)"
-        },
-        {
-          "dex": 365,
-          "name": "Walrein (Shadow)"
-        },
-        {
-          "dex": 977,
-          "name": "Dondozo"
+          "name": "Malamar"
         },
         {
           "dex": 895,
           "name": "Regidrago"
         },
         {
-          "dex": 487,
-          "name": "Giratina (Altered)"
+          "dex": 663,
+          "name": "Talonflame"
         },
         {
-          "dex": 939,
-          "name": "Bellibolt"
+          "dex": 365,
+          "name": "Walrein"
+        },
+        {
+          "dex": 977,
+          "name": "Dondozo"
+        },
+        {
+          "dex": 487,
+          "name": "Giratina (Altered)"
         },
         {
           "dex": 979,
           "name": "Annihilape"
         },
         {
-          "dex": 350,
-          "name": "Milotic"
+          "dex": 939,
+          "name": "Bellibolt"
         },
         {
           "dex": 488,
           "name": "Cresselia"
         },
         {
-          "dex": 208,
-          "name": "Steelix"
+          "dex": 346,
+          "name": "Cradily"
         },
         {
-          "dex": 119,
-          "name": "Seaking"
+          "dex": 350,
+          "name": "Milotic"
+        },
+        {
+          "dex": 765,
+          "name": "Oranguru"
         }
       ]
     },
@@ -272,20 +272,20 @@
           "name": "Kyurem (White)"
         },
         {
-          "dex": 792,
-          "name": "Lunala"
-        },
-        {
           "dex": 716,
           "name": "Xerneas"
         },
         {
-          "dex": 643,
-          "name": "Reshiram"
+          "dex": 792,
+          "name": "Lunala"
         },
         {
           "dex": 483,
           "name": "Dialga (Origin)"
+        },
+        {
+          "dex": 643,
+          "name": "Reshiram"
         },
         {
           "dex": 889,
@@ -312,12 +312,12 @@
           "name": "Lugia"
         },
         {
-          "dex": 800,
-          "name": "Necrozma (Dawn Wings)"
-        },
-        {
           "dex": 445,
           "name": "Garchomp (Shadow)"
+        },
+        {
+          "dex": 800,
+          "name": "Necrozma (Dawn Wings)"
         },
         {
           "dex": 717,
@@ -368,12 +368,12 @@
           "name": "Melmetal"
         },
         {
-          "dex": 380,
-          "name": "Latias (Shadow)"
-        },
-        {
           "dex": 647,
           "name": "Keldeo (Resolute)"
+        },
+        {
+          "dex": 380,
+          "name": "Latias (Shadow)"
         }
       ]
     }
