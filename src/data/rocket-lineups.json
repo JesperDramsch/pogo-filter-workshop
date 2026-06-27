@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-06-26T11:14:38.796Z",
+  "fetchedAt": "2026-06-27T10:23:32.687Z",
   "trainers": [
     {
       "name": "Giovanni",
@@ -124,15 +124,38 @@
               "types": [
                 "normal"
               ]
+            },
+            {
+              "name": "Golurk",
+              "types": [
+                "ground",
+                "ghost"
+              ]
+            },
+            {
+              "name": "Galarian Weezing",
+              "types": [
+                "poison",
+                "fairy"
+              ]
             }
           ],
           "resistorTypes": [
-            "rock",
-            "ghost",
-            "steel"
+            "normal",
+            "flying",
+            "ground",
+            "bug"
           ],
           "seMoveTypes": [
-            "fighting"
+            "fighting",
+            "ground",
+            "ghost",
+            "steel",
+            "water",
+            "grass",
+            "psychic",
+            "ice",
+            "dark"
           ]
         },
         {
@@ -513,6 +536,13 @@
           "slot": 1,
           "pokemons": [
             {
+              "name": "Litwick",
+              "types": [
+                "ghost",
+                "fire"
+              ]
+            },
+            {
               "name": "Ponyta",
               "types": [
                 "fire"
@@ -522,13 +552,6 @@
               "name": "Torchic",
               "types": [
                 "fire"
-              ]
-            },
-            {
-              "name": "Placeholder",
-              "types": [
-                "normal",
-                "normal"
               ]
             }
           ]
@@ -550,10 +573,10 @@
               ]
             },
             {
-              "name": "Placeholder",
+              "name": "Camerupt",
               "types": [
-                "normal",
-                "normal"
+                "fire",
+                "ground"
               ]
             }
           ]
@@ -585,10 +608,7 @@
       ],
       "resistorTypes": [
         "flying",
-        "ghost",
-        "fire",
         "water",
-        "psychic",
         "dragon",
         "fairy"
       ],
@@ -632,6 +652,13 @@
           "slot": 2,
           "pokemons": [
             {
+              "name": "Dewpider",
+              "types": [
+                "water",
+                "bug"
+              ]
+            },
+            {
               "name": "Swampert",
               "types": [
                 "water",
@@ -643,13 +670,6 @@
               "types": [
                 "water",
                 "dark"
-              ]
-            },
-            {
-              "name": "Placeholder",
-              "types": [
-                "normal",
-                "normal"
               ]
             }
           ]
@@ -685,8 +705,7 @@
         "fighting",
         "bug",
         "water",
-        "ice",
-        "dark"
+        "ice"
       ],
       "seMoveTypes": [
         "electric",
@@ -704,6 +723,12 @@
           "pokemons": [
             {
               "name": "Magikarp",
+              "types": [
+                "water"
+              ]
+            },
+            {
+              "name": "Feebas",
               "types": [
                 "water"
               ]
@@ -750,7 +775,7 @@
         "electric",
         "grass"
       ],
-      "lineupSize": 4
+      "lineupSize": 5
     },
     {
       "name": "Electric-type Female Grunt",
@@ -879,6 +904,13 @@
           "slot": 2,
           "pokemons": [
             {
+              "name": "Lileep",
+              "types": [
+                "rock",
+                "grass"
+              ]
+            },
+            {
               "name": "Sceptile",
               "types": [
                 "grass"
@@ -889,13 +921,6 @@
               "types": [
                 "grass",
                 "fairy"
-              ]
-            },
-            {
-              "name": "Placeholder",
-              "types": [
-                "normal",
-                "normal"
               ]
             }
           ]
@@ -1514,6 +1539,13 @@
           "slot": 1,
           "pokemons": [
             {
+              "name": "Venonat",
+              "types": [
+                "bug",
+                "poison"
+              ]
+            },
+            {
               "name": "Weedle",
               "types": [
                 "bug",
@@ -1524,13 +1556,6 @@
               "name": "Grubbin",
               "types": [
                 "bug"
-              ]
-            },
-            {
-              "name": "Placeholder",
-              "types": [
-                "normal",
-                "normal"
               ]
             }
           ]
@@ -1730,6 +1755,12 @@
           "slot": 2,
           "pokemons": [
             {
+              "name": "Dusclops",
+              "types": [
+                "ghost"
+              ]
+            },
+            {
               "name": "Sableye",
               "types": [
                 "dark",
@@ -1740,13 +1771,6 @@
               "name": "Cofagrigus",
               "types": [
                 "ghost"
-              ]
-            },
-            {
-              "name": "Placeholder",
-              "types": [
-                "normal",
-                "normal"
               ]
             }
           ]
@@ -1922,23 +1946,23 @@
           "slot": 2,
           "pokemons": [
             {
-              "name": "Alolan Raticate",
+              "name": "Sneasel",
               "types": [
                 "dark",
-                "normal"
+                "ice"
+              ]
+            },
+            {
+              "name": "Houndour",
+              "types": [
+                "dark",
+                "fire"
               ]
             },
             {
               "name": "Absol",
               "types": [
                 "dark"
-              ]
-            },
-            {
-              "name": "Placeholder",
-              "types": [
-                "normal",
-                "normal"
               ]
             }
           ]
@@ -1953,17 +1977,10 @@
               ]
             },
             {
-              "name": "Placeholder",
+              "name": "Hydreigon",
               "types": [
-                "normal",
-                "normal"
-              ]
-            },
-            {
-              "name": "Placeholder",
-              "types": [
-                "normal",
-                "normal"
+                "dark",
+                "dragon"
               ]
             }
           ]
@@ -1971,10 +1988,7 @@
       ],
       "resistorTypes": [
         "fighting",
-        "steel",
         "water",
-        "grass",
-        "dragon",
         "dark",
         "fairy"
       ],
@@ -1983,7 +1997,7 @@
         "fairy",
         "fighting"
       ],
-      "lineupSize": 9
+      "lineupSize": 8
     },
     {
       "name": "Steel-type Male Grunt",
