@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { ArrowRight, BookOpen } from "lucide-react";
+import { ArrowRight, BookOpen, Hand } from "lucide-react";
 import { useTranslation } from "./i18n/I18nProvider.jsx";
 import { C } from "./explain/colors.js";
 import { ChapterNav, HeroPill, AppCredit } from "./explain/Shell.jsx";
@@ -242,11 +242,30 @@ export default function Landing({ onNavigate }) {
 
           <div className="flex items-center justify-center gap-3 flex-wrap mt-8">
             <button
-              onClick={() => onNavigate("workshop")}
+              onClick={() => onNavigate("onboard")}
               className="mono text-sm font-bold px-5 py-2.5 rounded transition flex items-center gap-2"
               style={{ backgroundColor: C.red, color: "#fff" }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#FF5A4A")}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = C.red)}
+            >
+              <Hand size={14} /> {t("app.landing.cta_onboard")} <ArrowRight size={14} />
+            </button>
+            <button
+              onClick={() => onNavigate("workshop")}
+              className="mono text-sm px-5 py-2.5 rounded transition flex items-center gap-2"
+              style={{
+                backgroundColor: "transparent",
+                color: C.dim,
+                border: `1px solid ${C.border}`,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = C.text;
+                e.currentTarget.style.borderColor = C.borderHi;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = C.dim;
+                e.currentTarget.style.borderColor = C.border;
+              }}
             >
               {t("app.landing.cta_workshop")} <ArrowRight size={14} />
             </button>

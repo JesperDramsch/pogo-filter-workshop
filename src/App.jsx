@@ -24,6 +24,7 @@ import Regional from "./explain/Regional.jsx";
 import Trade from "./explain/Trade.jsx";
 import Rules from "./explain/Rules.jsx";
 import Algebra from "./explain/Algebra.jsx";
+import SwipeOnboarding from "./SwipeOnboarding.jsx";
 import {
   AppCredit,
   WorkshopNav,
@@ -51,6 +52,7 @@ const VIEW_BY_HASH = {
   "#explain/trade": "trade",
   "#rules": "rules",
   "#explain/algebra": "algebra",
+  "#onboard": "onboard",
 };
 const HASH_BY_VIEW = {
   landing: "",
@@ -60,6 +62,7 @@ const HASH_BY_VIEW = {
   trade: "#explain/trade",
   rules: "#rules",
   algebra: "#explain/algebra",
+  onboard: "#onboard",
 };
 // Step-keyed workshop hashes (#workshop/where, #workshop/what, ...) all map
 // to the workshop view; the specific step is parsed by `stepFromHash`.
@@ -2005,6 +2008,7 @@ const KEY_LUCKIES = "pogo:luckies";
 const KEY_TOP_ATTACKERS = "pogo:topAttackers";
 const KEY_TOP_MAX_ATTACKERS = "pogo:topMaxAttackers";
 const KEY_CONFIG = "pogo:config";
+const KEY_ONBOARDED = "pogo:onboarded";
 
 // iOS Safari (regular tab) refuses Storage API persistence at the WebKit
 // level: navigator.storage.persist() resolves with false immediately, no
@@ -2376,6 +2380,7 @@ export default function App() {
   const [newMyth, setNewMyth] = useState("");
   const [newKeeper, setNewKeeper] = useState("");
   const [loaded, setLoaded] = useState(false);
+  const [onboarded, setOnboarded] = useState(false);
   const [showSetTheory, setShowSetTheory] = useState(false);
   const [showAuxShadows, setShowAuxShadows] = useState(false);
   const [showAuxEvos, setShowAuxEvos] = useState(false);
@@ -2455,6 +2460,7 @@ export default function App() {
       const p = await loadJSON(KEY_LASTPIN, null);
       const b = await loadJSON(KEY_BAZAARTAGS, []);
       const step = await loadJSON(KEY_STEP, 1);
+      const ob = await loadJSON(KEY_ONBOARDED, false);
       setHundos(h);
       setConfig(mergeImportedConfig(c));
       const canonicalize = (arr) => (arr || []).map(s => resolveSpecies(s) || s);
@@ -2465,7 +2471,16 @@ export default function App() {
       setLastPin(p);
       setBazaarTags(b);
       setCurrentStep(step);
+      setOnboarded(ob);
       setLoaded(true);
+      // First-run: nudge brand-new visitors into the swipe onboarding instead
+      // of the marketing landing. Only when they actually arrived at "" (not a
+      // shared deep link), and only once — we flip the flag immediately so a
+      // reload or a later visit goes straight to the normal front door.
+      if (!ob && viewFromHash() === "landing") {
+        setOnboarded(true);
+        if (typeof window !== "undefined") window.location.hash = "#onboard";
+      }
     })();
   }, []);
 
@@ -2479,6 +2494,7 @@ export default function App() {
   useEffect(() => { if (loaded) saveJSON(KEY_LASTPIN, lastPin); }, [lastPin, loaded]);
   useEffect(() => { if (loaded) saveJSON(KEY_BAZAARTAGS, bazaarTags); }, [bazaarTags, loaded]);
   useEffect(() => { if (loaded) saveJSON(KEY_STEP, currentStep); }, [currentStep, loaded]);
+  useEffect(() => { if (loaded) saveJSON(KEY_ONBOARDED, onboarded); }, [onboarded, loaded]);
 
   // Locals at home location (drives auto-drop from Regionals protection + bazaar suggestions)
   const homeLocals = useMemo(() => computeHomeLocals(homeLocation), [homeLocation]);
@@ -2723,6 +2739,26 @@ export default function App() {
     if ("bazaarTags" in prepared)      setBazaarTags(prepared.bazaarTags);
   }
 
+  // Onboarding → workshop hand-off. completeOnboarding applies the swipe
+  // decisions (a patch of protect* booleans) onto the live config and drops
+  // the user straight on the filter-output step; skip just bails to the
+  // workshop with defaults. Both set the first-run flag so it won't re-show.
+  function completeOnboarding(patch, dest = "filter") {
+    if (patch && Object.keys(patch).length) {
+      setConfig((prev) => ({ ...prev, ...patch, lastAppliedPreset: null }));
+    }
+    setOnboarded(true);
+    // Drop into the workshop on the chosen step — "filter" for instant payoff,
+    // or "where" to pin the home location on the map. The hashchange listener
+    // resolves the hash to view=workshop + the matching currentStep.
+    const stepKey = dest === "where" ? "where" : "filter";
+    if (typeof window !== "undefined") window.location.hash = `#workshop/${stepKey}`;
+  }
+  function skipOnboarding() {
+    setOnboarded(true);
+    navigateView("workshop");
+  }
+
   // Step navigation helpers — labels/descs translated at render time
   const steps = [
     { n: 1, key: "where",  label: t("app.step.where.label"),  desc: t("app.step.where.desc") },
@@ -2768,6 +2804,13 @@ export default function App() {
       `}</style>
 
       {view === "landing"  && <Landing  onNavigate={navigateView} />}
+      {view === "onboard"  && (
+        <SwipeOnboarding
+          onComplete={completeOnboarding}
+          onSkip={skipOnboarding}
+          onNavigate={navigateView}
+        />
+      )}
       {view === "general"  && <General  onNavigate={navigateView} />}
       {view === "regional" && <Regional onNavigate={navigateView} />}
       {view === "trade"    && <Trade    onNavigate={navigateView} />}
