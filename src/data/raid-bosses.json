@@ -1,61 +1,90 @@
 {
-  "fetchedAt": "2026-06-24T10:34:55.851Z",
+  "fetchedAt": "2026-06-25T10:28:10.432Z",
   "raids": {
-    "mega": [
+    "ultra_beast": [
       {
-        "id": "SCIZOR",
+        "id": "CELESTEELA",
         "names": {
-          "en": "Mega Scizor",
-          "de": "Mega-Scherox",
-          "fr": "Méga-Cizayox",
-          "it": "MegaScizor",
-          "ja": "メガハッサム",
-          "ko": "메가핫삼",
-          "es": "Mega-Scizor"
+          "en": "Celesteela",
+          "de": "Kaguron",
+          "fr": "Bamboiselle",
+          "it": "Celesteela",
+          "ja": "テッカグヤ",
+          "ko": "철화구야",
+          "es": "Celesteela"
         },
         "types": [
-          "bug",
-          "steel"
+          "steel",
+          "flying"
         ],
         "resistorTypes": [
-          "fighting",
-          "flying",
-          "poison",
-          "ghost",
           "steel",
           "fire",
           "water",
           "electric"
         ],
         "seMoveTypes": [
+          "electric",
           "fire"
+        ]
+      },
+      {
+        "id": "KARTANA",
+        "names": {
+          "en": "Kartana",
+          "de": "Katagami",
+          "fr": "Katagami",
+          "it": "Kartana",
+          "ja": "カミツルギ",
+          "ko": "종이신도",
+          "es": "Kartana"
+        },
+        "types": [
+          "grass",
+          "steel"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "steel",
+          "fire",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "fire",
+          "fighting"
         ]
       }
     ],
-    "lvl5": [
+    "mega": [
       {
-        "id": "NECROZMA",
+        "id": "PIDGEOT",
         "names": {
-          "en": "Necrozma",
-          "de": "Necrozma",
-          "fr": "Necrozma",
-          "it": "Necrozma",
-          "ja": "ネクロズマ",
-          "ko": "네크로즈마",
-          "es": "Necrozma"
+          "en": "Mega Pidgeot",
+          "de": "Mega-Tauboss",
+          "fr": "Méga-Roucarnage",
+          "it": "MegaPidgeot",
+          "ja": "メガピジョット",
+          "ko": "메가피죤투",
+          "es": "Mega-Pidgeot"
         },
         "types": [
-          "psychic"
+          "normal",
+          "flying"
         ],
         "resistorTypes": [
+          "rock",
+          "ghost",
           "steel",
-          "psychic",
-          "dark"
+          "electric"
         ],
         "seMoveTypes": [
-          "bug",
-          "dark",
-          "ghost"
+          "electric",
+          "ice",
+          "rock"
         ]
       }
     ],
@@ -455,179 +484,6 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "celesteela-kartana-in-5-star-raid-battles-june-2026",
-      "name": "Celesteela and Kartana in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-06-24T06:00:00.000",
-      "end": "2026-06-30T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "CELESTEELA",
-          "names": {
-            "en": "Celesteela"
-          },
-          "types": [
-            "steel",
-            "flying"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "electric"
-          ],
-          "seMoveTypes": [
-            "fire",
-            "electric"
-          ]
-        },
-        {
-          "id": "KARTANA",
-          "names": {
-            "en": "Kartana"
-          },
-          "types": [
-            "grass",
-            "steel"
-          ],
-          "resistorTypes": [
-            "flying",
-            "poison",
-            "bug",
-            "steel",
-            "fire",
-            "grass",
-            "electric",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "fire"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "mega-pidgeot-in-mega-raids-june-2026",
-      "name": "Mega Pidgeot in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-06-24T06:00:00.000",
-      "end": "2026-07-01T06:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "PIDGEOT",
-          "names": {
-            "en": "Pidgeot"
-          },
-          "types": [
-            "normal",
-            "flying"
-          ],
-          "resistorTypes": [
-            "rock",
-            "ghost",
-            "steel",
-            "electric"
-          ],
-          "seMoveTypes": [
-            "rock",
-            "electric",
-            "ice"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20260624",
-      "name": "Celesteela and Kartana Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-06-24T18:00:00.000",
-      "end": "2026-06-24T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "CELESTEELA",
-          "names": {
-            "en": "Celesteela"
-          },
-          "types": [
-            "steel",
-            "flying"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "electric"
-          ],
-          "seMoveTypes": [
-            "fire",
-            "electric"
-          ]
-        },
-        {
-          "id": "KARTANA",
-          "names": {
-            "en": "Kartana"
-          },
-          "types": [
-            "grass",
-            "steel"
-          ],
-          "resistorTypes": [
-            "flying",
-            "poison",
-            "bug",
-            "steel",
-            "fire",
-            "grass",
-            "electric",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "fire"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "skarmory-super-mega-raid-day-2026",
-      "name": "Skarmory Super Mega Raid Day",
-      "eventType": "raid-day",
-      "start": "2026-06-27T14:00:00.000",
-      "end": "2026-06-27T17:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "SKARMORY",
-          "names": {
-            "en": "Skarmory"
-          },
-          "types": [
-            "steel",
-            "flying"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "electric"
-          ],
-          "seMoveTypes": [
-            "fire",
-            "electric"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "articuno-zapdos-moltres-in-5-star-raid-battles-july-2026",
       "name": "Articuno, Zapdos, and Moltres in 5-star Raid Battles",
       "eventType": "raid-battles",
@@ -768,6 +624,84 @@
           "seMoveTypes": [
             "dragon",
             "fairy"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20260701",
+      "name": "Articuno, Zapdos, and Moltres Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-07-01T18:00:00.000",
+      "end": "2026-07-01T19:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "ARTICUNO",
+          "names": {
+            "en": "Articuno"
+          },
+          "types": [
+            "ice",
+            "flying"
+          ],
+          "resistorTypes": [
+            "rock",
+            "steel",
+            "fire",
+            "water",
+            "electric",
+            "ice"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "steel",
+            "fire",
+            "electric"
+          ]
+        },
+        {
+          "id": "ZAPDOS",
+          "names": {
+            "en": "Zapdos"
+          },
+          "types": [
+            "electric",
+            "flying"
+          ],
+          "resistorTypes": [
+            "ground",
+            "rock",
+            "steel",
+            "electric",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "ice"
+          ]
+        },
+        {
+          "id": "MOLTRES",
+          "names": {
+            "en": "Moltres"
+          },
+          "types": [
+            "fire",
+            "flying"
+          ],
+          "resistorTypes": [
+            "rock",
+            "fire",
+            "water",
+            "electric",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "water",
+            "electric"
           ]
         }
       ]

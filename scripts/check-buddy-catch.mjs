@@ -1,15 +1,22 @@
-// Verifies the per-buddy catch-filter generation in buildFilters: the
-// expansion toggle (bare vs +family), the per-form filter lines (species and
-// type as SEPARATE &-clauses), the spare-hundo carve-out, and the expert raw
-// escape hatch. The default-fixture snapshot (check-fixtures.mjs) deliberately
+// Verifies the per-buddy catch-filter generation in buildFilters. Every buddy
+// now emits ONE combined catch filter: a species OR-list (the union of all
+// wished species — whole-species, form-restricted, and trade-evo families) plus
+// a per-species type guard `!<species>,<drop-types>` for each excluded regional
+// form, plus the shared protection guards. The expert raw escape hatch stays a
+// separate verbatim line. The default-fixture snapshot (check-fixtures.mjs)
 // ignores buddyCatchFilters and DEFAULT_CONFIG has no buddies, so this is the
-// only coverage for that code path.
+// only coverage for that path.
+//
+// Beyond string-shape checks, a mini PoGo evaluator (evalFilter) confirms the
+// combined filter's SEMANTICS on mock Pokémon — the form guards must isolate
+// each species without colliding across species that share a dropped type.
 //
 // Run with: npm run test:buddy  (or npx vite-node scripts/check-buddy-catch.mjs)
 
 import { buildFilters, DEFAULT_CONFIG } from "../src/App.jsx";
 import { LOCALES } from "../src/i18n/index.js";
 import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
+import REGIONAL_FORMS from "../src/data/regional-forms.json";
 
 function makeTFn(locale) {
   const messages = LOCALES[locale]?.messages || LOCALES.en.messages;
@@ -33,90 +40,202 @@ function check(label, cond, detail = "") {
 const LOCALE = "de";
 const tFn = makeTFn(LOCALE);
 const kw = pogoKeywords(LOCALE);
-const DARK = kw.type.dark;  // "unlicht"
-const ICE = kw.type.ice;    // "eis"
 const segs = (f) => f.split("&");
 
-// Buddy with: an exact target (habitak), a family-expand target (pikachu),
-// a type-qualified target the user owns a hundo of (mauzi/Alola=dark), a
-// type-qualified target with no hundo (sandan/Alola=ice), plus a raw blob.
-const buddy = {
-  id: "auri", name: "Auri", tagPrefix: "Auri", active: true, wantsTradeEvos: false,
-  rawAppend: "mauzi&schillernd",
-  targetSpecies: [
-    { species: "habitak", expand: false, type: null },
-    { species: "pikachu", expand: true,  type: null },
-    { species: "mauzi",   expand: false, type: "dark" },
-    { species: "sandan",  expand: false, type: "ice"  },
-  ],
+// Expected De Morgan clause for dropping a catalog form (must match App.jsx).
+function form(dex, key) {
+  return REGIONAL_FORMS.species[String(dex)].forms.find(f => f.key === key);
+}
+function deMorgan(f) {
+  return [
+    ...(f.include || []).map(t => `!${kw.type[t]}`),
+    ...(f.exclude || []).map(t => kw.type[t]),
+  ].join(",");
+}
+
+// ── Mini PoGo evaluator: filter = &-clauses (AND) of ,-literals (OR). ───────
+function evalFilter(filter, mon) {
+  return filter.split("&").every(clause =>
+    clause.split(",").some(lit => litMatch(lit.trim(), mon)));
+}
+function litMatch(lit, mon) {
+  if (lit.startsWith("!")) return !litMatch(lit.slice(1), mon);
+  if (lit.startsWith("+")) return (mon.family || [mon.species]).includes(lit.slice(1));
+  if (/^[0-4]\*$/.test(lit)) return mon.stars === Number(lit[0]);
+  if (lit === "#") return !!mon.tagged;
+  if (lit === kw.flag.favorite) return !!mon.favorite;
+  if (lit === kw.flag.traded) return !!mon.traded;
+  if (lit === kw.flag.shadow) return !!mon.shadow;
+  if (lit === kw.flag.lucky) return !!mon.lucky;
+  if (lit === kw.flag.shiny) return !!mon.shiny;
+  if (lit === kw.flag.legendary) return !!mon.legendary;
+  if (lit === kw.flag.ultra_beast) return !!mon.ultrabeast;
+  if (lit === kw.flag.costume) return !!mon.costume;
+  if (lit === kw.flag.purified) return !!mon.purified;
+  if (lit === kw.flag.background) return !!mon.background;
+  if (lit === kw.flag.mythical) return !!mon.mythical;
+  if (/^\d+$/.test(lit)) return mon.dex === Number(lit);
+  if (Object.values(kw.type).includes(lit)) return (mon.types || []).includes(lit);
+  return mon.species === lit; // bare species name
+}
+
+const mk = (o) => ({ family: [o.species], stars: 0, types: [], dex: 0, ...o });
+
+// Semantic scenarios use evalFilter on mock mons that only model species, form,
+// stars and flags. Turn off the optional protection toggles so the only guards
+// emitted are the always-on flag negations (!#, !favorit, !getauscht, !crypto,
+// !glücks, !mysteriös,808,809, !schillernd, !legendär) — all of which the mock
+// mons and evalFilter model. The full guard set is asserted structurally above.
+const SEM_CFG = {
+  ...DEFAULT_CONFIG,
+  protectUltraBeasts: false, protectCostumes: false, protectPurified: false,
+  protectBackgrounds: false, protectNundos: false, protectDoubleMoved: false,
+  protectDynamax: false, protectXXL: false, protectXL: false, protectXXS: false,
+  protectLegacyMoves: false,
 };
 
-console.log("Buddy catch generation (expertMode ON, hundo of Mauzi owned)");
+// ─────────────────────────────────────────────────────────────────────────
+console.log("Combined catch filter — structure (5 mixed targets, Mauzi hundo owned, expertMode ON)");
 {
+  const buddy = {
+    id: "auri", name: "Auri", tagPrefix: "Auri", active: true, wantsTradeEvos: false,
+    rawAppend: "mauzi&schillernd",
+    targetSpecies: [
+      { species: "habitak", expand: false, dropForms: [] },      // whole species
+      { species: "pikachu", expand: true,  dropForms: [] },      // +family, no regionals
+      { species: "raichu",  expand: false, dropForms: [] },      // catalog species, all forms kept
+      { species: "mauzi",   expand: false, dropForms: ["galar"] }, // drop Galar, owns hundo
+      { species: "sandan",  expand: false, dropForms: ["base"] },  // drop Kanto base
+    ],
+  };
   const cfg = { ...DEFAULT_CONFIG, expertMode: true, buddies: [buddy] };
   const res = buildFilters(["mauzi"], [], cfg, [], LOCALE, tFn);
   const all = res.buddyCatchFilters;
-
-  const shared = all.filter(b => !b.formKey);
-  const typed = all.filter(b => b.formKey && b.formKey !== "raw");
+  const combined = all.filter(b => !b.formKey);
   const raw = all.filter(b => b.formKey === "raw");
 
-  check("exactly one shared species-selector filter", shared.length === 1, `got ${shared.length}`);
-  check("exactly two per-form filter lines", typed.length === 2, `got ${typed.length}`);
+  check("exactly ONE combined catch line per buddy", combined.length === 1, `got ${combined.length}`);
   check("exactly one raw escape-hatch line", raw.length === 1, `got ${raw.length}`);
+  check("no separate per-form lines", all.length === 2, `got ${all.length} entries`);
 
-  // Shared selector: bare habitak (exact) + +pikachu (family), no Ibitak, no +habitak.
-  const sharedFilter = shared[0]?.filter || "";
-  check("shared selector is 'habitak,+pikachu'", sharedFilter.startsWith("habitak,+pikachu&"),
-    sharedFilter.slice(0, 40));
-  check("exact target has no '+' (Habitak not Ibitak)", !sharedFilter.includes("+habitak"));
-  check("shared selector excludes the typed species", !segs(sharedFilter).includes("mauzi"));
+  const f = combined[0]?.filter || "";
+  const S = segs(f);
+  // Union: all five species in the first comma-run, raichu folded in (not its own line).
+  check("union starts with all five species selectors",
+    f.startsWith("habitak,+pikachu,raichu,mauzi,sandan&"), f.slice(0, 60));
+  check("exact target has no '+' (Habitak not Ibitak)", !f.includes("+habitak"));
+  // Per-species scoped form guards.
+  check(`Galar-Mauzi guard '!mauzi,${deMorgan(form(52,"galar"))}' present`,
+    S.includes(`!mauzi,${deMorgan(form(52, "galar"))}`));
+  check(`Kanto-Sandan guard '!sandan,${deMorgan(form(27,"base"))}' present`,
+    S.includes(`!sandan,${deMorgan(form(27, "base"))}`));
+  // Spare-hundo carve-out (owns a Mauzi hundo) at buddy level.
+  check("spare stars line ORs in the owned-hundo species", S.includes("0*,1*,2*,mauzi"));
+  check("never-gift guard '!4*' present", S.includes("!4*"));
+  // Standard protection guards.
+  check("standard guards present ('!#', '!favorit')",
+    S.includes("!#") && f.includes(`!${kw.flag.favorite}`));
 
-  // Mauzi (dark / Alola) — owns a hundo → spare carve-out present.
-  const mauzi = typed.find(b => b.formKey === "mauzi-dark");
-  check("mauzi-dark form line exists", !!mauzi);
-  const mSegs = segs(mauzi?.filter || "");
-  check("species 'mauzi' is its OWN &-segment", mSegs.includes("mauzi"));
-  check(`type '${DARK}' is its OWN &-segment`, mSegs.includes(DARK));
-  check("species and type NOT fused in one comma-run",
-    !mSegs.some(s => s.includes(",") && s.includes("mauzi") && s.includes(DARK)));
-  check("spare carve-out present (owns Mauzi hundo): '!4*'", mSegs.includes("!4*"));
-  check("spare stars line ORs in the species", mSegs.some(s => s === "0*,1*,2*,mauzi"));
-
-  // Sandan (ice / Alola) — no hundo → plain stars, no spare guard.
-  const sandan = typed.find(b => b.formKey === "sandan-ice");
-  check("sandan-ice form line exists", !!sandan);
-  const sSegs = segs(sandan?.filter || "");
-  check("species 'sandan' is its OWN &-segment", sSegs.includes("sandan"));
-  check(`type '${ICE}' is its OWN &-segment`, sSegs.includes(ICE));
-  check("no spare guard without a hundo (no '!4*')", !sSegs.includes("!4*"));
-  check("plain trashable stars '0*,1*,2*' present", sSegs.includes("0*,1*,2*"));
-
-  // Every line carries the standard guards (not-tagged, favorites).
-  check("all lines guarded by '!#' and favorites",
-    [shared[0], mauzi, sandan].every(b => segs(b.filter).includes("!#")
-      && b.filter.includes(`!${kw.flag.favorite}`)));
-
-  // Raw line is verbatim and unguarded.
+  // Raw line verbatim and unguarded.
   check("raw line filter is verbatim", raw[0]?.filter === "mauzi&schillernd");
   check("raw line carries no guards", !segs(raw[0]?.filter || "").includes("!#"));
 }
 
-console.log("\nRaw escape hatch is expert-gated");
+// ─────────────────────────────────────────────────────────────────────────
+console.log("\nThe headline case — Kanto Mauzi + Galar Ponita is ONE filter (semantic)");
 {
-  const cfg = { ...DEFAULT_CONFIG, expertMode: false, buddies: [buddy] };
-  const res = buildFilters(["mauzi"], [], cfg, [], LOCALE, tFn);
-  check("no raw line when expertMode is off",
-    !res.buddyCatchFilters.some(b => b.formKey === "raw"));
+  const buddy = {
+    id: "julia", name: "Julia", tagPrefix: "Julia", active: true,
+    targetSpecies: [
+      { species: "mauzi",  expand: false, dropForms: ["alola", "galar"] }, // keep Kanto
+      { species: "ponita", expand: false, dropForms: ["base"] },           // keep Galar
+    ],
+  };
+  const cfg = { ...SEM_CFG, buddies: [buddy] };
+  const res = buildFilters([], [], cfg, [], LOCALE, tFn);
+  const lines = res.buddyCatchFilters;
+  check("Julia gets exactly ONE filter (not three)", lines.length === 1, `got ${lines.length}`);
+  const f = lines[0]?.filter || "";
+
+  const cases = [
+    ["Kanto Meowth",  mk({ species: "mauzi",  dex: 52, types: [kw.type.normal] }), true],
+    ["Alola Meowth",  mk({ species: "mauzi",  dex: 52, types: [kw.type.dark] }),   false],
+    ["Galar Meowth",  mk({ species: "mauzi",  dex: 52, types: [kw.type.steel] }),  false],
+    ["Kanto Ponita",  mk({ species: "ponita", dex: 77, types: [kw.type.fire] }),   false],
+    ["Galar Ponita",  mk({ species: "ponita", dex: 77, types: [kw.type.psychic] }), true],
+    ["Pidgey",        mk({ species: "taubsi", dex: 16, types: [kw.type.normal] }), false],
+  ];
+  for (const [label, mon, want] of cases) {
+    check(`${label} ${want ? "kept" : "dropped"}`, evalFilter(f, mon) === want);
+  }
 }
 
-console.log("\nBuddy with only a typed target emits no empty shared line");
+// ─────────────────────────────────────────────────────────────────────────
+console.log("\nCross-species type collision is contained (Mauzi drop steel + want steel Alolan Sandshrew)");
 {
-  const onlyTyped = { ...buddy, rawAppend: "", targetSpecies: [{ species: "mauzi", expand: false, type: "dark" }] };
-  const cfg = { ...DEFAULT_CONFIG, expertMode: true, buddies: [onlyTyped] };
-  const res = buildFilters([], [], cfg, [], LOCALE, tFn);
-  check("no guards-only shared filter", !res.buddyCatchFilters.some(b => !b.formKey));
-  check("the single form line is present", res.buddyCatchFilters.some(b => b.formKey === "mauzi-dark"));
+  const buddy = {
+    id: "x", name: "X", tagPrefix: "X", active: true,
+    targetSpecies: [
+      { species: "mauzi",  expand: false, dropForms: ["galar"] }, // drop Galar (steel)
+      { species: "sandan", expand: false, dropForms: ["base"] },  // keep Alolan (ice/steel)
+    ],
+  };
+  const cfg = { ...SEM_CFG, buddies: [buddy] };
+  const f = buildFilters([], [], cfg, [], LOCALE, tFn).buddyCatchFilters[0].filter;
+  // Alolan Sandshrew is steel — the Mauzi `!stahl` guard must NOT exclude it
+  // because that guard is scoped by `!mauzi`.
+  check("Alola Sandshrew (steel) kept despite Mauzi's steel drop",
+    evalFilter(f, mk({ species: "sandan", dex: 27, types: [kw.type.ice, kw.type.steel] })) === true);
+  check("Galar Meowth (steel) still dropped",
+    evalFilter(f, mk({ species: "mauzi", dex: 52, types: [kw.type.steel] })) === false);
+  check("Kanto Sandshrew (ground) dropped (base excluded)",
+    evalFilter(f, mk({ species: "sandan", dex: 27, types: [kw.type.ground] })) === false);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+console.log("\nFamily expansion + form drop uses '!+name' guard (semantic)");
+{
+  const buddy = {
+    id: "y", name: "Y", tagPrefix: "Y", active: true,
+    targetSpecies: [{ species: "mauzi", expand: true, dropForms: ["alola"] }], // +family, no Alolan
+  };
+  const cfg = { ...SEM_CFG, buddies: [buddy] };
+  const f = buildFilters([], [], cfg, [], LOCALE, tFn).buddyCatchFilters[0].filter;
+  check("guard uses '!+mauzi' (family-scoped)", segs(f).some(s => s.startsWith("!+mauzi,")));
+  const persian = (types) => mk({ species: "snobilikat", dex: 53, types, family: ["mauzi", "snobilikat"] });
+  check("Kanto Persian (in family, normal) kept", evalFilter(f, persian([kw.type.normal])) === true);
+  check("Alola Persian (in family, dark) dropped", evalFilter(f, persian([kw.type.dark])) === false);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+console.log("\nRaw escape hatch is expert-gated");
+{
+  const buddy = { id: "a", name: "A", tagPrefix: "A", active: true, rawAppend: "mauzi&schillernd",
+    targetSpecies: [{ species: "mauzi", expand: false, dropForms: ["galar"] }] };
+  const off = buildFilters([], [], { ...DEFAULT_CONFIG, expertMode: false, buddies: [buddy] }, [], LOCALE, tFn);
+  check("no raw line when expertMode is off", !off.buddyCatchFilters.some(b => b.formKey === "raw"));
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+console.log("\nOnly a form-restricted target → one combined line, still guarded");
+{
+  const buddy = { id: "o", name: "O", tagPrefix: "O", active: true, rawAppend: "",
+    targetSpecies: [{ species: "mauzi", expand: false, dropForms: ["galar"] }] };
+  const res = buildFilters([], [], { ...DEFAULT_CONFIG, expertMode: true, buddies: [buddy] }, [], LOCALE, tFn);
+  check("exactly one line", res.buddyCatchFilters.length === 1, `got ${res.buddyCatchFilters.length}`);
+  const f = res.buddyCatchFilters[0]?.filter || "";
+  check("has the species and a scoped guard and standard guards",
+    segs(f).includes("mauzi") && segs(f).some(s => s.startsWith("!mauzi,")) && segs(f).includes("!#"));
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+console.log("\nDropping every form catches nothing → species omitted");
+{
+  const buddy = { id: "z", name: "Z", tagPrefix: "Z", active: true, rawAppend: "",
+    targetSpecies: [{ species: "mauzi", expand: false, dropForms: ["base", "alola", "galar"] }] };
+  const res = buildFilters([], [], { ...DEFAULT_CONFIG, expertMode: true, buddies: [buddy] }, [], LOCALE, tFn);
+  check("no line emitted when all forms are dropped", res.buddyCatchFilters.length === 0,
+    `got ${res.buddyCatchFilters.length}`);
 }
 
 console.log(`\n${failures === 0 ? "✓ All buddy-catch tests passed." : `✗ ${failures} test(s) failed.`}`);
