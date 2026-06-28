@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, Fragment } from "react";
 import * as d3 from "d3";
 import { X, Plus, Copy, Check, ChevronDown, ChevronRight, RotateCcw, Sparkles, Settings, ArrowLeft, Download, Upload } from "lucide-react";
 import {
@@ -278,6 +278,15 @@ export const DEFAULT_CONFIG = {
   // charge move is already unlocked. Default off so newer accounts still
   // see candidates worth investing in.
   raidRequireSecondMove: false,
+
+  // Team Rocket lenient fallback. When true, each leader phase / typed grunt
+  // gets a SECOND "broad" counter FilterBox next to the strict one: any
+  // super-effective move in ANY slot OR a high-CP bulky pick, still guarded
+  // against the lineup's weaknesses. The strict filter often collapses to a
+  // handful of mons (it demands an SE fast AND SE charge move on one species),
+  // so this surfaces more of the user's box. Default on; toggle visible in
+  // normal mode too.
+  rocketLenientCounters: true,
 
   // The preset key the user last clicked, if they haven't tweaked anything
   // in ConfigPanel since. Cleared by any individual toggle change so the
@@ -1518,6 +1527,25 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     return [...set];
   };
 
+  // Lenient fallback pool for the Rocket counter boxes. The strict builders
+  // AND a super-effective FAST move with a super-effective CHARGE move; for a
+  // single-seMoveType trainer that collapses to the ~6 species carrying that
+  // type on both slots. This relaxes it to "an SE move in ANY slot OR a
+  // high-CP bulky pick", still gated by the SAME lineup weakness guard so
+  // nothing surfaced loses the matchup. Rendered as a second FilterBox when
+  // cfg.rocketLenientCounters is on. `,` binds tighter than `&`, so the move
+  // tokens + CP floor form one OR group, then each `!<type` is ANDed.
+  const ROCKET_LENIENT_CP_FLOOR = 3500; // user-chosen "WP over 3500" escape hatch
+  const buildLenientCounters = (seMoveList, lineupTypes) => {
+    const clauses = [];
+    const pool = [fastMoveClause(seMoveList), chargeMoveClause(seMoveList),
+                  `${kw.numeric.cp}${ROCKET_LENIENT_CP_FLOOR}-`].join(",");
+    push(clauses, pool, tFn("app.clause_why.rocket_lenient_pool"));
+    const wGuard = weaknessGuard(lineupTypes);
+    if (wGuard) push(clauses, wGuard, tFn("app.clause_why.rocket_not_weak_to_lineup"));
+    return { clause: clauses.map(c => c.clause).join("&"), clauses };
+  };
+
   const buildBossEntry = (boss, { requiresDynamax = false } = {}) => {
     const resistorList = (boss.resistorTypes || [])
       .map(t => kw.type[t]).filter(Boolean);
@@ -1711,7 +1739,7 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     const seMoveList = (phase.seMoveTypes || []).map(t => kw.type[t]).filter(Boolean);
     const localizedPokemons = localizePokemons(phase.pokemons);
     if (resistorList.length === 0 || seMoveList.length === 0) {
-      return { slot: phase.slot, pokemons: localizedPokemons, clause: "", clauses: [], skipped: true };
+      return { slot: phase.slot, pokemons: localizedPokemons, clause: "", clauses: [], lenient: null, skipped: true };
     }
     const clauses = [];
     // Soft resistor allowlist — narrow lineups like Landorus (resistorTypes:
@@ -1730,7 +1758,9 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     const wGuard = weaknessGuard(unionTypesOf(phase.pokemons));
     if (wGuard) push(clauses, wGuard, tFn("app.clause_why.rocket_not_weak_to_lineup"));
     return { slot: phase.slot, pokemons: localizedPokemons,
-             clause: clauses.map(c => c.clause).join("&"), clauses, skipped: false };
+             clause: clauses.map(c => c.clause).join("&"), clauses,
+             lenient: buildLenientCounters(seMoveList, unionTypesOf(phase.pokemons)),
+             skipped: false };
   };
   // ScrapedDuck names are like "Ice-type Female Grunt" / "Male Grunt" — pull
   // gender out of the EN string regardless of the user's outputLocale.
@@ -1766,7 +1796,7 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     const quote = resolveQuote(ROCKET_GRUNT_QUOTES.typed?.[trainer.type], gender);
     if (resistorList.length === 0 || seMoveList.length === 0) {
       return { name: displayName, type: trainer.type, phases: localizedPhases, quote,
-               clause: "", clauses: [], skipped: true };
+               clause: "", clauses: [], lenient: null, skipped: true };
     }
     const clauses = [];
     // Soft resistor allowlist — see buildLeaderPhase for the rationale.
@@ -1781,7 +1811,9 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
     const wGuard = weaknessGuard(unionTypesOf(allLineup));
     if (wGuard) push(clauses, wGuard, tFn("app.clause_why.rocket_not_weak_to_lineup"));
     return { name: displayName, type: trainer.type, phases: localizedPhases, quote,
-             clause: clauses.map(c => c.clause).join("&"), clauses, skipped: false };
+             clause: clauses.map(c => c.clause).join("&"), clauses,
+             lenient: buildLenientCounters(seMoveList, unionTypesOf(allLineup)),
+             skipped: false };
   };
   // Capitalized localized type name for display ("Feuer", "Wasser"). The
   // raw kw.type value is lowercase since filter syntax wants it that way.
@@ -1994,6 +2026,11 @@ function evalTerm(t, mon, kw, outputLocale) {
   m = t.match(distRe);  if (m) return (mon.distance||0) >= +m[1];
   const cpRe = new RegExp(`^${escapeRegex(kw.numeric.cp)}-?(\\d+)$`);
   m = t.match(cpRe);    if (m) return (mon.wp||9999) <= +m[1];
+  // CP floor (>= N) — trailing dash. Disjoint from cpRe (which ends in a
+  // digit), so ordering is safe. Used by the Rocket lenient pool (cp3500-).
+  // Default 0 so an unknown-CP fixture FAILS the floor (mirror of the <= 9999).
+  const cpFloorRe = new RegExp(`^${escapeRegex(kw.numeric.cp)}(\\d+)-$`);
+  m = t.match(cpFloorRe); if (m) return (mon.wp||0) >= +m[1];
   const ageRe = new RegExp(`^${escapeRegex(kw.numeric.age)}-(\\d+)$`);
   m = t.match(ageRe);   if (m) return (mon.ageDays||9999) <= +m[1];
   const yearRe = new RegExp(`^${escapeRegex(kw.numeric.year)}(\\d+)-$`);
@@ -3172,6 +3209,7 @@ export default function App() {
                     typedGrunts={rocketTypedGrunts}
                     genericGrunts={rocketGenericGrunts}
                     typeLabels={rocketTypeLabels}
+                    lenientCounters={effectiveConfig.rocketLenientCounters !== false}
                     open={showAuxRocket}
                     onToggle={() => setShowAuxRocket((s) => !s)}
                     copied={copied}
@@ -4339,7 +4377,7 @@ function GruntQuoteList({ quotes, t }) {
 }
 
 function RocketCollapsible({
-  fetchedAt, leaders, typedGrunts, genericGrunts, typeLabels,
+  fetchedAt, leaders, typedGrunts, genericGrunts, typeLabels, lenientCounters,
   open, onToggle, copied, copyToClipboard, t, outputLocale,
 }) {
   const [highlightedType, setHighlightedType] = useState(null);
@@ -4386,18 +4424,30 @@ function RocketCollapsible({
                   {leader.phases.map(phase => {
                     if (phase.skipped) return null;
                     const copyKey = `rocket_${leader.name}_${phase.slot}`;
+                    const lenientKey = `${copyKey}_lenient`;
                     return (
-                      <FilterBox
-                        key={copyKey}
-                        label={t("app.filter.rocket_phase_label", { params: { slot: phase.slot } })}
-                        accent="#C0392B"
-                        filterStr={phase.clause}
-                        copied={copied[copyKey]}
-                        onCopy={() => copyToClipboard(copyKey, phase.clause)}
-                        hint={t("app.filter.rocket_phase_hint", {
-                          params: { names: phase.pokemons.map(p => p.name).join(t("app.filter.rocket_lineup_or")) },
-                        })}
-                      />
+                      <Fragment key={copyKey}>
+                        <FilterBox
+                          label={t("app.filter.rocket_phase_label", { params: { slot: phase.slot } })}
+                          accent="#C0392B"
+                          filterStr={phase.clause}
+                          copied={copied[copyKey]}
+                          onCopy={() => copyToClipboard(copyKey, phase.clause)}
+                          hint={t("app.filter.rocket_phase_hint", {
+                            params: { names: phase.pokemons.map(p => p.name).join(t("app.filter.rocket_lineup_or")) },
+                          })}
+                        />
+                        {lenientCounters && phase.lenient?.clause && (
+                          <FilterBox
+                            label={t("app.filter.rocket_phase_label_lenient", { params: { slot: phase.slot } })}
+                            accent="#E08E0B"
+                            filterStr={phase.lenient.clause}
+                            copied={copied[lenientKey]}
+                            onCopy={() => copyToClipboard(lenientKey, phase.lenient.clause)}
+                            hint={t("app.filter.rocket_lenient_hint")}
+                          />
+                        )}
+                      </Fragment>
                     );
                   })}
                 </TrainerAccordion>
@@ -4432,6 +4482,16 @@ function RocketCollapsible({
                       onCopy={() => copyToClipboard(copyKey, g.clause)}
                       hint={lineupHint(g.phases, t)}
                     />
+                    {lenientCounters && g.lenient?.clause && (
+                      <FilterBox
+                        label={t("app.filter.rocket_grunt_filter_label_lenient")}
+                        accent="#E08E0B"
+                        filterStr={g.lenient.clause}
+                        copied={copied[`${copyKey}_lenient`]}
+                        onCopy={() => copyToClipboard(`${copyKey}_lenient`, g.lenient.clause)}
+                        hint={t("app.filter.rocket_lenient_hint")}
+                      />
+                    )}
                   </TrainerAccordion>
                 );
               })}
@@ -4992,6 +5052,24 @@ function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks =
         </div>
       )}
 
+      {/* TEAM ROCKET — counter filter options (visible in normal mode) */}
+      <div>
+        <div className="mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2">
+          {t("app.collapsible.aux_section_team_rocket")}
+        </div>
+        <label className="flex items-start gap-2 cursor-pointer mono text-xs">
+          <input
+            type="checkbox"
+            checked={config.rocketLenientCounters !== false}
+            onChange={e => set("rocketLenientCounters", e.target.checked)}
+            className="mt-0.5"
+          />
+          <div>
+            <span className="text-[#E6EDF3]">{t("app.protect.rocket_lenient_counters.label")}</span>
+            <p className="text-[#8B98A5] mt-0.5">{t("app.protect.rocket_lenient_counters.help")}</p>
+          </div>
+        </label>
+      </div>
 
       <hr className="border-[#1F2933]" />
 

@@ -957,5 +957,11 @@
   "app.explain.nav.next": "Siguiente",
   "app.explain.nav.landing": "Inicio",
   "app.explain.nav.explainer": "Explicación",
-  "app.explain.nav.workshop": "Taller"
+  "app.explain.nav.workshop": "Taller",
+  "app.clause_why.rocket_lenient_pool": "tiene un movimiento supereficaz en cualquier espacio, o es una opción de PC alto",
+  "app.filter.rocket_phase_label_lenient": "fase {slot} · amplio",
+  "app.filter.rocket_grunt_filter_label_lenient": "counters amplios",
+  "app.filter.rocket_lenient_hint": "Grupo más amplio: cualquier movimiento supereficaz (en cualquier espacio) o PC ≥ 3500, sin ser débil a la alineación. Úsalo cuando el filtro estricto muestre muy pocos de tus Pokémon.",
+  "app.protect.rocket_lenient_counters.label": "Mostrar counters de reserva amplios para el Team GO Rocket",
+  "app.protect.rocket_lenient_counters.help": "Añade una segunda caja de counters más amplia por fase de líder y recluta temático: cualquier movimiento supereficaz (en cualquier espacio) o PC ≥ 3500, siempre protegido frente a las debilidades de la alineación. Activado por defecto; desactívalo para despejar."
 }

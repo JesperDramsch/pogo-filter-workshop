@@ -1004,5 +1004,11 @@
   "app.events.sort_hint": "Event-Spawns, die du noch nicht favorisiert oder getaggt hast — was nach dem Behalten der Guten übrig bleibt.",
   "app.events.group_trash": "③ Müll",
   "app.events.trash_label": "Müll",
-  "app.events.trash_hint": "Event-Spawns, die deinen normalen Müll-Regeln entsprechen — räum die Dubletten weg, sobald die Keeper raus sind."
+  "app.events.trash_hint": "Event-Spawns, die deinen normalen Müll-Regeln entsprechen — räum die Dubletten weg, sobald die Keeper raus sind.",
+  "app.clause_why.rocket_lenient_pool": "hat einen sehr effektiven Move in irgendeinem Slot oder ist ein WP-starker Pick",
+  "app.filter.rocket_phase_label_lenient": "Phase {slot} · breit",
+  "app.filter.rocket_grunt_filter_label_lenient": "breite Counter",
+  "app.filter.rocket_lenient_hint": "Größerer Pool: irgendein sehr effektiver Move (egal welcher Slot) oder WP ≥ 3500, weiterhin nicht schwach gegen das Lineup. Nutze ihn, wenn der strikte Filter zu wenige deiner Pokémon zeigt.",
+  "app.protect.rocket_lenient_counters.label": "Breite Ausweich-Counter für Rocket zeigen",
+  "app.protect.rocket_lenient_counters.help": "Fügt pro Leader-Phase und Typ-Rüpel eine zweite, breitere Counter-Box hinzu: irgendein sehr effektiver Move (egal welcher Slot) oder WP ≥ 3500, weiterhin gegen die Schwächen des Lineups abgesichert. An per Default; zum Aufräumen ausschalten."
 }

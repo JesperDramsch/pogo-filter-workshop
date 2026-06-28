@@ -957,5 +957,11 @@
   "app.explain.nav.next": "下一頁",
   "app.explain.nav.landing": "首頁",
   "app.explain.nav.explainer": "解釋",
-  "app.explain.nav.workshop": "工作坊"
+  "app.explain.nav.workshop": "工作坊",
+  "app.clause_why.rocket_lenient_pool": "在任一招式槽帶有效果絕佳的招式，或是高 CP 的選擇",
+  "app.filter.rocket_phase_label_lenient": "第 {slot} 階段 · 寬鬆",
+  "app.filter.rocket_grunt_filter_label_lenient": "寬鬆剋制",
+  "app.filter.rocket_lenient_hint": "更大的池：任一招式槽帶效果絕佳招式，或 CP ≥ 3500，且不弱於陣容。當嚴格篩選器顯示的寶可夢太少時使用。",
+  "app.protect.rocket_lenient_counters.label": "顯示火箭隊的寬鬆備援剋制",
+  "app.protect.rocket_lenient_counters.help": "為每個首領階段與屬性嘍囉新增第二個更寬鬆的剋制框：任一招式槽帶效果絕佳招式，或 CP ≥ 3500，仍可防範陣容的弱點。預設開啟；想精簡時可關閉。"
 }

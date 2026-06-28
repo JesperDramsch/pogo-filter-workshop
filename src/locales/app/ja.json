@@ -957,5 +957,11 @@
   "app.explain.nav.next": "次へ",
   "app.explain.nav.landing": "ホーム",
   "app.explain.nav.explainer": "解説",
-  "app.explain.nav.workshop": "ワークショップ"
+  "app.explain.nav.workshop": "ワークショップ",
+  "app.clause_why.rocket_lenient_pool": "いずれかのスロットに効果抜群の技を持つ、または高CPのピック",
+  "app.filter.rocket_phase_label_lenient": "フェーズ {slot} · 広め",
+  "app.filter.rocket_grunt_filter_label_lenient": "広めのカウンター",
+  "app.filter.rocket_lenient_hint": "より広いプール：いずれかのスロットに効果抜群の技、またはCP 3500以上で、編成に弱くないもの。厳密フィルターで手持ちが少なすぎるときに使用。",
+  "app.protect.rocket_lenient_counters.label": "ロケット団の広い予備カウンターを表示",
+  "app.protect.rocket_lenient_counters.help": "リーダーの各フェーズとタイプ別したっぱごとに、2つ目のより広いカウンター枠を追加：いずれかのスロットに効果抜群の技、またはCP 3500以上で、編成の弱点から守られたまま。デフォルトはオン。すっきりさせたいときはオフに。"
 }

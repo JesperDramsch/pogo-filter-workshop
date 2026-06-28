@@ -957,5 +957,11 @@
   "app.explain.nav.next": "अगला",
   "app.explain.nav.landing": "होम",
   "app.explain.nav.explainer": "व्याख्या",
-  "app.explain.nav.workshop": "Workshop"
+  "app.explain.nav.workshop": "Workshop",
+  "app.clause_why.rocket_lenient_pool": "किसी भी slot में super-effective move रखता है, या high-CP pick है",
+  "app.filter.rocket_phase_label_lenient": "phase {slot} · broad",
+  "app.filter.rocket_grunt_filter_label_lenient": "broad counters",
+  "app.filter.rocket_lenient_hint": "बड़ा pool: किसी भी slot में कोई super-effective move या CP ≥ 3500, फिर भी lineup के प्रति weak नहीं। तब इस्तेमाल करें जब strict filter आपके बहुत कम Pokémon दिखाए।",
+  "app.protect.rocket_lenient_counters.label": "broad fallback Rocket counters दिखाएँ",
+  "app.protect.rocket_lenient_counters.help": "हर leader phase और typed grunt के लिए एक दूसरा, ज़्यादा broad counter box जोड़ता है: किसी भी slot में कोई super-effective move या CP ≥ 3500, फिर भी lineup की weaknesses से सुरक्षित। डिफ़ॉल्ट से on; declutter करने के लिए off करें।"
 }

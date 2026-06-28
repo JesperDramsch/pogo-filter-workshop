@@ -1004,5 +1004,11 @@
   "app.events.sort_hint": "Event spawns you haven't favourited or tagged yet — what's left to judge after you've kept the good ones.",
   "app.events.group_trash": "③ Trash",
   "app.events.trash_label": "trash",
-  "app.events.trash_hint": "Event spawns that match your normal trash rules — bulk-clear the dupes once you've pulled the keepers."
+  "app.events.trash_hint": "Event spawns that match your normal trash rules — bulk-clear the dupes once you've pulled the keepers.",
+  "app.clause_why.rocket_lenient_pool": "carries a super-effective move in any slot, or is a high-CP pick",
+  "app.filter.rocket_phase_label_lenient": "phase {slot} · broad",
+  "app.filter.rocket_grunt_filter_label_lenient": "broad counters",
+  "app.filter.rocket_lenient_hint": "Wider pool: any super-effective move (any slot) or CP ≥ 3500, still not weak to the lineup. Use when the strict filter shows too few of your Pokémon.",
+  "app.protect.rocket_lenient_counters.label": "Show broad fallback Rocket counters",
+  "app.protect.rocket_lenient_counters.help": "Adds a second, wider counter box per leader phase and typed grunt: any super-effective move (any slot) or CP ≥ 3500, still guarded against the lineup's weaknesses. On by default; turn off to declutter."
 }
