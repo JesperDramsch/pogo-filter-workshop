@@ -484,37 +484,6 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "skarmory-super-mega-raid-day-2026",
-      "name": "Skarmory Super Mega Raid Day",
-      "eventType": "raid-day",
-      "start": "2026-06-27T14:00:00.000",
-      "end": "2026-06-27T17:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "SKARMORY",
-          "names": {
-            "en": "Skarmory"
-          },
-          "types": [
-            "steel",
-            "flying"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "electric"
-          ],
-          "seMoveTypes": [
-            "fire",
-            "electric"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "articuno-zapdos-moltres-in-5-star-raid-battles-july-2026",
       "name": "Articuno, Zapdos, and Moltres in 5-star Raid Battles",
       "eventType": "raid-battles",
