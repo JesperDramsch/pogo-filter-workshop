@@ -42,6 +42,10 @@ export function pogoKeywords(outputLocale) {
       mega:         k(messages, "filter_key_mega_level"),
       mega_evolve:  k(messages, "filter_key_evolve_mega"),
       dynamax_move: k(messages, "filter_key_bread_move_a"),
+      // Gigantamax-capable flag (filter_key_dough). A STRICT SUBSET of
+      // dynamax_move — only ever emitted as the narrow `!gigadynamax` floor
+      // when broad Dynamax protection is off (see maxProtectClause in App).
+      gigantamax:   k(messages, "filter_key_dough"),
       // PoGo's `@3move` matches Pokémon that still need a 3rd-move TM (i.e.,
       // NOT yet double-moved). Currently a literal English keyword in PoGo
       // even on localized clients; fallback to "3move" in case a localized

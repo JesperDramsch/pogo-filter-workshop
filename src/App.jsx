@@ -198,6 +198,11 @@ export const DEFAULT_CONFIG = {
   protectXXS: true,
   protectDoubleMoved: true,
   protectDynamax: true,
+  // Gigantamax floor. Default ON but suppressed (never emitted) whenever
+  // protectDynamax is on, since Gigantamax-capable is a subset of Dynamax-
+  // capable. Only bites when broad Dynamax protection is off: keeps the rare
+  // Giga species while ordinary Dynamax commons become releasable.
+  protectGigantamax: true,
   protectNewEvolutions: true,  // (was protectMegaConditional — name simplified, mega0 logic preserved)
   protectBuddies: false,
 
@@ -540,6 +545,13 @@ export function mergeImportedConfig(raw) {
     merged.protectAnyTag = raw.protectTagged;
   }
   delete merged.protectTagged;
+  // protectGigantamax is new: a config that predates it back-fills the default
+  // (true). For the one cohort that explicitly saved protectDynamax:false, that
+  // would newly emit `!gigadynamax` (strictly safer, but a behavior change), so
+  // pin the floor off to keep their output byte-identical until they opt in.
+  if (raw?.protectGigantamax === undefined && raw?.protectDynamax === false) {
+    merged.protectGigantamax = false;
+  }
   // Canonicalize seeded defaults to the storage locale so chips render
   // consistently. Idempotent on already-canonical user input.
   const canonicalize = (arr) => (arr || []).map(s => resolveSpecies(s) || s);
@@ -764,6 +776,21 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
       : `!@${kw.flag.special_move}${suffix},${smeargleName}`;
   };
 
+  // Single source of truth for the Max-protection clause shared by trash /
+  // trade / gift, so the three sites can never diverge. Broad Dynamax
+  // protection emits the collision-safe `!dynaattacke1-` (the leveled Max-move
+  // keyword — NOT bare `!dynamax`, which self-expands and breaks `@Dynamax
+  // Cannon` searches). The Gigantamax floor is a strict subset, so the else-if
+  // is suppressed whenever broad protection is on — keeping the compact
+  // combined default byte-identical — and only emits the narrow `!gigadynamax`
+  // when broad is off, protecting rare Gigas while ordinary Dynamax commons
+  // stay releasable. Returns [clause, why] or null.
+  const maxProtectClause = () => {
+    if (cfg.protectDynamax) return [`!${kw.flag.dynamax_move}1-`, tFn("app.clause_why.dynamax")];
+    if (cfg.protectGigantamax && kw.flag.gigantamax) return [`!${kw.flag.gigantamax}`, tFn("app.clause_why.gigantamax")];
+    return null;
+  };
+
   // ── TRASH ──────────────────────────────────────────────────────────────
   push(trashClauses, [S012, H].filter(Boolean).join(","), tFn("app.clause_why.h_union_s012"));
   push(trashClauses, `${S012},${ivK1Bad}`, tFn("app.clause_why.not_k1"));
@@ -825,7 +852,7 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
   if (cfg.protectCostumes)     push(trashClauses, `!${kw.flag.costume}`, tFn("app.clause_why.costumes"));
   if (cfg.protectLuckies)      push(trashClauses, `!${kw.flag.lucky}`, tFn("app.clause_why.luckies"));
   if (cfg.protectBackgrounds)  push(trashClauses, `!${kw.flag.background}`, tFn("app.clause_why.backgrounds"));
-  if (cfg.protectDynamax)      push(trashClauses, `!${kw.flag.dynamax_move}1-`, tFn("app.clause_why.dynamax"));
+  { const mp = maxProtectClause(); if (mp) push(trashClauses, mp[0], mp[1]); }
   if (cfg.protectNewEvolutions) push(trashClauses, `!${kw.flag.new_evo},${kw.flag.mega}0`, tFn("app.clause_why.new_evolutions"));
   if (cfg.protectLegacyMoves) push(trashClauses, legacyMovesClause(), tFn("app.clause_why.legacy_moves"));
   if (cfg.protectBabies)       push(trashClauses, `!${kw.flag.baby}`, tFn("app.clause_why.babies"));
@@ -974,7 +1001,7 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
   // mirror the trash protection (search for cfg.protectBuddies above).
   if (cfg.protectBuddies)      push(tradeClauses, `!${kw.numeric.buddy}1-`, tFn("app.clause_why.buddies_were"));
   if (cfg.protectDoubleMoved)  push(tradeClauses, "@3move", tFn("app.clause_why.double_moved_trade"));
-  if (cfg.protectDynamax)      push(tradeClauses, `!${kw.flag.dynamax_move}1-`, tFn("app.clause_why.dynamax"));
+  { const mp = maxProtectClause(); if (mp) push(tradeClauses, mp[0], mp[1]); }
   // Trading away a would-be new-dex evolution costs you the registration; mirror
   // the trash protection (L738) so it isn't bulk-traded.
   if (cfg.protectNewEvolutions) push(tradeClauses, `!${kw.flag.new_evo},${kw.flag.mega}0`, tFn("app.clause_why.new_evolutions"));
@@ -1043,7 +1070,7 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
         tFn("app.clause_why.protect_nundos_trade"));
     }
     if (cfg.protectDoubleMoved) push(clauses, "@3move", tFn("app.clause_why.double_moved_trade"));
-    if (cfg.protectDynamax)     push(clauses, `!${kw.flag.dynamax_move}1-`, tFn("app.clause_why.dynamax"));
+    { const mp = maxProtectClause(); if (mp) push(clauses, mp[0], mp[1]); }
     if (cfg.protectXXL)         push(clauses, `!${kw.flag.xxl}`, tFn("app.clause_why.xxl_trade"));
     if (cfg.protectXL)          push(clauses, `!${kw.flag.xl}`,  tFn("app.clause_why.xl_trade"));
     if (cfg.protectXXS)         push(clauses, `!${kw.flag.xxs}`, tFn("app.clause_why.xxs"));
@@ -1884,6 +1911,7 @@ const FLAG_TO_MON = {
   background: "background", traded: "traded", hatched: "hatched",
   baby: "eggOnly", new_evo: "newDexEvo", special_move: "legacyMove",
   xxl: "xxl", xl: "xl", xxs: "xxs",
+  gigantamax: "gigantamaxCapable",
 };
 
 export function evalFilter(filterStr, mon, outputLocale = "de") {
@@ -4499,6 +4527,10 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = "de" })
     }
     return {
       ...m, families, dex: m.dex || 0,
+      // Gigantamax-capable is physically a subset of Dynamax-capable, so a mon
+      // marked Giga in the tester is implicitly Dyna too — otherwise the
+      // verifier could represent an impossible giga-but-not-dyna state.
+      flags: { ...m.flags, dynamaxCapable: m.flags.dynamaxCapable || m.flags.gigantamaxCapable },
       wp: 1500, ageDays: 5, distance: m.flags.farDistance ? 200 : 0,
       year: 2025,
     };
@@ -4511,7 +4543,7 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = "de" })
   const flagToggles = [
     ["favorite","app.verify.flag_fav"],["tagged","app.verify.flag_tag"],["shiny","app.verify.flag_shiny"],["lucky","app.verify.flag_lucky"],
     ["legendary","app.verify.flag_legend"],["mythical","app.verify.flag_myth"],["shadow","app.verify.flag_crypto"],["legacyMove","app.verify.flag_legacy"],
-    ["megaEvolved","app.verify.flag_mega"],["dynamaxCapable","app.verify.flag_dyna"],["doubleMoved","app.verify.flag_double_move"],
+    ["megaEvolved","app.verify.flag_mega"],["dynamaxCapable","app.verify.flag_dyna"],["gigantamaxCapable","app.verify.flag_giga"],["doubleMoved","app.verify.flag_double_move"],
     ["xxl","app.verify.flag_xxl"],["xl","app.verify.flag_xl"],["xxs","app.verify.flag_xxs"],["leagueU","app.verify.flag_league_u"],["buddy","app.verify.flag_buddy"],
   ];
 
@@ -4608,7 +4640,7 @@ const PRESETS = {
       protectCostumes: true, protectBackgrounds: true, protectLegacyMoves: true,
       protectBabies: true,
       protectXXL: true, protectXL: true, protectXXS: true,
-      protectDoubleMoved: true, protectDynamax: true, protectNewEvolutions: true,
+      protectDoubleMoved: true, protectDynamax: true, protectGigantamax: true, protectNewEvolutions: true,
       protectBuddies: true,
       protectLuckyEligible: true, luckyEligibleYear: 21,
       regionalGroups: defaultRegionalToggles(),
@@ -4634,7 +4666,7 @@ const PRESETS = {
         protectCostumes: true, protectBackgrounds: true, protectLegacyMoves: true,
         protectBabies: true,
         protectXXL: true, protectXL: true, protectXXS: true,
-        protectDoubleMoved: true, protectDynamax: true, protectNewEvolutions: true,
+        protectDoubleMoved: true, protectDynamax: true, protectGigantamax: true, protectNewEvolutions: true,
         protectBuddies: true,
         protectLuckyEligible: true, luckyEligibleYear: 21,
         regionalGroups: groups,
@@ -4655,7 +4687,7 @@ const PRESETS = {
         protectCostumes: true, protectBackgrounds: true, protectLegacyMoves: true,
         protectBabies: false,
         protectXXL: false, protectXL: false, protectXXS: false,
-        protectDoubleMoved: true, protectDynamax: true, protectNewEvolutions: false,
+        protectDoubleMoved: true, protectDynamax: true, protectGigantamax: true, protectNewEvolutions: false,
         protectBuddies: false,
         protectLuckyEligible: true, luckyEligibleYear: 21,
         regionalGroups: groups,
@@ -4679,7 +4711,7 @@ const PRESETS = {
         protectCostumes: false, protectBackgrounds: false, protectLegacyMoves: true,
         protectBabies: false,
         protectXXL: false, protectXL: false, protectXXS: false,
-        protectDoubleMoved: true, protectDynamax: false, protectNewEvolutions: false,
+        protectDoubleMoved: true, protectDynamax: false, protectGigantamax: false, protectNewEvolutions: false,
         protectBuddies: false,
         protectLuckyEligible: true, luckyEligibleYear: 21,
         regionalGroups: groups,
@@ -4696,7 +4728,6 @@ const EXPERT_ONLY_KEYS = new Set([
   "protectUltraBeasts",
   "protectPurified",
   "protectBuddies",
-  "protectDynamax",
   "protectLuckyEligible",
   "trashTradedRegionals",
   "leagueTags",
@@ -4755,7 +4786,8 @@ function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks =
     ["protectXXS",            "app.protect.xxs"],
     ["protectNewEvolutions",  "app.protect.new_evolutions", { expertOnly: true }],
     ["protectDoubleMoved",    "app.protect.double_moved",   { expertOnly: true }],
-    ["protectDynamax",        "app.protect.dynamax",        { expertOnly: true }],
+    ["protectDynamax",        "app.protect.dynamax",        { requireConfirmOff: true }],
+    ["protectGigantamax",     "app.protect.gigantamax",     { expertOnly: true, requireConfirmOff: true }],
     ["protectBuddies",        "app.protect.buddies_protect", { expertOnly: true }],
     ["protectLuckyEligible",  "app.protect.lucky_eligible", { expertOnly: true }],
   ];
@@ -4856,6 +4888,11 @@ function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks =
             );
           })}
         </div>
+        {!config.protectDynamax && config.protectGigantamax && (
+          <div className="border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]">
+            {t("app.protect.dynamax_off_note")}
+          </div>
+        )}
       </div>
 
       {/* RAID FILTERS (expert) — narrows per-boss counter filters */}
