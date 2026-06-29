@@ -963,5 +963,16 @@
   "app.filter.rocket_grunt_filter_label_lenient": "広めのカウンター",
   "app.filter.rocket_lenient_hint": "より広いプール：いずれかのスロットに効果抜群の技、またはCP 3500以上で、編成に弱くないもの。厳密フィルターで手持ちが少なすぎるときに使用。",
   "app.protect.rocket_lenient_counters.label": "ロケット団の広い予備カウンターを表示",
-  "app.protect.rocket_lenient_counters.help": "リーダーの各フェーズとタイプ別したっぱごとに、2つ目のより広いカウンター枠を追加：いずれかのスロットに効果抜群の技、またはCP 3500以上で、編成の弱点から守られたまま。デフォルトはオン。すっきりさせたいときはオフに。"
+  "app.protect.rocket_lenient_counters.help": "リーダーの各フェーズとタイプ別したっぱごとに、2つ目のより広いカウンター枠を追加：いずれかのスロットに効果抜群の技、またはCP 3500以上で、編成の弱点から守られたまま。デフォルトはオン。すっきりさせたいときはオフに。",
+  "app.collapsible.friend_wishlist": "フレンド用ほしいものリスト",
+  "app.filter.friend_wishlist_intro": "これをフレンドに渡してください。フレンドが自分のボックスでこの検索条件を貼り付けると、あなたに送れる交換可能なポケモン（あなたがまだキラ、または個体値100%として持っていない種）が表示されます。交換すると個体値は再抽選されるため、フレンドが完成した100%をそのまま渡すことはできません。任意の個体を交換してもらい、自分で粘ります（キラ交換が最も高確率）。",
+  "app.filter.friend_lucky_label": "キラ用ほしいものリスト",
+  "app.filter.friend_lucky_hint": "フレンド用：あなたがまだキラを持っていない種で、フレンドがまだ交換していない個体を表示します。交換でキラになる可能性があります。",
+  "app.filter.friend_hundo_label": "100%用ほしいものリスト",
+  "app.filter.friend_hundo_hint": "フレンド用：あなたが100%を持っていない種で、フレンドがまだ交換していない個体。個体値は問いません——交換で再抽選されるので、自分で100%を狙います（キラ交換が最適）。",
+  "app.filter.friend_guaranteed_label": "確定キラのみ（古い捕獲）",
+  "app.filter.friend_guaranteed_help": "キラのリストを、交換時に確定キラとなるほど古い捕獲に限定します。",
+  "app.clause_why.friend_have_lucky": "すでにキラ：#{dex} を除外",
+  "app.clause_why.friend_have_hundo": "すでに100%：#{dex} を除外",
+  "app.clause_why.friend_guaranteed_lucky": "確定キラ：20{year}年以前の捕獲のみ"
 }

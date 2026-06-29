@@ -71,5 +71,41 @@ console.log("\nScenario 6: legacy export without luckies → prepared.luckies ab
   check("luckies key absent (caller's setter skipped)", !("luckies" in prepared));
 }
 
+console.log("\nScenario 7: friend wishlist — blacklist by dex, trade guards, no 4* on hundo");
+{
+  // pikachu=25 (hundo), charizard=6 & dratini=147 (lucky). EN keywords.
+  const r = buildFilters(["pikachu"], ["charizard", "dratini"], DEFAULT_CONFIG, [], "en", t);
+  // Lucky list excludes the dex numbers of owned luckies (sorted), by NUMBER not name.
+  check("lucky wishlist excludes !6 (charizard)", r.friendLuckyWishlist.includes("!6"));
+  check("lucky wishlist excludes !147 (dratini)", r.friendLuckyWishlist.includes("!147"));
+  check("lucky wishlist uses dex numbers, not names", !/charizard|glurak|dratini/.test(r.friendLuckyWishlist));
+  check("lucky wishlist carries mythical carve-out 808,809", r.friendLuckyWishlist.includes("808,809"));
+  // Hundo list excludes owned hundo dex and crucially has NO 4* (IVs re-roll on trade).
+  check("hundo wishlist excludes !25 (pikachu)", r.friendHundoWishlist.includes("!25"));
+  check("hundo wishlist has NO 4* clause", !r.friendHundoWishlist.includes("4*"));
+  check("hundo wishlist carries trade guards (808,809)", r.friendHundoWishlist.includes("808,809"));
+  // Guaranteed variant = base lucky wishlist + an "old enough" year floor.
+  // DEFAULT_CONFIG.luckyEligibleYear === 21 → guaranteed window is 20 and earlier.
+  check("guaranteed lucky extends base list", r.friendLuckyWishlistGuaranteed.startsWith(r.friendLuckyWishlist));
+  check("guaranteed lucky adds year-20 floor", r.friendLuckyWishlistGuaranteed.includes("-20"));
+  check("plain lucky list has no year floor", !r.friendLuckyWishlist.includes("-20"));
+}
+
+console.log("\nScenario 8: friend wishlist localizes flag keywords to the friend's PoGo locale");
+{
+  const de = buildFilters([], ["pikachu"], DEFAULT_CONFIG, [], "de", t);
+  check("DE renders !getauscht (traded)", de.friendLuckyWishlist.includes("getauscht"));
+  check("DE renders !crypto (shadow)", de.friendLuckyWishlist.includes("crypto"));
+  check("DE renders !mysteriös (mythical)", de.friendLuckyWishlist.includes("mysteriös"));
+}
+
+console.log("\nScenario 9: empty HAVE-lists → guards only, lucky and hundo identical");
+{
+  const r = buildFilters([], [], DEFAULT_CONFIG, [], "en", t);
+  check("empty lucky list is guards only (no negated dex)", !/![0-9]/.test(r.friendLuckyWishlist));
+  check("empty lucky equals empty hundo (same guards)", r.friendLuckyWishlist === r.friendHundoWishlist);
+  check("guards still present (808,809)", r.friendHundoWishlist.includes("808,809"));
+}
+
 console.log(`\n${failures === 0 ? "✓ All lucky-logic checks passed." : `✗ ${failures} failure(s).`}`);
 process.exit(failures === 0 ? 0 : 1);

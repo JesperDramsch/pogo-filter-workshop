@@ -1010,5 +1010,16 @@
   "app.filter.rocket_grunt_filter_label_lenient": "breite Counter",
   "app.filter.rocket_lenient_hint": "Größerer Pool: irgendein sehr effektiver Move (egal welcher Slot) oder WP ≥ 3500, weiterhin nicht schwach gegen das Lineup. Nutze ihn, wenn der strikte Filter zu wenige deiner Pokémon zeigt.",
   "app.protect.rocket_lenient_counters.label": "Breite Ausweich-Counter für Rocket zeigen",
-  "app.protect.rocket_lenient_counters.help": "Fügt pro Leader-Phase und Typ-Rüpel eine zweite, breitere Counter-Box hinzu: irgendein sehr effektiver Move (egal welcher Slot) oder WP ≥ 3500, weiterhin gegen die Schwächen des Lineups abgesichert. An per Default; zum Aufräumen ausschalten."
+  "app.protect.rocket_lenient_counters.help": "Fügt pro Leader-Phase und Typ-Rüpel eine zweite, breitere Counter-Box hinzu: irgendein sehr effektiver Move (egal welcher Slot) oder WP ≥ 3500, weiterhin gegen die Schwächen des Lineups abgesichert. An per Default; zum Aufräumen ausschalten.",
+  "app.collapsible.friend_wishlist": "Freunde-Wunschliste",
+  "app.filter.friend_wishlist_intro": "Gib das einem Freund — er fügt einen Suchbegriff in seine eigene Box ein und sieht, welche tauschbaren Pokémon er dir schicken könnte: Spezies, die dir noch als Glücks- oder Hundo-Exemplar fehlen. Beim Tausch werden die IVs neu gewürfelt, ein Freund kann dir also keinen fertigen Hundo geben — du tauschst irgendein Exemplar und würfelst selbst (beste Chance beim Glückstausch).",
+  "app.filter.friend_lucky_label": "Glücks-Wunschliste",
+  "app.filter.friend_lucky_hint": "Für einen Freund: zeigt seine noch nie getauschten Pokémon von Spezies, von denen du noch kein Glücks-Exemplar hast — ein Tausch kann dir eins bescheren.",
+  "app.filter.friend_hundo_label": "Hundo-Wunschliste",
+  "app.filter.friend_hundo_hint": "Für einen Freund: seine nie getauschten Exemplare von Spezies, von denen du keinen Hundo hast. Beliebige IVs — der Tausch würfelt sie neu, du würfelst also selbst auf 100 % (am besten im Glückstausch).",
+  "app.filter.friend_guaranteed_label": "Nur garantierte Glückstausche (alte Fänge)",
+  "app.filter.friend_guaranteed_help": "Beschränkt die Glücks-Wunschliste auf Fänge, die alt genug für einen garantierten Glückstausch sind.",
+  "app.clause_why.friend_have_lucky": "Schon als Glücks: #{dex} ausgeschlossen",
+  "app.clause_why.friend_have_hundo": "Schon als Hundo: #{dex} ausgeschlossen",
+  "app.clause_why.friend_guaranteed_lucky": "Garantierter Glückstausch: nur Fänge aus 20{year} oder früher"
 }

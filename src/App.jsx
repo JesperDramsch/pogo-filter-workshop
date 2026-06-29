@@ -1292,6 +1292,71 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
   }
   const gift = giftClauses.map(c => c.clause).join("&");
 
+  // ── FRIEND WISHLIST ──────────────────────────────────────────────────────
+  // A search string the user hands to a FRIEND. The friend pastes it into
+  // THEIR OWN storage; it surfaces their tradeable Pokémon of species the user
+  // still lacks as a lucky / as a hundo, so the friend can trade them over.
+  //
+  // Encoded as a BLACKLIST (exclude the species the user already owns) using
+  // bare DEX NUMBERS. Numbers are locale-independent, so the species part works
+  // in the friend's PoGo client whatever its language — only the flag keywords
+  // (!traded / !shadow / !mythical) render in outputLocale. Blacklist also
+  // scales with the (smaller) owned set rather than the ~1000 missing species,
+  // keeping the string well under PoGo's ~5000-char box even for new accounts.
+  //
+  // Trade guards mirror the GIFT filter (the proven inverse pattern):
+  //   !traded            — a mon can be traded only ONCE; already-traded = dead end
+  //   !shadow            — shadows can never be traded
+  //   !mythical,808,809  — mythicals untradeable except Meltan / Melmetal
+  // The HUNDO list has NO 4* clause on purpose: trading re-rolls IVs, so a
+  // friend can't send a finished hundo — any untraded specimen is a valid roll
+  // (best odds in a lucky trade: 12/12/12 floor). The LUCKY list has an
+  // optional "guaranteed-lucky" variant restricting to old catches (jahr-N)
+  // that are guaranteed Lucky on trade.
+
+  // Canonical-name HAVE-list → sorted, de-duplicated base-dex numbers to negate.
+  // resolveSpeciesInfo collapses forms (mega/regional) to their base dex.
+  const ownedDexList = (names) => {
+    const seen = new Set();
+    for (const n of names || []) {
+      const dex = resolveSpeciesInfo(n)?.dex;
+      if (dex) seen.add(dex);
+    }
+    return [...seen].sort((a, b) => a - b);
+  };
+
+  // Shared trade-eligibility guards appended to every friend wishlist.
+  const pushFriendTradeGuards = (clauses) => {
+    push(clauses, `!${kw.flag.traded}`,           tFn("app.clause_why.gift_must_traded"));
+    push(clauses, `!${kw.flag.shadow}`,           tFn("app.clause_why.gift_must_shadow"));
+    push(clauses, `!${kw.flag.mythical},808,809`, tFn("app.clause_why.must_mythical_short"));
+  };
+
+  // Lucky wishlist — exclude every species the user already has a lucky of.
+  const friendLuckyClauses = [];
+  for (const dex of ownedDexList(luckies))
+    push(friendLuckyClauses, `!${dex}`, tFn("app.clause_why.friend_have_lucky", { params: { dex } }));
+  pushFriendTradeGuards(friendLuckyClauses);
+  const friendLuckyWishlist = friendLuckyClauses.map(c => c.clause).join("&");
+
+  // Guaranteed-lucky variant: AND an "old enough" year floor. luckyEligibleYear
+  // is the first NON-eligible (still-trashable) 2-digit year, so the guaranteed
+  // window is everything caught in the year BEFORE it (e.g. 21 → jahr-20).
+  const oldLuckyYear = cfg.luckyEligibleYear > 1 ? cfg.luckyEligibleYear - 1 : 0;
+  const friendLuckyGuaranteedClauses = friendLuckyClauses.slice();
+  if (oldLuckyYear > 0)
+    push(friendLuckyGuaranteedClauses, `${kw.numeric.year}-${oldLuckyYear}`,
+         tFn("app.clause_why.friend_guaranteed_lucky", { params: { year: oldLuckyYear } }));
+  const friendLuckyWishlistGuaranteed = friendLuckyGuaranteedClauses.map(c => c.clause).join("&");
+
+  // Hundo wishlist — exclude every species the user already has a hundo of.
+  // No 4* clause: IVs re-roll on trade, so any untraded specimen is fair game.
+  const friendHundoClauses = [];
+  for (const dex of ownedDexList(hundos))
+    push(friendHundoClauses, `!${dex}`, tFn("app.clause_why.friend_have_hundo", { params: { dex } }));
+  pushFriendTradeGuards(friendHundoClauses);
+  const friendHundoWishlist = friendHundoClauses.map(c => c.clause).join("&");
+
   // ── AUX FILTERS — task-oriented pro tools, paste these into the search
   //    box to *find* candidates (positive search filters, not the inverted
   //    trash style). Grouped by game aspect: shadows / evos / trades.
@@ -1943,6 +2008,9 @@ export function buildFilters(hundos, luckies, cfg, homeLocals = [], outputLocale
 
   return { trash, tradedTrashSort, trade, sort, luckySort, nundoSort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
            luckyHundoSet,
+           // Friend wishlists (blacklist of owned dex numbers + trade guards)
+           friendLuckyWishlist, friendLuckyWishlistGuaranteed, friendHundoWishlist,
+           friendLuckyClauses, friendHundoClauses,
            trashClauses, tradeClauses, sortClauses, luckySortClauses, nundoSortClauses, prestagedClauses, giftClauses,
            // Aux pro-tools
            shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
@@ -2450,6 +2518,9 @@ export default function App() {
   const [showAuxShadows, setShowAuxShadows] = useState(false);
   const [showAuxEvos, setShowAuxEvos] = useState(false);
   const [showAuxTrades, setShowAuxTrades] = useState(false);
+  const [showFriendWishlist, setShowFriendWishlist] = useState(false);
+  // Friend lucky wishlist: restrict to old catches guaranteed Lucky on trade.
+  const [friendGuaranteedLucky, setFriendGuaranteedLucky] = useState(false);
   const [showAuxMegas, setShowAuxMegas] = useState(false);
   const [showAuxEvents, setShowAuxEvents] = useState(false);
   const [showAuxRaids, setShowAuxRaids] = useState(false);
@@ -2592,6 +2663,7 @@ export default function App() {
   const effectiveOutputLocale = effectiveConfig.expertMode ? outputLocale : locale;
   const { trash, tradedTrashSort, trade, sort, luckySort, nundoSort, prestaged, gift, buddyCatchFilters, TE_full, TE_trim,
           luckyHundoSet,
+          friendLuckyWishlist, friendLuckyWishlistGuaranteed, friendHundoWishlist,
           trashClauses, tradeClauses, sortClauses, luckySortClauses, nundoSortClauses, prestagedClauses, giftClauses,
           shadowCheap, shadowSafe, shadowHundoCandidates, shadowFrustration,
           evoSwapCandy, evoSwapItem,
@@ -3147,6 +3219,48 @@ export default function App() {
                         copied={copied.pilotLong}
                         onCopy={() => copyToClipboard("pilotLong", pilotLong)}
                         hint={t("app.filter.pilot_long_hint")}
+                      />
+                    </div>
+                  </Collapsible>
+
+                  <Collapsible
+                    icon="🤝"
+                    label={t("app.collapsible.friend_wishlist")}
+                    open={showFriendWishlist}
+                    onToggle={() => setShowFriendWishlist((s) => !s)}>
+                    <div className="space-y-4">
+                      <p className="mono text-xs text-[#8B98A5] leading-relaxed">
+                        {t("app.filter.friend_wishlist_intro")}
+                      </p>
+                      <div>
+                        <FilterBox
+                          label={t("app.filter.friend_lucky_label")}
+                          accent="#F5B82E"
+                          filterStr={friendGuaranteedLucky ? friendLuckyWishlistGuaranteed : friendLuckyWishlist}
+                          copied={copied.friendLucky}
+                          onCopy={() => copyToClipboard("friendLucky", friendGuaranteedLucky ? friendLuckyWishlistGuaranteed : friendLuckyWishlist)}
+                          hint={t("app.filter.friend_lucky_hint")}
+                        />
+                        <label className="flex items-start gap-2 cursor-pointer mono text-xs mt-2">
+                          <input
+                            type="checkbox"
+                            checked={friendGuaranteedLucky}
+                            onChange={e => setFriendGuaranteedLucky(e.target.checked)}
+                            className="mt-0.5"
+                          />
+                          <div>
+                            <span className="text-[#E6EDF3]">{t("app.filter.friend_guaranteed_label")}</span>
+                            <p className="text-[#8B98A5] mt-0.5">{t("app.filter.friend_guaranteed_help")}</p>
+                          </div>
+                        </label>
+                      </div>
+                      <FilterBox
+                        label={t("app.filter.friend_hundo_label")}
+                        accent="#5EAFC5"
+                        filterStr={friendHundoWishlist}
+                        copied={copied.friendHundo}
+                        onCopy={() => copyToClipboard("friendHundo", friendHundoWishlist)}
+                        hint={t("app.filter.friend_hundo_hint")}
                       />
                     </div>
                   </Collapsible>
