@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-06-27T10:22:28.897Z",
+  "fetchedAt": "2026-06-29T12:42:07.712Z",
   "events": [
     {
       "id": "event-flying-taxi-2026-06-23t10-00-00",
@@ -89,6 +89,23 @@
         "Pikachu wearing a Team Instinct hat",
         "Pikachu wearing a Team Mystic hat",
         "Pikachu wearing a Team Valor hat"
+      ]
+    },
+    {
+      "id": "event-special-anniversary-pikachu-celebration-2026-07-13t10-00-00",
+      "title": "Special Anniversary Pikachu Celebration",
+      "category": "Event",
+      "start": "2026-07-13T10:00:00",
+      "end": "2026-07-20T20:00:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        25
+      ],
+      "spawns": [
+        "Pikachu"
+      ],
+      "unresolved": [
+        "Pikachu wearing a Tricks & Treats costume"
       ]
     }
   ]
