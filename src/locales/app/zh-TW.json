@@ -963,5 +963,16 @@
   "app.filter.rocket_grunt_filter_label_lenient": "寬鬆剋制",
   "app.filter.rocket_lenient_hint": "更大的池：任一招式槽帶效果絕佳招式，或 CP ≥ 3500，且不弱於陣容。當嚴格篩選器顯示的寶可夢太少時使用。",
   "app.protect.rocket_lenient_counters.label": "顯示火箭隊的寬鬆備援剋制",
-  "app.protect.rocket_lenient_counters.help": "為每個首領階段與屬性嘍囉新增第二個更寬鬆的剋制框：任一招式槽帶效果絕佳招式，或 CP ≥ 3500，仍可防範陣容的弱點。預設開啟；想精簡時可關閉。"
+  "app.protect.rocket_lenient_counters.help": "為每個首領階段與屬性嘍囉新增第二個更寬鬆的剋制框：任一招式槽帶效果絕佳招式，或 CP ≥ 3500，仍可防範陣容的弱點。預設開啟；想精簡時可關閉。",
+  "app.collapsible.friend_wishlist": "好友許願清單",
+  "app.filter.friend_wishlist_intro": "把這個給朋友——他在自己的倉庫貼上其中一個搜尋字串，就能看到可以交換給你的寶可夢：你還缺的幸運或滿值（100%）個體的物種。交換會重新隨機產生個體值，所以朋友無法直接給你現成的滿值個體：你交換任一隻並自己碰運氣（幸運交換機率最高）。",
+  "app.filter.friend_lucky_label": "幸運許願清單",
+  "app.filter.friend_lucky_hint": "給朋友：顯示他從未交換過、而你還沒有幸運個體的物種——交換就有機會獲得幸運。",
+  "app.filter.friend_hundo_label": "滿值許願清單",
+  "app.filter.friend_hundo_hint": "給朋友：他從未交換過、而你還沒有滿值的物種個體。個體值不限——交換會重新隨機，所以由你自己拚 100%（幸運交換最佳）。",
+  "app.filter.friend_guaranteed_label": "僅限保證幸運（舊捕獲）",
+  "app.filter.friend_guaranteed_help": "將幸運清單限制為足夠舊、交換時保證幸運的捕獲。",
+  "app.clause_why.friend_have_lucky": "已有幸運：排除 #{dex}",
+  "app.clause_why.friend_have_hundo": "已有滿值：排除 #{dex}",
+  "app.clause_why.friend_guaranteed_lucky": "保證幸運：僅 20{year} 年（含）以前的捕獲"
 }

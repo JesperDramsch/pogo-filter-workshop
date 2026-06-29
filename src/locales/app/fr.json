@@ -963,5 +963,16 @@
   "app.filter.rocket_grunt_filter_label_lenient": "counters larges",
   "app.filter.rocket_lenient_hint": "Pool plus large : n'importe quelle attaque super efficace (n'importe quel emplacement) ou PC ≥ 3500, toujours pas faible à la composition. À utiliser quand le filtre strict montre trop peu de vos Pokémon.",
   "app.protect.rocket_lenient_counters.label": "Afficher des counters de secours larges pour la Team GO Rocket",
-  "app.protect.rocket_lenient_counters.help": "Ajoute une deuxième boîte de counters plus large par phase de leader et sbire à thème : n'importe quelle attaque super efficace (n'importe quel emplacement) ou PC ≥ 3500, toujours protégé contre les faiblesses de la composition. Activé par défaut ; désactivez pour alléger l'affichage."
+  "app.protect.rocket_lenient_counters.help": "Ajoute une deuxième boîte de counters plus large par phase de leader et sbire à thème : n'importe quelle attaque super efficace (n'importe quel emplacement) ou PC ≥ 3500, toujours protégé contre les faiblesses de la composition. Activé par défaut ; désactivez pour alléger l'affichage.",
+  "app.collapsible.friend_wishlist": "liste de souhaits (amis)",
+  "app.filter.friend_wishlist_intro": "Donne ceci à un ami : il colle l'un des termes dans son propre stockage pour révéler les Pokémon échangeables qu'il pourrait t'envoyer, des espèces qui te manquent encore en chanceux ou en hundo (100 %). L'échange retire les IV au hasard, donc un ami ne peut pas te donner un hundo tout fait : tu échanges n'importe quel spécimen et tu tentes ta chance (meilleures chances lors d'un échange chanceux).",
+  "app.filter.friend_lucky_label": "liste de souhaits (chanceux)",
+  "app.filter.friend_lucky_hint": "Pour un ami : montre ses Pokémon jamais échangés des espèces dont tu n'as pas encore de chanceux ; un échange peut t'en donner un.",
+  "app.filter.friend_hundo_label": "liste de souhaits (hundos)",
+  "app.filter.friend_hundo_hint": "Pour un ami : ses spécimens jamais échangés des espèces dont tu n'as pas de hundo. N'importe quels IV : l'échange les retire au hasard, donc tu tentes le 100 % toi-même (mieux lors d'un échange chanceux).",
+  "app.filter.friend_guaranteed_label": "Chanceux garanti uniquement (anciennes captures)",
+  "app.filter.friend_guaranteed_help": "Limite la liste chanceux aux captures assez anciennes pour garantir un chanceux à l'échange.",
+  "app.clause_why.friend_have_lucky": "Déjà chanceux : #{dex} exclu",
+  "app.clause_why.friend_have_hundo": "Déjà hundo : #{dex} exclu",
+  "app.clause_why.friend_guaranteed_lucky": "Chanceux garanti : uniquement les captures de 20{year} ou avant"
 }

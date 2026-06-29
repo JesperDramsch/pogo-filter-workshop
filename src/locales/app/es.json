@@ -963,5 +963,16 @@
   "app.filter.rocket_grunt_filter_label_lenient": "counters amplios",
   "app.filter.rocket_lenient_hint": "Grupo más amplio: cualquier movimiento supereficaz (en cualquier espacio) o PC ≥ 3500, sin ser débil a la alineación. Úsalo cuando el filtro estricto muestre muy pocos de tus Pokémon.",
   "app.protect.rocket_lenient_counters.label": "Mostrar counters de reserva amplios para el Team GO Rocket",
-  "app.protect.rocket_lenient_counters.help": "Añade una segunda caja de counters más amplia por fase de líder y recluta temático: cualquier movimiento supereficaz (en cualquier espacio) o PC ≥ 3500, siempre protegido frente a las debilidades de la alineación. Activado por defecto; desactívalo para despejar."
+  "app.protect.rocket_lenient_counters.help": "Añade una segunda caja de counters más amplia por fase de líder y recluta temático: cualquier movimiento supereficaz (en cualquier espacio) o PC ≥ 3500, siempre protegido frente a las debilidades de la alineación. Activado por defecto; desactívalo para despejar.",
+  "app.collapsible.friend_wishlist": "lista de deseos para amigos",
+  "app.filter.friend_wishlist_intro": "Pásale esto a un amigo: pega uno de los términos en su propia caja para ver los Pokémon intercambiables que podría enviarte, especies que aún te faltan como afortunado o hundo (100 %). Al intercambiar se recalculan los IV, así que un amigo no puede darte un hundo ya hecho: intercambias cualquier ejemplar y tiras tú mismo (mejor probabilidad en un intercambio afortunado).",
+  "app.filter.friend_lucky_label": "lista de deseos (afortunados)",
+  "app.filter.friend_lucky_hint": "Para un amigo: muestra sus Pokémon nunca intercambiados de especies de las que aún no tienes un afortunado; un intercambio puede darte uno.",
+  "app.filter.friend_hundo_label": "lista de deseos (hundos)",
+  "app.filter.friend_hundo_hint": "Para un amigo: sus ejemplares nunca intercambiados de especies de las que no tienes hundo. Cualquier IV: el intercambio los recalcula, así que tiras tú al 100 % (mejor en un intercambio afortunado).",
+  "app.filter.friend_guaranteed_label": "Solo afortunado garantizado (capturas antiguas)",
+  "app.filter.friend_guaranteed_help": "Limita la lista de afortunados a capturas lo bastante antiguas para garantizar un afortunado al intercambiar.",
+  "app.clause_why.friend_have_lucky": "Ya afortunado: #{dex} excluido",
+  "app.clause_why.friend_have_hundo": "Ya hundo: #{dex} excluido",
+  "app.clause_why.friend_guaranteed_lucky": "Afortunado garantizado: solo capturas de 20{year} o anteriores"
 }

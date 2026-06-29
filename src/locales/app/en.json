@@ -1010,5 +1010,16 @@
   "app.filter.rocket_grunt_filter_label_lenient": "broad counters",
   "app.filter.rocket_lenient_hint": "Wider pool: any super-effective move (any slot) or CP ≥ 3500, still not weak to the lineup. Use when the strict filter shows too few of your Pokémon.",
   "app.protect.rocket_lenient_counters.label": "Show broad fallback Rocket counters",
-  "app.protect.rocket_lenient_counters.help": "Adds a second, wider counter box per leader phase and typed grunt: any super-effective move (any slot) or CP ≥ 3500, still guarded against the lineup's weaknesses. On by default; turn off to declutter."
+  "app.protect.rocket_lenient_counters.help": "Adds a second, wider counter box per leader phase and typed grunt: any super-effective move (any slot) or CP ≥ 3500, still guarded against the lineup's weaknesses. On by default; turn off to declutter.",
+  "app.collapsible.friend_wishlist": "friend wishlist",
+  "app.filter.friend_wishlist_intro": "Hand these to a friend — they paste one into their own storage to reveal the tradeable Pokémon they could send you: species you still lack as a lucky or a hundo. Trading re-rolls IVs, so a friend can't hand you a finished hundo — you trade for any specimen and roll for it yourself (best odds in a lucky trade).",
+  "app.filter.friend_lucky_label": "lucky wishlist",
+  "app.filter.friend_lucky_hint": "Give to a friend: reveals their never-traded Pokémon of species you have no lucky of yet — a trade can make you one.",
+  "app.filter.friend_hundo_label": "hundo wishlist",
+  "app.filter.friend_hundo_hint": "Give to a friend: their never-traded specimens of species you have no hundo of. Any IVs — the trade re-rolls them, so you roll for the 100 % yourself (best in a lucky trade).",
+  "app.filter.friend_guaranteed_label": "Guaranteed-lucky only (old catches)",
+  "app.filter.friend_guaranteed_help": "Restrict the lucky wishlist to catches old enough to be guaranteed lucky on trade.",
+  "app.clause_why.friend_have_lucky": "Already lucky: #{dex} excluded",
+  "app.clause_why.friend_have_hundo": "Already hundo: #{dex} excluded",
+  "app.clause_why.friend_guaranteed_lucky": "Guaranteed lucky: only catches from 20{year} or earlier"
 }

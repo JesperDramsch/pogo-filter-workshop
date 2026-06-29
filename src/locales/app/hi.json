@@ -963,5 +963,16 @@
   "app.filter.rocket_grunt_filter_label_lenient": "broad counters",
   "app.filter.rocket_lenient_hint": "बड़ा pool: किसी भी slot में कोई super-effective move या CP ≥ 3500, फिर भी lineup के प्रति weak नहीं। तब इस्तेमाल करें जब strict filter आपके बहुत कम Pokémon दिखाए।",
   "app.protect.rocket_lenient_counters.label": "broad fallback Rocket counters दिखाएँ",
-  "app.protect.rocket_lenient_counters.help": "हर leader phase और typed grunt के लिए एक दूसरा, ज़्यादा broad counter box जोड़ता है: किसी भी slot में कोई super-effective move या CP ≥ 3500, फिर भी lineup की weaknesses से सुरक्षित। डिफ़ॉल्ट से on; declutter करने के लिए off करें।"
+  "app.protect.rocket_lenient_counters.help": "हर leader phase और typed grunt के लिए एक दूसरा, ज़्यादा broad counter box जोड़ता है: किसी भी slot में कोई super-effective move या CP ≥ 3500, फिर भी lineup की weaknesses से सुरक्षित। डिफ़ॉल्ट से on; declutter करने के लिए off करें।",
+  "app.collapsible.friend_wishlist": "दोस्तों के लिए विशलिस्ट",
+  "app.filter.friend_wishlist_intro": "इसे किसी दोस्त को दें — वह अपने स्टोरेज में इनमें से एक सर्च डालकर वे ट्रेड-योग्य पोकेमॉन देख सकता है जो वह आपको भेज सकता है: वे प्रजातियाँ जो आपके पास अब भी लकी या हंडो (100%) के रूप में नहीं हैं। ट्रेड करने पर IV दोबारा रैंडम हो जाते हैं, इसलिए दोस्त आपको बना-बनाया हंडो नहीं दे सकता — आप कोई भी नमूना ट्रेड करके खुद किस्मत आज़माते हैं (लकी ट्रेड में सबसे ज़्यादा संभावना)।",
+  "app.filter.friend_lucky_label": "लकी विशलिस्ट",
+  "app.filter.friend_lucky_hint": "दोस्त के लिए: उन प्रजातियों के उसके कभी ट्रेड न किए गए पोकेमॉन दिखाता है जिनका आपके पास अभी लकी नहीं है — ट्रेड से एक मिल सकता है।",
+  "app.filter.friend_hundo_label": "हंडो विशलिस्ट",
+  "app.filter.friend_hundo_hint": "दोस्त के लिए: उन प्रजातियों के उसके कभी ट्रेड न किए गए नमूने जिनका आपके पास हंडो नहीं है। कोई भी IV — ट्रेड उन्हें दोबारा रैंडम करता है, इसलिए 100% के लिए आप खुद किस्मत आज़माते हैं (लकी ट्रेड में सबसे अच्छा)।",
+  "app.filter.friend_guaranteed_label": "केवल गारंटीड लकी (पुराने कैच)",
+  "app.filter.friend_guaranteed_help": "लकी विशलिस्ट को केवल उन कैच तक सीमित करें जो ट्रेड पर गारंटीड लकी होने जितने पुराने हों।",
+  "app.clause_why.friend_have_lucky": "पहले से लकी: #{dex} बाहर",
+  "app.clause_why.friend_have_hundo": "पहले से हंडो: #{dex} बाहर",
+  "app.clause_why.friend_guaranteed_lucky": "गारंटीड लकी: केवल 20{year} या उससे पहले के कैच"
 }
