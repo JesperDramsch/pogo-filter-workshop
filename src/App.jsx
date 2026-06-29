@@ -1529,7 +1529,7 @@ export function buildFilters(
 	// Lucky wishlist — exclude every species the user already has a lucky of.
 	const friendLuckyClauses = [];
 	for (const dex of ownedDexList(luckies))
-		push(friendLuckyClauses, `!${dex}`, tFn('app.clause_why.friend_have_lucky', { params: { dex } }));
+		push(friendLuckyClauses, `!+${dex}`, tFn('app.clause_why.friend_have_lucky', { params: { dex } }));
 	pushFriendTradeGuards(friendLuckyClauses);
 	const friendLuckyWishlist = friendLuckyClauses.map((c) => c.clause).join('&');
 
@@ -1550,7 +1550,7 @@ export function buildFilters(
 	// No 4* clause: IVs re-roll on trade, so any untraded specimen is fair game.
 	const friendHundoClauses = [];
 	for (const dex of ownedDexList(hundos))
-		push(friendHundoClauses, `!${dex}`, tFn('app.clause_why.friend_have_hundo', { params: { dex } }));
+		push(friendHundoClauses, `!+${dex}`, tFn('app.clause_why.friend_have_hundo', { params: { dex } }));
 	pushFriendTradeGuards(friendHundoClauses);
 	const friendHundoWishlist = friendHundoClauses.map((c) => c.clause).join('&');
 
