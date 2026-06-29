@@ -1529,11 +1529,7 @@ export function buildFilters(
 	// Lucky wishlist — exclude every species the user already has a lucky of.
 	const friendLuckyClauses = [];
 	for (const dex of ownedDexList(luckies))
-		push(
-			friendLuckyClauses,
-			`!+${speciesForOutput(dex, outputLocale)}`,
-			tFn('app.clause_why.friend_have_lucky', { params: { dex } }),
-		);
+		push(friendLuckyClauses, `!${dex}`, tFn('app.clause_why.friend_have_lucky', { params: { dex } }));
 	pushFriendTradeGuards(friendLuckyClauses);
 	const friendLuckyWishlist = friendLuckyClauses.map((c) => c.clause).join('&');
 
@@ -1554,11 +1550,7 @@ export function buildFilters(
 	// No 4* clause: IVs re-roll on trade, so any untraded specimen is fair game.
 	const friendHundoClauses = [];
 	for (const dex of ownedDexList(hundos))
-		push(
-			friendHundoClauses,
-			`!+${speciesForOutput(dex, outputLocale)}`,
-			tFn('app.clause_why.friend_have_hundo', { params: { dex } }),
-		);
+		push(friendHundoClauses, `!${dex}`, tFn('app.clause_why.friend_have_hundo', { params: { dex } }));
 	pushFriendTradeGuards(friendHundoClauses);
 	const friendHundoWishlist = friendHundoClauses.map((c) => c.clause).join('&');
 
@@ -3716,6 +3708,64 @@ export default function App() {
 													copied={copied.pilotLong}
 													onCopy={() => copyToClipboard('pilotLong', pilotLong)}
 													hint={t('app.filter.pilot_long_hint')}
+												/>
+											</div>
+										</Collapsible>
+
+										<Collapsible
+											icon='🤝'
+											label={t('app.collapsible.friend_wishlist')}
+											open={showFriendWishlist}
+											onToggle={() => setShowFriendWishlist((s) => !s)}
+										>
+											<div className='space-y-4'>
+												<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
+													{t('app.filter.friend_wishlist_intro')}
+												</p>
+												<div>
+													<FilterBox
+														label={t('app.filter.friend_lucky_label')}
+														accent='#F5B82E'
+														filterStr={
+															friendGuaranteedLucky
+																? friendLuckyWishlistGuaranteed
+																: friendLuckyWishlist
+														}
+														copied={copied.friendLucky}
+														onCopy={() =>
+															copyToClipboard(
+																'friendLucky',
+																friendGuaranteedLucky
+																	? friendLuckyWishlistGuaranteed
+																	: friendLuckyWishlist,
+															)
+														}
+														hint={t('app.filter.friend_lucky_hint')}
+													/>
+													<label className='flex items-start gap-2 cursor-pointer mono text-xs mt-2'>
+														<input
+															type='checkbox'
+															checked={friendGuaranteedLucky}
+															onChange={(e) => setFriendGuaranteedLucky(e.target.checked)}
+															className='mt-0.5'
+														/>
+														<div>
+															<span className='text-[#E6EDF3]'>
+																{t('app.filter.friend_guaranteed_label')}
+															</span>
+															<p className='text-[#8B98A5] mt-0.5'>
+																{t('app.filter.friend_guaranteed_help')}
+															</p>
+														</div>
+													</label>
+												</div>
+												<FilterBox
+													label={t('app.filter.friend_hundo_label')}
+													accent='#5EAFC5'
+													filterStr={friendHundoWishlist}
+													copied={copied.friendHundo}
+													onCopy={() => copyToClipboard('friendHundo', friendHundoWishlist)}
+													hint={t('app.filter.friend_hundo_hint')}
 												/>
 											</div>
 										</Collapsible>
