@@ -1,35 +1,6 @@
 {
-  "fetchedAt": "2026-06-29T12:42:07.712Z",
+  "fetchedAt": "2026-07-01T11:33:08.594Z",
   "events": [
-    {
-      "id": "event-flying-taxi-2026-06-23t10-00-00",
-      "title": "Flying Taxi",
-      "category": "Event",
-      "start": "2026-06-23T10:00:00",
-      "end": "2026-06-29T20:00:00",
-      "isLocalTime": true,
-      "spawnDex": [
-        16,
-        21,
-        163,
-        519,
-        731,
-        821,
-        931,
-        940
-      ],
-      "spawns": [
-        "Hoothoot",
-        "Pidgey",
-        "Pidove",
-        "Pikipek",
-        "Rookidee",
-        "Spearow",
-        "Squawkabilly",
-        "Wattrel"
-      ],
-      "unresolved": []
-    },
     {
       "id": "event-10th-anniversary-party-2026-07-04t10-00-00",
       "title": "10th Anniversary Party",
