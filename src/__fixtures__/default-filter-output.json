@@ -21,16 +21,6 @@
       "mega": {
         "PIDGEOT": "rock,ghost,steel,electric&@1electric,@1ice,@1rock&@2electric,@2ice,@2rock,@3electric,@3ice,@3rock&!<normal&!<flying"
       },
-      "lvl3": {
-        "BRAVIARY": "rock,steel,electric,psychic,dark&@1dark,@1electric,@1ghost,@1ice,@1rock&@2dark,@2electric,@2ghost,@2ice,@2rock,@3dark,@3electric,@3ghost,@3ice,@3rock&!<psychic&!<flying",
-        "CORVISQUIRE": "rock,steel,electric&@1electric,@1ice,@1rock&@2electric,@2ice,@2rock,@3electric,@3ice,@3rock&!<flying",
-        "BOMBIRDIER": "rock,steel,electric,dark,fairy&@1electric,@1fairy,@1ice,@1rock&@2electric,@2fairy,@2ice,@2rock,@3electric,@3fairy,@3ice,@3rock&!<flying&!<dark"
-      },
-      "lvl1": {
-        "SWABLU": "rock,ghost,steel,electric&@1electric,@1ice,@1rock&@2electric,@2ice,@2rock,@3electric,@3ice,@3rock&!<normal&!<flying",
-        "STARLY": "rock,ghost,steel,electric&@1electric,@1ice,@1rock&@2electric,@2ice,@2rock,@3electric,@3ice,@3rock&!<normal&!<flying",
-        "VULLABY": "rock,steel,electric,dark,fairy&@1electric,@1fairy,@1ice,@1rock&@2electric,@2fairy,@2ice,@2rock,@3electric,@3fairy,@3ice,@3rock&!<dark&!<flying"
-      },
       "shadow_lvl5": {
         "DIALGA": "steel,fire,water,electric&@1fighting,@1ground&@2fighting,@2ground,@3fighting,@3ground&!<steel&!<dragon"
       },
@@ -125,16 +115,6 @@
       },
       "mega": {
         "PIDGEOT": "gestein,geist,stahl,elektro&@1elektro,@1eis,@1gestein&@2elektro,@2eis,@2gestein,@3elektro,@3eis,@3gestein&!<normal&!<flug"
-      },
-      "lvl3": {
-        "BRAVIARY": "gestein,stahl,elektro,psycho,unlicht&@1unlicht,@1elektro,@1geist,@1eis,@1gestein&@2unlicht,@2elektro,@2geist,@2eis,@2gestein,@3unlicht,@3elektro,@3geist,@3eis,@3gestein&!<psycho&!<flug",
-        "CORVISQUIRE": "gestein,stahl,elektro&@1elektro,@1eis,@1gestein&@2elektro,@2eis,@2gestein,@3elektro,@3eis,@3gestein&!<flug",
-        "BOMBIRDIER": "gestein,stahl,elektro,unlicht,fee&@1elektro,@1fee,@1eis,@1gestein&@2elektro,@2fee,@2eis,@2gestein,@3elektro,@3fee,@3eis,@3gestein&!<flug&!<unlicht"
-      },
-      "lvl1": {
-        "SWABLU": "gestein,geist,stahl,elektro&@1elektro,@1eis,@1gestein&@2elektro,@2eis,@2gestein,@3elektro,@3eis,@3gestein&!<normal&!<flug",
-        "STARLY": "gestein,geist,stahl,elektro&@1elektro,@1eis,@1gestein&@2elektro,@2eis,@2gestein,@3elektro,@3eis,@3gestein&!<normal&!<flug",
-        "VULLABY": "gestein,stahl,elektro,unlicht,fee&@1elektro,@1fee,@1eis,@1gestein&@2elektro,@2fee,@2eis,@2gestein,@3elektro,@3fee,@3eis,@3gestein&!<unlicht&!<flug"
       },
       "shadow_lvl5": {
         "DIALGA": "stahl,feuer,wasser,elektro&@1kampf,@1boden&@2kampf,@2boden,@3kampf,@3boden&!<stahl&!<drache"
@@ -231,16 +211,6 @@
       "mega": {
         "PIDGEOT": "roca,fantasma,acero,eléctrico&@1eléctrico,@1hielo,@1roca&@2eléctrico,@2hielo,@2roca,@3eléctrico,@3hielo,@3roca&!<normal&!<volador"
       },
-      "lvl3": {
-        "BRAVIARY": "roca,acero,eléctrico,psíquico,siniestro&@1siniestro,@1eléctrico,@1fantasma,@1hielo,@1roca&@2siniestro,@2eléctrico,@2fantasma,@2hielo,@2roca,@3siniestro,@3eléctrico,@3fantasma,@3hielo,@3roca&!<psíquico&!<volador",
-        "CORVISQUIRE": "roca,acero,eléctrico&@1eléctrico,@1hielo,@1roca&@2eléctrico,@2hielo,@2roca,@3eléctrico,@3hielo,@3roca&!<volador",
-        "BOMBIRDIER": "roca,acero,eléctrico,siniestro,hada&@1eléctrico,@1hada,@1hielo,@1roca&@2eléctrico,@2hada,@2hielo,@2roca,@3eléctrico,@3hada,@3hielo,@3roca&!<volador&!<siniestro"
-      },
-      "lvl1": {
-        "SWABLU": "roca,fantasma,acero,eléctrico&@1eléctrico,@1hielo,@1roca&@2eléctrico,@2hielo,@2roca,@3eléctrico,@3hielo,@3roca&!<normal&!<volador",
-        "STARLY": "roca,fantasma,acero,eléctrico&@1eléctrico,@1hielo,@1roca&@2eléctrico,@2hielo,@2roca,@3eléctrico,@3hielo,@3roca&!<normal&!<volador",
-        "VULLABY": "roca,acero,eléctrico,siniestro,hada&@1eléctrico,@1hada,@1hielo,@1roca&@2eléctrico,@2hada,@2hielo,@2roca,@3eléctrico,@3hada,@3hielo,@3roca&!<siniestro&!<volador"
-      },
       "shadow_lvl5": {
         "DIALGA": "acero,fuego,agua,eléctrico&@1lucha,@1tierra&@2lucha,@2tierra,@3lucha,@3tierra&!<acero&!<dragón"
       },
@@ -335,16 +305,6 @@
       },
       "mega": {
         "PIDGEOT": "roche,spectre,acier,électrik&@1électrik,@1glace,@1roche&@2électrik,@2glace,@2roche,@3électrik,@3glace,@3roche&!<normal&!<vol"
-      },
-      "lvl3": {
-        "BRAVIARY": "roche,acier,électrik,psy,ténèbres&@1ténèbres,@1électrik,@1spectre,@1glace,@1roche&@2ténèbres,@2électrik,@2spectre,@2glace,@2roche,@3ténèbres,@3électrik,@3spectre,@3glace,@3roche&!<psy&!<vol",
-        "CORVISQUIRE": "roche,acier,électrik&@1électrik,@1glace,@1roche&@2électrik,@2glace,@2roche,@3électrik,@3glace,@3roche&!<vol",
-        "BOMBIRDIER": "roche,acier,électrik,ténèbres,fée&@1électrik,@1fée,@1glace,@1roche&@2électrik,@2fée,@2glace,@2roche,@3électrik,@3fée,@3glace,@3roche&!<vol&!<ténèbres"
-      },
-      "lvl1": {
-        "SWABLU": "roche,spectre,acier,électrik&@1électrik,@1glace,@1roche&@2électrik,@2glace,@2roche,@3électrik,@3glace,@3roche&!<normal&!<vol",
-        "STARLY": "roche,spectre,acier,électrik&@1électrik,@1glace,@1roche&@2électrik,@2glace,@2roche,@3électrik,@3glace,@3roche&!<normal&!<vol",
-        "VULLABY": "roche,acier,électrik,ténèbres,fée&@1électrik,@1fée,@1glace,@1roche&@2électrik,@2fée,@2glace,@2roche,@3électrik,@3fée,@3glace,@3roche&!<ténèbres&!<vol"
       },
       "shadow_lvl5": {
         "DIALGA": "acier,feu,eau,électrik&@1combat,@1sol&@2combat,@2sol,@3combat,@3sol&!<acier&!<dragon"
@@ -441,16 +401,6 @@
       "mega": {
         "PIDGEOT": "岩石,幽靈,鋼,電&@1電,@1冰,@1岩石&@2電,@2冰,@2岩石,@3電,@3冰,@3岩石&!<一般&!<飛行"
       },
-      "lvl3": {
-        "BRAVIARY": "岩石,鋼,電,超能力,惡&@1惡,@1電,@1幽靈,@1冰,@1岩石&@2惡,@2電,@2幽靈,@2冰,@2岩石,@3惡,@3電,@3幽靈,@3冰,@3岩石&!<超能力&!<飛行",
-        "CORVISQUIRE": "岩石,鋼,電&@1電,@1冰,@1岩石&@2電,@2冰,@2岩石,@3電,@3冰,@3岩石&!<飛行",
-        "BOMBIRDIER": "岩石,鋼,電,惡,妖精&@1電,@1妖精,@1冰,@1岩石&@2電,@2妖精,@2冰,@2岩石,@3電,@3妖精,@3冰,@3岩石&!<飛行&!<惡"
-      },
-      "lvl1": {
-        "SWABLU": "岩石,幽靈,鋼,電&@1電,@1冰,@1岩石&@2電,@2冰,@2岩石,@3電,@3冰,@3岩石&!<一般&!<飛行",
-        "STARLY": "岩石,幽靈,鋼,電&@1電,@1冰,@1岩石&@2電,@2冰,@2岩石,@3電,@3冰,@3岩石&!<一般&!<飛行",
-        "VULLABY": "岩石,鋼,電,惡,妖精&@1電,@1妖精,@1冰,@1岩石&@2電,@2妖精,@2冰,@2岩石,@3電,@3妖精,@3冰,@3岩石&!<惡&!<飛行"
-      },
       "shadow_lvl5": {
         "DIALGA": "鋼,火,水,電&@1格鬥,@1地面&@2格鬥,@2地面,@3格鬥,@3地面&!<鋼&!<龍"
       },
@@ -546,16 +496,6 @@
       "mega": {
         "PIDGEOT": "रॉक,घोट,टल,इलटक&@1इलटक,@1आइस,@1रॉक&@2इलटक,@2आइस,@2रॉक,@3इलटक,@3आइस,@3रॉक&!<नॉमल&!<़लाइंग"
       },
-      "lvl3": {
-        "BRAVIARY": "रॉक,टल,इलटक,साइकक,डाक&@1डाक,@1इलटक,@1घोट,@1आइस,@1रॉक&@2डाक,@2इलटक,@2घोट,@2आइस,@2रॉक,@3डाक,@3इलटक,@3घोट,@3आइस,@3रॉक&!<साइकक&!<़लाइंग",
-        "CORVISQUIRE": "रॉक,टल,इलटक&@1इलटक,@1आइस,@1रॉक&@2इलटक,@2आइस,@2रॉक,@3इलटक,@3आइस,@3रॉक&!<़लाइंग",
-        "BOMBIRDIER": "रॉक,टल,इलटक,डाक,फ़ेर&@1इलटक,@1फ़ेर,@1आइस,@1रॉक&@2इलटक,@2फ़ेर,@2आइस,@2रॉक,@3इलटक,@3फ़ेर,@3आइस,@3रॉक&!<़लाइंग&!<डाक"
-      },
-      "lvl1": {
-        "SWABLU": "रॉक,घोट,टल,इलटक&@1इलटक,@1आइस,@1रॉक&@2इलटक,@2आइस,@2रॉक,@3इलटक,@3आइस,@3रॉक&!<नॉमल&!<़लाइंग",
-        "STARLY": "रॉक,घोट,टल,इलटक&@1इलटक,@1आइस,@1रॉक&@2इलटक,@2आइस,@2रॉक,@3इलटक,@3आइस,@3रॉक&!<नॉमल&!<़लाइंग",
-        "VULLABY": "रॉक,टल,इलटक,डाक,फ़ेर&@1इलटक,@1फ़ेर,@1आइस,@1रॉक&@2इलटक,@2फ़ेर,@2आइस,@2रॉक,@3इलटक,@3फ़ेर,@3आइस,@3रॉक&!<डाक&!<़लाइंग"
-      },
       "shadow_lvl5": {
         "DIALGA": "टल,फ़ायर,वॉटर,इलटक&@1फ़ाइटंग,@1ाउंड&@2फ़ाइटंग,@2ाउंड,@3फ़ाइटंग,@3ाउंड&!<टल&!<डैगन"
       },
@@ -650,16 +590,6 @@
       },
       "mega": {
         "PIDGEOT": "いわ,ゴースト,はがね,でんき&@1でんき,@1こおり,@1いわ&@2でんき,@2こおり,@2いわ,@3でんき,@3こおり,@3いわ&!<ノーマル&!<ひこう"
-      },
-      "lvl3": {
-        "BRAVIARY": "いわ,はがね,でんき,エスパー,あく&@1あく,@1でんき,@1ゴースト,@1こおり,@1いわ&@2あく,@2でんき,@2ゴースト,@2こおり,@2いわ,@3あく,@3でんき,@3ゴースト,@3こおり,@3いわ&!<エスパー&!<ひこう",
-        "CORVISQUIRE": "いわ,はがね,でんき&@1でんき,@1こおり,@1いわ&@2でんき,@2こおり,@2いわ,@3でんき,@3こおり,@3いわ&!<ひこう",
-        "BOMBIRDIER": "いわ,はがね,でんき,あく,フェアリー&@1でんき,@1フェアリー,@1こおり,@1いわ&@2でんき,@2フェアリー,@2こおり,@2いわ,@3でんき,@3フェアリー,@3こおり,@3いわ&!<ひこう&!<あく"
-      },
-      "lvl1": {
-        "SWABLU": "いわ,ゴースト,はがね,でんき&@1でんき,@1こおり,@1いわ&@2でんき,@2こおり,@2いわ,@3でんき,@3こおり,@3いわ&!<ノーマル&!<ひこう",
-        "STARLY": "いわ,ゴースト,はがね,でんき&@1でんき,@1こおり,@1いわ&@2でんき,@2こおり,@2いわ,@3でんき,@3こおり,@3いわ&!<ノーマル&!<ひこう",
-        "VULLABY": "いわ,はがね,でんき,あく,フェアリー&@1でんき,@1フェアリー,@1こおり,@1いわ&@2でんき,@2フェアリー,@2こおり,@2いわ,@3でんき,@3フェアリー,@3こおり,@3いわ&!<あく&!<ひこう"
       },
       "shadow_lvl5": {
         "DIALGA": "はがね,ほのお,みず,でんき&@1かくとう,@1じめん&@2かくとう,@2じめん,@3かくとう,@3じめん&!<はがね&!<ドラゴン"
