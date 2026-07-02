@@ -1,75 +1,304 @@
 {
-  "fetchedAt": "2026-07-01T10:55:52.577Z",
+  "fetchedAt": "2026-07-02T10:18:47.566Z",
   "raids": {
-    "ultra_beast": [
+    "mega": [
       {
-        "id": "CELESTEELA",
+        "id": "LUCARIO",
         "names": {
-          "en": "Celesteela",
-          "de": "Kaguron",
-          "fr": "Bamboiselle",
-          "it": "Celesteela",
-          "ja": "テッカグヤ",
-          "ko": "철화구야",
-          "es": "Celesteela"
+          "en": "Mega Lucario",
+          "de": "Mega-Lucario",
+          "fr": "Méga-Lucario",
+          "it": "MegaLucario",
+          "ja": "メガルカリオ",
+          "ko": "메가루카리오",
+          "es": "Mega-Lucario"
         },
         "types": [
-          "steel",
-          "flying"
-        ],
-        "resistorTypes": [
-          "steel",
-          "fire",
-          "water",
-          "electric"
-        ],
-        "seMoveTypes": [
-          "electric",
-          "fire"
-        ]
-      },
-      {
-        "id": "KARTANA",
-        "names": {
-          "en": "Kartana",
-          "de": "Katagami",
-          "fr": "Katagami",
-          "it": "Kartana",
-          "ja": "カミツルギ",
-          "ko": "종이신도",
-          "es": "Kartana"
-        },
-        "types": [
-          "grass",
+          "fighting",
           "steel"
         ],
         "resistorTypes": [
           "flying",
           "poison",
           "bug",
+          "ghost",
+          "fire",
+          "water",
+          "electric",
+          "psychic"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "fire",
+          "ground"
+        ]
+      }
+    ],
+    "lvl5": [
+      {
+        "id": "ARTICUNO",
+        "names": {
+          "en": "Articuno",
+          "de": "Arktos",
+          "fr": "Artikodin",
+          "it": "Articuno",
+          "ja": "フリーザー",
+          "ko": "프리져",
+          "es": "Articuno"
+        },
+        "types": [
+          "ice",
+          "flying"
+        ],
+        "resistorTypes": [
+          "rock",
           "steel",
           "fire",
-          "grass",
+          "water",
+          "electric",
+          "ice"
+        ],
+        "seMoveTypes": [
+          "rock",
+          "electric",
+          "fire",
+          "steel"
+        ]
+      },
+      {
+        "id": "ZAPDOS",
+        "names": {
+          "en": "Zapdos",
+          "de": "Zapdos",
+          "fr": "Électhor",
+          "it": "Zapdos",
+          "ja": "サンダー",
+          "ko": "썬더",
+          "es": "Zapdos"
+        },
+        "types": [
+          "electric",
+          "flying"
+        ],
+        "resistorTypes": [
+          "ground",
+          "rock",
+          "steel",
           "electric",
           "dragon"
         ],
         "seMoveTypes": [
+          "ice",
+          "rock"
+        ]
+      },
+      {
+        "id": "MOLTRES",
+        "names": {
+          "en": "Moltres",
+          "de": "Lavados",
+          "fr": "Sulfura",
+          "it": "Moltres",
+          "ja": "ファイヤー",
+          "ko": "파이어",
+          "es": "Moltres"
+        },
+        "types": [
           "fire",
+          "flying"
+        ],
+        "resistorTypes": [
+          "rock",
+          "fire",
+          "water",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "rock",
+          "electric",
+          "water"
+        ]
+      }
+    ],
+    "lvl3": [
+      {
+        "id": "SCYTHER",
+        "names": {
+          "en": "Scyther",
+          "de": "Sichlor",
+          "fr": "Insécateur",
+          "it": "Scyther",
+          "ja": "ストライク",
+          "ko": "스라크",
+          "es": "Scyther"
+        },
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "rock",
+          "ghost",
+          "steel",
+          "fire",
+          "electric",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "rock",
+          "electric",
+          "fire",
+          "flying",
+          "ice"
+        ]
+      },
+      {
+        "id": "GYARADOS",
+        "names": {
+          "en": "Gyarados",
+          "de": "Garados",
+          "fr": "Léviator",
+          "it": "Gyarados",
+          "ja": "ギャラドス",
+          "ko": "갸라도스",
+          "es": "Gyarados"
+        },
+        "types": [
+          "water",
+          "flying"
+        ],
+        "resistorTypes": [
+          "steel",
+          "water",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "electric",
+          "rock"
+        ]
+      },
+      {
+        "id": "SNORLAX",
+        "names": {
+          "en": "Snorlax",
+          "de": "Relaxo",
+          "fr": "Ronflex",
+          "it": "Snorlax",
+          "ja": "カビゴン",
+          "ko": "잠만보",
+          "es": "Snorlax"
+        },
+        "types": [
+          "normal"
+        ],
+        "resistorTypes": [
+          "rock",
+          "ghost",
+          "steel"
+        ],
+        "seMoveTypes": [
           "fighting"
         ]
       }
     ],
-    "mega": [
+    "lvl1": [
       {
-        "id": "PIDGEOT",
+        "id": "VULPIX",
         "names": {
-          "en": "Mega Pidgeot",
-          "de": "Mega-Tauboss",
-          "fr": "Méga-Roucarnage",
-          "it": "MegaPidgeot",
-          "ja": "メガピジョット",
-          "ko": "메가피죤투",
-          "es": "Mega-Pidgeot"
+          "en": "Alolan Vulpix",
+          "de": "Alola-Vulpix",
+          "fr": "Goupix d'Alola",
+          "it": "Vulpix di Alola",
+          "ja": "アローラ ロコン",
+          "ko": "알로라 식스테일",
+          "es": "Vulpix de Alola"
+        },
+        "types": [
+          "ice"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "ice"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "fire",
+          "rock",
+          "steel"
+        ]
+      },
+      {
+        "id": "VULPIX",
+        "names": {
+          "en": "Vulpix",
+          "de": "Vulpix",
+          "fr": "Goupix",
+          "it": "Vulpix",
+          "ja": "ロコン",
+          "ko": "식스테일",
+          "es": "Vulpix"
+        },
+        "types": [
+          "fire"
+        ],
+        "resistorTypes": [
+          "rock",
+          "fire",
+          "water",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground",
+          "rock",
+          "water"
+        ]
+      },
+      {
+        "id": "GASTLY",
+        "names": {
+          "en": "Gastly",
+          "de": "Nebulak",
+          "fr": "Fantominus",
+          "it": "Gastly",
+          "ja": "ゴース",
+          "ko": "고오스",
+          "es": "Gastly"
+        },
+        "types": [
+          "ghost",
+          "poison"
+        ],
+        "resistorTypes": [
+          "normal",
+          "poison",
+          "ground",
+          "rock",
+          "steel",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "ghost",
+          "ground",
+          "psychic"
+        ]
+      },
+      {
+        "id": "RUFFLET",
+        "names": {
+          "en": "Rufflet",
+          "de": "Geronimatz",
+          "fr": "Furaiglon",
+          "it": "Rufflet",
+          "ja": "ワシボン",
+          "ko": "수리둥보",
+          "es": "Rufflet"
         },
         "types": [
           "normal",
@@ -90,74 +319,72 @@
     ],
     "shadow_lvl5": [
       {
-        "id": "DIALGA",
+        "id": "PALKIA",
         "names": {
-          "en": "Dialga",
-          "de": "Dialga",
-          "fr": "Dialga",
-          "it": "Dialga",
-          "ja": "ディアルガ",
-          "ko": "디아루가",
-          "es": "Dialga"
+          "en": "Palkia",
+          "de": "Palkia",
+          "fr": "Palkia",
+          "it": "Palkia",
+          "ja": "パルキア",
+          "ko": "펄기아",
+          "es": "Palkia"
         },
         "types": [
-          "steel",
+          "water",
           "dragon"
         ],
         "resistorTypes": [
           "steel",
-          "fire",
           "water",
-          "electric"
+          "grass",
+          "fairy"
         ],
         "seMoveTypes": [
-          "fighting",
-          "ground"
+          "dragon",
+          "fairy"
         ]
       }
     ],
     "shadow_lvl3": [
       {
-        "id": "MAROWAK",
+        "id": "GRAVELER",
         "names": {
-          "en": "Alolan Marowak",
-          "de": "Alola-Knogga",
-          "fr": "Ossatueur d'Alola",
-          "it": "Marowak di Alola",
-          "ja": "アローラ ガラガラ",
-          "ko": "알로라 텅구리",
-          "es": "Marowak de Alola"
+          "en": "Graveler",
+          "de": "Georok",
+          "fr": "Gravalanch",
+          "it": "Graveler",
+          "ja": "ゴローン",
+          "ko": "데구리",
+          "es": "Graveler"
         },
         "types": [
-          "fire",
-          "ghost"
+          "rock",
+          "ground"
         ],
         "resistorTypes": [
-          "normal",
-          "rock",
-          "fire",
-          "water",
-          "dragon",
-          "dark"
+          "fighting",
+          "ground",
+          "grass"
         ],
         "seMoveTypes": [
-          "dark",
-          "ghost",
+          "grass",
+          "water",
+          "fighting",
           "ground",
-          "rock",
-          "water"
+          "ice",
+          "steel"
         ]
       },
       {
-        "id": "HITMONLEE",
+        "id": "HITMONCHAN",
         "names": {
-          "en": "Hitmonlee",
-          "de": "Kicklee",
-          "fr": "Kicklee",
-          "it": "Hitmonlee",
-          "ja": "サワムラー",
-          "ko": "시라소몬",
-          "es": "Hitmonlee"
+          "en": "Hitmonchan",
+          "de": "Nockchan",
+          "fr": "Tygnon",
+          "it": "Hitmonchan",
+          "ja": "エビワラー",
+          "ko": "홍수몬",
+          "es": "Hitmonchan"
         },
         "types": [
           "fighting"
@@ -177,363 +404,147 @@
         ]
       },
       {
-        "id": "GLIGAR",
+        "id": "SCYTHER",
         "names": {
-          "en": "Gligar",
-          "de": "Skorgla",
-          "fr": "Scorplane",
-          "it": "Gligar",
-          "ja": "グライガー",
-          "ko": "글라이거",
-          "es": "Gligar"
+          "en": "Scyther",
+          "de": "Sichlor",
+          "fr": "Insécateur",
+          "it": "Scyther",
+          "ja": "ストライク",
+          "ko": "스라크",
+          "es": "Scyther"
         },
         "types": [
-          "ground",
+          "bug",
           "flying"
         ],
         "resistorTypes": [
-          "flying"
+          "flying",
+          "poison",
+          "rock",
+          "ghost",
+          "steel",
+          "fire",
+          "electric",
+          "fairy"
         ],
         "seMoveTypes": [
-          "ice",
-          "water"
+          "rock",
+          "electric",
+          "fire",
+          "flying",
+          "ice"
         ]
       }
     ],
     "shadow_lvl1": [
       {
-        "id": "HORSEA",
+        "id": "MANKEY",
         "names": {
-          "en": "Horsea",
-          "de": "Seeper",
-          "fr": "Hypotrempe",
-          "it": "Horsea",
-          "ja": "タッツー",
-          "ko": "쏘드라",
-          "es": "Horsea"
+          "en": "Mankey",
+          "de": "Menki",
+          "fr": "Férosinge",
+          "it": "Mankey",
+          "ja": "マンキー",
+          "ko": "망키",
+          "es": "Mankey"
         },
         "types": [
-          "water"
+          "fighting"
         ],
         "resistorTypes": [
-          "water",
-          "grass",
-          "dragon"
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "psychic",
+          "fairy"
         ],
         "seMoveTypes": [
-          "electric",
-          "grass"
+          "fairy",
+          "flying",
+          "psychic"
         ]
       },
       {
-        "id": "PORYGON",
+        "id": "PHANPY",
         "names": {
-          "en": "Porygon",
-          "de": "Porygon",
-          "fr": "Porygon",
-          "it": "Porygon",
-          "ja": "ポリゴン",
-          "ko": "폴리곤",
-          "es": "Porygon"
+          "en": "Phanpy",
+          "de": "Phanpy",
+          "fr": "Phanpy",
+          "it": "Phanpy",
+          "ja": "ゴマゾウ",
+          "ko": "코코리",
+          "es": "Phanpy"
         },
         "types": [
-          "normal"
+          "ground"
+        ],
+        "resistorTypes": [
+          "flying",
+          "bug",
+          "grass"
+        ],
+        "seMoveTypes": [
+          "grass",
+          "ice",
+          "water"
+        ]
+      },
+      {
+        "id": "RALTS",
+        "names": {
+          "en": "Ralts",
+          "de": "Trasla",
+          "fr": "Tarsal",
+          "it": "Ralts",
+          "ja": "ラルトス",
+          "ko": "랄토스",
+          "es": "Ralts"
+        },
+        "types": [
+          "psychic",
+          "fairy"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "psychic"
+        ],
+        "seMoveTypes": [
+          "ghost",
+          "poison",
+          "steel"
+        ]
+      },
+      {
+        "id": "DARUMAKA",
+        "names": {
+          "en": "Darumaka",
+          "de": "Flampion",
+          "fr": "Darumarond",
+          "it": "Darumaka",
+          "ja": "ダルマッカ",
+          "ko": "달막화",
+          "es": "Darumaka"
+        },
+        "types": [
+          "fire"
         ],
         "resistorTypes": [
           "rock",
-          "ghost",
-          "steel"
-        ],
-        "seMoveTypes": [
-          "fighting"
-        ]
-      },
-      {
-        "id": "BELDUM",
-        "names": {
-          "en": "Beldum",
-          "de": "Tanhel",
-          "fr": "Terhal",
-          "it": "Beldum",
-          "ja": "ダンバル",
-          "ko": "메탕",
-          "es": "Beldum"
-        },
-        "types": [
-          "steel",
-          "psychic"
-        ],
-        "resistorTypes": [
-          "steel",
           "fire",
           "water",
-          "electric",
-          "psychic",
-          "dark"
+          "dragon"
         ],
         "seMoveTypes": [
-          "dark",
-          "fire",
-          "ghost",
-          "ground"
-        ]
-      },
-      {
-        "id": "GOLETT",
-        "names": {
-          "en": "Golett",
-          "de": "Golbit",
-          "fr": "Gringolem",
-          "it": "Golett",
-          "ja": "ゴビット",
-          "ko": "골비람",
-          "es": "Golett"
-        },
-        "types": [
           "ground",
-          "ghost"
-        ],
-        "resistorTypes": [
-          "normal",
-          "flying",
-          "bug",
-          "grass",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "ghost",
-          "grass",
-          "ice",
+          "rock",
           "water"
         ]
       }
     ]
   },
   "maxBattles": {},
-  "eventRaids": [
-    {
-      "eventID": "articuno-zapdos-moltres-in-5-star-raid-battles-july-2026",
-      "name": "Articuno, Zapdos, and Moltres in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-07-01T06:00:00.000",
-      "end": "2026-07-05T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "ARTICUNO",
-          "names": {
-            "en": "Articuno"
-          },
-          "types": [
-            "ice",
-            "flying"
-          ],
-          "resistorTypes": [
-            "rock",
-            "steel",
-            "fire",
-            "water",
-            "electric",
-            "ice"
-          ],
-          "seMoveTypes": [
-            "rock",
-            "steel",
-            "fire",
-            "electric"
-          ]
-        },
-        {
-          "id": "ZAPDOS",
-          "names": {
-            "en": "Zapdos"
-          },
-          "types": [
-            "electric",
-            "flying"
-          ],
-          "resistorTypes": [
-            "ground",
-            "rock",
-            "steel",
-            "electric",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "rock",
-            "ice"
-          ]
-        },
-        {
-          "id": "MOLTRES",
-          "names": {
-            "en": "Moltres"
-          },
-          "types": [
-            "fire",
-            "flying"
-          ],
-          "resistorTypes": [
-            "rock",
-            "fire",
-            "water",
-            "electric",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "rock",
-            "water",
-            "electric"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "mega-lucario-in-mega-raids-july-2026",
-      "name": "Mega Lucario in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-07-01T06:00:00.000",
-      "end": "2026-07-05T22:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "LUCARIO",
-          "names": {
-            "en": "Lucario"
-          },
-          "types": [
-            "fighting",
-            "steel"
-          ],
-          "resistorTypes": [
-            "flying",
-            "poison",
-            "bug",
-            "ghost",
-            "fire",
-            "water",
-            "electric",
-            "psychic"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "ground",
-            "fire"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "shadow-palkia-in-shadow-raids-july-2026",
-      "name": "Shadow Palkia in Shadow Raids",
-      "eventType": "raid-battles",
-      "start": "2026-07-01T06:00:00.000",
-      "end": "2026-08-04T22:00:00.000",
-      "isShadow": true,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "PALKIA",
-          "names": {
-            "en": "Palkia"
-          },
-          "types": [
-            "water",
-            "dragon"
-          ],
-          "resistorTypes": [
-            "steel",
-            "water",
-            "grass",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "dragon",
-            "fairy"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20260701",
-      "name": "Articuno, Zapdos, and Moltres Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-07-01T18:00:00.000",
-      "end": "2026-07-01T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "ARTICUNO",
-          "names": {
-            "en": "Articuno"
-          },
-          "types": [
-            "ice",
-            "flying"
-          ],
-          "resistorTypes": [
-            "rock",
-            "steel",
-            "fire",
-            "water",
-            "electric",
-            "ice"
-          ],
-          "seMoveTypes": [
-            "rock",
-            "steel",
-            "fire",
-            "electric"
-          ]
-        },
-        {
-          "id": "ZAPDOS",
-          "names": {
-            "en": "Zapdos"
-          },
-          "types": [
-            "electric",
-            "flying"
-          ],
-          "resistorTypes": [
-            "ground",
-            "rock",
-            "steel",
-            "electric",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "rock",
-            "ice"
-          ]
-        },
-        {
-          "id": "MOLTRES",
-          "names": {
-            "en": "Moltres"
-          },
-          "types": [
-            "fire",
-            "flying"
-          ],
-          "resistorTypes": [
-            "rock",
-            "fire",
-            "water",
-            "electric",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "rock",
-            "water",
-            "electric"
-          ]
-        }
-      ]
-    }
-  ]
+  "eventRaids": []
 }
