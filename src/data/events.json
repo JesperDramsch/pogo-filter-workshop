@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-07-01T11:33:08.594Z",
+  "fetchedAt": "2026-07-04T10:24:59.887Z",
   "events": [
     {
       "id": "event-10th-anniversary-party-2026-07-04t10-00-00",
@@ -9,13 +9,23 @@
       "end": "2026-07-06T20:00:00",
       "isLocalTime": true,
       "spawnDex": [
+        1,
+        4,
+        7,
+        10,
         25,
+        100,
         133,
         265
       ],
       "spawns": [
+        "Bulbasaur",
+        "Caterpie",
+        "Charmander",
         "Eevee",
         "Pikachu",
+        "Squirtle",
+        "Voltorb",
         "Wurmple"
       ],
       "unresolved": []
