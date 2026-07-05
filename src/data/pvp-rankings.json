@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-07-02T11:04:01.157Z",
+  "fetchedAt": "2026-07-05T10:33:05.276Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -42,12 +42,12 @@
           "name": "Ninetales"
         },
         {
-          "dex": 222,
-          "name": "Corsola (Galarian)"
-        },
-        {
           "dex": 160,
           "name": "Feraligatr"
+        },
+        {
+          "dex": 222,
+          "name": "Corsola (Galarian)"
         },
         {
           "dex": 189,
@@ -66,24 +66,24 @@
           "name": "Fearow"
         },
         {
-          "dex": 230,
-          "name": "Kingdra"
-        },
-        {
           "dex": 184,
           "name": "Azumarill"
+        },
+        {
+          "dex": 230,
+          "name": "Kingdra"
         },
         {
           "dex": 799,
           "name": "Guzzlord"
         },
         {
-          "dex": 162,
-          "name": "Furret"
-        },
-        {
           "dex": 131,
           "name": "Lapras"
+        },
+        {
+          "dex": 162,
+          "name": "Furret"
         },
         {
           "dex": 148,
@@ -151,24 +151,24 @@
           "name": "Florges"
         },
         {
-          "dex": 640,
-          "name": "Virizion"
-        },
-        {
           "dex": 395,
           "name": "Empoleon (Shadow)"
+        },
+        {
+          "dex": 640,
+          "name": "Virizion"
         },
         {
           "dex": 146,
           "name": "Moltres (Galarian)"
         },
         {
-          "dex": 205,
-          "name": "Forretress"
-        },
-        {
           "dex": 593,
           "name": "Jellicent"
+        },
+        {
+          "dex": 205,
+          "name": "Forretress"
         },
         {
           "dex": 718,
@@ -203,52 +203,52 @@
           "name": "Blastoise"
         },
         {
-          "dex": 687,
-          "name": "Malamar"
-        },
-        {
-          "dex": 895,
-          "name": "Regidrago"
-        },
-        {
           "dex": 663,
           "name": "Talonflame"
         },
         {
+          "dex": 687,
+          "name": "Malamar (Shadow)"
+        },
+        {
           "dex": 365,
-          "name": "Walrein"
+          "name": "Walrein (Shadow)"
         },
         {
           "dex": 977,
           "name": "Dondozo"
         },
         {
-          "dex": 487,
-          "name": "Giratina (Altered)"
+          "dex": 895,
+          "name": "Regidrago"
         },
         {
-          "dex": 979,
-          "name": "Annihilape"
+          "dex": 487,
+          "name": "Giratina (Altered)"
         },
         {
           "dex": 939,
           "name": "Bellibolt"
         },
         {
-          "dex": 488,
-          "name": "Cresselia"
+          "dex": 979,
+          "name": "Annihilape"
         },
         {
-          "dex": 346,
-          "name": "Cradily"
+          "dex": 488,
+          "name": "Cresselia"
         },
         {
           "dex": 350,
           "name": "Milotic"
         },
         {
-          "dex": 765,
-          "name": "Oranguru"
+          "dex": 208,
+          "name": "Steelix"
+        },
+        {
+          "dex": 346,
+          "name": "Cradily"
         }
       ]
     },
@@ -268,6 +268,10 @@
           "name": "Metagross"
         },
         {
+          "dex": 792,
+          "name": "Lunala"
+        },
+        {
           "dex": 646,
           "name": "Kyurem (White)"
         },
@@ -276,16 +280,12 @@
           "name": "Xerneas"
         },
         {
-          "dex": 792,
-          "name": "Lunala"
+          "dex": 643,
+          "name": "Reshiram"
         },
         {
           "dex": 483,
           "name": "Dialga (Origin)"
-        },
-        {
-          "dex": 643,
-          "name": "Reshiram"
         },
         {
           "dex": 889,
@@ -337,7 +337,7 @@
         },
         {
           "dex": 381,
-          "name": "Latios"
+          "name": "Latios (Shadow)"
         },
         {
           "dex": 130,
@@ -461,12 +461,12 @@
           "name": "Oinkologne (Female)"
         },
         {
-          "dex": 226,
-          "name": "Mantine"
-        },
-        {
           "dex": 877,
           "name": "Morpeko (Hangry)"
+        },
+        {
+          "dex": 226,
+          "name": "Mantine"
         },
         {
           "dex": 733,
