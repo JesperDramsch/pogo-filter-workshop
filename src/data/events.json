@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-07-04T10:24:59.887Z",
+  "fetchedAt": "2026-07-06T12:15:22.094Z",
   "events": [
     {
       "id": "event-10th-anniversary-party-2026-07-04t10-00-00",
@@ -27,21 +27,6 @@
         "Squirtle",
         "Voltorb",
         "Wurmple"
-      ],
-      "unresolved": []
-    },
-    {
-      "id": "community-day-sobble-community-day-2026-07-04t14-00-00",
-      "title": "Sobble Community Day",
-      "category": "Community Day",
-      "start": "2026-07-04T14:00:00",
-      "end": "2026-07-04T17:00:00",
-      "isLocalTime": true,
-      "spawnDex": [
-        816
-      ],
-      "spawns": [
-        "Sobble"
       ],
       "unresolved": []
     },
