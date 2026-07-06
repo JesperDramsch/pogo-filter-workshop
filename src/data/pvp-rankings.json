@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-07-05T10:33:05.276Z",
+  "fetchedAt": "2026-07-06T12:17:15.045Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -516,120 +516,120 @@
           "name": "Regidrago"
         },
         {
+          "dex": 131,
+          "name": "Lapras"
+        },
+        {
           "dex": 765,
           "name": "Oranguru"
-        },
-        {
-          "dex": 230,
-          "name": "Kingdra"
-        },
-        {
-          "dex": 463,
-          "name": "Lickilicky"
         },
         {
           "dex": 222,
           "name": "Corsola (Galarian)"
         },
         {
-          "dex": 131,
-          "name": "Lapras"
+          "dex": 230,
+          "name": "Kingdra (Shadow)"
         },
         {
-          "dex": 488,
-          "name": "Cresselia"
+          "dex": 705,
+          "name": "Sliggoo"
         },
         {
-          "dex": 784,
-          "name": "Kommo-o"
-        },
-        {
-          "dex": 752,
-          "name": "Araquanid"
-        },
-        {
-          "dex": 326,
-          "name": "Grumpig"
-        },
-        {
-          "dex": 148,
-          "name": "Dragonair"
-        },
-        {
-          "dex": 162,
-          "name": "Furret"
-        },
-        {
-          "dex": 487,
-          "name": "Giratina (Altered) (Shadow)"
-        },
-        {
-          "dex": 706,
-          "name": "Goodra"
-        },
-        {
-          "dex": 334,
-          "name": "Altaria"
+          "dex": 463,
+          "name": "Lickilicky"
         },
         {
           "dex": 593,
           "name": "Jellicent"
         },
         {
-          "dex": 699,
-          "name": "Aurorus"
-        },
-        {
-          "dex": 780,
-          "name": "Drampa"
-        },
-        {
-          "dex": 356,
-          "name": "Dusclops"
-        },
-        {
-          "dex": 346,
-          "name": "Cradily"
+          "dex": 326,
+          "name": "Grumpig"
         },
         {
           "dex": 558,
           "name": "Crustle"
         },
         {
-          "dex": 733,
-          "name": "Toucannon (Shadow)"
+          "dex": 162,
+          "name": "Furret"
         },
         {
-          "dex": 477,
-          "name": "Dusknoir"
+          "dex": 699,
+          "name": "Aurorus"
         },
         {
-          "dex": 997,
-          "name": "Arctibax"
+          "dex": 372,
+          "name": "Shelgon"
         },
         {
-          "dex": 108,
-          "name": "Lickitung"
+          "dex": 752,
+          "name": "Araquanid"
         },
         {
-          "dex": 783,
-          "name": "Hakamo-o"
+          "dex": 488,
+          "name": "Cresselia"
         },
         {
-          "dex": 337,
-          "name": "Lunatone"
+          "dex": 148,
+          "name": "Dragonair (Shadow)"
+        },
+        {
+          "dex": 487,
+          "name": "Giratina (Altered) (Shadow)"
+        },
+        {
+          "dex": 346,
+          "name": "Cradily"
+        },
+        {
+          "dex": 356,
+          "name": "Dusclops (Shadow)"
+        },
+        {
+          "dex": 365,
+          "name": "Walrein"
+        },
+        {
+          "dex": 706,
+          "name": "Goodra"
         },
         {
           "dex": 364,
           "name": "Sealeo"
         },
         {
-          "dex": 206,
-          "name": "Dunsparce"
+          "dex": 226,
+          "name": "Mantine"
         },
         {
-          "dex": 130,
-          "name": "Gyarados (Shadow)"
+          "dex": 308,
+          "name": "Medicham"
+        },
+        {
+          "dex": 97,
+          "name": "Hypno"
+        },
+        {
+          "dex": 460,
+          "name": "Abomasnow"
+        },
+        {
+          "dex": 477,
+          "name": "Dusknoir (Shadow)"
+        },
+        {
+          "dex": 241,
+          "name": "Miltank"
+        },
+        {
+          "dex": 980,
+          "name": "Clodsire"
+        },
+        {
+          "dex": 189,
+          "name": "Jumpluff"
         }
       ]
     }
