@@ -1,123 +1,95 @@
 {
-  "fetchedAt": "2026-07-08T09:57:43.750Z",
+  "fetchedAt": "2026-07-09T10:39:06.775Z",
   "raids": {
     "mega": [
       {
-        "id": "TYRANITAR",
+        "id": "GENGAR",
         "names": {
-          "en": "Mega Tyranitar",
-          "de": "Mega-Despotar",
-          "fr": "Méga-Tyranocif",
-          "it": "MegaTyranitar",
-          "ja": "メガバンギラス",
-          "ko": "메가마기라스",
-          "es": "Mega-Tyranitar"
+          "en": "Mega Gengar",
+          "de": "Mega-Gengar",
+          "fr": "Méga-Ectoplasma",
+          "it": "MegaGengar",
+          "ja": "メガゲンガー",
+          "ko": "메가팬텀",
+          "es": "Mega-Gengar"
         },
         "types": [
-          "rock",
-          "dark"
+          "ghost",
+          "poison"
         ],
         "resistorTypes": [
-          "fighting",
+          "normal",
+          "poison",
           "ground",
+          "rock",
           "steel",
-          "dark",
-          "fairy"
+          "dark"
         ],
         "seMoveTypes": [
-          "fighting",
-          "bug",
-          "fairy",
-          "grass",
+          "dark",
+          "ghost",
           "ground",
-          "steel",
-          "water"
+          "psychic"
         ]
       }
     ],
     "lvl5": [
       {
-        "id": "ZEKROM",
+        "id": "ZACIAN",
         "names": {
-          "en": "Zekrom",
-          "de": "Zekrom",
-          "fr": "Zekrom",
-          "it": "Zekrom",
-          "ja": "ゼクロム",
-          "ko": "제크로무",
-          "es": "Zekrom"
+          "en": "Zacian (Crowned Sword)",
+          "de": "Zacian (König des Schwertes)",
+          "fr": "Zacian (Épée Suprême)",
+          "it": "Zacian (Re delle Spade)",
+          "ja": "ザシアン (けんのおう)",
+          "ko": "자시안 (검왕)",
+          "es": "Zacian (Espada Suprema)"
         },
         "types": [
-          "dragon",
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
-          "steel",
-          "grass",
-          "electric",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "dragon",
           "fairy",
-          "ground",
-          "ice"
-        ]
-      },
-      {
-        "id": "KYUREM",
-        "names": {
-          "en": "Kyurem (White Kyurem)",
-          "de": "Kyurem (Weißes Kyurem)",
-          "fr": "Kyurem (Kyurem Blanc)",
-          "it": "Kyurem (Kyurem Bianco)",
-          "ja": "キュレム (ホワイトキュレム)",
-          "ko": "큐레무 (화이트큐레무)",
-          "es": "Kyurem (Kyurem Blanco)"
-        },
-        "types": [
-          "dragon",
-          "ice"
+          "steel"
         ],
         "resistorTypes": [
+          "poison",
           "steel",
           "fire",
           "water",
-          "ice",
-          "fairy"
+          "electric"
         ],
         "seMoveTypes": [
-          "dragon",
-          "fairy",
-          "fighting",
-          "rock",
-          "steel"
+          "fire",
+          "ground"
         ]
       },
       {
-        "id": "NECROZMA",
+        "id": "ZAMAZENTA",
         "names": {
-          "en": "Necrozma (Dawn Wings)",
-          "de": "Necrozma (Morgenschwingen)",
-          "fr": "Necrozma (Ailes de l’Aurore)",
-          "it": "Necrozma (Ali dell'Aurora)",
-          "ja": "ネクロズマ (あかつきのつばさ)",
-          "ko": "네크로즈마 (새벽의 날개)",
-          "es": "Necrozma (Alas del Alba)"
+          "en": "Zamazenta (Crowned Shield)",
+          "de": "Zamazenta (König des Schildes)",
+          "fr": "Zamazenta (Bouclier Suprême)",
+          "it": "Zamazenta (Re degli Scudi)",
+          "ja": "ザマゼンタ (たてのおう)",
+          "ko": "자마젠타 (방패왕)",
+          "es": "Zamazenta (Escudo Supremo)"
         },
         "types": [
-          "psychic",
-          "ghost"
+          "fighting",
+          "steel"
         ],
         "resistorTypes": [
-          "normal",
-          "steel",
-          "dark"
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "fire",
+          "water",
+          "electric",
+          "psychic"
         ],
         "seMoveTypes": [
-          "dark",
-          "ghost"
+          "fighting",
+          "fire",
+          "ground"
         ]
       }
     ],
@@ -448,6 +420,35 @@
             "bug",
             "fire",
             "ice"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20260715",
+      "name": "Kyogre Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-07-15T18:00:00.000",
+      "end": "2026-07-15T19:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "KYOGRE",
+          "names": {
+            "en": "Kyogre"
+          },
+          "types": [
+            "water"
+          ],
+          "resistorTypes": [
+            "water",
+            "grass",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "grass",
+            "electric"
           ]
         }
       ]
