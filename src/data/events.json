@@ -1,33 +1,6 @@
 {
-  "fetchedAt": "2026-07-08T10:30:24.298Z",
+  "fetchedAt": "2026-07-13T11:27:58.630Z",
   "events": [
-    {
-      "id": "pok-mon-go-fest-pok-mon-go-fest-2026-global-2026-07-11t10-00-00",
-      "title": "Pokémon GO Fest 2026: Global",
-      "category": "Pokémon GO Fest",
-      "start": "2026-07-11T10:00:00",
-      "end": "2026-07-12T19:00:00",
-      "isLocalTime": true,
-      "spawnDex": [
-        1,
-        4,
-        7,
-        357,
-        626
-      ],
-      "spawns": [
-        "Bouffalant",
-        "Bulbasaur",
-        "Charmander",
-        "Squirtle",
-        "Tropius"
-      ],
-      "unresolved": [
-        "Pikachu wearing a Team Instinct hat",
-        "Pikachu wearing a Team Mystic hat",
-        "Pikachu wearing a Team Valor hat"
-      ]
-    },
     {
       "id": "event-special-anniversary-pikachu-celebration-2026-07-13t10-00-00",
       "title": "Special Anniversary Pikachu Celebration",
@@ -42,7 +15,9 @@
         "Pikachu"
       ],
       "unresolved": [
-        "Pikachu wearing a Tricks & Treats costume"
+        "Dapper Pikachu with blue accents",
+        "Dapper Pikachu with red accents",
+        "Dapper Pikachu with yellow accents"
       ]
     }
   ]
