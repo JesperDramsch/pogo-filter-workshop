@@ -15,11 +15,15 @@
     "pilotLong": "distance1000-&!traded&!4*&!legendary&!mythical&!shiny",
     "raidFilters": {
       "mega": {
-        "GENGAR": "normal,poison,ground,rock,steel,dark&@1dark,@1ghost,@1ground,@1psychic&@2dark,@2ghost,@2ground,@2psychic,@3dark,@3ghost,@3ground,@3psychic&!<ghost&!<poison"
+        "LUCARIO": "flying,poison,bug,ghost,fire,water,electric,psychic&@1fighting,@1fire,@1ground&@2fighting,@2fire,@2ground,@3fighting,@3fire,@3ground&!<fighting&!<steel"
       },
       "lvl5": {
-        "ZACIAN": "poison,steel,fire,water,electric&@1fire,@1ground&@2fire,@2ground,@3fire,@3ground&!<fairy&!<steel",
-        "ZAMAZENTA": "flying,poison,bug,ghost,fire,water,electric,psychic&@1fighting,@1fire,@1ground&@2fighting,@2fire,@2ground,@3fighting,@3fire,@3ground&!<fighting&!<steel"
+        "ARTICUNO": "rock,steel,fire,water,electric,ice&@1rock,@1electric,@1fire,@1steel&@2rock,@2electric,@2fire,@2steel,@3rock,@3electric,@3fire,@3steel&!<ice&!<flying",
+        "ZAPDOS": "ground,rock,steel,electric,dragon&@1ice,@1rock&@2ice,@2rock,@3ice,@3rock&!<electric&!<flying",
+        "MOLTRES": "rock,fire,water,electric,dragon&@1rock,@1electric,@1water&@2rock,@2electric,@2water,@3rock,@3electric,@3water&!<fire&!<flying"
+      },
+      "lvl1": {
+        "PIKACHU": "ground,grass,electric,dragon&@1ground&@2ground,@3ground&!<electric"
       },
       "shadow_lvl5": {
         "PALKIA": "steel,water,grass,fairy&@1dragon,@1fairy&@2dragon,@2fairy,@3dragon,@3fairy&!<water&!<dragon"
@@ -110,11 +114,15 @@
     "pilotLong": "entfernung1000-&!getauscht&!4*&!legendär&!mysteriös&!schillernd",
     "raidFilters": {
       "mega": {
-        "GENGAR": "normal,gift,boden,gestein,stahl,unlicht&@1unlicht,@1geist,@1boden,@1psycho&@2unlicht,@2geist,@2boden,@2psycho,@3unlicht,@3geist,@3boden,@3psycho&!<geist&!<gift"
+        "LUCARIO": "flug,gift,käfer,geist,feuer,wasser,elektro,psycho&@1kampf,@1feuer,@1boden&@2kampf,@2feuer,@2boden,@3kampf,@3feuer,@3boden&!<kampf&!<stahl"
       },
       "lvl5": {
-        "ZACIAN": "gift,stahl,feuer,wasser,elektro&@1feuer,@1boden&@2feuer,@2boden,@3feuer,@3boden&!<fee&!<stahl",
-        "ZAMAZENTA": "flug,gift,käfer,geist,feuer,wasser,elektro,psycho&@1kampf,@1feuer,@1boden&@2kampf,@2feuer,@2boden,@3kampf,@3feuer,@3boden&!<kampf&!<stahl"
+        "ARTICUNO": "gestein,stahl,feuer,wasser,elektro,eis&@1gestein,@1elektro,@1feuer,@1stahl&@2gestein,@2elektro,@2feuer,@2stahl,@3gestein,@3elektro,@3feuer,@3stahl&!<eis&!<flug",
+        "ZAPDOS": "boden,gestein,stahl,elektro,drache&@1eis,@1gestein&@2eis,@2gestein,@3eis,@3gestein&!<elektro&!<flug",
+        "MOLTRES": "gestein,feuer,wasser,elektro,drache&@1gestein,@1elektro,@1wasser&@2gestein,@2elektro,@2wasser,@3gestein,@3elektro,@3wasser&!<feuer&!<flug"
+      },
+      "lvl1": {
+        "PIKACHU": "boden,pflanze,elektro,drache&@1boden&@2boden,@3boden&!<elektro"
       },
       "shadow_lvl5": {
         "PALKIA": "stahl,wasser,pflanze,fee&@1drache,@1fee&@2drache,@2fee,@3drache,@3fee&!<wasser&!<drache"
@@ -205,11 +213,15 @@
     "pilotLong": "distancia1000-&!intercambiados&!4*&!legendario&!singular&!variocolor",
     "raidFilters": {
       "mega": {
-        "GENGAR": "normal,veneno,tierra,roca,acero,siniestro&@1siniestro,@1fantasma,@1tierra,@1psíquico&@2siniestro,@2fantasma,@2tierra,@2psíquico,@3siniestro,@3fantasma,@3tierra,@3psíquico&!<fantasma&!<veneno"
+        "LUCARIO": "volador,veneno,bicho,fantasma,fuego,agua,eléctrico,psíquico&@1lucha,@1fuego,@1tierra&@2lucha,@2fuego,@2tierra,@3lucha,@3fuego,@3tierra&!<lucha&!<acero"
       },
       "lvl5": {
-        "ZACIAN": "veneno,acero,fuego,agua,eléctrico&@1fuego,@1tierra&@2fuego,@2tierra,@3fuego,@3tierra&!<hada&!<acero",
-        "ZAMAZENTA": "volador,veneno,bicho,fantasma,fuego,agua,eléctrico,psíquico&@1lucha,@1fuego,@1tierra&@2lucha,@2fuego,@2tierra,@3lucha,@3fuego,@3tierra&!<lucha&!<acero"
+        "ARTICUNO": "roca,acero,fuego,agua,eléctrico,hielo&@1roca,@1eléctrico,@1fuego,@1acero&@2roca,@2eléctrico,@2fuego,@2acero,@3roca,@3eléctrico,@3fuego,@3acero&!<hielo&!<volador",
+        "ZAPDOS": "tierra,roca,acero,eléctrico,dragón&@1hielo,@1roca&@2hielo,@2roca,@3hielo,@3roca&!<eléctrico&!<volador",
+        "MOLTRES": "roca,fuego,agua,eléctrico,dragón&@1roca,@1eléctrico,@1agua&@2roca,@2eléctrico,@2agua,@3roca,@3eléctrico,@3agua&!<fuego&!<volador"
+      },
+      "lvl1": {
+        "PIKACHU": "tierra,planta,eléctrico,dragón&@1tierra&@2tierra,@3tierra&!<eléctrico"
       },
       "shadow_lvl5": {
         "PALKIA": "acero,agua,planta,hada&@1dragón,@1hada&@2dragón,@2hada,@3dragón,@3hada&!<agua&!<dragón"
@@ -300,11 +312,15 @@
     "pilotLong": "distance1000-&!échangé&!4*&!légendaire&!fabuleux&!chromatique",
     "raidFilters": {
       "mega": {
-        "GENGAR": "normal,poison,sol,roche,acier,ténèbres&@1ténèbres,@1spectre,@1sol,@1psy&@2ténèbres,@2spectre,@2sol,@2psy,@3ténèbres,@3spectre,@3sol,@3psy&!<spectre&!<poison"
+        "LUCARIO": "vol,poison,insecte,spectre,feu,eau,électrik,psy&@1combat,@1feu,@1sol&@2combat,@2feu,@2sol,@3combat,@3feu,@3sol&!<combat&!<acier"
       },
       "lvl5": {
-        "ZACIAN": "poison,acier,feu,eau,électrik&@1feu,@1sol&@2feu,@2sol,@3feu,@3sol&!<fée&!<acier",
-        "ZAMAZENTA": "vol,poison,insecte,spectre,feu,eau,électrik,psy&@1combat,@1feu,@1sol&@2combat,@2feu,@2sol,@3combat,@3feu,@3sol&!<combat&!<acier"
+        "ARTICUNO": "roche,acier,feu,eau,électrik,glace&@1roche,@1électrik,@1feu,@1acier&@2roche,@2électrik,@2feu,@2acier,@3roche,@3électrik,@3feu,@3acier&!<glace&!<vol",
+        "ZAPDOS": "sol,roche,acier,électrik,dragon&@1glace,@1roche&@2glace,@2roche,@3glace,@3roche&!<électrik&!<vol",
+        "MOLTRES": "roche,feu,eau,électrik,dragon&@1roche,@1électrik,@1eau&@2roche,@2électrik,@2eau,@3roche,@3électrik,@3eau&!<feu&!<vol"
+      },
+      "lvl1": {
+        "PIKACHU": "sol,plante,électrik,dragon&@1sol&@2sol,@3sol&!<électrik"
       },
       "shadow_lvl5": {
         "PALKIA": "acier,eau,plante,fée&@1dragon,@1fée&@2dragon,@2fée,@3dragon,@3fée&!<eau&!<dragon"
@@ -395,11 +411,15 @@
     "pilotLong": "距離1000-&!交換&!4*&!傳說的寶可夢&!幻&!異色",
     "raidFilters": {
       "mega": {
-        "GENGAR": "一般,毒,地面,岩石,鋼,惡&@1惡,@1幽靈,@1地面,@1超能力&@2惡,@2幽靈,@2地面,@2超能力,@3惡,@3幽靈,@3地面,@3超能力&!<幽靈&!<毒"
+        "LUCARIO": "飛行,毒,蟲,幽靈,火,水,電,超能力&@1格鬥,@1火,@1地面&@2格鬥,@2火,@2地面,@3格鬥,@3火,@3地面&!<格鬥&!<鋼"
       },
       "lvl5": {
-        "ZACIAN": "毒,鋼,火,水,電&@1火,@1地面&@2火,@2地面,@3火,@3地面&!<妖精&!<鋼",
-        "ZAMAZENTA": "飛行,毒,蟲,幽靈,火,水,電,超能力&@1格鬥,@1火,@1地面&@2格鬥,@2火,@2地面,@3格鬥,@3火,@3地面&!<格鬥&!<鋼"
+        "ARTICUNO": "岩石,鋼,火,水,電,冰&@1岩石,@1電,@1火,@1鋼&@2岩石,@2電,@2火,@2鋼,@3岩石,@3電,@3火,@3鋼&!<冰&!<飛行",
+        "ZAPDOS": "地面,岩石,鋼,電,龍&@1冰,@1岩石&@2冰,@2岩石,@3冰,@3岩石&!<電&!<飛行",
+        "MOLTRES": "岩石,火,水,電,龍&@1岩石,@1電,@1水&@2岩石,@2電,@2水,@3岩石,@3電,@3水&!<火&!<飛行"
+      },
+      "lvl1": {
+        "PIKACHU": "地面,草,電,龍&@1地面&@2地面,@3地面&!<電"
       },
       "shadow_lvl5": {
         "PALKIA": "鋼,水,草,妖精&@1龍,@1妖精&@2龍,@2妖精,@3龍,@3妖精&!<水&!<龍"
@@ -490,11 +510,15 @@
     "pilotLong": "दूर1000-&!टड कये गए&!4*&!लजेंडर&!मथकल&!शाइनी",
     "raidFilters": {
       "mega": {
-        "GENGAR": "नॉमल,पॉइज़न,ाउंड,रॉक,टल,डाक&@1डाक,@1घोट,@1ाउंड,@1साइकक&@2डाक,@2घोट,@2ाउंड,@2साइकक,@3डाक,@3घोट,@3ाउंड,@3साइकक&!<घोट&!<पॉइज़न"
+        "LUCARIO": "़लाइंग,पॉइज़न,बग,घोट,फ़ायर,वॉटर,इलटक,साइकक&@1फ़ाइटंग,@1फ़ायर,@1ाउंड&@2फ़ाइटंग,@2फ़ायर,@2ाउंड,@3फ़ाइटंग,@3फ़ायर,@3ाउंड&!<फ़ाइटंग&!<टल"
       },
       "lvl5": {
-        "ZACIAN": "पॉइज़न,टल,फ़ायर,वॉटर,इलटक&@1फ़ायर,@1ाउंड&@2फ़ायर,@2ाउंड,@3फ़ायर,@3ाउंड&!<फ़ेर&!<टल",
-        "ZAMAZENTA": "़लाइंग,पॉइज़न,बग,घोट,फ़ायर,वॉटर,इलटक,साइकक&@1फ़ाइटंग,@1फ़ायर,@1ाउंड&@2फ़ाइटंग,@2फ़ायर,@2ाउंड,@3फ़ाइटंग,@3फ़ायर,@3ाउंड&!<फ़ाइटंग&!<टल"
+        "ARTICUNO": "रॉक,टल,फ़ायर,वॉटर,इलटक,आइस&@1रॉक,@1इलटक,@1फ़ायर,@1टल&@2रॉक,@2इलटक,@2फ़ायर,@2टल,@3रॉक,@3इलटक,@3फ़ायर,@3टल&!<आइस&!<़लाइंग",
+        "ZAPDOS": "ाउंड,रॉक,टल,इलटक,डैगन&@1आइस,@1रॉक&@2आइस,@2रॉक,@3आइस,@3रॉक&!<इलटक&!<़लाइंग",
+        "MOLTRES": "रॉक,फ़ायर,वॉटर,इलटक,डैगन&@1रॉक,@1इलटक,@1वॉटर&@2रॉक,@2इलटक,@2वॉटर,@3रॉक,@3इलटक,@3वॉटर&!<फ़ायर&!<़लाइंग"
+      },
+      "lvl1": {
+        "PIKACHU": "ाउंड,ास,इलटक,डैगन&@1ाउंड&@2ाउंड,@3ाउंड&!<इलटक"
       },
       "shadow_lvl5": {
         "PALKIA": "टल,वॉटर,ास,फ़ेर&@1डैगन,@1फ़ेर&@2डैगन,@2फ़ेर,@3डैगन,@3फ़ेर&!<वॉटर&!<डैगन"
@@ -585,11 +609,15 @@
     "pilotLong": "きょり1000-&!こうかん&!4*&!伝説のポケモン&!まぼろし&!色違い",
     "raidFilters": {
       "mega": {
-        "GENGAR": "ノーマル,どく,じめん,いわ,はがね,あく&@1あく,@1ゴースト,@1じめん,@1エスパー&@2あく,@2ゴースト,@2じめん,@2エスパー,@3あく,@3ゴースト,@3じめん,@3エスパー&!<ゴースト&!<どく"
+        "LUCARIO": "ひこう,どく,むし,ゴースト,ほのお,みず,でんき,エスパー&@1かくとう,@1ほのお,@1じめん&@2かくとう,@2ほのお,@2じめん,@3かくとう,@3ほのお,@3じめん&!<かくとう&!<はがね"
       },
       "lvl5": {
-        "ZACIAN": "どく,はがね,ほのお,みず,でんき&@1ほのお,@1じめん&@2ほのお,@2じめん,@3ほのお,@3じめん&!<フェアリー&!<はがね",
-        "ZAMAZENTA": "ひこう,どく,むし,ゴースト,ほのお,みず,でんき,エスパー&@1かくとう,@1ほのお,@1じめん&@2かくとう,@2ほのお,@2じめん,@3かくとう,@3ほのお,@3じめん&!<かくとう&!<はがね"
+        "ARTICUNO": "いわ,はがね,ほのお,みず,でんき,こおり&@1いわ,@1でんき,@1ほのお,@1はがね&@2いわ,@2でんき,@2ほのお,@2はがね,@3いわ,@3でんき,@3ほのお,@3はがね&!<こおり&!<ひこう",
+        "ZAPDOS": "じめん,いわ,はがね,でんき,ドラゴン&@1こおり,@1いわ&@2こおり,@2いわ,@3こおり,@3いわ&!<でんき&!<ひこう",
+        "MOLTRES": "いわ,ほのお,みず,でんき,ドラゴン&@1いわ,@1でんき,@1みず&@2いわ,@2でんき,@2みず,@3いわ,@3でんき,@3みず&!<ほのお&!<ひこう"
+      },
+      "lvl1": {
+        "PIKACHU": "じめん,くさ,でんき,ドラゴン&@1じめん&@2じめん,@3じめん&!<でんき"
       },
       "shadow_lvl5": {
         "PALKIA": "はがね,みず,くさ,フェアリー&@1ドラゴン,@1フェアリー&@2ドラゴン,@2フェアリー,@3ドラゴン,@3フェアリー&!<みず&!<ドラゴン"

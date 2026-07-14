@@ -1,76 +1,17 @@
 {
-  "fetchedAt": "2026-07-09T10:39:06.775Z",
+  "fetchedAt": "2026-07-14T09:27:57.638Z",
   "raids": {
     "mega": [
       {
-        "id": "GENGAR",
+        "id": "LUCARIO",
         "names": {
-          "en": "Mega Gengar",
-          "de": "Mega-Gengar",
-          "fr": "Méga-Ectoplasma",
-          "it": "MegaGengar",
-          "ja": "メガゲンガー",
-          "ko": "메가팬텀",
-          "es": "Mega-Gengar"
-        },
-        "types": [
-          "ghost",
-          "poison"
-        ],
-        "resistorTypes": [
-          "normal",
-          "poison",
-          "ground",
-          "rock",
-          "steel",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "ghost",
-          "ground",
-          "psychic"
-        ]
-      }
-    ],
-    "lvl5": [
-      {
-        "id": "ZACIAN",
-        "names": {
-          "en": "Zacian (Crowned Sword)",
-          "de": "Zacian (König des Schwertes)",
-          "fr": "Zacian (Épée Suprême)",
-          "it": "Zacian (Re delle Spade)",
-          "ja": "ザシアン (けんのおう)",
-          "ko": "자시안 (검왕)",
-          "es": "Zacian (Espada Suprema)"
-        },
-        "types": [
-          "fairy",
-          "steel"
-        ],
-        "resistorTypes": [
-          "poison",
-          "steel",
-          "fire",
-          "water",
-          "electric"
-        ],
-        "seMoveTypes": [
-          "fire",
-          "ground"
-        ]
-      },
-      {
-        "id": "ZAMAZENTA",
-        "names": {
-          "en": "Zamazenta (Crowned Shield)",
-          "de": "Zamazenta (König des Schildes)",
-          "fr": "Zamazenta (Bouclier Suprême)",
-          "it": "Zamazenta (Re degli Scudi)",
-          "ja": "ザマゼンタ (たてのおう)",
-          "ko": "자마젠타 (방패왕)",
-          "es": "Zamazenta (Escudo Supremo)"
+          "en": "Mega Lucario",
+          "de": "Mega-Lucario",
+          "fr": "Méga-Lucario",
+          "it": "MegaLucario",
+          "ja": "メガルカリオ",
+          "ko": "메가루카리오",
+          "es": "Mega-Lucario"
         },
         "types": [
           "fighting",
@@ -89,6 +30,311 @@
         "seMoveTypes": [
           "fighting",
           "fire",
+          "ground"
+        ]
+      }
+    ],
+    "lvl5": [
+      {
+        "id": "ARTICUNO",
+        "names": {
+          "en": "Articuno",
+          "de": "Arktos",
+          "fr": "Artikodin",
+          "it": "Articuno",
+          "ja": "フリーザー",
+          "ko": "프리져",
+          "es": "Articuno"
+        },
+        "types": [
+          "ice",
+          "flying"
+        ],
+        "resistorTypes": [
+          "rock",
+          "steel",
+          "fire",
+          "water",
+          "electric",
+          "ice"
+        ],
+        "seMoveTypes": [
+          "rock",
+          "electric",
+          "fire",
+          "steel"
+        ]
+      },
+      {
+        "id": "ZAPDOS",
+        "names": {
+          "en": "Zapdos",
+          "de": "Zapdos",
+          "fr": "Électhor",
+          "it": "Zapdos",
+          "ja": "サンダー",
+          "ko": "썬더",
+          "es": "Zapdos"
+        },
+        "types": [
+          "electric",
+          "flying"
+        ],
+        "resistorTypes": [
+          "ground",
+          "rock",
+          "steel",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ice",
+          "rock"
+        ]
+      },
+      {
+        "id": "MOLTRES",
+        "names": {
+          "en": "Moltres",
+          "de": "Lavados",
+          "fr": "Sulfura",
+          "it": "Moltres",
+          "ja": "ファイヤー",
+          "ko": "파이어",
+          "es": "Moltres"
+        },
+        "types": [
+          "fire",
+          "flying"
+        ],
+        "resistorTypes": [
+          "rock",
+          "fire",
+          "water",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "rock",
+          "electric",
+          "water"
+        ]
+      }
+    ],
+    "lvl1": [
+      {
+        "id": "PIKACHU",
+        "names": {
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground"
+        ]
+      },
+      {
+        "id": "PIKACHU",
+        "names": {
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground"
+        ]
+      },
+      {
+        "id": "PIKACHU",
+        "names": {
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground"
+        ]
+      },
+      {
+        "id": "PIKACHU",
+        "names": {
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground"
+        ]
+      },
+      {
+        "id": "PIKACHU",
+        "names": {
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground"
+        ]
+      },
+      {
+        "id": "PIKACHU",
+        "names": {
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground"
+        ]
+      },
+      {
+        "id": "PIKACHU",
+        "names": {
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground"
+        ]
+      },
+      {
+        "id": "PIKACHU",
+        "names": {
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground"
+        ]
+      },
+      {
+        "id": "PIKACHU",
+        "names": {
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
           "ground"
         ]
       }
@@ -323,42 +569,6 @@
   },
   "maxBattles": {},
   "eventRaids": [
-    {
-      "eventID": "mega-lucario-in-mega-raids-july-13-2026",
-      "name": "Mega Lucario in Mega Raids - July 13",
-      "eventType": "raid-battles",
-      "start": "2026-07-13T06:00:00.000",
-      "end": "2026-07-14T22:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "LUCARIO",
-          "names": {
-            "en": "Lucario"
-          },
-          "types": [
-            "fighting",
-            "steel"
-          ],
-          "resistorTypes": [
-            "flying",
-            "poison",
-            "bug",
-            "ghost",
-            "fire",
-            "water",
-            "electric",
-            "psychic"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "ground",
-            "fire"
-          ]
-        }
-      ]
-    },
     {
       "eventID": "kyogre-in-5-star-raid-battles-july-2026",
       "name": "Kyogre in 5-star Raid Battles",
