@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-07-08T10:32:39.734Z",
+  "fetchedAt": "2026-07-15T10:18:08.388Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -508,13 +508,6 @@
     }
   },
   "gblEvents": [
-    {
-      "eventID": "gbl-forever-forward_ultra-league_fantasy-cup-ultra-league-edition",
-      "name": "Ultra League and Fantasy Cup: Ultra League Edition | Forever Forward",
-      "start": "2026-07-07T20:00:00.000Z",
-      "end": "2026-07-14T20:00:00.000Z",
-      "cups": []
-    },
     {
       "eventID": "gbl-forever-forward_master-league_retro-cup-great-league-edition",
       "name": "Master League and Retro Cup: Great League Edition | Forever Forward",
