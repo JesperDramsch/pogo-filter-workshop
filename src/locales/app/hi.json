@@ -475,6 +475,8 @@
   "app.regional_editor.type_check_label": "फॉर्म प्रोटेक्शन (टाइप-चेक)",
   "app.regional_editor.collectors_label": "कलेक्टर (प्रजाति प्रोटेक्शन)",
   "app.regional_editor.home_local_title": "अपने आप बंद — यह प्रजाति आपके पास लोकल स्पॉन होती है (होम)",
+  "app.regional_editor.hundo_extra": "(+{count} via 4★)",
+  "app.regional_editor.hundo_drop_title": "अपने आप निष्क्रिय — इस प्रजाति का hundo आपके पास है, इसलिए डुप्लिकेट बेकार हैं (वे +species carve-out के ज़रिए ट्रैश में दिखते हैं)",
   "app.regional_editor.all_family_members": "परिवार के सभी सदस्य",
   "app.regional.alolan.label": "Alolan फॉर्म्स",
   "app.regional.alolan.description": "जनरेशन 7 — Alolan रीजनल फॉर्म्स",

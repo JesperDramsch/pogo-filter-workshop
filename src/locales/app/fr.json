@@ -475,6 +475,8 @@
   "app.regional_editor.type_check_label": "Protection des formes (vérification de type)",
   "app.regional_editor.collectors_label": "Collectionneurs (protection d'espèce)",
   "app.regional_editor.home_local_title": "désactivé automatiquement — cette espèce apparaît localement chez vous",
+  "app.regional_editor.hundo_extra": "(+{count} via 4★)",
+  "app.regional_editor.hundo_drop_title": "désactivé automatiquement — vous avez un hundo de cette espèce, les doublons sont donc redondants (ils apparaissent dans la corbeille via l'exception +espèce)",
   "app.regional_editor.all_family_members": "tous les membres de la famille",
   "app.regional.alolan.label": "Formes d'Alola",
   "app.regional.alolan.description": "Génération 7 — formes régionales d'Alola",

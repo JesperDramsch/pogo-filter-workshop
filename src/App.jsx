@@ -3539,6 +3539,7 @@ export default function App() {
 									setConfig={setConfig}
 									homeLocals={homeLocals}
 									homeLocalTypeChecks={homeLocalTypeChecks}
+									hundos={hundos}
 								/>
 							</StepWrapper>
 						)}
@@ -5934,7 +5935,7 @@ const EXPERT_ONLY_KEYS = new Set([
 	'protectNundos',
 ]);
 
-function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks = [] }) {
+function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks = [], hundos = [] }) {
 	const { t, outputLocale } = useTranslation();
 	// Any individual change in ConfigPanel clears the preset marker — the
 	// marker means "this preset is currently in effect"; the moment the
@@ -6171,6 +6172,7 @@ function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks =
 							setGroup={(partial) => setGroup(key, partial)}
 							homeLocals={homeLocals}
 							homeLocalTypeChecks={homeLocalTypeChecks}
+							hundos={hundos}
 						/>
 					))}
 				</div>
@@ -6296,27 +6298,55 @@ function ToggleRow({ k, label, why, checked, onChange, expertBadge, requireConfi
 	);
 }
 
-function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = [], homeLocalTypeChecks = [] }) {
+function RegionalGroupEditor({
+	groupKey,
+	group,
+	state,
+	setGroup,
+	homeLocals = [],
+	homeLocalTypeChecks = [],
+	hundos = [],
+}) {
 	const { t } = useTranslation();
 	const [expanded, setExpanded] = useState(false);
 	const allTC = group.typeChecks.map((tc) => tc.species);
 	const allCol = group.collectors;
 	const tcEnabled = state.typeChecksEnabled === null ? allTC : state.typeChecksEnabled;
 	const colEnabled = state.collectorsEnabled === null ? allCol : state.collectorsEnabled;
-	// Home-locals are auto-dropped by effectiveConfig — exclude them from the counter
-	// so the displayed "X/Y aktiv" matches the actual filter output. typeChecks
-	// need the {species,type} pair to match — same species with different types
-	// (e.g. Paldean Tauros Combat vs Blaze) is the wrong granularity.
+	// Auto-drops are excluded from the counter so the displayed "X/Y aktiv"
+	// matches the actual filter output. Two mechanisms, mirroring buildFilters:
+	//   home  — this species spawns locally (species string for collectors,
+	//           {species,type} pair for typeChecks — same species with different
+	//           types, e.g. Paldean Tauros Combat vs Blaze, is the wrong
+	//           granularity for the pair check)
+	//   hundo — you own a hundo of the species, so duplicates are redundant and
+	//           the protection is carved out (species-level, form-agnostic).
+	// Home wins the display when both apply — either way the chip is dropped.
 	const homeSet = new Set(homeLocals);
 	const tcLocalSet = new Set(homeLocalTypeChecks.map((l) => `${l.species}|${l.type}`));
-	const tcLocalCount = group.typeChecks.filter((tc) => tcLocalSet.has(`${tc.species}|${tc.type}`)).length;
-	const tcEffective = tcEnabled.filter((sp) => !homeSet.has(sp));
-	const colEffective = colEnabled.filter((sp) => !homeSet.has(sp));
-	const totalEffective =
-		allTC.filter((sp) => !homeSet.has(sp)).length - tcLocalCount + allCol.filter((sp) => !homeSet.has(sp)).length;
+	const canonName = (s) => resolveSpecies(s) || String(s).toLowerCase();
+	const hundoSet = new Set((hundos || []).map(canonName));
+	const isHundoDropped = (sp) => hundoSet.has(canonName(sp));
+	const tcDropReason = (tc) =>
+		homeSet.has(tc.species) || tcLocalSet.has(`${tc.species}|${tc.type}`)
+			? 'home'
+			: isHundoDropped(tc.species)
+				? 'hundo'
+				: null;
+	const colDropReason = (sp) => (homeSet.has(sp) ? 'home' : isHundoDropped(sp) ? 'hundo' : null);
+	const tcEntriesEnabled = group.typeChecks.filter((tc) => tcEnabled.includes(tc.species));
 	const droppedByHome =
-		tcEnabled.length + colEnabled.length - (tcEffective.length + colEffective.length) + tcLocalCount;
-	const enabledCount = state.enabled ? tcEffective.length + colEffective.length - tcLocalCount : 0;
+		tcEntriesEnabled.filter((tc) => tcDropReason(tc) === 'home').length +
+		colEnabled.filter((sp) => colDropReason(sp) === 'home').length;
+	const droppedByHundo =
+		tcEntriesEnabled.filter((tc) => tcDropReason(tc) === 'hundo').length +
+		colEnabled.filter((sp) => colDropReason(sp) === 'hundo').length;
+	const totalEffective =
+		group.typeChecks.filter((tc) => !tcDropReason(tc)).length + allCol.filter((sp) => !colDropReason(sp)).length;
+	const enabledCount = state.enabled
+		? tcEntriesEnabled.filter((tc) => !tcDropReason(tc)).length +
+			colEnabled.filter((sp) => !colDropReason(sp)).length
+		: 0;
 
 	function toggleTC(species) {
 		const cur = tcEnabled;
@@ -6370,6 +6400,11 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
 								{t('app.regional_editor.home_extra', { params: { count: droppedByHome } })}
 							</span>
 						)}
+						{droppedByHundo > 0 && state.enabled && (
+							<span className='text-[#9B59B6] ml-1'>
+								{t('app.regional_editor.hundo_extra', { params: { count: droppedByHundo } })}
+							</span>
+						)}
 					</span>
 				</button>
 			</div>
@@ -6411,7 +6446,9 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
 							<div className='flex flex-wrap gap-1'>
 								{group.typeChecks.map((tc) => {
 									const on = tcEnabled.includes(tc.species);
-									const isHomeLocal = tcLocalSet.has(`${tc.species}|${tc.type}`);
+									const dropReason = tcDropReason(tc);
+									const isHomeLocal = dropReason === 'home';
+									const isHundoDrop = dropReason === 'hundo';
 									const tierBadge = tc.tier === 'S' ? '★' : tc.tier === 'C' ? '·' : null;
 									const tierColor =
 										tc.tier === 'S'
@@ -6424,19 +6461,26 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
 											key={`${tc.species}_${tc.type}`}
 											onClick={() => toggleTC(tc.species)}
 											title={
-												isHomeLocal ? t('app.regional_editor.home_local_title') : t(tc.noteKey)
+												isHomeLocal
+													? t('app.regional_editor.home_local_title')
+													: isHundoDrop
+														? t('app.regional_editor.hundo_drop_title')
+														: t(tc.noteKey)
 											}
-											disabled={!state.enabled || isHomeLocal}
+											disabled={!state.enabled || !!dropReason}
 											className={`mono text-[11px] px-2 py-0.5 rounded transition ${
 												isHomeLocal
 													? 'bg-[#27AE60]/10 text-[#27AE60] border border-[#27AE60]/30 line-through opacity-60'
-													: on
-														? 'bg-[#5EAFC5]/20 text-[#5EAFC5] border border-[#5EAFC5]/40'
-														: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
+													: isHundoDrop
+														? 'bg-[#9B59B6]/10 text-[#9B59B6] border border-[#9B59B6]/30 line-through opacity-60'
+														: on
+															? 'bg-[#5EAFC5]/20 text-[#5EAFC5] border border-[#5EAFC5]/40'
+															: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
 											}`}
 										>
 											{isHomeLocal && <span className='not-italic no-underline mr-0.5'>⌂</span>}
-											{tierBadge && !isHomeLocal && (
+											{isHundoDrop && <span className='not-italic no-underline mr-0.5'>4★</span>}
+											{tierBadge && !dropReason && (
 												<span className={`${tierColor} mr-0.5`}>{tierBadge}</span>
 											)}
 											{tc.species} <span className='opacity-70'>/ !{tc.type}</span>
@@ -6454,34 +6498,42 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
 							<div className='flex flex-wrap gap-1'>
 								{group.collectors.map((sp) => {
 									const on = colEnabled.includes(sp);
-									const isHomeLocal = homeLocals.includes(sp);
-									// Home-locals are auto-removed by effectiveConfig regardless of `on`,
-									// so render them as "off" visually with a ⌂ marker.
-									const effectivelyOn = on && !isHomeLocal;
+									const dropReason = colDropReason(sp);
+									const isHomeLocal = dropReason === 'home';
+									const isHundoDrop = dropReason === 'hundo';
+									// Auto-dropped chips (home via effectiveConfig, hundo via the
+									// buildFilters carve-out) are removed regardless of `on`, so
+									// render them as "off" visually with a ⌂ / 4★ marker.
+									const effectivelyOn = on && !dropReason;
 									const noteKey = group.collectorNotes?.[sp];
 									return (
 										<button
 											key={sp}
 											onClick={() => toggleCol(sp)}
-											disabled={!state.enabled || isHomeLocal}
+											disabled={!state.enabled || !!dropReason}
 											title={
 												isHomeLocal
 													? t('app.regional_editor.home_local_title')
-													: noteKey
-														? t(noteKey)
-														: undefined
+													: isHundoDrop
+														? t('app.regional_editor.hundo_drop_title')
+														: noteKey
+															? t(noteKey)
+															: undefined
 											}
 											className={`mono text-[11px] px-2 py-0.5 rounded transition ${
 												effectivelyOn
 													? 'bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/40'
 													: isHomeLocal
 														? 'bg-[#27AE60]/10 text-[#27AE60] border border-[#27AE60]/30 line-through opacity-60'
-														: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
+														: isHundoDrop
+															? 'bg-[#9B59B6]/10 text-[#9B59B6] border border-[#9B59B6]/30 line-through opacity-60'
+															: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
 											}`}
 										>
 											{isHomeLocal && <span className='not-italic no-underline mr-0.5'>⌂</span>}
+											{isHundoDrop && <span className='not-italic no-underline mr-0.5'>4★</span>}
 											{sp}
-											{noteKey && !isHomeLocal && (
+											{noteKey && !dropReason && (
 												<span
 													className='not-italic no-underline ml-1 opacity-60'
 													aria-hidden='true'

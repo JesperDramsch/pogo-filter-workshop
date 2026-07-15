@@ -475,6 +475,8 @@
   "app.regional_editor.type_check_label": "形態保護(屬性檢查)",
   "app.regional_editor.collectors_label": "收藏家(種類保護)",
   "app.regional_editor.home_local_title": "已自動停用 — 此種類在你當地(家)會出現",
+  "app.regional_editor.hundo_extra": "(+{count} via 4★)",
+  "app.regional_editor.hundo_drop_title": "自動停用 — 你已擁有此物種的 hundo(100%),重複個體因此多餘(會透過 +物種例外顯示在垃圾箱中)",
   "app.regional_editor.all_family_members": "所有家族成員",
   "app.regional.alolan.label": "阿羅拉的樣子",
   "app.regional.alolan.description": "第七世代 — 阿羅拉地區形態",

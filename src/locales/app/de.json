@@ -487,6 +487,8 @@
   "app.regional_editor.type_check_label": "Form-Schutz (Type-Check)",
   "app.regional_editor.collectors_label": "Sammler (Spezies-Schutz)",
   "app.regional_editor.home_local_title": "automatisch deaktiviert — diese Spezies spawnt bei dir lokal (Heimat)",
+  "app.regional_editor.hundo_extra": "(+{count} via 4★)",
+  "app.regional_editor.hundo_drop_title": "automatisch deaktiviert — du hast einen Hundo dieser Spezies, Duplikate sind damit überflüssig (sie tauchen stattdessen über den +Spezies-Carve-out im Trash auf)",
   "app.regional_editor.all_family_members": "alle Familien-Mitglieder",
   "app.regional.alolan.label": "Alola-Formen",
   "app.regional.alolan.description": "Generation 7 — alolanische Formen",

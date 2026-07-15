@@ -475,6 +475,8 @@
   "app.regional_editor.type_check_label": "フォーム保護 (タイプチェック)",
   "app.regional_editor.collectors_label": "コレクター (種族保護)",
   "app.regional_editor.home_local_title": "自動的に無効 — この種族はあなたの地元 (ホーム) で出現します",
+  "app.regional_editor.hundo_extra": "(+{count} via 4★)",
+  "app.regional_editor.hundo_drop_title": "自動的に無効 — この種の hundo (100%) を所有しているため、重複は不要です (+種名カーブアウト経由でゴミ箱に表示されます)",
   "app.regional_editor.all_family_members": "進化系統のすべてのメンバー",
   "app.regional.alolan.label": "アローラのすがた",
   "app.regional.alolan.description": "第7世代 — アローラのリージョンフォーム",

@@ -487,6 +487,8 @@
   "app.regional_editor.type_check_label": "Form protection (type-check)",
   "app.regional_editor.collectors_label": "Collectors (species protection)",
   "app.regional_editor.home_local_title": "automatically disabled — this species spawns locally for you (home)",
+  "app.regional_editor.hundo_extra": "(+{count} via 4★)",
+  "app.regional_editor.hundo_drop_title": "automatically disabled — you own a hundo of this species, so duplicates are redundant (they surface in trash via the +species carve-out instead)",
   "app.regional_editor.all_family_members": "all family members",
   "app.regional.alolan.label": "Alolan forms",
   "app.regional.alolan.description": "Generation 7 — Alolan regional forms",
