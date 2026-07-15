@@ -691,6 +691,74 @@
           ]
         }
       ]
+    },
+    {
+      "eventID": "mega-salamence-in-mega-raids-july-2026",
+      "name": "Mega Salamence in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-07-22T06:00:00.000",
+      "end": "2026-07-28T22:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "SALAMENCE",
+          "names": {
+            "en": "Salamence"
+          },
+          "types": [
+            "dragon",
+            "flying"
+          ],
+          "resistorTypes": [
+            "rock",
+            "steel",
+            "electric",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "ice",
+            "dragon",
+            "fairy"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "solgaleo-in-5-star-raid-battles-july-2026",
+      "name": "Solgaleo in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-07-22T06:00:00.000",
+      "end": "2026-07-28T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "SOLGALEO",
+          "names": {
+            "en": "Solgaleo"
+          },
+          "types": [
+            "psychic",
+            "steel"
+          ],
+          "resistorTypes": [
+            "steel",
+            "fire",
+            "water",
+            "electric",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "ground",
+            "ghost",
+            "fire",
+            "dark"
+          ]
+        }
+      ]
     }
   ]
 }
