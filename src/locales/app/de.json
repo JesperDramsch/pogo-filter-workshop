@@ -573,6 +573,7 @@
   "app.clause_why.buddies_were": "Schon mal Kumpel gewesen",
   "app.clause_why.double_moved_trash": "Zweiter Charge-Move freigeschaltet (@3move ist invertiert!)",
   "app.clause_why.custom_collectible": "Eigene Sammler-Pokémon: {name}",
+  "app.clause_why.bazaar_species": "Auf der Karte für Tausch vorgemerkt: {name} — geschützt bis getaggt & getauscht",
   "app.clause_why.cp_cap": "Sicherheitsnetz: WP ≤ {cp}",
   "app.clause_why.age_traded": "Sicherheitsnetz: vor ≤{days} Tagen gefangen ODER getauscht ODER erlöst",
   "app.clause_why.lucky_eligible": "Glücks-Tausch-Schutz: vor 20{year} gefangene und ungetauschte Pokémon werden geschützt (wahrscheinlich garantierte Glücks-Tausche)",

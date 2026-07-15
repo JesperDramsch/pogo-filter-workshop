@@ -561,6 +561,7 @@
   "app.clause_why.buddies_were": "相棒だった",
   "app.clause_why.double_moved_trash": "2 つ目のスペシャルアタック解放 (@3move は反転!)",
   "app.clause_why.custom_collectible": "あなたのコレクション: {name}",
+  "app.clause_why.bazaar_species": "マップで交換用にマーク: {name} — タグ付けして交換するまで保護",
   "app.clause_why.cp_cap": "セーフティネット: CP ≤ {cp}",
   "app.clause_why.age_traded": "セーフティネット: 過去 {days} 日以内に捕獲または交換済みまたはリトレーン済み",
   "app.clause_why.lucky_eligible": "キラ交換セーフティ: 20{year} 年以前の未交換捕獲を保護 (キラ交換が保証される可能性が高い)",

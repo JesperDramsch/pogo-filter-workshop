@@ -174,5 +174,45 @@ console.log("\nBuddy spare-dupe surfacing (you own a hundo of a species the budd
   check("no-hundo buddy: plain 0*,1*,2* clause, no !4*", clauses(fk).includes("0*,1*,2*") && !clauses(fk).includes("!4*"));
 }
 
+console.log("\nMap-marked bazaar species protected in TRASH (Choreogel regression)");
+{
+  // Simulate the auto-drop that burned travelers: home sits in an Oricorio
+  // region, so effectiveConfig removed Choreogel from the collectibles group —
+  // and the map-marked list used to have NO effect on the filters at all.
+  const cfg = mergeImportedConfig({});
+  cfg.regionalGroups = {
+    ...cfg.regionalGroups,
+    collectibles: { ...cfg.regionalGroups.collectibles, collectorsEnabled: [] },
+  };
+  const noMark = buildFilters([], [], cfg, [], "de", tFn, []);
+  const marked = buildFilters([], [], cfg, [], "de", tFn, [], ["Choreogel (Buyo)", "Choreogel (Hula)"]);
+
+  check("baseline: collector dropped → Choreogel unprotected",
+    !hasClauseMatching(noMark.trash, /^!choreogel$/i), "regression guard");
+  check("map-marked: species protected in trash", hasClauseMatching(marked.trash, /^!Choreogel$/));
+  check("form suffixes collapse to ONE species clause",
+    clauses(marked.trash).filter(c => /choreogel/i.test(c)).length === 1,
+    clauses(marked.trash).filter(c => /choreogel/i.test(c)).join("|"));
+
+  // Dedupe: default config still has the Choreogel collector enabled — the
+  // bazaar entry must not add a second clause.
+  const dflt = buildFilters([], [], mergeImportedConfig({}), [], "de", tFn, [], ["Choreogel (Buyo)"]);
+  check("collector already enabled → no duplicate clause",
+    clauses(dflt.trash).filter(c => /^!choreogel$/i.test(c)).length === 1);
+
+  // German map names re-render in the user's PoGo output locale.
+  const en = buildFilters([], [], cfg, [], "en", tFn, [], ["Choreogel (Buyo)"]);
+  check("marked species renders in output locale (EN)", hasClauseMatching(en.trash, /^!Oricorio$/));
+
+  // Trade stays intentionally asymmetric: marked mons are FOR trading away.
+  check("trade does NOT whole-species-protect marked mons (intentional)",
+    !hasClauseMatching(marked.trade, /^!choreogel$/i));
+
+  // No marks → byte-identical output (fixtures stay stable).
+  const before = buildFilters([], [], mergeImportedConfig({}), [], "de", tFn, []);
+  const after  = buildFilters([], [], mergeImportedConfig({}), [], "de", tFn, [], []);
+  check("empty bazaar list leaves trash byte-identical", before.trash === after.trash);
+}
+
 console.log(`\n${failures === 0 ? "✓ All carve-out checks passed." : `✗ ${failures} failure(s).`}`);
 process.exit(failures === 0 ? 0 : 1);

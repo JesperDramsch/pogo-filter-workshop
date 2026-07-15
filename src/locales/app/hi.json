@@ -561,6 +561,7 @@
   "app.clause_why.buddies_were": "पहले बडी थे",
   "app.clause_why.double_moved_trash": "दूसरा चार्ज मूव अनलॉक (@3move उल्टा है!)",
   "app.clause_why.custom_collectible": "आपका कलेक्टिबल: {name}",
+  "app.clause_why.bazaar_species": "मैप पर ट्रेड के लिए चिह्नित: {name} — टैग और ट्रेड होने तक सुरक्षित",
   "app.clause_why.cp_cap": "सेफ्टी नेट: CP ≤ {cp}",
   "app.clause_why.age_traded": "सेफ्टी नेट: पिछले {days} दिनों में पकड़ा गया या ट्रेड हुआ या purified",
   "app.clause_why.lucky_eligible": "Lucky-trade safety: pre-20{year} untraded catches protected (likely guaranteed lucky)",

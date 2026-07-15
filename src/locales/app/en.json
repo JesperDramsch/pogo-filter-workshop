@@ -573,6 +573,7 @@
   "app.clause_why.buddies_were": "Was a buddy",
   "app.clause_why.double_moved_trash": "Second charge move unlocked (@3move is inverted!)",
   "app.clause_why.custom_collectible": "Your collectible: {name}",
+  "app.clause_why.bazaar_species": "Marked for trade on the map: {name} — protected until you tag & trade it",
   "app.clause_why.cp_cap": "Safety net: CP ≤ {cp}",
   "app.clause_why.age_traded": "Safety net: caught within {days} days OR traded OR purified",
   "app.clause_why.lucky_eligible": "Lucky-trade safety: pre-20{year} untraded catches protected (likely guaranteed lucky)",

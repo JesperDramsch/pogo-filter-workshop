@@ -561,6 +561,7 @@
   "app.clause_why.buddies_were": "Fue compañero",
   "app.clause_why.double_moved_trash": "Segundo movimiento cargado desbloqueado (¡@3move está invertido!)",
   "app.clause_why.custom_collectible": "Tu coleccionable: {name}",
+  "app.clause_why.bazaar_species": "Marcado para intercambio en el mapa: {name} — protegido hasta etiquetarlo e intercambiarlo",
   "app.clause_why.cp_cap": "Red de seguridad: PC ≤ {cp}",
   "app.clause_why.age_traded": "Red de seguridad: capturado dentro de {days} días O intercambiado O purificado",
   "app.clause_why.lucky_eligible": "Seguridad afortunado: capturas pre-20{year} no intercambiadas protegidas (probablemente afortunados garantizados)",

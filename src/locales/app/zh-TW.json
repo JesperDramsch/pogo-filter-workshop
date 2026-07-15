@@ -561,6 +561,7 @@
   "app.clause_why.buddies_were": "曾為夥伴",
   "app.clause_why.double_moved_trash": "已解鎖第二招特殊招式(@3move 是反向的!)",
   "app.clause_why.custom_collectible": "你的收藏品:{name}",
+  "app.clause_why.bazaar_species": "已在地圖上標記為交換:{name} — 在標記並交換前受保護",
   "app.clause_why.cp_cap": "安全網:CP ≤ {cp}",
   "app.clause_why.age_traded": "安全網:於 {days} 天內捕獲 或 已交換 或 已淨化",
   "app.clause_why.lucky_eligible": "幸運交換安全:保護 20{year} 年以前未交換的寶可夢(很可能是保證的幸運交換)",

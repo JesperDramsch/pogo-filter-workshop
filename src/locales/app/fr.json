@@ -561,6 +561,7 @@
   "app.clause_why.buddies_were": "Ancien copain",
   "app.clause_why.double_moved_trash": "Deuxième attaque chargée débloquée (@3move est inversé !)",
   "app.clause_why.custom_collectible": "Votre collectionnable : {name}",
+  "app.clause_why.bazaar_species": "Marqué pour échange sur la carte : {name} — protégé jusqu’à l’étiquetage et l’échange",
   "app.clause_why.cp_cap": "Filet de sécurité : PC ≤ {cp}",
   "app.clause_why.age_traded": "Filet de sécurité : capturé dans les {days} jours OU échangé OU purifié",
   "app.clause_why.lucky_eligible": "Sécurité chanceux : captures pré-20{year} non échangées protégées (probablement chanceux garantis)",

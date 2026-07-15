@@ -823,6 +823,7 @@ export function buildFilters(
 	outputLocale = 'de',
 	tFn = (k) => k,
 	homeLocalTypeChecks = [],
+	bazaarSpecies = [],
 ) {
 	const kw = pogoKeywords(outputLocale);
 
@@ -1092,6 +1093,29 @@ export function buildFilters(
 		if (allRegionalCollectorsOut.has(lower)) continue;
 		const display = capFirst(lower);
 		push(trashClauses, `!${display}`, tFn('app.clause_why.custom_collectible', { params: { name: display } }));
+	}
+	// Map-marked trade candidates (the RegionalMap bazaar list). The !#<basarTag>
+	// clause above only protects mons the user has ALREADY tagged in-game — a
+	// fresh travel catch is untagged until they get around to it, and the species
+	// may carry no collector protection at all (form-regionals like Choreogel are
+	// auto-dropped from collectibles when home has a local form). Protecting the
+	// species here makes marking on the map immediately safe. Deliberately NOT
+	// gated on hundos/homeLocals: the mark is explicit user intent (bring these
+	// back for friends), which outranks every redundancy carve-out. Region names
+	// may carry a form suffix PoGo search can't express ("Choreogel (Buyo)") —
+	// strip it and protect the whole species.
+	const bazaarSpeciesSeen = new Set();
+	for (const raw of bazaarSpecies || []) {
+		const base = String(raw).replace(/\s*\(.*?\)\s*$/, '');
+		const lower = speciesForOutput(base, outputLocale);
+		if (!lower || bazaarSpeciesSeen.has(lower)) continue;
+		bazaarSpeciesSeen.add(lower);
+		const display = capFirst(lower);
+		// Skip if an identical species clause already exists (enabled collector or
+		// custom collectible) — clause case differs between the two, so compare
+		// case-insensitively.
+		if (trashClauses.some((c) => c.clause.toLowerCase() === `!${lower}`)) continue;
+		push(trashClauses, `!${display}`, tFn('app.clause_why.bazaar_species', { params: { name: display } }));
 	}
 	if (cfg.cpCap && cfg.cpCap > 0)
 		push(
@@ -3118,6 +3142,7 @@ export default function App() {
 				effectiveOutputLocale,
 				t,
 				homeLocalTypeChecks,
+				bazaarTags,
 			),
 		[
 			hundos,
@@ -3128,6 +3153,7 @@ export default function App() {
 			effectiveOutputLocale,
 			topAttackers,
 			topMaxAttackers,
+			bazaarTags,
 			t,
 		],
 	);
