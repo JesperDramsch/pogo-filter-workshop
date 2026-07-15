@@ -513,6 +513,7 @@ const REGIONAL_GROUPS = {
 			Floette: 'app.regional.collectibles.notes.flabebe_forms',
 			Florges: 'app.regional.collectibles.notes.flabebe_forms',
 			Choreogel: 'app.regional.collectibles.notes.oricorio_forms',
+			Krawalloro: 'app.regional.collectibles.notes.squawkabilly_forms',
 		},
 		collectors: [
 			// Vivillon-line — flat collectors; collapses to +Purmel if all 3 selected
@@ -538,6 +539,7 @@ const REGIONAL_GROUPS = {
 			'Floette',
 			'Florges', // Red/Yellow/Blue flowers
 			'Choreogel', // Oricorio (Pom-Pom/Sensu/Baile/Pa'u)
+			'Krawalloro', // Squawkabilly (Green E / Blue W / Yellow + White worldwide)
 		],
 	},
 };
@@ -2648,7 +2650,49 @@ const IBERIAN_RING = [
 	[-9.6, 43.8], // close
 ];
 
+// Squawkabilly's Green/Blue plumage split runs along the LITERAL prime
+// meridian (0° longitude) — NOT the paired/hemispheric KMZ L-line above.
+// London straddles it; Madrid and Lisbon land WEST (Blue side). Intermediate
+// vertices keep every consecutive lon step under 180° for the antimeridian
+// unwrap in pointInRegionGeom.
+const PRIME_MERIDIAN_SPLIT = {
+	east: [
+		[0, 85],
+		[90, 85],
+		[180, 85],
+		[180, -85],
+		[90, -85],
+		[0, -85],
+		[0, 85],
+	],
+	west: [
+		[0, 85],
+		[0, -85],
+		[-90, -85],
+		[-180, -85],
+		[-180, 85],
+		[-90, 85],
+		[0, 85],
+	],
+};
+
 const POGO_REGIONS_ROTATING = [
+	{
+		folder: 'Type 4 [Hemispheric E/W, prime meridian] (manually maintained)',
+		name: 'Eastern Hemisphere (0° meridian) — Green Plumage Squawkabilly',
+		english: ['Green Plumage Squawkabilly'],
+		german: ['Krawalloro (Grünfedrig)'],
+		// Yellow + White Plumage spawn worldwide, so they carry no polygon —
+		// only the two region-locked plumages appear on the map.
+		geometry: { type: 'Polygon', coordinates: [PRIME_MERIDIAN_SPLIT.east] },
+	},
+	{
+		folder: 'Type 4 [Hemispheric E/W, prime meridian] (manually maintained)',
+		name: 'Western Hemisphere (0° meridian) — Blue Plumage Squawkabilly',
+		english: ['Blue Plumage Squawkabilly'],
+		german: ['Krawalloro (Blaufedrig)'],
+		geometry: { type: 'Polygon', coordinates: [PRIME_MERIDIAN_SPLIT.west] },
+	},
 	{
 		folder: 'Type 3/4 [Paired/Hemispheric] (E side, manually maintained)',
 		name: 'Eastern paired/hemispheric (Europe + Asia + Oceania)',

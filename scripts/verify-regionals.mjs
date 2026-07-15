@@ -171,6 +171,12 @@ const TESTS = [
   { id: "0806", german: "Kopplosio",   in: ["NewYork", "SaoPaulo", "Cairo"], out: ["Berlin", "Tokyo", "Sydney"] },
   // #0874 Stonjourner — UK
   { id: "0874", german: "Humanolith",  in: ["London"], out: ["Paris", "Berlin", "NewYork"] },
+  // #0931 Squawkabilly — Green Plumage: Eastern Hemisphere. The split is the LITERAL
+  // prime meridian (0° longitude), not the paired/hemispheric KMZ L-line — so Madrid
+  // and Lisbon land WEST (Blue side). Yellow + White Plumage spawn worldwide → no polygon.
+  { id: "0931", german: "Krawalloro (Grünfedrig)", in: ["Berlin", "Tokyo", "Sydney", "Cairo", "Athens"], out: ["NewYork", "SaoPaulo", "Lima", "Madrid", "Lisbon"] },
+  // #0931 Squawkabilly — Blue Plumage: Western Hemisphere (west of 0°).
+  { id: "0931", german: "Krawalloro (Blaufedrig)", in: ["NewYork", "SaoPaulo", "Lima", "Madrid", "Lisbon"], out: ["Berlin", "Tokyo", "Sydney", "Cairo"] },
 ];
 
 let passed = 0, failed = 0, skipped = 0;

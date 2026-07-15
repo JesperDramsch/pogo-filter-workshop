@@ -515,6 +515,7 @@
   "app.regional.collectibles.description": "Collections multi-formes / motifs — les formes ne sont pas séparément cherchables dans PoGo",
   "app.regional.collectibles.notes.flabebe_forms": "Sort tous les Flabébé / Floette / Florges de la corbeille — on ne distingue pas les fleurs rouges/jaunes/bleues par type. Apporte des fleurs à tes amis !",
   "app.regional.collectibles.notes.oricorio_forms": "Sort tous les styles d'Oricorio (Pompon / Sensu / Baile / Pa'u) de la corbeille — les styles ne sont pas cherchables séparément dans PoGo.",
+  "app.regional.collectibles.notes.squawkabilly_forms": "Sort tous les plumages de Tapatoès de la corbeille — Vert (hémisphère Est) et Bleu (hémisphère Ouest) se séparent au méridien 0°, Jaune et Blanc apparaissent partout, et les plumages ne sont pas cherchables séparément dans PoGo.",
   "app.regional.collectibles.notes.furfrou_forms": "Sort toutes les coupes de Furfrou de la corbeille — les coupes ne sont pas cherchables séparément dans PoGo.",
   "app.regional.collectibles.notes.tatsugiri_forms": "Sort toutes les formes de Tatsugiri (Bouclé / Affaissé / Étiré) de la corbeille — les formes ne sont pas cherchables séparément.",
   "app.regional.collectibles.notes.shellos_forms": "Sort les formes Mer-Est / Mer-Ouest de la corbeille — non cherchables séparément dans PoGo.",

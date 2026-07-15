@@ -515,6 +515,7 @@
   "app.regional.collectibles.description": "Colecciones de varias formas / patrones — las formas no se buscan por separado en PoGo",
   "app.regional.collectibles.notes.flabebe_forms": "Saca todos los Flabébé / Floette / Florges de la basura — no podemos distinguir flores rojas/amarillas/azules por tipo. ¡Llévales a tus amigos algunas flores!",
   "app.regional.collectibles.notes.oricorio_forms": "Saca todos los estilos de Oricorio (Pompones / Refinado / Apasionado / Plácido) de la basura — los estilos no son buscables por separado en PoGo.",
+  "app.regional.collectibles.notes.squawkabilly_forms": "Saca todos los plumajes de Squawkabilly de la basura — Verde (hemisferio oriental) y Azul (hemisferio occidental) se dividen en el meridiano 0°, Amarillo y Blanco aparecen en todo el mundo, y los plumajes no son buscables por separado en PoGo.",
   "app.regional.collectibles.notes.furfrou_forms": "Saca todos los cortes de Furfrou de la basura — los cortes no son buscables por separado en PoGo.",
   "app.regional.collectibles.notes.tatsugiri_forms": "Saca todas las formas de Tatsugiri (Rizado / Caído / Estirado) de la basura — las formas no son buscables por separado.",
   "app.regional.collectibles.notes.shellos_forms": "Saca las formas Mar Este / Mar Oeste de la basura — no son buscables por separado en PoGo.",
