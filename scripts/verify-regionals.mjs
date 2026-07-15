@@ -9,7 +9,7 @@
 // Output is one line per Pokemon: PASS / FAIL / NOT-IN-DATA, with details
 // on any mismatch so we can fix the underlying polygon or rotation entry.
 
-import { buildFilters, computeHomeLocals, computeHomeLocalTypeChecks, mergeImportedConfig, DEFAULT_CONFIG, DEFAULT_HUNDOS } from "../src/App.jsx";
+import { buildFilters, computeHomeLocals, computeHomeLocalTypeChecks, computeFurfrouTrims, mergeImportedConfig, DEFAULT_CONFIG, DEFAULT_HUNDOS } from "../src/App.jsx";
 
 // Representative cities — [lon, lat] matches the App's homeLocation shape.
 const C = {
@@ -329,9 +329,44 @@ for (const t of E2E_TESTS) {
   }
 }
 
+// ─── Coiffwaff (Furfrou) trim regions ───────────────────────────────────────
+// Region-locked cuts offered by the in-game form change only while physically
+// inside the region. Debutante/Diamond/Star ride the Big-Three trio polygons,
+// La Reine the Klefki polygon; Kabuki (Japan) and Pharaoh (Egypt) are
+// hand-drawn rings — the `not` cities pin their boundaries (Seoul must not get
+// Kabuki, Athens must not get Pharaoh despite the shared Sigilyph polygon).
+const TRIM_TESTS = [
+  { trim: "debutante", in: ["NewYork", "SaoPaulo", "Lima", "MexicoCity", "Nuuk"], not: ["Berlin", "Tokyo", "Sydney", "Cairo"] },
+  // India straddles the trio boundary at 90°E — Mumbai/Delhi land on the
+  // Diamond (Europe/ME/Africa) side, Bangkok on the Star (Asia-Pacific) side.
+  { trim: "diamond",   in: ["Berlin", "Paris", "Madrid", "Cairo", "Lagos", "Athens", "Mumbai"], not: ["NewYork", "Tokyo", "Sydney"] },
+  { trim: "star",      in: ["Tokyo", "Beijing", "Sydney", "Bangkok"], not: ["Berlin", "NewYork", "Cairo", "Mumbai"] },
+  { trim: "lareine",   in: ["Paris"], not: ["Berlin", "London", "Madrid", "NewYork"] },
+  { trim: "kabuki",    in: ["Tokyo"], not: ["Seoul", "Beijing", "Manila", "Berlin"] },
+  { trim: "pharaoh",   in: ["Cairo"], not: ["Athens", "Nairobi", "Lagos", "Berlin"] },
+];
+let trimPassed = 0, trimFailed = 0;
+for (const t of TRIM_TESTS) {
+  const errors = [];
+  for (const city of t.in) {
+    if (!computeFurfrouTrims(C[city]).includes(t.trim)) errors.push(`  MISSING: ${t.trim} not offered at ${city}`);
+  }
+  for (const city of t.not) {
+    if (computeFurfrouTrims(C[city]).includes(t.trim)) errors.push(`  LEAKED:  ${t.trim} unexpectedly offered at ${city}`);
+  }
+  if (errors.length === 0) {
+    trimPassed++;
+    console.log(`✓  Trim ${t.trim.padEnd(10)} PASS  (${t.in.length} in, ${t.not.length} out)`);
+  } else {
+    trimFailed++;
+    console.log(`✗  Trim ${t.trim.padEnd(10)} FAIL`);
+    for (const e of errors) console.log(e);
+  }
+}
+
 console.log();
-console.log(`Summary: ${passed} pass, ${failed} fail, ${skipped} skip | Paldean typeChecks: ${paldeanPassed} pass, ${paldeanFailed} fail | E2E filter: ${e2ePassed} pass, ${e2eFailed} fail`);
-if (failed > 0 || paldeanFailed > 0 || e2eFailed > 0) {
+console.log(`Summary: ${passed} pass, ${failed} fail, ${skipped} skip | Paldean typeChecks: ${paldeanPassed} pass, ${paldeanFailed} fail | E2E filter: ${e2ePassed} pass, ${e2eFailed} fail | Furfrou trims: ${trimPassed} pass, ${trimFailed} fail`);
+if (failed > 0 || paldeanFailed > 0 || e2eFailed > 0 || trimFailed > 0) {
   if (failed > 0) {
     console.log(`\nCollector/typeCheck failures:`);
     for (const f of failures) console.log(`  #${f.id} ${f.german}: ${f.errors.length} issue(s)`);

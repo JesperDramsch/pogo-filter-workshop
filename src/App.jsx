@@ -2767,6 +2767,67 @@ const POGO_REGIONS_KMZ_TAGGED = POGO_REGIONS_KMZ.map((r) =>
 );
 const POGO_REGIONS = [...POGO_REGIONS_KMZ_TAGGED, ...POGO_REGIONS_ROTATING];
 
+// ─── Coiffwaff (Furfrou) trim regions ──────────────────────────────────────
+// The in-game form change (25 candy + 10,000 stardust) offers the
+// region-locked trims only while you are PHYSICALLY inside the region — but
+// the cut sticks when you fly home, which makes it a travel to-do just like
+// tagging regionals for trade. Debutante/Diamond/Star ride the same Big-Three
+// trio polygons as the lake guardians; La Reine reuses the Klefki (France)
+// polygon. Japan (Kabuki) and Egypt (Pharaoh) have no KMZ polygon, so they
+// get hand-drawn coastal rings — loose traces that stay clear of Busan,
+// Ulleungdo, and Sakhalin on the Japan side and hug Egypt's borders + Sinai
+// on the other. Good enough for a travel tip, not a border treaty.
+// (Natural/Matron/Dandy are global and Heart is event-only — no polygons.)
+const JAPAN_MAIN_RING = [
+	[129.2, 32.0], // west of Kyushu
+	[129.5, 34.75], // Tsushima Strait — east of Busan
+	[131.2, 38.3], // Sea of Japan — east of Ulleungdo
+	[136.0, 41.5],
+	[139.4, 44.3],
+	[141.9, 45.65], // La Pérouse Strait — south of Sakhalin
+	[145.9, 44.4], // NE Hokkaido — inside the Kuril line
+	[146.3, 42.3],
+	[142.5, 35.5], // Pacific side
+	[140.5, 32.5], // Izu Islands
+	[136.0, 32.5],
+	[130.8, 30.0], // south of Kyushu
+	[129.2, 32.0],
+];
+const RYUKYU_RING = [
+	[122.6, 23.9], // east of Taiwan (Yonaguni)
+	[130.5, 26.5],
+	[131.0, 28.6], // Amami Islands
+	[128.0, 28.6],
+	[122.6, 25.3],
+	[122.6, 23.9],
+];
+const EGYPT_RING = [
+	[24.7, 31.9], // Mediterranean coast, Libyan border
+	[34.25, 31.3], // Sinai Mediterranean coast, short of Gaza
+	[34.9, 29.6], // Gulf of Aqaba
+	[34.9, 27.7],
+	[36.9, 22.0], // Red Sea coast down to the Sudan line
+	[24.7, 22.0], // southern border
+	[24.7, 31.9],
+];
+const kmzGeometry = (name) => POGO_REGIONS_KMZ.find((r) => r.name === name)?.geometry || null;
+const FURFROU_TRIM_REGIONS = [
+	{ trim: 'debutante', geometry: kmzGeometry('Pom-Pom Oricorio/Yellow Flabébé/Panpour/Azelf') },
+	{ trim: 'diamond', geometry: kmzGeometry('Baile Oricorio/Red Flabébé/Pansear/Mesprit') },
+	{ trim: 'star', geometry: kmzGeometry('Sensu Oricorio/Blue Flabébé/Pansage/Uxie') },
+	{ trim: 'lareine', geometry: kmzGeometry('Klefki') },
+	{ trim: 'kabuki', geometry: { type: 'MultiPolygon', coordinates: [[JAPAN_MAIN_RING], [RYUKYU_RING]] } },
+	{ trim: 'pharaoh', geometry: { type: 'Polygon', coordinates: [EGYPT_RING] } },
+].filter((e) => e.geometry);
+
+// Trim keys locally unlockable at a location. Exported so
+// scripts/verify-regionals.mjs can pin the boundaries (Paris vs Berlin,
+// Cairo vs Athens, Tokyo vs Seoul).
+export function computeFurfrouTrims(lonLat) {
+	if (!lonLat) return [];
+	return FURFROU_TRIM_REGIONS.filter((e) => pointInRegionGeom(lonLat, e.geometry)).map((e) => e.trim);
+}
+
 // Exported so scripts/verify-regionals.mjs can run the exact production code
 // path against the canonical regional table.
 export function computeHomeLocals(homeLocation) {
@@ -6657,6 +6718,13 @@ function RegionalMap({
 		return out;
 	}, [lastPin]);
 
+	// Coiffwaff trim travel tip: region-locked cuts unlockable at the pin that
+	// home does NOT offer. The form change must happen while physically inside
+	// the region, but the cut persists afterwards — worth doing on a trip.
+	const pinTrims = useMemo(() => computeFurfrouTrims(lastPin), [lastPin]);
+	const homeTrims = useMemo(() => computeFurfrouTrims(homeLocation), [homeLocation]);
+	const newTrims = useMemo(() => pinTrims.filter((k) => !homeTrims.includes(k)), [pinTrims, homeTrims]);
+
 	// Aggregate Pokémon names from matched regions, splitting into:
 	//   - "wanted": at this pin but NOT already at home (worth bringing back)
 	//   - "alreadyLocal": at this pin AND already at home (no need to tag — friends don't need them)
@@ -7087,6 +7155,22 @@ function RegionalMap({
 									)}
 								</button>
 							)}
+						</div>
+					)}
+
+					{/* Coiffwaff trim travel tip — cuts unlockable here but not at home */}
+					{newTrims.length > 0 && (
+						<div className='border border-[#9B59B6]/40 rounded p-3 bg-[#9B59B6]/5'>
+							<div className='mono text-[10.5px] uppercase tracking-wider text-[#9B59B6] mb-1'>
+								{t('app.map.furfrou_tip_title')}
+							</div>
+							<div className='mono text-[11px] text-[#8090A0]'>
+								{t('app.map.furfrou_tip_body', {
+									params: {
+										trims: newTrims.map((k) => t(`app.map.furfrou_trim.${k}`)).join(' · '),
+									},
+								})}
+							</div>
 						</div>
 					)}
 				</div>
