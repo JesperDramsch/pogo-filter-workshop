@@ -513,6 +513,7 @@ const REGIONAL_GROUPS = {
 			Floette: 'app.regional.collectibles.notes.flabebe_forms',
 			Florges: 'app.regional.collectibles.notes.flabebe_forms',
 			Choreogel: 'app.regional.collectibles.notes.oricorio_forms',
+			Krawalloro: 'app.regional.collectibles.notes.squawkabilly_forms',
 		},
 		collectors: [
 			// Vivillon-line — flat collectors; collapses to +Purmel if all 3 selected
@@ -538,6 +539,7 @@ const REGIONAL_GROUPS = {
 			'Floette',
 			'Florges', // Red/Yellow/Blue flowers
 			'Choreogel', // Oricorio (Pom-Pom/Sensu/Baile/Pa'u)
+			'Krawalloro', // Squawkabilly (Green E / Blue W / Yellow + White worldwide)
 		],
 	},
 };
@@ -823,6 +825,7 @@ export function buildFilters(
 	outputLocale = 'de',
 	tFn = (k) => k,
 	homeLocalTypeChecks = [],
+	bazaarSpecies = [],
 ) {
 	const kw = pogoKeywords(outputLocale);
 
@@ -1092,6 +1095,29 @@ export function buildFilters(
 		if (allRegionalCollectorsOut.has(lower)) continue;
 		const display = capFirst(lower);
 		push(trashClauses, `!${display}`, tFn('app.clause_why.custom_collectible', { params: { name: display } }));
+	}
+	// Map-marked trade candidates (the RegionalMap bazaar list). The !#<basarTag>
+	// clause above only protects mons the user has ALREADY tagged in-game — a
+	// fresh travel catch is untagged until they get around to it, and the species
+	// may carry no collector protection at all (form-regionals like Choreogel are
+	// auto-dropped from collectibles when home has a local form). Protecting the
+	// species here makes marking on the map immediately safe. Deliberately NOT
+	// gated on hundos/homeLocals: the mark is explicit user intent (bring these
+	// back for friends), which outranks every redundancy carve-out. Region names
+	// may carry a form suffix PoGo search can't express ("Choreogel (Buyo)") —
+	// strip it and protect the whole species.
+	const bazaarSpeciesSeen = new Set();
+	for (const raw of bazaarSpecies || []) {
+		const base = String(raw).replace(/\s*\(.*?\)\s*$/, '');
+		const lower = speciesForOutput(base, outputLocale);
+		if (!lower || bazaarSpeciesSeen.has(lower)) continue;
+		bazaarSpeciesSeen.add(lower);
+		const display = capFirst(lower);
+		// Skip if an identical species clause already exists (enabled collector or
+		// custom collectible) — clause case differs between the two, so compare
+		// case-insensitively.
+		if (trashClauses.some((c) => c.clause.toLowerCase() === `!${lower}`)) continue;
+		push(trashClauses, `!${display}`, tFn('app.clause_why.bazaar_species', { params: { name: display } }));
 	}
 	if (cfg.cpCap && cfg.cpCap > 0)
 		push(
@@ -2624,7 +2650,49 @@ const IBERIAN_RING = [
 	[-9.6, 43.8], // close
 ];
 
+// Squawkabilly's Green/Blue plumage split runs along the LITERAL prime
+// meridian (0° longitude) — NOT the paired/hemispheric KMZ L-line above.
+// London straddles it; Madrid and Lisbon land WEST (Blue side). Intermediate
+// vertices keep every consecutive lon step under 180° for the antimeridian
+// unwrap in pointInRegionGeom.
+const PRIME_MERIDIAN_SPLIT = {
+	east: [
+		[0, 85],
+		[90, 85],
+		[180, 85],
+		[180, -85],
+		[90, -85],
+		[0, -85],
+		[0, 85],
+	],
+	west: [
+		[0, 85],
+		[0, -85],
+		[-90, -85],
+		[-180, -85],
+		[-180, 85],
+		[-90, 85],
+		[0, 85],
+	],
+};
+
 const POGO_REGIONS_ROTATING = [
+	{
+		folder: 'Type 4 [Hemispheric E/W, prime meridian] (manually maintained)',
+		name: 'Eastern Hemisphere (0° meridian) — Green Plumage Squawkabilly',
+		english: ['Green Plumage Squawkabilly'],
+		german: ['Krawalloro (Grünfedrig)'],
+		// Yellow + White Plumage spawn worldwide, so they carry no polygon —
+		// only the two region-locked plumages appear on the map.
+		geometry: { type: 'Polygon', coordinates: [PRIME_MERIDIAN_SPLIT.east] },
+	},
+	{
+		folder: 'Type 4 [Hemispheric E/W, prime meridian] (manually maintained)',
+		name: 'Western Hemisphere (0° meridian) — Blue Plumage Squawkabilly',
+		english: ['Blue Plumage Squawkabilly'],
+		german: ['Krawalloro (Blaufedrig)'],
+		geometry: { type: 'Polygon', coordinates: [PRIME_MERIDIAN_SPLIT.west] },
+	},
 	{
 		folder: 'Type 3/4 [Paired/Hemispheric] (E side, manually maintained)',
 		name: 'Eastern paired/hemispheric (Europe + Asia + Oceania)',
@@ -2698,6 +2766,67 @@ const POGO_REGIONS_KMZ_TAGGED = POGO_REGIONS_KMZ.map((r) =>
 	KMZ_TYPE_CHECKS[r.name] ? { ...r, typeChecks: KMZ_TYPE_CHECKS[r.name] } : r,
 );
 const POGO_REGIONS = [...POGO_REGIONS_KMZ_TAGGED, ...POGO_REGIONS_ROTATING];
+
+// ─── Coiffwaff (Furfrou) trim regions ──────────────────────────────────────
+// The in-game form change (25 candy + 10,000 stardust) offers the
+// region-locked trims only while you are PHYSICALLY inside the region — but
+// the cut sticks when you fly home, which makes it a travel to-do just like
+// tagging regionals for trade. Debutante/Diamond/Star ride the same Big-Three
+// trio polygons as the lake guardians; La Reine reuses the Klefki (France)
+// polygon. Japan (Kabuki) and Egypt (Pharaoh) have no KMZ polygon, so they
+// get hand-drawn coastal rings — loose traces that stay clear of Busan,
+// Ulleungdo, and Sakhalin on the Japan side and hug Egypt's borders + Sinai
+// on the other. Good enough for a travel tip, not a border treaty.
+// (Natural/Matron/Dandy are global and Heart is event-only — no polygons.)
+const JAPAN_MAIN_RING = [
+	[129.2, 32.0], // west of Kyushu
+	[129.5, 34.75], // Tsushima Strait — east of Busan
+	[131.2, 38.3], // Sea of Japan — east of Ulleungdo
+	[136.0, 41.5],
+	[139.4, 44.3],
+	[141.9, 45.65], // La Pérouse Strait — south of Sakhalin
+	[145.9, 44.4], // NE Hokkaido — inside the Kuril line
+	[146.3, 42.3],
+	[142.5, 35.5], // Pacific side
+	[140.5, 32.5], // Izu Islands
+	[136.0, 32.5],
+	[130.8, 30.0], // south of Kyushu
+	[129.2, 32.0],
+];
+const RYUKYU_RING = [
+	[122.6, 23.9], // east of Taiwan (Yonaguni)
+	[130.5, 26.5],
+	[131.0, 28.6], // Amami Islands
+	[128.0, 28.6],
+	[122.6, 25.3],
+	[122.6, 23.9],
+];
+const EGYPT_RING = [
+	[24.7, 31.9], // Mediterranean coast, Libyan border
+	[34.25, 31.3], // Sinai Mediterranean coast, short of Gaza
+	[34.9, 29.6], // Gulf of Aqaba
+	[34.9, 27.7],
+	[36.9, 22.0], // Red Sea coast down to the Sudan line
+	[24.7, 22.0], // southern border
+	[24.7, 31.9],
+];
+const kmzGeometry = (name) => POGO_REGIONS_KMZ.find((r) => r.name === name)?.geometry || null;
+const FURFROU_TRIM_REGIONS = [
+	{ trim: 'debutante', geometry: kmzGeometry('Pom-Pom Oricorio/Yellow Flabébé/Panpour/Azelf') },
+	{ trim: 'diamond', geometry: kmzGeometry('Baile Oricorio/Red Flabébé/Pansear/Mesprit') },
+	{ trim: 'star', geometry: kmzGeometry('Sensu Oricorio/Blue Flabébé/Pansage/Uxie') },
+	{ trim: 'lareine', geometry: kmzGeometry('Klefki') },
+	{ trim: 'kabuki', geometry: { type: 'MultiPolygon', coordinates: [[JAPAN_MAIN_RING], [RYUKYU_RING]] } },
+	{ trim: 'pharaoh', geometry: { type: 'Polygon', coordinates: [EGYPT_RING] } },
+].filter((e) => e.geometry);
+
+// Trim keys locally unlockable at a location. Exported so
+// scripts/verify-regionals.mjs can pin the boundaries (Paris vs Berlin,
+// Cairo vs Athens, Tokyo vs Seoul).
+export function computeFurfrouTrims(lonLat) {
+	if (!lonLat) return [];
+	return FURFROU_TRIM_REGIONS.filter((e) => pointInRegionGeom(lonLat, e.geometry)).map((e) => e.trim);
+}
 
 // Exported so scripts/verify-regionals.mjs can run the exact production code
 // path against the canonical regional table.
@@ -3118,6 +3247,7 @@ export default function App() {
 				effectiveOutputLocale,
 				t,
 				homeLocalTypeChecks,
+				bazaarTags,
 			),
 		[
 			hundos,
@@ -3128,6 +3258,7 @@ export default function App() {
 			effectiveOutputLocale,
 			topAttackers,
 			topMaxAttackers,
+			bazaarTags,
 			t,
 		],
 	);
@@ -3469,6 +3600,7 @@ export default function App() {
 									setConfig={setConfig}
 									homeLocals={homeLocals}
 									homeLocalTypeChecks={homeLocalTypeChecks}
+									hundos={hundos}
 								/>
 							</StepWrapper>
 						)}
@@ -5864,7 +5996,7 @@ const EXPERT_ONLY_KEYS = new Set([
 	'protectNundos',
 ]);
 
-function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks = [] }) {
+function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks = [], hundos = [] }) {
 	const { t, outputLocale } = useTranslation();
 	// Any individual change in ConfigPanel clears the preset marker — the
 	// marker means "this preset is currently in effect"; the moment the
@@ -6101,6 +6233,7 @@ function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks =
 							setGroup={(partial) => setGroup(key, partial)}
 							homeLocals={homeLocals}
 							homeLocalTypeChecks={homeLocalTypeChecks}
+							hundos={hundos}
 						/>
 					))}
 				</div>
@@ -6226,27 +6359,55 @@ function ToggleRow({ k, label, why, checked, onChange, expertBadge, requireConfi
 	);
 }
 
-function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = [], homeLocalTypeChecks = [] }) {
+function RegionalGroupEditor({
+	groupKey,
+	group,
+	state,
+	setGroup,
+	homeLocals = [],
+	homeLocalTypeChecks = [],
+	hundos = [],
+}) {
 	const { t } = useTranslation();
 	const [expanded, setExpanded] = useState(false);
 	const allTC = group.typeChecks.map((tc) => tc.species);
 	const allCol = group.collectors;
 	const tcEnabled = state.typeChecksEnabled === null ? allTC : state.typeChecksEnabled;
 	const colEnabled = state.collectorsEnabled === null ? allCol : state.collectorsEnabled;
-	// Home-locals are auto-dropped by effectiveConfig — exclude them from the counter
-	// so the displayed "X/Y aktiv" matches the actual filter output. typeChecks
-	// need the {species,type} pair to match — same species with different types
-	// (e.g. Paldean Tauros Combat vs Blaze) is the wrong granularity.
+	// Auto-drops are excluded from the counter so the displayed "X/Y aktiv"
+	// matches the actual filter output. Two mechanisms, mirroring buildFilters:
+	//   home  — this species spawns locally (species string for collectors,
+	//           {species,type} pair for typeChecks — same species with different
+	//           types, e.g. Paldean Tauros Combat vs Blaze, is the wrong
+	//           granularity for the pair check)
+	//   hundo — you own a hundo of the species, so duplicates are redundant and
+	//           the protection is carved out (species-level, form-agnostic).
+	// Home wins the display when both apply — either way the chip is dropped.
 	const homeSet = new Set(homeLocals);
 	const tcLocalSet = new Set(homeLocalTypeChecks.map((l) => `${l.species}|${l.type}`));
-	const tcLocalCount = group.typeChecks.filter((tc) => tcLocalSet.has(`${tc.species}|${tc.type}`)).length;
-	const tcEffective = tcEnabled.filter((sp) => !homeSet.has(sp));
-	const colEffective = colEnabled.filter((sp) => !homeSet.has(sp));
-	const totalEffective =
-		allTC.filter((sp) => !homeSet.has(sp)).length - tcLocalCount + allCol.filter((sp) => !homeSet.has(sp)).length;
+	const canonName = (s) => resolveSpecies(s) || String(s).toLowerCase();
+	const hundoSet = new Set((hundos || []).map(canonName));
+	const isHundoDropped = (sp) => hundoSet.has(canonName(sp));
+	const tcDropReason = (tc) =>
+		homeSet.has(tc.species) || tcLocalSet.has(`${tc.species}|${tc.type}`)
+			? 'home'
+			: isHundoDropped(tc.species)
+				? 'hundo'
+				: null;
+	const colDropReason = (sp) => (homeSet.has(sp) ? 'home' : isHundoDropped(sp) ? 'hundo' : null);
+	const tcEntriesEnabled = group.typeChecks.filter((tc) => tcEnabled.includes(tc.species));
 	const droppedByHome =
-		tcEnabled.length + colEnabled.length - (tcEffective.length + colEffective.length) + tcLocalCount;
-	const enabledCount = state.enabled ? tcEffective.length + colEffective.length - tcLocalCount : 0;
+		tcEntriesEnabled.filter((tc) => tcDropReason(tc) === 'home').length +
+		colEnabled.filter((sp) => colDropReason(sp) === 'home').length;
+	const droppedByHundo =
+		tcEntriesEnabled.filter((tc) => tcDropReason(tc) === 'hundo').length +
+		colEnabled.filter((sp) => colDropReason(sp) === 'hundo').length;
+	const totalEffective =
+		group.typeChecks.filter((tc) => !tcDropReason(tc)).length + allCol.filter((sp) => !colDropReason(sp)).length;
+	const enabledCount = state.enabled
+		? tcEntriesEnabled.filter((tc) => !tcDropReason(tc)).length +
+			colEnabled.filter((sp) => !colDropReason(sp)).length
+		: 0;
 
 	function toggleTC(species) {
 		const cur = tcEnabled;
@@ -6300,6 +6461,11 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
 								{t('app.regional_editor.home_extra', { params: { count: droppedByHome } })}
 							</span>
 						)}
+						{droppedByHundo > 0 && state.enabled && (
+							<span className='text-[#9B59B6] ml-1'>
+								{t('app.regional_editor.hundo_extra', { params: { count: droppedByHundo } })}
+							</span>
+						)}
 					</span>
 				</button>
 			</div>
@@ -6341,7 +6507,9 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
 							<div className='flex flex-wrap gap-1'>
 								{group.typeChecks.map((tc) => {
 									const on = tcEnabled.includes(tc.species);
-									const isHomeLocal = tcLocalSet.has(`${tc.species}|${tc.type}`);
+									const dropReason = tcDropReason(tc);
+									const isHomeLocal = dropReason === 'home';
+									const isHundoDrop = dropReason === 'hundo';
 									const tierBadge = tc.tier === 'S' ? '★' : tc.tier === 'C' ? '·' : null;
 									const tierColor =
 										tc.tier === 'S'
@@ -6354,19 +6522,26 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
 											key={`${tc.species}_${tc.type}`}
 											onClick={() => toggleTC(tc.species)}
 											title={
-												isHomeLocal ? t('app.regional_editor.home_local_title') : t(tc.noteKey)
+												isHomeLocal
+													? t('app.regional_editor.home_local_title')
+													: isHundoDrop
+														? t('app.regional_editor.hundo_drop_title')
+														: t(tc.noteKey)
 											}
-											disabled={!state.enabled || isHomeLocal}
+											disabled={!state.enabled || !!dropReason}
 											className={`mono text-[11px] px-2 py-0.5 rounded transition ${
 												isHomeLocal
 													? 'bg-[#27AE60]/10 text-[#27AE60] border border-[#27AE60]/30 line-through opacity-60'
-													: on
-														? 'bg-[#5EAFC5]/20 text-[#5EAFC5] border border-[#5EAFC5]/40'
-														: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
+													: isHundoDrop
+														? 'bg-[#9B59B6]/10 text-[#9B59B6] border border-[#9B59B6]/30 line-through opacity-60'
+														: on
+															? 'bg-[#5EAFC5]/20 text-[#5EAFC5] border border-[#5EAFC5]/40'
+															: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
 											}`}
 										>
 											{isHomeLocal && <span className='not-italic no-underline mr-0.5'>⌂</span>}
-											{tierBadge && !isHomeLocal && (
+											{isHundoDrop && <span className='not-italic no-underline mr-0.5'>4★</span>}
+											{tierBadge && !dropReason && (
 												<span className={`${tierColor} mr-0.5`}>{tierBadge}</span>
 											)}
 											{tc.species} <span className='opacity-70'>/ !{tc.type}</span>
@@ -6384,34 +6559,42 @@ function RegionalGroupEditor({ groupKey, group, state, setGroup, homeLocals = []
 							<div className='flex flex-wrap gap-1'>
 								{group.collectors.map((sp) => {
 									const on = colEnabled.includes(sp);
-									const isHomeLocal = homeLocals.includes(sp);
-									// Home-locals are auto-removed by effectiveConfig regardless of `on`,
-									// so render them as "off" visually with a ⌂ marker.
-									const effectivelyOn = on && !isHomeLocal;
+									const dropReason = colDropReason(sp);
+									const isHomeLocal = dropReason === 'home';
+									const isHundoDrop = dropReason === 'hundo';
+									// Auto-dropped chips (home via effectiveConfig, hundo via the
+									// buildFilters carve-out) are removed regardless of `on`, so
+									// render them as "off" visually with a ⌂ / 4★ marker.
+									const effectivelyOn = on && !dropReason;
 									const noteKey = group.collectorNotes?.[sp];
 									return (
 										<button
 											key={sp}
 											onClick={() => toggleCol(sp)}
-											disabled={!state.enabled || isHomeLocal}
+											disabled={!state.enabled || !!dropReason}
 											title={
 												isHomeLocal
 													? t('app.regional_editor.home_local_title')
-													: noteKey
-														? t(noteKey)
-														: undefined
+													: isHundoDrop
+														? t('app.regional_editor.hundo_drop_title')
+														: noteKey
+															? t(noteKey)
+															: undefined
 											}
 											className={`mono text-[11px] px-2 py-0.5 rounded transition ${
 												effectivelyOn
 													? 'bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/40'
 													: isHomeLocal
 														? 'bg-[#27AE60]/10 text-[#27AE60] border border-[#27AE60]/30 line-through opacity-60'
-														: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
+														: isHundoDrop
+															? 'bg-[#9B59B6]/10 text-[#9B59B6] border border-[#9B59B6]/30 line-through opacity-60'
+															: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
 											}`}
 										>
 											{isHomeLocal && <span className='not-italic no-underline mr-0.5'>⌂</span>}
+											{isHundoDrop && <span className='not-italic no-underline mr-0.5'>4★</span>}
 											{sp}
-											{noteKey && !isHomeLocal && (
+											{noteKey && !dropReason && (
 												<span
 													className='not-italic no-underline ml-1 opacity-60'
 													aria-hidden='true'
@@ -6534,6 +6717,13 @@ function RegionalMap({
 		}
 		return out;
 	}, [lastPin]);
+
+	// Coiffwaff trim travel tip: region-locked cuts unlockable at the pin that
+	// home does NOT offer. The form change must happen while physically inside
+	// the region, but the cut persists afterwards — worth doing on a trip.
+	const pinTrims = useMemo(() => computeFurfrouTrims(lastPin), [lastPin]);
+	const homeTrims = useMemo(() => computeFurfrouTrims(homeLocation), [homeLocation]);
+	const newTrims = useMemo(() => pinTrims.filter((k) => !homeTrims.includes(k)), [pinTrims, homeTrims]);
 
 	// Aggregate Pokémon names from matched regions, splitting into:
 	//   - "wanted": at this pin but NOT already at home (worth bringing back)
@@ -6965,6 +7155,22 @@ function RegionalMap({
 									)}
 								</button>
 							)}
+						</div>
+					)}
+
+					{/* Coiffwaff trim travel tip — cuts unlockable here but not at home */}
+					{newTrims.length > 0 && (
+						<div className='border border-[#9B59B6]/40 rounded p-3 bg-[#9B59B6]/5'>
+							<div className='mono text-[10.5px] uppercase tracking-wider text-[#9B59B6] mb-1'>
+								{t('app.map.furfrou_tip_title')}
+							</div>
+							<div className='mono text-[11px] text-[#8090A0]'>
+								{t('app.map.furfrou_tip_body', {
+									params: {
+										trims: newTrims.map((k) => t(`app.map.furfrou_trim.${k}`)).join(' · '),
+									},
+								})}
+							</div>
 						</div>
 					)}
 				</div>
