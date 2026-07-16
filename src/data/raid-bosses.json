@@ -1,123 +1,64 @@
 {
-  "fetchedAt": "2026-07-14T09:27:57.638Z",
+  "fetchedAt": "2026-07-16T09:36:46.020Z",
   "raids": {
     "mega": [
       {
-        "id": "LUCARIO",
+        "id": "SCEPTILE",
         "names": {
-          "en": "Mega Lucario",
-          "de": "Mega-Lucario",
-          "fr": "Méga-Lucario",
-          "it": "MegaLucario",
-          "ja": "メガルカリオ",
-          "ko": "메가루카리오",
-          "es": "Mega-Lucario"
+          "en": "Mega Sceptile",
+          "de": "Mega-Gewaldro",
+          "fr": "Méga-Jungko",
+          "it": "MegaSceptile",
+          "ja": "メガジュカイン",
+          "ko": "메가나무킹",
+          "es": "Mega-Sceptile"
         },
         "types": [
-          "fighting",
-          "steel"
+          "grass",
+          "dragon"
         ],
         "resistorTypes": [
           "flying",
           "poison",
           "bug",
-          "ghost",
+          "steel",
           "fire",
-          "water",
-          "electric",
-          "psychic"
+          "grass",
+          "fairy"
         ],
         "seMoveTypes": [
-          "fighting",
-          "fire",
-          "ground"
+          "ice",
+          "bug",
+          "dragon",
+          "fairy",
+          "flying",
+          "poison"
         ]
       }
     ],
     "lvl5": [
       {
-        "id": "ARTICUNO",
+        "id": "KYOGRE",
         "names": {
-          "en": "Articuno",
-          "de": "Arktos",
-          "fr": "Artikodin",
-          "it": "Articuno",
-          "ja": "フリーザー",
-          "ko": "프리져",
-          "es": "Articuno"
+          "en": "Kyogre",
+          "de": "Kyogre",
+          "fr": "Kyogre",
+          "it": "Kyogre",
+          "ja": "カイオーガ",
+          "ko": "가이오가",
+          "es": "Kyogre"
         },
         "types": [
-          "ice",
-          "flying"
-        ],
-        "resistorTypes": [
-          "rock",
-          "steel",
-          "fire",
-          "water",
-          "electric",
-          "ice"
-        ],
-        "seMoveTypes": [
-          "rock",
-          "electric",
-          "fire",
-          "steel"
-        ]
-      },
-      {
-        "id": "ZAPDOS",
-        "names": {
-          "en": "Zapdos",
-          "de": "Zapdos",
-          "fr": "Électhor",
-          "it": "Zapdos",
-          "ja": "サンダー",
-          "ko": "썬더",
-          "es": "Zapdos"
-        },
-        "types": [
-          "electric",
-          "flying"
-        ],
-        "resistorTypes": [
-          "ground",
-          "rock",
-          "steel",
-          "electric",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "ice",
-          "rock"
-        ]
-      },
-      {
-        "id": "MOLTRES",
-        "names": {
-          "en": "Moltres",
-          "de": "Lavados",
-          "fr": "Sulfura",
-          "it": "Moltres",
-          "ja": "ファイヤー",
-          "ko": "파이어",
-          "es": "Moltres"
-        },
-        "types": [
-          "fire",
-          "flying"
-        ],
-        "resistorTypes": [
-          "rock",
-          "fire",
-          "water",
-          "electric",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "rock",
-          "electric",
           "water"
+        ],
+        "resistorTypes": [
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "electric",
+          "grass"
         ]
       }
     ],
@@ -570,100 +511,6 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "kyogre-in-5-star-raid-battles-july-2026",
-      "name": "Kyogre in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-07-15T06:00:00.000",
-      "end": "2026-07-21T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "KYOGRE",
-          "names": {
-            "en": "Kyogre"
-          },
-          "types": [
-            "water"
-          ],
-          "resistorTypes": [
-            "water",
-            "grass",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "grass",
-            "electric"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "mega-sceptile-in-mega-raids-july-2026",
-      "name": "Mega Sceptile in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-07-15T06:00:00.000",
-      "end": "2026-07-21T22:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "SCEPTILE",
-          "names": {
-            "en": "Sceptile"
-          },
-          "types": [
-            "grass"
-          ],
-          "resistorTypes": [
-            "flying",
-            "poison",
-            "bug",
-            "steel",
-            "fire",
-            "grass",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "poison",
-            "bug",
-            "fire",
-            "ice"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20260715",
-      "name": "Kyogre Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-07-15T18:00:00.000",
-      "end": "2026-07-15T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "KYOGRE",
-          "names": {
-            "en": "Kyogre"
-          },
-          "types": [
-            "water"
-          ],
-          "resistorTypes": [
-            "water",
-            "grass",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "grass",
-            "electric"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "raichu-super-mega-raid-day-2026",
       "name": "Raichu Super Mega Raid Day",
       "eventType": "raid-day",
@@ -731,6 +578,41 @@
       "eventType": "raid-battles",
       "start": "2026-07-22T06:00:00.000",
       "end": "2026-07-28T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "SOLGALEO",
+          "names": {
+            "en": "Solgaleo"
+          },
+          "types": [
+            "psychic",
+            "steel"
+          ],
+          "resistorTypes": [
+            "steel",
+            "fire",
+            "water",
+            "electric",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "ground",
+            "ghost",
+            "fire",
+            "dark"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20260722",
+      "name": "Solgaleo Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-07-22T18:00:00.000",
+      "end": "2026-07-22T19:00:00.000",
       "isShadow": false,
       "isMega": false,
       "bosses": [
