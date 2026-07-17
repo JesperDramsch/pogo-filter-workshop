@@ -1881,6 +1881,23 @@ export function buildFilters(
 			(ev.spawnDex || []).map(String),
 		);
 	}
+	// Egg pools — Season pools run for months, event pools for days; hatched
+	// Pokémon trade fine, so "hatch it for me" is a legit friend-collect ask.
+	// Deliberately NOT part of the rare-set gate below: a Season pool is
+	// near-always live and would otherwise permanently suppress the rare set,
+	// which exists to cover WILD-spawn lulls.
+	for (const pool of EVENTS.eggPools || []) {
+		const endMs = Date.parse(pool.end);
+		if (Number.isFinite(endMs) && endMs < friendCollectNowMs) continue;
+		pushFriendCollectSuggestion(
+			'eggs',
+			pool.id,
+			pool.title,
+			{ start: pool.start, end: pool.end },
+			(pool.eggDex || []).map(String),
+			25,
+		);
+	}
 	// Rare-species fallback — only when no event set made it through (event
 	// lull, or every event spawn is already curated/owned): pseudo-legendaries,
 	// fossils and classic rares keep the rotation going between events.
@@ -5236,6 +5253,8 @@ function FriendCollectEditor({ list, onChange, mode, onModeChange, targets, sugg
 
 	const suggestionLabel = (s) => {
 		if (s.kind === 'event') return `✨ ${s.title}`;
+		if (s.kind === 'eggs')
+			return `🥚 ${t('app.filter.friend_collect_suggest_eggs', { params: { title: s.title } })}`;
 		if (s.kind === 'rare') return `💎 ${t('app.filter.friend_collect_suggest_rare')}`;
 		if (s.kind === 'raids') return `⚔️ ${t('app.filter.friend_collect_suggest_raid')}`;
 		return `🏆 ${t('app.filter.friend_collect_suggest_pvp')}`;

@@ -1039,5 +1039,8 @@
   "app.clear_list.confirm": "vraiment vider ?",
   "app.clear_list.title": "Retire toutes les entrées de cette liste — premier appui pour armer, second pour vider.",
   "app.changelog.entry.friend_collect_rare_reset.title": "Set d'espèces rares et boutons de réinitialisation",
-  "app.changelog.entry.friend_collect_rare_reset.body": "Quand aucun set d'événement n'est disponible (creux entre événements, ou tous les spawns déjà ajoutés), les suggestions proposent désormais un set d'espèces rares — pseudo-légendaires, fossiles et raretés classiques — pour toujours pouvoir faire tourner. La liste ciblée et la liste de capture de chaque partenaire d'échange gagnent aussi un bouton de vidage en deux appuis."
+  "app.changelog.entry.friend_collect_rare_reset.body": "Quand aucun set d'événement n'est disponible (creux entre événements, ou tous les spawns déjà ajoutés), les suggestions proposent désormais un set d'espèces rares — pseudo-légendaires, fossiles et raretés classiques — pour toujours pouvoir faire tourner. La liste ciblée et la liste de capture de chaque partenaire d'échange gagnent aussi un bouton de vidage en deux appuis.",
+  "app.filter.friend_collect_suggest_eggs": "Œufs · {title}",
+  "app.changelog.entry.friend_collect_egg_pools.title": "Les œufs alimentent les suggestions",
+  "app.changelog.entry.friend_collect_egg_pools.body": "Les sets suggérés incluent désormais les pools d'œufs du flux en direct : celui de la saison en cours (plusieurs mois) et ceux des événements, préfiltrés comme les autres sets. Les Pokémon éclos s'échangent normalement — « fais-le éclore pour moi » est une demande légitime. Les sets d'œufs ne remplacent pas le set d'espèces rares, qui couvre toujours les creux de spawns sauvages."
 }

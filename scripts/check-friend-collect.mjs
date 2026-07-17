@@ -161,7 +161,41 @@ console.log('\nScenario 5: rare-species fallback set');
 	);
 }
 
-console.log('\nScenario 6: output locale rendering');
+console.log('\nScenario 6: egg-pool sets');
+{
+	const now = Date.now();
+	const r = buildFilters([], [], { ...cfg, friendCollectSpecies: [] }, [], 'en', t);
+	const eggSug = r.friendCollectSuggestions.filter((s) => s.kind === 'eggs');
+	const activePools = (EVENTS.eggPools || []).filter(
+		(p) => !(Number.isFinite(Date.parse(p.end)) && Date.parse(p.end) < now) && (p.eggDex || []).length > 0,
+	);
+	// Snapshot-agnostic: each active pool yields a set (nothing curated/owned to
+	// prune it away), never more sets than pools, and past pools never surface.
+	check(
+		'one egg set per active pool',
+		eggSug.length === activePools.length,
+		`${eggSug.length} sets vs ${activePools.length} active pools`,
+	);
+	check('egg sets capped at 25', eggSug.every((s) => s.species.length <= 25));
+	check(
+		'egg set ids map to pool ids',
+		eggSug.every((s) => activePools.some((p) => p.id === s.id)),
+	);
+	// Egg sets must NOT count toward the rare-set gate (a Season pool is
+	// near-always live and would permanently suppress it) — consume all event
+	// spawns: rare appears even while egg sets are still on offer.
+	const activeEventDex = (EVENTS.events || [])
+		.filter((ev) => !(Number.isFinite(Date.parse(ev.end)) && Date.parse(ev.end) < now))
+		.flatMap((ev) => ev.spawnDex || []);
+	const curatedEv = [...new Set(activeEventDex.map((d) => pokemonNameFor(String(d))).filter(Boolean))];
+	const r2 = buildFilters([], [], { ...cfg, friendCollectSpecies: curatedEv }, [], 'en', t);
+	check(
+		'egg sets do not suppress the rare fallback',
+		r2.friendCollectSuggestions.some((s) => s.kind === 'rare'),
+	);
+}
+
+console.log('\nScenario 7: output locale rendering');
 {
 	const r = buildFilters(hundos, luckies, cfg, [], 'de', t);
 	check(
@@ -171,7 +205,7 @@ console.log('\nScenario 6: output locale rendering');
 	);
 }
 
-console.log('\nScenario 7: config merge');
+console.log('\nScenario 8: config merge');
 {
 	const m = mergeImportedConfig({ friendCollectSpecies: ['Dragonite', '131'], friendCollectMode: 'weird' });
 	check(

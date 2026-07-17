@@ -1084,5 +1084,8 @@
   "app.clear_list.confirm": "really clear?",
   "app.clear_list.title": "Removes every entry from this list — first tap arms, second tap clears.",
   "app.changelog.entry.friend_collect_rare_reset.title": "Rare-species set & list reset buttons",
-  "app.changelog.entry.friend_collect_rare_reset.body": "When no event set is on offer (event lull, or you've already added every event spawn), the friend-collect suggestions now include a rare-species set — pseudo-legendaries, fossils and classic rares — so there's always something to rotate to. The curated collect list and each trade buddy's catch list also gained a two-tap clear button."
+  "app.changelog.entry.friend_collect_rare_reset.body": "When no event set is on offer (event lull, or you've already added every event spawn), the friend-collect suggestions now include a rare-species set — pseudo-legendaries, fossils and classic rares — so there's always something to rotate to. The curated collect list and each trade buddy's catch list also gained a two-tap clear button.",
+  "app.filter.friend_collect_suggest_eggs": "Egg pool · {title}",
+  "app.changelog.entry.friend_collect_egg_pools.title": "Egg pools feed the collect suggestions",
+  "app.changelog.entry.friend_collect_egg_pools.body": "The friend-collect suggested sets now include egg pools from the live feed: the current Season's months-long pool and event-specific pools, pre-pruned like every other set. Hatched Pokémon trade fine — \"hatch it for me\" is a legit ask. Egg sets don't suppress the rare-species fallback, which stays keyed to wild-spawn lulls."
 }

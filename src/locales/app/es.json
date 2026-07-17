@@ -1039,5 +1039,8 @@
   "app.clear_list.confirm": "¿vaciar de verdad?",
   "app.clear_list.title": "Elimina todas las entradas de esta lista — el primer toque arma, el segundo vacía.",
   "app.changelog.entry.friend_collect_rare_reset.title": "Set de especies raras y botones de reinicio",
-  "app.changelog.entry.friend_collect_rare_reset.body": "Cuando no hay set de evento disponible (pausa entre eventos, o ya añadiste todos los spawns del evento), las sugerencias ofrecen ahora un set de especies raras — pseudolegendarios, fósiles y rarezas clásicas — para que siempre haya rotación. La lista curada y la lista de captura de cada compañero de intercambio ganan además un botón de vaciado en dos toques."
+  "app.changelog.entry.friend_collect_rare_reset.body": "Cuando no hay set de evento disponible (pausa entre eventos, o ya añadiste todos los spawns del evento), las sugerencias ofrecen ahora un set de especies raras — pseudolegendarios, fósiles y rarezas clásicas — para que siempre haya rotación. La lista curada y la lista de captura de cada compañero de intercambio ganan además un botón de vaciado en dos toques.",
+  "app.filter.friend_collect_suggest_eggs": "Huevos · {title}",
+  "app.changelog.entry.friend_collect_egg_pools.title": "Los huevos alimentan las sugerencias",
+  "app.changelog.entry.friend_collect_egg_pools.body": "Los sets sugeridos ahora incluyen los huevos del feed en vivo: el pool de la temporada actual (meses) y los de eventos, prefiltrados como cualquier otro set. Los Pokémon eclosionados se intercambian con normalidad — \"incúbalo por mí\" es una petición legítima. Los sets de huevos no desplazan al set de especies raras, que sigue cubriendo las pausas de spawns salvajes."
 }

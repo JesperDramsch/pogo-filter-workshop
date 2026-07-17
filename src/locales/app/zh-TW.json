@@ -1039,5 +1039,8 @@
   "app.clear_list.confirm": "確定清空？",
   "app.clear_list.title": "移除此清單的所有項目 — 第一下啟動確認，第二下清空。",
   "app.changelog.entry.friend_collect_rare_reset.title": "稀有物種組合與清單重設按鈕",
-  "app.changelog.entry.friend_collect_rare_reset.body": "當沒有活動組合可用（活動空窗，或活動出現的物種都已加入）時，建議組合現在會提供稀有物種組合 — 準傳說、化石與經典稀有 — 讓輪替不中斷。精選收集清單與每位交換夥伴的捕捉清單也新增了兩下確認的清空按鈕。"
+  "app.changelog.entry.friend_collect_rare_reset.body": "當沒有活動組合可用（活動空窗，或活動出現的物種都已加入）時，建議組合現在會提供稀有物種組合 — 準傳說、化石與經典稀有 — 讓輪替不中斷。精選收集清單與每位交換夥伴的捕捉清單也新增了兩下確認的清空按鈕。",
+  "app.filter.friend_collect_suggest_eggs": "蛋池 · {title}",
+  "app.changelog.entry.friend_collect_egg_pools.title": "蛋池加入收集建議",
+  "app.changelog.entry.friend_collect_egg_pools.body": "建議組合現在納入即時資料的蛋池：目前賽季長達數月的蛋池與活動專屬蛋池，與其他組合一樣預先過濾。孵出的寶可夢可正常交換 —「幫我孵這個」是合理的請求。蛋池組合不會取代稀有物種組合，後者仍負責野生出現的空窗期。"
 }
