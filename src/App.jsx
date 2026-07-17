@@ -1365,9 +1365,14 @@ export function buildFilters(
 		// Examples: drop Galar Mauzi {include:[steel]} → `!mauzi,!stahl`; drop Paldea
 		// combat Tauros {include:[fighting],exclude:[fire,water]} → `!tauros,!kampf,feuer,wasser`.
 		const unionTargets = [...plainTargets, ...liveFormTargets];
+		// The expert raw append is comma-spliced into the species OR-list, so it
+		// rides the same guarded filter as every other target. A `&` inside the
+		// raw text splits clauses right here (comma binds tighter than `&`) —
+		// that precedence footgun is the expert's to own (see raw_help copy).
 		const speciesParts = [
 			...unionTargets.map(sel),
 			...(wantsTE ? TE_full.map((base) => `+${teDisplay(base, outputLocale)}`) : []),
+			...(hasRaw ? [rawAppend] : []),
 		];
 		if (speciesParts.length > 0) {
 			const why = [
@@ -1375,6 +1380,7 @@ export function buildFilters(
 					? tFn('app.clause_why.buddy_targets_count', { params: { count: unionTargets.length } })
 					: null,
 				wantsTE ? tFn('app.clause_why.buddy_te_count', { params: { count: TE_full.length } }) : null,
+				hasRaw ? tFn('app.clause_why.buddy_raw_append') : null,
 			]
 				.filter(Boolean)
 				.join(' + ');
@@ -1406,21 +1412,6 @@ export function buildFilters(
 				prefix,
 				filter: catchClauses.map((c) => c.clause).join('&'),
 				clauses: catchClauses,
-			});
-		}
-
-		// ── Expert raw escape hatch — its OWN line, verbatim and UNGUARDED ──
-		// A stray comma in a raw blob could break precedence across a guarded
-		// clause set, so it never gets `&`-appended to one. Expert-only.
-		if (hasRaw) {
-			buddyCatchFilters.push({
-				buddyName: b.name,
-				prefix,
-				formKey: 'raw',
-				label: `${b.name} · ${tFn('app.buddy_catch.raw_label')}`,
-				filter: rawAppend,
-				clauses: [{ clause: rawAppend, why: tFn('app.buddy_catch.raw_why') }],
-				raw: true,
 			});
 		}
 	}
@@ -4276,14 +4267,11 @@ function BuddyCatchSection({ buddyCatchFilters, copied, onCopy }) {
 				<span className='text-[#8090A0] normal-case'>· {t('app.buddy_catch.section_subtitle')}</span>
 			</div>
 			{buddyCatchFilters.map((b) => {
-				// A buddy can now emit multiple lines (shared selector + one per form +
-				// optional raw), so the key/copy-id must include formKey to stay unique.
-				const uid = b.formKey ? `${b.prefix}-${b.formKey}` : b.prefix;
-				const key = `buddyCatch:${uid}`;
+				const key = `buddyCatch:${b.prefix}`;
 				return (
 					<FilterBox
-						key={uid}
-						label={b.label || t('app.buddy_catch.filter_label', { params: { name: b.buddyName } })}
+						key={b.prefix}
+						label={t('app.buddy_catch.filter_label', { params: { name: b.buddyName } })}
 						accent='#E67E22'
 						filterStr={b.filter}
 						copied={copied[key]}
@@ -5598,8 +5586,8 @@ function RawClausesPanel({
 				buddyCatchFilters.length > 0 &&
 				buddyCatchFilters.map((b) => (
 					<ClauseList
-						key={`catch:${b.formKey ? `${b.prefix}-${b.formKey}` : b.prefix}`}
-						title={b.label || t('app.buddy_catch.filter_label', { params: { name: b.buddyName } })}
+						key={`catch:${b.prefix}`}
+						title={t('app.buddy_catch.filter_label', { params: { name: b.buddyName } })}
 						accent='#E67E22'
 						clauses={b.clauses}
 					/>

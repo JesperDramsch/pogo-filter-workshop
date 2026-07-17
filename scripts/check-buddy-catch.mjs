@@ -1,9 +1,9 @@
 // Verifies the per-buddy catch-filter generation in buildFilters. Every buddy
-// now emits ONE combined catch filter: a species OR-list (the union of all
-// wished species — whole-species, form-restricted, and trade-evo families) plus
-// a per-species type guard `!<species>,<drop-types>` for each excluded regional
-// form, plus the shared protection guards. The expert raw escape hatch stays a
-// separate verbatim line. The default-fixture snapshot (check-fixtures.mjs)
+// emits ONE combined catch filter: a species OR-list (the union of all wished
+// species — whole-species, form-restricted, and trade-evo families, plus the
+// expert raw append comma-spliced in verbatim) plus a per-species type guard
+// `!<species>,<drop-types>` for each excluded regional form, plus the shared
+// protection guards. The default-fixture snapshot (check-fixtures.mjs)
 // ignores buddyCatchFilters and DEFAULT_CONFIG has no buddies, so this is the
 // only coverage for that path.
 //
@@ -99,7 +99,7 @@ console.log("Combined catch filter — structure (5 mixed targets, Mauzi hundo o
 {
   const buddy = {
     id: "auri", name: "Auri", tagPrefix: "Auri", active: true, wantsTradeEvos: false,
-    rawAppend: "mauzi&schillernd",
+    rawAppend: "kokowei,151",
     targetSpecies: [
       { species: "habitak", expand: false, dropForms: [] },      // whole species
       { species: "pikachu", expand: true,  dropForms: [] },      // +family, no regionals
@@ -111,18 +111,16 @@ console.log("Combined catch filter — structure (5 mixed targets, Mauzi hundo o
   const cfg = { ...DEFAULT_CONFIG, expertMode: true, buddies: [buddy] };
   const res = buildFilters(["mauzi"], [], cfg, [], LOCALE, tFn);
   const all = res.buddyCatchFilters;
-  const combined = all.filter(b => !b.formKey);
-  const raw = all.filter(b => b.formKey === "raw");
 
-  check("exactly ONE combined catch line per buddy", combined.length === 1, `got ${combined.length}`);
-  check("exactly one raw escape-hatch line", raw.length === 1, `got ${raw.length}`);
-  check("no separate per-form lines", all.length === 2, `got ${all.length} entries`);
+  check("exactly ONE catch line per buddy (raw merged, no extra box)", all.length === 1,
+    `got ${all.length} entries`);
 
-  const f = combined[0]?.filter || "";
+  const f = all[0]?.filter || "";
   const S = segs(f);
-  // Union: all five species in the first comma-run, raichu folded in (not its own line).
-  check("union starts with all five species selectors",
-    f.startsWith("habitak,+pikachu,raichu,mauzi,sandan&"), f.slice(0, 60));
+  // Union: all five species in the first comma-run, raichu folded in (not its
+  // own line), raw append comma-spliced verbatim at the end of the union.
+  check("union starts with all five species selectors + raw append",
+    f.startsWith("habitak,+pikachu,raichu,mauzi,sandan,kokowei,151&"), f.slice(0, 60));
   check("exact target has no '+' (Habitak not Ibitak)", !f.includes("+habitak"));
   // Per-species scoped form guards.
   check(`Galar-Mauzi guard '!mauzi,${deMorgan(form(52,"galar"))}' present`,
@@ -132,13 +130,36 @@ console.log("Combined catch filter — structure (5 mixed targets, Mauzi hundo o
   // Spare-hundo carve-out (owns a Mauzi hundo) at buddy level.
   check("spare stars line ORs in the owned-hundo species", S.includes("0*,1*,2*,mauzi"));
   check("never-gift guard '!4*' present", S.includes("!4*"));
-  // Standard protection guards.
+  // Standard protection guards — they now cover the raw append too.
   check("standard guards present ('!#', '!favorit')",
     S.includes("!#") && f.includes(`!${kw.flag.favorite}`));
+}
 
-  // Raw line verbatim and unguarded.
-  check("raw line filter is verbatim", raw[0]?.filter === "mauzi&schillernd");
-  check("raw line carries no guards", !segs(raw[0]?.filter || "").includes("!#"));
+// ─────────────────────────────────────────────────────────────────────────
+console.log("\nRaw append rides the guarded filter (semantic)");
+{
+  const buddy = { id: "r", name: "R", tagPrefix: "R", active: true, rawAppend: "kokowei",
+    targetSpecies: [{ species: "habitak", expand: false, dropForms: [] }] };
+  const cfg = { ...SEM_CFG, expertMode: true, buddies: [buddy] };
+  const res = buildFilters([], [], cfg, [], LOCALE, tFn);
+  check("one line only", res.buddyCatchFilters.length === 1, `got ${res.buddyCatchFilters.length}`);
+  const f = res.buddyCatchFilters[0]?.filter || "";
+  check("raw species caught", evalFilter(f, mk({ species: "kokowei", dex: 103 })) === true);
+  check("wish species still caught", evalFilter(f, mk({ species: "habitak", dex: 21 })) === true);
+  check("tagged raw species protected by the shared guards",
+    evalFilter(f, mk({ species: "kokowei", dex: 103, tagged: true })) === false);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+console.log("\nRaw-only buddy still gets ONE combined, guarded line");
+{
+  const buddy = { id: "q", name: "Q", tagPrefix: "Q", active: true, rawAppend: "kokowei",
+    targetSpecies: [] };
+  const res = buildFilters([], [], { ...DEFAULT_CONFIG, expertMode: true, buddies: [buddy] }, [], LOCALE, tFn);
+  check("exactly one line", res.buddyCatchFilters.length === 1, `got ${res.buddyCatchFilters.length}`);
+  const f = res.buddyCatchFilters[0]?.filter || "";
+  check("union is the raw text, stars + guards apply",
+    f.startsWith("kokowei&0*,1*,2*&") && segs(f).includes("!#"), f.slice(0, 40));
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -208,12 +229,13 @@ console.log("\nFamily expansion + form drop uses '!+name' guard (semantic)");
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-console.log("\nRaw escape hatch is expert-gated");
+console.log("\nRaw append is expert-gated");
 {
-  const buddy = { id: "a", name: "A", tagPrefix: "A", active: true, rawAppend: "mauzi&schillernd",
+  const buddy = { id: "a", name: "A", tagPrefix: "A", active: true, rawAppend: "kokowei",
     targetSpecies: [{ species: "mauzi", expand: false, dropForms: ["galar"] }] };
   const off = buildFilters([], [], { ...DEFAULT_CONFIG, expertMode: false, buddies: [buddy] }, [], LOCALE, tFn);
-  check("no raw line when expertMode is off", !off.buddyCatchFilters.some(b => b.formKey === "raw"));
+  check("raw text absent from the filter when expertMode is off",
+    !off.buddyCatchFilters.some(b => b.filter.includes("kokowei")));
 }
 
 // ─────────────────────────────────────────────────────────────────────────
