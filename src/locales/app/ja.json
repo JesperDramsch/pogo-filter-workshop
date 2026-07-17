@@ -1016,7 +1016,7 @@
   "app.filter.friend_collect_section": "フレンドに集めてもらう",
   "app.filter.friend_collect_intro": "下の「すべて」フォールバックの代わりになる狙い撃ちリスト：交換フォーカスを選び、種を厳選（おすすめセットや手入力）して、フレンドに1本の検索文字列を渡します。見つかった種はリストに残りますが、文字列からは自動的に外れます。",
   "app.filter.friend_collect_label": "厳選収集リスト",
-  "app.filter.friend_collect_hint": "フレンドに渡すと、指定した種の交換可能なポケモンだけが表示されます — すでに持っている系統は除外。キラ／100%が増えたら再コピーするだけで文字列が更新されます。",
+  "app.filter.friend_collect_hint": "フレンドに渡す一本の文字列。選んだ種の交換可能なポケモンだけが表示されます。入手済みのターゲットは自動的に外れます — キラ／100%が増えたら再コピーしてください。",
   "app.filter.friend_collect_mode_label": "交換フォーカス",
   "app.filter.friend_collect_mode_lucky": "キラ",
   "app.filter.friend_collect_mode_hundo": "100%",
@@ -1033,5 +1033,14 @@
   "app.filter.friend_fallback_section": "フォールバック · まだ足りないすべて",
   "app.clause_why.friend_collect_targets": "厳選した収集ターゲット（系統ごと）",
   "app.changelog.entry.friend_collect_wishlist.title": "フレンド収集の厳選ほしいものリスト",
-  "app.changelog.entry.friend_collect_wishlist.body": "集めてほしい種をフレンドに正確に伝えられます。フレンド用ほしいものリスト欄でキラ（既定）か100%のフォーカスを選び、おすすめセット（開催中イベントの出現、レイド・メタ、PvP・メタ）や手入力で種を追加して、ポジティブな検索文字列を共有。完了した系統は自動的に文字列から外れます — 従来のブラックリスト型リストは「すべて」のフォールバックとして残ります。"
+  "app.changelog.entry.friend_collect_wishlist.body": "集めてほしい種をフレンドに正確に伝えられます。フレンド用ほしいものリスト欄でキラ（既定）か100%のフォーカスを選び、おすすめセット（開催中イベントの出現、レイド・メタ、PvP・メタ）や手入力で種を追加して、ポジティブな検索文字列を共有。入手済みのターゲットは自動的に文字列から外れます — 従来のブラックリスト型リストは「すべて」のフォールバックとして残ります。",
+  "app.filter.friend_collect_suggest_rare": "レアな種",
+  "app.clear_list.label": "リストを空にする",
+  "app.clear_list.confirm": "本当に空にする？",
+  "app.clear_list.title": "このリストの項目をすべて削除します — 1回目のタップで確認、2回目で削除。",
+  "app.changelog.entry.friend_collect_rare_reset.title": "レア種セットとリストのクリアボタン",
+  "app.changelog.entry.friend_collect_rare_reset.body": "イベントセットが出せないとき（イベントの谷間、またはイベント出現をすべて追加済み）、おすすめにレア種セット — 600族、化石、定番のレア — が表示され、いつでもローテーションできます。厳選収集リストと各交換相手のキャッチリストに2タップのクリアボタンも追加。",
+  "app.filter.friend_collect_suggest_eggs": "タマゴ · {title}",
+  "app.changelog.entry.friend_collect_egg_pools.title": "タマゴプールがおすすめセットに",
+  "app.changelog.entry.friend_collect_egg_pools.body": "おすすめセットにライブフィードのタマゴプールが加わりました：現在のシーズンの数か月にわたるプールと、イベント専用プール。他のセット同様に事前フィルタ済みです。孵化したポケモンは普通に交換できるので「孵化して」も立派なお願い。タマゴセットはレア種セットを押しのけません — あちらは野生出現の谷間用のままです。"
 }

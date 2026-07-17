@@ -1,4 +1,6 @@
 [
+	{ "id": "friend_collect_egg_pools", "date": "2026-07-17" },
+	{ "id": "friend_collect_rare_reset", "date": "2026-07-17" },
 	{ "id": "friend_collect_wishlist", "date": "2026-07-17" },
 	{ "id": "verify_star_derived", "date": "2026-07-17" },
 	{ "id": "verify_species_terms", "date": "2026-07-17" },

@@ -4,6 +4,12 @@
 // spawn's English name to a base dex number, and writes a slim artifact at
 // src/data/events.json that App.jsx imports at build time.
 //
+// The same pass also collects EGG POOLS (`details.eggs`) into a separate
+// `eggPools` array: Season entries carry a months-long pool and some events
+// ship their own — both feed the friend-collect suggestion sets (hatched
+// Pokémon trade fine). Kept separate from `events` so the wild-spawn card
+// logic stays untouched (a Season has eggs but no spawns).
+//
 // Why the derivation lives in this script (not the app):
 //   - Keeps the runtime bundle small (one json file, no name index at runtime).
 //   - Filter strings rebuild deterministically from a committed snapshot.
@@ -107,11 +113,15 @@ function resolveBaseDex(raw, nameIdx) {
 
 // Resolve an event's spawn list to deduped sorted dex numbers + the base names
 // we matched (handy for readable git diffs) + any names we couldn't resolve.
+// Entries may be plain strings (pre-2026-07 feed) or { name, ... } objects
+// (the feed migrated mid-July 2026; eggs always used objects) — accept both.
 function resolveSpawns(spawns, nameIdx) {
   const dexSet = new Set();
   const nameSet = new Set();
   const unresolved = [];
-  for (const raw of spawns) {
+  for (const entry of spawns) {
+    const raw = typeof entry === "string" ? entry : entry?.name;
+    if (!raw) continue;
     const hit = resolveBaseDex(raw, nameIdx);
     if (hit) {
       dexSet.add(hit.dex);
@@ -170,10 +180,47 @@ async function main() {
   const futureEdge = now + UPCOMING_HORIZON_MS;
 
   const eventsOut = [];
+  const eggPoolsOut = [];
   let skippedNoSpawns = 0;
   let skippedWindow = 0;
   let skippedCategory = 0;
   let totalUnresolved = 0;
+
+  // Egg pools first — collected from EVERY category (a Season has eggs but no
+  // spawns and would otherwise never be visited; SKIP_CATEGORIES only mutes
+  // wild-spawn noise, not eggs). Feed items are { name, ... } objects.
+  for (const [category, list] of Object.entries(feed)) {
+    if (!Array.isArray(list)) continue;
+    for (const event of list) {
+      const eggs = event?.details?.eggs;
+      if (!Array.isArray(eggs) || eggs.length === 0) continue;
+
+      const startMs = Date.parse(event.start_time);
+      const endMs = Date.parse(event.end_time);
+      if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) continue;
+      if (endMs < pastEdge || startMs > futureEdge) continue;
+
+      const { spawnDex: eggDex, spawns: eggNames, unresolved } = resolveSpawns(eggs, nameIdx);
+      if (eggDex.length === 0) continue;
+      if (unresolved.length > 0) {
+        totalUnresolved += unresolved.length;
+        console.warn(`  ⚠ "${event.title}" eggs: unresolved names — ${unresolved.join(", ")}`);
+      }
+
+      eggPoolsOut.push({
+        id: `${slugId(category, event.title, event.start_time)}-eggs`,
+        title: event.title,
+        category,
+        start: event.start_time,
+        end: event.end_time,
+        isLocalTime: !!event.is_local_time,
+        eggDex,
+        eggs: eggNames,
+        unresolved,
+      });
+    }
+  }
+  eggPoolsOut.sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
 
   for (const [category, list] of Object.entries(feed)) {
     if (SKIP_CATEGORIES.has(category)) { skippedCategory += (Array.isArray(list) ? list.length : 0); continue; }
@@ -226,12 +273,16 @@ async function main() {
   // Preserve the previous fetchedAt when the resolved event set is unchanged so
   // the daily sync doesn't open a PR just because the timestamp moved. The UI's
   // "last sync · Xh ago" still reflects the last time the content actually moved.
-  const newContent = { events: eventsOut };
+  const newContent = { events: eventsOut, eggPools: eggPoolsOut };
   let fetchedAt = new Date().toISOString();
   if (existsSync(OUT_PATH)) {
     try {
       const prev = JSON.parse(readFileSync(OUT_PATH, "utf8"));
-      if (canonicalStringify({ events: prev.events }) === canonicalStringify(newContent) && prev.fetchedAt) {
+      if (
+        canonicalStringify({ events: prev.events, eggPools: prev.eggPools || [] }) ===
+          canonicalStringify(newContent) &&
+        prev.fetchedAt
+      ) {
         fetchedAt = prev.fetchedAt;
         console.log("  ↺ content unchanged — preserving previous fetchedAt");
       }
@@ -241,6 +292,7 @@ async function main() {
   writeJson(OUT_PATH, { fetchedAt, ...newContent });
   console.log(`✓ wrote ${OUT_PATH}`);
   console.log(`  events: ${eventsOut.length} surfaced · ${skippedNoSpawns} without spawns · ${skippedWindow} outside window · ${skippedCategory} skipped categories · ${totalUnresolved} unresolved spawn names`);
+  console.log(`  egg pools: ${eggPoolsOut.length} surfaced`);
 }
 
 main().catch((e) => {

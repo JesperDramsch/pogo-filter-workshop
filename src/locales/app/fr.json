@@ -1016,7 +1016,7 @@
   "app.filter.friend_collect_section": "Fais collecter tes amis pour toi",
   "app.filter.friend_collect_intro": "Une liste de vœux délibérée au lieu du repli « tout » ci-dessous : choisis un axe d'échange, sélectionne les espèces (sets suggérés ou saisie libre) et donne une seule chaîne à ton ami. Les entrées déjà trouvées restent dans la liste mais sortent automatiquement de la chaîne.",
   "app.filter.friend_collect_label": "liste ciblée",
-  "app.filter.friend_collect_hint": "Pour un ami : révèle ses Pokémon échangeables exactement des espèces demandées — moins les familles que tu as déjà. Recopie après de nouveaux chanceux/hundos ; la chaîne se met à jour seule.",
+  "app.filter.friend_collect_hint": "Pour un ami : une seule chaîne qui révèle ses Pokémon échangeables exactement des espèces choisies. Les cibles déjà trouvées en sortent — recopie après de nouveaux chanceux/hundos.",
   "app.filter.friend_collect_mode_label": "axe d'échange",
   "app.filter.friend_collect_mode_lucky": "chanceux",
   "app.filter.friend_collect_mode_hundo": "hundo",
@@ -1033,5 +1033,14 @@
   "app.filter.friend_fallback_section": "repli · tout ce qui te manque encore",
   "app.clause_why.friend_collect_targets": "Tes cibles de collecte ciblées (toute la famille)",
   "app.changelog.entry.friend_collect_wishlist.title": "Liste de collecte ciblée pour amis",
-  "app.changelog.entry.friend_collect_wishlist.body": "Dis à tes amis exactement quoi collecter pour toi. Dans la section liste de vœux, choisis l'axe chanceux (par défaut) ou hundo, ajoute des sets suggérés (spawns de l'événement en cours, méta raids, méta PvP) ou tes propres espèces, et partage une chaîne de recherche positive. Les familles complétées sortent automatiquement de la chaîne — les listes noires restent en repli."
+  "app.changelog.entry.friend_collect_wishlist.body": "Dis à tes amis exactement quoi collecter pour toi. Dans la section liste de vœux, choisis l'axe chanceux (par défaut) ou hundo, ajoute des sets suggérés (spawns de l'événement en cours, méta raids, méta PvP) ou tes propres espèces, et partage une chaîne de recherche positive. Les cibles déjà trouvées sortent automatiquement de la chaîne — les listes noires restent en repli.",
+  "app.filter.friend_collect_suggest_rare": "Espèces rares",
+  "app.clear_list.label": "vider la liste",
+  "app.clear_list.confirm": "vraiment vider ?",
+  "app.clear_list.title": "Retire toutes les entrées de cette liste — premier appui pour armer, second pour vider.",
+  "app.changelog.entry.friend_collect_rare_reset.title": "Set d'espèces rares et boutons de réinitialisation",
+  "app.changelog.entry.friend_collect_rare_reset.body": "Quand aucun set d'événement n'est disponible (creux entre événements, ou tous les spawns déjà ajoutés), les suggestions proposent désormais un set d'espèces rares — pseudo-légendaires, fossiles et raretés classiques — pour toujours pouvoir faire tourner. La liste ciblée et la liste de capture de chaque partenaire d'échange gagnent aussi un bouton de vidage en deux appuis.",
+  "app.filter.friend_collect_suggest_eggs": "Œufs · {title}",
+  "app.changelog.entry.friend_collect_egg_pools.title": "Les œufs alimentent les suggestions",
+  "app.changelog.entry.friend_collect_egg_pools.body": "Les sets suggérés incluent désormais les pools d'œufs du flux en direct : celui de la saison en cours (plusieurs mois) et ceux des événements, préfiltrés comme les autres sets. Les Pokémon éclos s'échangent normalement — « fais-le éclore pour moi » est une demande légitime. Les sets d'œufs ne remplacent pas le set d'espèces rares, qui couvre toujours les creux de spawns sauvages."
 }
