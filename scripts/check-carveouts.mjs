@@ -13,7 +13,7 @@
 
 import {
   buildFilters, evalFilter, mergeImportedConfig, DEFAULT_CONFIG,
-  regionalProtectionsFor,
+  regionalProtectionsFor, ivToBar, starFromIVs,
 } from "../src/App.jsx";
 
 const tFn = (k) => k;
@@ -89,6 +89,22 @@ console.log("\nB1 — regionalProtectionsFor drives the hundo-adder popup");
   check("disabled group + unchecked collector → no popup for corasonn",
     regionalProtectionsFor("corasonn", off).length === 0,
     `got ${JSON.stringify(regionalProtectionsFor("corasonn", off))}`);
+}
+
+console.log("\nVerify tester: star rating + bars derive from raw IVs (no impossible mons)");
+{
+  check("15/15/15 → 4★ hundo, max bars", starFromIVs(15, 15, 15) === 4 && ivToBar(15) === 4);
+  check("44 total (14/15/15) → 3★, NOT 4★", starFromIVs(14, 15, 15) === 3);
+  check("37 total → 3★ floor", starFromIVs(15, 15, 7) === 3);
+  check("36 total → 2★ ceiling", starFromIVs(15, 15, 6) === 2);
+  check("30 total → 2★ floor", starFromIVs(10, 10, 10) === 2);
+  check("29 total → 1★ ceiling", starFromIVs(10, 10, 9) === 1);
+  check("23 total → 1★ floor", starFromIVs(8, 8, 7) === 1);
+  check("22 total → 0★ ceiling", starFromIVs(8, 8, 6) === 0);
+  check("0/0/0 → 0★ nundo, empty bars", starFromIVs(0, 0, 0) === 0 && ivToBar(0) === 0);
+  check("bar buckets: 1-5 → 1, 6-10 → 2, 11-14 → 3",
+    ivToBar(1) === 1 && ivToBar(5) === 1 && ivToBar(6) === 2
+    && ivToBar(10) === 2 && ivToBar(11) === 3 && ivToBar(14) === 3);
 }
 
 console.log("\nB2a — buddy tags protected in TRADE (granular-tag mode)");

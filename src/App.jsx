@@ -5826,12 +5826,14 @@ function ClauseList({ title, accent, clauses }) {
 
 function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = 'de' }) {
 	const { t } = useTranslation();
+	// Raw 0-15 IVs (what the in-game appraisal screen shows). Bars and star
+	// rating are DERIVED — see ivToBar/starFromIVs — so the tester can't
+	// represent an impossible mon. Default 10/10/10 = 2/2/2 bars, 2★.
 	const [m, setM] = useState({
 		family: '',
-		star: 2,
-		atk: 1,
-		def: 1,
-		hp: 1,
+		ivAtk: 10,
+		ivDef: 10,
+		ivHp: 10,
 		flags: {},
 		types: [],
 		dex: 0,
@@ -5860,6 +5862,12 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = 'de' })
 		}
 		return {
 			...m,
+			// Filter terms consume bars (0attack..4attack) and stars — both
+			// derived from the raw IVs so they can never contradict each other.
+			atk: ivToBar(m.ivAtk),
+			def: ivToBar(m.ivDef),
+			hp: ivToBar(m.ivHp),
+			star: starFromIVs(m.ivAtk, m.ivDef, m.ivHp),
 			families,
 			dex: m.dex || 0,
 			// Gigantamax-capable is physically a subset of Dynamax-capable, so a mon
@@ -5907,33 +5915,36 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = 'de' })
 					placeholder={t('app.verify.placeholder_family')}
 				/>
 				<FieldNum
-					label={t('app.verify.field_star')}
-					value={m.star}
-					onChange={(v) => setM({ ...m, star: +v })}
-					min={0}
-					max={4}
-				/>
-				<FieldNum
 					label={t('app.verify.field_atk')}
-					value={m.atk}
-					onChange={(v) => setM({ ...m, atk: +v })}
+					value={m.ivAtk}
+					onChange={(v) => setM({ ...m, ivAtk: Math.max(0, Math.min(15, +v || 0)) })}
 					min={0}
-					max={4}
+					max={15}
 				/>
 				<FieldNum
 					label={t('app.verify.field_def')}
-					value={m.def}
-					onChange={(v) => setM({ ...m, def: +v })}
+					value={m.ivDef}
+					onChange={(v) => setM({ ...m, ivDef: Math.max(0, Math.min(15, +v || 0)) })}
 					min={0}
-					max={4}
+					max={15}
 				/>
 				<FieldNum
 					label={t('app.verify.field_hp')}
-					value={m.hp}
-					onChange={(v) => setM({ ...m, hp: +v })}
+					value={m.ivHp}
+					onChange={(v) => setM({ ...m, ivHp: Math.max(0, Math.min(15, +v || 0)) })}
 					min={0}
-					max={4}
+					max={15}
 				/>
+				{/* Star + bars are read-only: PoGo derives them from the IVs, so the
+				    tester does too (no impossible 4★-with-1/1/1 states). */}
+				<div title={t('app.verify.star_derived_help')}>
+					<label className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
+						{t('app.verify.field_star')}
+					</label>
+					<div className='mono text-xs w-full bg-[#0B0F14] border border-[#1F2933] px-2 py-1.5 rounded text-[#E6EDF3] mt-1'>
+						{mon.star}★ <span className='text-[#8090A0]'>· {mon.atk}/{mon.def}/{mon.hp}</span>
+					</div>
+				</div>
 			</div>
 
 			<div className='flex flex-wrap gap-1.5'>
@@ -5962,10 +5973,22 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = 'de' })
 					{inH ? t('app.verify.yes') : t('app.verify.no')}
 				</span>
 				<span className='mx-2'>·</span>
-				{t('app.verify.iv_class')} {classifyIV(m.atk, m.def, m.hp, t)}
+				{t('app.verify.iv_class')} {classifyIV(mon.atk, mon.def, mon.hp, t)}
 			</div>
 		</div>
 	);
+}
+
+// PoGo derives the appraisal star rating FROM the IVs — they are not
+// independently settable in the game, so the verify tester must not allow
+// impossible combinations (a 4★ with 1/1/1 bars). Raw per-stat IVs are 0-15;
+// the search-syntax "bars" (0attack..4attack) bucket each stat, and the star
+// rating buckets the total: 0-22 → 0★, 23-29 → 1★, 30-36 → 2★, 37-44 → 3★,
+// 45 → 4★ (the hundo).
+export const ivToBar = (iv) => (iv >= 15 ? 4 : iv >= 11 ? 3 : iv >= 6 ? 2 : iv >= 1 ? 1 : 0);
+export function starFromIVs(atk, def, hp) {
+	const total = atk + def + hp;
+	return total === 45 ? 4 : total >= 37 ? 3 : total >= 30 ? 2 : total >= 23 ? 1 : 0;
 }
 
 function classifyIV(a, d, h, t) {
