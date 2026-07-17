@@ -1365,27 +1365,23 @@ export function buildFilters(
 		// Examples: drop Galar Mauzi {include:[steel]} → `!mauzi,!stahl`; drop Paldea
 		// combat Tauros {include:[fighting],exclude:[fire,water]} → `!tauros,!kampf,feuer,wasser`.
 		const unionTargets = [...plainTargets, ...liveFormTargets];
-		// The expert raw append is comma-spliced into the species OR-list, so it
-		// rides the same guarded filter as every other target. A `&` inside the
-		// raw text splits clauses right here (comma binds tighter than `&`) —
-		// that precedence footgun is the expert's to own (see raw_help copy).
 		const speciesParts = [
 			...unionTargets.map(sel),
 			...(wantsTE ? TE_full.map((base) => `+${teDisplay(base, outputLocale)}`) : []),
-			...(hasRaw ? [rawAppend] : []),
 		];
-		if (speciesParts.length > 0) {
-			const why = [
-				unionTargets.length > 0
-					? tFn('app.clause_why.buddy_targets_count', { params: { count: unionTargets.length } })
-					: null,
-				wantsTE ? tFn('app.clause_why.buddy_te_count', { params: { count: TE_full.length } }) : null,
-				hasRaw ? tFn('app.clause_why.buddy_raw_append') : null,
-			]
-				.filter(Boolean)
-				.join(' + ');
+		if (speciesParts.length > 0 || hasRaw) {
 			const catchClauses = [];
-			push(catchClauses, speciesParts.join(','), `${b.name}: ${why}`);
+			if (speciesParts.length > 0) {
+				const why = [
+					unionTargets.length > 0
+						? tFn('app.clause_why.buddy_targets_count', { params: { count: unionTargets.length } })
+						: null,
+					wantsTE ? tFn('app.clause_why.buddy_te_count', { params: { count: TE_full.length } }) : null,
+				]
+					.filter(Boolean)
+					.join(' + ');
+				push(catchClauses, speciesParts.join(','), `${b.name}: ${why}`);
+			}
 			pushStarsOrSpare(catchClauses, unionTargets.filter((t) => hundoOutSet.has(t.display)).map(sel));
 			// Per-species form guards — one comma-OR `&`-clause per dropped form.
 			for (const t of liveFormTargets) {
@@ -1407,6 +1403,16 @@ export function buildFilters(
 				}
 			}
 			pushBuddyGuards(catchClauses);
+			// ── Expert raw append — extra `&`-clauses on the SAME filter ─────────
+			// Verbatim, split on `&` only so each piece shows up as its own clause
+			// in the explain panel; the `&`-join below reconstructs the input
+			// exactly. Comma binds tighter than `&`, so each comma-group (e.g.
+			// `!361,weiblich,female`) stays a self-contained guard.
+			if (hasRaw) {
+				for (const part of rawAppend.split('&')) {
+					push(catchClauses, part, tFn('app.clause_why.buddy_raw_append'));
+				}
+			}
 			buddyCatchFilters.push({
 				buddyName: b.name,
 				prefix,

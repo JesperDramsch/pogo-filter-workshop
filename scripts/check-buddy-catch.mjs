@@ -1,11 +1,11 @@
 // Verifies the per-buddy catch-filter generation in buildFilters. Every buddy
 // emits ONE combined catch filter: a species OR-list (the union of all wished
-// species — whole-species, form-restricted, and trade-evo families, plus the
-// expert raw append comma-spliced in verbatim) plus a per-species type guard
-// `!<species>,<drop-types>` for each excluded regional form, plus the shared
-// protection guards. The default-fixture snapshot (check-fixtures.mjs)
-// ignores buddyCatchFilters and DEFAULT_CONFIG has no buddies, so this is the
-// only coverage for that path.
+// species — whole-species, form-restricted, and trade-evo families) plus a
+// per-species type guard `!<species>,<drop-types>` for each excluded regional
+// form, plus the shared protection guards, plus the expert raw append
+// `&`-joined verbatim at the end as extra AND-clauses. The default-fixture
+// snapshot (check-fixtures.mjs) ignores buddyCatchFilters and DEFAULT_CONFIG
+// has no buddies, so this is the only coverage for that path.
 //
 // Beyond string-shape checks, a mini PoGo evaluator (evalFilter) confirms the
 // combined filter's SEMANTICS on mock Pokémon — the form guards must isolate
@@ -62,6 +62,8 @@ function litMatch(lit, mon) {
   if (lit.startsWith("!")) return !litMatch(lit.slice(1), mon);
   if (lit.startsWith("+")) return (mon.family || [mon.species]).includes(lit.slice(1));
   if (/^[0-4]\*$/.test(lit)) return mon.stars === Number(lit[0]);
+  if (lit === "weiblich" || lit === "female") return mon.gender === "female";
+  if (lit === "männlich" || lit === "male") return mon.gender === "male";
   if (lit === "#") return !!mon.tagged;
   if (lit === kw.flag.favorite) return !!mon.favorite;
   if (lit === kw.flag.traded) return !!mon.traded;
@@ -99,7 +101,7 @@ console.log("Combined catch filter — structure (5 mixed targets, Mauzi hundo o
 {
   const buddy = {
     id: "auri", name: "Auri", tagPrefix: "Auri", active: true, wantsTradeEvos: false,
-    rawAppend: "kokowei,151",
+    rawAppend: "!361,weiblich,female&!412,männlich,male",
     targetSpecies: [
       { species: "habitak", expand: false, dropForms: [] },      // whole species
       { species: "pikachu", expand: true,  dropForms: [] },      // +family, no regionals
@@ -117,10 +119,14 @@ console.log("Combined catch filter — structure (5 mixed targets, Mauzi hundo o
 
   const f = all[0]?.filter || "";
   const S = segs(f);
-  // Union: all five species in the first comma-run, raichu folded in (not its
-  // own line), raw append comma-spliced verbatim at the end of the union.
-  check("union starts with all five species selectors + raw append",
-    f.startsWith("habitak,+pikachu,raichu,mauzi,sandan,kokowei,151&"), f.slice(0, 60));
+  // Union: all five species in the first comma-run, raichu folded in (not its own line).
+  check("union starts with all five species selectors",
+    f.startsWith("habitak,+pikachu,raichu,mauzi,sandan&"), f.slice(0, 60));
+  // Raw append `&`-joined verbatim at the end, each comma-group its own clause.
+  check("raw append clauses at the end, verbatim",
+    f.endsWith("&!361,weiblich,female&!412,männlich,male"), f.slice(-50));
+  check("each raw comma-group is a self-contained clause",
+    S.includes("!361,weiblich,female") && S.includes("!412,männlich,male"));
   check("exact target has no '+' (Habitak not Ibitak)", !f.includes("+habitak"));
   // Per-species scoped form guards.
   check(`Galar-Mauzi guard '!mauzi,${deMorgan(form(52,"galar"))}' present`,
@@ -136,18 +142,33 @@ console.log("Combined catch filter — structure (5 mixed targets, Mauzi hundo o
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-console.log("\nRaw append rides the guarded filter (semantic)");
+console.log("\nRaw append restricts the guarded filter (semantic — no purified/costume, female-only Meowth)");
 {
-  const buddy = { id: "r", name: "R", tagPrefix: "R", active: true, rawAppend: "kokowei",
-    targetSpecies: [{ species: "habitak", expand: false, dropForms: [] }] };
+  // SEM_CFG turns the purified/costume toggles OFF, so those exclusions can
+  // only come from the raw append — proving the raw clauses take effect.
+  const buddy = {
+    id: "r", name: "R", tagPrefix: "R", active: true,
+    rawAppend: `!${kw.flag.purified}&!${kw.flag.costume}&!52,weiblich,female`,
+    targetSpecies: [
+      { species: "mauzi",   expand: false, dropForms: [] },
+      { species: "habitak", expand: false, dropForms: [] },
+    ],
+  };
   const cfg = { ...SEM_CFG, expertMode: true, buddies: [buddy] };
   const res = buildFilters([], [], cfg, [], LOCALE, tFn);
   check("one line only", res.buddyCatchFilters.length === 1, `got ${res.buddyCatchFilters.length}`);
   const f = res.buddyCatchFilters[0]?.filter || "";
-  check("raw species caught", evalFilter(f, mk({ species: "kokowei", dex: 103 })) === true);
-  check("wish species still caught", evalFilter(f, mk({ species: "habitak", dex: 21 })) === true);
-  check("tagged raw species protected by the shared guards",
-    evalFilter(f, mk({ species: "kokowei", dex: 103, tagged: true })) === false);
+  check("female Meowth kept", evalFilter(f, mk({ species: "mauzi", dex: 52, gender: "female" })) === true);
+  check("male Meowth dropped by the gender guard",
+    evalFilter(f, mk({ species: "mauzi", dex: 52, gender: "male" })) === false);
+  check("purified female Meowth dropped by the raw !purified clause",
+    evalFilter(f, mk({ species: "mauzi", dex: 52, gender: "female", purified: true })) === false);
+  check("costumed female Meowth dropped by the raw !costume clause",
+    evalFilter(f, mk({ species: "mauzi", dex: 52, gender: "female", costume: true })) === false);
+  check("male Spearow untouched (gender guard is scoped to dex 52)",
+    evalFilter(f, mk({ species: "habitak", dex: 21, gender: "male" })) === true);
+  check("shared guards still apply on top (tagged female Meowth protected)",
+    evalFilter(f, mk({ species: "mauzi", dex: 52, gender: "female", tagged: true })) === false);
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -158,8 +179,8 @@ console.log("\nRaw-only buddy still gets ONE combined, guarded line");
   const res = buildFilters([], [], { ...DEFAULT_CONFIG, expertMode: true, buddies: [buddy] }, [], LOCALE, tFn);
   check("exactly one line", res.buddyCatchFilters.length === 1, `got ${res.buddyCatchFilters.length}`);
   const f = res.buddyCatchFilters[0]?.filter || "";
-  check("union is the raw text, stars + guards apply",
-    f.startsWith("kokowei&0*,1*,2*&") && segs(f).includes("!#"), f.slice(0, 40));
+  check("stars + guards, raw appended at the end",
+    f.startsWith("0*,1*,2*&") && segs(f).includes("!#") && f.endsWith("&kokowei"), f.slice(0, 40));
 }
 
 // ─────────────────────────────────────────────────────────────────────────
