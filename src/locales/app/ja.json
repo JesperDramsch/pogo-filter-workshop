@@ -467,6 +467,8 @@
   "app.buddy_targets.gender_male": "オスのみ",
   "app.hundo_regional.title": "保護中の地域限定のパーフェクト個体",
   "app.hundo_regional.body": "パーフェクト個体(4★)を登録しても、この種族はゴミ箱フィルターから除外されたままです — 地域限定の保護が優先されるため、重複は表示されません。重複を処分したい場合は、地域限定ステップのコレクターチップで種族のチェックを外してください。",
+  "app.changelog.entry.verify_species_terms.title": "検証テスターが種族指定の条件を理解",
+  "app.changelog.entry.verify_species_terms.body": "種族名を直接指定する条件 (相棒の希望リスト、地域限定コレクター保護) がテスターに無視され、保護中のポケモンがゴミ箱行きと誤表示されることがありました。どの言語の種族名も解決するようになりました。",
   "app.changelog.entry.hundo_regionals_stay_protected.title": "地域限定の保護が 4★ 例外より優先に",
   "app.changelog.entry.hundo_regionals_stay_protected.body": "4★ を登録しても地域限定が保護リストから静かに外れることはなくなりました — 地域限定ステップで自分でチェックを外すまで重複は安全です。該当する場合は 4★ 追加時に警告が出ます。",
   "app.regional_sync.title": "地域限定の保護を更新しました",
@@ -1005,7 +1007,7 @@
   "app.filter.friend_hundo_hint": "フレンド用：あなたが100%を持っていない種で、フレンドがまだ交換していない個体。個体値は問いません——交換で再抽選されるので、自分で100%を狙います（キラ交換が最適）。",
   "app.filter.friend_guaranteed_label": "確定キラのみ（古い捕獲）",
   "app.filter.friend_guaranteed_help": "キラのリストを、交換時に確定キラとなるほど古い捕獲に限定します。",
-  "app.clause_why.friend_have_lucky": "すでにキラ：#{dex} を除外",
-  "app.clause_why.friend_have_hundo": "すでに100%：#{dex} を除外",
+  "app.clause_why.friend_have_lucky": "すでにキラ：{species} の系統を除外",
+  "app.clause_why.friend_have_hundo": "すでに100%：{species} の系統を除外",
   "app.clause_why.friend_guaranteed_lucky": "確定キラ：20{year}年以前の捕獲のみ"
 }

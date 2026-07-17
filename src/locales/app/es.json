@@ -467,6 +467,8 @@
   "app.buddy_targets.gender_male": "solo macho",
   "app.hundo_regional.title": "Hundo de un regional protegido",
   "app.hundo_regional.body": "Estas especies siguen excluidas del filtro de descarte aunque ahora tengas su hundo — la protección regional gana, así que los duplicados no aparecerán. Si prefieres descartarlos, desmarca la especie en los chips de coleccionista del paso de regionales.",
+  "app.changelog.entry.verify_species_terms.title": "El verificador entiende cláusulas de especie exacta",
+  "app.changelog.entry.verify_species_terms.body": "Las cláusulas que nombran una especie exacta (listas de deseos, protecciones de coleccionistas regionales) eran ignoradas por el probador, que podía marcar como basura un Pokémon protegido. Ahora resuelve nombres de especies en cualquier idioma.",
   "app.changelog.entry.hundo_regionals_stay_protected.title": "La protección regional ahora prevalece sobre la excepción de hundos",
   "app.changelog.entry.hundo_regionals_stay_protected.body": "Tener un hundo ya no quita en silencio un regional de la lista de protección — los duplicados quedan a salvo hasta que tú mismo desmarques la especie en el paso de regionales. El añadidor de hundos te avisa cuando aplica.",
   "app.regional_sync.title": "Protecciones regionales actualizadas",
@@ -1005,7 +1007,7 @@
   "app.filter.friend_hundo_hint": "Para un amigo: sus ejemplares nunca intercambiados de especies de las que no tienes hundo. Cualquier IV: el intercambio los recalcula, así que tiras tú al 100 % (mejor en un intercambio afortunado).",
   "app.filter.friend_guaranteed_label": "Solo afortunado garantizado (capturas antiguas)",
   "app.filter.friend_guaranteed_help": "Limita la lista de afortunados a capturas lo bastante antiguas para garantizar un afortunado al intercambiar.",
-  "app.clause_why.friend_have_lucky": "Ya afortunado: #{dex} excluido",
-  "app.clause_why.friend_have_hundo": "Ya hundo: #{dex} excluido",
+  "app.clause_why.friend_have_lucky": "Ya afortunado: familia de {species} excluida",
+  "app.clause_why.friend_have_hundo": "Ya hundo: familia de {species} excluida",
   "app.clause_why.friend_guaranteed_lucky": "Afortunado garantizado: solo capturas de 20{year} o anteriores"
 }

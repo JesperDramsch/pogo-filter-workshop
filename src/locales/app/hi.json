@@ -467,6 +467,8 @@
   "app.buddy_targets.gender_male": "केवल नर",
   "app.hundo_regional.title": "सुरक्षित रीजनल का hundo",
   "app.hundo_regional.body": "इन प्रजातियों का hundo होने के बावजूद ये ट्रैश फ़िल्टर से बाहर ही रहती हैं — रीजनल सुरक्षा जीतती है, इसलिए डुप्लिकेट नहीं दिखेंगे। डुप्लिकेट हटाना चाहें तो रीजनल स्टेप के कलेक्टर चिप्स में प्रजाति को अनचेक करें।",
+  "app.changelog.entry.verify_species_terms.title": "वेरिफ़ाई टेस्टर अब सटीक-प्रजाति क्लॉज़ समझता है",
+  "app.changelog.entry.verify_species_terms.body": "सटीक प्रजाति वाले क्लॉज़ (बडी विश लिस्ट, रीजनल कलेक्टर सुरक्षा) टेस्टर द्वारा अनदेखे रह जाते थे, जिससे सुरक्षित पोकेमोन गलती से ट्रैश दिख सकता था। अब यह किसी भी भाषा में प्रजाति नाम पहचानता है।",
   "app.changelog.entry.hundo_regionals_stay_protected.title": "रीजनल सुरक्षा अब hundo छूट से ऊपर",
   "app.changelog.entry.hundo_regionals_stay_protected.body": "hundo होने पर अब रीजनल चुपचाप सुरक्षा सूची से नहीं हटता — जब तक आप खुद रीजनल स्टेप में प्रजाति अनचेक न करें, डुप्लिकेट सुरक्षित रहते हैं। लागू होने पर hundo जोड़ते समय चेतावनी मिलती है।",
   "app.regional_sync.title": "रीजनल सुरक्षा अपडेट हुई",
@@ -1005,7 +1007,7 @@
   "app.filter.friend_hundo_hint": "दोस्त के लिए: उन प्रजातियों के उसके कभी ट्रेड न किए गए नमूने जिनका आपके पास हंडो नहीं है। कोई भी IV — ट्रेड उन्हें दोबारा रैंडम करता है, इसलिए 100% के लिए आप खुद किस्मत आज़माते हैं (लकी ट्रेड में सबसे अच्छा)।",
   "app.filter.friend_guaranteed_label": "केवल गारंटीड लकी (पुराने कैच)",
   "app.filter.friend_guaranteed_help": "लकी विशलिस्ट को केवल उन कैच तक सीमित करें जो ट्रेड पर गारंटीड लकी होने जितने पुराने हों।",
-  "app.clause_why.friend_have_lucky": "पहले से लकी: #{dex} बाहर",
-  "app.clause_why.friend_have_hundo": "पहले से हंडो: #{dex} बाहर",
+  "app.clause_why.friend_have_lucky": "पहले से लकी: {species} परिवार बाहर",
+  "app.clause_why.friend_have_hundo": "पहले से hundo: {species} परिवार बाहर",
   "app.clause_why.friend_guaranteed_lucky": "गारंटीड लकी: केवल 20{year} या उससे पहले के कैच"
 }

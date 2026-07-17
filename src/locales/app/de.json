@@ -477,6 +477,8 @@
   "app.buddy_targets.gender_male": "nur männlich",
   "app.hundo_regional.title": "Hundo eines geschützten Regionals",
   "app.hundo_regional.body": "Diese Arten bleiben vom Trash-Filter ausgeschlossen, obwohl du jetzt ihren Hundo hast — der Regional-Schutz gewinnt, Duplikate tauchen also nicht auf. Willst du die Dubletten doch entsorgen, wähle die Art bei den Sammler-Chips im Regional-Schritt ab.",
+  "app.changelog.entry.verify_species_terms.title": "Der Verify-Tester versteht exakte Spezies-Klauseln",
+  "app.changelog.entry.verify_species_terms.body": "Filter-Klauseln mit exakter Spezies (Kumpel-Wunschlisten, Regional-Sammler-Schutz) wurden vom Mon-Tester stillschweigend ignoriert — geschützte Pokémon konnten fälschlich als Trash angezeigt werden. Jetzt löst er Spezies-Namen in jeder Sprache auf.",
   "app.changelog.entry.hundo_regionals_stay_protected.title": "Regional-Schutz sticht jetzt den Hundo-Carve-out",
   "app.changelog.entry.hundo_regionals_stay_protected.body": "Ein Hundo wirft ein Regional nicht mehr stillschweigend aus der Schutzliste — Dubletten bleiben sicher, bis du die Art im Regional-Schritt selbst abwählst. Der Hundo-Eintrag warnt dich, wenn das zutrifft.",
   "app.regional_sync.title": "Regional-Schutz aktualisiert",
@@ -1050,7 +1052,7 @@
   "app.filter.friend_hundo_hint": "Für einen Freund: seine nie getauschten Exemplare von Spezies, von denen du keinen Hundo hast. Beliebige IVs — der Tausch würfelt sie neu, du würfelst also selbst auf 100 % (am besten im Glückstausch).",
   "app.filter.friend_guaranteed_label": "Nur garantierte Glückstausche (alte Fänge)",
   "app.filter.friend_guaranteed_help": "Beschränkt die Glücks-Wunschliste auf Fänge, die alt genug für einen garantierten Glückstausch sind.",
-  "app.clause_why.friend_have_lucky": "Schon als Glücks: #{dex} ausgeschlossen",
-  "app.clause_why.friend_have_hundo": "Schon als Hundo: #{dex} ausgeschlossen",
+  "app.clause_why.friend_have_lucky": "Schon als Glücks: {species}-Familie ausgeschlossen",
+  "app.clause_why.friend_have_hundo": "Schon als Hundo: {species}-Familie ausgeschlossen",
   "app.clause_why.friend_guaranteed_lucky": "Garantierter Glückstausch: nur Fänge aus 20{year} oder früher"
 }

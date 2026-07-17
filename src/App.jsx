@@ -1635,11 +1635,14 @@ export function buildFilters(
 	// still lacks as a lucky / as a hundo, so the friend can trade them over.
 	//
 	// Encoded as a BLACKLIST (exclude the species the user already owns) using
-	// bare DEX NUMBERS. Numbers are locale-independent, so the species part works
-	// in the friend's PoGo client whatever its language — only the flag keywords
-	// (!traded / !shadow / !mythical) render in outputLocale. Blacklist also
-	// scales with the (smaller) owned set rather than the ~1000 missing species,
-	// keeping the string well under PoGo's ~5000-char box even for new accounts.
+	// family-expanded NAME selectors (`!+glurak`) rendered in outputLocale — the
+	// share panel's locale picker sets that to the FRIEND's PoGo language.
+	// Family expansion because lucky status and IVs both survive evolution: one
+	// family member covers the whole line, and `+name` is the only family
+	// syntax PoGo has (there is no `+dex`). Only the species names and the flag
+	// keywords (!traded / !shadow / !mythical) are locale-sensitive. Blacklist
+	// also scales with the (smaller) owned set rather than the ~1000 missing
+	// species, keeping the string well under PoGo's ~5000-char box.
 	//
 	// Trade guards mirror the GIFT filter (the proven inverse pattern):
 	//   !traded            — a mon can be traded only ONCE; already-traded = dead end
@@ -1651,15 +1654,18 @@ export function buildFilters(
 	// optional "guaranteed-lucky" variant restricting to old catches (jahr-N)
 	// that are guaranteed Lucky on trade.
 
-	// Canonical-name HAVE-list → sorted, de-duplicated base-dex numbers to negate.
-	// resolveSpeciesInfo collapses forms (mega/regional) to their base dex.
-	const ownedDexList = (names) => {
+	// Canonical-name HAVE-list → sorted, de-duplicated output-locale species
+	// names to negate. resolveSpeciesInfo collapses forms (mega/regional) to
+	// their base dex; unresolvable entries are dropped rather than emitting a
+	// broken selector.
+	const ownedSpeciesNames = (names) => {
 		const seen = new Set();
 		for (const n of names || []) {
 			const dex = resolveSpeciesInfo(n)?.dex;
-			if (dex) seen.add(pokemonNameFor(String(dex), outputLocale) || dex.name?.toLowerCase());
+			const out = dex ? pokemonNameFor(String(dex), outputLocale) : null;
+			if (out) seen.add(out.toLowerCase());
 		}
-		return [...seen].sort((a, b) => a - b);
+		return [...seen].sort((a, b) => a.localeCompare(b));
 	};
 
 	// Shared trade-eligibility guards appended to every friend wishlist.
@@ -1669,10 +1675,14 @@ export function buildFilters(
 		push(clauses, `!${kw.flag.mythical},808,809`, tFn('app.clause_why.must_mythical_short'));
 	};
 
-	// Lucky wishlist — exclude every species the user already has a lucky of.
+	// Lucky wishlist — exclude every family the user already has a lucky in.
 	const friendLuckyClauses = [];
-	for (const dex of ownedDexList(luckies))
-		push(friendLuckyClauses, `!+${dex}`, tFn('app.clause_why.friend_have_lucky', { params: { dex } }));
+	for (const sp of ownedSpeciesNames(luckies))
+		push(
+			friendLuckyClauses,
+			`!+${sp}`,
+			tFn('app.clause_why.friend_have_lucky', { params: { species: capFirst(sp) } }),
+		);
 	pushFriendTradeGuards(friendLuckyClauses);
 	const friendLuckyWishlist = friendLuckyClauses.map((c) => c.clause).join('&');
 
@@ -1689,11 +1699,15 @@ export function buildFilters(
 		);
 	const friendLuckyWishlistGuaranteed = friendLuckyGuaranteedClauses.map((c) => c.clause).join('&');
 
-	// Hundo wishlist — exclude every species the user already has a hundo of.
+	// Hundo wishlist — exclude every family the user already has a hundo in.
 	// No 4* clause: IVs re-roll on trade, so any untraded specimen is fair game.
 	const friendHundoClauses = [];
-	for (const dex of ownedDexList(hundos))
-		push(friendHundoClauses, `!+${dex}`, tFn('app.clause_why.friend_have_hundo', { params: { dex } }));
+	for (const sp of ownedSpeciesNames(hundos))
+		push(
+			friendHundoClauses,
+			`!+${sp}`,
+			tFn('app.clause_why.friend_have_hundo', { params: { species: capFirst(sp) } }),
+		);
 	pushFriendTradeGuards(friendHundoClauses);
 	const friendHundoWishlist = friendHundoClauses.map((c) => c.clause).join('&');
 
@@ -2618,6 +2632,21 @@ function evalTerm(t, mon, kw, outputLocale) {
 	const typeKey = typeKeyFromKeyword(t, outputLocale);
 	if (typeKey) {
 		return (mon.types || []).includes(typeKey);
+	}
+
+	// Bare species-name literal — the EXACT-species selector that buddy unions
+	// ("corasonn,dratini"), regional collector protections ("!corasonn"), and
+	// scoped guards ("!Corasonn,!geist") emit. Went unrecognized (→ null-skip,
+	// clause always false) since exact targets stopped being +family selectors.
+	// Resolve in any locale, then compare identity: dex when the mon carries
+	// one, else canonical name against the mon's own species (families[0] in
+	// the verify tester). Checked LAST so localized flag/type keywords that
+	// shadow a species name keep their filter meaning.
+	const speciesInfo = resolveSpeciesInfo(t);
+	if (speciesInfo) {
+		if (mon.dex) return mon.dex === speciesInfo.dex;
+		const own = mon.species || (mon.families || [])[0] || '';
+		return own !== '' && (resolveSpecies(own) || String(own).toLowerCase()) === (resolveSpecies(t) || t.toLowerCase());
 	}
 
 	return null;

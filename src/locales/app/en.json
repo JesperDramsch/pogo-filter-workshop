@@ -477,6 +477,8 @@
   "app.buddy_targets.gender_male": "male only",
   "app.hundo_regional.title": "Hundo of a protected regional",
   "app.hundo_regional.body": "These species stay excluded from the trash filter even though you now own their hundo — regional protection wins, so duplicates won't surface. If you'd rather trash the dupes, uncheck the species in the collector chips of the regionals step.",
+  "app.changelog.entry.verify_species_terms.title": "The verify tester understands exact-species clauses",
+  "app.changelog.entry.verify_species_terms.body": "Filter clauses naming an exact species (buddy wish lists, regional collector protections) were silently ignored by the mon tester, which could report a protected Pokémon as trash. It now resolves species names in any language.",
   "app.changelog.entry.hundo_regionals_stay_protected.title": "Regional protection now outranks the hundo carve-out",
   "app.changelog.entry.hundo_regionals_stay_protected.body": "Owning a hundo no longer silently drops a regional from the protection list — dupes stay safe until you uncheck the species in the regionals step yourself. The hundo adder warns you when this applies.",
   "app.regional_sync.title": "Regional protections updated",
@@ -1050,7 +1052,7 @@
   "app.filter.friend_hundo_hint": "Give to a friend: their never-traded specimens of species you have no hundo of. Any IVs — the trade re-rolls them, so you roll for the 100 % yourself (best in a lucky trade).",
   "app.filter.friend_guaranteed_label": "Guaranteed-lucky only (old catches)",
   "app.filter.friend_guaranteed_help": "Restrict the lucky wishlist to catches old enough to be guaranteed lucky on trade.",
-  "app.clause_why.friend_have_lucky": "Already lucky: #{dex} excluded",
-  "app.clause_why.friend_have_hundo": "Already hundo: #{dex} excluded",
+  "app.clause_why.friend_have_lucky": "Already lucky: the {species} family is excluded",
+  "app.clause_why.friend_have_hundo": "Already hundo: the {species} family is excluded",
   "app.clause_why.friend_guaranteed_lucky": "Guaranteed lucky: only catches from 20{year} or earlier"
 }

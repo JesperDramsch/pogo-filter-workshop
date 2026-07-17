@@ -467,6 +467,8 @@
   "app.buddy_targets.gender_male": "mâle uniquement",
   "app.hundo_regional.title": "Hundo d'un régional protégé",
   "app.hundo_regional.body": "Ces espèces restent exclues du filtre poubelle même si vous possédez désormais leur hundo — la protection régionale l'emporte, les doublons n'apparaîtront donc pas. Pour les jeter quand même, décochez l'espèce dans les puces collectionneurs de l'étape des régionaux.",
+  "app.changelog.entry.verify_species_terms.title": "Le testeur de vérification comprend les clauses d'espèce exacte",
+  "app.changelog.entry.verify_species_terms.body": "Les clauses nommant une espèce exacte (listes de souhaits des copains, protections des collectionneurs régionaux) étaient ignorées par le testeur, qui pouvait déclarer poubelle un Pokémon protégé. Il résout désormais les noms d'espèces dans toutes les langues.",
   "app.changelog.entry.hundo_regionals_stay_protected.title": "La protection régionale prime désormais sur l'exception hundo",
   "app.changelog.entry.hundo_regionals_stay_protected.body": "Posséder un hundo ne retire plus silencieusement un régional de la liste de protection — les doublons restent à l'abri tant que vous ne décochez pas l'espèce vous-même dans l'étape des régionaux. L'ajout de hundo vous prévient quand c'est le cas.",
   "app.regional_sync.title": "Protections régionales mises à jour",
@@ -1005,7 +1007,7 @@
   "app.filter.friend_hundo_hint": "Pour un ami : ses spécimens jamais échangés des espèces dont tu n'as pas de hundo. N'importe quels IV : l'échange les retire au hasard, donc tu tentes le 100 % toi-même (mieux lors d'un échange chanceux).",
   "app.filter.friend_guaranteed_label": "Chanceux garanti uniquement (anciennes captures)",
   "app.filter.friend_guaranteed_help": "Limite la liste chanceux aux captures assez anciennes pour garantir un chanceux à l'échange.",
-  "app.clause_why.friend_have_lucky": "Déjà chanceux : #{dex} exclu",
-  "app.clause_why.friend_have_hundo": "Déjà hundo : #{dex} exclu",
+  "app.clause_why.friend_have_lucky": "Déjà chanceux : famille de {species} exclue",
+  "app.clause_why.friend_have_hundo": "Déjà hundo : famille de {species} exclue",
   "app.clause_why.friend_guaranteed_lucky": "Chanceux garanti : uniquement les captures de 20{year} ou avant"
 }
