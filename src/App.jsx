@@ -1790,21 +1790,21 @@ export function buildFilters(
 	// The blacklist wishlists above are the "everything I still lack" fallback.
 	// This is the deliberate version: the user curates a target list (suggested
 	// sets + manual input), picks a trading focus (lucky by default, or hundo),
-	// and hands the friend a POSITIVE filter.
+	// and hands the friend ONE positive filter.
 	//
-	// Shape: `+target,… & !+owned,… & trade guards`. Targets render family-
-	// expanded; the same `!+owned` family guards as the fallback then subtract
-	// every family already done in the chosen have-list. PoGo's own `+family`
-	// algebra does the set math in-game (lucky status and IVs both survive
-	// evolution), so there's no evolution-family table needed app-side — a
-	// lucky Raichu correctly silences a curated Pikachu. The string shrinks
-	// automatically as new luckies / hundos land in the have-lists.
+	// Shape: `+target,… & trade guards` — a singular string driven purely by
+	// the selection. The have-collection is NOT encoded as `!+owned` guards:
+	// that's the fallback wishlists' job, it makes the string scale with the
+	// collection instead of the selection (hundreds of luckies ≈ thousands of
+	// chars, toward PoGo's ~5000 cap), and family-wide subtraction would
+	// silently override an explicit pick — lucky/hundo dex entries are
+	// per-species, so a lucky Raichu must NOT cancel a curated Pikachu.
+	// Exact-species ownership is pruned app-side instead (the dimmed ✓ chip
+	// and the drop from the positives below), so the string still shrinks as
+	// new luckies / hundos land in the have-lists.
 	const friendCollectMode = cfg.friendCollectMode === 'hundo' ? 'hundo' : 'lucky';
 	const friendCollectHaves = friendCollectMode === 'hundo' ? hundos : luckies;
 	const friendCollectHaveSet = new Set((friendCollectHaves || []).map(canonKey));
-	// `owned` here is exact-species only (drives the dimmed ✓ chip); cross-stage
-	// ownership (lucky Raichu vs curated Pikachu) is still pruned correctly at
-	// the string level by the `!+owned` family guards.
 	const friendCollectTargets = (cfg.friendCollectSpecies || []).map((sp) => ({
 		species: sp,
 		display: speciesForOutput(sp, outputLocale),
@@ -1818,17 +1818,6 @@ export function buildFilters(
 			friendCollectActive.map((tg) => `+${tg.display}`).join(','),
 			tFn('app.clause_why.friend_collect_targets'),
 		);
-		for (const sp of ownedSpeciesNames(friendCollectHaves))
-			push(
-				friendCollectClauses,
-				`!+${sp}`,
-				tFn(
-					friendCollectMode === 'hundo'
-						? 'app.clause_why.friend_have_hundo'
-						: 'app.clause_why.friend_have_lucky',
-					{ params: { species: capFirst(sp) } },
-				),
-			);
 		pushFriendTradeGuards(friendCollectClauses);
 	}
 	const friendCollectWishlist = friendCollectClauses.map((c) => c.clause).join('&');

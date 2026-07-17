@@ -32,7 +32,7 @@ const cfg = {
 const luckies = ['dragoran', 'lapras'];
 const hundos = ['glurak'];
 
-console.log('Scenario 1: lucky focus — exact-owned drops, families excluded');
+console.log('Scenario 1: lucky focus — exact-owned drops, singular selection-driven string');
 {
 	const r = buildFilters(hundos, luckies, cfg, [], 'en', t);
 	check("mode defaults to 'lucky'", r.friendCollectMode === 'lucky');
@@ -47,29 +47,24 @@ console.log('Scenario 1: lucky focus — exact-owned drops, families excluded');
 		JSON.stringify(r.friendCollectTargets),
 	);
 	check(
-		'positives = non-owned targets only',
-		r.friendCollectWishlist.startsWith('+dratini,+larvitar&'),
+		'string = selection + trade guards, nothing else',
+		r.friendCollectWishlist === '+dratini,+larvitar&!traded&!shadow&!mythical,808,809',
 		r.friendCollectWishlist,
 	);
-	check('owned lucky family excluded (!+dragonite)', r.friendCollectWishlist.includes('!+dragonite'));
-	check('owned lucky family excluded (!+lapras)', r.friendCollectWishlist.includes('!+lapras'));
-	check(
-		'trade guards present',
-		r.friendCollectWishlist.includes('!traded') &&
-			r.friendCollectWishlist.includes('!shadow') &&
-			r.friendCollectWishlist.includes('!mythical,808,809'),
-	);
+	// The have-collection must NOT be encoded as !+family guards — that's the
+	// fallback wishlists' job, it scales the string with the collection instead
+	// of the selection, and a family-wide !+dragonite would silently cancel a
+	// curated dratini (lucky dex entries are per-species).
+	check('no !+owned family guards in the string', !r.friendCollectWishlist.includes('!+'));
 	check(
 		'guaranteed variant appends year floor',
 		r.friendCollectWishlistGuaranteed.endsWith('&year-20') &&
 			r.friendCollectWishlistGuaranteed !== r.friendCollectWishlist,
 		r.friendCollectWishlistGuaranteed,
 	);
-	// hundo ownership must NOT leak into the lucky-focused string
-	check('hundo have-list ignored in lucky focus', !r.friendCollectWishlist.includes('!+charizard'));
 }
 
-console.log('\nScenario 2: hundo focus — prunes against hundos, no year floor');
+console.log('\nScenario 2: hundo focus — prunes exact-owned against hundos, no year floor');
 {
 	const r = buildFilters(
 		hundos,
@@ -80,8 +75,12 @@ console.log('\nScenario 2: hundo focus — prunes against hundos, no year floor'
 		t,
 	);
 	check('exact-owned charizard dropped from positives', r.friendCollectWishlist.startsWith('+dratini&'));
-	check('hundo families excluded (!+charizard)', r.friendCollectWishlist.includes('!+charizard'));
-	check('lucky families NOT excluded', !r.friendCollectWishlist.includes('!+dragonite'));
+	check('no !+owned family guards in the string', !r.friendCollectWishlist.includes('!+'));
+	check(
+		'string = selection + trade guards, nothing else',
+		r.friendCollectWishlist === '+dratini&!traded&!shadow&!mythical,808,809',
+		r.friendCollectWishlist,
+	);
 	check(
 		'guaranteed variant === base (IVs re-roll regardless of age)',
 		r.friendCollectWishlistGuaranteed === r.friendCollectWishlist,
@@ -199,8 +198,8 @@ console.log('\nScenario 7: output locale rendering');
 {
 	const r = buildFilters(hundos, luckies, cfg, [], 'de', t);
 	check(
-		'DE output renders German names',
-		r.friendCollectWishlist.startsWith('+dratini,+larvitar') && r.friendCollectWishlist.includes('!+dragoran'),
+		'DE output renders German names and keywords',
+		r.friendCollectWishlist.startsWith('+dratini,+larvitar&') && r.friendCollectWishlist.includes('!getauscht'),
 		r.friendCollectWishlist,
 	);
 }
