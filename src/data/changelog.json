@@ -1,4 +1,5 @@
 [
+	{ "id": "hundo_regionals_stay_protected", "date": "2026-07-17" },
 	{ "id": "regional_catalog_sync", "date": "2026-07-17" },
 	{ "id": "buddy_gender_picker", "date": "2026-07-17" },
 	{ "id": "buddy_raw_append_merged", "date": "2026-07-17" }

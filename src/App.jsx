@@ -618,6 +618,30 @@ export function regionalCatalogTokens() {
 	return out.sort();
 }
 
+// Which enabled regional groups currently protect this species (as a typeCheck
+// or collector)? Used by the hundo adder to warn that a freshly-added hundo of
+// a regional does NOT surface its duplicates — regional protection wins over
+// the hundo carve-out, and unchecking the species in the regionals step is the
+// explicit opt-out. Species is matched canonically, so any input locale works.
+export function regionalProtectionsFor(species, cfg) {
+	const canon = resolveSpecies(species) || String(species).toLowerCase();
+	const same = (sp) => (resolveSpecies(sp) || String(sp).toLowerCase()) === canon;
+	const groups = cfg?.regionalGroups || {};
+	const out = [];
+	for (const [key, group] of Object.entries(REGIONAL_GROUPS)) {
+		const state = groups[key];
+		if (!state || !state.enabled) continue;
+		const tcOn = group.typeChecks.some(
+			(tc) => same(tc.species) && (state.typeChecksEnabled === null || state.typeChecksEnabled.includes(tc.species)),
+		);
+		const colOn = group.collectors.some(
+			(sp) => same(sp) && (state.collectorsEnabled === null || state.collectorsEnabled.includes(sp)),
+		);
+		if (tcOn || colOn) out.push(key);
+	}
+	return out;
+}
+
 // Pokémon name dictionary, resolvers, and reverse-lookup helpers live in
 // src/data/species.js (multi-locale, generated from the published Google
 // Sheet via scripts/fetch-translations.mjs at build time). Imported above.
@@ -1122,14 +1146,11 @@ export function buildFilters(
 			// homeLocals-based auto-drop for bare collectors.
 			if (homeLocalTypeChecks.some((l) => l.species === tc.species && l.type === tc.type)) continue;
 			const speciesOut = speciesForOutput(tc.species, outputLocale);
-			// Hundo carve-out parity with the bare-collector loop below (L800): if
-			// the user owns a hundo of this species, its duplicates are redundant and
-			// should fall through to trash instead of being re-protected here — the
-			// same intent as the `+H` carve-out on trash clause 1. The hundo list is
-			// form-agnostic (PoGo can't search by regional form), so — exactly like
-			// collectors — we drop by species, which covers multi-form species too
-			// (e.g. owning a hundo Tauros surfaces every Paldean form's dupes).
-			if (hundoOutSet.has(speciesOut)) continue;
+			// NO hundo carve-out here (deliberately): a regional stays excluded from
+			// trash even once you own its hundo — a regional dupe is trade bait for
+			// friends, not junk. The user opts OUT explicitly by unchecking the
+			// species in the regionals step; the hundo adder tells them so when they
+			// add a protected regional (HundoRegionalNotice).
 			const speciesDisplay = capFirst(speciesOut);
 			const typeOut = kw.type[tc.type] || tc.type;
 			// Optional excludeTypes carves additional negative-type modifiers into the
@@ -1151,11 +1172,12 @@ export function buildFilters(
 				`${tFn(group.labelKey)}: ${tFn(tc.noteKey)}${whyCarve}`,
 			);
 		}
-		// Collectors — resolve each to outputLocale, then collapse families
+		// Collectors — resolve each to outputLocale, then collapse families.
+		// Same as the typeChecks above: hundo ownership does NOT drop the
+		// protection — unchecking the collector chip is the explicit opt-out.
 		const enabledCollectorsOut = group.collectors
 			.filter((sp) => state.collectorsEnabled === null || state.collectorsEnabled.includes(sp))
-			.map((sp) => speciesForOutput(sp, outputLocale))
-			.filter((sp) => !hundoOutSet.has(sp));
+			.map((sp) => speciesForOutput(sp, outputLocale));
 		const collapsed = collapseFamilies(enabledCollectorsOut, FAMILY_COLLAPSES);
 		for (const entry of collapsed) {
 			const groupLabel = tFn(group.labelKey);
@@ -1176,7 +1198,8 @@ export function buildFilters(
 	);
 	for (const sp of cfg.customCollectibles || []) {
 		const lower = speciesForOutput(sp, outputLocale);
-		if (hundoOutSet.has(lower)) continue;
+		// No hundo gate here either — a custom collectible is explicit user
+		// intent; removing it from the list is the opt-out.
 		if (allRegionalCollectorsOut.has(lower)) continue;
 		const display = capFirst(lower);
 		push(trashClauses, `!${display}`, tFn('app.clause_why.custom_collectible', { params: { name: display } }));
@@ -3176,6 +3199,9 @@ export default function App() {
 	// Regionals added to the user's protections by the catalog sync in
 	// mergeImportedConfig on this load — non-empty triggers the one-time popup.
 	const [regionalNotices, setRegionalNotices] = useState([]);
+	// Hundos just added via the adder that are ALSO protected regionals — the
+	// popup explains that protection wins and where the opt-out lives.
+	const [hundoRegionalNotice, setHundoRegionalNotice] = useState([]);
 	const [showChangelog, setShowChangelog] = useState(false);
 	// Number of changelog entries the user has already opened the panel for —
 	// drives the "new" dot on the footer link.
@@ -3384,15 +3410,24 @@ export default function App() {
 		if (tokens.length === 0) return;
 		const set = new Set(hundos);
 		const unresolved = [];
+		const added = [];
 		for (const tok of tokens) {
 			const resolved = resolveSpecies(tok);
 			if (resolved) {
+				if (!set.has(resolved)) added.push(resolved);
 				set.add(resolved);
 			} else {
 				unresolved.push(tok);
 			}
 		}
 		setHundos([...set].sort());
+		// A hundo of a protected regional does NOT surface its duplicates (the
+		// regional clauses win) — tell the user right away instead of letting
+		// them wonder why the dupes never showed up in trash.
+		const regionalAdds = added
+			.map((sp) => ({ species: sp, groups: regionalProtectionsFor(sp, config) }))
+			.filter((x) => x.groups.length > 0);
+		if (regionalAdds.length > 0) setHundoRegionalNotice(regionalAdds);
 		if (unresolved.length > 0) {
 			// Keep unresolved tokens in the input so the user sees what didn't match
 			setNewHundo(unresolved.join(', '));
@@ -3711,7 +3746,6 @@ export default function App() {
 									setConfig={setConfig}
 									homeLocals={homeLocals}
 									homeLocalTypeChecks={homeLocalTypeChecks}
-									hundos={hundos}
 								/>
 							</StepWrapper>
 						)}
@@ -4343,6 +4377,7 @@ export default function App() {
 				onExport={exportState}
 				onImport={applyImportEnvelope}
 			/>
+			<HundoRegionalNotice notices={hundoRegionalNotice} onClose={() => setHundoRegionalNotice([])} />
 			<RegionalSyncNotice
 				notices={regionalNotices}
 				onClose={() => setRegionalNotices([])}
@@ -6126,7 +6161,7 @@ const EXPERT_ONLY_KEYS = new Set([
 	'protectNundos',
 ]);
 
-function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks = [], hundos = [] }) {
+function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks = [] }) {
 	const { t, outputLocale } = useTranslation();
 	// Any individual change in ConfigPanel clears the preset marker — the
 	// marker means "this preset is currently in effect"; the moment the
@@ -6363,7 +6398,6 @@ function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks =
 							setGroup={(partial) => setGroup(key, partial)}
 							homeLocals={homeLocals}
 							homeLocalTypeChecks={homeLocalTypeChecks}
-							hundos={hundos}
 						/>
 					))}
 				</div>
@@ -6496,7 +6530,6 @@ function RegionalGroupEditor({
 	setGroup,
 	homeLocals = [],
 	homeLocalTypeChecks = [],
-	hundos = [],
 }) {
 	const { t } = useTranslation();
 	const [expanded, setExpanded] = useState(false);
@@ -6505,33 +6538,23 @@ function RegionalGroupEditor({
 	const tcEnabled = state.typeChecksEnabled === null ? allTC : state.typeChecksEnabled;
 	const colEnabled = state.collectorsEnabled === null ? allCol : state.collectorsEnabled;
 	// Auto-drops are excluded from the counter so the displayed "X/Y aktiv"
-	// matches the actual filter output. Two mechanisms, mirroring buildFilters:
-	//   home  — this species spawns locally (species string for collectors,
-	//           {species,type} pair for typeChecks — same species with different
-	//           types, e.g. Paldean Tauros Combat vs Blaze, is the wrong
-	//           granularity for the pair check)
-	//   hundo — you own a hundo of the species, so duplicates are redundant and
-	//           the protection is carved out (species-level, form-agnostic).
-	// Home wins the display when both apply — either way the chip is dropped.
+	// matches the actual filter output. One mechanism, mirroring buildFilters:
+	//   home — this species spawns locally (species string for collectors,
+	//          {species,type} pair for typeChecks — same species with different
+	//          types, e.g. Paldean Tauros Combat vs Blaze, is the wrong
+	//          granularity for the pair check)
+	// Hundo ownership deliberately does NOT drop a chip: regional protection
+	// wins over the hundo carve-out, and unchecking here is the manual opt-out
+	// (see the no-hundo-carve-out comments in the buildFilters regional loop).
 	const homeSet = new Set(homeLocals);
 	const tcLocalSet = new Set(homeLocalTypeChecks.map((l) => `${l.species}|${l.type}`));
-	const canonName = (s) => resolveSpecies(s) || String(s).toLowerCase();
-	const hundoSet = new Set((hundos || []).map(canonName));
-	const isHundoDropped = (sp) => hundoSet.has(canonName(sp));
 	const tcDropReason = (tc) =>
-		homeSet.has(tc.species) || tcLocalSet.has(`${tc.species}|${tc.type}`)
-			? 'home'
-			: isHundoDropped(tc.species)
-				? 'hundo'
-				: null;
-	const colDropReason = (sp) => (homeSet.has(sp) ? 'home' : isHundoDropped(sp) ? 'hundo' : null);
+		homeSet.has(tc.species) || tcLocalSet.has(`${tc.species}|${tc.type}`) ? 'home' : null;
+	const colDropReason = (sp) => (homeSet.has(sp) ? 'home' : null);
 	const tcEntriesEnabled = group.typeChecks.filter((tc) => tcEnabled.includes(tc.species));
 	const droppedByHome =
 		tcEntriesEnabled.filter((tc) => tcDropReason(tc) === 'home').length +
 		colEnabled.filter((sp) => colDropReason(sp) === 'home').length;
-	const droppedByHundo =
-		tcEntriesEnabled.filter((tc) => tcDropReason(tc) === 'hundo').length +
-		colEnabled.filter((sp) => colDropReason(sp) === 'hundo').length;
 	const totalEffective =
 		group.typeChecks.filter((tc) => !tcDropReason(tc)).length + allCol.filter((sp) => !colDropReason(sp)).length;
 	const enabledCount = state.enabled
@@ -6591,11 +6614,6 @@ function RegionalGroupEditor({
 								{t('app.regional_editor.home_extra', { params: { count: droppedByHome } })}
 							</span>
 						)}
-						{droppedByHundo > 0 && state.enabled && (
-							<span className='text-[#9B59B6] ml-1'>
-								{t('app.regional_editor.hundo_extra', { params: { count: droppedByHundo } })}
-							</span>
-						)}
 					</span>
 				</button>
 			</div>
@@ -6639,7 +6657,6 @@ function RegionalGroupEditor({
 									const on = tcEnabled.includes(tc.species);
 									const dropReason = tcDropReason(tc);
 									const isHomeLocal = dropReason === 'home';
-									const isHundoDrop = dropReason === 'hundo';
 									const tierBadge = tc.tier === 'S' ? '★' : tc.tier === 'C' ? '·' : null;
 									const tierColor =
 										tc.tier === 'S'
@@ -6651,26 +6668,17 @@ function RegionalGroupEditor({
 										<button
 											key={`${tc.species}_${tc.type}`}
 											onClick={() => toggleTC(tc.species)}
-											title={
-												isHomeLocal
-													? t('app.regional_editor.home_local_title')
-													: isHundoDrop
-														? t('app.regional_editor.hundo_drop_title')
-														: t(tc.noteKey)
-											}
+											title={isHomeLocal ? t('app.regional_editor.home_local_title') : t(tc.noteKey)}
 											disabled={!state.enabled || !!dropReason}
 											className={`mono text-[11px] px-2 py-0.5 rounded transition ${
 												isHomeLocal
 													? 'bg-[#27AE60]/10 text-[#27AE60] border border-[#27AE60]/30 line-through opacity-60'
-													: isHundoDrop
-														? 'bg-[#9B59B6]/10 text-[#9B59B6] border border-[#9B59B6]/30 line-through opacity-60'
-														: on
-															? 'bg-[#5EAFC5]/20 text-[#5EAFC5] border border-[#5EAFC5]/40'
-															: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
+													: on
+														? 'bg-[#5EAFC5]/20 text-[#5EAFC5] border border-[#5EAFC5]/40'
+														: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
 											}`}
 										>
 											{isHomeLocal && <span className='not-italic no-underline mr-0.5'>⌂</span>}
-											{isHundoDrop && <span className='not-italic no-underline mr-0.5'>4★</span>}
 											{tierBadge && !dropReason && (
 												<span className={`${tierColor} mr-0.5`}>{tierBadge}</span>
 											)}
@@ -6691,10 +6699,8 @@ function RegionalGroupEditor({
 									const on = colEnabled.includes(sp);
 									const dropReason = colDropReason(sp);
 									const isHomeLocal = dropReason === 'home';
-									const isHundoDrop = dropReason === 'hundo';
-									// Auto-dropped chips (home via effectiveConfig, hundo via the
-									// buildFilters carve-out) are removed regardless of `on`, so
-									// render them as "off" visually with a ⌂ / 4★ marker.
+									// Home-dropped chips (via effectiveConfig) are removed regardless
+									// of `on`, so render them as "off" visually with a ⌂ marker.
 									const effectivelyOn = on && !dropReason;
 									const noteKey = group.collectorNotes?.[sp];
 									return (
@@ -6705,24 +6711,19 @@ function RegionalGroupEditor({
 											title={
 												isHomeLocal
 													? t('app.regional_editor.home_local_title')
-													: isHundoDrop
-														? t('app.regional_editor.hundo_drop_title')
-														: noteKey
-															? t(noteKey)
-															: undefined
+													: noteKey
+														? t(noteKey)
+														: undefined
 											}
 											className={`mono text-[11px] px-2 py-0.5 rounded transition ${
 												effectivelyOn
 													? 'bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/40'
 													: isHomeLocal
 														? 'bg-[#27AE60]/10 text-[#27AE60] border border-[#27AE60]/30 line-through opacity-60'
-														: isHundoDrop
-															? 'bg-[#9B59B6]/10 text-[#9B59B6] border border-[#9B59B6]/30 line-through opacity-60'
-															: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
+														: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
 											}`}
 										>
 											{isHomeLocal && <span className='not-italic no-underline mr-0.5'>⌂</span>}
-											{isHundoDrop && <span className='not-italic no-underline mr-0.5'>4★</span>}
 											{sp}
 											{noteKey && !dropReason && (
 												<span
@@ -7401,6 +7402,53 @@ function NumField({ label, value, onChange, text, hint }) {
 // Holds settings that aren't about "what to protect" but rather "how the tool
 // behaves": expert mode, trade tag names, custom tags, league tags, scope
 // safety nets, and the dangerous reset. Reachable via gear icon in header.
+
+// Popup after adding a hundo of a species that's currently protected as a
+// regional: the protection stays (dupes will NOT surface in trash), and the
+// opt-out is unchecking the species in the regionals step. Fired from
+// addHundo; purely informational, nothing to confirm.
+function HundoRegionalNotice({ notices, onClose }) {
+	const { t } = useTranslation();
+	if (!notices || notices.length === 0) return null;
+	return (
+		<div
+			role='dialog'
+			aria-modal='true'
+			aria-label={t('app.hundo_regional.title')}
+			onClick={onClose}
+			style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
+			className='fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4'
+		>
+			<div
+				onClick={(e) => e.stopPropagation()}
+				style={{ backgroundColor: '#0F1419' }}
+				className='border border-[#2D3A47] rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'
+			>
+				<h2 className='mono text-base font-semibold text-[#E6EDF3]'>{t('app.hundo_regional.title')}</h2>
+				<ul className='space-y-1'>
+					{notices.map((n) => (
+						<li key={n.species} className='mono text-xs text-[#E6EDF3] flex items-baseline gap-2'>
+							<span className='text-[#F5B82E]'>4★</span>
+							{capFirst(n.species)}
+							<span className='text-[#8090A0]'>
+								({n.groups.map((g) => t(REGIONAL_GROUPS[g]?.labelKey || g)).join(', ')})
+							</span>
+						</li>
+					))}
+				</ul>
+				<p className='mono text-xs text-[#8090A0] leading-relaxed'>{t('app.hundo_regional.body')}</p>
+				<div className='flex justify-end'>
+					<button
+						onClick={onClose}
+						className='mono text-xs bg-[#E67E22]/20 hover:bg-[#E67E22]/30 text-[#E67E22] px-3 py-1.5 rounded transition'
+					>
+						{t('app.regional_sync.ok')}
+					</button>
+				</div>
+			</div>
+		</div>
+	);
+}
 
 // One-time popup after the regional catalog sync added protections to a
 // returning user's config (see mergeImportedConfig). Lists what changed so the
