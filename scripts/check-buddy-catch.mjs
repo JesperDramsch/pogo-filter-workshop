@@ -172,6 +172,43 @@ console.log("\nRaw append restricts the guarded filter (semantic — no purified
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+console.log("\nGender picker emits per-species scoped guards (structure + semantic)");
+{
+  const buddy = {
+    id: "g", name: "G", tagPrefix: "G", active: true,
+    targetSpecies: [
+      { species: "mauzi",   expand: false, dropForms: [], gender: "female" },
+      { species: "pikachu", expand: true,  dropForms: [], gender: "male" },
+      { species: "habitak", expand: false, dropForms: [], gender: "any" },
+    ],
+  };
+  const cfg = { ...SEM_CFG, buddies: [buddy] };
+  const res = buildFilters([], [], cfg, [], LOCALE, tFn);
+  check("still exactly ONE line", res.buddyCatchFilters.length === 1,
+    `got ${res.buddyCatchFilters.length}`);
+  const f = res.buddyCatchFilters[0]?.filter || "";
+  const S = segs(f);
+  check(`exact target guard '!mauzi,${kw.flag.female}' present`,
+    S.includes(`!mauzi,${kw.flag.female}`));
+  check(`family target guard '!+pikachu,${kw.flag.male}' present`,
+    S.includes(`!+pikachu,${kw.flag.male}`));
+  check("'any' target emits no gender guard", !S.some(s => s.startsWith("!habitak")));
+
+  const pichu = (gender) => mk({ species: "pichu", dex: 172, gender, family: ["pikachu", "pichu"] });
+  const cases = [
+    ["female Meowth", mk({ species: "mauzi", dex: 52, gender: "female" }), true],
+    ["male Meowth",   mk({ species: "mauzi", dex: 52, gender: "male" }),   false],
+    ["male Pichu (family target)",   pichu("male"),   true],
+    ["female Pichu (family target)", pichu("female"), false],
+    ["male Spearow (no gender pick)",   mk({ species: "habitak", dex: 21, gender: "male" }),   true],
+    ["female Spearow (no gender pick)", mk({ species: "habitak", dex: 21, gender: "female" }), true],
+  ];
+  for (const [label, mon, want] of cases) {
+    check(`${label} ${want ? "kept" : "dropped"}`, evalFilter(f, mon) === want);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 console.log("\nRaw-only buddy still gets ONE combined, guarded line");
 {
   const buddy = { id: "q", name: "Q", tagPrefix: "Q", active: true, rawAppend: "kokowei",

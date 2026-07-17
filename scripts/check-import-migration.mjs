@@ -115,14 +115,16 @@ console.log("\nBuddy targets: legacy string[] → structured Target[]");
           { species: "mauzi", type: "unlicht" },       // localized type word
           { species: "sandan", type: "ice", expand: true }, // key + expand
           { species: "pikachu" },                      // object, no type
+          { species: "ponita", gender: "female" },     // valid gender pick
+          { species: "raichu", gender: "banana" },     // junk gender → 'any'
           null, 42, {},                                // junk → dropped
         ],
       },
     ],
   });
   const ts = out.buddies[0].targetSpecies;
-  check("legacy string → whole-species target (empty dropForms)",
-    JSON.stringify(ts[0]) === JSON.stringify({ species: "habitak", expand: false, dropForms: [] }),
+  check("legacy string → whole-species target (empty dropForms, gender any)",
+    JSON.stringify(ts[0]) === JSON.stringify({ species: "habitak", expand: false, dropForms: [], gender: "any" }),
     `got ${JSON.stringify(ts[0])}`);
   check("legacy type 'unlicht' migrates to keep only Alolan Mauzi",
     ts[1]?.species === "mauzi" && ts[1]?.expand === false
@@ -136,7 +138,9 @@ console.log("\nBuddy targets: legacy string[] → structured Target[]");
   check("object without type → whole-species, expand false",
     ts[3]?.species === "pikachu" && ts[3]?.expand === false
     && Array.isArray(ts[3]?.dropForms) && ts[3].dropForms.length === 0);
-  check("junk entries (null, number, {}) dropped", ts.length === 4, `got length ${ts.length}`);
+  check("valid gender pick preserved", ts[4]?.gender === "female", `got ${JSON.stringify(ts[4])}`);
+  check("junk gender coerced to 'any'", ts[5]?.gender === "any", `got ${JSON.stringify(ts[5])}`);
+  check("junk entries (null, number, {}) dropped", ts.length === 6, `got length ${ts.length}`);
   check("rawAppend backfilled to ''", out.buddies[0].rawAppend === "");
 }
 

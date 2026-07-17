@@ -611,19 +611,20 @@ function defaultRegionalToggles() {
 const BUDDY_TYPE_KEYS = new Set(Object.keys(pogoKeywords('de').type));
 
 // Normalize one buddy target onto the structured shape
-//   { species, expand, dropForms }
+//   { species, expand, dropForms, gender }
 // where `species` is a canonical lowercase name, `expand` toggles +family
-// expansion (default off → exact species), and `dropForms` is an array of
+// expansion (default off → exact species), `dropForms` is an array of
 // regional-form keys to EXCLUDE from the catch list (default [] → catch every
-// form). Legacy string entries become exact, catch-all targets. Legacy
-// `{type}` entries (the old single-form picker) migrate by keeping only the
-// form whose predicate includes that type and dropping the rest. Idempotent —
-// a normalized target re-runs unchanged. Returns null for junk so the caller
+// form), and `gender` is 'male' | 'female' | 'any' (default 'any' → both).
+// Legacy string entries become exact, catch-all targets. Legacy `{type}`
+// entries (the old single-form picker) migrate by keeping only the form whose
+// predicate includes that type and dropping the rest. Idempotent — a
+// normalized target re-runs unchanged. Returns null for junk so the caller
 // can drop it.
 export function normalizeBuddyTarget(entry) {
 	if (typeof entry === 'string') {
 		const species = resolveSpecies(entry) || entry.toLowerCase();
-		return species ? { species, expand: false, dropForms: [] } : null;
+		return species ? { species, expand: false, dropForms: [], gender: 'any' } : null;
 	}
 	if (entry && typeof entry === 'object' && entry.species != null) {
 		const species = resolveSpecies(entry.species) || String(entry.species).toLowerCase();
@@ -639,7 +640,8 @@ export function normalizeBuddyTarget(entry) {
 			const keep = key && forms.find((f) => (f.include || []).includes(key));
 			if (keep) dropForms = forms.filter((f) => f.key !== keep.key).map((f) => f.key);
 		}
-		return { species, expand: !!entry.expand, dropForms };
+		const gender = entry.gender === 'male' || entry.gender === 'female' ? entry.gender : 'any';
+		return { species, expand: !!entry.expand, dropForms, gender };
 	}
 	return null;
 }
@@ -1318,12 +1320,12 @@ export function buildFilters(
 
 	for (const b of activeBuddies) {
 		const prefix = b.tagPrefix.replace(/^#/, '');
-		// targetSpecies entries are structured Targets { species, expand, dropForms }
-		// (legacy strings / typed targets are migrated to this shape on load).
-		// Resolve each to an output-locale display name. Whole-species targets
-		// (dropForms empty) and form-restricted targets both feed ONE combined
-		// filter: every species joins the union OR-list, and each dropped form adds
-		// a per-species type guard below.
+		// targetSpecies entries are structured Targets { species, expand, dropForms,
+		// gender } (legacy strings / typed targets are migrated to this shape on
+		// load). Resolve each to an output-locale display name. Whole-species
+		// targets (dropForms empty) and form-restricted targets both feed ONE
+		// combined filter: every species joins the union OR-list, and each dropped
+		// form / gender pick adds a per-species guard below.
 		const allTargets = (b.targetSpecies || [])
 			.filter((t) => t && t.species)
 			.map((t) => ({
@@ -1331,6 +1333,7 @@ export function buildFilters(
 				display: speciesForOutput(t.species, outputLocale),
 				expand: !!t.expand,
 				dropForms: Array.isArray(t.dropForms) ? t.dropForms : [],
+				gender: t.gender === 'male' || t.gender === 'female' ? t.gender : 'any',
 			}));
 		const plainTargets = allTargets.filter((t) => t.dropForms.length === 0);
 		const formTargets = allTargets.filter((t) => t.dropForms.length > 0);
@@ -1401,6 +1404,17 @@ export function buildFilters(
 						}),
 					);
 				}
+			}
+			// Per-species gender guards — same scoped implication as the form
+			// guards: `!<species>,<gender-kw>` = "NOT this species OR the wanted
+			// gender" constrains only that species and leaves the union untouched.
+			for (const t of unionTargets) {
+				if (t.gender !== 'male' && t.gender !== 'female') continue;
+				push(
+					catchClauses,
+					`!${sel(t)},${kw.flag[t.gender]}`,
+					tFn(`app.clause_why.buddy_gender_${t.gender}`, { params: { species: capFirst(t.display) } }),
+				);
 			}
 			pushBuddyGuards(catchClauses);
 			// ── Expert raw append — extra `&`-clauses on the SAME filter ─────────
@@ -2389,6 +2403,8 @@ const FLAG_TO_MON = {
 	background: 'background',
 	traded: 'traded',
 	hatched: 'hatched',
+	female: 'female',
+	male: 'male',
 	baby: 'eggOnly',
 	new_evo: 'newDexEvo',
 	special_move: 'legacyMove',
@@ -8078,7 +8094,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 		for (const tok of tokens) {
 			const r = resolveSpecies(tok);
 			if (r) {
-				if (!map.has(r)) map.set(r, { species: r, expand: false, dropForms: [] });
+				if (!map.has(r)) map.set(r, { species: r, expand: false, dropForms: [], gender: 'any' });
 			} else remaining.push(tok);
 		}
 		const next = [...map.values()].sort((a, b) => a.species.localeCompare(b.species));
@@ -8166,6 +8182,29 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 										? t('app.buddy_targets.expand_family')
 										: t('app.buddy_targets.expand_exact')}
 								</button>
+								{/* Gender picker: ♀/♂ — click to catch only that gender, click the
+                    active one again to go back to both. Emits the scoped
+                    `!<species>,<gender>` guard. */}
+								<span className='flex items-center gap-1' title={t('app.buddy_targets.gender_help')}>
+									{['female', 'male'].map((g) => {
+										const on = tg.gender === g;
+										return (
+											<button
+												key={g}
+												onClick={() => updateAt(i, { gender: on ? 'any' : g })}
+												aria-pressed={on}
+												aria-label={t(`app.buddy_targets.gender_${g}`)}
+												className={`text-[10px] px-1.5 py-0.5 rounded border transition ${
+													on
+														? 'bg-[#E67E22]/25 border-[#E67E22]/50 text-[#E67E22]'
+														: 'bg-transparent border-[#2D3A47] text-[#8090A0] hover:text-[#E6EDF3]'
+												}`}
+											>
+												{g === 'female' ? '♀' : '♂'}
+											</button>
+										);
+									})}
+								</span>
 								{/* Regional-form picker: every form is catch-on by default; click
                     a chip to drop that form (struck through). Hidden for species
                     with no type-distinguishable regional forms. */}
