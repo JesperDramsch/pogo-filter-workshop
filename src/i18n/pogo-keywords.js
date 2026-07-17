@@ -31,6 +31,8 @@ export function pogoKeywords(outputLocale) {
       shadow:       k(messages, "filter_key_shadow"),
       purified:     k(messages, "filter_key_purified"),
       costume:      k(messages, "filter_key_costume"),
+      female:       k(messages, "filter_key_gender_female"),
+      male:         k(messages, "filter_key_gender_male"),
       background:   k(messages, "filter_key_any_background"),
       traded:       k(messages, "filter_key_traded"),
       hatched:      k(messages, "filter_key_hatched"),

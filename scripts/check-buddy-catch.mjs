@@ -1,11 +1,11 @@
 // Verifies the per-buddy catch-filter generation in buildFilters. Every buddy
-// now emits ONE combined catch filter: a species OR-list (the union of all
-// wished species — whole-species, form-restricted, and trade-evo families) plus
-// a per-species type guard `!<species>,<drop-types>` for each excluded regional
-// form, plus the shared protection guards. The expert raw escape hatch stays a
-// separate verbatim line. The default-fixture snapshot (check-fixtures.mjs)
-// ignores buddyCatchFilters and DEFAULT_CONFIG has no buddies, so this is the
-// only coverage for that path.
+// emits ONE combined catch filter: a species OR-list (the union of all wished
+// species — whole-species, form-restricted, and trade-evo families) plus a
+// per-species type guard `!<species>,<drop-types>` for each excluded regional
+// form, plus the shared protection guards, plus the expert raw append
+// `&`-joined verbatim at the end as extra AND-clauses. The default-fixture
+// snapshot (check-fixtures.mjs) ignores buddyCatchFilters and DEFAULT_CONFIG
+// has no buddies, so this is the only coverage for that path.
 //
 // Beyond string-shape checks, a mini PoGo evaluator (evalFilter) confirms the
 // combined filter's SEMANTICS on mock Pokémon — the form guards must isolate
@@ -62,6 +62,8 @@ function litMatch(lit, mon) {
   if (lit.startsWith("!")) return !litMatch(lit.slice(1), mon);
   if (lit.startsWith("+")) return (mon.family || [mon.species]).includes(lit.slice(1));
   if (/^[0-4]\*$/.test(lit)) return mon.stars === Number(lit[0]);
+  if (lit === "weiblich" || lit === "female") return mon.gender === "female";
+  if (lit === "männlich" || lit === "male") return mon.gender === "male";
   if (lit === "#") return !!mon.tagged;
   if (lit === kw.flag.favorite) return !!mon.favorite;
   if (lit === kw.flag.traded) return !!mon.traded;
@@ -99,7 +101,7 @@ console.log("Combined catch filter — structure (5 mixed targets, Mauzi hundo o
 {
   const buddy = {
     id: "auri", name: "Auri", tagPrefix: "Auri", active: true, wantsTradeEvos: false,
-    rawAppend: "mauzi&schillernd",
+    rawAppend: "!361,weiblich,female&!412,männlich,male",
     targetSpecies: [
       { species: "habitak", expand: false, dropForms: [] },      // whole species
       { species: "pikachu", expand: true,  dropForms: [] },      // +family, no regionals
@@ -111,18 +113,20 @@ console.log("Combined catch filter — structure (5 mixed targets, Mauzi hundo o
   const cfg = { ...DEFAULT_CONFIG, expertMode: true, buddies: [buddy] };
   const res = buildFilters(["mauzi"], [], cfg, [], LOCALE, tFn);
   const all = res.buddyCatchFilters;
-  const combined = all.filter(b => !b.formKey);
-  const raw = all.filter(b => b.formKey === "raw");
 
-  check("exactly ONE combined catch line per buddy", combined.length === 1, `got ${combined.length}`);
-  check("exactly one raw escape-hatch line", raw.length === 1, `got ${raw.length}`);
-  check("no separate per-form lines", all.length === 2, `got ${all.length} entries`);
+  check("exactly ONE catch line per buddy (raw merged, no extra box)", all.length === 1,
+    `got ${all.length} entries`);
 
-  const f = combined[0]?.filter || "";
+  const f = all[0]?.filter || "";
   const S = segs(f);
   // Union: all five species in the first comma-run, raichu folded in (not its own line).
   check("union starts with all five species selectors",
     f.startsWith("habitak,+pikachu,raichu,mauzi,sandan&"), f.slice(0, 60));
+  // Raw append `&`-joined verbatim at the end, each comma-group its own clause.
+  check("raw append clauses at the end, verbatim",
+    f.endsWith("&!361,weiblich,female&!412,männlich,male"), f.slice(-50));
+  check("each raw comma-group is a self-contained clause",
+    S.includes("!361,weiblich,female") && S.includes("!412,männlich,male"));
   check("exact target has no '+' (Habitak not Ibitak)", !f.includes("+habitak"));
   // Per-species scoped form guards.
   check(`Galar-Mauzi guard '!mauzi,${deMorgan(form(52,"galar"))}' present`,
@@ -132,13 +136,88 @@ console.log("Combined catch filter — structure (5 mixed targets, Mauzi hundo o
   // Spare-hundo carve-out (owns a Mauzi hundo) at buddy level.
   check("spare stars line ORs in the owned-hundo species", S.includes("0*,1*,2*,mauzi"));
   check("never-gift guard '!4*' present", S.includes("!4*"));
-  // Standard protection guards.
+  // Standard protection guards — they now cover the raw append too.
   check("standard guards present ('!#', '!favorit')",
     S.includes("!#") && f.includes(`!${kw.flag.favorite}`));
+}
 
-  // Raw line verbatim and unguarded.
-  check("raw line filter is verbatim", raw[0]?.filter === "mauzi&schillernd");
-  check("raw line carries no guards", !segs(raw[0]?.filter || "").includes("!#"));
+// ─────────────────────────────────────────────────────────────────────────
+console.log("\nRaw append restricts the guarded filter (semantic — no purified/costume, female-only Meowth)");
+{
+  // SEM_CFG turns the purified/costume toggles OFF, so those exclusions can
+  // only come from the raw append — proving the raw clauses take effect.
+  const buddy = {
+    id: "r", name: "R", tagPrefix: "R", active: true,
+    rawAppend: `!${kw.flag.purified}&!${kw.flag.costume}&!52,weiblich,female`,
+    targetSpecies: [
+      { species: "mauzi",   expand: false, dropForms: [] },
+      { species: "habitak", expand: false, dropForms: [] },
+    ],
+  };
+  const cfg = { ...SEM_CFG, expertMode: true, buddies: [buddy] };
+  const res = buildFilters([], [], cfg, [], LOCALE, tFn);
+  check("one line only", res.buddyCatchFilters.length === 1, `got ${res.buddyCatchFilters.length}`);
+  const f = res.buddyCatchFilters[0]?.filter || "";
+  check("female Meowth kept", evalFilter(f, mk({ species: "mauzi", dex: 52, gender: "female" })) === true);
+  check("male Meowth dropped by the gender guard",
+    evalFilter(f, mk({ species: "mauzi", dex: 52, gender: "male" })) === false);
+  check("purified female Meowth dropped by the raw !purified clause",
+    evalFilter(f, mk({ species: "mauzi", dex: 52, gender: "female", purified: true })) === false);
+  check("costumed female Meowth dropped by the raw !costume clause",
+    evalFilter(f, mk({ species: "mauzi", dex: 52, gender: "female", costume: true })) === false);
+  check("male Spearow untouched (gender guard is scoped to dex 52)",
+    evalFilter(f, mk({ species: "habitak", dex: 21, gender: "male" })) === true);
+  check("shared guards still apply on top (tagged female Meowth protected)",
+    evalFilter(f, mk({ species: "mauzi", dex: 52, gender: "female", tagged: true })) === false);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+console.log("\nGender picker emits per-species scoped guards (structure + semantic)");
+{
+  const buddy = {
+    id: "g", name: "G", tagPrefix: "G", active: true,
+    targetSpecies: [
+      { species: "mauzi",   expand: false, dropForms: [], gender: "female" },
+      { species: "pikachu", expand: true,  dropForms: [], gender: "male" },
+      { species: "habitak", expand: false, dropForms: [], gender: "any" },
+    ],
+  };
+  const cfg = { ...SEM_CFG, buddies: [buddy] };
+  const res = buildFilters([], [], cfg, [], LOCALE, tFn);
+  check("still exactly ONE line", res.buddyCatchFilters.length === 1,
+    `got ${res.buddyCatchFilters.length}`);
+  const f = res.buddyCatchFilters[0]?.filter || "";
+  const S = segs(f);
+  check(`exact target guard '!mauzi,${kw.flag.female}' present`,
+    S.includes(`!mauzi,${kw.flag.female}`));
+  check(`family target guard '!+pikachu,${kw.flag.male}' present`,
+    S.includes(`!+pikachu,${kw.flag.male}`));
+  check("'any' target emits no gender guard", !S.some(s => s.startsWith("!habitak")));
+
+  const pichu = (gender) => mk({ species: "pichu", dex: 172, gender, family: ["pikachu", "pichu"] });
+  const cases = [
+    ["female Meowth", mk({ species: "mauzi", dex: 52, gender: "female" }), true],
+    ["male Meowth",   mk({ species: "mauzi", dex: 52, gender: "male" }),   false],
+    ["male Pichu (family target)",   pichu("male"),   true],
+    ["female Pichu (family target)", pichu("female"), false],
+    ["male Spearow (no gender pick)",   mk({ species: "habitak", dex: 21, gender: "male" }),   true],
+    ["female Spearow (no gender pick)", mk({ species: "habitak", dex: 21, gender: "female" }), true],
+  ];
+  for (const [label, mon, want] of cases) {
+    check(`${label} ${want ? "kept" : "dropped"}`, evalFilter(f, mon) === want);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+console.log("\nRaw-only buddy still gets ONE combined, guarded line");
+{
+  const buddy = { id: "q", name: "Q", tagPrefix: "Q", active: true, rawAppend: "kokowei",
+    targetSpecies: [] };
+  const res = buildFilters([], [], { ...DEFAULT_CONFIG, expertMode: true, buddies: [buddy] }, [], LOCALE, tFn);
+  check("exactly one line", res.buddyCatchFilters.length === 1, `got ${res.buddyCatchFilters.length}`);
+  const f = res.buddyCatchFilters[0]?.filter || "";
+  check("stars + guards, raw appended at the end",
+    f.startsWith("0*,1*,2*&") && segs(f).includes("!#") && f.endsWith("&kokowei"), f.slice(0, 40));
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -208,12 +287,13 @@ console.log("\nFamily expansion + form drop uses '!+name' guard (semantic)");
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-console.log("\nRaw escape hatch is expert-gated");
+console.log("\nRaw append is expert-gated");
 {
-  const buddy = { id: "a", name: "A", tagPrefix: "A", active: true, rawAppend: "mauzi&schillernd",
+  const buddy = { id: "a", name: "A", tagPrefix: "A", active: true, rawAppend: "kokowei",
     targetSpecies: [{ species: "mauzi", expand: false, dropForms: ["galar"] }] };
   const off = buildFilters([], [], { ...DEFAULT_CONFIG, expertMode: false, buddies: [buddy] }, [], LOCALE, tFn);
-  check("no raw line when expertMode is off", !off.buddyCatchFilters.some(b => b.formKey === "raw"));
+  check("raw text absent from the filter when expertMode is off",
+    !off.buddyCatchFilters.some(b => b.filter.includes("kokowei")));
 }
 
 // ─────────────────────────────────────────────────────────────────────────

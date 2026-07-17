@@ -28,7 +28,7 @@
 import {
   mergeImportedConfig, DEFAULT_CONFIG,
   validateImportEnvelope, prepareImport,
-  SCHEMA_CURRENT,
+  SCHEMA_CURRENT, regionalCatalogTokens,
 } from "../src/App.jsx";
 import { resolveSpecies } from "../src/data/species.js";
 
@@ -115,14 +115,16 @@ console.log("\nBuddy targets: legacy string[] → structured Target[]");
           { species: "mauzi", type: "unlicht" },       // localized type word
           { species: "sandan", type: "ice", expand: true }, // key + expand
           { species: "pikachu" },                      // object, no type
+          { species: "ponita", gender: "female" },     // valid gender pick
+          { species: "raichu", gender: "banana" },     // junk gender → 'any'
           null, 42, {},                                // junk → dropped
         ],
       },
     ],
   });
   const ts = out.buddies[0].targetSpecies;
-  check("legacy string → whole-species target (empty dropForms)",
-    JSON.stringify(ts[0]) === JSON.stringify({ species: "habitak", expand: false, dropForms: [] }),
+  check("legacy string → whole-species target (empty dropForms, gender any)",
+    JSON.stringify(ts[0]) === JSON.stringify({ species: "habitak", expand: false, dropForms: [], gender: "any" }),
     `got ${JSON.stringify(ts[0])}`);
   check("legacy type 'unlicht' migrates to keep only Alolan Mauzi",
     ts[1]?.species === "mauzi" && ts[1]?.expand === false
@@ -136,7 +138,9 @@ console.log("\nBuddy targets: legacy string[] → structured Target[]");
   check("object without type → whole-species, expand false",
     ts[3]?.species === "pikachu" && ts[3]?.expand === false
     && Array.isArray(ts[3]?.dropForms) && ts[3].dropForms.length === 0);
-  check("junk entries (null, number, {}) dropped", ts.length === 4, `got length ${ts.length}`);
+  check("valid gender pick preserved", ts[4]?.gender === "female", `got ${JSON.stringify(ts[4])}`);
+  check("junk gender coerced to 'any'", ts[5]?.gender === "any", `got ${JSON.stringify(ts[5])}`);
+  check("junk entries (null, number, {}) dropped", ts.length === 6, `got length ${ts.length}`);
   check("rawAppend backfilled to ''", out.buddies[0].rawAppend === "");
 }
 
@@ -326,6 +330,72 @@ console.log("\nPrepareImport shape filtering: bad values dropped silently");
   check("invalid homeLocation not present", !("homeLocation" in out));
   check("null bazaarTags not present", !("bazaarTags" in out));
   check("invalid config not present", !("config" in out));
+}
+
+console.log("\nRegional catalog sync: legacy config (no regionalCatalogSeen) is grandfathered");
+{
+  const notices = [];
+  const out = mergeImportedConfig({
+    regionalGroups: {
+      // hisuian intentionally missing — pre-Hisui config
+      alolan: { enabled: true, typeChecksEnabled: ["Raichu"], collectorsEnabled: null },
+    },
+  }, notices);
+  check("no popup notices for grandfathered configs", notices.length === 0,
+    `got ${JSON.stringify(notices)}`);
+  check("missing group still backfilled with defaults (enabled)",
+    out.regionalGroups.hisuian?.enabled === true);
+  check("existing array untouched (no retroactive additions)",
+    JSON.stringify(out.regionalGroups.alolan.typeChecksEnabled) === JSON.stringify(["Raichu"]));
+  check("regionalCatalogSeen fingerprint written",
+    JSON.stringify(out.regionalCatalogSeen) === JSON.stringify(regionalCatalogTokens()));
+}
+
+console.log("\nRegional catalog sync: additions since the last visit are applied + reported");
+{
+  // Simulate a catalog that grew: the stored fingerprint is missing the
+  // hisuian group, an A-tier and a C-tier Alolan typeCheck, one collectible
+  // collector, and one Galarian typeCheck (whose group the user disabled).
+  const seen = regionalCatalogTokens().filter(tok =>
+    tok !== "hisuian" && !tok.startsWith("hisuian>")
+    && tok !== "alolan>tc>Kokowei" && tok !== "alolan>tc>Sandan"
+    && tok !== "collectibles>col>Krawalloro"
+    && tok !== "galarian>tc>Pantimos");
+  const notices = [];
+  const out = mergeImportedConfig({
+    regionalCatalogSeen: seen,
+    regionalGroups: {
+      alolan: { enabled: true, typeChecksEnabled: ["Raichu", "NichtEcht"], collectorsEnabled: null },
+      galarian: { enabled: false, typeChecksEnabled: ["Smogmog"], collectorsEnabled: null },
+      paldean: { enabled: true, typeChecksEnabled: null, collectorsEnabled: null },
+      collectibles: { enabled: true, typeChecksEnabled: null, collectorsEnabled: ["Coiffwaff"] },
+    },
+  }, notices);
+  const g = out.regionalGroups;
+  check("new group backfilled enabled + noticed",
+    g.hisuian?.enabled === true && notices.some(n => n.kind === "group" && n.group === "hisuian"));
+  check("A-tier typeCheck appended to array + noticed",
+    g.alolan.typeChecksEnabled.includes("Kokowei")
+    && notices.some(n => n.kind === "typeCheck" && n.species === "Kokowei"));
+  check("C-tier typeCheck NOT appended, no notice (fresh-install default is off)",
+    !g.alolan.typeChecksEnabled.includes("Sandan")
+    && !notices.some(n => n.species === "Sandan"));
+  check("stale species pruned from array", !g.alolan.typeChecksEnabled.includes("NichtEcht"));
+  check("collector appended to array + noticed",
+    g.collectibles.collectorsEnabled.includes("Krawalloro")
+    && notices.some(n => n.kind === "collector" && n.species === "Krawalloro"));
+  check("disabled group: array updated but NO notice (nothing is protected)",
+    g.galarian.typeChecksEnabled.includes("Pantimos")
+    && !notices.some(n => n.species === "Pantimos"));
+  check("null (= all on) state stays null", g.paldean.typeChecksEnabled === null);
+  check("fingerprint advanced to the current catalog",
+    JSON.stringify(out.regionalCatalogSeen) === JSON.stringify(regionalCatalogTokens()));
+  const twice = [];
+  const again = mergeImportedConfig(out, twice);
+  check("idempotent: re-merge yields no new notices", twice.length === 0,
+    `got ${JSON.stringify(twice)}`);
+  check("idempotent: groups unchanged on re-merge",
+    JSON.stringify(again.regionalGroups) === JSON.stringify(out.regionalGroups));
 }
 
 console.log(`\n${failures === 0 ? "✓ All migration tests passed." : `✗ ${failures} test(s) failed.`}`);

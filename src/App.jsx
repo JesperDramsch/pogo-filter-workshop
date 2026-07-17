@@ -25,6 +25,7 @@ import PVP_RANKINGS from './data/pvp-rankings.json';
 import META_RANKINGS from './data/meta-rankings.json';
 import EVOLUTION_COSTS from './data/evolution-costs.json';
 import REGIONAL_FORMS from './data/regional-forms.json';
+import CHANGELOG from './data/changelog.json';
 import { useTranslation } from './i18n/I18nProvider.jsx';
 import Landing from './Landing.jsx';
 import General from './explain/General.jsx';
@@ -602,6 +603,45 @@ function defaultRegionalToggles() {
 	return out;
 }
 
+// Flat fingerprint of the regional catalog: every group key plus one token per
+// typeCheck / collector species ("alolan", "alolan>tc>Kokowei",
+// "collectibles>col>Coiffwaff"). Stored on the config as `regionalCatalogSeen`
+// at every merge, so the NEXT load can tell a genuinely-new catalog entry
+// apart from one the user deselected.
+export function regionalCatalogTokens() {
+	const out = [];
+	for (const [key, group] of Object.entries(REGIONAL_GROUPS)) {
+		out.push(key);
+		for (const tc of group.typeChecks) out.push(`${key}>tc>${tc.species}`);
+		for (const sp of group.collectors) out.push(`${key}>col>${sp}`);
+	}
+	return out.sort();
+}
+
+// Which enabled regional groups currently protect this species (as a typeCheck
+// or collector)? Used by the hundo adder to warn that a freshly-added hundo of
+// a regional does NOT surface its duplicates — regional protection wins over
+// the hundo carve-out, and unchecking the species in the regionals step is the
+// explicit opt-out. Species is matched canonically, so any input locale works.
+export function regionalProtectionsFor(species, cfg) {
+	const canon = resolveSpecies(species) || String(species).toLowerCase();
+	const same = (sp) => (resolveSpecies(sp) || String(sp).toLowerCase()) === canon;
+	const groups = cfg?.regionalGroups || {};
+	const out = [];
+	for (const [key, group] of Object.entries(REGIONAL_GROUPS)) {
+		const state = groups[key];
+		if (!state || !state.enabled) continue;
+		const tcOn = group.typeChecks.some(
+			(tc) => same(tc.species) && (state.typeChecksEnabled === null || state.typeChecksEnabled.includes(tc.species)),
+		);
+		const colOn = group.collectors.some(
+			(sp) => same(sp) && (state.collectorsEnabled === null || state.collectorsEnabled.includes(sp)),
+		);
+		if (tcOn || colOn) out.push(key);
+	}
+	return out;
+}
+
 // Pokémon name dictionary, resolvers, and reverse-lookup helpers live in
 // src/data/species.js (multi-locale, generated from the published Google
 // Sheet via scripts/fetch-translations.mjs at build time). Imported above.
@@ -611,19 +651,20 @@ function defaultRegionalToggles() {
 const BUDDY_TYPE_KEYS = new Set(Object.keys(pogoKeywords('de').type));
 
 // Normalize one buddy target onto the structured shape
-//   { species, expand, dropForms }
+//   { species, expand, dropForms, gender }
 // where `species` is a canonical lowercase name, `expand` toggles +family
-// expansion (default off → exact species), and `dropForms` is an array of
+// expansion (default off → exact species), `dropForms` is an array of
 // regional-form keys to EXCLUDE from the catch list (default [] → catch every
-// form). Legacy string entries become exact, catch-all targets. Legacy
-// `{type}` entries (the old single-form picker) migrate by keeping only the
-// form whose predicate includes that type and dropping the rest. Idempotent —
-// a normalized target re-runs unchanged. Returns null for junk so the caller
+// form), and `gender` is 'male' | 'female' | 'any' (default 'any' → both).
+// Legacy string entries become exact, catch-all targets. Legacy `{type}`
+// entries (the old single-form picker) migrate by keeping only the form whose
+// predicate includes that type and dropping the rest. Idempotent — a
+// normalized target re-runs unchanged. Returns null for junk so the caller
 // can drop it.
 export function normalizeBuddyTarget(entry) {
 	if (typeof entry === 'string') {
 		const species = resolveSpecies(entry) || entry.toLowerCase();
-		return species ? { species, expand: false, dropForms: [] } : null;
+		return species ? { species, expand: false, dropForms: [], gender: 'any' } : null;
 	}
 	if (entry && typeof entry === 'object' && entry.species != null) {
 		const species = resolveSpecies(entry.species) || String(entry.species).toLowerCase();
@@ -639,7 +680,8 @@ export function normalizeBuddyTarget(entry) {
 			const keep = key && forms.find((f) => (f.include || []).includes(key));
 			if (keep) dropForms = forms.filter((f) => f.key !== keep.key).map((f) => f.key);
 		}
-		return { species, expand: !!entry.expand, dropForms };
+		const gender = entry.gender === 'male' || entry.gender === 'female' ? entry.gender : 'any';
+		return { species, expand: !!entry.expand, dropForms, gender };
 	}
 	return null;
 }
@@ -652,10 +694,77 @@ export function normalizeBuddyTarget(entry) {
 // Pattern: spread DEFAULT_CONFIG first so missing fields back-fill, then
 // the raw blob so user values win, then explicit cleanup for legacy keys
 // and renames. Unknown forward-compat keys are preserved.
-export function mergeImportedConfig(raw) {
+//
+// `notices` (optional) collects catalog-sync events the caller may surface to
+// the user: one { kind: 'group'|'typeCheck'|'collector', group, species? }
+// entry per regional that was newly added to their protections (see the
+// catalog-sync block below).
+export function mergeImportedConfig(raw, notices = []) {
 	const merged = { ...DEFAULT_CONFIG, ...(raw || {}) };
 	if (!merged.regionalGroups || Object.keys(merged.regionalGroups).length === 0) {
 		merged.regionalGroups = defaultRegionalToggles();
+	}
+	// ── Regional catalog sync ─────────────────────────────────────────────
+	// The regional catalog grows over time (new game generations, synced form
+	// data). A stored config is a snapshot: without this block a returning
+	// user's filter silently skips every regional added after their last visit
+	// (missing group key → whole group skipped in buildFilters; a
+	// typeChecksEnabled/collectorsEnabled ARRAY never gains new species).
+	// New entries become protected BY DEFAULT — same rules as a fresh install
+	// (C-tier stays off) — and each addition lands in `notices` so the UI can
+	// tell the user their state was updated. `regionalCatalogSeen` (the
+	// fingerprint from the last merge) distinguishes "new to this user" from
+	// "user turned it off"; configs predating the field are grandfathered to
+	// the current catalog so nobody gets a retroactive popup.
+	{
+		const seen = new Set(
+			Array.isArray(raw?.regionalCatalogSeen) ? raw.regionalCatalogSeen : regionalCatalogTokens(),
+		);
+		const defaults = defaultRegionalToggles();
+		const groups = { ...merged.regionalGroups };
+		for (const [key, group] of Object.entries(REGIONAL_GROUPS)) {
+			if (!groups[key]) {
+				groups[key] = defaults[key];
+				if (!seen.has(key)) notices.push({ kind: 'group', group: key });
+				continue;
+			}
+			const state = { ...groups[key] };
+			// Prune species that left the catalog (renames, delistings) so stale
+			// selections can't linger in the editor or the share/export payload.
+			const tcSpecies = new Set(group.typeChecks.map((tc) => tc.species));
+			if (Array.isArray(state.typeChecksEnabled)) {
+				state.typeChecksEnabled = state.typeChecksEnabled.filter((sp) => tcSpecies.has(sp));
+			}
+			const colSpecies = new Set(group.collectors);
+			if (Array.isArray(state.collectorsEnabled)) {
+				state.collectorsEnabled = state.collectorsEnabled.filter((sp) => colSpecies.has(sp));
+			}
+			for (const tc of group.typeChecks) {
+				if (seen.has(`${key}>tc>${tc.species}`)) continue;
+				// null = "all on" already covers it; an array only gains
+				// recommended-tier entries (C-tier stays off, like fresh defaults).
+				const protects =
+					state.typeChecksEnabled === null ||
+					((tc.tier || 'A') !== 'C' && !state.typeChecksEnabled.includes(tc.species));
+				if (Array.isArray(state.typeChecksEnabled) && protects) {
+					state.typeChecksEnabled = [...state.typeChecksEnabled, tc.species];
+				}
+				// A notice claims "this is now protected" — only true if the group
+				// itself is on. Disabled groups still get the array updated above so
+				// re-enabling later picks the new species up.
+				if (protects && state.enabled) notices.push({ kind: 'typeCheck', group: key, species: tc.species });
+			}
+			for (const sp of group.collectors) {
+				if (seen.has(`${key}>col>${sp}`)) continue;
+				if (Array.isArray(state.collectorsEnabled) && !state.collectorsEnabled.includes(sp)) {
+					state.collectorsEnabled = [...state.collectorsEnabled, sp];
+				}
+				if (state.enabled) notices.push({ kind: 'collector', group: key, species: sp });
+			}
+			groups[key] = state;
+		}
+		merged.regionalGroups = groups;
+		merged.regionalCatalogSeen = regionalCatalogTokens();
 	}
 	if (!merged.enabledTradeEvos || merged.enabledTradeEvos.length === 0) {
 		merged.enabledTradeEvos = Object.keys(TRADE_EVO_FAMILIES);
@@ -1037,14 +1146,11 @@ export function buildFilters(
 			// homeLocals-based auto-drop for bare collectors.
 			if (homeLocalTypeChecks.some((l) => l.species === tc.species && l.type === tc.type)) continue;
 			const speciesOut = speciesForOutput(tc.species, outputLocale);
-			// Hundo carve-out parity with the bare-collector loop below (L800): if
-			// the user owns a hundo of this species, its duplicates are redundant and
-			// should fall through to trash instead of being re-protected here — the
-			// same intent as the `+H` carve-out on trash clause 1. The hundo list is
-			// form-agnostic (PoGo can't search by regional form), so — exactly like
-			// collectors — we drop by species, which covers multi-form species too
-			// (e.g. owning a hundo Tauros surfaces every Paldean form's dupes).
-			if (hundoOutSet.has(speciesOut)) continue;
+			// NO hundo carve-out here (deliberately): a regional stays excluded from
+			// trash even once you own its hundo — a regional dupe is trade bait for
+			// friends, not junk. The user opts OUT explicitly by unchecking the
+			// species in the regionals step; the hundo adder tells them so when they
+			// add a protected regional (HundoRegionalNotice).
 			const speciesDisplay = capFirst(speciesOut);
 			const typeOut = kw.type[tc.type] || tc.type;
 			// Optional excludeTypes carves additional negative-type modifiers into the
@@ -1066,11 +1172,12 @@ export function buildFilters(
 				`${tFn(group.labelKey)}: ${tFn(tc.noteKey)}${whyCarve}`,
 			);
 		}
-		// Collectors — resolve each to outputLocale, then collapse families
+		// Collectors — resolve each to outputLocale, then collapse families.
+		// Same as the typeChecks above: hundo ownership does NOT drop the
+		// protection — unchecking the collector chip is the explicit opt-out.
 		const enabledCollectorsOut = group.collectors
 			.filter((sp) => state.collectorsEnabled === null || state.collectorsEnabled.includes(sp))
-			.map((sp) => speciesForOutput(sp, outputLocale))
-			.filter((sp) => !hundoOutSet.has(sp));
+			.map((sp) => speciesForOutput(sp, outputLocale));
 		const collapsed = collapseFamilies(enabledCollectorsOut, FAMILY_COLLAPSES);
 		for (const entry of collapsed) {
 			const groupLabel = tFn(group.labelKey);
@@ -1091,7 +1198,8 @@ export function buildFilters(
 	);
 	for (const sp of cfg.customCollectibles || []) {
 		const lower = speciesForOutput(sp, outputLocale);
-		if (hundoOutSet.has(lower)) continue;
+		// No hundo gate here either — a custom collectible is explicit user
+		// intent; removing it from the list is the opt-out.
 		if (allRegionalCollectorsOut.has(lower)) continue;
 		const display = capFirst(lower);
 		push(trashClauses, `!${display}`, tFn('app.clause_why.custom_collectible', { params: { name: display } }));
@@ -1318,12 +1426,12 @@ export function buildFilters(
 
 	for (const b of activeBuddies) {
 		const prefix = b.tagPrefix.replace(/^#/, '');
-		// targetSpecies entries are structured Targets { species, expand, dropForms }
-		// (legacy strings / typed targets are migrated to this shape on load).
-		// Resolve each to an output-locale display name. Whole-species targets
-		// (dropForms empty) and form-restricted targets both feed ONE combined
-		// filter: every species joins the union OR-list, and each dropped form adds
-		// a per-species type guard below.
+		// targetSpecies entries are structured Targets { species, expand, dropForms,
+		// gender } (legacy strings / typed targets are migrated to this shape on
+		// load). Resolve each to an output-locale display name. Whole-species
+		// targets (dropForms empty) and form-restricted targets both feed ONE
+		// combined filter: every species joins the union OR-list, and each dropped
+		// form / gender pick adds a per-species guard below.
 		const allTargets = (b.targetSpecies || [])
 			.filter((t) => t && t.species)
 			.map((t) => ({
@@ -1331,6 +1439,7 @@ export function buildFilters(
 				display: speciesForOutput(t.species, outputLocale),
 				expand: !!t.expand,
 				dropForms: Array.isArray(t.dropForms) ? t.dropForms : [],
+				gender: t.gender === 'male' || t.gender === 'female' ? t.gender : 'any',
 			}));
 		const plainTargets = allTargets.filter((t) => t.dropForms.length === 0);
 		const formTargets = allTargets.filter((t) => t.dropForms.length > 0);
@@ -1369,17 +1478,19 @@ export function buildFilters(
 			...unionTargets.map(sel),
 			...(wantsTE ? TE_full.map((base) => `+${teDisplay(base, outputLocale)}`) : []),
 		];
-		if (speciesParts.length > 0) {
-			const why = [
-				unionTargets.length > 0
-					? tFn('app.clause_why.buddy_targets_count', { params: { count: unionTargets.length } })
-					: null,
-				wantsTE ? tFn('app.clause_why.buddy_te_count', { params: { count: TE_full.length } }) : null,
-			]
-				.filter(Boolean)
-				.join(' + ');
+		if (speciesParts.length > 0 || hasRaw) {
 			const catchClauses = [];
-			push(catchClauses, speciesParts.join(','), `${b.name}: ${why}`);
+			if (speciesParts.length > 0) {
+				const why = [
+					unionTargets.length > 0
+						? tFn('app.clause_why.buddy_targets_count', { params: { count: unionTargets.length } })
+						: null,
+					wantsTE ? tFn('app.clause_why.buddy_te_count', { params: { count: TE_full.length } }) : null,
+				]
+					.filter(Boolean)
+					.join(' + ');
+				push(catchClauses, speciesParts.join(','), `${b.name}: ${why}`);
+			}
 			pushStarsOrSpare(catchClauses, unionTargets.filter((t) => hundoOutSet.has(t.display)).map(sel));
 			// Per-species form guards — one comma-OR `&`-clause per dropped form.
 			for (const t of liveFormTargets) {
@@ -1400,27 +1511,33 @@ export function buildFilters(
 					);
 				}
 			}
+			// Per-species gender guards — same scoped implication as the form
+			// guards: `!<species>,<gender-kw>` = "NOT this species OR the wanted
+			// gender" constrains only that species and leaves the union untouched.
+			for (const t of unionTargets) {
+				if (t.gender !== 'male' && t.gender !== 'female') continue;
+				push(
+					catchClauses,
+					`!${sel(t)},${kw.flag[t.gender]}`,
+					tFn(`app.clause_why.buddy_gender_${t.gender}`, { params: { species: capFirst(t.display) } }),
+				);
+			}
 			pushBuddyGuards(catchClauses);
+			// ── Expert raw append — extra `&`-clauses on the SAME filter ─────────
+			// Verbatim, split on `&` only so each piece shows up as its own clause
+			// in the explain panel; the `&`-join below reconstructs the input
+			// exactly. Comma binds tighter than `&`, so each comma-group (e.g.
+			// `!361,weiblich,female`) stays a self-contained guard.
+			if (hasRaw) {
+				for (const part of rawAppend.split('&')) {
+					push(catchClauses, part, tFn('app.clause_why.buddy_raw_append'));
+				}
+			}
 			buddyCatchFilters.push({
 				buddyName: b.name,
 				prefix,
 				filter: catchClauses.map((c) => c.clause).join('&'),
 				clauses: catchClauses,
-			});
-		}
-
-		// ── Expert raw escape hatch — its OWN line, verbatim and UNGUARDED ──
-		// A stray comma in a raw blob could break precedence across a guarded
-		// clause set, so it never gets `&`-appended to one. Expert-only.
-		if (hasRaw) {
-			buddyCatchFilters.push({
-				buddyName: b.name,
-				prefix,
-				formKey: 'raw',
-				label: `${b.name} · ${tFn('app.buddy_catch.raw_label')}`,
-				filter: rawAppend,
-				clauses: [{ clause: rawAppend, why: tFn('app.buddy_catch.raw_why') }],
-				raw: true,
 			});
 		}
 	}
@@ -1518,11 +1635,14 @@ export function buildFilters(
 	// still lacks as a lucky / as a hundo, so the friend can trade them over.
 	//
 	// Encoded as a BLACKLIST (exclude the species the user already owns) using
-	// bare DEX NUMBERS. Numbers are locale-independent, so the species part works
-	// in the friend's PoGo client whatever its language — only the flag keywords
-	// (!traded / !shadow / !mythical) render in outputLocale. Blacklist also
-	// scales with the (smaller) owned set rather than the ~1000 missing species,
-	// keeping the string well under PoGo's ~5000-char box even for new accounts.
+	// family-expanded NAME selectors (`!+glurak`) rendered in outputLocale — the
+	// share panel's locale picker sets that to the FRIEND's PoGo language.
+	// Family expansion because lucky status and IVs both survive evolution: one
+	// family member covers the whole line, and `+name` is the only family
+	// syntax PoGo has (there is no `+dex`). Only the species names and the flag
+	// keywords (!traded / !shadow / !mythical) are locale-sensitive. Blacklist
+	// also scales with the (smaller) owned set rather than the ~1000 missing
+	// species, keeping the string well under PoGo's ~5000-char box.
 	//
 	// Trade guards mirror the GIFT filter (the proven inverse pattern):
 	//   !traded            — a mon can be traded only ONCE; already-traded = dead end
@@ -1534,15 +1654,18 @@ export function buildFilters(
 	// optional "guaranteed-lucky" variant restricting to old catches (jahr-N)
 	// that are guaranteed Lucky on trade.
 
-	// Canonical-name HAVE-list → sorted, de-duplicated base-dex numbers to negate.
-	// resolveSpeciesInfo collapses forms (mega/regional) to their base dex.
-	const ownedDexList = (names) => {
+	// Canonical-name HAVE-list → sorted, de-duplicated output-locale species
+	// names to negate. resolveSpeciesInfo collapses forms (mega/regional) to
+	// their base dex; unresolvable entries are dropped rather than emitting a
+	// broken selector.
+	const ownedSpeciesNames = (names) => {
 		const seen = new Set();
 		for (const n of names || []) {
 			const dex = resolveSpeciesInfo(n)?.dex;
-			if (dex) seen.add(pokemonNameFor(String(dex), outputLocale) || dex.name?.toLowerCase());
+			const out = dex ? pokemonNameFor(String(dex), outputLocale) : null;
+			if (out) seen.add(out.toLowerCase());
 		}
-		return [...seen].sort((a, b) => a - b);
+		return [...seen].sort((a, b) => a.localeCompare(b));
 	};
 
 	// Shared trade-eligibility guards appended to every friend wishlist.
@@ -1552,10 +1675,14 @@ export function buildFilters(
 		push(clauses, `!${kw.flag.mythical},808,809`, tFn('app.clause_why.must_mythical_short'));
 	};
 
-	// Lucky wishlist — exclude every species the user already has a lucky of.
+	// Lucky wishlist — exclude every family the user already has a lucky in.
 	const friendLuckyClauses = [];
-	for (const dex of ownedDexList(luckies))
-		push(friendLuckyClauses, `!+${dex}`, tFn('app.clause_why.friend_have_lucky', { params: { dex } }));
+	for (const sp of ownedSpeciesNames(luckies))
+		push(
+			friendLuckyClauses,
+			`!+${sp}`,
+			tFn('app.clause_why.friend_have_lucky', { params: { species: capFirst(sp) } }),
+		);
 	pushFriendTradeGuards(friendLuckyClauses);
 	const friendLuckyWishlist = friendLuckyClauses.map((c) => c.clause).join('&');
 
@@ -1572,11 +1699,15 @@ export function buildFilters(
 		);
 	const friendLuckyWishlistGuaranteed = friendLuckyGuaranteedClauses.map((c) => c.clause).join('&');
 
-	// Hundo wishlist — exclude every species the user already has a hundo of.
+	// Hundo wishlist — exclude every family the user already has a hundo in.
 	// No 4* clause: IVs re-roll on trade, so any untraded specimen is fair game.
 	const friendHundoClauses = [];
-	for (const dex of ownedDexList(hundos))
-		push(friendHundoClauses, `!+${dex}`, tFn('app.clause_why.friend_have_hundo', { params: { dex } }));
+	for (const sp of ownedSpeciesNames(hundos))
+		push(
+			friendHundoClauses,
+			`!+${sp}`,
+			tFn('app.clause_why.friend_have_hundo', { params: { species: capFirst(sp) } }),
+		);
 	pushFriendTradeGuards(friendHundoClauses);
 	const friendHundoWishlist = friendHundoClauses.map((c) => c.clause).join('&');
 
@@ -2392,6 +2523,8 @@ const FLAG_TO_MON = {
 	background: 'background',
 	traded: 'traded',
 	hatched: 'hatched',
+	female: 'female',
+	male: 'male',
 	baby: 'eggOnly',
 	new_evo: 'newDexEvo',
 	special_move: 'legacyMove',
@@ -2501,6 +2634,21 @@ function evalTerm(t, mon, kw, outputLocale) {
 		return (mon.types || []).includes(typeKey);
 	}
 
+	// Bare species-name literal — the EXACT-species selector that buddy unions
+	// ("corasonn,dratini"), regional collector protections ("!corasonn"), and
+	// scoped guards ("!Corasonn,!geist") emit. Went unrecognized (→ null-skip,
+	// clause always false) since exact targets stopped being +family selectors.
+	// Resolve in any locale, then compare identity: dex when the mon carries
+	// one, else canonical name against the mon's own species (families[0] in
+	// the verify tester). Checked LAST so localized flag/type keywords that
+	// shadow a species name keep their filter meaning.
+	const speciesInfo = resolveSpeciesInfo(t);
+	if (speciesInfo) {
+		if (mon.dex) return mon.dex === speciesInfo.dex;
+		const own = mon.species || (mon.families || [])[0] || '';
+		return own !== '' && (resolveSpecies(own) || String(own).toLowerCase()) === (resolveSpecies(t) || t.toLowerCase());
+	}
+
 	return null;
 }
 
@@ -2512,6 +2660,7 @@ const KEY_TOP_ATTACKERS = 'pogo:topAttackers';
 const KEY_TOP_MAX_ATTACKERS = 'pogo:topMaxAttackers';
 const KEY_CONFIG = 'pogo:config';
 const KEY_ONBOARDED = 'pogo:onboarded';
+const KEY_CHANGELOG_SEEN = 'pogo:changelogSeen';
 
 // iOS Safari (regular tab) refuses Storage API persistence at the WebKit
 // level: navigator.storage.persist() resolves with false immediately, no
@@ -3076,6 +3225,16 @@ export default function App() {
 	});
 	const [resetArmed, setResetArmed] = useState(false);
 	const [showSettings, setShowSettings] = useState(false);
+	// Regionals added to the user's protections by the catalog sync in
+	// mergeImportedConfig on this load — non-empty triggers the one-time popup.
+	const [regionalNotices, setRegionalNotices] = useState([]);
+	// Hundos just added via the adder that are ALSO protected regionals — the
+	// popup explains that protection wins and where the opt-out lives.
+	const [hundoRegionalNotice, setHundoRegionalNotice] = useState([]);
+	const [showChangelog, setShowChangelog] = useState(false);
+	// Number of changelog entries the user has already opened the panel for —
+	// drives the "new" dot on the footer link.
+	const [changelogSeen, setChangelogSeen] = useState(CHANGELOG.length);
 	useEffect(() => {
 		if (!resetArmed) return;
 		const t = setTimeout(() => setResetArmed(false), 3000);
@@ -3095,8 +3254,12 @@ export default function App() {
 			const b = await loadJSON(KEY_BAZAARTAGS, []);
 			const step = await loadJSON(KEY_STEP, 1);
 			const ob = await loadJSON(KEY_ONBOARDED, false);
+			const clSeen = await loadJSON(KEY_CHANGELOG_SEEN, 0);
 			setHundos(h);
-			setConfig(mergeImportedConfig(c));
+			const catalogNotices = [];
+			setConfig(mergeImportedConfig(c, catalogNotices));
+			if (catalogNotices.length > 0) setRegionalNotices(catalogNotices);
+			setChangelogSeen(clSeen);
 			const canonicalize = (arr) => (arr || []).map((s) => resolveSpecies(s) || s);
 			setLuckies(canonicalize(l));
 			setTopAttackers(canonicalize(ta));
@@ -3149,6 +3312,9 @@ export default function App() {
 	useEffect(() => {
 		if (loaded) saveJSON(KEY_ONBOARDED, onboarded);
 	}, [onboarded, loaded]);
+	useEffect(() => {
+		if (loaded) saveJSON(KEY_CHANGELOG_SEEN, changelogSeen);
+	}, [changelogSeen, loaded]);
 
 	// Locals at home location (drives auto-drop from Regionals protection + bazaar suggestions)
 	const homeLocals = useMemo(() => computeHomeLocals(homeLocation), [homeLocation]);
@@ -3273,15 +3439,24 @@ export default function App() {
 		if (tokens.length === 0) return;
 		const set = new Set(hundos);
 		const unresolved = [];
+		const added = [];
 		for (const tok of tokens) {
 			const resolved = resolveSpecies(tok);
 			if (resolved) {
+				if (!set.has(resolved)) added.push(resolved);
 				set.add(resolved);
 			} else {
 				unresolved.push(tok);
 			}
 		}
 		setHundos([...set].sort());
+		// A hundo of a protected regional does NOT surface its duplicates (the
+		// regional clauses win) — tell the user right away instead of letting
+		// them wonder why the dupes never showed up in trash.
+		const regionalAdds = added
+			.map((sp) => ({ species: sp, groups: regionalProtectionsFor(sp, config) }))
+			.filter((x) => x.groups.length > 0);
+		if (regionalAdds.length > 0) setHundoRegionalNotice(regionalAdds);
 		if (unresolved.length > 0) {
 			// Keep unresolved tokens in the input so the user sees what didn't match
 			setNewHundo(unresolved.join(', '));
@@ -3600,7 +3775,6 @@ export default function App() {
 									setConfig={setConfig}
 									homeLocals={homeLocals}
 									homeLocalTypeChecks={homeLocalTypeChecks}
-									hundos={hundos}
 								/>
 							</StepWrapper>
 						)}
@@ -4201,6 +4375,18 @@ export default function App() {
 									· home {homeLocation[1].toFixed(1)}°,{homeLocation[0].toFixed(1)}°
 								</span>
 							)}
+							<button
+								onClick={() => {
+									setShowChangelog(true);
+									setChangelogSeen(CHANGELOG.length);
+								}}
+								className='ml-auto flex items-center gap-1.5 hover:text-[#E6EDF3] transition underline decoration-dotted underline-offset-2'
+							>
+								{t('app.changelog.footer_link')}
+								{changelogSeen < CHANGELOG.length && (
+									<span className='w-1.5 h-1.5 rounded-full bg-[#E67E22] inline-block' aria-hidden='true' />
+								)}
+							</button>
 						</footer>
 						<AppCredit />
 					</div>
@@ -4220,6 +4406,17 @@ export default function App() {
 				onExport={exportState}
 				onImport={applyImportEnvelope}
 			/>
+			<HundoRegionalNotice notices={hundoRegionalNotice} onClose={() => setHundoRegionalNotice([])} />
+			<RegionalSyncNotice
+				notices={regionalNotices}
+				onClose={() => setRegionalNotices([])}
+				onShowChangelog={() => {
+					setRegionalNotices([]);
+					setShowChangelog(true);
+					setChangelogSeen(CHANGELOG.length);
+				}}
+			/>
+			<ChangelogModal open={showChangelog} onClose={() => setShowChangelog(false)} />
 		</div>
 	);
 }
@@ -4276,14 +4473,11 @@ function BuddyCatchSection({ buddyCatchFilters, copied, onCopy }) {
 				<span className='text-[#8090A0] normal-case'>· {t('app.buddy_catch.section_subtitle')}</span>
 			</div>
 			{buddyCatchFilters.map((b) => {
-				// A buddy can now emit multiple lines (shared selector + one per form +
-				// optional raw), so the key/copy-id must include formKey to stay unique.
-				const uid = b.formKey ? `${b.prefix}-${b.formKey}` : b.prefix;
-				const key = `buddyCatch:${uid}`;
+				const key = `buddyCatch:${b.prefix}`;
 				return (
 					<FilterBox
-						key={uid}
-						label={b.label || t('app.buddy_catch.filter_label', { params: { name: b.buddyName } })}
+						key={b.prefix}
+						label={t('app.buddy_catch.filter_label', { params: { name: b.buddyName } })}
 						accent='#E67E22'
 						filterStr={b.filter}
 						copied={copied[key]}
@@ -5598,8 +5792,8 @@ function RawClausesPanel({
 				buddyCatchFilters.length > 0 &&
 				buddyCatchFilters.map((b) => (
 					<ClauseList
-						key={`catch:${b.formKey ? `${b.prefix}-${b.formKey}` : b.prefix}`}
-						title={b.label || t('app.buddy_catch.filter_label', { params: { name: b.buddyName } })}
+						key={`catch:${b.prefix}`}
+						title={t('app.buddy_catch.filter_label', { params: { name: b.buddyName } })}
 						accent='#E67E22'
 						clauses={b.clauses}
 					/>
@@ -5632,12 +5826,14 @@ function ClauseList({ title, accent, clauses }) {
 
 function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = 'de' }) {
 	const { t } = useTranslation();
+	// Raw 0-15 IVs (what the in-game appraisal screen shows). Bars and star
+	// rating are DERIVED — see ivToBar/starFromIVs — so the tester can't
+	// represent an impossible mon. Default 10/10/10 = 2/2/2 bars, 2★.
 	const [m, setM] = useState({
 		family: '',
-		star: 2,
-		atk: 1,
-		def: 1,
-		hp: 1,
+		ivAtk: 10,
+		ivDef: 10,
+		ivHp: 10,
 		flags: {},
 		types: [],
 		dex: 0,
@@ -5666,6 +5862,12 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = 'de' })
 		}
 		return {
 			...m,
+			// Filter terms consume bars (0attack..4attack) and stars — both
+			// derived from the raw IVs so they can never contradict each other.
+			atk: ivToBar(m.ivAtk),
+			def: ivToBar(m.ivDef),
+			hp: ivToBar(m.ivHp),
+			star: starFromIVs(m.ivAtk, m.ivDef, m.ivHp),
 			families,
 			dex: m.dex || 0,
 			// Gigantamax-capable is physically a subset of Dynamax-capable, so a mon
@@ -5713,33 +5915,36 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = 'de' })
 					placeholder={t('app.verify.placeholder_family')}
 				/>
 				<FieldNum
-					label={t('app.verify.field_star')}
-					value={m.star}
-					onChange={(v) => setM({ ...m, star: +v })}
-					min={0}
-					max={4}
-				/>
-				<FieldNum
 					label={t('app.verify.field_atk')}
-					value={m.atk}
-					onChange={(v) => setM({ ...m, atk: +v })}
+					value={m.ivAtk}
+					onChange={(v) => setM({ ...m, ivAtk: Math.max(0, Math.min(15, +v || 0)) })}
 					min={0}
-					max={4}
+					max={15}
 				/>
 				<FieldNum
 					label={t('app.verify.field_def')}
-					value={m.def}
-					onChange={(v) => setM({ ...m, def: +v })}
+					value={m.ivDef}
+					onChange={(v) => setM({ ...m, ivDef: Math.max(0, Math.min(15, +v || 0)) })}
 					min={0}
-					max={4}
+					max={15}
 				/>
 				<FieldNum
 					label={t('app.verify.field_hp')}
-					value={m.hp}
-					onChange={(v) => setM({ ...m, hp: +v })}
+					value={m.ivHp}
+					onChange={(v) => setM({ ...m, ivHp: Math.max(0, Math.min(15, +v || 0)) })}
 					min={0}
-					max={4}
+					max={15}
 				/>
+				{/* Star + bars are read-only: PoGo derives them from the IVs, so the
+				    tester does too (no impossible 4★-with-1/1/1 states). */}
+				<div title={t('app.verify.star_derived_help')}>
+					<label className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
+						{t('app.verify.field_star')}
+					</label>
+					<div className='mono text-xs w-full bg-[#0B0F14] border border-[#1F2933] px-2 py-1.5 rounded text-[#E6EDF3] mt-1'>
+						{mon.star}★ <span className='text-[#8090A0]'>· {mon.atk}/{mon.def}/{mon.hp}</span>
+					</div>
+				</div>
 			</div>
 
 			<div className='flex flex-wrap gap-1.5'>
@@ -5768,10 +5973,22 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = 'de' })
 					{inH ? t('app.verify.yes') : t('app.verify.no')}
 				</span>
 				<span className='mx-2'>·</span>
-				{t('app.verify.iv_class')} {classifyIV(m.atk, m.def, m.hp, t)}
+				{t('app.verify.iv_class')} {classifyIV(mon.atk, mon.def, mon.hp, t)}
 			</div>
 		</div>
 	);
+}
+
+// PoGo derives the appraisal star rating FROM the IVs — they are not
+// independently settable in the game, so the verify tester must not allow
+// impossible combinations (a 4★ with 1/1/1 bars). Raw per-stat IVs are 0-15;
+// the search-syntax "bars" (0attack..4attack) bucket each stat, and the star
+// rating buckets the total: 0-22 → 0★, 23-29 → 1★, 30-36 → 2★, 37-44 → 3★,
+// 45 → 4★ (the hundo).
+export const ivToBar = (iv) => (iv >= 15 ? 4 : iv >= 11 ? 3 : iv >= 6 ? 2 : iv >= 1 ? 1 : 0);
+export function starFromIVs(atk, def, hp) {
+	const total = atk + def + hp;
+	return total === 45 ? 4 : total >= 37 ? 3 : total >= 30 ? 2 : total >= 23 ? 1 : 0;
 }
 
 function classifyIV(a, d, h, t) {
@@ -5996,7 +6213,7 @@ const EXPERT_ONLY_KEYS = new Set([
 	'protectNundos',
 ]);
 
-function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks = [], hundos = [] }) {
+function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks = [] }) {
 	const { t, outputLocale } = useTranslation();
 	// Any individual change in ConfigPanel clears the preset marker — the
 	// marker means "this preset is currently in effect"; the moment the
@@ -6233,7 +6450,6 @@ function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks =
 							setGroup={(partial) => setGroup(key, partial)}
 							homeLocals={homeLocals}
 							homeLocalTypeChecks={homeLocalTypeChecks}
-							hundos={hundos}
 						/>
 					))}
 				</div>
@@ -6366,7 +6582,6 @@ function RegionalGroupEditor({
 	setGroup,
 	homeLocals = [],
 	homeLocalTypeChecks = [],
-	hundos = [],
 }) {
 	const { t } = useTranslation();
 	const [expanded, setExpanded] = useState(false);
@@ -6375,33 +6590,23 @@ function RegionalGroupEditor({
 	const tcEnabled = state.typeChecksEnabled === null ? allTC : state.typeChecksEnabled;
 	const colEnabled = state.collectorsEnabled === null ? allCol : state.collectorsEnabled;
 	// Auto-drops are excluded from the counter so the displayed "X/Y aktiv"
-	// matches the actual filter output. Two mechanisms, mirroring buildFilters:
-	//   home  — this species spawns locally (species string for collectors,
-	//           {species,type} pair for typeChecks — same species with different
-	//           types, e.g. Paldean Tauros Combat vs Blaze, is the wrong
-	//           granularity for the pair check)
-	//   hundo — you own a hundo of the species, so duplicates are redundant and
-	//           the protection is carved out (species-level, form-agnostic).
-	// Home wins the display when both apply — either way the chip is dropped.
+	// matches the actual filter output. One mechanism, mirroring buildFilters:
+	//   home — this species spawns locally (species string for collectors,
+	//          {species,type} pair for typeChecks — same species with different
+	//          types, e.g. Paldean Tauros Combat vs Blaze, is the wrong
+	//          granularity for the pair check)
+	// Hundo ownership deliberately does NOT drop a chip: regional protection
+	// wins over the hundo carve-out, and unchecking here is the manual opt-out
+	// (see the no-hundo-carve-out comments in the buildFilters regional loop).
 	const homeSet = new Set(homeLocals);
 	const tcLocalSet = new Set(homeLocalTypeChecks.map((l) => `${l.species}|${l.type}`));
-	const canonName = (s) => resolveSpecies(s) || String(s).toLowerCase();
-	const hundoSet = new Set((hundos || []).map(canonName));
-	const isHundoDropped = (sp) => hundoSet.has(canonName(sp));
 	const tcDropReason = (tc) =>
-		homeSet.has(tc.species) || tcLocalSet.has(`${tc.species}|${tc.type}`)
-			? 'home'
-			: isHundoDropped(tc.species)
-				? 'hundo'
-				: null;
-	const colDropReason = (sp) => (homeSet.has(sp) ? 'home' : isHundoDropped(sp) ? 'hundo' : null);
+		homeSet.has(tc.species) || tcLocalSet.has(`${tc.species}|${tc.type}`) ? 'home' : null;
+	const colDropReason = (sp) => (homeSet.has(sp) ? 'home' : null);
 	const tcEntriesEnabled = group.typeChecks.filter((tc) => tcEnabled.includes(tc.species));
 	const droppedByHome =
 		tcEntriesEnabled.filter((tc) => tcDropReason(tc) === 'home').length +
 		colEnabled.filter((sp) => colDropReason(sp) === 'home').length;
-	const droppedByHundo =
-		tcEntriesEnabled.filter((tc) => tcDropReason(tc) === 'hundo').length +
-		colEnabled.filter((sp) => colDropReason(sp) === 'hundo').length;
 	const totalEffective =
 		group.typeChecks.filter((tc) => !tcDropReason(tc)).length + allCol.filter((sp) => !colDropReason(sp)).length;
 	const enabledCount = state.enabled
@@ -6461,11 +6666,6 @@ function RegionalGroupEditor({
 								{t('app.regional_editor.home_extra', { params: { count: droppedByHome } })}
 							</span>
 						)}
-						{droppedByHundo > 0 && state.enabled && (
-							<span className='text-[#9B59B6] ml-1'>
-								{t('app.regional_editor.hundo_extra', { params: { count: droppedByHundo } })}
-							</span>
-						)}
 					</span>
 				</button>
 			</div>
@@ -6509,7 +6709,6 @@ function RegionalGroupEditor({
 									const on = tcEnabled.includes(tc.species);
 									const dropReason = tcDropReason(tc);
 									const isHomeLocal = dropReason === 'home';
-									const isHundoDrop = dropReason === 'hundo';
 									const tierBadge = tc.tier === 'S' ? '★' : tc.tier === 'C' ? '·' : null;
 									const tierColor =
 										tc.tier === 'S'
@@ -6521,26 +6720,17 @@ function RegionalGroupEditor({
 										<button
 											key={`${tc.species}_${tc.type}`}
 											onClick={() => toggleTC(tc.species)}
-											title={
-												isHomeLocal
-													? t('app.regional_editor.home_local_title')
-													: isHundoDrop
-														? t('app.regional_editor.hundo_drop_title')
-														: t(tc.noteKey)
-											}
+											title={isHomeLocal ? t('app.regional_editor.home_local_title') : t(tc.noteKey)}
 											disabled={!state.enabled || !!dropReason}
 											className={`mono text-[11px] px-2 py-0.5 rounded transition ${
 												isHomeLocal
 													? 'bg-[#27AE60]/10 text-[#27AE60] border border-[#27AE60]/30 line-through opacity-60'
-													: isHundoDrop
-														? 'bg-[#9B59B6]/10 text-[#9B59B6] border border-[#9B59B6]/30 line-through opacity-60'
-														: on
-															? 'bg-[#5EAFC5]/20 text-[#5EAFC5] border border-[#5EAFC5]/40'
-															: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
+													: on
+														? 'bg-[#5EAFC5]/20 text-[#5EAFC5] border border-[#5EAFC5]/40'
+														: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
 											}`}
 										>
 											{isHomeLocal && <span className='not-italic no-underline mr-0.5'>⌂</span>}
-											{isHundoDrop && <span className='not-italic no-underline mr-0.5'>4★</span>}
 											{tierBadge && !dropReason && (
 												<span className={`${tierColor} mr-0.5`}>{tierBadge}</span>
 											)}
@@ -6561,10 +6751,8 @@ function RegionalGroupEditor({
 									const on = colEnabled.includes(sp);
 									const dropReason = colDropReason(sp);
 									const isHomeLocal = dropReason === 'home';
-									const isHundoDrop = dropReason === 'hundo';
-									// Auto-dropped chips (home via effectiveConfig, hundo via the
-									// buildFilters carve-out) are removed regardless of `on`, so
-									// render them as "off" visually with a ⌂ / 4★ marker.
+									// Home-dropped chips (via effectiveConfig) are removed regardless
+									// of `on`, so render them as "off" visually with a ⌂ marker.
 									const effectivelyOn = on && !dropReason;
 									const noteKey = group.collectorNotes?.[sp];
 									return (
@@ -6575,24 +6763,19 @@ function RegionalGroupEditor({
 											title={
 												isHomeLocal
 													? t('app.regional_editor.home_local_title')
-													: isHundoDrop
-														? t('app.regional_editor.hundo_drop_title')
-														: noteKey
-															? t(noteKey)
-															: undefined
+													: noteKey
+														? t(noteKey)
+														: undefined
 											}
 											className={`mono text-[11px] px-2 py-0.5 rounded transition ${
 												effectivelyOn
 													? 'bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/40'
 													: isHomeLocal
 														? 'bg-[#27AE60]/10 text-[#27AE60] border border-[#27AE60]/30 line-through opacity-60'
-														: isHundoDrop
-															? 'bg-[#9B59B6]/10 text-[#9B59B6] border border-[#9B59B6]/30 line-through opacity-60'
-															: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
+														: 'bg-[#1F2933] text-[#8090A0] border border-transparent hover:bg-[#2D3A47]'
 											}`}
 										>
 											{isHomeLocal && <span className='not-italic no-underline mr-0.5'>⌂</span>}
-											{isHundoDrop && <span className='not-italic no-underline mr-0.5'>4★</span>}
 											{sp}
 											{noteKey && !dropReason && (
 												<span
@@ -7271,6 +7454,157 @@ function NumField({ label, value, onChange, text, hint }) {
 // Holds settings that aren't about "what to protect" but rather "how the tool
 // behaves": expert mode, trade tag names, custom tags, league tags, scope
 // safety nets, and the dangerous reset. Reachable via gear icon in header.
+
+// Popup after adding a hundo of a species that's currently protected as a
+// regional: the protection stays (dupes will NOT surface in trash), and the
+// opt-out is unchecking the species in the regionals step. Fired from
+// addHundo; purely informational, nothing to confirm.
+function HundoRegionalNotice({ notices, onClose }) {
+	const { t } = useTranslation();
+	if (!notices || notices.length === 0) return null;
+	return (
+		<div
+			role='dialog'
+			aria-modal='true'
+			aria-label={t('app.hundo_regional.title')}
+			onClick={onClose}
+			style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
+			className='fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4'
+		>
+			<div
+				onClick={(e) => e.stopPropagation()}
+				style={{ backgroundColor: '#0F1419' }}
+				className='border border-[#2D3A47] rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'
+			>
+				<h2 className='mono text-base font-semibold text-[#E6EDF3]'>{t('app.hundo_regional.title')}</h2>
+				<ul className='space-y-1'>
+					{notices.map((n) => (
+						<li key={n.species} className='mono text-xs text-[#E6EDF3] flex items-baseline gap-2'>
+							<span className='text-[#F5B82E]'>4★</span>
+							{capFirst(n.species)}
+							<span className='text-[#8090A0]'>
+								({n.groups.map((g) => t(REGIONAL_GROUPS[g]?.labelKey || g)).join(', ')})
+							</span>
+						</li>
+					))}
+				</ul>
+				<p className='mono text-xs text-[#8090A0] leading-relaxed'>{t('app.hundo_regional.body')}</p>
+				<div className='flex justify-end'>
+					<button
+						onClick={onClose}
+						className='mono text-xs bg-[#E67E22]/20 hover:bg-[#E67E22]/30 text-[#E67E22] px-3 py-1.5 rounded transition'
+					>
+						{t('app.regional_sync.ok')}
+					</button>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+// One-time popup after the regional catalog sync added protections to a
+// returning user's config (see mergeImportedConfig). Lists what changed so the
+// "magic behind the scenes" stays visible; the entries are already active, the
+// user only decides whether to review them in the regionals step.
+function RegionalSyncNotice({ notices, onClose, onShowChangelog }) {
+	const { t } = useTranslation();
+	if (!notices || notices.length === 0) return null;
+	return (
+		<div
+			role='dialog'
+			aria-modal='true'
+			aria-label={t('app.regional_sync.title')}
+			onClick={onClose}
+			style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
+			className='fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4'
+		>
+			<div
+				onClick={(e) => e.stopPropagation()}
+				style={{ backgroundColor: '#0F1419' }}
+				className='border border-[#2D3A47] rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'
+			>
+				<h2 className='mono text-base font-semibold text-[#E6EDF3]'>{t('app.regional_sync.title')}</h2>
+				<p className='mono text-xs text-[#8090A0] leading-relaxed'>{t('app.regional_sync.body')}</p>
+				<ul className='space-y-1'>
+					{notices.map((n, i) => (
+						<li key={i} className='mono text-xs text-[#E6EDF3] flex items-baseline gap-2'>
+							<span className='text-[#E67E22]'>+</span>
+							<span className='text-[#8090A0]'>{t(REGIONAL_GROUPS[n.group]?.labelKey || n.group)}:</span>
+							{n.kind === 'group' ? t('app.regional_sync.whole_group') : capFirst(n.species)}
+						</li>
+					))}
+				</ul>
+				<div className='flex gap-2 justify-end'>
+					<button
+						onClick={onShowChangelog}
+						className='mono text-xs text-[#8090A0] hover:text-[#E6EDF3] px-3 py-1.5 rounded border border-[#2D3A47] transition'
+					>
+						{t('app.regional_sync.changelog_button')}
+					</button>
+					<button
+						onClick={onClose}
+						className='mono text-xs bg-[#E67E22]/20 hover:bg-[#E67E22]/30 text-[#E67E22] px-3 py-1.5 rounded transition'
+					>
+						{t('app.regional_sync.ok')}
+					</button>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+// "What's new" panel fed by src/data/changelog.json (ids + dates only — the
+// user-facing text lives in the app locale bundles under
+// app.changelog.entry.<id>.*, so entries localize like everything else).
+function ChangelogModal({ open, onClose }) {
+	const { t } = useTranslation();
+	if (!open) return null;
+	return (
+		<div
+			role='dialog'
+			aria-modal='true'
+			aria-label={t('app.changelog.title')}
+			onClick={onClose}
+			style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
+			className='fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4'
+		>
+			<div
+				onClick={(e) => e.stopPropagation()}
+				style={{ backgroundColor: '#0F1419' }}
+				className='border border-[#2D3A47] rounded-lg w-full max-w-lg max-h-[80vh] overflow-y-auto shadow-2xl'
+			>
+				<div
+					style={{ backgroundColor: '#0F1419' }}
+					className='sticky top-0 border-b border-[#1F2933] px-5 py-3 flex items-center justify-between'
+				>
+					<h2 className='mono text-base font-semibold text-[#E6EDF3]'>{t('app.changelog.title')}</h2>
+					<button
+						onClick={onClose}
+						aria-label={t('app.modal.settings.close_aria')}
+						className='text-[#8090A0] hover:text-[#E6EDF3] transition p-1'
+					>
+						<X size={18} />
+					</button>
+				</div>
+				<div className='p-5 space-y-4'>
+					{CHANGELOG.map((entry) => (
+						<div key={entry.id} className='border border-[#1F2933] rounded p-3 space-y-1'>
+							<div className='flex items-baseline gap-2'>
+								<span className='mono text-sm text-[#E6EDF3] font-semibold'>
+									{t(`app.changelog.entry.${entry.id}.title`)}
+								</span>
+								<span className='mono text-[10px] text-[#8090A0] ml-auto'>{entry.date}</span>
+							</div>
+							<p className='mono text-xs text-[#8090A0] leading-relaxed'>
+								{t(`app.changelog.entry.${entry.id}.body`)}
+							</p>
+						</div>
+					))}
+				</div>
+			</div>
+		</div>
+	);
+}
 
 function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArmed, onExport, onImport }) {
 	const { t, locale, setLocale, outputLocale, setOutputLocale, locales } = useTranslation();
@@ -8084,7 +8418,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 		for (const tok of tokens) {
 			const r = resolveSpecies(tok);
 			if (r) {
-				if (!map.has(r)) map.set(r, { species: r, expand: false, dropForms: [] });
+				if (!map.has(r)) map.set(r, { species: r, expand: false, dropForms: [], gender: 'any' });
 			} else remaining.push(tok);
 		}
 		const next = [...map.values()].sort((a, b) => a.species.localeCompare(b.species));
@@ -8172,6 +8506,29 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 										? t('app.buddy_targets.expand_family')
 										: t('app.buddy_targets.expand_exact')}
 								</button>
+								{/* Gender picker: ♀/♂ — click to catch only that gender, click the
+                    active one again to go back to both. Emits the scoped
+                    `!<species>,<gender>` guard. */}
+								<span className='flex items-center gap-1' title={t('app.buddy_targets.gender_help')}>
+									{['female', 'male'].map((g) => {
+										const on = tg.gender === g;
+										return (
+											<button
+												key={g}
+												onClick={() => updateAt(i, { gender: on ? 'any' : g })}
+												aria-pressed={on}
+												aria-label={t(`app.buddy_targets.gender_${g}`)}
+												className={`text-[10px] px-1.5 py-0.5 rounded border transition ${
+													on
+														? 'bg-[#E67E22]/25 border-[#E67E22]/50 text-[#E67E22]'
+														: 'bg-transparent border-[#2D3A47] text-[#8090A0] hover:text-[#E6EDF3]'
+												}`}
+											>
+												{g === 'female' ? '♀' : '♂'}
+											</button>
+										);
+									})}
+								</span>
 								{/* Regional-form picker: every form is catch-on by default; click
                     a chip to drop that form (struck through). Hidden for species
                     with no type-distinguishable regional forms. */}

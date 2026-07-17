@@ -1,15 +1,20 @@
 // Regression tests for the hundo + friend (buddy) carve-out logic.
 // Run with: npx vite-node scripts/check-carveouts.mjs
 //
-// Covers three fixes:
-//   B1  — regional typeChecks honor the hundo carve-out (Corasonn / Paldean
-//         Tauros) the same way bare collectors already do.
+// Covers:
+//   B1  — regional protection OUTRANKS the hundo carve-out: owning a hundo of
+//         a protected regional does NOT drop its typeCheck/collector clauses
+//         (unchecking the species in the regionals step is the explicit
+//         opt-out; the hundo adder warns via regionalProtectionsFor).
 //   B2a — buddy tag prefixes are protected in the TRADE filter (granular-tag
 //         mode), so friend-staged mons don't leak into the general trade pile.
 //   B2b — buddy tag prefixes are surfaced in the PRESTAGED filter, so the
 //         hand-off pile has an output filter at all.
 
-import { buildFilters, evalFilter, mergeImportedConfig, DEFAULT_CONFIG } from "../src/App.jsx";
+import {
+  buildFilters, evalFilter, mergeImportedConfig, DEFAULT_CONFIG,
+  regionalProtectionsFor, ivToBar, starFromIVs,
+} from "../src/App.jsx";
 
 const tFn = (k) => k;
 let failures = 0;
@@ -22,10 +27,11 @@ const hasClauseMatching = (filterStr, re) => clauses(filterStr).some(c => re.tes
 
 const BUDDY = { id: "1", name: "Auri", tagPrefix: "#auri", active: true, targetSpecies: ["kindwurm"] };
 
-console.log("B1 — hundo carve-out drops regional typeCheck protection");
+console.log("B1 — regional protection outranks the hundo carve-out");
 {
   // Galarian Corsola (Corasonn) is BOTH a galarian typeCheck (ghost form) AND a
-  // regionals collector. Owning a hundo must drop BOTH so 3★ dupes surface.
+  // regionals collector. Owning a hundo must keep BOTH — dupes of a regional
+  // are trade bait, not junk. The opt-out is unchecking the species chips.
   const withHundo = buildFilters(["corasonn"], [], mergeImportedConfig({}), [], "de", tFn);
   const noHundo   = buildFilters([],            [], mergeImportedConfig({}), [], "de", tFn);
 
@@ -36,26 +42,69 @@ console.log("B1 — hundo carve-out drops regional typeCheck protection");
     hasClauseMatching(noHundo.trash, /^!corasonn$/i),
     "regression guard");
 
-  check("hundo corasonn: galarian ghost protection DROPPED",
-    !hasClauseMatching(withHundo.trash, /^!Corasonn,!geist/i));
-  check("hundo corasonn: regionals collector DROPPED",
-    !hasClauseMatching(withHundo.trash, /^!corasonn$/i));
-  check("hundo corasonn: carve-out token still present in trash clause 1",
+  check("hundo corasonn: galarian ghost protection KEPT",
+    hasClauseMatching(withHundo.trash, /^!Corasonn,!geist/i));
+  check("hundo corasonn: regionals collector KEPT",
+    hasClauseMatching(withHundo.trash, /^!corasonn$/i));
+  check("hundo corasonn: general +species token still in trash clause 1 (moot but harmless)",
     withHundo.trash.split("&")[0].includes("+corasonn"));
-  check("hundo corasonn: a DIFFERENT regional (Tropius) stays protected",
-    hasClauseMatching(withHundo.trash, /^!tropius$/i),
-    "drop must be species-specific, not global");
+
+  // The explicit opt-out: unchecking the collector + typeCheck chips drops the
+  // clauses even though the group stays enabled.
+  const optedOut = mergeImportedConfig({});
+  optedOut.regionalGroups.galarian = { ...optedOut.regionalGroups.galarian,
+    typeChecksEnabled: ["Smogmog", "Pantimos", "Makabaja", "Porenta"] }; // minus Corasonn
+  optedOut.regionalGroups.regionals = { ...optedOut.regionalGroups.regionals, collectorsEnabled: [] };
+  const out = buildFilters(["corasonn"], [], optedOut, [], "de", tFn);
+  check("unchecking the chips drops the protection (manual opt-out works)",
+    !hasClauseMatching(out.trash, /^!Corasonn,!geist/i) && !hasClauseMatching(out.trash, /^!corasonn$/i));
 }
 
-console.log("\nB1 — Paldean Tauros: every form's typeCheck drops on hundo");
+console.log("\nB1 — Paldean Tauros: typeChecks survive hundo ownership too");
 {
   const withHundo = buildFilters(["tauros"], [], mergeImportedConfig({}), [], "de", tFn);
   const noHundo   = buildFilters([],         [], mergeImportedConfig({}), [], "de", tFn);
   const tauroClauses = (f) => clauses(f.trash).filter(c => /^!Tauros,/i.test(c));
   check("no-hundo baseline: Tauros typeChecks present (3 paldean + 1 base)",
     tauroClauses(noHundo).length >= 4, `found ${tauroClauses(noHundo).length}`);
-  check("hundo tauros: ALL Tauros typeCheck clauses dropped",
-    tauroClauses(withHundo).length === 0, `found ${tauroClauses(withHundo).length}`);
+  check("hundo tauros: ALL Tauros typeCheck clauses kept",
+    tauroClauses(withHundo).length === tauroClauses(noHundo).length,
+    `found ${tauroClauses(withHundo).length}`);
+}
+
+console.log("\nB1 — regionalProtectionsFor drives the hundo-adder popup");
+{
+  const cfg = mergeImportedConfig({});
+  check("corasonn reports its protecting groups",
+    regionalProtectionsFor("corasonn", cfg).length >= 2,
+    `got ${JSON.stringify(regionalProtectionsFor("corasonn", cfg))}`);
+  check("input locale doesn't matter (EN 'Corsola' resolves)",
+    JSON.stringify(regionalProtectionsFor("Corsola", cfg))
+      === JSON.stringify(regionalProtectionsFor("corasonn", cfg)));
+  check("a non-regional (Dratini) reports nothing",
+    regionalProtectionsFor("dratini", cfg).length === 0);
+  const off = mergeImportedConfig({});
+  off.regionalGroups.galarian = { ...off.regionalGroups.galarian, enabled: false };
+  off.regionalGroups.regionals = { ...off.regionalGroups.regionals, collectorsEnabled: [] };
+  check("disabled group + unchecked collector → no popup for corasonn",
+    regionalProtectionsFor("corasonn", off).length === 0,
+    `got ${JSON.stringify(regionalProtectionsFor("corasonn", off))}`);
+}
+
+console.log("\nVerify tester: star rating + bars derive from raw IVs (no impossible mons)");
+{
+  check("15/15/15 → 4★ hundo, max bars", starFromIVs(15, 15, 15) === 4 && ivToBar(15) === 4);
+  check("44 total (14/15/15) → 3★, NOT 4★", starFromIVs(14, 15, 15) === 3);
+  check("37 total → 3★ floor", starFromIVs(15, 15, 7) === 3);
+  check("36 total → 2★ ceiling", starFromIVs(15, 15, 6) === 2);
+  check("30 total → 2★ floor", starFromIVs(10, 10, 10) === 2);
+  check("29 total → 1★ ceiling", starFromIVs(10, 10, 9) === 1);
+  check("23 total → 1★ floor", starFromIVs(8, 8, 7) === 1);
+  check("22 total → 0★ ceiling", starFromIVs(8, 8, 6) === 0);
+  check("0/0/0 → 0★ nundo, empty bars", starFromIVs(0, 0, 0) === 0 && ivToBar(0) === 0);
+  check("bar buckets: 1-5 → 1, 6-10 → 2, 11-14 → 3",
+    ivToBar(1) === 1 && ivToBar(5) === 1 && ivToBar(6) === 2
+    && ivToBar(10) === 2 && ivToBar(11) === 3 && ivToBar(14) === 3);
 }
 
 console.log("\nB2a — buddy tags protected in TRADE (granular-tag mode)");

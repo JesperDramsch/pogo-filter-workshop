@@ -71,17 +71,22 @@ console.log("\nScenario 6: legacy export without luckies → prepared.luckies ab
   check("luckies key absent (caller's setter skipped)", !("luckies" in prepared));
 }
 
-console.log("\nScenario 7: friend wishlist — blacklist by dex, trade guards, no 4* on hundo");
+console.log("\nScenario 7: friend wishlist — family-name blacklist, trade guards, no 4* on hundo");
 {
-  // pikachu=25 (hundo), charizard=6 & dratini=147 (lucky). EN keywords.
+  // pikachu (hundo), charizard & dratini (lucky). EN output locale → EN names.
+  // Owned families are excluded via `!+name` (family syntax has no dex form,
+  // and lucky status / IVs survive evolution so one member covers the line).
   const r = buildFilters(["pikachu"], ["charizard", "dratini"], DEFAULT_CONFIG, [], "en", t);
-  // Lucky list excludes the dex numbers of owned luckies (sorted), by NUMBER not name.
-  check("lucky wishlist excludes !6 (charizard)", r.friendLuckyWishlist.includes("!6"));
-  check("lucky wishlist excludes !147 (dratini)", r.friendLuckyWishlist.includes("!147"));
-  check("lucky wishlist uses dex numbers, not names", !/charizard|glurak|dratini/.test(r.friendLuckyWishlist));
+  check("lucky wishlist excludes the charizard family", r.friendLuckyWishlist.includes("!+charizard"));
+  check("lucky wishlist excludes the dratini family", r.friendLuckyWishlist.includes("!+dratini"));
+  check("lucky wishlist renders names in the output locale (no DE leak)",
+    !/glurak|dratini.*glurak/.test(r.friendLuckyWishlist) && !r.friendLuckyWishlist.includes("glurak"));
+  check("owned families sorted alphabetically",
+    r.friendLuckyWishlist.indexOf("!+charizard") < r.friendLuckyWishlist.indexOf("!+dratini"));
+  check("no broken selectors from unresolvable entries", !r.friendLuckyWishlist.includes("undefined"));
   check("lucky wishlist carries mythical carve-out 808,809", r.friendLuckyWishlist.includes("808,809"));
-  // Hundo list excludes owned hundo dex and crucially has NO 4* (IVs re-roll on trade).
-  check("hundo wishlist excludes !25 (pikachu)", r.friendHundoWishlist.includes("!25"));
+  // Hundo list excludes owned hundo family and crucially has NO 4* (IVs re-roll on trade).
+  check("hundo wishlist excludes the pikachu family", r.friendHundoWishlist.includes("!+pikachu"));
   check("hundo wishlist has NO 4* clause", !r.friendHundoWishlist.includes("4*"));
   check("hundo wishlist carries trade guards (808,809)", r.friendHundoWishlist.includes("808,809"));
   // Guaranteed variant = base lucky wishlist + an "old enough" year floor.
