@@ -20,6 +20,11 @@
       "lvl5": {
         "KYOGRE": "water,grass,dragon&@1electric,@1grass&@2electric,@2grass,@3electric,@3grass&!<water"
       },
+      "lvl3": {
+        "RAICHU": "ground,steel,grass,electric,psychic,dragon,dark&@1bug,@1dark,@1ghost,@1ground&@2bug,@2dark,@2ghost,@2ground,@3bug,@3dark,@3ghost,@3ground&!<electric&!<psychic",
+        "TYPHLOSION": "normal,rock,fire,water,dragon,dark&@1dark,@1ghost,@1ground,@1rock,@1water&@2dark,@2ghost,@2ground,@2rock,@2water,@3dark,@3ghost,@3ground,@3rock,@3water&!<fire&!<ghost",
+        "DURALUDON": "steel,fire,water,electric&@1fighting,@1ground&@2fighting,@2ground,@3fighting,@3ground&!<steel&!<dragon"
+      },
       "lvl1": {
         "PIKACHU": "ground,grass,electric,dragon&@1ground&@2ground,@3ground&!<electric"
       },
@@ -116,6 +121,11 @@
       },
       "lvl5": {
         "KYOGRE": "wasser,pflanze,drache&@1elektro,@1pflanze&@2elektro,@2pflanze,@3elektro,@3pflanze&!<wasser"
+      },
+      "lvl3": {
+        "RAICHU": "boden,stahl,pflanze,elektro,psycho,drache,unlicht&@1käfer,@1unlicht,@1geist,@1boden&@2käfer,@2unlicht,@2geist,@2boden,@3käfer,@3unlicht,@3geist,@3boden&!<elektro&!<psycho",
+        "TYPHLOSION": "normal,gestein,feuer,wasser,drache,unlicht&@1unlicht,@1geist,@1boden,@1gestein,@1wasser&@2unlicht,@2geist,@2boden,@2gestein,@2wasser,@3unlicht,@3geist,@3boden,@3gestein,@3wasser&!<feuer&!<geist",
+        "DURALUDON": "stahl,feuer,wasser,elektro&@1kampf,@1boden&@2kampf,@2boden,@3kampf,@3boden&!<stahl&!<drache"
       },
       "lvl1": {
         "PIKACHU": "boden,pflanze,elektro,drache&@1boden&@2boden,@3boden&!<elektro"
@@ -214,6 +224,11 @@
       "lvl5": {
         "KYOGRE": "agua,planta,dragón&@1eléctrico,@1planta&@2eléctrico,@2planta,@3eléctrico,@3planta&!<agua"
       },
+      "lvl3": {
+        "RAICHU": "tierra,acero,planta,eléctrico,psíquico,dragón,siniestro&@1bicho,@1siniestro,@1fantasma,@1tierra&@2bicho,@2siniestro,@2fantasma,@2tierra,@3bicho,@3siniestro,@3fantasma,@3tierra&!<eléctrico&!<psíquico",
+        "TYPHLOSION": "normal,roca,fuego,agua,dragón,siniestro&@1siniestro,@1fantasma,@1tierra,@1roca,@1agua&@2siniestro,@2fantasma,@2tierra,@2roca,@2agua,@3siniestro,@3fantasma,@3tierra,@3roca,@3agua&!<fuego&!<fantasma",
+        "DURALUDON": "acero,fuego,agua,eléctrico&@1lucha,@1tierra&@2lucha,@2tierra,@3lucha,@3tierra&!<acero&!<dragón"
+      },
       "lvl1": {
         "PIKACHU": "tierra,planta,eléctrico,dragón&@1tierra&@2tierra,@3tierra&!<eléctrico"
       },
@@ -310,6 +325,11 @@
       },
       "lvl5": {
         "KYOGRE": "eau,plante,dragon&@1électrik,@1plante&@2électrik,@2plante,@3électrik,@3plante&!<eau"
+      },
+      "lvl3": {
+        "RAICHU": "sol,acier,plante,électrik,psy,dragon,ténèbres&@1insecte,@1ténèbres,@1spectre,@1sol&@2insecte,@2ténèbres,@2spectre,@2sol,@3insecte,@3ténèbres,@3spectre,@3sol&!<électrik&!<psy",
+        "TYPHLOSION": "normal,roche,feu,eau,dragon,ténèbres&@1ténèbres,@1spectre,@1sol,@1roche,@1eau&@2ténèbres,@2spectre,@2sol,@2roche,@2eau,@3ténèbres,@3spectre,@3sol,@3roche,@3eau&!<feu&!<spectre",
+        "DURALUDON": "acier,feu,eau,électrik&@1combat,@1sol&@2combat,@2sol,@3combat,@3sol&!<acier&!<dragon"
       },
       "lvl1": {
         "PIKACHU": "sol,plante,électrik,dragon&@1sol&@2sol,@3sol&!<électrik"
@@ -408,6 +428,11 @@
       "lvl5": {
         "KYOGRE": "水,草,龍&@1電,@1草&@2電,@2草,@3電,@3草&!<水"
       },
+      "lvl3": {
+        "RAICHU": "地面,鋼,草,電,超能力,龍,惡&@1蟲,@1惡,@1幽靈,@1地面&@2蟲,@2惡,@2幽靈,@2地面,@3蟲,@3惡,@3幽靈,@3地面&!<電&!<超能力",
+        "TYPHLOSION": "一般,岩石,火,水,龍,惡&@1惡,@1幽靈,@1地面,@1岩石,@1水&@2惡,@2幽靈,@2地面,@2岩石,@2水,@3惡,@3幽靈,@3地面,@3岩石,@3水&!<火&!<幽靈",
+        "DURALUDON": "鋼,火,水,電&@1格鬥,@1地面&@2格鬥,@2地面,@3格鬥,@3地面&!<鋼&!<龍"
+      },
       "lvl1": {
         "PIKACHU": "地面,草,電,龍&@1地面&@2地面,@3地面&!<電"
       },
@@ -505,6 +530,11 @@
       "lvl5": {
         "KYOGRE": "वॉटर,ास,डैगन&@1इलटक,@1ास&@2इलटक,@2ास,@3इलटक,@3ास&!<वॉटर"
       },
+      "lvl3": {
+        "RAICHU": "ाउंड,टल,ास,इलटक,साइकक,डैगन,डाक&@1बग,@1डाक,@1घोट,@1ाउंड&@2बग,@2डाक,@2घोट,@2ाउंड,@3बग,@3डाक,@3घोट,@3ाउंड&!<इलटक&!<साइकक",
+        "TYPHLOSION": "नॉमल,रॉक,फ़ायर,वॉटर,डैगन,डाक&@1डाक,@1घोट,@1ाउंड,@1रॉक,@1वॉटर&@2डाक,@2घोट,@2ाउंड,@2रॉक,@2वॉटर,@3डाक,@3घोट,@3ाउंड,@3रॉक,@3वॉटर&!<फ़ायर&!<घोट",
+        "DURALUDON": "टल,फ़ायर,वॉटर,इलटक&@1फ़ाइटंग,@1ाउंड&@2फ़ाइटंग,@2ाउंड,@3फ़ाइटंग,@3ाउंड&!<टल&!<डैगन"
+      },
       "lvl1": {
         "PIKACHU": "ाउंड,ास,इलटक,डैगन&@1ाउंड&@2ाउंड,@3ाउंड&!<इलटक"
       },
@@ -601,6 +631,11 @@
       },
       "lvl5": {
         "KYOGRE": "みず,くさ,ドラゴン&@1でんき,@1くさ&@2でんき,@2くさ,@3でんき,@3くさ&!<みず"
+      },
+      "lvl3": {
+        "RAICHU": "じめん,はがね,くさ,でんき,エスパー,ドラゴン,あく&@1むし,@1あく,@1ゴースト,@1じめん&@2むし,@2あく,@2ゴースト,@2じめん,@3むし,@3あく,@3ゴースト,@3じめん&!<でんき&!<エスパー",
+        "TYPHLOSION": "ノーマル,いわ,ほのお,みず,ドラゴン,あく&@1あく,@1ゴースト,@1じめん,@1いわ,@1みず&@2あく,@2ゴースト,@2じめん,@2いわ,@2みず,@3あく,@3ゴースト,@3じめん,@3いわ,@3みず&!<ほのお&!<ゴースト",
+        "DURALUDON": "はがね,ほのお,みず,でんき&@1かくとう,@1じめん&@2かくとう,@2じめん,@3かくとう,@3じめん&!<はがね&!<ドラゴン"
       },
       "lvl1": {
         "PIKACHU": "じめん,くさ,でんき,ドラゴン&@1じめん&@2じめん,@3じめん&!<でんき"

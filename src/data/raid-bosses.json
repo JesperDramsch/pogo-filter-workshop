@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-07-16T09:36:46.020Z",
+  "fetchedAt": "2026-07-17T09:29:02.439Z",
   "raids": {
     "mega": [
       {
@@ -59,6 +59,96 @@
         "seMoveTypes": [
           "electric",
           "grass"
+        ]
+      }
+    ],
+    "lvl3": [
+      {
+        "id": "RAICHU",
+        "names": {
+          "en": "Alolan Raichu",
+          "de": "Alola-Raichu",
+          "fr": "Raichu d'Alola",
+          "it": "Raichu di Alola",
+          "ja": "アローラ ライチュウ",
+          "ko": "알로라 라이츄",
+          "es": "Raichu de Alola"
+        },
+        "types": [
+          "electric",
+          "psychic"
+        ],
+        "resistorTypes": [
+          "ground",
+          "steel",
+          "grass",
+          "electric",
+          "psychic",
+          "dragon",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "bug",
+          "dark",
+          "ghost",
+          "ground"
+        ]
+      },
+      {
+        "id": "TYPHLOSION",
+        "names": {
+          "en": "Hisuian Typhlosion",
+          "de": "Hisuian-Tornupto",
+          "fr": "Typhlosion de Hisuian",
+          "it": "Typhlosion di Hisuian",
+          "ja": "バクフーン",
+          "ko": "블레이범",
+          "es": "Typhlosion de Galar"
+        },
+        "types": [
+          "fire",
+          "ghost"
+        ],
+        "resistorTypes": [
+          "normal",
+          "rock",
+          "fire",
+          "water",
+          "dragon",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "ghost",
+          "ground",
+          "rock",
+          "water"
+        ]
+      },
+      {
+        "id": "DURALUDON",
+        "names": {
+          "en": "Duraludon",
+          "de": "Duraludon",
+          "fr": "Duralugon",
+          "it": "Duraludon",
+          "ja": "ジュラルドン",
+          "ko": "두랄루돈",
+          "es": "Duraludon"
+        },
+        "types": [
+          "steel",
+          "dragon"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "electric"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "ground"
         ]
       }
     ],
@@ -510,35 +600,6 @@
   },
   "maxBattles": {},
   "eventRaids": [
-    {
-      "eventID": "raichu-super-mega-raid-day-2026",
-      "name": "Raichu Super Mega Raid Day",
-      "eventType": "raid-day",
-      "start": "2026-07-18T14:00:00.000",
-      "end": "2026-07-18T17:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "RAICHU",
-          "names": {
-            "en": "Raichu"
-          },
-          "types": [
-            "electric"
-          ],
-          "resistorTypes": [
-            "ground",
-            "grass",
-            "electric",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "ground"
-          ]
-        }
-      ]
-    },
     {
       "eventID": "mega-salamence-in-mega-raids-july-2026",
       "name": "Mega Salamence in Mega Raids",
