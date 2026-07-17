@@ -25,6 +25,7 @@ import PVP_RANKINGS from './data/pvp-rankings.json';
 import META_RANKINGS from './data/meta-rankings.json';
 import EVOLUTION_COSTS from './data/evolution-costs.json';
 import REGIONAL_FORMS from './data/regional-forms.json';
+import CHANGELOG from './data/changelog.json';
 import { useTranslation } from './i18n/I18nProvider.jsx';
 import Landing from './Landing.jsx';
 import General from './explain/General.jsx';
@@ -602,6 +603,21 @@ function defaultRegionalToggles() {
 	return out;
 }
 
+// Flat fingerprint of the regional catalog: every group key plus one token per
+// typeCheck / collector species ("alolan", "alolan>tc>Kokowei",
+// "collectibles>col>Coiffwaff"). Stored on the config as `regionalCatalogSeen`
+// at every merge, so the NEXT load can tell a genuinely-new catalog entry
+// apart from one the user deselected.
+export function regionalCatalogTokens() {
+	const out = [];
+	for (const [key, group] of Object.entries(REGIONAL_GROUPS)) {
+		out.push(key);
+		for (const tc of group.typeChecks) out.push(`${key}>tc>${tc.species}`);
+		for (const sp of group.collectors) out.push(`${key}>col>${sp}`);
+	}
+	return out.sort();
+}
+
 // Pokémon name dictionary, resolvers, and reverse-lookup helpers live in
 // src/data/species.js (multi-locale, generated from the published Google
 // Sheet via scripts/fetch-translations.mjs at build time). Imported above.
@@ -654,10 +670,77 @@ export function normalizeBuddyTarget(entry) {
 // Pattern: spread DEFAULT_CONFIG first so missing fields back-fill, then
 // the raw blob so user values win, then explicit cleanup for legacy keys
 // and renames. Unknown forward-compat keys are preserved.
-export function mergeImportedConfig(raw) {
+//
+// `notices` (optional) collects catalog-sync events the caller may surface to
+// the user: one { kind: 'group'|'typeCheck'|'collector', group, species? }
+// entry per regional that was newly added to their protections (see the
+// catalog-sync block below).
+export function mergeImportedConfig(raw, notices = []) {
 	const merged = { ...DEFAULT_CONFIG, ...(raw || {}) };
 	if (!merged.regionalGroups || Object.keys(merged.regionalGroups).length === 0) {
 		merged.regionalGroups = defaultRegionalToggles();
+	}
+	// ── Regional catalog sync ─────────────────────────────────────────────
+	// The regional catalog grows over time (new game generations, synced form
+	// data). A stored config is a snapshot: without this block a returning
+	// user's filter silently skips every regional added after their last visit
+	// (missing group key → whole group skipped in buildFilters; a
+	// typeChecksEnabled/collectorsEnabled ARRAY never gains new species).
+	// New entries become protected BY DEFAULT — same rules as a fresh install
+	// (C-tier stays off) — and each addition lands in `notices` so the UI can
+	// tell the user their state was updated. `regionalCatalogSeen` (the
+	// fingerprint from the last merge) distinguishes "new to this user" from
+	// "user turned it off"; configs predating the field are grandfathered to
+	// the current catalog so nobody gets a retroactive popup.
+	{
+		const seen = new Set(
+			Array.isArray(raw?.regionalCatalogSeen) ? raw.regionalCatalogSeen : regionalCatalogTokens(),
+		);
+		const defaults = defaultRegionalToggles();
+		const groups = { ...merged.regionalGroups };
+		for (const [key, group] of Object.entries(REGIONAL_GROUPS)) {
+			if (!groups[key]) {
+				groups[key] = defaults[key];
+				if (!seen.has(key)) notices.push({ kind: 'group', group: key });
+				continue;
+			}
+			const state = { ...groups[key] };
+			// Prune species that left the catalog (renames, delistings) so stale
+			// selections can't linger in the editor or the share/export payload.
+			const tcSpecies = new Set(group.typeChecks.map((tc) => tc.species));
+			if (Array.isArray(state.typeChecksEnabled)) {
+				state.typeChecksEnabled = state.typeChecksEnabled.filter((sp) => tcSpecies.has(sp));
+			}
+			const colSpecies = new Set(group.collectors);
+			if (Array.isArray(state.collectorsEnabled)) {
+				state.collectorsEnabled = state.collectorsEnabled.filter((sp) => colSpecies.has(sp));
+			}
+			for (const tc of group.typeChecks) {
+				if (seen.has(`${key}>tc>${tc.species}`)) continue;
+				// null = "all on" already covers it; an array only gains
+				// recommended-tier entries (C-tier stays off, like fresh defaults).
+				const protects =
+					state.typeChecksEnabled === null ||
+					((tc.tier || 'A') !== 'C' && !state.typeChecksEnabled.includes(tc.species));
+				if (Array.isArray(state.typeChecksEnabled) && protects) {
+					state.typeChecksEnabled = [...state.typeChecksEnabled, tc.species];
+				}
+				// A notice claims "this is now protected" — only true if the group
+				// itself is on. Disabled groups still get the array updated above so
+				// re-enabling later picks the new species up.
+				if (protects && state.enabled) notices.push({ kind: 'typeCheck', group: key, species: tc.species });
+			}
+			for (const sp of group.collectors) {
+				if (seen.has(`${key}>col>${sp}`)) continue;
+				if (Array.isArray(state.collectorsEnabled) && !state.collectorsEnabled.includes(sp)) {
+					state.collectorsEnabled = [...state.collectorsEnabled, sp];
+				}
+				if (state.enabled) notices.push({ kind: 'collector', group: key, species: sp });
+			}
+			groups[key] = state;
+		}
+		merged.regionalGroups = groups;
+		merged.regionalCatalogSeen = regionalCatalogTokens();
 	}
 	if (!merged.enabledTradeEvos || merged.enabledTradeEvos.length === 0) {
 		merged.enabledTradeEvos = Object.keys(TRADE_EVO_FAMILIES);
@@ -2525,6 +2608,7 @@ const KEY_TOP_ATTACKERS = 'pogo:topAttackers';
 const KEY_TOP_MAX_ATTACKERS = 'pogo:topMaxAttackers';
 const KEY_CONFIG = 'pogo:config';
 const KEY_ONBOARDED = 'pogo:onboarded';
+const KEY_CHANGELOG_SEEN = 'pogo:changelogSeen';
 
 // iOS Safari (regular tab) refuses Storage API persistence at the WebKit
 // level: navigator.storage.persist() resolves with false immediately, no
@@ -3089,6 +3173,13 @@ export default function App() {
 	});
 	const [resetArmed, setResetArmed] = useState(false);
 	const [showSettings, setShowSettings] = useState(false);
+	// Regionals added to the user's protections by the catalog sync in
+	// mergeImportedConfig on this load — non-empty triggers the one-time popup.
+	const [regionalNotices, setRegionalNotices] = useState([]);
+	const [showChangelog, setShowChangelog] = useState(false);
+	// Number of changelog entries the user has already opened the panel for —
+	// drives the "new" dot on the footer link.
+	const [changelogSeen, setChangelogSeen] = useState(CHANGELOG.length);
 	useEffect(() => {
 		if (!resetArmed) return;
 		const t = setTimeout(() => setResetArmed(false), 3000);
@@ -3108,8 +3199,12 @@ export default function App() {
 			const b = await loadJSON(KEY_BAZAARTAGS, []);
 			const step = await loadJSON(KEY_STEP, 1);
 			const ob = await loadJSON(KEY_ONBOARDED, false);
+			const clSeen = await loadJSON(KEY_CHANGELOG_SEEN, 0);
 			setHundos(h);
-			setConfig(mergeImportedConfig(c));
+			const catalogNotices = [];
+			setConfig(mergeImportedConfig(c, catalogNotices));
+			if (catalogNotices.length > 0) setRegionalNotices(catalogNotices);
+			setChangelogSeen(clSeen);
 			const canonicalize = (arr) => (arr || []).map((s) => resolveSpecies(s) || s);
 			setLuckies(canonicalize(l));
 			setTopAttackers(canonicalize(ta));
@@ -3162,6 +3257,9 @@ export default function App() {
 	useEffect(() => {
 		if (loaded) saveJSON(KEY_ONBOARDED, onboarded);
 	}, [onboarded, loaded]);
+	useEffect(() => {
+		if (loaded) saveJSON(KEY_CHANGELOG_SEEN, changelogSeen);
+	}, [changelogSeen, loaded]);
 
 	// Locals at home location (drives auto-drop from Regionals protection + bazaar suggestions)
 	const homeLocals = useMemo(() => computeHomeLocals(homeLocation), [homeLocation]);
@@ -4214,6 +4312,18 @@ export default function App() {
 									· home {homeLocation[1].toFixed(1)}°,{homeLocation[0].toFixed(1)}°
 								</span>
 							)}
+							<button
+								onClick={() => {
+									setShowChangelog(true);
+									setChangelogSeen(CHANGELOG.length);
+								}}
+								className='ml-auto flex items-center gap-1.5 hover:text-[#E6EDF3] transition underline decoration-dotted underline-offset-2'
+							>
+								{t('app.changelog.footer_link')}
+								{changelogSeen < CHANGELOG.length && (
+									<span className='w-1.5 h-1.5 rounded-full bg-[#E67E22] inline-block' aria-hidden='true' />
+								)}
+							</button>
 						</footer>
 						<AppCredit />
 					</div>
@@ -4233,6 +4343,16 @@ export default function App() {
 				onExport={exportState}
 				onImport={applyImportEnvelope}
 			/>
+			<RegionalSyncNotice
+				notices={regionalNotices}
+				onClose={() => setRegionalNotices([])}
+				onShowChangelog={() => {
+					setRegionalNotices([]);
+					setShowChangelog(true);
+					setChangelogSeen(CHANGELOG.length);
+				}}
+			/>
+			<ChangelogModal open={showChangelog} onClose={() => setShowChangelog(false)} />
 		</div>
 	);
 }
@@ -7281,6 +7401,110 @@ function NumField({ label, value, onChange, text, hint }) {
 // Holds settings that aren't about "what to protect" but rather "how the tool
 // behaves": expert mode, trade tag names, custom tags, league tags, scope
 // safety nets, and the dangerous reset. Reachable via gear icon in header.
+
+// One-time popup after the regional catalog sync added protections to a
+// returning user's config (see mergeImportedConfig). Lists what changed so the
+// "magic behind the scenes" stays visible; the entries are already active, the
+// user only decides whether to review them in the regionals step.
+function RegionalSyncNotice({ notices, onClose, onShowChangelog }) {
+	const { t } = useTranslation();
+	if (!notices || notices.length === 0) return null;
+	return (
+		<div
+			role='dialog'
+			aria-modal='true'
+			aria-label={t('app.regional_sync.title')}
+			onClick={onClose}
+			style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
+			className='fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4'
+		>
+			<div
+				onClick={(e) => e.stopPropagation()}
+				style={{ backgroundColor: '#0F1419' }}
+				className='border border-[#2D3A47] rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'
+			>
+				<h2 className='mono text-base font-semibold text-[#E6EDF3]'>{t('app.regional_sync.title')}</h2>
+				<p className='mono text-xs text-[#8090A0] leading-relaxed'>{t('app.regional_sync.body')}</p>
+				<ul className='space-y-1'>
+					{notices.map((n, i) => (
+						<li key={i} className='mono text-xs text-[#E6EDF3] flex items-baseline gap-2'>
+							<span className='text-[#E67E22]'>+</span>
+							<span className='text-[#8090A0]'>{t(REGIONAL_GROUPS[n.group]?.labelKey || n.group)}:</span>
+							{n.kind === 'group' ? t('app.regional_sync.whole_group') : capFirst(n.species)}
+						</li>
+					))}
+				</ul>
+				<div className='flex gap-2 justify-end'>
+					<button
+						onClick={onShowChangelog}
+						className='mono text-xs text-[#8090A0] hover:text-[#E6EDF3] px-3 py-1.5 rounded border border-[#2D3A47] transition'
+					>
+						{t('app.regional_sync.changelog_button')}
+					</button>
+					<button
+						onClick={onClose}
+						className='mono text-xs bg-[#E67E22]/20 hover:bg-[#E67E22]/30 text-[#E67E22] px-3 py-1.5 rounded transition'
+					>
+						{t('app.regional_sync.ok')}
+					</button>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+// "What's new" panel fed by src/data/changelog.json (ids + dates only — the
+// user-facing text lives in the app locale bundles under
+// app.changelog.entry.<id>.*, so entries localize like everything else).
+function ChangelogModal({ open, onClose }) {
+	const { t } = useTranslation();
+	if (!open) return null;
+	return (
+		<div
+			role='dialog'
+			aria-modal='true'
+			aria-label={t('app.changelog.title')}
+			onClick={onClose}
+			style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
+			className='fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4'
+		>
+			<div
+				onClick={(e) => e.stopPropagation()}
+				style={{ backgroundColor: '#0F1419' }}
+				className='border border-[#2D3A47] rounded-lg w-full max-w-lg max-h-[80vh] overflow-y-auto shadow-2xl'
+			>
+				<div
+					style={{ backgroundColor: '#0F1419' }}
+					className='sticky top-0 border-b border-[#1F2933] px-5 py-3 flex items-center justify-between'
+				>
+					<h2 className='mono text-base font-semibold text-[#E6EDF3]'>{t('app.changelog.title')}</h2>
+					<button
+						onClick={onClose}
+						aria-label={t('app.modal.settings.close_aria')}
+						className='text-[#8090A0] hover:text-[#E6EDF3] transition p-1'
+					>
+						<X size={18} />
+					</button>
+				</div>
+				<div className='p-5 space-y-4'>
+					{CHANGELOG.map((entry) => (
+						<div key={entry.id} className='border border-[#1F2933] rounded p-3 space-y-1'>
+							<div className='flex items-baseline gap-2'>
+								<span className='mono text-sm text-[#E6EDF3] font-semibold'>
+									{t(`app.changelog.entry.${entry.id}.title`)}
+								</span>
+								<span className='mono text-[10px] text-[#8090A0] ml-auto'>{entry.date}</span>
+							</div>
+							<p className='mono text-xs text-[#8090A0] leading-relaxed'>
+								{t(`app.changelog.entry.${entry.id}.body`)}
+							</p>
+						</div>
+					))}
+				</div>
+			</div>
+		</div>
+	);
+}
 
 function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArmed, onExport, onImport }) {
 	const { t, locale, setLocale, outputLocale, setOutputLocale, locales } = useTranslation();
