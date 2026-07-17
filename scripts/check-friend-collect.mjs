@@ -9,6 +9,8 @@ import {
 	DEFAULT_TOP_ATTACKERS,
 	mergeImportedConfig,
 } from '../src/App.jsx';
+import EVENTS from '../src/data/events.json';
+import { pokemonNameFor } from '../src/data/species.js';
 
 const t = (key, opts) => (opts && 'fallback' in opts ? opts.fallback : key);
 
@@ -127,7 +129,39 @@ console.log('\nScenario 4: suggestion sets');
 	);
 }
 
-console.log('\nScenario 5: output locale rendering');
+console.log('\nScenario 5: rare-species fallback set');
+{
+	// Gate invariant, independent of the events snapshot's freshness: with
+	// nothing curated/owned, the rare set appears exactly when no event set
+	// survives.
+	const base = buildFilters([], [], { ...cfg, friendCollectSpecies: [] }, [], 'en', t);
+	const hasEvent = base.friendCollectSuggestions.some((s) => s.kind === 'event');
+	const hasRare = base.friendCollectSuggestions.some((s) => s.kind === 'rare');
+	check('rare set present exactly when no event set is', hasEvent !== hasRare);
+
+	// Curate every active event spawn → event sets vanish (fully consumed) →
+	// the rare set steps in as the rotation fallback.
+	const now = Date.now();
+	const activeDex = (EVENTS.events || [])
+		.filter((ev) => !(Number.isFinite(Date.parse(ev.end)) && Date.parse(ev.end) < now))
+		.flatMap((ev) => ev.spawnDex || []);
+	const curated = [...new Set(activeDex.map((d) => pokemonNameFor(String(d))).filter(Boolean))];
+	const r = buildFilters([], [], { ...cfg, friendCollectSpecies: curated }, [], 'en', t);
+	const rare = r.friendCollectSuggestions.find((s) => s.kind === 'rare');
+	check(
+		'event sets consumed → no event suggestion',
+		!r.friendCollectSuggestions.some((s) => s.kind === 'event'),
+	);
+	check('rare set offered as rotation fallback', !!rare);
+	check('rare set capped at 25', !!rare && rare.species.length <= 25);
+	check('rare set contains a fossil (omanyte)', !!rare && rare.species.includes(pokemonNameFor('138')));
+	check(
+		'rare set pruned of curated species',
+		!!rare && !rare.species.some((sp) => curated.includes(sp)),
+	);
+}
+
+console.log('\nScenario 6: output locale rendering');
 {
 	const r = buildFilters(hundos, luckies, cfg, [], 'de', t);
 	check(
@@ -137,7 +171,7 @@ console.log('\nScenario 5: output locale rendering');
 	);
 }
 
-console.log('\nScenario 6: config merge');
+console.log('\nScenario 7: config merge');
 {
 	const m = mergeImportedConfig({ friendCollectSpecies: ['Dragonite', '131'], friendCollectMode: 'weird' });
 	check(

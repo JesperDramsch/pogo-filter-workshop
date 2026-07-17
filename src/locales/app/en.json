@@ -1078,5 +1078,11 @@
   "app.filter.friend_fallback_section": "fallback · everything you still lack",
   "app.clause_why.friend_collect_targets": "Your curated collect targets (family-wide)",
   "app.changelog.entry.friend_collect_wishlist.title": "Curated friend-collect wishlist",
-  "app.changelog.entry.friend_collect_wishlist.body": "Tell friends exactly what to collect for you. In the friend-wishlist section, pick a lucky (default) or hundo focus, pull in suggested sets (current event spawns, raid meta, PvP meta) or type your own species, and share one positive search string. Families you complete drop out of the string automatically — the blacklist wishlists remain as the everything-fallback."
+  "app.changelog.entry.friend_collect_wishlist.body": "Tell friends exactly what to collect for you. In the friend-wishlist section, pick a lucky (default) or hundo focus, pull in suggested sets (current event spawns, raid meta, PvP meta) or type your own species, and share one positive search string. Families you complete drop out of the string automatically — the blacklist wishlists remain as the everything-fallback.",
+  "app.filter.friend_collect_suggest_rare": "Rare species picks",
+  "app.clear_list.label": "clear list",
+  "app.clear_list.confirm": "really clear?",
+  "app.clear_list.title": "Removes every entry from this list — first tap arms, second tap clears.",
+  "app.changelog.entry.friend_collect_rare_reset.title": "Rare-species set & list reset buttons",
+  "app.changelog.entry.friend_collect_rare_reset.body": "When no event set is on offer (event lull, or you've already added every event spawn), the friend-collect suggestions now include a rare-species set — pseudo-legendaries, fossils and classic rares — so there's always something to rotate to. The curated collect list and each trade buddy's catch list also gained a two-tap clear button."
 }

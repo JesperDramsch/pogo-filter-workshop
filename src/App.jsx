@@ -158,6 +158,43 @@ const UNTRADEABLE_MYTHICAL_DEX = new Set([
 	1025, // Pecharunt
 ]);
 
+// "Generally rare" suggestion pool for the friend-collect wishlist — offered
+// only while no event set is on the table (no running/upcoming event, or all
+// of its spawns are already curated/owned), so there's always something to
+// rotate to between events. Hand-curated base dex numbers: pseudo-legendary
+// lines, fossils, and a few classic rare wild spawns. The shared suggestion
+// builder applies the usual pruning (curated/owned/mythical) and the cap.
+const RARE_COLLECT_DEX = [
+	// Pseudo-legendary lines
+	147, // Dratini
+	246, // Larvitar
+	371, // Bagon
+	374, // Beldum
+	443, // Gible
+	633, // Deino
+	704, // Goomy
+	782, // Jangmo-o
+	885, // Dreepy
+	996, // Frigibax
+	// Fossils
+	138, // Omanyte
+	140, // Kabuto
+	142, // Aerodactyl
+	345, // Lileep
+	347, // Anorith
+	408, // Cranidos
+	410, // Shieldon
+	564, // Tirtouga
+	566, // Archen
+	696, // Tyrunt
+	698, // Amaura
+	// Classic rare wild spawns
+	131, // Lapras
+	143, // Snorlax
+	201, // Unown
+	610, // Axew
+];
+
 // Trade-evo families: dex-keyed identity, German base name as the user-facing
 // config key (kept stable so persisted localStorage state ["abra", "machollo"]
 // keeps working across locale changes). `baseDex` is the family head for
@@ -1842,6 +1879,19 @@ export function buildFilters(
 			ev.title,
 			{ start: ev.start, end: ev.end },
 			(ev.spawnDex || []).map(String),
+		);
+	}
+	// Rare-species fallback — only when no event set made it through (event
+	// lull, or every event spawn is already curated/owned): pseudo-legendaries,
+	// fossils and classic rares keep the rotation going between events.
+	if (!friendCollectSuggestions.some((s) => s.kind === 'event')) {
+		pushFriendCollectSuggestion(
+			'rare',
+			'rare-collect',
+			null,
+			{},
+			RARE_COLLECT_DEX.map(String),
+			25,
 		);
 	}
 	// Valuable keepers — the user's raid-meta roster (score-sorted, so the cap
@@ -5105,6 +5155,42 @@ function CustomCollectiblesEditor({ list, onChange }) {
 	);
 }
 
+// Two-click list clear: the first click arms (label flips to a confirm prompt
+// for 3 s), the second click clears. Mirrors the Settings full-reset arming
+// pattern at list scope so one stray tap can't wipe a curated list. Renders
+// nothing while the list is empty.
+function ClearListButton({ count, onClear }) {
+	const { t } = useTranslation();
+	const [armed, setArmed] = useState(false);
+	useEffect(() => {
+		if (!armed) return;
+		const timer = setTimeout(() => setArmed(false), 3000);
+		return () => clearTimeout(timer);
+	}, [armed]);
+	if (!count) return null;
+	return (
+		<button
+			onClick={() => {
+				if (!armed) {
+					setArmed(true);
+					return;
+				}
+				setArmed(false);
+				onClear();
+			}}
+			title={t('app.clear_list.title')}
+			className={`mono text-[10.5px] px-2 py-0.5 rounded border transition flex items-center gap-1 ${
+				armed
+					? 'bg-[#FF6B5B]/15 border-[#FF6B5B]/50 text-[#FF6B5B]'
+					: 'bg-transparent border-[#2D3A47] text-[#8090A0] hover:text-[#E6EDF3]'
+			}`}
+		>
+			<RotateCcw size={10} />
+			{armed ? t('app.clear_list.confirm') : t('app.clear_list.label')}
+		</button>
+	);
+}
+
 // Curated "have friends collect for me" editor: trading-focus switch,
 // one-tap suggested sets (event spawns / raid meta / PvP meta, pre-pruned of
 // owned + already-added species in buildFilters), the curated chips (owned
@@ -5150,6 +5236,7 @@ function FriendCollectEditor({ list, onChange, mode, onModeChange, targets, sugg
 
 	const suggestionLabel = (s) => {
 		if (s.kind === 'event') return `✨ ${s.title}`;
+		if (s.kind === 'rare') return `💎 ${t('app.filter.friend_collect_suggest_rare')}`;
 		if (s.kind === 'raids') return `⚔️ ${t('app.filter.friend_collect_suggest_raid')}`;
 		return `🏆 ${t('app.filter.friend_collect_suggest_pvp')}`;
 	};
@@ -5175,6 +5262,9 @@ function FriendCollectEditor({ list, onChange, mode, onModeChange, targets, sugg
 						</button>
 					))}
 				</div>
+				<span className='ml-auto'>
+					<ClearListButton count={list.length} onClear={() => onChange([])} />
+				</span>
 			</div>
 			<p className='mono text-xs text-[#8090A0] leading-relaxed'>
 				{t('app.filter.friend_collect_mode_help')}
@@ -8878,8 +8968,9 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 				<span className='mono text-[10.5px] text-[#8090A0]'>
 					{t('app.buddy_targets.prefix_label')} <code className='text-[#E67E22]'>#{buddy.tagPrefix}</code>
 				</span>
-				<span className='mono text-[10.5px] text-[#8090A0] ml-auto'>
+				<span className='mono text-[10.5px] text-[#8090A0] ml-auto flex items-center gap-2'>
 					{t('app.buddy_targets.count_label', { params: { count: targets.length } })}
+					<ClearListButton count={targets.length} onClear={() => onChange({ targetSpecies: [] })} />
 				</span>
 			</div>
 

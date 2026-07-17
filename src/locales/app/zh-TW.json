@@ -1033,5 +1033,11 @@
   "app.filter.friend_fallback_section": "後備 · 你仍缺少的全部",
   "app.clause_why.friend_collect_targets": "你精選的收集目標（整個家族）",
   "app.changelog.entry.friend_collect_wishlist.title": "朋友收集精選願望清單",
-  "app.changelog.entry.friend_collect_wishlist.body": "精確告訴朋友要幫你收集什麼。在朋友願望清單區選擇幸運（預設）或滿值重點，加入建議組合（目前活動出現、團體戰主流、PvP 主流）或自行輸入物種，分享一條正向搜尋字串。已完成的家族會自動從字串移除 — 原有的黑名單願望清單保留為「全部」後備。"
+  "app.changelog.entry.friend_collect_wishlist.body": "精確告訴朋友要幫你收集什麼。在朋友願望清單區選擇幸運（預設）或滿值重點，加入建議組合（目前活動出現、團體戰主流、PvP 主流）或自行輸入物種，分享一條正向搜尋字串。已完成的家族會自動從字串移除 — 原有的黑名單願望清單保留為「全部」後備。",
+  "app.filter.friend_collect_suggest_rare": "稀有物種",
+  "app.clear_list.label": "清空清單",
+  "app.clear_list.confirm": "確定清空？",
+  "app.clear_list.title": "移除此清單的所有項目 — 第一下啟動確認，第二下清空。",
+  "app.changelog.entry.friend_collect_rare_reset.title": "稀有物種組合與清單重設按鈕",
+  "app.changelog.entry.friend_collect_rare_reset.body": "當沒有活動組合可用（活動空窗，或活動出現的物種都已加入）時，建議組合現在會提供稀有物種組合 — 準傳說、化石與經典稀有 — 讓輪替不中斷。精選收集清單與每位交換夥伴的捕捉清單也新增了兩下確認的清空按鈕。"
 }

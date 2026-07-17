@@ -1033,5 +1033,11 @@
   "app.filter.friend_fallback_section": "フォールバック · まだ足りないすべて",
   "app.clause_why.friend_collect_targets": "厳選した収集ターゲット（系統ごと）",
   "app.changelog.entry.friend_collect_wishlist.title": "フレンド収集の厳選ほしいものリスト",
-  "app.changelog.entry.friend_collect_wishlist.body": "集めてほしい種をフレンドに正確に伝えられます。フレンド用ほしいものリスト欄でキラ（既定）か100%のフォーカスを選び、おすすめセット（開催中イベントの出現、レイド・メタ、PvP・メタ）や手入力で種を追加して、ポジティブな検索文字列を共有。完了した系統は自動的に文字列から外れます — 従来のブラックリスト型リストは「すべて」のフォールバックとして残ります。"
+  "app.changelog.entry.friend_collect_wishlist.body": "集めてほしい種をフレンドに正確に伝えられます。フレンド用ほしいものリスト欄でキラ（既定）か100%のフォーカスを選び、おすすめセット（開催中イベントの出現、レイド・メタ、PvP・メタ）や手入力で種を追加して、ポジティブな検索文字列を共有。完了した系統は自動的に文字列から外れます — 従来のブラックリスト型リストは「すべて」のフォールバックとして残ります。",
+  "app.filter.friend_collect_suggest_rare": "レアな種",
+  "app.clear_list.label": "リストを空にする",
+  "app.clear_list.confirm": "本当に空にする？",
+  "app.clear_list.title": "このリストの項目をすべて削除します — 1回目のタップで確認、2回目で削除。",
+  "app.changelog.entry.friend_collect_rare_reset.title": "レア種セットとリストのクリアボタン",
+  "app.changelog.entry.friend_collect_rare_reset.body": "イベントセットが出せないとき（イベントの谷間、またはイベント出現をすべて追加済み）、おすすめにレア種セット — 600族、化石、定番のレア — が表示され、いつでもローテーションできます。厳選収集リストと各交換相手のキャッチリストに2タップのクリアボタンも追加。"
 }

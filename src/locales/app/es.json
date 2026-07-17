@@ -1033,5 +1033,11 @@
   "app.filter.friend_fallback_section": "comodín · todo lo que aún te falta",
   "app.clause_why.friend_collect_targets": "Tus objetivos de colección curados (toda la familia)",
   "app.changelog.entry.friend_collect_wishlist.title": "Lista curada para que amigos coleccionen",
-  "app.changelog.entry.friend_collect_wishlist.body": "Di a tus amigos exactamente qué coleccionar para ti. En la sección de lista de deseos, elige enfoque afortunado (por defecto) o hundo, añade sets sugeridos (spawns del evento actual, meta de raids, meta PvP) o tus propias especies y comparte una cadena de búsqueda positiva. Las familias completadas salen de la cadena automáticamente — las listas negras quedan como comodín."
+  "app.changelog.entry.friend_collect_wishlist.body": "Di a tus amigos exactamente qué coleccionar para ti. En la sección de lista de deseos, elige enfoque afortunado (por defecto) o hundo, añade sets sugeridos (spawns del evento actual, meta de raids, meta PvP) o tus propias especies y comparte una cadena de búsqueda positiva. Las familias completadas salen de la cadena automáticamente — las listas negras quedan como comodín.",
+  "app.filter.friend_collect_suggest_rare": "Especies raras",
+  "app.clear_list.label": "vaciar lista",
+  "app.clear_list.confirm": "¿vaciar de verdad?",
+  "app.clear_list.title": "Elimina todas las entradas de esta lista — el primer toque arma, el segundo vacía.",
+  "app.changelog.entry.friend_collect_rare_reset.title": "Set de especies raras y botones de reinicio",
+  "app.changelog.entry.friend_collect_rare_reset.body": "Cuando no hay set de evento disponible (pausa entre eventos, o ya añadiste todos los spawns del evento), las sugerencias ofrecen ahora un set de especies raras — pseudolegendarios, fósiles y rarezas clásicas — para que siempre haya rotación. La lista curada y la lista de captura de cada compañero de intercambio ganan además un botón de vaciado en dos toques."
 }

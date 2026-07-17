@@ -1078,5 +1078,11 @@
   "app.filter.friend_fallback_section": "Fallback · alles, was dir noch fehlt",
   "app.clause_why.friend_collect_targets": "Deine kuratierten Sammel-Ziele (familienweit)",
   "app.changelog.entry.friend_collect_wishlist.title": "Kuratierte Freunde-Sammel-Wunschliste",
-  "app.changelog.entry.friend_collect_wishlist.body": "Sag Freunden genau, was sie für dich sammeln sollen. Im Freunde-Wunschlisten-Bereich Fokus Glück (Standard) oder Hundo wählen, vorgeschlagene Sets übernehmen (aktuelle Event-Spawns, Raid-Meta, PvP-Meta) oder eigene Spezies eintragen und einen positiven Suchstring teilen. Abgeschlossene Familien fallen automatisch aus dem String — die Blacklist-Wunschlisten bleiben als Alles-Fallback."
+  "app.changelog.entry.friend_collect_wishlist.body": "Sag Freunden genau, was sie für dich sammeln sollen. Im Freunde-Wunschlisten-Bereich Fokus Glück (Standard) oder Hundo wählen, vorgeschlagene Sets übernehmen (aktuelle Event-Spawns, Raid-Meta, PvP-Meta) oder eigene Spezies eintragen und einen positiven Suchstring teilen. Abgeschlossene Familien fallen automatisch aus dem String — die Blacklist-Wunschlisten bleiben als Alles-Fallback.",
+  "app.filter.friend_collect_suggest_rare": "Seltene Spezies",
+  "app.clear_list.label": "Liste leeren",
+  "app.clear_list.confirm": "wirklich leeren?",
+  "app.clear_list.title": "Entfernt alle Einträge dieser Liste — erster Tipp aktiviert, zweiter leert.",
+  "app.changelog.entry.friend_collect_rare_reset.title": "Seltene-Spezies-Set & Listen-Reset",
+  "app.changelog.entry.friend_collect_rare_reset.body": "Wenn gerade kein Event-Set ansteht (Event-Flaute, oder alle Event-Spawns sind schon übernommen), bieten die Sammel-Vorschläge jetzt ein Set seltener Spezies an — Pseudo-Legendäre, Fossilien und klassische Raritäten — damit es immer etwas zu rotieren gibt. Die kuratierte Sammel-Liste und die Fang-Liste jedes Tausch-Buddys haben außerdem einen Zwei-Tipp-Leeren-Knopf bekommen."
 }

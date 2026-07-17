@@ -1033,5 +1033,11 @@
   "app.filter.friend_fallback_section": "repli · tout ce qui te manque encore",
   "app.clause_why.friend_collect_targets": "Tes cibles de collecte ciblées (toute la famille)",
   "app.changelog.entry.friend_collect_wishlist.title": "Liste de collecte ciblée pour amis",
-  "app.changelog.entry.friend_collect_wishlist.body": "Dis à tes amis exactement quoi collecter pour toi. Dans la section liste de vœux, choisis l'axe chanceux (par défaut) ou hundo, ajoute des sets suggérés (spawns de l'événement en cours, méta raids, méta PvP) ou tes propres espèces, et partage une chaîne de recherche positive. Les familles complétées sortent automatiquement de la chaîne — les listes noires restent en repli."
+  "app.changelog.entry.friend_collect_wishlist.body": "Dis à tes amis exactement quoi collecter pour toi. Dans la section liste de vœux, choisis l'axe chanceux (par défaut) ou hundo, ajoute des sets suggérés (spawns de l'événement en cours, méta raids, méta PvP) ou tes propres espèces, et partage une chaîne de recherche positive. Les familles complétées sortent automatiquement de la chaîne — les listes noires restent en repli.",
+  "app.filter.friend_collect_suggest_rare": "Espèces rares",
+  "app.clear_list.label": "vider la liste",
+  "app.clear_list.confirm": "vraiment vider ?",
+  "app.clear_list.title": "Retire toutes les entrées de cette liste — premier appui pour armer, second pour vider.",
+  "app.changelog.entry.friend_collect_rare_reset.title": "Set d'espèces rares et boutons de réinitialisation",
+  "app.changelog.entry.friend_collect_rare_reset.body": "Quand aucun set d'événement n'est disponible (creux entre événements, ou tous les spawns déjà ajoutés), les suggestions proposent désormais un set d'espèces rares — pseudo-légendaires, fossiles et raretés classiques — pour toujours pouvoir faire tourner. La liste ciblée et la liste de capture de chaque partenaire d'échange gagnent aussi un bouton de vidage en deux appuis."
 }
