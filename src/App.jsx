@@ -129,6 +129,35 @@ export const DEFAULT_TOP_ATTACKERS = META_RANKINGS.topAttackers;
 // `charizard` covers Gigantamax Charizard.
 export const DEFAULT_TOP_MAX_ATTACKERS = META_RANKINGS.topMaxAttackers;
 
+// Mythical dex numbers that can NEVER be traded — used to keep untradeable
+// species out of the friend-collect suggestion sets (they'd be inert against
+// the `!mythical` trade guard anyway, just noise in the chips). Meltan (808)
+// and Melmetal (809) are mythical but tradeable, so they're deliberately NOT
+// in this set — mirrors the `!mythical,808,809` guard carve-out.
+const UNTRADEABLE_MYTHICAL_DEX = new Set([
+	151, // Mew
+	251, // Celebi
+	385, // Jirachi
+	386, // Deoxys
+	489, // Phione
+	490, // Manaphy
+	491, // Darkrai
+	492, // Shaymin
+	493, // Arceus
+	494, // Victini
+	647, // Keldeo
+	648, // Meloetta
+	649, // Genesect
+	719, // Diancie
+	720, // Hoopa
+	721, // Volcanion
+	801, // Magearna
+	802, // Marshadow
+	807, // Zeraora
+	893, // Zarude
+	1025, // Pecharunt
+]);
+
 // Trade-evo families: dex-keyed identity, German base name as the user-facing
 // config key (kept stable so persisted localStorage state ["abra", "machollo"]
 // keeps working across locale changes). `baseDex` is the family head for
@@ -231,6 +260,13 @@ export const DEFAULT_CONFIG = {
 	regionalGroups: {},
 	enabledTradeEvos: [],
 	customCollectibles: [], // user-added species to protect (lowercase German names)
+	// "Have friends collect for me" — curated species list for the positive
+	// friend-collect wishlist (lowercase German names, like customCollectibles).
+	// Entries stay stored even once found; the string just stops emitting them
+	// (mode switches or resets bring them back without retyping).
+	friendCollectSpecies: [],
+	// Which have-list prunes the curated wishlist: 'lucky' (default) | 'hundo'.
+	friendCollectMode: 'lucky',
 	// Trade buddies — list of { id, name, tagPrefix, events: [event-names] }
 	// tagPrefix matches any sub-tag (e.g. #Auri matches #Auri:hat-pika via PoGo prefix match).
 	buddies: [],
@@ -797,6 +833,8 @@ export function mergeImportedConfig(raw, notices = []) {
 	const canonicalize = (arr) => (arr || []).map((s) => resolveSpecies(s) || s);
 	merged.mythTooManyOf = canonicalize(merged.mythTooManyOf);
 	merged.shadowKeeperSpecies = canonicalize(merged.shadowKeeperSpecies);
+	merged.friendCollectSpecies = canonicalize(merged.friendCollectSpecies);
+	if (merged.friendCollectMode !== 'hundo') merged.friendCollectMode = 'lucky';
 	// Buddy targets: migrate legacy string[] → structured Target[] and backfill
 	// the per-buddy raw escape hatch. `rawAppend` first so an existing value wins.
 	// Dedupe by species|type so a hand-edited import can't yield colliding lines.
@@ -1711,6 +1749,109 @@ export function buildFilters(
 	pushFriendTradeGuards(friendHundoClauses);
 	const friendHundoWishlist = friendHundoClauses.map((c) => c.clause).join('&');
 
+	// ── FRIEND COLLECT — curated "have friends collect for me" list ─────────
+	// The blacklist wishlists above are the "everything I still lack" fallback.
+	// This is the deliberate version: the user curates a target list (suggested
+	// sets + manual input), picks a trading focus (lucky by default, or hundo),
+	// and hands the friend a POSITIVE filter.
+	//
+	// Shape: `+target,… & !+owned,… & trade guards`. Targets render family-
+	// expanded; the same `!+owned` family guards as the fallback then subtract
+	// every family already done in the chosen have-list. PoGo's own `+family`
+	// algebra does the set math in-game (lucky status and IVs both survive
+	// evolution), so there's no evolution-family table needed app-side — a
+	// lucky Raichu correctly silences a curated Pikachu. The string shrinks
+	// automatically as new luckies / hundos land in the have-lists.
+	const friendCollectMode = cfg.friendCollectMode === 'hundo' ? 'hundo' : 'lucky';
+	const friendCollectHaves = friendCollectMode === 'hundo' ? hundos : luckies;
+	const friendCollectHaveSet = new Set((friendCollectHaves || []).map(canonKey));
+	// `owned` here is exact-species only (drives the dimmed ✓ chip); cross-stage
+	// ownership (lucky Raichu vs curated Pikachu) is still pruned correctly at
+	// the string level by the `!+owned` family guards.
+	const friendCollectTargets = (cfg.friendCollectSpecies || []).map((sp) => ({
+		species: sp,
+		display: speciesForOutput(sp, outputLocale),
+		owned: friendCollectHaveSet.has(canonKey(sp)),
+	}));
+	const friendCollectClauses = [];
+	const friendCollectActive = friendCollectTargets.filter((tg) => !tg.owned);
+	if (friendCollectActive.length > 0) {
+		push(
+			friendCollectClauses,
+			friendCollectActive.map((tg) => `+${tg.display}`).join(','),
+			tFn('app.clause_why.friend_collect_targets'),
+		);
+		for (const sp of ownedSpeciesNames(friendCollectHaves))
+			push(
+				friendCollectClauses,
+				`!+${sp}`,
+				tFn(
+					friendCollectMode === 'hundo'
+						? 'app.clause_why.friend_have_hundo'
+						: 'app.clause_why.friend_have_lucky',
+					{ params: { species: capFirst(sp) } },
+				),
+			);
+		pushFriendTradeGuards(friendCollectClauses);
+	}
+	const friendCollectWishlist = friendCollectClauses.map((c) => c.clause).join('&');
+	// Guaranteed-lucky variant — lucky mode only (a hundo hunt gains nothing
+	// from the age floor; IVs re-roll on every trade regardless of catch year).
+	let friendCollectWishlistGuaranteed = friendCollectWishlist;
+	if (friendCollectMode === 'lucky' && friendCollectWishlist && oldLuckyYear > 0) {
+		const guaranteed = friendCollectClauses.slice();
+		push(
+			guaranteed,
+			`${kw.numeric.year}-${oldLuckyYear}`,
+			tFn('app.clause_why.friend_guaranteed_lucky', { params: { year: oldLuckyYear } }),
+		);
+		friendCollectWishlistGuaranteed = guaranteed.map((c) => c.clause).join('&');
+	}
+
+	// Suggested sets for the curated list. Candidates resolve to the storage
+	// locale (base dex — forms collapse, matching wishlist semantics), then
+	// drop what's already curated or already owned in the current mode, so the
+	// "add" counts stay honest. Untradeable mythicals are skipped up front.
+	const friendCollectCuratedSet = new Set((cfg.friendCollectSpecies || []).map(canonKey));
+	const friendCollectSuggestions = [];
+	const pushFriendCollectSuggestion = (kind, id, title, meta, inputs, cap = Infinity) => {
+		const seen = new Set();
+		const species = [];
+		for (const input of inputs || []) {
+			const info = resolveSpeciesInfo(input);
+			if (!info) continue;
+			if (UNTRADEABLE_MYTHICAL_DEX.has(info.dex)) continue;
+			const stored = pokemonNameFor(String(info.dex));
+			if (!stored || seen.has(stored)) continue;
+			seen.add(stored);
+			if (friendCollectCuratedSet.has(stored) || friendCollectHaveSet.has(stored)) continue;
+			species.push(stored);
+			if (species.length >= cap) break;
+		}
+		if (species.length > 0) friendCollectSuggestions.push({ kind, id, title, ...meta, species });
+	};
+	// Event spawns — running or upcoming events only; one suggestion per event
+	// so the set can be refreshed for the latest event as feeds update.
+	const friendCollectNowMs = Date.now();
+	for (const ev of EVENTS.events || []) {
+		const endMs = Date.parse(ev.end);
+		if (Number.isFinite(endMs) && endMs < friendCollectNowMs) continue;
+		pushFriendCollectSuggestion(
+			'event',
+			ev.id,
+			ev.title,
+			{ start: ev.start, end: ev.end },
+			(ev.spawnDex || []).map(String),
+		);
+	}
+	// Valuable keepers — the user's raid-meta roster (score-sorted, so the cap
+	// keeps the strongest) and the current PvP league metas.
+	pushFriendCollectSuggestion('raids', 'meta-raids', null, {}, cfg.topAttackers || [], 25);
+	const pvpMetaDex = [];
+	for (const league of Object.values(PVP_RANKINGS.leagues || {}))
+		for (const s of league.species || []) pvpMetaDex.push(String(s.dex));
+	pushFriendCollectSuggestion('pvp', 'meta-pvp', null, {}, pvpMetaDex, 25);
+
 	// ── AUX FILTERS — task-oriented pro tools, paste these into the search
 	//    box to *find* candidates (positive search filters, not the inverted
 	//    trash style). Grouped by game aspect: shadows / evos / trades.
@@ -2450,6 +2591,13 @@ export function buildFilters(
 		friendHundoWishlist,
 		friendLuckyClauses,
 		friendHundoClauses,
+		// Curated friend-collect wishlist (positive targets − owned families)
+		friendCollectMode,
+		friendCollectTargets,
+		friendCollectWishlist,
+		friendCollectWishlistGuaranteed,
+		friendCollectClauses,
+		friendCollectSuggestions,
 		trashClauses,
 		tradeClauses,
 		sortClauses,
@@ -3153,6 +3301,9 @@ export default function App() {
 	const [showFriendWishlist, setShowFriendWishlist] = useState(false);
 	// Friend lucky wishlist: restrict to old catches guaranteed Lucky on trade.
 	const [friendGuaranteedLucky, setFriendGuaranteedLucky] = useState(false);
+	// Same toggle for the curated friend-collect list (own state — the two
+	// boxes are copied independently, so their scopes shouldn't couple).
+	const [friendCollectGuaranteed, setFriendCollectGuaranteed] = useState(false);
 	const [showAuxMegas, setShowAuxMegas] = useState(false);
 	const [showAuxEvents, setShowAuxEvents] = useState(false);
 	const [showAuxRaids, setShowAuxRaids] = useState(false);
@@ -3361,6 +3512,11 @@ export default function App() {
 		friendLuckyWishlist,
 		friendLuckyWishlistGuaranteed,
 		friendHundoWishlist,
+		friendCollectMode,
+		friendCollectTargets,
+		friendCollectWishlist,
+		friendCollectWishlistGuaranteed,
+		friendCollectSuggestions,
 		trashClauses,
 		tradeClauses,
 		sortClauses,
@@ -4025,6 +4181,79 @@ export default function App() {
 											onToggle={() => setShowFriendWishlist((s) => !s)}
 										>
 											<div className='space-y-4'>
+												{/* Curated "have friends collect for me" — deliberate targets */}
+												<div>
+													<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-1.5'>
+														{t('app.filter.friend_collect_section')}
+													</div>
+													<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
+														{t('app.filter.friend_collect_intro')}
+													</p>
+												</div>
+												<FriendCollectEditor
+													list={effectiveConfig.friendCollectSpecies || []}
+													onChange={(next) =>
+														setConfig((c) => ({ ...c, friendCollectSpecies: next }))
+													}
+													mode={friendCollectMode}
+													onModeChange={(m) =>
+														setConfig((c) => ({ ...c, friendCollectMode: m }))
+													}
+													targets={friendCollectTargets}
+													suggestions={friendCollectSuggestions}
+												/>
+												{friendCollectWishlist ? (
+													<div>
+														<FilterBox
+															label={t('app.filter.friend_collect_label')}
+															accent='#27AE60'
+															filterStr={
+																friendCollectMode === 'lucky' && friendCollectGuaranteed
+																	? friendCollectWishlistGuaranteed
+																	: friendCollectWishlist
+															}
+															copied={copied.friendCollect}
+															onCopy={() =>
+																copyToClipboard(
+																	'friendCollect',
+																	friendCollectMode === 'lucky' && friendCollectGuaranteed
+																		? friendCollectWishlistGuaranteed
+																		: friendCollectWishlist,
+																)
+															}
+															hint={t('app.filter.friend_collect_hint')}
+														/>
+														{friendCollectMode === 'lucky' && (
+															<label className='flex items-start gap-2 cursor-pointer mono text-xs mt-2'>
+																<input
+																	type='checkbox'
+																	checked={friendCollectGuaranteed}
+																	onChange={(e) => setFriendCollectGuaranteed(e.target.checked)}
+																	className='mt-0.5'
+																/>
+																<div>
+																	<span className='text-[#E6EDF3]'>
+																		{t('app.filter.friend_guaranteed_label')}
+																	</span>
+																	<p className='text-[#8B98A5] mt-0.5'>
+																		{t('app.filter.friend_guaranteed_help')}
+																	</p>
+																</div>
+															</label>
+														)}
+													</div>
+												) : (
+													friendCollectTargets.length > 0 && (
+														<p className='mono text-xs text-[#27AE60]'>
+															{t('app.filter.friend_collect_all_owned')}
+														</p>
+													)
+												)}
+
+												{/* Fallback — blacklist of everything already owned */}
+												<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] pt-3 border-t border-[#1F2933]'>
+													{t('app.filter.friend_fallback_section')}
+												</div>
 												<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
 													{t('app.filter.friend_wishlist_intro')}
 												</p>
@@ -4864,6 +5093,193 @@ function CustomCollectiblesEditor({ list, onChange }) {
 									}`}
 								>
 									<span className='text-[9px] opacity-60'>{labelByType[tok.info.inputLocale]}</span>
+									{tok.info.names.de}
+									{isDupe && <span className='opacity-60'>✓</span>}
+								</span>
+							);
+						})}
+					</div>
+				</div>
+			)}
+		</div>
+	);
+}
+
+// Curated "have friends collect for me" editor: trading-focus switch,
+// one-tap suggested sets (event spawns / raid meta / PvP meta, pre-pruned of
+// owned + already-added species in buildFilters), the curated chips (owned
+// entries dim with a ✓ instead of vanishing — the string already skips them),
+// and the usual multi-locale species input.
+function FriendCollectEditor({ list, onChange, mode, onModeChange, targets, suggestions }) {
+	const { t } = useTranslation();
+	const [input, setInput] = useState('');
+
+	const previewTokens = useMemo(() => {
+		return input
+			.split(/[,;\s]+/)
+			.filter(Boolean)
+			.map((tok) => ({
+				input: tok,
+				info: resolveSpeciesInfo(tok),
+			}));
+	}, [input]);
+	const resolved = previewTokens.filter((p) => p.info);
+	const newResolved = resolved.filter((p) => !list.includes(p.info.names.de.toLowerCase()));
+	const dupes = resolved.filter((p) => list.includes(p.info.names.de.toLowerCase()));
+	const unresolved = previewTokens.filter((p) => !p.info);
+
+	function addAll() {
+		const tokens = input.split(/[,;\s]+/).filter(Boolean);
+		if (tokens.length === 0) return;
+		const set = new Set(list);
+		const remaining = [];
+		for (const tok of tokens) {
+			const r = resolveSpecies(tok);
+			if (r) set.add(r);
+			else remaining.push(tok);
+		}
+		onChange([...set].sort());
+		setInput(remaining.join(', '));
+	}
+	function addSet(species) {
+		onChange([...new Set([...list, ...species])].sort());
+	}
+	function remove(name) {
+		onChange(list.filter((n) => n !== name));
+	}
+
+	const suggestionLabel = (s) => {
+		if (s.kind === 'event') return `✨ ${s.title}`;
+		if (s.kind === 'raids') return `⚔️ ${t('app.filter.friend_collect_suggest_raid')}`;
+		return `🏆 ${t('app.filter.friend_collect_suggest_pvp')}`;
+	};
+
+	return (
+		<div className='space-y-3'>
+			<div className='flex items-center gap-2 flex-wrap'>
+				<span className='mono text-xs text-[#8090A0]'>{t('app.filter.friend_collect_mode_label')}</span>
+				<div className='flex rounded overflow-hidden border border-[#2D3A47]'>
+					{['lucky', 'hundo'].map((m) => (
+						<button
+							key={m}
+							onClick={() => onModeChange(m)}
+							className={`mono text-xs px-3 py-1 transition ${
+								mode === m
+									? m === 'lucky'
+										? 'bg-[#F5B82E]/20 text-[#F5B82E]'
+										: 'bg-[#5EAFC5]/20 text-[#5EAFC5]'
+									: 'bg-[#1F2933] text-[#8090A0] hover:text-[#E6EDF3]'
+							}`}
+						>
+							{t(`app.filter.friend_collect_mode_${m}`)}
+						</button>
+					))}
+				</div>
+			</div>
+			<p className='mono text-xs text-[#8090A0] leading-relaxed'>
+				{t('app.filter.friend_collect_mode_help')}
+			</p>
+
+			{suggestions.length > 0 && (
+				<div className='space-y-1.5'>
+					<div className='mono text-[10px] uppercase tracking-wider text-[#8090A0]'>
+						{t('app.filter.friend_collect_suggest_title')}
+					</div>
+					{suggestions.map((s) => (
+						<div
+							key={s.id}
+							className='flex items-center justify-between gap-2 border border-[#1F2933] rounded px-2.5 py-1.5 bg-[#0B0F14]'
+						>
+							<div className='mono text-xs text-[#E6EDF3] min-w-0'>
+								<span className='break-words'>{suggestionLabel(s)}</span>
+								<span className='text-[#8090A0] ml-1.5 whitespace-nowrap'>
+									{t('app.filter.friend_collect_suggest_count', {
+										params: { count: s.species.length },
+									})}
+								</span>
+							</div>
+							<button
+								onClick={() => addSet(s.species)}
+								className='mono text-xs bg-[#27AE60] hover:bg-[#3FCF80] text-white px-2.5 py-1 rounded transition flex items-center gap-1 shrink-0'
+							>
+								<Plus size={12} /> {t('app.collectibles.add_button')}
+							</button>
+						</div>
+					))}
+				</div>
+			)}
+
+			{targets.length > 0 ? (
+				<div className='flex flex-wrap gap-1.5'>
+					{targets.map((tg) => (
+						<span
+							key={tg.species}
+							title={tg.owned ? t(`app.filter.friend_collect_owned_${mode}`) : undefined}
+							className={`chip-enter mono text-xs pl-2 pr-1 py-0.5 rounded flex items-center gap-1.5 group border ${
+								tg.owned
+									? 'bg-[#8090A0]/10 text-[#8B98A5] border-[#2D3A47]'
+									: 'bg-[#27AE60]/15 text-[#27AE60] border-[#27AE60]/40'
+							}`}
+						>
+							{tg.owned && <span>✓</span>}
+							<span className={tg.owned ? 'line-through decoration-[#8090A0]/60' : ''}>{tg.display}</span>
+							<button
+								onClick={() => remove(tg.species)}
+								className='opacity-50 group-hover:opacity-100 hover:text-[#FF6B5B] transition'
+							>
+								<X size={10} />
+							</button>
+						</span>
+					))}
+				</div>
+			) : (
+				<p className='mono text-xs text-[#8B98A5] italic'>{t('app.filter.friend_collect_empty')}</p>
+			)}
+
+			<div className='flex gap-2'>
+				<input
+					type='text'
+					value={input}
+					onChange={(e) => setInput(e.target.value)}
+					onKeyDown={(e) => e.key === 'Enter' && addAll()}
+					placeholder={t('app.filter.friend_collect_input_placeholder')}
+					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
+				/>
+				<button
+					onClick={addAll}
+					disabled={previewTokens.length === 0 || newResolved.length === 0}
+					className='mono text-sm bg-[#27AE60] hover:bg-[#3FCF80] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded transition flex items-center gap-1.5'
+				>
+					<Plus size={14} /> {t('app.collectibles.add_button')}
+				</button>
+			</div>
+
+			{previewTokens.length > 0 && (
+				<div className='border border-[#1F2933] rounded p-2.5 bg-[#0B0F14] space-y-1.5'>
+					<div className='mono text-[10px] uppercase tracking-wider text-[#8090A0]'>
+						{t('app.collectibles.preview_summary', {
+							params: { new: newResolved.length, dupes: dupes.length, unresolved: unresolved.length },
+						})}
+					</div>
+					<div className='flex flex-wrap gap-1.5'>
+						{previewTokens.map((tok, i) => {
+							if (!tok.info)
+								return (
+									<span
+										key={i}
+										className='mono text-[11px] bg-[#FF6B5B]/15 text-[#FF6B5B] px-2 py-0.5 rounded'
+									>
+										✗ {tok.input}
+									</span>
+								);
+							const isDupe = list.includes(tok.info.names.de.toLowerCase());
+							return (
+								<span
+									key={i}
+									className={`mono text-[11px] px-2 py-0.5 rounded flex items-center gap-1 ${
+										isDupe ? 'bg-[#5C6975]/15 text-[#8090A0]' : 'bg-[#27AE60]/15 text-[#27AE60]'
+									}`}
+								>
 									{tok.info.names.de}
 									{isDupe && <span className='opacity-60'>✓</span>}
 								</span>

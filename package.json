@@ -22,6 +22,7 @@
     "test:buddy": "vite-node scripts/check-buddy-catch.mjs",
     "test:regionals": "vite-node scripts/verify-regionals.mjs",
     "test:lucky": "vite-node scripts/check-lucky-logic.mjs",
+    "test:friendcollect": "vite-node scripts/check-friend-collect.mjs",
     "fixtures:update": "vite-node scripts/generate-fixtures.mjs",
     "preview": "vite preview",
     "deploy": "npm run build && gh-pages -d dist"
