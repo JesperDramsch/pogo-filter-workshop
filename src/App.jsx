@@ -1699,10 +1699,21 @@ export function buildFilters(
 	// also scales with the (smaller) owned set rather than the ~1000 missing
 	// species, keeping the string well under PoGo's ~5000-char box.
 	//
-	// Trade guards mirror the GIFT filter (the proven inverse pattern):
+	// Trade guards mirror the GIFT filter (the proven inverse pattern), in two
+	// tiers:
+	//   can't be traded AT ALL —
 	//   !traded            — a mon can be traded only ONCE; already-traded = dead end
 	//   !shadow            — shadows can never be traded
 	//   !mythical,808,809  — mythicals untradeable except Meltan / Melmetal
+	//   copy would be a SPECIAL trade (wishlists are regular-trade workflows) —
+	//   !shiny             — shinies always trigger a Special Trade
+	//   !costume           — costumes do when the exact costume is unregistered
+	//   !background        — special/location backgrounds always do
+	//   !purified          — purified always do
+	// Species-level special trades (a curated legendary, blacklist-style
+	// legendaries in the fallbacks) deliberately remain — those are the user's
+	// explicit asks; the suggestion packs already filter them via
+	// SPECIAL_TRADE_DEX.
 	// The HUNDO list has NO 4* clause on purpose: trading re-rolls IVs, so a
 	// friend can't send a finished hundo — any untraded specimen is a valid roll
 	// (best odds in a lucky trade: 12/12/12 floor). The LUCKY list has an
@@ -1728,6 +1739,10 @@ export function buildFilters(
 		push(clauses, `!${kw.flag.traded}`, tFn('app.clause_why.gift_must_traded'));
 		push(clauses, `!${kw.flag.shadow}`, tFn('app.clause_why.gift_must_shadow'));
 		push(clauses, `!${kw.flag.mythical},808,809`, tFn('app.clause_why.must_mythical_short'));
+		push(clauses, `!${kw.flag.shiny}`, tFn('app.clause_why.friend_no_shiny'));
+		push(clauses, `!${kw.flag.costume}`, tFn('app.clause_why.friend_no_costume'));
+		push(clauses, `!${kw.flag.background}`, tFn('app.clause_why.friend_no_background'));
+		push(clauses, `!${kw.flag.purified}`, tFn('app.clause_why.friend_no_purified'));
 	};
 
 	// Lucky wishlist — exclude every family the user already has a lucky in.

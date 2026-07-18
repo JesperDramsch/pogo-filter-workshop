@@ -51,7 +51,7 @@ console.log('Scenario 1: lucky focus — exact-owned drops, singular selection-d
 	);
 	check(
 		'string = exact-species selection + trade guards, nothing else',
-		r.friendCollectWishlist === 'dratini,larvitar&!traded&!shadow&!mythical,808,809',
+		r.friendCollectWishlist === 'dratini,larvitar&!traded&!shadow&!mythical,808,809&!shiny&!costume&!background&!purified',
 		r.friendCollectWishlist,
 	);
 	// Targets are bare exact-species terms: `+dratini` would ask the friend for
@@ -80,7 +80,7 @@ console.log('\nScenario 2: hundo focus — prunes exact-owned against hundos, no
 	check('no + family expansion anywhere in the string', !r.friendCollectWishlist.includes('+'));
 	check(
 		'string = selection + trade guards, nothing else',
-		r.friendCollectWishlist === 'dratini&!traded&!shadow&!mythical,808,809',
+		r.friendCollectWishlist === 'dratini&!traded&!shadow&!mythical,808,809&!shiny&!costume&!background&!purified',
 		r.friendCollectWishlist,
 	);
 	check(
@@ -101,7 +101,7 @@ console.log('\nScenario 4: egg babies emitted bare (the original bug)');
 	const r = buildFilters([], [], { ...cfg, friendCollectSpecies: ['pichu'] }, [], 'en', t);
 	check(
 		'curated Pichu asks for Pichu only, not the Pikachu family',
-		r.friendCollectWishlist === 'pichu&!traded&!shadow&!mythical,808,809',
+		r.friendCollectWishlist === 'pichu&!traded&!shadow&!mythical,808,809&!shiny&!costume&!background&!purified',
 		r.friendCollectWishlist,
 	);
 }
@@ -231,6 +231,11 @@ console.log('\nScenario 8: output locale rendering');
 	check(
 		'DE output renders German names and keywords',
 		r.friendCollectWishlist.startsWith('dratini,larvitar&') && r.friendCollectWishlist.includes('!getauscht'),
+		r.friendCollectWishlist,
+	);
+	check(
+		'DE output localizes the special-copy guards (shiny → schillernd)',
+		r.friendCollectWishlist.includes('!schillernd'),
 		r.friendCollectWishlist,
 	);
 }
