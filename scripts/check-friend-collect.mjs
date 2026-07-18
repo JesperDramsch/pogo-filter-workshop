@@ -355,6 +355,15 @@ console.log('\nScenario 11: game-master pokemonClass parser (offline sample)');
 	check('classless species ignored', !ids.has(147));
 	check('exactly the three special entries', ids.size === 3, JSON.stringify([...ids]));
 	check('empty/absent game master yields empty set', specialTradeDexFromGameMaster(null).size === 0);
+	// Wrapped payload shapes ({ template: [...] } etc.) must parse identically.
+	for (const wrapper of ['template', 'templates', 'itemTemplate']) {
+		const wrapped = specialTradeDexFromGameMaster({ [wrapper]: sample });
+		check(
+			`wrapped game master shape '{ ${wrapper}: [...] }' parses identically`,
+			wrapped.size === 3 && wrapped.has(793) && wrapped.has(150) && wrapped.has(808),
+		);
+	}
+	check('unrecognized object payload yields empty set', specialTradeDexFromGameMaster({ foo: 1 }).size === 0);
 }
 
 console.log('\nScenario 12: generations parser — every plausible pogoapi shape yields the starter bases');

@@ -132,7 +132,13 @@ const SPECIAL_TRADE_CLASSES = /LEGENDARY|MYTHIC|ULTRA_BEAST/i;
 // offline parse test in scripts/check-friend-collect.mjs.
 export function specialTradeDexFromGameMaster(templates) {
   const ids = new Set();
-  for (const entry of templates || []) {
+  // latest.json is a plain array today, but older/mirrored game masters wrap
+  // the list ({ template: [...] } / { templates: [...] } / { itemTemplate:
+  // [...] }) — normalize instead of throwing on a non-iterable payload.
+  const list = Array.isArray(templates)
+    ? templates
+    : templates?.template || templates?.templates || templates?.itemTemplate || [];
+  for (const entry of list) {
     const node = entry?.data || entry;
     const ps = node?.pokemonSettings;
     if (!ps?.pokemonClass || !SPECIAL_TRADE_CLASSES.test(ps.pokemonClass)) continue;
