@@ -14,6 +14,7 @@ import EVENTS from '../src/data/events.json';
 import SPECIES_META from '../src/data/species-meta.json';
 import PVP_RANKINGS from '../src/data/pvp-rankings.json';
 import { pokemonNameFor } from '../src/data/species.js';
+import { specialTradeDexFromGameMaster } from './fetch-species-meta.mjs';
 
 const t = (key, opts) => (opts && 'fallback' in opts ? opts.fallback : key);
 
@@ -332,6 +333,28 @@ console.log('\nScenario 10: species-meta snapshot shape (bad syncs must not sile
 		'specialTradeDex ∩ powerLineDex = ∅',
 		(SPECIES_META.powerLineDex || []).every((dex) => !special.has(dex)),
 	);
+}
+
+console.log('\nScenario 11: game-master pokemonClass parser (offline sample)');
+{
+	// Shape mirrors PokeMiners latest.json: [{ templateId, data: { templateId,
+	// pokemonSettings } }]. The parser must catch all three special classes,
+	// ignore classless species, and survive malformed entries.
+	const sample = [
+		{ templateId: 'V0793_POKEMON_NIHILEGO', data: { templateId: 'V0793_POKEMON_NIHILEGO', pokemonSettings: { pokemonId: 'NIHILEGO', pokemonClass: 'POKEMON_CLASS_ULTRA_BEAST' } } },
+		{ templateId: 'V0150_POKEMON_MEWTWO', data: { templateId: 'V0150_POKEMON_MEWTWO', pokemonSettings: { pokemonId: 'MEWTWO', pokemonClass: 'POKEMON_CLASS_LEGENDARY' } } },
+		{ templateId: 'V0808_POKEMON_MELTAN', data: { templateId: 'V0808_POKEMON_MELTAN', pokemonSettings: { pokemonId: 'MELTAN', pokemonClass: 'POKEMON_CLASS_MYTHIC' } } },
+		{ templateId: 'V0147_POKEMON_DRATINI', data: { templateId: 'V0147_POKEMON_DRATINI', pokemonSettings: { pokemonId: 'DRATINI' } } },
+		{ templateId: 'COMBAT_V0001_MOVE_WRAP', data: { templateId: 'COMBAT_V0001_MOVE_WRAP' } },
+		null,
+	];
+	const ids = specialTradeDexFromGameMaster(sample);
+	check('Ultra Beast class → 793', ids.has(793));
+	check('Legendary class → 150', ids.has(150));
+	check('Mythic class → 808 (Meltan stays special-trade)', ids.has(808));
+	check('classless species ignored', !ids.has(147));
+	check('exactly the three special entries', ids.size === 3, JSON.stringify([...ids]));
+	check('empty/absent game master yields empty set', specialTradeDexFromGameMaster(null).size === 0);
 }
 
 if (failures > 0) {

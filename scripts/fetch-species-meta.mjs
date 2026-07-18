@@ -6,15 +6,21 @@
 //
 //  - specialTradeDex: species that can only move in a Special Trade and
 //    therefore never belong in a regular-trade "collect for me" pack.
-//    Union of pogoapi rarity classes "Legendary" + "Mythic" and the
-//    raid-exclusive roster. The raid-exclusive union is the structural
-//    guarantee for Ultra Beasts (raid-only, special trade) no matter how
-//    the rarity feed happens to classify them. Meltan/Melmetal stay IN
-//    this set: they're the one mythical line that is tradeable at all,
-//    but the trade is still a Special Trade (mythic class) — App.jsx's
-//    `!mythical,808,809` wishlist guard re-includes them because it
-//    answers a different question ("can the friend trade it at all"),
-//    not "is it a regular trade".
+//    Three-source union, so no single upstream quirk can leak a species:
+//      1. PokeMiners game master `pokemonSettings.pokemonClass` —
+//         POKEMON_CLASS_LEGENDARY / _MYTHIC / _ULTRA_BEAST, the game's
+//         own classes that the Special-Trade rule keys off. Authoritative
+//         (pogoapi's rarity feed follows main-series taxonomy, where
+//         Ultra Beasts are NOT legendaries — the first live run tripped
+//         the Nihilego assertion exactly because of that).
+//      2. pogoapi rarity: every non-"Standard" category (not just
+//         Legendary/Mythic, in case Ultra Beasts sit in their own bucket).
+//      3. pogoapi raid-exclusive roster.
+//    Meltan/Melmetal stay IN this set: they're the one mythical line that
+//    is tradeable at all, but the trade is still a Special Trade (mythic
+//    class) — App.jsx's `!mythical,808,809` wishlist guard re-includes
+//    them because it answers a different question ("can the friend trade
+//    it at all"), not "is it a regular trade".
 //
 //  - starterDex: the three starter BASE species of every generation.
 //    Derived by rule, not list: each generation's regional dex opens with
@@ -50,7 +56,30 @@ const ENDPOINTS = {
   evolutions:  "https://pogoapi.net/api/v1/pokemon_evolutions.json",
   stats:       "https://pogoapi.net/api/v1/pokemon_stats.json",
   released:    "https://pogoapi.net/api/v1/released_pokemon.json",
+  // PokeMiners game master (same org the grunt-quote fetcher uses). Big file
+  // (~tens of MB) but this script only runs in the daily sync workflow.
+  gameMaster:  "https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/latest.json",
 };
+
+// Game-master pokemonClass values whose species require a Special Trade.
+const SPECIAL_TRADE_CLASSES = /LEGENDARY|MYTHIC|ULTRA_BEAST/i;
+
+// Extract { dex → specialClass } pairs from the PokeMiners game master.
+// Template ids look like "V0793_POKEMON_NIHILEGO"; the settings node carries
+// pokemonClass only for legendary/mythic/UB species. Exported for the
+// offline parse test in scripts/check-friend-collect.mjs.
+export function specialTradeDexFromGameMaster(templates) {
+  const ids = new Set();
+  for (const entry of templates || []) {
+    const node = entry?.data || entry;
+    const ps = node?.pokemonSettings;
+    if (!ps?.pokemonClass || !SPECIAL_TRADE_CLASSES.test(ps.pokemonClass)) continue;
+    const tid = node?.templateId || entry?.templateId || "";
+    const m = /^V(\d+)_POKEMON_/.exec(tid);
+    if (m) ids.add(parseInt(m[1], 10));
+  }
+  return ids;
+}
 
 // Tunables. The plan defaults — change here, not at consumer side.
 const STARTERS_PER_GENERATION = 9;   // 3 lines × 3 stages open every regional dex
@@ -134,20 +163,31 @@ async function main() {
     }
     process.exit(1);
   }
-  // Raid-exclusive is a belt-and-braces feed; if the endpoint goes away the
-  // rarity union still stands and the Nihilego assertion below is the gate.
+  // Secondary feeds are belt-and-braces; each may fail independently — the
+  // union of whatever succeeds plus the assertions below is the gate.
   try {
     raidExcl = await fetchJson(ENDPOINTS.raidExcl);
   } catch (e) {
-    console.warn(`⚠  raid_exclusive fetch failed (${e.message}) — relying on rarity classes only.`);
+    console.warn(`⚠  raid_exclusive fetch failed (${e.message}).`);
+  }
+  let gameMaster = null;
+  try {
+    console.log("→ Fetching PokeMiners game master (pokemonClass source)");
+    gameMaster = await fetchJson(ENDPOINTS.gameMaster);
+  } catch (e) {
+    console.warn(`⚠  game master fetch failed (${e.message}).`);
   }
 
   // ── specialTradeDex ──
   const specialTrade = new Set();
+  // 1. Game master pokemonClass — the game's own Special-Trade classes.
+  for (const id of specialTradeDexFromGameMaster(gameMaster)) specialTrade.add(id);
+  // 2. Rarity: everything pogoapi does NOT file under "Standard".
   for (const [category, entries] of Object.entries(rarity || {})) {
-    if (!/legendary|mythic/i.test(category)) continue;
+    if (/standard/i.test(category)) continue;
     for (const id of collectDexIds(entries)) specialTrade.add(id);
   }
+  // 3. Raid-exclusive roster.
   if (raidExcl) for (const id of collectDexIds(raidExcl)) specialTrade.add(id);
 
   // ── starterDex ──
@@ -289,4 +329,9 @@ async function main() {
   console.log(`  power lines:   ${newContent.powerLineDex.length} base dex`);
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+// Only run when executed directly — check-friend-collect.mjs imports the
+// game-master parser above without triggering a fetch.
+import { pathToFileURL } from "node:url";
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch(e => { console.error(e); process.exit(1); });
+}
