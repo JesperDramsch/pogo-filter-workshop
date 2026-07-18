@@ -1,0 +1,38 @@
+name: Sync species meta
+
+on:
+  schedule:
+    - cron: "29 8 * * *" # daily at 08:29 UTC (offset from other syncs)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Exits 1 on real failure (fetch error, or a sanity assertion like
+      # "Nihilego ∈ specialTradeDex" tripping on an upstream change). A failed
+      # run shows up as a red workflow + GitHub notification, which is the only
+      # intervention the user wants. The friend-collect packs read this
+      # snapshot at build time; nothing here feeds the fixture snapshot.
+      - name: Derive species meta from pogoapi
+        run: npm run fetch-species-meta
+      - name: Commit + push if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- src/data/species-meta.json; then
+            echo "No species-meta changes — skipping commit."
+            exit 0
+          fi
+          git add src/data/species-meta.json
+          git commit -m "chore(species-meta): sync special-trade/starter/power-line pools from pogoapi"
+          git push

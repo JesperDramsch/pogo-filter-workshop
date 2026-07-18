@@ -24,6 +24,7 @@ import RocketQuoteLookup from './explain/RocketQuoteLookup.jsx';
 import PVP_RANKINGS from './data/pvp-rankings.json';
 import META_RANKINGS from './data/meta-rankings.json';
 import EVOLUTION_COSTS from './data/evolution-costs.json';
+import SPECIES_META from './data/species-meta.json';
 import REGIONAL_FORMS from './data/regional-forms.json';
 import CHANGELOG from './data/changelog.json';
 import { useTranslation } from './i18n/I18nProvider.jsx';
@@ -158,42 +159,13 @@ const UNTRADEABLE_MYTHICAL_DEX = new Set([
 	1025, // Pecharunt
 ]);
 
-// "Generally rare" suggestion pool for the friend-collect wishlist — offered
-// only while no event set is on the table (no running/upcoming event, or all
-// of its spawns are already curated/owned), so there's always something to
-// rotate to between events. Hand-curated base dex numbers: pseudo-legendary
-// lines, fossils, and a few classic rare wild spawns. The shared suggestion
-// builder applies the usual pruning (curated/owned/mythical) and the cap.
-const RARE_COLLECT_DEX = [
-	// Pseudo-legendary lines
-	147, // Dratini
-	246, // Larvitar
-	371, // Bagon
-	374, // Beldum
-	443, // Gible
-	633, // Deino
-	704, // Goomy
-	782, // Jangmo-o
-	885, // Dreepy
-	996, // Frigibax
-	// Fossils
-	138, // Omanyte
-	140, // Kabuto
-	142, // Aerodactyl
-	345, // Lileep
-	347, // Anorith
-	408, // Cranidos
-	410, // Shieldon
-	564, // Tirtouga
-	566, // Archen
-	696, // Tyrunt
-	698, // Amaura
-	// Classic rare wild spawns
-	131, // Lapras
-	143, // Snorlax
-	201, // Unown
-	610, // Axew
-];
+// Species that only move in a Special Trade (legendaries, mythicals, Ultra
+// Beasts) — they never belong in a regular-trade friend-collect pack. Derived
+// snapshot from pogoapi (rarity Legendary ∪ Mythic ∪ raid-exclusives, minus
+// the Meltan-line carve-out), regenerated daily by
+// scripts/fetch-species-meta.mjs — no hand-maintained list here. The same
+// snapshot supplies the starter and "power line" pack pools below.
+const SPECIAL_TRADE_DEX = new Set(SPECIES_META.specialTradeDex);
 
 // Trade-evo families: dex-keyed identity, German base name as the user-facing
 // config key (kept stable so persisted localStorage state ["abra", "machollo"]
@@ -304,6 +276,10 @@ export const DEFAULT_CONFIG = {
 	friendCollectSpecies: [],
 	// Which have-list prunes the curated wishlist: 'lucky' (default) | 'hundo'.
 	friendCollectMode: 'lucky',
+	// Restrict the curated wishlist string to guaranteed-lucky old catches
+	// (lucky mode only). Persisted config rather than per-session UI state —
+	// it's a curation setting like the mode above.
+	friendCollectGuaranteedOnly: false,
 	// Trade buddies — list of { id, name, tagPrefix, events: [event-names] }
 	// tagPrefix matches any sub-tag (e.g. #Auri matches #Auri:hat-pika via PoGo prefix match).
 	buddies: [],
@@ -872,6 +848,8 @@ export function mergeImportedConfig(raw, notices = []) {
 	merged.shadowKeeperSpecies = canonicalize(merged.shadowKeeperSpecies);
 	merged.friendCollectSpecies = canonicalize(merged.friendCollectSpecies);
 	if (merged.friendCollectMode !== 'hundo') merged.friendCollectMode = 'lucky';
+	// Legacy configs (and junk values) coerce to the off default.
+	merged.friendCollectGuaranteedOnly = merged.friendCollectGuaranteedOnly === true;
 	// Buddy targets: migrate legacy string[] → structured Target[] and backfill
 	// the per-buddy raw escape hatch. `rawAppend` first so an existing value wins.
 	// Dedupe by species|type so a hand-edited import can't yield colliding lines.
@@ -1792,16 +1770,21 @@ export function buildFilters(
 	// sets + manual input), picks a trading focus (lucky by default, or hundo),
 	// and hands the friend ONE positive filter.
 	//
-	// Shape: `+target,… & trade guards` — a singular string driven purely by
-	// the selection. The have-collection is NOT encoded as `!+owned` guards:
-	// that's the fallback wishlists' job, it makes the string scale with the
-	// collection instead of the selection (hundreds of luckies ≈ thousands of
-	// chars, toward PoGo's ~5000 cap), and family-wide subtraction would
-	// silently override an explicit pick — lucky/hundo dex entries are
-	// per-species, so a lucky Raichu must NOT cancel a curated Pikachu.
-	// Exact-species ownership is pruned app-side instead (the dimmed ✓ chip
-	// and the drop from the positives below), so the string still shrinks as
-	// new luckies / hundos land in the have-lists.
+	// Shape: `target,… & trade guards` — a singular string driven purely by
+	// the selection, with each target a bare EXACT-species term (same
+	// convention as buddy unions and what the verify-tab evaluator resolves).
+	// No `+` family expansion: a curated Pichu asks for Pichu, not the whole
+	// Pikachu line — friends should collect exactly what was picked, and egg
+	// babies must never fan out into their evolved families. The
+	// have-collection is NOT encoded as `!+owned` guards: that's the fallback
+	// wishlists' job, it makes the string scale with the collection instead
+	// of the selection (hundreds of luckies ≈ thousands of chars, toward
+	// PoGo's ~5000 cap), and family-wide subtraction would silently override
+	// an explicit pick — lucky/hundo dex entries are per-species, so a lucky
+	// Raichu must NOT cancel a curated Pikachu. Exact-species ownership is
+	// pruned app-side instead (the dimmed ✓ chip and the drop from the
+	// positives below), so the string still shrinks as new luckies / hundos
+	// land in the have-lists.
 	const friendCollectMode = cfg.friendCollectMode === 'hundo' ? 'hundo' : 'lucky';
 	const friendCollectHaves = friendCollectMode === 'hundo' ? hundos : luckies;
 	const friendCollectHaveSet = new Set((friendCollectHaves || []).map(canonKey));
@@ -1815,7 +1798,7 @@ export function buildFilters(
 	if (friendCollectActive.length > 0) {
 		push(
 			friendCollectClauses,
-			friendCollectActive.map((tg) => `+${tg.display}`).join(','),
+			friendCollectActive.map((tg) => tg.display).join(','),
 			tFn('app.clause_why.friend_collect_targets'),
 		);
 		pushFriendTradeGuards(friendCollectClauses);
@@ -1837,7 +1820,9 @@ export function buildFilters(
 	// Suggested sets for the curated list. Candidates resolve to the storage
 	// locale (base dex — forms collapse, matching wishlist semantics), then
 	// drop what's already curated or already owned in the current mode, so the
-	// "add" counts stay honest. Untradeable mythicals are skipped up front.
+	// "add" counts stay honest. Untradeable mythicals AND special-trade-only
+	// species (legendaries / Ultra Beasts) are skipped up front — these packs
+	// are strictly regular-trade material.
 	const friendCollectCuratedSet = new Set((cfg.friendCollectSpecies || []).map(canonKey));
 	const friendCollectSuggestions = [];
 	const pushFriendCollectSuggestion = (kind, id, title, meta, inputs, cap = Infinity) => {
@@ -1847,6 +1832,7 @@ export function buildFilters(
 			const info = resolveSpeciesInfo(input);
 			if (!info) continue;
 			if (UNTRADEABLE_MYTHICAL_DEX.has(info.dex)) continue;
+			if (SPECIAL_TRADE_DEX.has(info.dex)) continue;
 			const stored = pokemonNameFor(String(info.dex));
 			if (!stored || seen.has(stored)) continue;
 			seen.add(stored);
@@ -1887,26 +1873,78 @@ export function buildFilters(
 			25,
 		);
 	}
-	// Rare-species fallback — only when no event set made it through (event
-	// lull, or every event spawn is already curated/owned): pseudo-legendaries,
-	// fossils and classic rares keep the rotation going between events.
-	if (!friendCollectSuggestions.some((s) => s.kind === 'event')) {
-		pushFriendCollectSuggestion(
-			'rare',
-			'rare-collect',
-			null,
-			{},
-			RARE_COLLECT_DEX.map(String),
-			25,
-		);
-	}
+	// Evergreen packs — always on offer (no event gate: they shrink as they're
+	// consumed and re-fill as the feeds drift). All pools are data-derived:
+	// trade-evo lines are the fixed game mechanic, everything else comes from
+	// the synced snapshots.
+	//
+	// Trade evolutions: the pre-final members (what a friend actually sends) —
+	// evolving a traded one costs 0 candy, the single cheapest way to finish
+	// Machamp/Gengar/Alakazam & co.
+	pushFriendCollectSuggestion(
+		'tradeevo',
+		'trade-evos',
+		null,
+		{ hintKey: 'app.filter.friend_collect_hint_tradeevo' },
+		Object.values(TRADE_EVO_FAMILIES).flatMap((f) => f.memberDex.slice(0, -1)).map(String),
+	);
+	// Candy-heavy lines (evolution-costs feed): 400-single-jump and
+	// high-cumulative chains — every traded copy is transfer+trade candy
+	// toward an expensive evolution.
+	pushFriendCollectSuggestion(
+		'candy',
+		'candy-heavy',
+		null,
+		{ hintKey: 'app.filter.friend_collect_hint_candy' },
+		EVOLUTION_COSTS.candyHeavy || [],
+		25,
+	);
+	// Power lines (species-meta feed): pseudo-legendary-style strong 3-stage
+	// lines — rare spawns whose finals carry raids and Master League.
+	pushFriendCollectSuggestion(
+		'powerlines',
+		'power-lines',
+		null,
+		{ hintKey: 'app.filter.friend_collect_hint_powerlines' },
+		(SPECIES_META.powerLineDex || []).map(String),
+		25,
+	);
+	// Starter bases (species-meta feed): Community-Day royalty — their
+	// exclusive-move finals are prime regular trades.
+	pushFriendCollectSuggestion(
+		'starters',
+		'starters',
+		null,
+		{ hintKey: 'app.filter.friend_collect_hint_starters' },
+		(SPECIES_META.starterDex || []).map(String),
+	);
 	// Valuable keepers — the user's raid-meta roster (score-sorted, so the cap
-	// keeps the strongest) and the current PvP league metas.
-	pushFriendCollectSuggestion('raids', 'meta-raids', null, {}, cfg.topAttackers || [], 25);
-	const pvpMetaDex = [];
-	for (const league of Object.values(PVP_RANKINGS.leagues || {}))
-		for (const s of league.species || []) pvpMetaDex.push(String(s.dex));
-	pushFriendCollectSuggestion('pvp', 'meta-pvp', null, {}, pvpMetaDex, 25);
+	// keeps the strongest) and the current PvP league metas, split per league
+	// because the lucky-trade IV floor cuts opposite ways in each (see hints).
+	pushFriendCollectSuggestion(
+		'raids',
+		'meta-raids',
+		null,
+		{ hintKey: 'app.filter.friend_collect_hint_raids' },
+		cfg.topAttackers || [],
+		25,
+	);
+	pushFriendCollectSuggestion(
+		'pvp-great',
+		'meta-pvp-great',
+		null,
+		{ hintKey: 'app.filter.friend_collect_hint_gl', warn: true },
+		(PVP_RANKINGS.leagues?.great?.species || []).map((s) => String(s.dex)),
+		25,
+	);
+	pushFriendCollectSuggestion(
+		'pvp-ultra',
+		'meta-pvp-ultra',
+		null,
+		{ hintKey: 'app.filter.friend_collect_hint_ul' },
+		(PVP_RANKINGS.leagues?.ultra?.species || []).map((s) => String(s.dex)),
+		25,
+	);
 
 	// ── AUX FILTERS — task-oriented pro tools, paste these into the search
 	//    box to *find* candidates (positive search filters, not the inverted
@@ -3356,10 +3394,9 @@ export default function App() {
 	const [showAuxTrades, setShowAuxTrades] = useState(false);
 	const [showFriendWishlist, setShowFriendWishlist] = useState(false);
 	// Friend lucky wishlist: restrict to old catches guaranteed Lucky on trade.
+	// (The curated friend-collect list's equivalent toggle lives in config as
+	// `friendCollectGuaranteedOnly` — it's a persisted curation setting.)
 	const [friendGuaranteedLucky, setFriendGuaranteedLucky] = useState(false);
-	// Same toggle for the curated friend-collect list (own state — the two
-	// boxes are copied independently, so their scopes shouldn't couple).
-	const [friendCollectGuaranteed, setFriendCollectGuaranteed] = useState(false);
 	const [showAuxMegas, setShowAuxMegas] = useState(false);
 	const [showAuxEvents, setShowAuxEvents] = useState(false);
 	const [showAuxRaids, setShowAuxRaids] = useState(false);
@@ -3987,6 +4024,8 @@ export default function App() {
 									setConfig={setConfig}
 									homeLocals={homeLocals}
 									homeLocalTypeChecks={homeLocalTypeChecks}
+									friendCollectTargets={friendCollectTargets}
+									friendCollectSuggestions={friendCollectSuggestions}
 								/>
 							</StepWrapper>
 						)}
@@ -4142,6 +4181,46 @@ export default function App() {
 											hint={t('app.filter.nundo_sort_hint')}
 										/>
 									)}
+									{/* Curated friend-collect wishlist — a first-class filter like
+                      trash/trade; its target list is curated in step 2 (Was). */}
+									{friendCollectTargets.length > 0 &&
+										(friendCollectWishlist ? (
+											<div>
+												<FilterBox
+													label={t('app.filter.friend_collect_label')}
+													accent='#27AE60'
+													filterStr={
+														friendCollectMode === 'lucky' &&
+														effectiveConfig.friendCollectGuaranteedOnly
+															? friendCollectWishlistGuaranteed
+															: friendCollectWishlist
+													}
+													copied={copied.friendCollect}
+													onCopy={() =>
+														copyToClipboard(
+															'friendCollect',
+															friendCollectMode === 'lucky' &&
+																effectiveConfig.friendCollectGuaranteedOnly
+																? friendCollectWishlistGuaranteed
+																: friendCollectWishlist,
+														)
+													}
+													hint={
+														friendCollectMode === 'lucky' &&
+														effectiveConfig.friendCollectGuaranteedOnly
+															? `${t('app.filter.friend_collect_hint')} (${t('app.filter.friend_guaranteed_label')})`
+															: t('app.filter.friend_collect_hint')
+													}
+												/>
+												<p className='mono text-[10.5px] text-[#8090A0] mt-1'>
+													{t('app.filter.friend_collect_edit_pointer')}
+												</p>
+											</div>
+										) : (
+											<p className='mono text-xs text-[#27AE60]'>
+												{t('app.filter.friend_collect_all_owned')}
+											</p>
+										))}
 									{buddyCatchFilters.length > 0 && (
 										<BuddyCatchSection
 											buddyCatchFilters={buddyCatchFilters}
@@ -4237,79 +4316,9 @@ export default function App() {
 											onToggle={() => setShowFriendWishlist((s) => !s)}
 										>
 											<div className='space-y-4'>
-												{/* Curated "have friends collect for me" — deliberate targets */}
-												<div>
-													<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-1.5'>
-														{t('app.filter.friend_collect_section')}
-													</div>
-													<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
-														{t('app.filter.friend_collect_intro')}
-													</p>
-												</div>
-												<FriendCollectEditor
-													list={effectiveConfig.friendCollectSpecies || []}
-													onChange={(next) =>
-														setConfig((c) => ({ ...c, friendCollectSpecies: next }))
-													}
-													mode={friendCollectMode}
-													onModeChange={(m) =>
-														setConfig((c) => ({ ...c, friendCollectMode: m }))
-													}
-													targets={friendCollectTargets}
-													suggestions={friendCollectSuggestions}
-												/>
-												{friendCollectWishlist ? (
-													<div>
-														<FilterBox
-															label={t('app.filter.friend_collect_label')}
-															accent='#27AE60'
-															filterStr={
-																friendCollectMode === 'lucky' && friendCollectGuaranteed
-																	? friendCollectWishlistGuaranteed
-																	: friendCollectWishlist
-															}
-															copied={copied.friendCollect}
-															onCopy={() =>
-																copyToClipboard(
-																	'friendCollect',
-																	friendCollectMode === 'lucky' && friendCollectGuaranteed
-																		? friendCollectWishlistGuaranteed
-																		: friendCollectWishlist,
-																)
-															}
-															hint={t('app.filter.friend_collect_hint')}
-														/>
-														{friendCollectMode === 'lucky' && (
-															<label className='flex items-start gap-2 cursor-pointer mono text-xs mt-2'>
-																<input
-																	type='checkbox'
-																	checked={friendCollectGuaranteed}
-																	onChange={(e) => setFriendCollectGuaranteed(e.target.checked)}
-																	className='mt-0.5'
-																/>
-																<div>
-																	<span className='text-[#E6EDF3]'>
-																		{t('app.filter.friend_guaranteed_label')}
-																	</span>
-																	<p className='text-[#8B98A5] mt-0.5'>
-																		{t('app.filter.friend_guaranteed_help')}
-																	</p>
-																</div>
-															</label>
-														)}
-													</div>
-												) : (
-													friendCollectTargets.length > 0 && (
-														<p className='mono text-xs text-[#27AE60]'>
-															{t('app.filter.friend_collect_all_owned')}
-														</p>
-													)
-												)}
-
-												{/* Fallback — blacklist of everything already owned */}
-												<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] pt-3 border-t border-[#1F2933]'>
-													{t('app.filter.friend_fallback_section')}
-												</div>
+												{/* Fallback wishlists — blacklist of everything already owned. The
+                            curated "collect for me" list is configured in step 2 and its
+                            string renders as a top-level filter above. */}
 												<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
 													{t('app.filter.friend_wishlist_intro')}
 												</p>
@@ -5202,9 +5211,22 @@ function ClearListButton({ count, onClear }) {
 // owned + already-added species in buildFilters), the curated chips (owned
 // entries dim with a ✓ instead of vanishing — the string already skips them),
 // and the usual multi-locale species input.
-function FriendCollectEditor({ list, onChange, mode, onModeChange, targets, suggestions }) {
+function FriendCollectEditor({
+	list,
+	onChange,
+	mode,
+	onModeChange,
+	guaranteedOnly = false,
+	onGuaranteedChange,
+	targets,
+	suggestions,
+}) {
 	const { t } = useTranslation();
 	const [input, setInput] = useState('');
+	// Packs disclosure: open for first-run discovery (nothing curated yet),
+	// collapsed once a list exists — the pack rows are tall and the chips are
+	// the primary surface after that.
+	const [showPacks, setShowPacks] = useState(list.length === 0);
 
 	const previewTokens = useMemo(() => {
 		return input
@@ -5244,10 +5266,21 @@ function FriendCollectEditor({ list, onChange, mode, onModeChange, targets, sugg
 		if (s.kind === 'event') return `✨ ${s.title}`;
 		if (s.kind === 'eggs')
 			return `🥚 ${t('app.filter.friend_collect_suggest_eggs', { params: { title: s.title } })}`;
-		if (s.kind === 'rare') return `💎 ${t('app.filter.friend_collect_suggest_rare')}`;
+		if (s.kind === 'tradeevo') return `🧬 ${t('app.filter.friend_collect_suggest_tradeevo')}`;
+		if (s.kind === 'candy') return `🍬 ${t('app.filter.friend_collect_suggest_candy')}`;
+		if (s.kind === 'powerlines') return `🐲 ${t('app.filter.friend_collect_suggest_powerlines')}`;
+		if (s.kind === 'starters') return `🌱 ${t('app.filter.friend_collect_suggest_starters')}`;
 		if (s.kind === 'raids') return `⚔️ ${t('app.filter.friend_collect_suggest_raid')}`;
-		return `🏆 ${t('app.filter.friend_collect_suggest_pvp')}`;
+		if (s.kind === 'pvp-great') return `🥇 ${t('app.filter.friend_collect_suggest_pvp_great')}`;
+		return `🥈 ${t('app.filter.friend_collect_suggest_pvp_ultra')}`;
 	};
+	// Pack grouping: time-limited feeds first, evergreen collections, then the
+	// meta-driven pools. Groups render only when they have surviving packs.
+	const SUGGESTION_GROUPS = [
+		{ key: 'live', kinds: ['event', 'eggs'] },
+		{ key: 'evergreen', kinds: ['tradeevo', 'candy', 'powerlines', 'starters'] },
+		{ key: 'meta', kinds: ['raids', 'pvp-great', 'pvp-ultra'] },
+	];
 
 	return (
 		<div className='space-y-3'>
@@ -5277,33 +5310,84 @@ function FriendCollectEditor({ list, onChange, mode, onModeChange, targets, sugg
 			<p className='mono text-xs text-[#8090A0] leading-relaxed'>
 				{t('app.filter.friend_collect_mode_help')}
 			</p>
+			{mode === 'lucky' && onGuaranteedChange && (
+				<label className='flex items-start gap-2 cursor-pointer mono text-xs'>
+					<input
+						type='checkbox'
+						checked={guaranteedOnly}
+						onChange={(e) => onGuaranteedChange(e.target.checked)}
+						className='mt-0.5'
+					/>
+					<div>
+						<span className='text-[#E6EDF3]'>{t('app.filter.friend_guaranteed_label')}</span>
+						<p className='text-[#8B98A5] mt-0.5'>{t('app.filter.friend_guaranteed_help')}</p>
+					</div>
+				</label>
+			)}
+			<p className='mono text-[10.5px] text-[#8090A0] leading-relaxed'>
+				{t('app.filter.friend_collect_xl_note')}
+			</p>
 
 			{suggestions.length > 0 && (
-				<div className='space-y-1.5'>
-					<div className='mono text-[10px] uppercase tracking-wider text-[#8090A0]'>
-						{t('app.filter.friend_collect_suggest_title')}
-					</div>
-					{suggestions.map((s) => (
-						<div
-							key={s.id}
-							className='flex items-center justify-between gap-2 border border-[#1F2933] rounded px-2.5 py-1.5 bg-[#0B0F14]'
-						>
-							<div className='mono text-xs text-[#E6EDF3] min-w-0'>
-								<span className='break-words'>{suggestionLabel(s)}</span>
-								<span className='text-[#8090A0] ml-1.5 whitespace-nowrap'>
-									{t('app.filter.friend_collect_suggest_count', {
-										params: { count: s.species.length },
-									})}
-								</span>
-							</div>
-							<button
-								onClick={() => addSet(s.species)}
-								className='mono text-xs bg-[#27AE60] hover:bg-[#3FCF80] text-white px-2.5 py-1 rounded transition flex items-center gap-1 shrink-0'
-							>
-								<Plus size={12} /> {t('app.collectibles.add_button')}
-							</button>
+				<div className='border border-[#1F2933] rounded'>
+					<button
+						onClick={() => setShowPacks((s) => !s)}
+						className='w-full px-2.5 py-2 flex items-center gap-2 hover:bg-[#141A21] transition'
+					>
+						{showPacks ? (
+							<ChevronDown size={12} className='text-[#5EAFC5]' />
+						) : (
+							<ChevronRight size={12} className='text-[#8090A0]' />
+						)}
+						<span className='mono text-[10px] uppercase tracking-wider text-[#8090A0]'>
+							{t('app.filter.friend_collect_suggest_title')} · {suggestions.length}
+						</span>
+					</button>
+					{showPacks && (
+						<div className='px-2.5 pb-2.5 space-y-2.5 border-t border-[#1F2933] pt-2'>
+							{SUGGESTION_GROUPS.map((group) => {
+								const packs = suggestions.filter((s) => group.kinds.includes(s.kind));
+								if (packs.length === 0) return null;
+								return (
+									<div key={group.key} className='space-y-1.5'>
+										<div className='mono text-[10px] uppercase tracking-wider text-[#5C6975]'>
+											{t(`app.filter.friend_collect_group_${group.key}`)}
+										</div>
+										{packs.map((s) => (
+											<div key={s.id} className='border border-[#1F2933] rounded px-2.5 py-1.5 bg-[#0B0F14]'>
+												<div className='flex items-center justify-between gap-2'>
+													<div className='mono text-xs text-[#E6EDF3] min-w-0'>
+														<span className='break-words'>{suggestionLabel(s)}</span>
+														<span className='text-[#8090A0] ml-1.5 whitespace-nowrap'>
+															{t('app.filter.friend_collect_suggest_count', {
+																params: { count: s.species.length },
+															})}
+														</span>
+													</div>
+													<button
+														onClick={() => addSet(s.species)}
+														className='mono text-xs bg-[#27AE60] hover:bg-[#3FCF80] text-white px-2.5 py-1 rounded transition flex items-center gap-1 shrink-0'
+													>
+														<Plus size={12} /> {t('app.collectibles.add_button')}
+													</button>
+												</div>
+												{s.hintKey &&
+													(s.warn && mode === 'lucky' ? (
+														<p className='mono text-[10.5px] text-[#F5B82E] mt-1 leading-relaxed'>
+															⚠ {t(s.hintKey)}
+														</p>
+													) : (
+														<p className='mono text-[10.5px] text-[#8090A0] mt-1 leading-relaxed'>
+															{t(s.hintKey)}
+														</p>
+													))}
+											</div>
+										))}
+									</div>
+								);
+							})}
 						</div>
-					))}
+					)}
 				</div>
 			)}
 
@@ -6727,8 +6811,18 @@ const EXPERT_ONLY_KEYS = new Set([
 	'protectNundos',
 ]);
 
-function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks = [] }) {
+function ConfigPanel({
+	config,
+	setConfig,
+	homeLocals = [],
+	homeLocalTypeChecks = [],
+	friendCollectTargets = [],
+	friendCollectSuggestions = [],
+}) {
 	const { t, outputLocale } = useTranslation();
+	// "Lass Freunde für dich sammeln" — collapsed by default; the target lists
+	// get long, and the section is a sibling of the buddy wish-species cards.
+	const [showFriendCollect, setShowFriendCollect] = useState(false);
 	// Any individual change in ConfigPanel clears the preset marker — the
 	// marker means "this preset is currently in effect"; the moment the
 	// user tweaks anything, that's no longer literally true.
@@ -6988,6 +7082,36 @@ function ConfigPanel({ config, setConfig, homeLocals = [], homeLocalTypeChecks =
 					<hr className='border-[#1F2933]' />
 				</>
 			)}
+
+			{/* FRIEND COLLECT — "have friends collect for me": the mirror image of
+		    the buddy wish-species above (what YOU collect for THEM). Curates
+		    config.friendCollectSpecies; the resulting filter string renders as
+		    a top-level box in step 4. Collapsible — the pack + target lists
+		    get long. */}
+			<Collapsible
+				icon='🤝'
+				label={`${t('app.filter.friend_collect_section')} · ${friendCollectTargets.length}`}
+				open={showFriendCollect}
+				onToggle={() => setShowFriendCollect((s) => !s)}
+			>
+				<div className='space-y-4'>
+					<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
+						{t('app.filter.friend_collect_intro')}
+					</p>
+					<FriendCollectEditor
+						list={config.friendCollectSpecies || []}
+						onChange={(next) => set('friendCollectSpecies', next)}
+						mode={config.friendCollectMode === 'hundo' ? 'hundo' : 'lucky'}
+						onModeChange={(m) => set('friendCollectMode', m)}
+						guaranteedOnly={!!config.friendCollectGuaranteedOnly}
+						onGuaranteedChange={(v) => set('friendCollectGuaranteedOnly', v)}
+						targets={friendCollectTargets}
+						suggestions={friendCollectSuggestions}
+					/>
+				</div>
+			</Collapsible>
+
+			<hr className='border-[#1F2933]' />
 
 			{/* CUSTOM COLLECTIBLES */}
 			<CustomCollectiblesEditor
@@ -8905,6 +9029,10 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 	const [input, setInput] = useState('');
 	// targetSpecies entries are structured Targets { species, expand, dropForms }.
 	const targets = buddy.targetSpecies || [];
+	// Per-buddy disclosure: the wish-species lists get long, so each card
+	// collapses to its header (name + count). Open by default only while the
+	// list is empty, so adding the first species stays frictionless.
+	const [open, setOpen] = useState(targets.length === 0);
 
 	const previewTokens = useMemo(() => {
 		return input
@@ -8971,17 +9099,30 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 
 	return (
 		<div className='border border-[#E67E22]/20 rounded p-2.5 space-y-2'>
-			<div className='flex items-baseline gap-2 flex-wrap'>
+			<div
+				className='flex items-baseline gap-2 flex-wrap cursor-pointer select-none hover:bg-[#E67E22]/5 -m-1 p-1 rounded transition'
+				onClick={() => setOpen((s) => !s)}
+			>
+				{open ? (
+					<ChevronDown size={12} className='text-[#E67E22] self-center shrink-0' />
+				) : (
+					<ChevronRight size={12} className='text-[#8090A0] self-center shrink-0' />
+				)}
 				<span className='mono text-sm text-[#E6EDF3] font-semibold'>{buddy.name}</span>
 				<span className='mono text-[10.5px] text-[#8090A0]'>
 					{t('app.buddy_targets.prefix_label')} <code className='text-[#E67E22]'>#{buddy.tagPrefix}</code>
 				</span>
-				<span className='mono text-[10.5px] text-[#8090A0] ml-auto flex items-center gap-2'>
+				<span
+					className='mono text-[10.5px] text-[#8090A0] ml-auto flex items-center gap-2'
+					onClick={(e) => e.stopPropagation()}
+				>
 					{t('app.buddy_targets.count_label', { params: { count: targets.length } })}
 					<ClearListButton count={targets.length} onClear={() => onChange({ targetSpecies: [] })} />
 				</span>
 			</div>
 
+			{open && (
+				<>
 			<label
 				className='mono text-[11px] flex items-center gap-2 cursor-pointer text-[#E6EDF3] hover:bg-[#E67E22]/5 rounded px-1 py-0.5 transition w-fit'
 				title={t('app.buddy_targets.te_toggle_title')}
@@ -9161,6 +9302,8 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 					/>
 					<p className='mono text-[10px] text-[#8090A0] leading-relaxed'>{t('app.buddy_targets.raw_help')}</p>
 				</div>
+			)}
+				</>
 			)}
 		</div>
 	);

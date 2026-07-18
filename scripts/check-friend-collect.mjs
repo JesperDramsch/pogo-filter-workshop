@@ -1,6 +1,7 @@
-// Checks the curated "have friends collect for me" wishlist: positive targets,
-// family-aware pruning via !+owned guards, lucky/hundo focus, suggestion sets,
-// and the config merge/canonicalization path.
+// Checks the curated "have friends collect for me" wishlist: positive
+// EXACT-species targets (no + family expansion), lucky/hundo focus, the
+// data-derived suggestion packs (special-trade filtering included), and the
+// config merge/canonicalization path.
 // Run with: npx vite-node scripts/check-friend-collect.mjs
 
 import {
@@ -10,6 +11,8 @@ import {
 	mergeImportedConfig,
 } from '../src/App.jsx';
 import EVENTS from '../src/data/events.json';
+import SPECIES_META from '../src/data/species-meta.json';
+import PVP_RANKINGS from '../src/data/pvp-rankings.json';
 import { pokemonNameFor } from '../src/data/species.js';
 
 const t = (key, opts) => (opts && 'fallback' in opts ? opts.fallback : key);
@@ -47,15 +50,14 @@ console.log('Scenario 1: lucky focus — exact-owned drops, singular selection-d
 		JSON.stringify(r.friendCollectTargets),
 	);
 	check(
-		'string = selection + trade guards, nothing else',
-		r.friendCollectWishlist === '+dratini,+larvitar&!traded&!shadow&!mythical,808,809',
+		'string = exact-species selection + trade guards, nothing else',
+		r.friendCollectWishlist === 'dratini,larvitar&!traded&!shadow&!mythical,808,809',
 		r.friendCollectWishlist,
 	);
-	// The have-collection must NOT be encoded as !+family guards — that's the
-	// fallback wishlists' job, it scales the string with the collection instead
-	// of the selection, and a family-wide !+dragonite would silently cancel a
-	// curated dratini (lucky dex entries are per-species).
-	check('no !+owned family guards in the string', !r.friendCollectWishlist.includes('!+'));
+	// Targets are bare exact-species terms: `+dratini` would ask the friend for
+	// the entire evolution family — wrong in general and disastrous for egg
+	// babies (a curated Pichu must not fan out into Pikachu/Raichu).
+	check('no + family expansion anywhere in the string', !r.friendCollectWishlist.includes('+'));
 	check(
 		'guaranteed variant appends year floor',
 		r.friendCollectWishlistGuaranteed.endsWith('&year-20') &&
@@ -74,11 +76,11 @@ console.log('\nScenario 2: hundo focus — prunes exact-owned against hundos, no
 		'en',
 		t,
 	);
-	check('exact-owned charizard dropped from positives', r.friendCollectWishlist.startsWith('+dratini&'));
-	check('no !+owned family guards in the string', !r.friendCollectWishlist.includes('!+'));
+	check('exact-owned charizard dropped from positives', r.friendCollectWishlist.startsWith('dratini&'));
+	check('no + family expansion anywhere in the string', !r.friendCollectWishlist.includes('+'));
 	check(
 		'string = selection + trade guards, nothing else',
-		r.friendCollectWishlist === '+dratini&!traded&!shadow&!mythical,808,809',
+		r.friendCollectWishlist === 'dratini&!traded&!shadow&!mythical,808,809',
 		r.friendCollectWishlist,
 	);
 	check(
@@ -94,20 +96,48 @@ console.log('\nScenario 3: fully-owned list yields an empty string');
 	check('target still listed as owned', r.friendCollectTargets[0]?.owned === true);
 }
 
-console.log('\nScenario 4: suggestion sets');
+console.log('\nScenario 4: egg babies emitted bare (the original bug)');
+{
+	const r = buildFilters([], [], { ...cfg, friendCollectSpecies: ['pichu'] }, [], 'en', t);
+	check(
+		'curated Pichu asks for Pichu only, not the Pikachu family',
+		r.friendCollectWishlist === 'pichu&!traded&!shadow&!mythical,808,809',
+		r.friendCollectWishlist,
+	);
+}
+
+console.log('\nScenario 5: suggestion packs — lineup, caps, hygiene');
 {
 	const r = buildFilters(hundos, luckies, cfg, [], 'en', t);
 	const sug = r.friendCollectSuggestions;
+	const kinds = new Set(sug.map((s) => s.kind));
+	for (const kind of ['tradeevo', 'candy', 'powerlines', 'starters', 'raids', 'pvp-great', 'pvp-ultra']) {
+		check(`'${kind}' pack present`, kinds.has(kind), JSON.stringify([...kinds]));
+	}
+	check("gated 'rare' pack retired", !kinds.has('rare'));
+	check("combined 'pvp' pack retired (split per league)", !kinds.has('pvp'));
 	check(
-		'raid + pvp sets present',
-		sug.some((s) => s.kind === 'raids') && sug.some((s) => s.kind === 'pvp'),
-		JSON.stringify(sug.map((s) => s.kind)),
+		'capped packs stay ≤ 25',
+		sug.filter((s) => ['candy', 'powerlines', 'raids', 'pvp-great', 'pvp-ultra', 'eggs'].includes(s.kind))
+			.every((s) => s.species.length <= 25),
 	);
-	const raids = sug.find((s) => s.kind === 'raids');
-	check('raid set capped at 25', raids && raids.species.length <= 25);
 	check(
-		'no untradeable mythicals in any set',
+		'no untradeable mythicals in any pack',
 		!sug.some((s) => s.species.some((sp) => ['mew', 'deoxys', 'darkrai', 'genesect'].includes(sp))),
+	);
+	// The regular-trade guarantee: nothing from the special-trade snapshot may
+	// surface in ANY pack. DEFAULT_TOP_ATTACKERS is legendary-heavy, so the
+	// raids pack is the real regression test here.
+	const specialNames = new Set(
+		(SPECIES_META.specialTradeDex || []).map((dex) => pokemonNameFor(String(dex))).filter(Boolean),
+	);
+	const leaked = [];
+	for (const s of sug)
+		for (const sp of s.species) if (specialNames.has(sp)) leaked.push(`${s.kind}:${sp}`);
+	check('no special-trade species (legendary/UB) in any pack', leaked.length === 0, leaked.join(', '));
+	check(
+		'raids pack survives the special-trade filter with real picks',
+		(sug.find((s) => s.kind === 'raids')?.species.length || 0) > 0,
 	);
 	check(
 		'already-curated and owned species pruned',
@@ -119,48 +149,61 @@ console.log('\nScenario 4: suggestion sets');
 		'candidates canonical in the storage locale (lowercase)',
 		sug.every((s) => s.species.every((sp) => typeof sp === 'string' && sp === sp.toLowerCase())),
 	);
-	// Event sets depend on the events.json snapshot: every emitted set must
-	// belong to a non-past event window (past events never suggest).
 	const now = Date.now();
 	check(
-		'event sets only for running/upcoming events',
+		'event packs only for running/upcoming events',
 		sug.filter((s) => s.kind === 'event').every((s) => !(Date.parse(s.end) < now)),
 	);
+	// GL/UL packs derive strictly from the per-league PvP snapshots.
+	for (const [kind, league] of [
+		['pvp-great', 'great'],
+		['pvp-ultra', 'ultra'],
+	]) {
+		const pack = sug.find((s) => s.kind === kind);
+		const leagueNames = new Set(
+			(PVP_RANKINGS.leagues?.[league]?.species || [])
+				.map((s) => pokemonNameFor(String(s.dex)))
+				.filter(Boolean),
+		);
+		check(
+			`'${kind}' pack ⊆ ${league}-league snapshot`,
+			!!pack && pack.species.every((sp) => leagueNames.has(sp)),
+		);
+	}
+	// GL carries the lucky-IV-floor warning; UL deliberately does not.
+	check(
+		'GL pack flagged with the lucky-floor warning',
+		sug.find((s) => s.kind === 'pvp-great')?.warn === true &&
+			!sug.find((s) => s.kind === 'pvp-ultra')?.warn,
+	);
+	check(
+		'packs carry hint keys for the UI',
+		['tradeevo', 'candy', 'powerlines', 'starters', 'raids', 'pvp-great', 'pvp-ultra'].every(
+			(kind) => typeof sug.find((s) => s.kind === kind)?.hintKey === 'string',
+		),
+	);
 }
 
-console.log('\nScenario 5: rare-species fallback set');
+console.log('\nScenario 6: evergreen packs — no event gate, prune-to-vanish');
 {
-	// Gate invariant, independent of the events snapshot's freshness: with
-	// nothing curated/owned, the rare set appears exactly when no event set
-	// survives.
+	// Nothing curated/owned → the evergreen packs are always on offer,
+	// regardless of the events snapshot (the old rare set was event-gated).
 	const base = buildFilters([], [], { ...cfg, friendCollectSpecies: [] }, [], 'en', t);
-	const hasEvent = base.friendCollectSuggestions.some((s) => s.kind === 'event');
-	const hasRare = base.friendCollectSuggestions.some((s) => s.kind === 'rare');
-	check('rare set present exactly when no event set is', hasEvent !== hasRare);
+	for (const kind of ['tradeevo', 'candy', 'powerlines', 'starters'])
+		check(`'${kind}' offered with nothing curated`, base.friendCollectSuggestions.some((s) => s.kind === kind));
 
-	// Curate every active event spawn → event sets vanish (fully consumed) →
-	// the rare set steps in as the rotation fallback.
-	const now = Date.now();
-	const activeDex = (EVENTS.events || [])
-		.filter((ev) => !(Number.isFinite(Date.parse(ev.end)) && Date.parse(ev.end) < now))
-		.flatMap((ev) => ev.spawnDex || []);
-	const curated = [...new Set(activeDex.map((d) => pokemonNameFor(String(d))).filter(Boolean))];
-	const r = buildFilters([], [], { ...cfg, friendCollectSpecies: curated }, [], 'en', t);
-	const rare = r.friendCollectSuggestions.find((s) => s.kind === 'rare');
+	// Curating a pack's entire pool consumes it (prune still works).
+	const powerNames = [
+		...new Set((SPECIES_META.powerLineDex || []).map((d) => pokemonNameFor(String(d))).filter(Boolean)),
+	];
+	const r = buildFilters([], [], { ...cfg, friendCollectSpecies: powerNames }, [], 'en', t);
 	check(
-		'event sets consumed → no event suggestion',
-		!r.friendCollectSuggestions.some((s) => s.kind === 'event'),
-	);
-	check('rare set offered as rotation fallback', !!rare);
-	check('rare set capped at 25', !!rare && rare.species.length <= 25);
-	check('rare set contains a fossil (omanyte)', !!rare && rare.species.includes(pokemonNameFor('138')));
-	check(
-		'rare set pruned of curated species',
-		!!rare && !rare.species.some((sp) => curated.includes(sp)),
+		'fully-curated power-lines pack disappears',
+		!r.friendCollectSuggestions.some((s) => s.kind === 'powerlines'),
 	);
 }
 
-console.log('\nScenario 6: egg-pool sets');
+console.log('\nScenario 7: egg-pool sets');
 {
 	const now = Date.now();
 	const r = buildFilters([], [], { ...cfg, friendCollectSpecies: [] }, [], 'en', t);
@@ -180,31 +223,19 @@ console.log('\nScenario 6: egg-pool sets');
 		'egg set ids map to pool ids',
 		eggSug.every((s) => activePools.some((p) => p.id === s.id)),
 	);
-	// Egg sets must NOT count toward the rare-set gate (a Season pool is
-	// near-always live and would permanently suppress it) — consume all event
-	// spawns: rare appears even while egg sets are still on offer.
-	const activeEventDex = (EVENTS.events || [])
-		.filter((ev) => !(Number.isFinite(Date.parse(ev.end)) && Date.parse(ev.end) < now))
-		.flatMap((ev) => ev.spawnDex || []);
-	const curatedEv = [...new Set(activeEventDex.map((d) => pokemonNameFor(String(d))).filter(Boolean))];
-	const r2 = buildFilters([], [], { ...cfg, friendCollectSpecies: curatedEv }, [], 'en', t);
-	check(
-		'egg sets do not suppress the rare fallback',
-		r2.friendCollectSuggestions.some((s) => s.kind === 'rare'),
-	);
 }
 
-console.log('\nScenario 7: output locale rendering');
+console.log('\nScenario 8: output locale rendering');
 {
 	const r = buildFilters(hundos, luckies, cfg, [], 'de', t);
 	check(
 		'DE output renders German names and keywords',
-		r.friendCollectWishlist.startsWith('+dratini,+larvitar&') && r.friendCollectWishlist.includes('!getauscht'),
+		r.friendCollectWishlist.startsWith('dratini,larvitar&') && r.friendCollectWishlist.includes('!getauscht'),
 		r.friendCollectWishlist,
 	);
 }
 
-console.log('\nScenario 8: config merge');
+console.log('\nScenario 9: config merge');
 {
 	const m = mergeImportedConfig({ friendCollectSpecies: ['Dragonite', '131'], friendCollectMode: 'weird' });
 	check(
@@ -218,7 +249,35 @@ console.log('\nScenario 8: config merge');
 		'legacy configs back-fill the defaults',
 		Array.isArray(legacy.friendCollectSpecies) &&
 			legacy.friendCollectSpecies.length === 0 &&
-			legacy.friendCollectMode === 'lucky',
+			legacy.friendCollectMode === 'lucky' &&
+			legacy.friendCollectGuaranteedOnly === false,
+	);
+	check(
+		'guaranteed-only: true survives the merge',
+		mergeImportedConfig({ friendCollectGuaranteedOnly: true }).friendCollectGuaranteedOnly === true,
+	);
+	check(
+		'guaranteed-only: junk coerces to false',
+		mergeImportedConfig({ friendCollectGuaranteedOnly: 'yes' }).friendCollectGuaranteedOnly === false,
+	);
+}
+
+console.log('\nScenario 10: species-meta snapshot shape (bad syncs must not silently empty the packs)');
+{
+	const special = new Set(SPECIES_META.specialTradeDex || []);
+	check('specialTradeDex non-empty', special.size > 0);
+	check('starterDex non-empty, whole trios (3 per gen)', (SPECIES_META.starterDex || []).length >= 27 && SPECIES_META.starterDex.length % 3 === 0);
+	check('powerLineDex non-empty', (SPECIES_META.powerLineDex || []).length > 0);
+	check('Nihilego (Ultra Beast) is special-trade', special.has(793));
+	check('Mewtwo is special-trade', special.has(150));
+	check('Meltan stays regular-tradeable', !special.has(808));
+	check(
+		'specialTradeDex ∩ starterDex = ∅',
+		(SPECIES_META.starterDex || []).every((dex) => !special.has(dex)),
+	);
+	check(
+		'specialTradeDex ∩ powerLineDex = ∅',
+		(SPECIES_META.powerLineDex || []).every((dex) => !special.has(dex)),
 	);
 }
 
