@@ -87,12 +87,19 @@ export function generationDexSets(generations, nameToDex = new Map()) {
     const n = parseInt(String(v).replace(/\D+/g, ""), 10);
     return Number.isNaN(n) ? null : n;
   };
+  // Entry id: the real feed (2026-07-18 log capture) names the field `id`,
+  // not `pokemon_id` — accept both here. collectDexIds stays pokemon_id-only
+  // on purpose: bare `id` fields in the rarity/raid feeds could mean anything.
+  const entryId = (e) => parseInt(e?.pokemon_id ?? e?.id, 10);
   if (Array.isArray(generations)) {
     for (const e of generations || []) {
       const gen = genNum(e?.generation_number ?? e?.generation ?? e?.gen);
       if (gen == null) continue;
-      add(gen, parseInt(e?.pokemon_id, 10)); // A — flat entry
+      add(gen, entryId(e)); // A — flat entry
       for (const id of collectDexIds(e)) add(gen, id); // A — nested species list
+      for (const sub of Object.values(e || {})) {
+        if (Array.isArray(sub)) for (const s of sub) add(gen, entryId(s)); // A — nested list with `id` fields
+      }
     }
     return byGen;
   }
@@ -113,6 +120,10 @@ export function generationDexSets(generations, nameToDex = new Map()) {
     const gen = genNum(key);
     if (gen == null) continue;
     for (const id of collectDexIds(val)) add(gen, id); // B (and C with pokemon_id fields)
+    if (Array.isArray(val)) {
+      // B — the live feed's actual shape: { "Generation 1": [{ id, name }] }
+      for (const e of val) add(gen, entryId(e));
+    }
     if (!Array.isArray(val)) {
       for (const k of Object.keys(val)) add(gen, parseInt(k, 10)); // C — ids as keys
       const lo = parseInt(val.min_dex ?? val.min ?? val.start ?? val.from, 10);
@@ -306,8 +317,12 @@ async function main() {
     `  generations parsed: ${generationSets.size} · starters derived: ${[...starters].sort((a, b) => a - b).slice(0, 6).join(",")}…`,
   );
   if (generationSets.size === 0) {
-    console.warn(`⚠  unrecognized pokemon_generations shape — payload sample:`);
-    console.warn(`   ${JSON.stringify(generations)?.slice(0, 600)}`);
+    // Structural sample only — never serialize the full payload into the log.
+    const sample = Array.isArray(generations)
+      ? generations.slice(0, 2)
+      : Object.fromEntries(Object.entries(generations || {}).slice(0, 1).map(([k, v]) => [k, Array.isArray(v) ? v.slice(0, 3) : v]));
+    console.warn(`⚠  unrecognized pokemon_generations shape — structural sample:`);
+    console.warn(`   ${JSON.stringify(sample)?.slice(0, 600)}`);
   }
 
   // ── powerLineDex ──

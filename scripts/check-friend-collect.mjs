@@ -389,6 +389,12 @@ console.log('\nScenario 12: generations parser — every plausible pogoapi shape
 		generation_1: gen1ids.map(entry),
 		generation_2: gen2ids.map(entry),
 	});
+	// B-live: the REAL feed shape captured from the 2026-07-18 sync log —
+	// "Generation 1" keys and entries with `id` (NOT pokemon_id) fields.
+	expect('B-live: { "Generation 1": [{ generation_number, id, name }] } (actual pogoapi shape)', {
+		'Generation 1': gen1ids.map((id) => ({ generation_number: 1, id, name: `p${id}` })),
+		'Generation 2': gen2ids.map((id) => ({ generation_number: 2, id, name: `p${id}` })),
+	});
 	expect('C: object generation → keyed-by-id', {
 		generation_1: Object.fromEntries(gen1ids.map((id) => [id, { name: `p${id}` }])),
 		generation_2: Object.fromEntries(gen2ids.map((id) => [id, { name: `p${id}` }])),
