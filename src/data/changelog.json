@@ -1,4 +1,8 @@
 [
+	{ "id": "friend_collect_focus_both", "date": "2026-07-18" },
+	{ "id": "wishlist_special_trade_guards", "date": "2026-07-18" },
+	{ "id": "multi_instance_sync", "date": "2026-07-18" },
+	{ "id": "friend_collect_polish", "date": "2026-07-18" },
 	{ "id": "friend_collect_egg_pools", "date": "2026-07-17" },
 	{ "id": "friend_collect_rare_reset", "date": "2026-07-17" },
 	{ "id": "friend_collect_wishlist", "date": "2026-07-17" },

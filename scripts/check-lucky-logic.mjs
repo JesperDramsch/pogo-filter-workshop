@@ -102,6 +102,7 @@ console.log("\nScenario 8: friend wishlist localizes flag keywords to the friend
   check("DE renders !getauscht (traded)", de.friendLuckyWishlist.includes("getauscht"));
   check("DE renders !crypto (shadow)", de.friendLuckyWishlist.includes("crypto"));
   check("DE renders !mysteriös (mythical)", de.friendLuckyWishlist.includes("mysteriös"));
+  check("DE renders !schillernd (shiny special-copy guard)", de.friendLuckyWishlist.includes("schillernd"));
 }
 
 console.log("\nScenario 9: empty HAVE-lists → guards only, lucky and hundo identical");
@@ -110,6 +111,12 @@ console.log("\nScenario 9: empty HAVE-lists → guards only, lucky and hundo ide
   check("empty lucky list is guards only (no negated dex)", !/![0-9]/.test(r.friendLuckyWishlist));
   check("empty lucky equals empty hundo (same guards)", r.friendLuckyWishlist === r.friendHundoWishlist);
   check("guards still present (808,809)", r.friendHundoWishlist.includes("808,809"));
+  // Copy-level Special-Trade guards: shiny/costumed/background/purified copies
+  // would each trigger a Special Trade, so no wishlist may surface them.
+  for (const flag of ["!shiny", "!costume", "!background", "!purified"]) {
+    check(`special-copy guard ${flag} on both wishlists`,
+      r.friendLuckyWishlist.includes(flag) && r.friendHundoWishlist.includes(flag));
+  }
 }
 
 console.log(`\n${failures === 0 ? "✓ All lucky-logic checks passed." : `✗ ${failures} failure(s).`}`);
