@@ -66,12 +66,16 @@ const ENDPOINTS = {
 // assertion because the real payload didn't match the shape we guessed.
 // Handled shapes:
 //   A. array of entries:            [{ pokemon_id, generation_number }, ...]
+//      (incl. per-generation entries carrying a NESTED species list)
 //   B. object gen → entry list:     { "generation_1": [{ pokemon_id }, ...] }
 //   C. object gen → keyed-by-id:    { "generation_1": { "1": {...}, ... } }
 //   D. object gen → dex range:      { "generation_1": { min_dex, max_dex } }
 //   E. object id → generation:      { "1": "generation_1" | 1, ... }
+//   F. object NAME → generation:    { "bulbasaur": 1, ... } (needs nameToDex,
+//      built from the stats feed)
+//   G. object id → entry w/ gen:    { "1": { generation_number: 1 }, ... }
 // Exported for the offline shape tests in scripts/check-friend-collect.mjs.
-export function generationDexSets(generations) {
+export function generationDexSets(generations, nameToDex = new Map()) {
   const byGen = new Map();
   const add = (gen, id) => {
     if (!Number.isInteger(gen) || !Number.isInteger(id)) return;
@@ -79,18 +83,31 @@ export function generationDexSets(generations) {
     byGen.get(gen).add(id);
   };
   const genNum = (v) => {
+    if (v == null) return null;
     const n = parseInt(String(v).replace(/\D+/g, ""), 10);
     return Number.isNaN(n) ? null : n;
   };
   if (Array.isArray(generations)) {
     for (const e of generations || []) {
-      add(genNum(e?.generation_number ?? e?.generation), parseInt(e?.pokemon_id, 10)); // A
+      const gen = genNum(e?.generation_number ?? e?.generation ?? e?.gen);
+      if (gen == null) continue;
+      add(gen, parseInt(e?.pokemon_id, 10)); // A — flat entry
+      for (const id of collectDexIds(e)) add(gen, id); // A — nested species list
     }
     return byGen;
   }
   for (const [key, val] of Object.entries(generations || {})) {
     if (val == null || typeof val !== "object") {
-      add(genNum(val), parseInt(key, 10)); // E — key is the pokemon id
+      const scalarGen = genNum(val);
+      const keyId = parseInt(key, 10);
+      if (!Number.isNaN(keyId)) add(scalarGen, keyId); // E — key is the pokemon id
+      else if (nameToDex.has(normalizeName(key))) add(scalarGen, nameToDex.get(normalizeName(key))); // F
+      continue;
+    }
+    const entryGen = genNum(val.generation_number ?? val.generation ?? val.gen);
+    const keyId = parseInt(key, 10);
+    if (entryGen != null && !Number.isNaN(keyId) && !/\D/.test(key)) {
+      add(entryGen, keyId); // G — key is the pokemon id, gen sits in the entry
       continue;
     }
     const gen = genNum(key);
@@ -111,9 +128,9 @@ export function generationDexSets(generations) {
 // The three starter BASE species per generation: each generation's regional
 // dex opens with its three starter lines as three consecutive trios, so take
 // the nine lowest dex ids and keep offsets 0/3/6.
-export function starterDexFromGenerations(generations, perGeneration = 9) {
+export function starterDexFromGenerations(generations, perGeneration = 9, nameToDex = new Map()) {
   const starters = new Set();
-  for (const ids of generationDexSets(generations).values()) {
+  for (const ids of generationDexSets(generations, nameToDex).values()) {
     [...ids]
       .sort((a, b) => a - b)
       .slice(0, perGeneration)
@@ -259,13 +276,27 @@ async function main() {
   if (raidExcl) for (const id of collectDexIds(raidExcl)) specialTrade.add(id);
 
   // ── starterDex ──
-  const generationSets = generationDexSets(generations);
-  const starters = starterDexFromGenerations(generations, STARTERS_PER_GENERATION);
+  // Name→dex lookup (from the stats feed) lets the parser resolve
+  // name-keyed generation payloads.
+  const nameToDex = new Map();
+  for (const row of stats || []) {
+    const id = parseInt(row.pokemon_id, 10);
+    if (Number.isNaN(id) || !row.pokemon_name) continue;
+    const key = normalizeName(row.pokemon_name);
+    if (!nameToDex.has(key)) nameToDex.set(key, id);
+  }
+  const generationSets = generationDexSets(generations, nameToDex);
+  const starters = starterDexFromGenerations(generations, STARTERS_PER_GENERATION, nameToDex);
   // Diagnostic breadcrumb: if an assertion below trips, this line says whether
-  // the feed shape parsed at all (0 generations = unrecognized payload shape).
+  // the feed shape parsed at all — and on a zero-parse, a payload sample goes
+  // straight into the log so the next fix doesn't have to guess the shape.
   console.log(
     `  generations parsed: ${generationSets.size} · starters derived: ${[...starters].sort((a, b) => a - b).slice(0, 6).join(",")}…`,
   );
+  if (generationSets.size === 0) {
+    console.warn(`⚠  unrecognized pokemon_generations shape — payload sample:`);
+    console.warn(`   ${JSON.stringify(generations)?.slice(0, 600)}`);
+  }
 
   // ── powerLineDex ──
   // released_pokemon.json is an object keyed by pokemon_id string.

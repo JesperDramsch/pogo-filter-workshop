@@ -401,6 +401,29 @@ console.log('\nScenario 12: generations parser — every plausible pogoapi shape
 		...Object.fromEntries(gen1ids.map((id) => [id, 'generation_1'])),
 		...Object.fromEntries(gen2ids.map((id) => [id, 2])),
 	});
+	// F: name-keyed payloads need the stats-derived name→dex lookup.
+	const nameToDex = new Map([...gen1ids, ...gen2ids].map((id) => [`mon-${id}`, id]));
+	const named = starterDexFromGenerations(
+		{
+			...Object.fromEntries(gen1ids.map((id) => [`Mon ${id}`, 'generation_1'])),
+			...Object.fromEntries(gen2ids.map((id) => [`Mon ${id}`, 2])),
+		},
+		9,
+		nameToDex,
+	);
+	check(
+		'F: object pokemon-name → generation (via name→dex lookup)',
+		[1, 4, 7, 152, 155, 158].every((d) => named.has(d)) && !named.has(2),
+		JSON.stringify([...named].sort((a, b) => a - b)),
+	);
+	expect('G: object pokemon-id → entry with generation field', {
+		...Object.fromEntries(gen1ids.map((id) => [id, { generation_number: 1, name: `p${id}` }])),
+		...Object.fromEntries(gen2ids.map((id) => [id, { generation_number: 2, name: `p${id}` }])),
+	});
+	expect('A2: per-generation array entries with nested species lists', [
+		{ generation_number: 1, pokemon_species: gen1ids.map(entry) },
+		{ generation_number: 2, pokemon_species: gen2ids.map(entry) },
+	]);
 	check('unrecognized payload yields empty set (assertion will trip loudly)', starterDexFromGenerations({ weird: true }).size === 0);
 }
 
