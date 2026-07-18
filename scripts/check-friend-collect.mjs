@@ -14,7 +14,7 @@ import EVENTS from '../src/data/events.json';
 import SPECIES_META from '../src/data/species-meta.json';
 import PVP_RANKINGS from '../src/data/pvp-rankings.json';
 import { pokemonNameFor } from '../src/data/species.js';
-import { specialTradeDexFromGameMaster } from './fetch-species-meta.mjs';
+import { specialTradeDexFromGameMaster, starterDexFromGenerations } from './fetch-species-meta.mjs';
 
 const t = (key, opts) => (opts && 'fallback' in opts ? opts.fallback : key);
 
@@ -355,6 +355,44 @@ console.log('\nScenario 11: game-master pokemonClass parser (offline sample)');
 	check('classless species ignored', !ids.has(147));
 	check('exactly the three special entries', ids.size === 3, JSON.stringify([...ids]));
 	check('empty/absent game master yields empty set', specialTradeDexFromGameMaster(null).size === 0);
+}
+
+console.log('\nScenario 12: generations parser — every plausible pogoapi shape yields the starter bases');
+{
+	// Gen-1 (dex 1-12 sample) must always yield bases 1/4/7; gen-2 sample
+	// (152-160) must yield 152/155/158. One fixture per handled shape.
+	const gen1ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+	const gen2ids = [152, 153, 154, 155, 156, 157, 158, 159, 160];
+	const expect = (label, generations) => {
+		const s = starterDexFromGenerations(generations);
+		check(
+			label,
+			[1, 4, 7, 152, 155, 158].every((d) => s.has(d)) && !s.has(2) && !s.has(3) && !s.has(10),
+			JSON.stringify([...s].sort((a, b) => a - b)),
+		);
+	};
+	const entry = (id) => ({ pokemon_id: id, pokemon_name: `p${id}` });
+	expect('A: array of {pokemon_id, generation_number}', [
+		...gen1ids.map((id) => ({ pokemon_id: id, generation_number: 1 })),
+		...gen2ids.map((id) => ({ pokemon_id: id, generation_number: 2 })),
+	]);
+	expect('B: object generation → entry list', {
+		generation_1: gen1ids.map(entry),
+		generation_2: gen2ids.map(entry),
+	});
+	expect('C: object generation → keyed-by-id', {
+		generation_1: Object.fromEntries(gen1ids.map((id) => [id, { name: `p${id}` }])),
+		generation_2: Object.fromEntries(gen2ids.map((id) => [id, { name: `p${id}` }])),
+	});
+	expect('D: object generation → dex range', {
+		generation_1: { min_dex: 1, max_dex: 12 },
+		generation_2: { min_dex: 152, max_dex: 160 },
+	});
+	expect('E: object pokemon-id → generation', {
+		...Object.fromEntries(gen1ids.map((id) => [id, 'generation_1'])),
+		...Object.fromEntries(gen2ids.map((id) => [id, 2])),
+	});
+	check('unrecognized payload yields empty set (assertion will trip loudly)', starterDexFromGenerations({ weird: true }).size === 0);
 }
 
 if (failures > 0) {

@@ -61,6 +61,68 @@ const ENDPOINTS = {
   gameMaster:  "https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/latest.json",
 };
 
+// Group dex ids by generation from pogoapi's pokemon_generations.json,
+// whatever shape it arrives in — the first live run tripped the starter
+// assertion because the real payload didn't match the shape we guessed.
+// Handled shapes:
+//   A. array of entries:            [{ pokemon_id, generation_number }, ...]
+//   B. object gen → entry list:     { "generation_1": [{ pokemon_id }, ...] }
+//   C. object gen → keyed-by-id:    { "generation_1": { "1": {...}, ... } }
+//   D. object gen → dex range:      { "generation_1": { min_dex, max_dex } }
+//   E. object id → generation:      { "1": "generation_1" | 1, ... }
+// Exported for the offline shape tests in scripts/check-friend-collect.mjs.
+export function generationDexSets(generations) {
+  const byGen = new Map();
+  const add = (gen, id) => {
+    if (!Number.isInteger(gen) || !Number.isInteger(id)) return;
+    if (!byGen.has(gen)) byGen.set(gen, new Set());
+    byGen.get(gen).add(id);
+  };
+  const genNum = (v) => {
+    const n = parseInt(String(v).replace(/\D+/g, ""), 10);
+    return Number.isNaN(n) ? null : n;
+  };
+  if (Array.isArray(generations)) {
+    for (const e of generations || []) {
+      add(genNum(e?.generation_number ?? e?.generation), parseInt(e?.pokemon_id, 10)); // A
+    }
+    return byGen;
+  }
+  for (const [key, val] of Object.entries(generations || {})) {
+    if (val == null || typeof val !== "object") {
+      add(genNum(val), parseInt(key, 10)); // E — key is the pokemon id
+      continue;
+    }
+    const gen = genNum(key);
+    if (gen == null) continue;
+    for (const id of collectDexIds(val)) add(gen, id); // B (and C with pokemon_id fields)
+    if (!Array.isArray(val)) {
+      for (const k of Object.keys(val)) add(gen, parseInt(k, 10)); // C — ids as keys
+      const lo = parseInt(val.min_dex ?? val.min ?? val.start ?? val.from, 10);
+      const hi = parseInt(val.max_dex ?? val.max ?? val.end ?? val.to, 10);
+      if (!Number.isNaN(lo) && !Number.isNaN(hi) && hi >= lo && hi - lo < 2000) {
+        for (let i = lo; i <= hi; i++) add(gen, i); // D
+      }
+    }
+  }
+  return byGen;
+}
+
+// The three starter BASE species per generation: each generation's regional
+// dex opens with its three starter lines as three consecutive trios, so take
+// the nine lowest dex ids and keep offsets 0/3/6.
+export function starterDexFromGenerations(generations, perGeneration = 9) {
+  const starters = new Set();
+  for (const ids of generationDexSets(generations).values()) {
+    [...ids]
+      .sort((a, b) => a - b)
+      .slice(0, perGeneration)
+      .filter((_, idx) => idx % 3 === 0)
+      .forEach((id) => starters.add(id));
+  }
+  return starters;
+}
+
 // Game-master pokemonClass values whose species require a Special Trade.
 const SPECIAL_TRADE_CLASSES = /LEGENDARY|MYTHIC|ULTRA_BEAST/i;
 
@@ -191,25 +253,13 @@ async function main() {
   if (raidExcl) for (const id of collectDexIds(raidExcl)) specialTrade.add(id);
 
   // ── starterDex ──
-  // Group every dex id by generation, then take the 9 lowest per generation.
-  const byGeneration = new Map();
-  const genEntries = Array.isArray(generations)
-    ? generations.map((e) => [e.generation_number ?? e.generation, [e]])
-    : Object.entries(generations || {});
-  for (const [genKey, entries] of genEntries) {
-    const genNum = parseInt(String(genKey).replace(/\D+/g, ""), 10);
-    if (Number.isNaN(genNum)) continue;
-    if (!byGeneration.has(genNum)) byGeneration.set(genNum, new Set());
-    for (const id of collectDexIds(entries)) byGeneration.get(genNum).add(id);
-  }
-  const starters = new Set();
-  for (const ids of byGeneration.values()) {
-    [...ids]
-      .sort((a, b) => a - b)
-      .slice(0, STARTERS_PER_GENERATION)
-      .filter((_, idx) => idx % 3 === 0) // line bases sit at offsets 0/3/6
-      .forEach((id) => starters.add(id));
-  }
+  const generationSets = generationDexSets(generations);
+  const starters = starterDexFromGenerations(generations, STARTERS_PER_GENERATION);
+  // Diagnostic breadcrumb: if an assertion below trips, this line says whether
+  // the feed shape parsed at all (0 generations = unrecognized payload shape).
+  console.log(
+    `  generations parsed: ${generationSets.size} · starters derived: ${[...starters].sort((a, b) => a - b).slice(0, 6).join(",")}…`,
+  );
 
   // ── powerLineDex ──
   // released_pokemon.json is an object keyed by pokemon_id string.
