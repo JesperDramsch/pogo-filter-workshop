@@ -276,7 +276,8 @@ export const DEFAULT_CONFIG = {
 	// Entries stay stored even once found; the string just stops emitting them
 	// (mode switches or resets bring them back without retyping).
 	friendCollectSpecies: [],
-	// Which have-list prunes the curated wishlist: 'lucky' (default) | 'hundo'.
+	// Which goal prunes the curated wishlist: 'lucky' (default) | 'hundo' |
+	// 'both' ('both' = covered only once lucky AND hundo are owned).
 	friendCollectMode: 'lucky',
 	// Restrict the curated wishlist string to guaranteed-lucky old catches
 	// (lucky mode only). Persisted config rather than per-session UI state —
@@ -849,7 +850,7 @@ export function mergeImportedConfig(raw, notices = []) {
 	merged.mythTooManyOf = canonicalize(merged.mythTooManyOf);
 	merged.shadowKeeperSpecies = canonicalize(merged.shadowKeeperSpecies);
 	merged.friendCollectSpecies = canonicalize(merged.friendCollectSpecies);
-	if (merged.friendCollectMode !== 'hundo') merged.friendCollectMode = 'lucky';
+	if (!['lucky', 'hundo', 'both'].includes(merged.friendCollectMode)) merged.friendCollectMode = 'lucky';
 	// Legacy configs (and junk values) coerce to the off default.
 	merged.friendCollectGuaranteedOnly = merged.friendCollectGuaranteedOnly === true;
 	// Buddy targets: migrate legacy string[] → structured Target[] and backfill
@@ -1802,14 +1803,32 @@ export function buildFilters(
 	// pruned app-side instead (the dimmed ✓ chip and the drop from the
 	// positives below), so the string still shrinks as new luckies / hundos
 	// land in the have-lists.
-	const friendCollectMode = cfg.friendCollectMode === 'hundo' ? 'hundo' : 'lucky';
-	const friendCollectHaves = friendCollectMode === 'hundo' ? hundos : luckies;
-	const friendCollectHaveSet = new Set((friendCollectHaves || []).map(canonKey));
-	const friendCollectTargets = (cfg.friendCollectSpecies || []).map((sp) => ({
-		species: sp,
-		display: speciesForOutput(sp, outputLocale),
-		owned: friendCollectHaveSet.has(canonKey(sp)),
-	}));
+	// Focus: 'lucky' | 'hundo' | 'both'. 'both' means the user wants each
+	// species as a lucky AND as a hundo — a target only counts as covered
+	// (and drops from the string / prunes the packs) once BOTH goals are met.
+	const friendCollectMode = ['hundo', 'both'].includes(cfg.friendCollectMode)
+		? cfg.friendCollectMode
+		: 'lucky';
+	const friendCollectHundoSet = new Set((hundos || []).map(canonKey));
+	// luckySet (canonKey'd luckies) already exists above for the lucky/hundo
+	// intersection logic — reuse it here.
+	const friendCollectCovered = (canonName) => {
+		const l = luckySet.has(canonName);
+		const h = friendCollectHundoSet.has(canonName);
+		if (friendCollectMode === 'lucky') return l;
+		if (friendCollectMode === 'hundo') return h;
+		return l && h;
+	};
+	const friendCollectTargets = (cfg.friendCollectSpecies || []).map((sp) => {
+		const key = canonKey(sp);
+		return {
+			species: sp,
+			display: speciesForOutput(sp, outputLocale),
+			ownedLucky: luckySet.has(key),
+			ownedHundo: friendCollectHundoSet.has(key),
+			owned: friendCollectCovered(key),
+		};
+	});
 	const friendCollectClauses = [];
 	const friendCollectActive = friendCollectTargets.filter((tg) => !tg.owned);
 	if (friendCollectActive.length > 0) {
@@ -1853,7 +1872,7 @@ export function buildFilters(
 			const stored = pokemonNameFor(String(info.dex));
 			if (!stored || seen.has(stored)) continue;
 			seen.add(stored);
-			if (friendCollectCuratedSet.has(stored) || friendCollectHaveSet.has(stored)) continue;
+			if (friendCollectCuratedSet.has(stored) || friendCollectCovered(stored)) continue;
 			species.push(stored);
 			if (species.length >= cap) break;
 		}
@@ -3492,6 +3511,8 @@ export default function App() {
 	// Hundos just added via the adder that are ALSO protected regionals — the
 	// popup explains that protection wins and where the opt-out lives.
 	const [hundoRegionalNotice, setHundoRegionalNotice] = useState([]);
+	// Curated friend-collect targets newly covered by a step-3 hundo/lucky add.
+	const [friendCollectCoveredNotice, setFriendCollectCoveredNotice] = useState([]);
 	const [showChangelog, setShowChangelog] = useState(false);
 	// Number of changelog entries the user has already opened the panel for —
 	// drives the "new" dot on the footer link.
@@ -3788,6 +3809,27 @@ export default function App() {
 		],
 	);
 
+	// Newly-added haves that touch curated friend-collect targets → purple
+	// popup (mirrors the regional-hundo notice pattern below). `added` holds
+	// canonical storage-locale names, same shape as config.friendCollectSpecies,
+	// so plain equality works. Under 'both' focus a one-goal add is reported as
+	// partial progress (target stays in the string until the other goal lands).
+	function detectFriendCollectCovered(added, goal) {
+		const curated = new Set(config.friendCollectSpecies || []);
+		if (curated.size === 0) return [];
+		const mode = ['hundo', 'both'].includes(config.friendCollectMode) ? config.friendCollectMode : 'lucky';
+		if (goal === 'hundo' && mode === 'lucky') return [];
+		if (goal === 'lucky' && mode === 'hundo') return [];
+		const otherSet = new Set(goal === 'hundo' ? luckies : hundos);
+		const notices = [];
+		for (const sp of added) {
+			if (!curated.has(sp)) continue;
+			const nowFullyCovered = mode === 'both' ? otherSet.has(sp) : true;
+			notices.push({ species: sp, goal, nowFullyCovered });
+		}
+		return notices;
+	}
+
 	function addHundo() {
 		// Accept comma/space/semicolon-separated lists. Each token can be:
 		// - a dex number (e.g. "1", "201", "0666")
@@ -3816,6 +3858,8 @@ export default function App() {
 			.map((sp) => ({ species: sp, groups: regionalProtectionsFor(sp, config) }))
 			.filter((x) => x.groups.length > 0);
 		if (regionalAdds.length > 0) setHundoRegionalNotice(regionalAdds);
+		const covered = detectFriendCollectCovered(added, 'hundo');
+		if (covered.length > 0) setFriendCollectCoveredNotice(covered);
 		if (unresolved.length > 0) {
 			// Keep unresolved tokens in the input so the user sees what didn't match
 			setNewHundo(unresolved.join(', '));
@@ -3834,12 +3878,17 @@ export default function App() {
 		if (tokens.length === 0) return;
 		const set = new Set(luckies);
 		const unresolved = [];
+		const added = [];
 		for (const tok of tokens) {
 			const resolved = resolveSpecies(tok);
-			if (resolved) set.add(resolved);
-			else unresolved.push(tok);
+			if (resolved) {
+				if (!set.has(resolved)) added.push(resolved);
+				set.add(resolved);
+			} else unresolved.push(tok);
 		}
 		setLuckies([...set].sort());
+		const covered = detectFriendCollectCovered(added, 'lucky');
+		if (covered.length > 0) setFriendCollectCoveredNotice(covered);
 		setNewLucky(unresolved.length > 0 ? unresolved.join(', ') : '');
 	}
 	function removeLucky(s) {
@@ -4811,6 +4860,13 @@ export default function App() {
 				onImport={applyImportEnvelope}
 			/>
 			<HundoRegionalNotice notices={hundoRegionalNotice} onClose={() => setHundoRegionalNotice([])} />
+			{/* Sequential, not stacked: the regional notice (if any) shows first. */}
+			{hundoRegionalNotice.length === 0 && (
+				<FriendCollectCoveredNotice
+					notices={friendCollectCoveredNotice}
+					onClose={() => setFriendCollectCoveredNotice([])}
+				/>
+			)}
 			<RegionalSyncNotice
 				notices={regionalNotices}
 				onClose={() => setRegionalNotices([])}
@@ -5397,21 +5453,26 @@ function FriendCollectEditor({
 			<div className='flex items-center gap-2 flex-wrap'>
 				<span className='mono text-xs text-[#8090A0]'>{t('app.filter.friend_collect_mode_label')}</span>
 				<div className='flex rounded overflow-hidden border border-[#2D3A47]'>
-					{['lucky', 'hundo'].map((m) => (
-						<button
-							key={m}
-							onClick={() => onModeChange(m)}
-							className={`mono text-xs px-3 py-1 transition ${
-								mode === m
-									? m === 'lucky'
-										? 'bg-[#F5B82E]/20 text-[#F5B82E]'
-										: 'bg-[#5EAFC5]/20 text-[#5EAFC5]'
-									: 'bg-[#1F2933] text-[#8090A0] hover:text-[#E6EDF3]'
-							}`}
-						>
-							{t(`app.filter.friend_collect_mode_${m}`)}
-						</button>
-					))}
+					{['lucky', 'hundo', 'both'].map((m) => {
+						// Accent language matches the chip badges: amber = lucky,
+						// purple = hundo (4★), green = both goals.
+						const activeCls = {
+							lucky: 'bg-[#F5B82E]/20 text-[#F5B82E]',
+							hundo: 'bg-[#9B59B6]/20 text-[#9B59B6]',
+							both: 'bg-[#27AE60]/20 text-[#27AE60]',
+						}[m];
+						return (
+							<button
+								key={m}
+								onClick={() => onModeChange(m)}
+								className={`mono text-xs px-3 py-1 transition ${
+									mode === m ? activeCls : 'bg-[#1F2933] text-[#8090A0] hover:text-[#E6EDF3]'
+								}`}
+							>
+								{t(`app.filter.friend_collect_mode_${m}`)}
+							</button>
+						);
+					})}
 				</div>
 				<span className='ml-auto'>
 					<ClearListButton count={list.length} onClear={() => onChange([])} />
@@ -5515,6 +5576,25 @@ function FriendCollectEditor({
 						>
 							{tg.owned && <span>✓</span>}
 							<span className={tg.owned ? 'line-through decoration-[#8090A0]/60' : ''}>{tg.display}</span>
+							{/* Per-goal coverage badges — amber = owned as lucky, purple =
+                  owned as hundo. Shown regardless of focus so partial progress
+                  in 'both' mode (and cross-goal ownership) stays visible. */}
+							{tg.ownedLucky && (
+								<span
+									title={t('app.filter.friend_collect_badge_lucky')}
+									className='text-[9px] px-1 py-px rounded bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/40'
+								>
+									✦
+								</span>
+							)}
+							{tg.ownedHundo && (
+								<span
+									title={t('app.filter.friend_collect_badge_hundo')}
+									className='text-[9px] px-1 py-px rounded bg-[#9B59B6]/20 text-[#9B59B6] border border-[#9B59B6]/40'
+								>
+									4★
+								</span>
+							)}
 							<button
 								onClick={() => remove(tg.species)}
 								className='opacity-50 group-hover:opacity-100 hover:text-[#FF6B5B] transition'
@@ -7211,7 +7291,7 @@ function ConfigPanel({
 					<FriendCollectEditor
 						list={config.friendCollectSpecies || []}
 						onChange={(next) => set('friendCollectSpecies', next)}
-						mode={config.friendCollectMode === 'hundo' ? 'hundo' : 'lucky'}
+						mode={['hundo', 'both'].includes(config.friendCollectMode) ? config.friendCollectMode : 'lucky'}
 						onModeChange={(m) => set('friendCollectMode', m)}
 						guaranteedOnly={!!config.friendCollectGuaranteedOnly}
 						onGuaranteedChange={(v) => set('friendCollectGuaranteedOnly', v)}
@@ -8241,6 +8321,61 @@ function HundoRegionalNotice({ notices, onClose }) {
 					<button
 						onClick={onClose}
 						className='mono text-xs bg-[#E67E22]/20 hover:bg-[#E67E22]/30 text-[#E67E22] px-3 py-1.5 rounded transition'
+					>
+						{t('app.regional_sync.ok')}
+					</button>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+// Popup when a step-3 hundo/lucky add covers a curated friend-collect target:
+// fully covered targets drop out of the friend string automatically, and under
+// 'both' focus a one-goal add is reported as partial progress (target stays
+// until the other goal lands). Same event-driven pattern as
+// HundoRegionalNotice above, purple-themed to match the 4★ badge language.
+function FriendCollectCoveredNotice({ notices, onClose }) {
+	const { t } = useTranslation();
+	if (!notices || notices.length === 0) return null;
+	const anyFull = notices.some((n) => n.nowFullyCovered);
+	const anyPartial = notices.some((n) => !n.nowFullyCovered);
+	return (
+		<div
+			role='dialog'
+			aria-modal='true'
+			aria-label={t('app.friend_covered.title')}
+			onClick={onClose}
+			style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
+			className='fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4'
+		>
+			<div
+				onClick={(e) => e.stopPropagation()}
+				style={{ backgroundColor: '#0F1419' }}
+				className='border border-[#9B59B6]/40 rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'
+			>
+				<h2 className='mono text-base font-semibold text-[#9B59B6]'>{t('app.friend_covered.title')}</h2>
+				<ul className='space-y-1 border border-[#9B59B6]/40 rounded p-3 bg-[#9B59B6]/5'>
+					{notices.map((n) => (
+						<li key={`${n.species}-${n.goal}`} className='mono text-xs text-[#E6EDF3] flex items-baseline gap-2'>
+							<span className={n.goal === 'hundo' ? 'text-[#9B59B6]' : 'text-[#F5B82E]'}>
+								{n.goal === 'hundo' ? '4★' : '✦'}
+							</span>
+							{capFirst(n.species)}
+							{!n.nowFullyCovered && (
+								<span className='text-[#8090A0]'>{t('app.friend_covered.partial_tag')}</span>
+							)}
+						</li>
+					))}
+				</ul>
+				{anyFull && <p className='mono text-xs text-[#8090A0] leading-relaxed'>{t('app.friend_covered.body')}</p>}
+				{anyPartial && (
+					<p className='mono text-xs text-[#8090A0] leading-relaxed'>{t('app.friend_covered.body_partial')}</p>
+				)}
+				<div className='flex justify-end'>
+					<button
+						onClick={onClose}
+						className='mono text-xs bg-[#9B59B6]/20 hover:bg-[#9B59B6]/30 text-[#9B59B6] px-3 py-1.5 rounded transition'
 					>
 						{t('app.regional_sync.ok')}
 					</button>

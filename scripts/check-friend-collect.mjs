@@ -240,6 +240,50 @@ console.log('\nScenario 8: output locale rendering');
 	);
 }
 
+console.log("\nScenario 8b: 'both' focus — covered only when lucky AND hundo are owned");
+{
+	// dragoran: lucky + hundo → fully covered, drops. glurak: hundo only →
+	// stays in the string. dratini: neither → stays.
+	const r = buildFilters(
+		['dragoran', 'glurak'],
+		['dragoran'],
+		{ ...cfg, friendCollectSpecies: ['dragoran', 'glurak', 'dratini'], friendCollectMode: 'both' },
+		[],
+		'en',
+		t,
+	);
+	check("mode resolves to 'both'", r.friendCollectMode === 'both');
+	check(
+		'per-goal flags are exact',
+		JSON.stringify(r.friendCollectTargets.map((x) => [x.display, x.ownedLucky, x.ownedHundo, x.owned])) ===
+			JSON.stringify([
+				['dragonite', true, true, true],
+				['charizard', false, true, false],
+				['dratini', false, false, false],
+			]),
+		JSON.stringify(r.friendCollectTargets),
+	);
+	check(
+		'only the fully-covered target drops from the string',
+		r.friendCollectWishlist.startsWith('charizard,dratini&'),
+		r.friendCollectWishlist,
+	);
+	check(
+		"guaranteed variant === base in 'both' (year floor is lucky-focus only)",
+		r.friendCollectWishlistGuaranteed === r.friendCollectWishlist,
+	);
+
+	// Suggestion pruning follows the same predicate: a species owned only as
+	// lucky is still suggestible under 'both' (not yet fully covered) but
+	// pruned under 'lucky'. Dratini sits in the power-lines pack.
+	const luckyOnly = buildFilters([], ['dratini'], { ...cfg, friendCollectSpecies: [], friendCollectMode: 'both' }, [], 'en', t);
+	const powerBoth = luckyOnly.friendCollectSuggestions.find((s) => s.kind === 'powerlines');
+	check("lucky-only species still suggested under 'both'", !!powerBoth && powerBoth.species.includes('dratini'));
+	const luckyMode = buildFilters([], ['dratini'], { ...cfg, friendCollectSpecies: [], friendCollectMode: 'lucky' }, [], 'en', t);
+	const powerLucky = luckyMode.friendCollectSuggestions.find((s) => s.kind === 'powerlines');
+	check("same species pruned from packs under 'lucky'", !!powerLucky && !powerLucky.species.includes('dratini'));
+}
+
 console.log('\nScenario 9: config merge');
 {
 	const m = mergeImportedConfig({ friendCollectSpecies: ['Dragonite', '131'], friendCollectMode: 'weird' });
@@ -249,6 +293,10 @@ console.log('\nScenario 9: config merge');
 		JSON.stringify(m.friendCollectSpecies),
 	);
 	check("unknown mode falls back to 'lucky'", m.friendCollectMode === 'lucky');
+	check(
+		"'both' mode survives the merge",
+		mergeImportedConfig({ friendCollectMode: 'both' }).friendCollectMode === 'both',
+	);
 	const legacy = mergeImportedConfig({});
 	check(
 		'legacy configs back-fill the defaults',
