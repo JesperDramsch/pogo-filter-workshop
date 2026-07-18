@@ -4435,9 +4435,10 @@ export default function App() {
 											onToggle={() => setShowFriendWishlist((s) => !s)}
 										>
 											<div className='space-y-4'>
-												{/* Curated "collect for me" string — THE friend-facing string,
-                            so it lives here with the other friend wishlists. Its
-                            target list is curated in step 2 (Was). */}
+												{/* Curated "collect for me" string — renders alongside the
+                            fallback wishlists below, since all friend-facing strings
+                            live in this section. Its target list is edited in the
+                            step-2 config panel. */}
 												{friendCollectTargets.length > 0 &&
 													(friendCollectWishlist ? (
 														<div>
