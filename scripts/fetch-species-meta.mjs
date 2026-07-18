@@ -6,7 +6,7 @@
 //
 //  - specialTradeDex: species that can only move in a Special Trade and
 //    therefore never belong in a regular-trade "collect for me" pack.
-//    Three-source union, so no single upstream quirk can leak a species:
+//    Two-source union, so no single upstream quirk can leak a species:
 //      1. PokeMiners game master `pokemonSettings.pokemonClass` —
 //         POKEMON_CLASS_LEGENDARY / _MYTHIC / _ULTRA_BEAST, the game's
 //         own classes that the Special-Trade rule keys off. Authoritative
@@ -15,7 +15,10 @@
 //         the Nihilego assertion exactly because of that).
 //      2. pogoapi rarity: every non-"Standard" category (not just
 //         Legendary/Mythic, in case Ultra Beasts sit in their own bucket).
-//      3. pogoapi raid-exclusive roster.
+//    The raid-exclusive roster was dropped as a source: a live run tripped
+//    the specialTradeDex ∩ starterDex guard, showing "raid-only" is not a
+//    special-trade signal (shadow/event raids feature regular species,
+//    starters included).
 //    Meltan/Melmetal stay IN this set: they're the one mythical line that
 //    is tradeable at all, but the trade is still a Special Trade (mythic
 //    class) — App.jsx's `!mythical,808,809` wishlist guard re-includes
@@ -51,7 +54,6 @@ const OUT_PATH = resolve(DATA_DIR, "species-meta.json");
 
 const ENDPOINTS = {
   rarity:      "https://pogoapi.net/api/v1/pokemon_rarity.json",
-  raidExcl:    "https://pogoapi.net/api/v1/raid_exclusive_pokemon.json",
   generations: "https://pogoapi.net/api/v1/pokemon_generations.json",
   evolutions:  "https://pogoapi.net/api/v1/pokemon_evolutions.json",
   stats:       "https://pogoapi.net/api/v1/pokemon_stats.json",
@@ -253,7 +255,6 @@ async function main() {
   const offlineOk = args.has("--offline-ok");
 
   let rarity, generations, evolutions, stats, released;
-  let raidExcl = null;
   try {
     console.log("→ Fetching pogoapi.net endpoints");
     [rarity, generations, evolutions, stats, released] = await Promise.all([
@@ -271,13 +272,8 @@ async function main() {
     }
     process.exit(1);
   }
-  // Secondary feeds are belt-and-braces; each may fail independently — the
-  // union of whatever succeeds plus the assertions below is the gate.
-  try {
-    raidExcl = await fetchJson(ENDPOINTS.raidExcl);
-  } catch (e) {
-    console.warn(`⚠  raid_exclusive fetch failed (${e.message}).`);
-  }
+  // The game master may fail independently of the pogoapi batch — the union
+  // of whatever succeeds plus the assertions below is the gate.
   let gameMaster = null;
   try {
     console.log("→ Fetching PokeMiners game master (pokemonClass source)");
@@ -287,16 +283,15 @@ async function main() {
   }
 
   // ── specialTradeDex ──
-  const specialTrade = new Set();
-  // 1. Game master pokemonClass — the game's own Special-Trade classes.
-  for (const id of specialTradeDexFromGameMaster(gameMaster)) specialTrade.add(id);
-  // 2. Rarity: everything pogoapi does NOT file under "Standard".
+  // Per-source sets kept separate so an assertion failure can name the
+  // source that leaked (see the overlap diagnostic below).
+  const gmSet = specialTradeDexFromGameMaster(gameMaster);
+  const raritySet = new Set();
   for (const [category, entries] of Object.entries(rarity || {})) {
     if (/standard/i.test(category)) continue;
-    for (const id of collectDexIds(entries)) specialTrade.add(id);
+    for (const id of collectDexIds(entries)) raritySet.add(id);
   }
-  // 3. Raid-exclusive roster.
-  if (raidExcl) for (const id of collectDexIds(raidExcl)) specialTrade.add(id);
+  const specialTrade = new Set([...gmSet, ...raritySet]);
 
   // ── starterDex ──
   // Name→dex lookup (from the stats feed) lets the parser resolve
@@ -405,6 +400,16 @@ async function main() {
 
   // Sanity gates — exit 1 turns the sync workflow red, which is the only
   // intervention signal the user wants.
+  // Overlap attribution first: if a starter ends up special-trade, name the
+  // ids AND the source that leaked them before the assertion kills the run.
+  const overlap = newContent.starterDex.filter((dex) => specialTrade.has(dex));
+  if (overlap.length > 0) {
+    console.warn(
+      `⚠  special∩starter overlap: ${overlap
+        .map((dex) => `${dex}(gm:${gmSet.has(dex) ? "y" : "n"} rarity:${raritySet.has(dex) ? "y" : "n"})`)
+        .join(", ")}`,
+    );
+  }
   assertOrDie(newContent.specialTradeDex.includes(150), "Mewtwo (150) ∈ specialTradeDex");
   assertOrDie(newContent.specialTradeDex.includes(151), "Mew (151) ∈ specialTradeDex");
   assertOrDie(newContent.specialTradeDex.includes(793), "Nihilego (793, Ultra Beast) ∈ specialTradeDex");
