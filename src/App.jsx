@@ -161,10 +161,12 @@ const UNTRADEABLE_MYTHICAL_DEX = new Set([
 
 // Species that only move in a Special Trade (legendaries, mythicals, Ultra
 // Beasts) — they never belong in a regular-trade friend-collect pack. Derived
-// snapshot from pogoapi (rarity Legendary ∪ Mythic ∪ raid-exclusives, minus
-// the Meltan-line carve-out), regenerated daily by
-// scripts/fetch-species-meta.mjs — no hand-maintained list here. The same
-// snapshot supplies the starter and "power line" pack pools below.
+// snapshot from pogoapi (rarity Legendary ∪ Mythic ∪ raid-exclusives),
+// regenerated daily by scripts/fetch-species-meta.mjs — no hand-maintained
+// list here. Note Meltan/Melmetal ARE in this set: tradeable (unlike other
+// mythicals, hence the `!mythical,808,809` wishlist guard keeps them), but
+// only as a Special Trade — so packs never suggest them. The same snapshot
+// supplies the starter and "power line" pack pools below.
 const SPECIAL_TRADE_DEX = new Set(SPECIES_META.specialTradeDex);
 
 // Trade-evo families: dex-keyed identity, German base name as the user-facing

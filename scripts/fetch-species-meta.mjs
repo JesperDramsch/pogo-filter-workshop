@@ -9,10 +9,12 @@
 //    Union of pogoapi rarity classes "Legendary" + "Mythic" and the
 //    raid-exclusive roster. The raid-exclusive union is the structural
 //    guarantee for Ultra Beasts (raid-only, special trade) no matter how
-//    the rarity feed happens to classify them. Meltan/Melmetal are carved
-//    back out — the one mythical line Niantic allows in regular trades,
-//    the same exception App.jsx's trade guards (`!mythical,808,809`) and
-//    UNTRADEABLE_MYTHICAL_DEX already encode.
+//    the rarity feed happens to classify them. Meltan/Melmetal stay IN
+//    this set: they're the one mythical line that is tradeable at all,
+//    but the trade is still a Special Trade (mythic class) — App.jsx's
+//    `!mythical,808,809` wishlist guard re-includes them because it
+//    answers a different question ("can the friend trade it at all"),
+//    not "is it a regular trade".
 //
 //  - starterDex: the three starter BASE species of every generation.
 //    Derived by rule, not list: each generation's regional dex opens with
@@ -55,10 +57,6 @@ const STARTERS_PER_GENERATION = 9;   // 3 lines × 3 stages open every regional 
 const POWER_LINE_CUMULATIVE_CANDY = 125; // pseudo baseline (25 + 100)
 const POWER_LINE_MIN_STAGES = 3;
 const POWER_LINE_TOP = 20;           // strongest qualifying lines by final stat product
-
-// The one mythical line Niantic allows in regular trades (Meltan/Melmetal) —
-// mirrors the `!mythical,808,809` trade-guard exception in App.jsx.
-const TRADEABLE_MYTHICAL_DEX = [808, 809];
 
 // Trade-evo bases (Kadabra/Machoke/… lines): these chains would qualify as
 // power lines on candy+stats, but they already have a dedicated pack. Keyed
@@ -151,7 +149,6 @@ async function main() {
     for (const id of collectDexIds(entries)) specialTrade.add(id);
   }
   if (raidExcl) for (const id of collectDexIds(raidExcl)) specialTrade.add(id);
-  for (const dex of TRADEABLE_MYTHICAL_DEX) specialTrade.delete(dex);
 
   // ── starterDex ──
   // Group every dex id by generation, then take the 9 lowest per generation.
@@ -258,7 +255,10 @@ async function main() {
   assertOrDie(newContent.specialTradeDex.includes(151), "Mew (151) ∈ specialTradeDex");
   assertOrDie(newContent.specialTradeDex.includes(793), "Nihilego (793, Ultra Beast) ∈ specialTradeDex");
   assertOrDie(newContent.specialTradeDex.includes(888), "Zacian (888) ∈ specialTradeDex");
-  assertOrDie(!newContent.specialTradeDex.includes(808), "Meltan (808) regular-tradeable exception");
+  assertOrDie(
+    newContent.specialTradeDex.includes(808),
+    "Meltan (808) ∈ specialTradeDex — tradeable, but only as a Special Trade",
+  );
   for (const dex of [1, 4, 7, 906]) {
     assertOrDie(newContent.starterDex.includes(dex), `starter ${dex} ∈ starterDex`);
   }

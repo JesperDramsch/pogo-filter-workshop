@@ -270,7 +270,7 @@ console.log('\nScenario 10: species-meta snapshot shape (bad syncs must not sile
 	check('powerLineDex non-empty', (SPECIES_META.powerLineDex || []).length > 0);
 	check('Nihilego (Ultra Beast) is special-trade', special.has(793));
 	check('Mewtwo is special-trade', special.has(150));
-	check('Meltan stays regular-tradeable', !special.has(808));
+	check('Meltan is special-trade (tradeable, but never a regular trade)', special.has(808) && special.has(809));
 	check(
 		'specialTradeDex ∩ starterDex = ∅',
 		(SPECIES_META.starterDex || []).every((dex) => !special.has(dex)),
