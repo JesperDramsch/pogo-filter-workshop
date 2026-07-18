@@ -4340,46 +4340,6 @@ export default function App() {
 											hint={t('app.filter.nundo_sort_hint')}
 										/>
 									)}
-									{/* Curated friend-collect wishlist — a first-class filter like
-                      trash/trade; its target list is curated in step 2 (Was). */}
-									{friendCollectTargets.length > 0 &&
-										(friendCollectWishlist ? (
-											<div>
-												<FilterBox
-													label={t('app.filter.friend_collect_label')}
-													accent='#27AE60'
-													filterStr={
-														friendCollectMode === 'lucky' &&
-														effectiveConfig.friendCollectGuaranteedOnly
-															? friendCollectWishlistGuaranteed
-															: friendCollectWishlist
-													}
-													copied={copied.friendCollect}
-													onCopy={() =>
-														copyToClipboard(
-															'friendCollect',
-															friendCollectMode === 'lucky' &&
-																effectiveConfig.friendCollectGuaranteedOnly
-																? friendCollectWishlistGuaranteed
-																: friendCollectWishlist,
-														)
-													}
-													hint={
-														friendCollectMode === 'lucky' &&
-														effectiveConfig.friendCollectGuaranteedOnly
-															? `${t('app.filter.friend_collect_hint')} (${t('app.filter.friend_guaranteed_label')})`
-															: t('app.filter.friend_collect_hint')
-													}
-												/>
-												<p className='mono text-[10.5px] text-[#8090A0] mt-1'>
-													{t('app.filter.friend_collect_edit_pointer')}
-												</p>
-											</div>
-										) : (
-											<p className='mono text-xs text-[#27AE60]'>
-												{t('app.filter.friend_collect_all_owned')}
-											</p>
-										))}
 									{buddyCatchFilters.length > 0 && (
 										<BuddyCatchSection
 											buddyCatchFilters={buddyCatchFilters}
@@ -4475,10 +4435,55 @@ export default function App() {
 											onToggle={() => setShowFriendWishlist((s) => !s)}
 										>
 											<div className='space-y-4'>
-												{/* Fallback wishlists — blacklist of everything already owned. The
-                            curated "collect for me" list is configured in step 2 and its
-                            string renders as a top-level filter above. */}
-												<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
+												{/* Curated "collect for me" string — renders alongside the
+                            fallback wishlists below, since all friend-facing strings
+                            live in this section. Its target list is edited in the
+                            step-2 config panel. */}
+												{friendCollectTargets.length > 0 &&
+													(friendCollectWishlist ? (
+														<div>
+															<FilterBox
+																label={t('app.filter.friend_collect_label')}
+																accent='#27AE60'
+																filterStr={
+																	friendCollectMode === 'lucky' &&
+																	effectiveConfig.friendCollectGuaranteedOnly
+																		? friendCollectWishlistGuaranteed
+																		: friendCollectWishlist
+																}
+																copied={copied.friendCollect}
+																onCopy={() =>
+																	copyToClipboard(
+																		'friendCollect',
+																		friendCollectMode === 'lucky' &&
+																			effectiveConfig.friendCollectGuaranteedOnly
+																			? friendCollectWishlistGuaranteed
+																			: friendCollectWishlist,
+																	)
+																}
+																hint={
+																	friendCollectMode === 'lucky' &&
+																	effectiveConfig.friendCollectGuaranteedOnly
+																		? `${t('app.filter.friend_collect_hint')} (${t('app.filter.friend_guaranteed_label')})`
+																		: t('app.filter.friend_collect_hint')
+																}
+															/>
+															<p className='mono text-[10.5px] text-[#8090A0] mt-1'>
+																{t('app.filter.friend_collect_edit_pointer')}
+															</p>
+														</div>
+													) : (
+														<p className='mono text-xs text-[#27AE60]'>
+															{t('app.filter.friend_collect_all_owned')}
+														</p>
+													))}
+
+												{/* Fallback wishlists — blacklist of everything already owned. */}
+												<p
+													className={`mono text-xs text-[#8B98A5] leading-relaxed ${
+														friendCollectTargets.length > 0 ? 'pt-3 border-t border-[#1F2933]' : ''
+													}`}
+												>
 													{t('app.filter.friend_wishlist_intro')}
 												</p>
 												<div>
