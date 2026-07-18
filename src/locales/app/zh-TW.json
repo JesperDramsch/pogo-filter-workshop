@@ -467,6 +467,8 @@
   "app.buddy_targets.gender_male": "只要公的",
   "app.hundo_regional.title": "已保護區域限定的滿值個體",
   "app.hundo_regional.body": "即使你現在擁有牠們的滿值個體，這些物種仍會被排除在垃圾篩選器之外 — 區域限定保護優先，所以重複個體不會出現。想清掉重複的話，請在區域限定步驟的收藏家標籤中取消勾選該物種。",
+  "app.changelog.entry.multi_instance_sync.title": "設定不再被第二個分頁或休眠的 PWA 視窗覆蓋",
+  "app.changelog.entry.multi_instance_sync.body": "過去每個實例只在啟動時讀取一次儲存空間 — 舊分頁或沉睡多日的 PWA 視窗可能在下一次點擊時把過時狀態寫回,悄悄還原你最近的變更(「XL 和換裝又開了」bug)。現在開啟中的分頁會立即接收彼此的變更,甦醒的視窗也會先從磁碟載入最新狀態才儲存。只有精靈步驟刻意維持每個分頁獨立。",
   "app.changelog.entry.friend_collect_polish.title": "好友願望清單:精準物種、新套組、新位置",
   "app.changelog.entry.friend_collect_polish.body": "精選收集清單搬家了:在步驟 2 編輯(就在夥伴願望物種旁),完成的字串則和其他篩選器一起放在步驟 4。目標現在是精準物種而非整個家族 — 蛋裡的寶寶就是寶寶。建議套組完全由資料推導並經交換過濾(不含傳說/幻之/究極異獸):交換進化、高糖果需求家族、強力家族、御三家、團體戰環境與分聯盟 PvP 環境 — 並附警告:12/12/12 幸運下限會毀掉超級聯盟 Rank 1 配置。夥伴卡片與新區塊可折疊,保證幸運開關現在會被儲存。",
   "app.changelog.entry.verify_star_derived.title": "驗證測試器改由 IV 推算星級",

@@ -3562,6 +3562,99 @@ export default function App() {
 		if (loaded) saveJSON(KEY_CHANGELOG_SEEN, changelogSeen);
 	}, [changelogSeen, loaded]);
 
+	// ── Multi-instance safety ────────────────────────────────────────────────
+	// Every persist effect above writes its slice whole, and state is read from
+	// localStorage exactly once at mount — so a second tab or a suspended PWA
+	// window holds stale state in memory, and its next save silently reverts
+	// anything changed elsewhere since it loaded ("XL and costumed came back").
+	// Two listeners close the gap:
+	//   - 'storage' applies keys as OTHER live tabs write them (a tab never
+	//     receives events for its own writes, so these are genuinely remote)
+	//   - visibility/pageshow re-hydrates a waking instance from disk before
+	//     the user can interact — suspended pages don't get storage events
+	// Per-key last-write-wins remains, which is fine: the failure mode was
+	// whole-slice clobber from stale memory, not field-level races.
+	// KEY_STEP is deliberately NOT synced — wizard position is per-tab.
+	useEffect(() => {
+		if (!loaded) return undefined;
+		const canonicalize = (arr) => (arr || []).map((s) => resolveSpecies(s) || s);
+		const apply = (key, value) => {
+			switch (key) {
+				case KEY_HUNDOS:
+					setHundos(Array.isArray(value) ? value : DEFAULT_HUNDOS);
+					break;
+				case KEY_LUCKIES:
+					setLuckies(canonicalize(Array.isArray(value) ? value : DEFAULT_LUCKIES));
+					break;
+				case KEY_TOP_ATTACKERS:
+					setTopAttackers(canonicalize(Array.isArray(value) ? value : DEFAULT_TOP_ATTACKERS));
+					break;
+				case KEY_TOP_MAX_ATTACKERS:
+					setTopMaxAttackers(canonicalize(Array.isArray(value) ? value : DEFAULT_TOP_MAX_ATTACKERS));
+					break;
+				case KEY_CONFIG:
+					// mergeImportedConfig is idempotent, so the echo write settles:
+					// re-merging an already-merged config emits the same JSON and
+					// same-value setItem calls fire no further storage events.
+					setConfig(mergeImportedConfig(value));
+					break;
+				case KEY_HOME:
+					setHomeLocation(value ?? null);
+					break;
+				case KEY_LASTPIN:
+					setLastPin(value ?? null);
+					break;
+				case KEY_BAZAARTAGS:
+					setBazaarTags(Array.isArray(value) ? value : []);
+					break;
+				case KEY_ONBOARDED:
+					setOnboarded(value === true);
+					break;
+				case KEY_CHANGELOG_SEEN:
+					setChangelogSeen(typeof value === 'number' ? value : 0);
+					break;
+				default:
+					break;
+			}
+		};
+		const onStorage = (e) => {
+			if (e.storageArea !== localStorage || !e.key || e.newValue == null) return;
+			try {
+				apply(e.key, JSON.parse(e.newValue));
+			} catch {
+				/* foreign or corrupt value — ignore */
+			}
+		};
+		// Full re-hydrate for a waking instance. The tab was idle while
+		// suspended, so there are no in-flight local edits to race with.
+		const rehydrate = async () => {
+			apply(KEY_HUNDOS, await loadJSON(KEY_HUNDOS, DEFAULT_HUNDOS));
+			apply(KEY_LUCKIES, await loadJSON(KEY_LUCKIES, DEFAULT_LUCKIES));
+			apply(KEY_TOP_ATTACKERS, await loadJSON(KEY_TOP_ATTACKERS, DEFAULT_TOP_ATTACKERS));
+			apply(KEY_TOP_MAX_ATTACKERS, await loadJSON(KEY_TOP_MAX_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS));
+			apply(KEY_CONFIG, await loadJSON(KEY_CONFIG, DEFAULT_CONFIG));
+			apply(KEY_HOME, await loadJSON(KEY_HOME, null));
+			apply(KEY_LASTPIN, await loadJSON(KEY_LASTPIN, null));
+			apply(KEY_BAZAARTAGS, await loadJSON(KEY_BAZAARTAGS, []));
+			apply(KEY_ONBOARDED, await loadJSON(KEY_ONBOARDED, false));
+			apply(KEY_CHANGELOG_SEEN, await loadJSON(KEY_CHANGELOG_SEEN, 0));
+		};
+		const onVisibility = () => {
+			if (document.visibilityState === 'visible') rehydrate();
+		};
+		const onPageShow = (e) => {
+			if (e.persisted) rehydrate(); // restored from bfcache with old memory
+		};
+		window.addEventListener('storage', onStorage);
+		document.addEventListener('visibilitychange', onVisibility);
+		window.addEventListener('pageshow', onPageShow);
+		return () => {
+			window.removeEventListener('storage', onStorage);
+			document.removeEventListener('visibilitychange', onVisibility);
+			window.removeEventListener('pageshow', onPageShow);
+		};
+	}, [loaded]);
+
 	// Locals at home location (drives auto-drop from Regionals protection + bazaar suggestions)
 	const homeLocals = useMemo(() => computeHomeLocals(homeLocation), [homeLocation]);
 	const homeLocalTypeChecks = useMemo(() => computeHomeLocalTypeChecks(homeLocation), [homeLocation]);
