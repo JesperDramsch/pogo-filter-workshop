@@ -139,12 +139,22 @@ export function generationDexSets(generations, nameToDex = new Map()) {
 }
 
 // The three starter BASE species per generation: each generation's regional
-// dex opens with its three starter lines as three consecutive trios, so take
+// dex opens with its three starter lines as three consecutive trios — ONCE
+// special-trade species are skipped. That carve-out exists for exactly one
+// reason: Unova's dex opens with Victini (494, mythical) ahead of the
+// Snivy/Tepig/Oshawott trios, which a live run caught via the
+// specialTradeDex ∩ starterDex guard. Skipping the exclusions first, take
 // the nine lowest dex ids and keep offsets 0/3/6.
-export function starterDexFromGenerations(generations, perGeneration = 9, nameToDex = new Map()) {
+export function starterDexFromGenerations(
+  generations,
+  perGeneration = 9,
+  nameToDex = new Map(),
+  excludeDex = new Set(),
+) {
   const starters = new Set();
   for (const ids of generationDexSets(generations, nameToDex).values()) {
     [...ids]
+      .filter((id) => !excludeDex.has(id))
       .sort((a, b) => a - b)
       .slice(0, perGeneration)
       .filter((_, idx) => idx % 3 === 0)
@@ -304,7 +314,7 @@ async function main() {
     if (!nameToDex.has(key)) nameToDex.set(key, id);
   }
   const generationSets = generationDexSets(generations, nameToDex);
-  const starters = starterDexFromGenerations(generations, STARTERS_PER_GENERATION, nameToDex);
+  const starters = starterDexFromGenerations(generations, STARTERS_PER_GENERATION, nameToDex, specialTrade);
   // Diagnostic breadcrumb: if an assertion below trips, this line says whether
   // the feed shape parsed at all — and on a zero-parse, a payload sample goes
   // straight into the log so the next fix doesn't have to guess the shape.
@@ -418,9 +428,13 @@ async function main() {
     newContent.specialTradeDex.includes(808),
     "Meltan (808) ∈ specialTradeDex — tradeable, but only as a Special Trade",
   );
-  for (const dex of [1, 4, 7, 906]) {
+  for (const dex of [1, 4, 7, 495, 906]) {
     assertOrDie(newContent.starterDex.includes(dex), `starter ${dex} ∈ starterDex`);
   }
+  assertOrDie(
+    !newContent.starterDex.includes(494),
+    "Victini (494) ∉ starterDex — Unova's dex opens with a mythical, not the trios",
+  );
   assertOrDie(newContent.powerLineDex.includes(147), "Dratini (147) ∈ powerLineDex");
   assertOrDie(
     newContent.starterDex.every((dex) => !specialTrade.has(dex)),

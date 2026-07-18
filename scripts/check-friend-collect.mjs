@@ -431,6 +431,20 @@ console.log('\nScenario 12: generations parser — every plausible pogoapi shape
 		{ generation_number: 2, pokemon_species: gen2ids.map(entry) },
 	]);
 	check('unrecognized payload yields empty set (assertion will trip loudly)', starterDexFromGenerations({ weird: true }).size === 0);
+	// The Victini case (caught live): Unova's dex opens with a mythical at 494
+	// before the starter trios — special-trade species are skipped before the
+	// 0/3/6 trio pattern applies.
+	const gen5 = starterDexFromGenerations(
+		{ 'Generation 5': Array.from({ length: 10 }, (_, i) => ({ generation_number: 5, id: 494 + i, name: `p${494 + i}` })) },
+		9,
+		new Map(),
+		new Set([494]),
+	);
+	check(
+		'gen-5 starters skip Victini (494) and land on 495/498/501',
+		gen5.has(495) && gen5.has(498) && gen5.has(501) && !gen5.has(494) && !gen5.has(497) && !gen5.has(500),
+		JSON.stringify([...gen5].sort((a, b) => a - b)),
+	);
 }
 
 if (failures > 0) {
