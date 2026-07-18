@@ -14,6 +14,7 @@ import EVENTS from '../src/data/events.json';
 import SPECIES_META from '../src/data/species-meta.json';
 import PVP_RANKINGS from '../src/data/pvp-rankings.json';
 import { pokemonNameFor } from '../src/data/species.js';
+import { specialTradeDexFromGameMaster, starterDexFromGenerations } from './fetch-species-meta.mjs';
 
 const t = (key, opts) => (opts && 'fallback' in opts ? opts.fallback : key);
 
@@ -331,6 +332,118 @@ console.log('\nScenario 10: species-meta snapshot shape (bad syncs must not sile
 	check(
 		'specialTradeDex ∩ powerLineDex = ∅',
 		(SPECIES_META.powerLineDex || []).every((dex) => !special.has(dex)),
+	);
+}
+
+console.log('\nScenario 11: game-master pokemonClass parser (offline sample)');
+{
+	// Shape mirrors PokeMiners latest.json: [{ templateId, data: { templateId,
+	// pokemonSettings } }]. The parser must catch all three special classes,
+	// ignore classless species, and survive malformed entries.
+	const sample = [
+		{ templateId: 'V0793_POKEMON_NIHILEGO', data: { templateId: 'V0793_POKEMON_NIHILEGO', pokemonSettings: { pokemonId: 'NIHILEGO', pokemonClass: 'POKEMON_CLASS_ULTRA_BEAST' } } },
+		{ templateId: 'V0150_POKEMON_MEWTWO', data: { templateId: 'V0150_POKEMON_MEWTWO', pokemonSettings: { pokemonId: 'MEWTWO', pokemonClass: 'POKEMON_CLASS_LEGENDARY' } } },
+		{ templateId: 'V0808_POKEMON_MELTAN', data: { templateId: 'V0808_POKEMON_MELTAN', pokemonSettings: { pokemonId: 'MELTAN', pokemonClass: 'POKEMON_CLASS_MYTHIC' } } },
+		{ templateId: 'V0147_POKEMON_DRATINI', data: { templateId: 'V0147_POKEMON_DRATINI', pokemonSettings: { pokemonId: 'DRATINI' } } },
+		{ templateId: 'COMBAT_V0001_MOVE_WRAP', data: { templateId: 'COMBAT_V0001_MOVE_WRAP' } },
+		null,
+	];
+	const ids = specialTradeDexFromGameMaster(sample);
+	check('Ultra Beast class → 793', ids.has(793));
+	check('Legendary class → 150', ids.has(150));
+	check('Mythic class → 808 (Meltan stays special-trade)', ids.has(808));
+	check('classless species ignored', !ids.has(147));
+	check('exactly the three special entries', ids.size === 3, JSON.stringify([...ids]));
+	check('empty/absent game master yields empty set', specialTradeDexFromGameMaster(null).size === 0);
+	// Wrapped payload shapes ({ template: [...] } etc.) must parse identically.
+	for (const wrapper of ['template', 'templates', 'itemTemplate']) {
+		const wrapped = specialTradeDexFromGameMaster({ [wrapper]: sample });
+		check(
+			`wrapped game master shape '{ ${wrapper}: [...] }' parses identically`,
+			wrapped.size === 3 && wrapped.has(793) && wrapped.has(150) && wrapped.has(808),
+		);
+	}
+	check('unrecognized object payload yields empty set', specialTradeDexFromGameMaster({ foo: 1 }).size === 0);
+}
+
+console.log('\nScenario 12: generations parser — every plausible pogoapi shape yields the starter bases');
+{
+	// Gen-1 (dex 1-12 sample) must always yield bases 1/4/7; gen-2 sample
+	// (152-160) must yield 152/155/158. One fixture per handled shape.
+	const gen1ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+	const gen2ids = [152, 153, 154, 155, 156, 157, 158, 159, 160];
+	const expect = (label, generations) => {
+		const s = starterDexFromGenerations(generations);
+		check(
+			label,
+			[1, 4, 7, 152, 155, 158].every((d) => s.has(d)) && !s.has(2) && !s.has(3) && !s.has(10),
+			JSON.stringify([...s].sort((a, b) => a - b)),
+		);
+	};
+	const entry = (id) => ({ pokemon_id: id, pokemon_name: `p${id}` });
+	expect('A: array of {pokemon_id, generation_number}', [
+		...gen1ids.map((id) => ({ pokemon_id: id, generation_number: 1 })),
+		...gen2ids.map((id) => ({ pokemon_id: id, generation_number: 2 })),
+	]);
+	expect('B: object generation → entry list', {
+		generation_1: gen1ids.map(entry),
+		generation_2: gen2ids.map(entry),
+	});
+	// B-live: the REAL feed shape captured from the 2026-07-18 sync log —
+	// "Generation 1" keys and entries with `id` (NOT pokemon_id) fields.
+	expect('B-live: { "Generation 1": [{ generation_number, id, name }] } (actual pogoapi shape)', {
+		'Generation 1': gen1ids.map((id) => ({ generation_number: 1, id, name: `p${id}` })),
+		'Generation 2': gen2ids.map((id) => ({ generation_number: 2, id, name: `p${id}` })),
+	});
+	expect('C: object generation → keyed-by-id', {
+		generation_1: Object.fromEntries(gen1ids.map((id) => [id, { name: `p${id}` }])),
+		generation_2: Object.fromEntries(gen2ids.map((id) => [id, { name: `p${id}` }])),
+	});
+	expect('D: object generation → dex range', {
+		generation_1: { min_dex: 1, max_dex: 12 },
+		generation_2: { min_dex: 152, max_dex: 160 },
+	});
+	expect('E: object pokemon-id → generation', {
+		...Object.fromEntries(gen1ids.map((id) => [id, 'generation_1'])),
+		...Object.fromEntries(gen2ids.map((id) => [id, 2])),
+	});
+	// F: name-keyed payloads need the stats-derived name→dex lookup.
+	const nameToDex = new Map([...gen1ids, ...gen2ids].map((id) => [`mon-${id}`, id]));
+	const named = starterDexFromGenerations(
+		{
+			...Object.fromEntries(gen1ids.map((id) => [`Mon ${id}`, 'generation_1'])),
+			...Object.fromEntries(gen2ids.map((id) => [`Mon ${id}`, 2])),
+		},
+		9,
+		nameToDex,
+	);
+	check(
+		'F: object pokemon-name → generation (via name→dex lookup)',
+		[1, 4, 7, 152, 155, 158].every((d) => named.has(d)) && !named.has(2),
+		JSON.stringify([...named].sort((a, b) => a - b)),
+	);
+	expect('G: object pokemon-id → entry with generation field', {
+		...Object.fromEntries(gen1ids.map((id) => [id, { generation_number: 1, name: `p${id}` }])),
+		...Object.fromEntries(gen2ids.map((id) => [id, { generation_number: 2, name: `p${id}` }])),
+	});
+	expect('A2: per-generation array entries with nested species lists', [
+		{ generation_number: 1, pokemon_species: gen1ids.map(entry) },
+		{ generation_number: 2, pokemon_species: gen2ids.map(entry) },
+	]);
+	check('unrecognized payload yields empty set (assertion will trip loudly)', starterDexFromGenerations({ weird: true }).size === 0);
+	// The Victini case (caught live): Unova's dex opens with a mythical at 494
+	// before the starter trios — special-trade species are skipped before the
+	// 0/3/6 trio pattern applies.
+	const gen5 = starterDexFromGenerations(
+		{ 'Generation 5': Array.from({ length: 10 }, (_, i) => ({ generation_number: 5, id: 494 + i, name: `p${494 + i}` })) },
+		9,
+		new Map(),
+		new Set([494]),
+	);
+	check(
+		'gen-5 starters skip Victini (494) and land on 495/498/501',
+		gen5.has(495) && gen5.has(498) && gen5.has(501) && !gen5.has(494) && !gen5.has(497) && !gen5.has(500),
+		JSON.stringify([...gen5].sort((a, b) => a - b)),
 	);
 }
 
