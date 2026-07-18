@@ -143,10 +143,10 @@ export function starterDexFromGenerations(generations, perGeneration = 9, nameTo
 // Game-master pokemonClass values whose species require a Special Trade.
 const SPECIAL_TRADE_CLASSES = /LEGENDARY|MYTHIC|ULTRA_BEAST/i;
 
-// Extract { dex → specialClass } pairs from the PokeMiners game master.
-// Template ids look like "V0793_POKEMON_NIHILEGO"; the settings node carries
-// pokemonClass only for legendary/mythic/UB species. Exported for the
-// offline parse test in scripts/check-friend-collect.mjs.
+// Extract the Set of dex ids whose game-master entry carries a special-trade
+// pokemonClass. Template ids look like "V0793_POKEMON_NIHILEGO"; the settings
+// node carries pokemonClass only for legendary/mythic/UB species. Exported
+// for the offline parse test in scripts/check-friend-collect.mjs.
 export function specialTradeDexFromGameMaster(templates) {
   const ids = new Set();
   // latest.json is a plain array today, but older/mirrored game masters wrap
@@ -187,6 +187,18 @@ async function fetchJson(url) {
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
   return res.json();
+}
+
+// Mirrors fetch-evolution-costs.mjs:normalizeName — lowercase, strip
+// punctuation, hyphenate — so name-keyed payloads match the stats feed's
+// pokemon_name entries in the name→dex lookup.
+function normalizeName(name) {
+  return String(name)
+    .toLowerCase()
+    .replace(/[.':]/g, "")
+    .replace(/[♂]/g, "-m")
+    .replace(/[♀]/g, "-f")
+    .replace(/\s+/g, "-");
 }
 
 // pogoapi payloads come in three shapes: array of entries, object keyed by
