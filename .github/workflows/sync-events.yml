@@ -12,17 +12,12 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      # Push as the Pushologist GitHub App so the commit can bypass the
-      # branch protection on main (GITHUB_TOKEN pushes are rejected there).
-      - name: Mint Pushologist app token
-        id: app-token
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_SECRET }}
+      # Check out with a fine-grained PAT (stored in APP_SECRET) instead of
+      # GITHUB_TOKEN: branch protection on main rejects GITHUB_TOKEN pushes,
+      # while the PAT pushes as the repo admin, who is allowed to bypass.
       - uses: actions/checkout@v4
         with:
-          token: ${{ steps.app-token.outputs.token }}
+          token: ${{ secrets.APP_SECRET }}
       - uses: actions/setup-node@v4
         with:
           node-version: 20
