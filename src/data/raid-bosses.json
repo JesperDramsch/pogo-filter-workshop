@@ -1,350 +1,175 @@
 {
-  "fetchedAt": "2026-07-17T09:29:02.439Z",
+  "fetchedAt": "2026-07-24T09:58:49.348Z",
   "raids": {
     "mega": [
       {
-        "id": "SCEPTILE",
+        "id": "SALAMENCE",
         "names": {
-          "en": "Mega Sceptile",
-          "de": "Mega-Gewaldro",
-          "fr": "Méga-Jungko",
-          "it": "MegaSceptile",
-          "ja": "メガジュカイン",
-          "ko": "메가나무킹",
-          "es": "Mega-Sceptile"
+          "en": "Mega Salamence",
+          "de": "Mega-Brutalanda",
+          "fr": "Méga-Drattak",
+          "it": "MegaSalamence",
+          "ja": "メガボーマンダ",
+          "ko": "메가보만다",
+          "es": "Mega-Salamence"
         },
         "types": [
-          "grass",
-          "dragon"
+          "dragon",
+          "flying"
         ],
         "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
+          "rock",
           "steel",
-          "fire",
-          "grass",
+          "electric",
           "fairy"
         ],
         "seMoveTypes": [
           "ice",
-          "bug",
           "dragon",
           "fairy",
-          "flying",
-          "poison"
+          "rock"
         ]
       }
     ],
     "lvl5": [
       {
-        "id": "KYOGRE",
+        "id": "SOLGALEO",
         "names": {
-          "en": "Kyogre",
-          "de": "Kyogre",
-          "fr": "Kyogre",
-          "it": "Kyogre",
-          "ja": "カイオーガ",
-          "ko": "가이오가",
-          "es": "Kyogre"
+          "en": "Solgaleo",
+          "de": "Solgaleo",
+          "fr": "Solgaleo",
+          "it": "Solgaleo",
+          "ja": "ソルガレオ",
+          "ko": "솔가레오",
+          "es": "Solgaleo"
         },
         "types": [
-          "water"
+          "psychic",
+          "steel"
         ],
         "resistorTypes": [
+          "steel",
+          "fire",
           "water",
-          "grass",
-          "dragon"
+          "electric",
+          "psychic",
+          "dark"
         ],
         "seMoveTypes": [
-          "electric",
-          "grass"
+          "dark",
+          "fire",
+          "ghost",
+          "ground"
         ]
       }
     ],
     "lvl3": [
       {
-        "id": "RAICHU",
+        "id": "RATICATE",
         "names": {
-          "en": "Alolan Raichu",
-          "de": "Alola-Raichu",
-          "fr": "Raichu d'Alola",
-          "it": "Raichu di Alola",
-          "ja": "アローラ ライチュウ",
-          "ko": "알로라 라이츄",
-          "es": "Raichu de Alola"
+          "en": "Raticate",
+          "de": "Rattikarl",
+          "fr": "Rattatac",
+          "it": "Raticate",
+          "ja": "ラッタ",
+          "ko": "레트라",
+          "es": "Raticate"
         },
         "types": [
-          "electric",
+          "normal"
+        ],
+        "resistorTypes": [
+          "rock",
+          "ghost",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "fighting"
+        ]
+      },
+      {
+        "id": "NIDORINO",
+        "names": {
+          "en": "Nidorino",
+          "de": "Nidorino",
+          "fr": "Nidorino",
+          "it": "Nidorino",
+          "ja": "ニドリーノ",
+          "ko": "니드리노",
+          "es": "Nidorino"
+        },
+        "types": [
+          "poison"
+        ],
+        "resistorTypes": [
+          "poison",
+          "ground",
+          "rock",
+          "ghost",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "ground",
+          "psychic"
+        ]
+      },
+      {
+        "id": "GENGAR",
+        "names": {
+          "en": "Gengar",
+          "de": "Gengar",
+          "fr": "Ectoplasma",
+          "it": "Gengar",
+          "ja": "ゲンガー",
+          "ko": "팬텀",
+          "es": "Gengar"
+        },
+        "types": [
+          "ghost",
+          "poison"
+        ],
+        "resistorTypes": [
+          "normal",
+          "poison",
+          "ground",
+          "rock",
+          "steel",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "ghost",
+          "ground",
+          "psychic"
+        ]
+      },
+      {
+        "id": "WOBBUFFET",
+        "names": {
+          "en": "Wobbuffet",
+          "de": "Woingenau",
+          "fr": "Qulbutoké",
+          "it": "Wobbuffet",
+          "ja": "ソーナンス",
+          "ko": "마자용",
+          "es": "Wobbuffet"
+        },
+        "types": [
           "psychic"
         ],
         "resistorTypes": [
-          "ground",
           "steel",
-          "grass",
-          "electric",
           "psychic",
-          "dragon",
           "dark"
         ],
         "seMoveTypes": [
           "bug",
           "dark",
-          "ghost",
-          "ground"
-        ]
-      },
-      {
-        "id": "TYPHLOSION",
-        "names": {
-          "en": "Hisuian Typhlosion",
-          "de": "Hisuian-Tornupto",
-          "fr": "Typhlosion de Hisuian",
-          "it": "Typhlosion di Hisuian",
-          "ja": "バクフーン",
-          "ko": "블레이범",
-          "es": "Typhlosion de Galar"
-        },
-        "types": [
-          "fire",
           "ghost"
-        ],
-        "resistorTypes": [
-          "normal",
-          "rock",
-          "fire",
-          "water",
-          "dragon",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "ghost",
-          "ground",
-          "rock",
-          "water"
-        ]
-      },
-      {
-        "id": "DURALUDON",
-        "names": {
-          "en": "Duraludon",
-          "de": "Duraludon",
-          "fr": "Duralugon",
-          "it": "Duraludon",
-          "ja": "ジュラルドン",
-          "ko": "두랄루돈",
-          "es": "Duraludon"
-        },
-        "types": [
-          "steel",
-          "dragon"
-        ],
-        "resistorTypes": [
-          "steel",
-          "fire",
-          "water",
-          "electric"
-        ],
-        "seMoveTypes": [
-          "fighting",
-          "ground"
         ]
       }
     ],
     "lvl1": [
-      {
-        "id": "PIKACHU",
-        "names": {
-          "en": "Pikachu",
-          "de": "Pikachu",
-          "fr": "Pikachu",
-          "it": "Pikachu",
-          "ja": "ピカチュウ",
-          "ko": "피카츄",
-          "es": "Pikachu"
-        },
-        "types": [
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "ground"
-        ]
-      },
-      {
-        "id": "PIKACHU",
-        "names": {
-          "en": "Pikachu",
-          "de": "Pikachu",
-          "fr": "Pikachu",
-          "it": "Pikachu",
-          "ja": "ピカチュウ",
-          "ko": "피카츄",
-          "es": "Pikachu"
-        },
-        "types": [
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "ground"
-        ]
-      },
-      {
-        "id": "PIKACHU",
-        "names": {
-          "en": "Pikachu",
-          "de": "Pikachu",
-          "fr": "Pikachu",
-          "it": "Pikachu",
-          "ja": "ピカチュウ",
-          "ko": "피카츄",
-          "es": "Pikachu"
-        },
-        "types": [
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "ground"
-        ]
-      },
-      {
-        "id": "PIKACHU",
-        "names": {
-          "en": "Pikachu",
-          "de": "Pikachu",
-          "fr": "Pikachu",
-          "it": "Pikachu",
-          "ja": "ピカチュウ",
-          "ko": "피카츄",
-          "es": "Pikachu"
-        },
-        "types": [
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "ground"
-        ]
-      },
-      {
-        "id": "PIKACHU",
-        "names": {
-          "en": "Pikachu",
-          "de": "Pikachu",
-          "fr": "Pikachu",
-          "it": "Pikachu",
-          "ja": "ピカチュウ",
-          "ko": "피카츄",
-          "es": "Pikachu"
-        },
-        "types": [
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "ground"
-        ]
-      },
-      {
-        "id": "PIKACHU",
-        "names": {
-          "en": "Pikachu",
-          "de": "Pikachu",
-          "fr": "Pikachu",
-          "it": "Pikachu",
-          "ja": "ピカチュウ",
-          "ko": "피카츄",
-          "es": "Pikachu"
-        },
-        "types": [
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "ground"
-        ]
-      },
-      {
-        "id": "PIKACHU",
-        "names": {
-          "en": "Pikachu",
-          "de": "Pikachu",
-          "fr": "Pikachu",
-          "it": "Pikachu",
-          "ja": "ピカチュウ",
-          "ko": "피카츄",
-          "es": "Pikachu"
-        },
-        "types": [
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "ground"
-        ]
-      },
-      {
-        "id": "PIKACHU",
-        "names": {
-          "en": "Pikachu",
-          "de": "Pikachu",
-          "fr": "Pikachu",
-          "it": "Pikachu",
-          "ja": "ピカチュウ",
-          "ko": "피카츄",
-          "es": "Pikachu"
-        },
-        "types": [
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "ground"
-        ]
-      },
       {
         "id": "PIKACHU",
         "names": {
@@ -601,104 +426,104 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "mega-salamence-in-mega-raids-july-2026",
-      "name": "Mega Salamence in Mega Raids",
+      "eventID": "kyurem-in-5-star-raid-battles-july-2026",
+      "name": "Kyurem in 5-star Raid Battles",
       "eventType": "raid-battles",
-      "start": "2026-07-22T06:00:00.000",
-      "end": "2026-07-28T22:00:00.000",
+      "start": "2026-07-29T06:00:00.000",
+      "end": "2026-08-04T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "KYUREM",
+          "names": {
+            "en": "Kyurem"
+          },
+          "types": [
+            "dragon",
+            "ice"
+          ],
+          "resistorTypes": [
+            "steel",
+            "fire",
+            "water",
+            "ice",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "rock",
+            "steel",
+            "dragon",
+            "fairy"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-aggron-in-mega-raids-july-2026",
+      "name": "Mega Aggron in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-07-29T06:00:00.000",
+      "end": "2026-08-04T22:00:00.000",
       "isShadow": false,
       "isMega": true,
       "bosses": [
         {
-          "id": "SALAMENCE",
+          "id": "AGGRON",
           "names": {
-            "en": "Salamence"
+            "en": "Aggron"
           },
           "types": [
-            "dragon",
-            "flying"
+            "steel",
+            "rock"
           ],
           "resistorTypes": [
-            "rock",
-            "steel",
-            "electric",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "rock",
-            "ice",
-            "dragon",
-            "fairy"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "solgaleo-in-5-star-raid-battles-july-2026",
-      "name": "Solgaleo in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-07-22T06:00:00.000",
-      "end": "2026-07-28T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "SOLGALEO",
-          "names": {
-            "en": "Solgaleo"
-          },
-          "types": [
-            "psychic",
-            "steel"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "electric",
-            "psychic",
-            "dark"
-          ],
-          "seMoveTypes": [
+            "fighting",
             "ground",
-            "ghost",
-            "fire",
-            "dark"
+            "steel",
+            "water",
+            "electric"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "ground",
+            "water"
           ]
         }
       ]
     },
     {
-      "eventID": "raidhour20260722",
-      "name": "Solgaleo Raid Hour",
+      "eventID": "raidhour20260729",
+      "name": "Kyurem Raid Hour",
       "eventType": "raid-hour",
-      "start": "2026-07-22T18:00:00.000",
-      "end": "2026-07-22T19:00:00.000",
+      "start": "2026-07-29T18:00:00.000",
+      "end": "2026-07-29T19:00:00.000",
       "isShadow": false,
       "isMega": false,
       "bosses": [
         {
-          "id": "SOLGALEO",
+          "id": "KYUREM",
           "names": {
-            "en": "Solgaleo"
+            "en": "Kyurem"
           },
           "types": [
-            "psychic",
-            "steel"
+            "dragon",
+            "ice"
           ],
           "resistorTypes": [
             "steel",
             "fire",
             "water",
-            "electric",
-            "psychic",
-            "dark"
+            "ice",
+            "fairy"
           ],
           "seMoveTypes": [
-            "ground",
-            "ghost",
-            "fire",
-            "dark"
+            "fighting",
+            "rock",
+            "steel",
+            "dragon",
+            "fairy"
           ]
         }
       ]
