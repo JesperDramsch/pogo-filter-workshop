@@ -6093,11 +6093,15 @@ function FriendCollectEditor({
 									4★
 								</span>
 							)}
-							{/* Click-only refinements — buddy-target semantics, friend-collect
-							    accent. ♀/♂ locks the wanted gender (scoped `!species,<gender>`
-							    guard; Combee/Salandit gender-locked evolutions). Form chips drop
-							    regional forms the friend should skip (one scoped De-Morgan guard
-							    per dropped form); hidden for species without catalog forms. */}
+							{/* Click-only refinements — buddy-target semantics, but the QUIET
+							    have-list badge styling (gray at rest, blue when deliberately
+							    set) so a big chip cloud stays calm: untouched chips show dim
+							    gray tags, and color only appears where the user made a pick.
+							    ♀/♂ locks the wanted gender (scoped `!species,<gender>` guard;
+							    Combee/Salandit gender-locked evolutions). Form tags drop
+							    regional forms the friend should skip (one scoped De-Morgan
+							    guard per dropped form; kept forms turn blue once a restriction
+							    exists); hidden for species without catalog forms. */}
 							{onGendersChange && (
 								<span className='flex items-center gap-0.5' title={t('app.filter.friend_collect_gender_help')}>
 									{['female', 'male'].map((g) => {
@@ -6109,8 +6113,8 @@ function FriendCollectEditor({
 												aria-pressed={on}
 												className={`text-[9px] px-1 py-px rounded border transition ${
 													on
-														? 'bg-[#27AE60]/25 border-[#27AE60]/50 text-[#27AE60]'
-														: 'bg-transparent border-[#2D3A47] text-[#8090A0] hover:text-[#E6EDF3]'
+														? 'bg-[#5EAFC5]/25 border-[#5EAFC5]/50 text-[#5EAFC5]'
+														: 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
 												}`}
 											>
 												{g === 'female' ? '♀' : '♂'}
@@ -6127,14 +6131,18 @@ function FriendCollectEditor({
 									>
 										{(regionalFormsFor(tg.species) || []).map((f) => {
 											const droppedHere = (dropForms[tg.species] || []).includes(f.key);
+											const restricted = (dropForms[tg.species] || []).length > 0;
 											return (
 												<button
 													key={f.key}
 													onClick={() => toggleDropForm(tg.species, f.key)}
+													aria-pressed={restricted && !droppedHere}
 													className={`text-[9px] px-1 py-px rounded border transition ${
 														droppedHere
-															? 'bg-transparent border-[#2D3A47] text-[#5A6673] line-through'
-															: 'bg-[#27AE60]/25 border-[#27AE60]/50 text-[#27AE60]'
+															? 'bg-transparent border-[#2D3A47] text-[#3E4854] line-through'
+															: restricted
+																? 'bg-[#5EAFC5]/25 border-[#5EAFC5]/50 text-[#5EAFC5]'
+																: 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
 													}`}
 												>
 													{formRegionLabel(f, t)}
