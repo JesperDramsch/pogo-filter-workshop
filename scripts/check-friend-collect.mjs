@@ -371,6 +371,126 @@ console.log('\nScenario 8d: coverage overrides — forced targets stay in the st
 		!forced.friendCollectSuggestions.some((s) => s.species.includes('lapras')));
 }
 
+console.log('\nScenario 8e: click-only refinements — gender and drop-form guards');
+{
+	const base = { ...cfg, friendCollectSpecies: ['vulpix', 'dratini'], friendCollectMode: 'lucky' };
+	// Gender lock: scoped implication, exactly the buddy idiom.
+	const g = buildFilters([], [], { ...base, friendCollectGenders: { vulpix: 'female' } }, [], 'en', t);
+	check(
+		'gender guard emitted, scoped to the one species',
+		g.friendCollectWishlist.startsWith('vulpix,dratini&!vulpix,female&'),
+		g.friendCollectWishlist,
+	);
+	check('target carries the gender for the chip UI', g.friendCollectTargets[0]?.gender === 'female');
+	// Drop the Kanto base form → keep Alola only: one De-Morgan guard from the
+	// regional-forms catalog (base Vulpix isolates as fire).
+	const f = buildFilters([], [], { ...base, friendCollectDropForms: { vulpix: ['base'] } }, [], 'en', t);
+	check(
+		'drop-form guard emitted from catalog types',
+		f.friendCollectWishlist.startsWith('vulpix,dratini&!vulpix,!fire&'),
+		f.friendCollectWishlist,
+	);
+	// Both refinements stack on one target, then the trade guards follow.
+	const both = buildFilters(
+		[],
+		[],
+		{ ...base, friendCollectGenders: { vulpix: 'male' }, friendCollectDropForms: { vulpix: ['alola'] } },
+		[],
+		'en',
+		t,
+	);
+	check(
+		'form + gender guards stack before the trade guards',
+		both.friendCollectWishlist.startsWith('vulpix,dratini&!vulpix,!ice&!vulpix,male&!traded&'),
+		both.friendCollectWishlist,
+	);
+	// Refinements ride only on ACTIVE targets — an owned target emits nothing.
+	const owned = buildFilters(
+		[],
+		['vulpix'],
+		{ ...base, friendCollectGenders: { vulpix: 'female' } },
+		[],
+		'en',
+		t,
+	);
+	check('owned target emits no orphaned guards', !owned.friendCollectWishlist.includes('!vulpix'));
+	// DE output localizes the guard keywords.
+	const de = buildFilters([], [], { ...base, friendCollectDropForms: { vulpix: ['base'] } }, [], 'de', t);
+	check(
+		'DE output localizes the type keyword (fire → feuer)',
+		de.friendCollectWishlist.includes('!vulpix,!feuer'),
+		de.friendCollectWishlist,
+	);
+}
+
+console.log('\nScenario 8f: form-aware coverage — annotations opt in to finer pruning');
+{
+	const base = {
+		...cfg,
+		friendCollectSpecies: ['vulpix'],
+		friendCollectMode: 'lucky',
+		friendCollectDropForms: { vulpix: ['base'] }, // target wants Alola only
+	};
+	// Unannotated lucky Vulpix = species-level = covers everything (status quo).
+	const plain = buildFilters([], ['vulpix'], base, [], 'en', t);
+	check('unannotated ownership still covers a restricted target', plain.friendCollectTargets[0].owned === true);
+	// Annotated to the Kanto base form: the wanted Alolan is NOT owned.
+	const kanto = buildFilters([], ['vulpix'], { ...base, luckyForms: { vulpix: ['base'] } }, [], 'en', t);
+	check(
+		'base-form lucky does not cover an Alola-restricted target',
+		kanto.friendCollectTargets[0].owned === false && kanto.friendCollectWishlist.startsWith('vulpix'),
+		JSON.stringify(kanto.friendCollectTargets),
+	);
+	// Annotated to the wanted form: covered again.
+	const alola = buildFilters([], ['vulpix'], { ...base, luckyForms: { vulpix: ['alola'] } }, [], 'en', t);
+	check('matching-form lucky covers the restricted target', alola.friendCollectTargets[0].owned === true);
+	// Unrestricted targets keep species-level semantics even when annotated.
+	const unrestricted = buildFilters(
+		[],
+		['vulpix'],
+		{ ...cfg, friendCollectSpecies: ['vulpix'], luckyForms: { vulpix: ['base'] } },
+		[],
+		'en',
+		t,
+	);
+	check('annotation alone never un-covers an unrestricted target', unrestricted.friendCollectTargets[0].owned === true);
+}
+
+console.log('\nScenario 8g: form-scoped wishlist exclusions — owned form out, other forms stay visible');
+{
+	// Lucky Kanto Vulpix only → the fallback wishlist must NOT hide the
+	// friend's Alolan line: `!+vulpix` becomes `!+vulpix,!fire`.
+	const ann = buildFilters([], ['vulpix', 'lapras'], { ...cfg, luckyForms: { vulpix: ['base'] } }, [], 'en', t);
+	check(
+		'lucky exclusion scoped to the owned form',
+		ann.friendLuckyWishlist.includes('!+vulpix,!fire') && !ann.friendLuckyWishlist.includes('!+vulpix&'),
+		ann.friendLuckyWishlist,
+	);
+	check('unannotated entries keep the plain family exclusion', ann.friendLuckyWishlist.includes('!+lapras'));
+	// Owning EVERY catalog form falls back to the plain exclusion.
+	const all = buildFilters([], ['vulpix'], { ...cfg, luckyForms: { vulpix: ['base', 'alola'] } }, [], 'en', t);
+	check('all-forms annotation = plain exclusion', all.friendLuckyWishlist.startsWith('!+vulpix&'), all.friendLuckyWishlist);
+	// Exclude-based form predicates (Kanto Raichu isolates as NOT-psychic)
+	// De-Morgan into a positive term.
+	const raichu = buildFilters(['raichu'], [], { ...cfg, hundoForms: { raichu: ['base'] } }, [], 'en', t);
+	check(
+		'exclude-based catalog predicate handled (hundo Kanto Raichu → !+raichu,psychic)',
+		raichu.friendHundoWishlist.startsWith('!+raichu,psychic&'),
+		raichu.friendHundoWishlist,
+	);
+	// The guaranteed-lucky variant inherits the scoped clauses.
+	check(
+		'guaranteed variant inherits the scoped exclusion',
+		ann.friendLuckyWishlistGuaranteed.includes('!+vulpix,!fire'),
+	);
+	// Defaults (no annotations) are byte-identical to the pre-feature output.
+	const a = buildFilters(hundos, luckies, cfg, [], 'en', t);
+	check(
+		'no annotations → wishlists unchanged',
+		a.friendLuckyWishlist.includes('!+dragoran') || a.friendLuckyWishlist.includes('!+dragonite'),
+	);
+}
+
 console.log('\nScenario 9: config merge');
 {
 	const m = mergeImportedConfig({ friendCollectSpecies: ['Dragonite', '131'], friendCollectMode: 'weird' });
@@ -414,6 +534,45 @@ console.log('\nScenario 9: config merge');
 	check(
 		'junk forced value coerces to empty',
 		mergeImportedConfig({ friendCollectForced: 'yes' }).friendCollectForced.length === 0,
+	);
+	// Species-keyed side-band maps: canonicalized keys, validated values,
+	// curated-subset enforcement where the list lives in config.
+	const maps = mergeImportedConfig({
+		friendCollectSpecies: ['Vulpix', 'Dratini'],
+		friendCollectGenders: { Vulpix: 'female', Dratini: 'weird', Pikachu: 'male' },
+		friendCollectDropForms: { Vulpix: ['base', 'bogus'], Dratini: ['base'], Meowth: ['alola'] },
+		hundoForms: { Meowth: ['galar', 'junk'], Lapras: ['base'] },
+		luckyForms: 'junk',
+	});
+	check(
+		'genders: canonical keys, valid values, curated subset only',
+		JSON.stringify(maps.friendCollectGenders) === JSON.stringify({ vulpix: 'female' }),
+		JSON.stringify(maps.friendCollectGenders),
+	);
+	check(
+		'dropForms: catalog-validated, non-catalog species dropped',
+		JSON.stringify(maps.friendCollectDropForms) === JSON.stringify({ vulpix: ['base'] }),
+		JSON.stringify(maps.friendCollectDropForms),
+	);
+	check(
+		'have-list form maps: keys canonicalized (Meowth → mauzi), junk form keys dropped',
+		JSON.stringify(maps.hundoForms) === JSON.stringify({ mauzi: ['galar'] }),
+		JSON.stringify(maps.hundoForms),
+	);
+	check('scalar junk map coerces to empty', JSON.stringify(maps.luckyForms) === '{}');
+	check(
+		'dropping every catalog form is rejected as junk',
+		JSON.stringify(
+			mergeImportedConfig({ friendCollectSpecies: ['Vulpix'], friendCollectDropForms: { Vulpix: ['base', 'alola'] } })
+				.friendCollectDropForms,
+		) === '{}',
+	);
+	const legacyMaps = mergeImportedConfig({});
+	check(
+		'legacy configs back-fill all four maps empty',
+		[legacyMaps.friendCollectGenders, legacyMaps.friendCollectDropForms, legacyMaps.hundoForms, legacyMaps.luckyForms].every(
+			(m) => m && typeof m === 'object' && Object.keys(m).length === 0,
+		),
 	);
 }
 
