@@ -169,6 +169,75 @@ const UNTRADEABLE_MYTHICAL_DEX = new Set([
 // supplies the starter and "power line" pack pools below.
 const SPECIAL_TRADE_DEX = new Set(SPECIES_META.specialTradeDex);
 
+// Baby stages (Pichu, Riolu, Toxel & co.) — the fixed 19-species game
+// mechanic, hand-maintained like TRADE_EVO_FAMILIES (no feed carries a baby
+// flag). Used by collectibleBaseDex below: a friend-collect pack should ask
+// for the stage ABOVE the baby (Pikachu, not Pichu) — babies are egg-centric
+// rare catches, and a lucky/hundo baby still has to be evolved out of the
+// baby stage before it's the thing the user actually wanted.
+const BABY_DEX = new Set([
+	172, // Pichu
+	173, // Cleffa
+	174, // Igglybuff
+	175, // Togepi
+	236, // Tyrogue
+	238, // Smoochum
+	239, // Elekid
+	240, // Magby
+	298, // Azurill
+	360, // Wynaut
+	406, // Budew
+	433, // Chingling
+	438, // Bonsly
+	439, // Mime Jr.
+	440, // Happiny
+	446, // Munchlax
+	447, // Riolu
+	458, // Mantyke
+	848, // Toxel
+]);
+
+// Child dex → parent dex for every evolution step (species-meta feed, GM +
+// pogoapi union). Old snapshots without the field degrade gracefully: every
+// species counts as its own base and the packs behave as before.
+const EVO_PARENT_BY_DEX = SPECIES_META.evoParentByDex || {};
+// Inverse (parent → children), for the one walk the parent map can't do:
+// hopping DOWN from a baby that is itself the candidate.
+const EVO_CHILDREN_BY_DEX = (() => {
+	const m = new Map();
+	for (const [child, parent] of Object.entries(EVO_PARENT_BY_DEX)) {
+		const key = String(parent);
+		if (!m.has(key)) m.set(key, []);
+		m.get(key).push(parseInt(child, 10));
+	}
+	return m;
+})();
+
+// The stage a friend-collect pack should actually suggest for a species:
+// the base of its evolution line — trades re-roll IVs and luckiness sticks,
+// so the base covers the whole line by evolving, while an evolved copy can
+// never become the base (a lucky Greedent is not a lucky Skwovet). One
+// exception, per the babies rule above: when the line bottoms out in a baby,
+// the collectible base is the stage directly above it (Raichu → Pikachu, not
+// Pichu). A candidate that IS a baby hops down to its child when that child
+// is unambiguous; Tyrogue (three children) stays put — the pack preview
+// toggles let the user drop it by hand. Exported for the offline checks in
+// scripts/check-friend-collect.mjs.
+export function collectibleBaseDex(dex) {
+	const path = [dex];
+	let cur = dex;
+	// Cycle-guarded walk to the root of the line (real lines are ≤4 hops).
+	while (EVO_PARENT_BY_DEX[String(cur)] !== undefined && path.length < 10) {
+		cur = EVO_PARENT_BY_DEX[String(cur)];
+		if (path.includes(cur)) break;
+		path.push(cur);
+	}
+	if (!BABY_DEX.has(cur)) return cur;
+	if (path.length >= 2) return path[path.length - 2];
+	const children = EVO_CHILDREN_BY_DEX.get(String(cur)) || [];
+	return children.length === 1 ? children[0] : cur;
+}
+
 // Trade-evo families: dex-keyed identity, German base name as the user-facing
 // config key (kept stable so persisted localStorage state ["abra", "machollo"]
 // keeps working across locale changes). `baseDex` is the family head for
@@ -283,6 +352,30 @@ export const DEFAULT_CONFIG = {
 	// (lucky mode only). Persisted config rather than per-session UI state —
 	// it's a curation setting like the mode above.
 	friendCollectGuaranteedOnly: false,
+	// Coverage overrides: curated species that stay in the string even though
+	// the current focus counts them as owned (e.g. keep hunting the hundo on a
+	// species whose lucky already landed). Subset of friendCollectSpecies.
+	friendCollectForced: [],
+	// Per-target refinements — click-only (chip pickers; typed input never
+	// sets these). Keys are canonical storage-locale species names, kept a
+	// subset of friendCollectSpecies on merge.
+	//   friendCollectGenders:   { species: 'male' | 'female' } — emits a
+	//     scoped `!species,<gender>` guard (Combee/Salandit gender locks).
+	//   friendCollectDropForms: { species: [formKey, …] } — regional forms
+	//     the friend should NOT collect, buddy dropForms semantics; emits one
+	//     `!species,<De Morgan types>` guard per dropped form. Only species
+	//     in the regional-forms catalog.
+	friendCollectGenders: {},
+	friendCollectDropForms: {},
+	// Form annotations for the have-lists: which regional form(s) the owned
+	// lucky/hundo actually is ({ species: [formKey, …] }). Click-only badges
+	// on the step-3 chips; absent key = form unknown → exactly today's
+	// species-level behavior everywhere. Consumed by (a) the friend-collect
+	// coverage predicate and (b) form-scoped `!+family` exclusions in the
+	// fallback wishlists. hundos/luckies live outside config, so stale keys
+	// are pruned in the chip handlers and ignored by consumers, not in merge.
+	hundoForms: {},
+	luckyForms: {},
 	// Trade buddies — list of { id, name, tagPrefix, events: [event-names] }
 	// tagPrefix matches any sub-tag (e.g. #Auri matches #Auri:hat-pika via PoGo prefix match).
 	buddies: [],
@@ -853,6 +946,48 @@ export function mergeImportedConfig(raw, notices = []) {
 	if (!['lucky', 'hundo', 'both'].includes(merged.friendCollectMode)) merged.friendCollectMode = 'lucky';
 	// Legacy configs (and junk values) coerce to the off default.
 	merged.friendCollectGuaranteedOnly = merged.friendCollectGuaranteedOnly === true;
+	// Coverage overrides ride on the curated list: canonicalize, then drop
+	// anything no longer curated (junk / hand-edited imports included).
+	const friendCollectSet = new Set(merged.friendCollectSpecies);
+	merged.friendCollectForced = canonicalize(
+		Array.isArray(merged.friendCollectForced) ? merged.friendCollectForced : [],
+	).filter((sp) => friendCollectSet.has(sp));
+	// Species-keyed side-band maps: canonicalize keys, validate values, and
+	// never let a hand-edited import smuggle junk into the emitters. Maps are
+	// opaque to the resolver on purpose — annotations are click-only, so no
+	// name parsing happens here beyond plain species canonicalization.
+	const canonMapKeys = (obj, validate) => {
+		const out = {};
+		if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return out;
+		for (const [rawKey, rawVal] of Object.entries(obj)) {
+			const key = resolveSpecies(rawKey) || String(rawKey).toLowerCase();
+			const val = validate(key, rawVal);
+			if (val !== undefined && !(key in out)) out[key] = val;
+		}
+		return out;
+	};
+	// Regional-form annotation values: dedupe against the species' catalog
+	// forms; unknown keys drop, empty results drop the entry entirely.
+	const validFormKeys = (species, rawVal) => {
+		const catalog = (regionalFormsFor(species) || []).map((f) => f.key);
+		if (catalog.length === 0 || !Array.isArray(rawVal)) return undefined;
+		const keep = [...new Set(rawVal.filter((k) => catalog.includes(k)))];
+		return keep.length > 0 ? keep : undefined;
+	};
+	merged.friendCollectGenders = canonMapKeys(merged.friendCollectGenders, (key, v) =>
+		friendCollectSet.has(key) && (v === 'male' || v === 'female') ? v : undefined,
+	);
+	merged.friendCollectDropForms = canonMapKeys(merged.friendCollectDropForms, (key, v) => {
+		if (!friendCollectSet.has(key)) return undefined;
+		const keep = validFormKeys(key, v);
+		if (!keep) return undefined;
+		// Dropping every form would make the target catch nothing — the picker
+		// blocks it, so a full drop here can only be import junk.
+		const catalog = (regionalFormsFor(key) || []).map((f) => f.key);
+		return keep.length < catalog.length ? keep : undefined;
+	});
+	merged.hundoForms = canonMapKeys(merged.hundoForms, validFormKeys);
+	merged.luckyForms = canonMapKeys(merged.luckyForms, validFormKeys);
 	// Buddy targets: migrate legacy string[] → structured Target[] and backfill
 	// the per-buddy raw escape hatch. `rawAppend` first so an existing value wins.
 	// Dedupe by species|type so a hand-edited import can't yield colliding lines.
@@ -940,6 +1075,13 @@ function deduppedTradeEvos(hundos, enabled) {
 		if (!overlapsH) trimmed.push(base);
 	}
 	return { full, trimmed };
+}
+
+// Object copy without one key — the species-keyed side-band maps (forced /
+// gender / form annotations) shed entries this way when a chip is removed.
+function omitKey(obj, key) {
+	const { [key]: _dropped, ...rest } = obj || {};
+	return rest;
 }
 
 // Helper: split comma-separated tag list, returning array of trimmed tag names.
@@ -1746,13 +1888,64 @@ export function buildFilters(
 		push(clauses, `!${kw.flag.purified}`, tFn('app.clause_why.friend_no_purified'));
 	};
 
-	// Lucky wishlist — exclude every family the user already has a lucky in.
+	// Shared De Morgan encoding for a form predicate's NEGATION — same idiom
+	// as the buddy drop-form guards: ¬(inc₁∧inc₂∧¬exc) = ¬inc₁ ∨ ¬inc₂ ∨ exc,
+	// rendered as comma-OR type terms in the output locale. Empty string means
+	// the form carries no type predicate (shouldn't happen with catalog data).
+	const formDropTerms = (f) =>
+		[
+			...(f.include || []).map((ty) => `!${kw.type[ty] || ty}`),
+			...(f.exclude || []).map((ty) => kw.type[ty] || ty),
+		].join(',');
+
+	// Form-scoped exclusion plans for the fallback wishlists. An owned entry
+	// annotated to specific regional form(s) (cfg.luckyForms / cfg.hundoForms,
+	// click-only badges on the step-3 chips) excludes only those forms — the
+	// un-owned forms stay visible to the friend: a lucky Kanto Vulpix must not
+	// hide their Alolan one. Keyed by OUTPUT-locale name to match
+	// ownedSpeciesNames; annotation covering every catalog form (or any form
+	// without a usable type predicate) falls back to the plain `!+family`
+	// exclusion — same clause as today, safe over-exclusion.
+	const formScopedExclusions = (ann) => {
+		const map = new Map();
+		for (const [key, ownedKeys] of Object.entries(ann || {})) {
+			if (!Array.isArray(ownedKeys) || ownedKeys.length === 0) continue;
+			const catalog = regionalFormsFor(key) || [];
+			if (catalog.length === 0) continue;
+			const owned = catalog.filter((f) => ownedKeys.includes(f.key));
+			if (owned.length === 0 || owned.length >= catalog.length) continue;
+			if (owned.some((f) => !formDropTerms(f))) continue;
+			const out = speciesForOutput(key, outputLocale);
+			if (out) map.set(out, owned);
+		}
+		return map;
+	};
+	const luckyScopedExclusions = formScopedExclusions(cfg.luckyForms);
+	const hundoScopedExclusions = formScopedExclusions(cfg.hundoForms);
+	const pushOwnedExclusion = (clauses, sp, scopedMap, plainWhyKey, formWhyKey) => {
+		const scoped = scopedMap.get(sp);
+		if (!scoped) {
+			push(clauses, `!+${sp}`, tFn(plainWhyKey, { params: { species: capFirst(sp) } }));
+			return;
+		}
+		for (const f of scoped)
+			push(
+				clauses,
+				`!+${sp},${formDropTerms(f)}`,
+				tFn(formWhyKey, { params: { species: capFirst(sp), region: formRegionLabel(f, tFn) } }),
+			);
+	};
+
+	// Lucky wishlist — exclude every family the user already has a lucky in
+	// (form-scoped where the lucky is annotated to specific regional forms).
 	const friendLuckyClauses = [];
 	for (const sp of ownedSpeciesNames(luckies))
-		push(
+		pushOwnedExclusion(
 			friendLuckyClauses,
-			`!+${sp}`,
-			tFn('app.clause_why.friend_have_lucky', { params: { species: capFirst(sp) } }),
+			sp,
+			luckyScopedExclusions,
+			'app.clause_why.friend_have_lucky',
+			'app.clause_why.friend_have_lucky_form',
 		);
 	pushFriendTradeGuards(friendLuckyClauses);
 	const friendLuckyWishlist = friendLuckyClauses.map((c) => c.clause).join('&');
@@ -1770,14 +1963,17 @@ export function buildFilters(
 		);
 	const friendLuckyWishlistGuaranteed = friendLuckyGuaranteedClauses.map((c) => c.clause).join('&');
 
-	// Hundo wishlist — exclude every family the user already has a hundo in.
+	// Hundo wishlist — exclude every family the user already has a hundo in
+	// (form-scoped where annotated, same as the lucky wishlist above).
 	// No 4* clause: IVs re-roll on trade, so any untraded specimen is fair game.
 	const friendHundoClauses = [];
 	for (const sp of ownedSpeciesNames(hundos))
-		push(
+		pushOwnedExclusion(
 			friendHundoClauses,
-			`!+${sp}`,
-			tFn('app.clause_why.friend_have_hundo', { params: { species: capFirst(sp) } }),
+			sp,
+			hundoScopedExclusions,
+			'app.clause_why.friend_have_hundo',
+			'app.clause_why.friend_have_hundo_form',
 		);
 	pushFriendTradeGuards(friendHundoClauses);
 	const friendHundoWishlist = friendHundoClauses.map((c) => c.clause).join('&');
@@ -1802,7 +1998,9 @@ export function buildFilters(
 	// Raichu must NOT cancel a curated Pikachu. Exact-species ownership is
 	// pruned app-side instead (the dimmed ✓ chip and the drop from the
 	// positives below), so the string still shrinks as new luckies / hundos
-	// land in the have-lists.
+	// land in the have-lists. cfg.friendCollectForced overrides that pruning
+	// per species: a forced target stays in the string although the focus
+	// counts it as owned (the lucky landed, the hundo hunt continues).
 	// Focus: 'lucky' | 'hundo' | 'both'. 'both' means the user wants each
 	// species as a lucky AND as a hundo — a target only counts as covered
 	// (and drops from the string / prunes the packs) once BOTH goals are met.
@@ -1812,31 +2010,106 @@ export function buildFilters(
 	const friendCollectHundoSet = new Set((hundos || []).map(canonKey));
 	// luckySet (canonKey'd luckies) already exists above for the lucky/hundo
 	// intersection logic — reuse it here.
-	const friendCollectCovered = (canonName) => {
-		const l = luckySet.has(canonName);
-		const h = friendCollectHundoSet.has(canonName);
+	//
+	// Form-aware ownership: a target restricted to specific regional forms
+	// (friendCollectDropForms) only counts as covered when the owned lucky's /
+	// hundo's form annotation overlaps the forms the target still wants.
+	// Unannotated ownership stays species-level (covers everything — exactly
+	// today's behavior), so annotations opt IN to finer pruning and absence
+	// changes nothing. Gender restrictions deliberately do NOT affect
+	// coverage: the have-lists carry no gender, so a gender-locked hunt that
+	// outlives a species-level catch is what the forced toggle is for.
+	const friendCollectGenderMap = cfg.friendCollectGenders || {};
+	const friendCollectDropMap = cfg.friendCollectDropForms || {};
+	// Kept-form keys for a restricted target; null = unrestricted (species
+	// without catalog forms, nothing dropped, or junk that dropped every form).
+	const friendCollectKeptForms = (canonName) => {
+		const catalog = regionalFormsFor(canonName) || [];
+		if (catalog.length === 0) return null;
+		const dropped = new Set(
+			Array.isArray(friendCollectDropMap[canonName]) ? friendCollectDropMap[canonName] : [],
+		);
+		if (dropped.size === 0) return null;
+		const kept = catalog.filter((f) => !dropped.has(f.key)).map((f) => f.key);
+		return kept.length > 0 && kept.length < catalog.length ? kept : null;
+	};
+	const friendCollectGoalOwned = (canonName, ownedSpecies, formAnn, keptFormKeys) => {
+		if (!ownedSpecies) return false;
+		if (!keptFormKeys) return true;
+		const owned = formAnn?.[canonName];
+		if (!Array.isArray(owned) || owned.length === 0) return true;
+		return owned.some((k) => keptFormKeys.includes(k));
+	};
+	const friendCollectCovered = (canonName, keptFormKeys = null) => {
+		const l = friendCollectGoalOwned(canonName, luckySet.has(canonName), cfg.luckyForms, keptFormKeys);
+		const h = friendCollectGoalOwned(
+			canonName,
+			friendCollectHundoSet.has(canonName),
+			cfg.hundoForms,
+			keptFormKeys,
+		);
 		if (friendCollectMode === 'lucky') return l;
 		if (friendCollectMode === 'hundo') return h;
 		return l && h;
 	};
+	// Coverage overrides: a curated species the user explicitly re-activated
+	// even though the focus counts it as owned — the lucky Furfrou is in, but
+	// the hundo hunt on it continues. Overrides keep the target in the string;
+	// pack pruning is untouched (a forced species is curated, so packs skip it
+	// via the curated set anyway).
+	const friendCollectForcedSet = new Set((cfg.friendCollectForced || []).map(canonKey));
 	const friendCollectTargets = (cfg.friendCollectSpecies || []).map((sp) => {
 		const key = canonKey(sp);
+		const kept = friendCollectKeptForms(key);
+		const gender = friendCollectGenderMap[key];
 		return {
 			species: sp,
 			display: speciesForOutput(sp, outputLocale),
-			ownedLucky: luckySet.has(key),
-			ownedHundo: friendCollectHundoSet.has(key),
-			owned: friendCollectCovered(key),
+			ownedLucky: friendCollectGoalOwned(key, luckySet.has(key), cfg.luckyForms, kept),
+			ownedHundo: friendCollectGoalOwned(key, friendCollectHundoSet.has(key), cfg.hundoForms, kept),
+			owned: friendCollectCovered(key, kept),
+			forced: friendCollectForcedSet.has(key),
+			gender: gender === 'male' || gender === 'female' ? gender : null,
+			keptForms: kept,
 		};
 	});
 	const friendCollectClauses = [];
-	const friendCollectActive = friendCollectTargets.filter((tg) => !tg.owned);
+	const friendCollectActive = friendCollectTargets.filter((tg) => !tg.owned || tg.forced);
 	if (friendCollectActive.length > 0) {
 		push(
 			friendCollectClauses,
 			friendCollectActive.map((tg) => tg.display).join(','),
 			tFn('app.clause_why.friend_collect_targets'),
 		);
+		// Per-target refinement guards — the same scoped implication the buddy
+		// filters use: `!<species>,<terms>` constrains only that species inside
+		// the OR-union. One clause per dropped form, one per gender pick.
+		for (const tg of friendCollectActive) {
+			const key = canonKey(tg.species);
+			if (tg.keptForms) {
+				const catalog = regionalFormsFor(key) || [];
+				const keptSet = new Set(tg.keptForms);
+				for (const f of catalog.filter((x) => !keptSet.has(x.key))) {
+					const terms = formDropTerms(f);
+					if (!terms) continue;
+					push(
+						friendCollectClauses,
+						`!${tg.display},${terms}`,
+						tFn('app.clause_why.friend_collect_drop_form', {
+							params: { species: capFirst(tg.display), region: formRegionLabel(f, tFn) },
+						}),
+					);
+				}
+			}
+			if (tg.gender)
+				push(
+					friendCollectClauses,
+					`!${tg.display},${kw.flag[tg.gender]}`,
+					tFn(`app.clause_why.friend_collect_gender_${tg.gender}`, {
+						params: { species: capFirst(tg.display) },
+					}),
+				);
+		}
 		pushFriendTradeGuards(friendCollectClauses);
 	}
 	const friendCollectWishlist = friendCollectClauses.map((c) => c.clause).join('&');
@@ -1854,29 +2127,40 @@ export function buildFilters(
 	}
 
 	// Suggested sets for the curated list. Candidates resolve to the storage
-	// locale (base dex — forms collapse, matching wishlist semantics), then
-	// drop what's already curated or already owned in the current mode, so the
-	// "add" counts stay honest. Untradeable mythicals AND special-trade-only
-	// species (legendaries / Ultra Beasts) are skipped up front — these packs
-	// are strictly regular-trade material.
+	// locale, then — unless the pack opts out via keepStages — collapse to
+	// their COLLECTIBLE BASE (collectibleBaseDex: base of the line, or the
+	// stage above a baby). Friends collect toward luckies/hundos, and only the
+	// base can grow into the whole line — a meta-pack Greedent must arrive as
+	// Skwovet, and then prune against an already-lucky Skwovet instead of
+	// sneaking in beside it. Egg pools keep their stages: eggs hatch exactly
+	// what they hatch, and a "hatch it for me" ask for Pichu can't be
+	// fulfilled with a Pikachu filter. After the remap, drop what's already
+	// curated or already owned in the current mode, so the "add" counts stay
+	// honest. Untradeable mythicals AND special-trade-only species
+	// (legendaries / Ultra Beasts) are skipped — these packs are strictly
+	// regular-trade material. `display` mirrors `species` in the output
+	// locale for the pack-preview chips in the editor.
 	const friendCollectCuratedSet = new Set((cfg.friendCollectSpecies || []).map(canonKey));
 	const friendCollectSuggestions = [];
-	const pushFriendCollectSuggestion = (kind, id, title, meta, inputs, cap = Infinity) => {
+	const pushFriendCollectSuggestion = (kind, id, title, meta, inputs, { cap = Infinity, keepStages = false } = {}) => {
 		const seen = new Set();
 		const species = [];
+		const display = [];
 		for (const input of inputs || []) {
 			const info = resolveSpeciesInfo(input);
 			if (!info) continue;
-			if (UNTRADEABLE_MYTHICAL_DEX.has(info.dex)) continue;
-			if (SPECIAL_TRADE_DEX.has(info.dex)) continue;
-			const stored = pokemonNameFor(String(info.dex));
+			const dex = keepStages ? info.dex : collectibleBaseDex(info.dex);
+			if (UNTRADEABLE_MYTHICAL_DEX.has(dex)) continue;
+			if (SPECIAL_TRADE_DEX.has(dex)) continue;
+			const stored = pokemonNameFor(String(dex));
 			if (!stored || seen.has(stored)) continue;
 			seen.add(stored);
 			if (friendCollectCuratedSet.has(stored) || friendCollectCovered(stored)) continue;
 			species.push(stored);
+			display.push(pokemonNameFor(String(dex), outputLocale) || stored);
 			if (species.length >= cap) break;
 		}
-		if (species.length > 0) friendCollectSuggestions.push({ kind, id, title, ...meta, species });
+		if (species.length > 0) friendCollectSuggestions.push({ kind, id, title, ...meta, species, display });
 	};
 	// Event spawns — running or upcoming events only; one suggestion per event
 	// so the set can be refreshed for the latest event as feeds update.
@@ -1897,6 +2181,8 @@ export function buildFilters(
 	// Deliberately NOT part of the rare-set gate below: a Season pool is
 	// near-always live and would otherwise permanently suppress the rare set,
 	// which exists to cover WILD-spawn lulls.
+	// keepStages: eggs hatch exactly what they hatch — babies included — so
+	// the collectible-base remap must not touch these pools.
 	for (const pool of EVENTS.eggPools || []) {
 		const endMs = Date.parse(pool.end);
 		if (Number.isFinite(endMs) && endMs < friendCollectNowMs) continue;
@@ -1906,7 +2192,7 @@ export function buildFilters(
 			pool.title,
 			{ start: pool.start, end: pool.end },
 			(pool.eggDex || []).map(String),
-			25,
+			{ cap: 25, keepStages: true },
 		);
 	}
 	// Evergreen packs — always on offer (no event gate: they shrink as they're
@@ -1914,15 +2200,16 @@ export function buildFilters(
 	// trade-evo lines are the fixed game mechanic, everything else comes from
 	// the synced snapshots.
 	//
-	// Trade evolutions: the pre-final members (what a friend actually sends) —
-	// evolving a traded one costs 0 candy, the single cheapest way to finish
-	// Machamp/Gengar/Alakazam & co.
+	// Trade evolutions: the family bases — the trade discount sticks to the
+	// traded mon through every later evolution, so a traded base finishes
+	// Machamp/Gengar/Alakazam & co. with the 0-candy final step intact. (Mids
+	// like Machoke would collapse to the base in the remap anyway.)
 	pushFriendCollectSuggestion(
 		'tradeevo',
 		'trade-evos',
 		null,
 		{ hintKey: 'app.filter.friend_collect_hint_tradeevo' },
-		Object.values(TRADE_EVO_FAMILIES).flatMap((f) => f.memberDex.slice(0, -1)).map(String),
+		Object.values(TRADE_EVO_FAMILIES).map((f) => String(f.baseDex)),
 	);
 	// Candy-heavy lines (evolution-costs feed): 400-single-jump and
 	// high-cumulative chains — every traded copy is transfer+trade candy
@@ -1933,7 +2220,7 @@ export function buildFilters(
 		null,
 		{ hintKey: 'app.filter.friend_collect_hint_candy' },
 		EVOLUTION_COSTS.candyHeavy || [],
-		25,
+		{ cap: 25 },
 	);
 	// Power lines (species-meta feed): pseudo-legendary-style strong 3-stage
 	// lines — rare spawns whose finals carry raids and Master League.
@@ -1943,7 +2230,7 @@ export function buildFilters(
 		null,
 		{ hintKey: 'app.filter.friend_collect_hint_powerlines' },
 		(SPECIES_META.powerLineDex || []).map(String),
-		25,
+		{ cap: 25 },
 	);
 	// Starter bases (species-meta feed): Community-Day royalty — their
 	// exclusive-move finals are prime regular trades.
@@ -1963,7 +2250,7 @@ export function buildFilters(
 		null,
 		{ hintKey: 'app.filter.friend_collect_hint_raids' },
 		cfg.topAttackers || [],
-		25,
+		{ cap: 25 },
 	);
 	pushFriendCollectSuggestion(
 		'pvp-great',
@@ -1971,7 +2258,7 @@ export function buildFilters(
 		null,
 		{ hintKey: 'app.filter.friend_collect_hint_gl', warn: true },
 		(PVP_RANKINGS.leagues?.great?.species || []).map((s) => String(s.dex)),
-		25,
+		{ cap: 25 },
 	);
 	pushFriendCollectSuggestion(
 		'pvp-ultra',
@@ -1979,7 +2266,7 @@ export function buildFilters(
 		null,
 		{ hintKey: 'app.filter.friend_collect_hint_ul' },
 		(PVP_RANKINGS.leagues?.ultra?.species || []).map((s) => String(s.dex)),
-		25,
+		{ cap: 25 },
 	);
 
 	// ── AUX FILTERS — task-oriented pro tools, paste these into the search
@@ -3869,6 +4156,9 @@ export default function App() {
 	}
 	function removeHundo(h) {
 		setHundos(hundos.filter((x) => x !== h));
+		// Shed the form annotation with the entry (config map keys must not
+		// outlive their have-list species).
+		if (config.hundoForms?.[h]) setConfig({ ...config, hundoForms: omitKey(config.hundoForms, h) });
 	}
 	function addLucky() {
 		// Same parser as addHundo: comma/space/semicolon-split, multi-locale
@@ -3893,6 +4183,7 @@ export default function App() {
 	}
 	function removeLucky(s) {
 		setLuckies(luckies.filter((x) => x !== s));
+		if (config.luckyForms?.[s]) setConfig({ ...config, luckyForms: omitKey(config.luckyForms, s) });
 	}
 	function addTopAttacker() {
 		// Same parser as addHundo: comma/space/semicolon-split, multi-locale
@@ -4210,6 +4501,8 @@ export default function App() {
 											setNewHundo={setNewHundo}
 											addHundo={addHundo}
 											removeHundo={removeHundo}
+											formsAnn={config.hundoForms || {}}
+											onFormsAnnChange={(next) => setConfig({ ...config, hundoForms: next })}
 										/>
 										<hr className='my-8 border-[#1F2933]' />
 										<SpeciesListEditor
@@ -4220,6 +4513,8 @@ export default function App() {
 											removeItem={removeLucky}
 											titleKey='app.luckies'
 											accent='#F5B82E'
+											formsAnn={config.luckyForms || {}}
+											onFormsAnnChange={(next) => setConfig({ ...config, luckyForms: next })}
 										/>
 									</div>
 									{effectiveConfig.expertMode && effectiveConfig.protectMythicals && (
@@ -4954,7 +5249,53 @@ function BuddyCatchSection({ buddyCatchFilters, copied, onCopy }) {
 	);
 }
 
-function HundosEditor({ hundos, setHundos, newHundo, setNewHundo, addHundo, removeHundo }) {
+// Shared chip add-on for the have-list editors: regional-form annotation
+// badges. Click-only — marks WHICH form(s) the owned lucky/hundo actually is
+// for the ~51 catalog species; no badge active = form unknown = species-level
+// behavior everywhere (exactly the pre-annotation semantics). Feeds the
+// friend-collect coverage predicate and the form-scoped wishlist exclusions.
+function HaveFormBadges({ species, formsAnn, onFormsAnnChange, t }) {
+	if (!onFormsAnnChange) return null;
+	const catalog = regionalFormsFor(species) || [];
+	if (catalog.length === 0) return null;
+	const owned = new Set(formsAnn?.[species] || []);
+	const toggle = (formKey) => {
+		const next = new Set(owned);
+		if (next.has(formKey)) next.delete(formKey);
+		else next.add(formKey);
+		if (next.size > 0) onFormsAnnChange({ ...(formsAnn || {}), [species]: [...next] });
+		else onFormsAnnChange(omitKey(formsAnn, species));
+	};
+	return (
+		<span className='flex items-center gap-0.5' title={t('app.have_forms.help')}>
+			{catalog.map((f) => (
+				<button
+					key={f.key}
+					onClick={() => toggle(f.key)}
+					aria-pressed={owned.has(f.key)}
+					className={`text-[9px] px-1 py-px rounded border transition ${
+						owned.has(f.key)
+							? 'bg-[#5EAFC5]/25 border-[#5EAFC5]/50 text-[#5EAFC5]'
+							: 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
+					}`}
+				>
+					{formRegionLabel(f, t)}
+				</button>
+			))}
+		</span>
+	);
+}
+
+function HundosEditor({
+	hundos,
+	setHundos,
+	newHundo,
+	setNewHundo,
+	addHundo,
+	removeHundo,
+	formsAnn,
+	onFormsAnnChange,
+}) {
 	const { t } = useTranslation();
 	// Live preview of what's about to be added: parse the input, resolve each token,
 	// show a green chip for each resolved one + a red marker for unresolved tokens.
@@ -4987,6 +5328,7 @@ function HundosEditor({ hundos, setHundos, newHundo, setNewHundo, addHundo, remo
 					>
 						<span className='text-[#5EAFC5]'>+</span>
 						{h}
+						<HaveFormBadges species={h} formsAnn={formsAnn} onFormsAnnChange={onFormsAnnChange} t={t} />
 						<button
 							onClick={() => removeHundo(h)}
 							className='opacity-40 group-hover:opacity-100 hover:text-[#E74C3C] transition'
@@ -5085,7 +5427,17 @@ function HundosEditor({ hundos, setHundos, newHundo, setNewHundo, addHundo, remo
 // hundos editor, but parameterized by `titleKey` so the i18n strings live
 // under any namespace (e.g. `app.top_attackers.*`). Used for personal
 // roster lists. Accent color drives the add-button hue.
-function SpeciesListEditor({ items, newItem, setNewItem, addItem, removeItem, titleKey, accent }) {
+function SpeciesListEditor({
+	items,
+	newItem,
+	setNewItem,
+	addItem,
+	removeItem,
+	titleKey,
+	accent,
+	formsAnn,
+	onFormsAnnChange,
+}) {
 	const { t } = useTranslation();
 	const previewTokens = useMemo(() => {
 		return newItem
@@ -5116,6 +5468,7 @@ function SpeciesListEditor({ items, newItem, setNewItem, addItem, removeItem, ti
 					>
 						<span style={{ color: accent }}>+</span>
 						{s}
+						<HaveFormBadges species={s} formsAnn={formsAnn} onFormsAnnChange={onFormsAnnChange} t={t} />
 						<button
 							onClick={() => removeItem(s)}
 							className='opacity-40 group-hover:opacity-100 hover:text-[#E74C3C] transition'
@@ -5379,9 +5732,11 @@ function ClearListButton({ count, onClear }) {
 
 // Curated "have friends collect for me" editor: trading-focus switch,
 // one-tap suggested sets (event spawns / raid meta / PvP meta, pre-pruned of
-// owned + already-added species in buildFilters), the curated chips (owned
-// entries dim with a ✓ instead of vanishing — the string already skips them),
-// and the usual multi-locale species input.
+// owned + already-added species in buildFilters) with a per-pack species
+// preview (tap to exclude before adding), the curated chips (owned entries
+// dim with a ✓ instead of vanishing — the string already skips them; tapping
+// a dimmed chip forces it back into the string), and the usual multi-locale
+// species input.
 function FriendCollectEditor({
 	list,
 	onChange,
@@ -5391,6 +5746,12 @@ function FriendCollectEditor({
 	onGuaranteedChange,
 	targets,
 	suggestions,
+	forced = [],
+	onForcedChange,
+	genders = {},
+	onGendersChange,
+	dropForms = {},
+	onDropFormsChange,
 }) {
 	const { t } = useTranslation();
 	const [input, setInput] = useState('');
@@ -5398,6 +5759,11 @@ function FriendCollectEditor({
 	// collapsed once a list exists — the pack rows are tall and the chips are
 	// the primary surface after that.
 	const [showPacks, setShowPacks] = useState(list.length === 0);
+	// Pack preview state — session-only UI state, keyed by pack id: which
+	// packs show their species, and which species the user tapped out of the
+	// upcoming add. Not persisted: once added, curation lives in `list`.
+	const [openPreviews, setOpenPreviews] = useState({});
+	const [packDeselected, setPackDeselected] = useState({});
 
 	const previewTokens = useMemo(() => {
 		return input
@@ -5431,6 +5797,61 @@ function FriendCollectEditor({
 	}
 	function remove(name) {
 		onChange(list.filter((n) => n !== name));
+		// Side-band maps ride on the curated list — no orphaned entries.
+		if (onForcedChange && forced.includes(name)) onForcedChange(forced.filter((n) => n !== name));
+		if (onGendersChange && name in genders) onGendersChange(omitKey(genders, name));
+		if (onDropFormsChange && name in dropForms) onDropFormsChange(omitKey(dropForms, name));
+	}
+	function clearAll() {
+		onChange([]);
+		if (onForcedChange && forced.length > 0) onForcedChange([]);
+		if (onGendersChange && Object.keys(genders).length > 0) onGendersChange({});
+		if (onDropFormsChange && Object.keys(dropForms).length > 0) onDropFormsChange({});
+	}
+	// Click-only refinements — same semantics as the buddy target pickers.
+	// Gender: click ♀ or ♂ to lock, click the active one again to clear.
+	function toggleGender(name, g) {
+		if (!onGendersChange) return;
+		if (genders[name] === g) onGendersChange(omitKey(genders, name));
+		else onGendersChange({ ...genders, [name]: g });
+	}
+	// Forms: every form collected by default; click to drop one (the picker
+	// never lets the LAST kept form drop — a target that catches nothing).
+	function toggleDropForm(name, formKey) {
+		if (!onDropFormsChange) return;
+		const dropped = new Set(dropForms[name] || []);
+		if (dropped.has(formKey)) {
+			dropped.delete(formKey);
+		} else {
+			const catalog = regionalFormsFor(name) || [];
+			if (catalog.filter((f) => !dropped.has(f.key)).length <= 1) return;
+			dropped.add(formKey);
+		}
+		if (dropped.size > 0) onDropFormsChange({ ...dropForms, [name]: [...dropped] });
+		else onDropFormsChange(omitKey(dropForms, name));
+	}
+	// Owned chips toggle their coverage override: forced targets re-enter the
+	// string (keep hunting the hundo although the lucky already landed).
+	function toggleForced(name) {
+		if (!onForcedChange) return;
+		if (forced.includes(name)) onForcedChange(forced.filter((n) => n !== name));
+		else onForcedChange([...forced, name].sort());
+	}
+	function togglePreview(id) {
+		setOpenPreviews((prev) => ({ ...prev, [id]: !prev[id] }));
+	}
+	function togglePackSpecies(packId, name) {
+		setPackDeselected((prev) => {
+			const next = new Set(prev[packId] || []);
+			if (next.has(name)) next.delete(name);
+			else next.add(name);
+			return { ...prev, [packId]: [...next] };
+		});
+	}
+	// What an Add would actually add, after the preview de-selections.
+	function packSelection(s) {
+		const off = new Set(packDeselected[s.id] || []);
+		return s.species.filter((name) => !off.has(name));
 	}
 
 	const suggestionLabel = (s) => {
@@ -5480,7 +5901,7 @@ function FriendCollectEditor({
 					})}
 				</div>
 				<span className='ml-auto'>
-					<ClearListButton count={list.length} onClear={() => onChange([])} />
+					<ClearListButton count={list.length} onClear={clearAll} />
 				</span>
 			</div>
 			<p className='mono text-xs text-[#8090A0] leading-relaxed'>
@@ -5541,12 +5962,53 @@ function FriendCollectEditor({
 														</span>
 													</div>
 													<button
-														onClick={() => addSet(s.species)}
-														className='mono text-xs bg-[#27AE60] hover:bg-[#3FCF80] text-white px-2.5 py-1 rounded transition flex items-center gap-1 shrink-0'
+														onClick={() => addSet(packSelection(s))}
+														disabled={packSelection(s).length === 0}
+														className='mono text-xs bg-[#27AE60] hover:bg-[#3FCF80] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-2.5 py-1 rounded transition flex items-center gap-1 shrink-0'
 													>
 														<Plus size={12} /> {t('app.collectibles.add_button')}
+														{packSelection(s).length < s.species.length &&
+															` ${packSelection(s).length}/${s.species.length}`}
 													</button>
 												</div>
+												{/* Species preview: what would this Add actually add? Open the
+												    list and tap a chip to leave that species out. */}
+												<button
+													onClick={() => togglePreview(s.id)}
+													className='mono text-[10px] mt-1 flex items-center gap-1 text-[#5EAFC5] hover:text-[#8FD4E8] transition'
+												>
+													{openPreviews[s.id] ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
+													{t(
+														openPreviews[s.id]
+															? 'app.filter.friend_collect_preview_hide'
+															: 'app.filter.friend_collect_preview_show',
+													)}
+												</button>
+												{openPreviews[s.id] && (
+													<div className='mt-1.5 space-y-1'>
+														<p className='mono text-[10px] text-[#5C6975]'>
+															{t('app.filter.friend_collect_preview_help')}
+														</p>
+														<div className='flex flex-wrap gap-1'>
+															{s.species.map((name, i) => {
+																const off = (packDeselected[s.id] || []).includes(name);
+																return (
+																	<button
+																		key={name}
+																		onClick={() => togglePackSpecies(s.id, name)}
+																		className={`mono text-[11px] px-2 py-0.5 rounded border transition ${
+																			off
+																				? 'bg-[#5C6975]/10 text-[#5C6975] border-[#2D3A47] line-through'
+																				: 'bg-[#27AE60]/15 text-[#27AE60] border-[#27AE60]/40'
+																		}`}
+																	>
+																		{(s.display || [])[i] || name}
+																	</button>
+																);
+															})}
+														</div>
+													</div>
+												)}
 												{s.hintKey &&
 													(s.warn && mode === 'lucky' ? (
 														<p className='mono text-[10.5px] text-[#F5B82E] mt-1 leading-relaxed'>
@@ -5569,21 +6031,52 @@ function FriendCollectEditor({
 
 			{targets.length > 0 ? (
 				<div className='flex flex-wrap gap-1.5'>
-					{targets.map((tg) => (
+				{targets.map((tg) => {
+					// Three chip states: active (green), owned-and-dimmed (grey, the
+					// string skips it), owned-but-FORCED (green with a dashed border —
+					// the user tapped it back into the string, e.g. hundo hunt on an
+					// already-lucky species). Tapping the name toggles the override.
+					const overridden = tg.owned && tg.forced;
+					const dimmed = tg.owned && !tg.forced;
+					return (
 						<span
 							key={tg.species}
-							title={tg.owned ? t(`app.filter.friend_collect_owned_${mode}`) : undefined}
+							title={
+								overridden
+									? t('app.filter.friend_collect_forced_active')
+									: dimmed
+										? t(`app.filter.friend_collect_owned_${mode}`)
+										: undefined
+							}
 							className={`chip-enter mono text-xs pl-2 pr-1 py-0.5 rounded flex items-center gap-1.5 group border ${
-								tg.owned
+								dimmed
 									? 'bg-[#8090A0]/10 text-[#8B98A5] border-[#2D3A47]'
-									: 'bg-[#27AE60]/15 text-[#27AE60] border-[#27AE60]/40'
+									: overridden
+										? 'bg-[#27AE60]/15 text-[#27AE60] border-dashed border-[#27AE60]/60'
+										: 'bg-[#27AE60]/15 text-[#27AE60] border-[#27AE60]/40'
 							}`}
 						>
 							{tg.owned && <span>✓</span>}
-							<span className={tg.owned ? 'line-through decoration-[#8090A0]/60' : ''}>{tg.display}</span>
+							{tg.owned && onForcedChange ? (
+								<button
+									onClick={() => toggleForced(tg.species)}
+									title={t(
+										overridden
+											? 'app.filter.friend_collect_forced_off_tip'
+											: 'app.filter.friend_collect_forced_on_tip',
+									)}
+									className={`transition hover:text-[#3FCF80] ${
+										dimmed ? 'line-through decoration-[#8090A0]/60' : ''
+									}`}
+								>
+									{tg.display}
+								</button>
+							) : (
+								<span className={dimmed ? 'line-through decoration-[#8090A0]/60' : ''}>{tg.display}</span>
+							)}
 							{/* Per-goal coverage badges — amber = owned as lucky, purple =
-                  owned as hundo. Shown regardless of focus so partial progress
-                  in 'both' mode (and cross-goal ownership) stays visible. */}
+							    owned as hundo. Shown regardless of focus so partial progress
+							    in 'both' mode (and cross-goal ownership) stays visible. */}
 							{tg.ownedLucky && (
 								<span
 									title={t('app.filter.friend_collect_badge_lucky')}
@@ -5600,6 +6093,64 @@ function FriendCollectEditor({
 									4★
 								</span>
 							)}
+							{/* Click-only refinements — buddy-target semantics, but the QUIET
+							    have-list badge styling (gray at rest, blue when deliberately
+							    set) so a big chip cloud stays calm: untouched chips show dim
+							    gray tags, and color only appears where the user made a pick.
+							    ♀/♂ locks the wanted gender (scoped `!species,<gender>` guard;
+							    Combee/Salandit gender-locked evolutions). Form tags drop
+							    regional forms the friend should skip (one scoped De-Morgan
+							    guard per dropped form; kept forms turn blue once a restriction
+							    exists); hidden for species without catalog forms. */}
+							{onGendersChange && (
+								<span className='flex items-center gap-0.5' title={t('app.filter.friend_collect_gender_help')}>
+									{['female', 'male'].map((g) => {
+										const on = genders[tg.species] === g;
+										return (
+											<button
+												key={g}
+												onClick={() => toggleGender(tg.species, g)}
+												aria-pressed={on}
+												className={`text-[9px] px-1 py-px rounded border transition ${
+													on
+														? 'bg-[#5EAFC5]/25 border-[#5EAFC5]/50 text-[#5EAFC5]'
+														: 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
+												}`}
+											>
+												{g === 'female' ? '♀' : '♂'}
+											</button>
+										);
+									})}
+								</span>
+							)}
+							{onDropFormsChange &&
+								(regionalFormsFor(tg.species) || []).length > 0 && (
+									<span
+										className='flex items-center gap-0.5 flex-wrap'
+										title={t('app.filter.friend_collect_forms_help')}
+									>
+										{(regionalFormsFor(tg.species) || []).map((f) => {
+											const droppedHere = (dropForms[tg.species] || []).includes(f.key);
+											const restricted = (dropForms[tg.species] || []).length > 0;
+											return (
+												<button
+													key={f.key}
+													onClick={() => toggleDropForm(tg.species, f.key)}
+													aria-pressed={restricted && !droppedHere}
+													className={`text-[9px] px-1 py-px rounded border transition ${
+														droppedHere
+															? 'bg-transparent border-[#2D3A47] text-[#3E4854] line-through'
+															: restricted
+																? 'bg-[#5EAFC5]/25 border-[#5EAFC5]/50 text-[#5EAFC5]'
+																: 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
+													}`}
+												>
+													{formRegionLabel(f, t)}
+												</button>
+											);
+										})}
+									</span>
+								)}
 							<button
 								onClick={() => remove(tg.species)}
 								className='opacity-50 group-hover:opacity-100 hover:text-[#FF6B5B] transition'
@@ -5607,7 +6158,8 @@ function FriendCollectEditor({
 								<X size={10} />
 							</button>
 						</span>
-					))}
+					);
+				})}
 				</div>
 			) : (
 				<p className='mono text-xs text-[#8B98A5] italic'>{t('app.filter.friend_collect_empty')}</p>
@@ -7302,6 +7854,12 @@ function ConfigPanel({
 						onGuaranteedChange={(v) => set('friendCollectGuaranteedOnly', v)}
 						targets={friendCollectTargets}
 						suggestions={friendCollectSuggestions}
+						forced={config.friendCollectForced || []}
+						onForcedChange={(next) => set('friendCollectForced', next)}
+						genders={config.friendCollectGenders || {}}
+						onGendersChange={(next) => set('friendCollectGenders', next)}
+						dropForms={config.friendCollectDropForms || {}}
+						onDropFormsChange={(next) => set('friendCollectDropForms', next)}
 					/>
 				</div>
 			</Collapsible>

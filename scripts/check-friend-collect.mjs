@@ -6,6 +6,7 @@
 
 import {
 	buildFilters,
+	collectibleBaseDex,
 	DEFAULT_CONFIG,
 	DEFAULT_TOP_ATTACKERS,
 	mergeImportedConfig,
@@ -13,8 +14,12 @@ import {
 import EVENTS from '../src/data/events.json';
 import SPECIES_META from '../src/data/species-meta.json';
 import PVP_RANKINGS from '../src/data/pvp-rankings.json';
-import { pokemonNameFor } from '../src/data/species.js';
-import { specialTradeDexFromGameMaster, starterDexFromGenerations } from './fetch-species-meta.mjs';
+import { pokemonNameFor, resolveSpeciesInfo } from '../src/data/species.js';
+import {
+	evoParentsFromGameMaster,
+	specialTradeDexFromGameMaster,
+	starterDexFromGenerations,
+} from './fetch-species-meta.mjs';
 
 const t = (key, opts) => (opts && 'fallback' in opts ? opts.fallback : key);
 
@@ -155,22 +160,38 @@ console.log('\nScenario 5: suggestion packs — lineup, caps, hygiene');
 		'event packs only for running/upcoming events',
 		sug.filter((s) => s.kind === 'event').every((s) => !(Date.parse(s.end) < now)),
 	);
-	// GL/UL packs derive strictly from the per-league PvP snapshots.
+	// GL/UL packs derive strictly from the per-league PvP snapshots — modulo
+	// the collectible-base remap: a snapshot Greedent surfaces as Skwovet.
 	for (const [kind, league] of [
 		['pvp-great', 'great'],
 		['pvp-ultra', 'ultra'],
 	]) {
 		const pack = sug.find((s) => s.kind === kind);
-		const leagueNames = new Set(
+		const leagueBaseNames = new Set(
 			(PVP_RANKINGS.leagues?.[league]?.species || [])
-				.map((s) => pokemonNameFor(String(s.dex)))
+				.map((s) => pokemonNameFor(String(collectibleBaseDex(s.dex))))
 				.filter(Boolean),
 		);
 		check(
-			`'${kind}' pack ⊆ ${league}-league snapshot`,
-			!!pack && pack.species.every((sp) => leagueNames.has(sp)),
+			`'${kind}' pack ⊆ collectible bases of the ${league}-league snapshot`,
+			!!pack && pack.species.every((sp) => leagueBaseNames.has(sp)),
 		);
 	}
+	// Every non-egg pack suggests collectible bases ONLY (eggs keep their
+	// stages — they hatch exactly what they hatch).
+	const nonBase = [];
+	for (const s of sug) {
+		if (s.kind === 'eggs') continue;
+		for (const sp of s.species) {
+			const dex = resolveSpeciesInfo(sp)?.dex;
+			if (dex && collectibleBaseDex(dex) !== dex) nonBase.push(`${s.kind}:${sp}`);
+		}
+	}
+	check('non-egg packs contain only collectible-base species', nonBase.length === 0, nonBase.join(', '));
+	check(
+		'packs carry display names aligned with species',
+		sug.every((s) => Array.isArray(s.display) && s.display.length === s.species.length),
+	);
 	// GL carries the lucky-IV-floor warning; UL deliberately does not.
 	check(
 		'GL pack flagged with the lucky-floor warning',
@@ -193,9 +214,15 @@ console.log('\nScenario 6: evergreen packs — no event gate, prune-to-vanish');
 	for (const kind of ['tradeevo', 'candy', 'powerlines', 'starters'])
 		check(`'${kind}' offered with nothing curated`, base.friendCollectSuggestions.some((s) => s.kind === kind));
 
-	// Curating a pack's entire pool consumes it (prune still works).
+	// Curating a pack's entire pool consumes it (prune still works). The pool
+	// goes through the collectible-base remap first — Togepi's power line
+	// surfaces as Togetic, so the curated names must match the remapped set.
 	const powerNames = [
-		...new Set((SPECIES_META.powerLineDex || []).map((d) => pokemonNameFor(String(d))).filter(Boolean)),
+		...new Set(
+			(SPECIES_META.powerLineDex || [])
+				.map((d) => pokemonNameFor(String(collectibleBaseDex(d))))
+				.filter(Boolean),
+		),
 	];
 	const r = buildFilters([], [], { ...cfg, friendCollectSpecies: powerNames }, [], 'en', t);
 	check(
@@ -285,6 +312,185 @@ console.log("\nScenario 8b: 'both' focus — covered only when lucky AND hundo a
 	check("same species pruned from packs under 'lucky'", !!powerLucky && !powerLucky.species.includes('dratini'));
 }
 
+console.log('\nScenario 8c: collectible-base remap — packs suggest what a friend should actually catch');
+{
+	// The unit rule: base of the line; baby-headed lines yield the stage
+	// above the baby; a baby with several children (Tyrogue) stays put.
+	check('Greedent (820) → Skwovet (819)', collectibleBaseDex(820) === 819);
+	check('Dragonite (149) → Dratini (147)', collectibleBaseDex(149) === 147);
+	check('Raichu (26) → Pikachu (25), hopping over baby Pichu', collectibleBaseDex(26) === 25);
+	check('Pichu (172) itself → Pikachu (25)', collectibleBaseDex(172) === 25);
+	check('Azumarill (184) → Marill (183), not baby Azurill', collectibleBaseDex(184) === 183);
+	check('Tyrogue (236) stays — three children, no unambiguous hop', collectibleBaseDex(236) === 236);
+	check('Lucario (448) stays — the stage above baby Riolu IS the target', collectibleBaseDex(448) === 448);
+	check('a base stays a base', collectibleBaseDex(147) === 147 && collectibleBaseDex(1) === 1);
+
+	// The live regression (the original complaint): Greedent sits in the GL
+	// snapshot, so the pack must offer Skwovet — and a lucky Skwovet ("raffel"
+	// in the DE storage locale) must prune it instead of coexisting with a
+	// pack-added Greedent.
+	const fresh = buildFilters([], [], { ...cfg, friendCollectSpecies: [] }, [], 'en', t);
+	const gl = fresh.friendCollectSuggestions.find((s) => s.kind === 'pvp-great');
+	check('GL pack never offers schlaraffel (Greedent) — evolved stages stay out',
+		!!gl && !gl.species.includes('schlaraffel'),
+		JSON.stringify(gl?.species));
+	check('GL pack offers raffel (Skwovet) instead, unless the 25-cap cut the line entirely',
+		!!gl && (gl.species.includes('raffel') || gl.species.length === 25),
+		JSON.stringify(gl?.species));
+	check('GL pack offers marill, not azumarill / baby azurill',
+		!!gl && gl.species.includes('marill') && !gl.species.includes('azumarill') && !gl.species.includes('azurill'));
+	const pruned = buildFilters([], ['raffel'], { ...cfg, friendCollectSpecies: [] }, [], 'en', t);
+	const glPruned = pruned.friendCollectSuggestions.find((s) => s.kind === 'pvp-great');
+	check('lucky Skwovet prunes the whole line from the GL pack',
+		!glPruned || (!glPruned.species.includes('raffel') && !glPruned.species.includes('schlaraffel')));
+}
+
+console.log('\nScenario 8d: coverage overrides — forced targets stay in the string');
+{
+	const base = { ...cfg, friendCollectSpecies: ['lapras', 'dratini'], friendCollectMode: 'lucky' };
+	const plain = buildFilters([], ['lapras'], base, [], 'en', t);
+	check('without an override the owned target drops', plain.friendCollectWishlist.startsWith('dratini&'));
+	const forced = buildFilters([], ['lapras'], { ...base, friendCollectForced: ['lapras'] }, [], 'en', t);
+	check('forced target re-enters the positives',
+		forced.friendCollectWishlist.startsWith('lapras,dratini&'),
+		forced.friendCollectWishlist);
+	check('targets carry the forced flag',
+		JSON.stringify(forced.friendCollectTargets.map((x) => [x.display, x.owned, x.forced])) ===
+			JSON.stringify([
+				['lapras', true, true],
+				['dratini', false, false],
+			]),
+		JSON.stringify(forced.friendCollectTargets));
+	// A fully-owned single-target list with an override: the string must NOT
+	// collapse to empty (the whole point of the override).
+	const solo = buildFilters([], ['lapras'], { ...cfg, friendCollectSpecies: ['lapras'], friendCollectForced: ['lapras'] }, [], 'en', t);
+	check('fully-owned + forced still emits a string', solo.friendCollectWishlist.startsWith('lapras&'));
+	// Packs are pruned by the curated set, not by the override — forcing a
+	// species never resurfaces it as a suggestion.
+	check('forced species never resurfaces in packs',
+		!forced.friendCollectSuggestions.some((s) => s.species.includes('lapras')));
+}
+
+console.log('\nScenario 8e: click-only refinements — gender and drop-form guards');
+{
+	const base = { ...cfg, friendCollectSpecies: ['vulpix', 'dratini'], friendCollectMode: 'lucky' };
+	// Gender lock: scoped implication, exactly the buddy idiom.
+	const g = buildFilters([], [], { ...base, friendCollectGenders: { vulpix: 'female' } }, [], 'en', t);
+	check(
+		'gender guard emitted, scoped to the one species',
+		g.friendCollectWishlist.startsWith('vulpix,dratini&!vulpix,female&'),
+		g.friendCollectWishlist,
+	);
+	check('target carries the gender for the chip UI', g.friendCollectTargets[0]?.gender === 'female');
+	// Drop the Kanto base form → keep Alola only: one De-Morgan guard from the
+	// regional-forms catalog (base Vulpix isolates as fire).
+	const f = buildFilters([], [], { ...base, friendCollectDropForms: { vulpix: ['base'] } }, [], 'en', t);
+	check(
+		'drop-form guard emitted from catalog types',
+		f.friendCollectWishlist.startsWith('vulpix,dratini&!vulpix,!fire&'),
+		f.friendCollectWishlist,
+	);
+	// Both refinements stack on one target, then the trade guards follow.
+	const both = buildFilters(
+		[],
+		[],
+		{ ...base, friendCollectGenders: { vulpix: 'male' }, friendCollectDropForms: { vulpix: ['alola'] } },
+		[],
+		'en',
+		t,
+	);
+	check(
+		'form + gender guards stack before the trade guards',
+		both.friendCollectWishlist.startsWith('vulpix,dratini&!vulpix,!ice&!vulpix,male&!traded&'),
+		both.friendCollectWishlist,
+	);
+	// Refinements ride only on ACTIVE targets — an owned target emits nothing.
+	const owned = buildFilters(
+		[],
+		['vulpix'],
+		{ ...base, friendCollectGenders: { vulpix: 'female' } },
+		[],
+		'en',
+		t,
+	);
+	check('owned target emits no orphaned guards', !owned.friendCollectWishlist.includes('!vulpix'));
+	// DE output localizes the guard keywords.
+	const de = buildFilters([], [], { ...base, friendCollectDropForms: { vulpix: ['base'] } }, [], 'de', t);
+	check(
+		'DE output localizes the type keyword (fire → feuer)',
+		de.friendCollectWishlist.includes('!vulpix,!feuer'),
+		de.friendCollectWishlist,
+	);
+}
+
+console.log('\nScenario 8f: form-aware coverage — annotations opt in to finer pruning');
+{
+	const base = {
+		...cfg,
+		friendCollectSpecies: ['vulpix'],
+		friendCollectMode: 'lucky',
+		friendCollectDropForms: { vulpix: ['base'] }, // target wants Alola only
+	};
+	// Unannotated lucky Vulpix = species-level = covers everything (status quo).
+	const plain = buildFilters([], ['vulpix'], base, [], 'en', t);
+	check('unannotated ownership still covers a restricted target', plain.friendCollectTargets[0].owned === true);
+	// Annotated to the Kanto base form: the wanted Alolan is NOT owned.
+	const kanto = buildFilters([], ['vulpix'], { ...base, luckyForms: { vulpix: ['base'] } }, [], 'en', t);
+	check(
+		'base-form lucky does not cover an Alola-restricted target',
+		kanto.friendCollectTargets[0].owned === false && kanto.friendCollectWishlist.startsWith('vulpix'),
+		JSON.stringify(kanto.friendCollectTargets),
+	);
+	// Annotated to the wanted form: covered again.
+	const alola = buildFilters([], ['vulpix'], { ...base, luckyForms: { vulpix: ['alola'] } }, [], 'en', t);
+	check('matching-form lucky covers the restricted target', alola.friendCollectTargets[0].owned === true);
+	// Unrestricted targets keep species-level semantics even when annotated.
+	const unrestricted = buildFilters(
+		[],
+		['vulpix'],
+		{ ...cfg, friendCollectSpecies: ['vulpix'], luckyForms: { vulpix: ['base'] } },
+		[],
+		'en',
+		t,
+	);
+	check('annotation alone never un-covers an unrestricted target', unrestricted.friendCollectTargets[0].owned === true);
+}
+
+console.log('\nScenario 8g: form-scoped wishlist exclusions — owned form out, other forms stay visible');
+{
+	// Lucky Kanto Vulpix only → the fallback wishlist must NOT hide the
+	// friend's Alolan line: `!+vulpix` becomes `!+vulpix,!fire`.
+	const ann = buildFilters([], ['vulpix', 'lapras'], { ...cfg, luckyForms: { vulpix: ['base'] } }, [], 'en', t);
+	check(
+		'lucky exclusion scoped to the owned form',
+		ann.friendLuckyWishlist.includes('!+vulpix,!fire') && !ann.friendLuckyWishlist.includes('!+vulpix&'),
+		ann.friendLuckyWishlist,
+	);
+	check('unannotated entries keep the plain family exclusion', ann.friendLuckyWishlist.includes('!+lapras'));
+	// Owning EVERY catalog form falls back to the plain exclusion.
+	const all = buildFilters([], ['vulpix'], { ...cfg, luckyForms: { vulpix: ['base', 'alola'] } }, [], 'en', t);
+	check('all-forms annotation = plain exclusion', all.friendLuckyWishlist.startsWith('!+vulpix&'), all.friendLuckyWishlist);
+	// Exclude-based form predicates (Kanto Raichu isolates as NOT-psychic)
+	// De-Morgan into a positive term.
+	const raichu = buildFilters(['raichu'], [], { ...cfg, hundoForms: { raichu: ['base'] } }, [], 'en', t);
+	check(
+		'exclude-based catalog predicate handled (hundo Kanto Raichu → !+raichu,psychic)',
+		raichu.friendHundoWishlist.startsWith('!+raichu,psychic&'),
+		raichu.friendHundoWishlist,
+	);
+	// The guaranteed-lucky variant inherits the scoped clauses.
+	check(
+		'guaranteed variant inherits the scoped exclusion',
+		ann.friendLuckyWishlistGuaranteed.includes('!+vulpix,!fire'),
+	);
+	// Defaults (no annotations) are byte-identical to the pre-feature output.
+	const a = buildFilters(hundos, luckies, cfg, [], 'en', t);
+	check(
+		'no annotations → wishlists unchanged',
+		a.friendLuckyWishlist.includes('!+dragoran') || a.friendLuckyWishlist.includes('!+dragonite'),
+	);
+}
+
 console.log('\nScenario 9: config merge');
 {
 	const m = mergeImportedConfig({ friendCollectSpecies: ['Dragonite', '131'], friendCollectMode: 'weird' });
@@ -314,6 +520,60 @@ console.log('\nScenario 9: config merge');
 		'guaranteed-only: junk coerces to false',
 		mergeImportedConfig({ friendCollectGuaranteedOnly: 'yes' }).friendCollectGuaranteedOnly === false,
 	);
+	const mf = mergeImportedConfig({
+		friendCollectSpecies: ['Dragonite', '131'],
+		friendCollectForced: ['Dragonite', 'Pikachu'],
+	});
+	check(
+		'forced overrides canonicalized and filtered to the curated list',
+		JSON.stringify(mf.friendCollectForced) === JSON.stringify(['dragoran']),
+		JSON.stringify(mf.friendCollectForced),
+	);
+	const legacyForced = mergeImportedConfig({}).friendCollectForced;
+	check('legacy configs back-fill an empty forced list', Array.isArray(legacyForced) && legacyForced.length === 0);
+	check(
+		'junk forced value coerces to empty',
+		mergeImportedConfig({ friendCollectForced: 'yes' }).friendCollectForced.length === 0,
+	);
+	// Species-keyed side-band maps: canonicalized keys, validated values,
+	// curated-subset enforcement where the list lives in config.
+	const maps = mergeImportedConfig({
+		friendCollectSpecies: ['Vulpix', 'Dratini'],
+		friendCollectGenders: { Vulpix: 'female', Dratini: 'weird', Pikachu: 'male' },
+		friendCollectDropForms: { Vulpix: ['base', 'bogus'], Dratini: ['base'], Meowth: ['alola'] },
+		hundoForms: { Meowth: ['galar', 'junk'], Lapras: ['base'] },
+		luckyForms: 'junk',
+	});
+	check(
+		'genders: canonical keys, valid values, curated subset only',
+		JSON.stringify(maps.friendCollectGenders) === JSON.stringify({ vulpix: 'female' }),
+		JSON.stringify(maps.friendCollectGenders),
+	);
+	check(
+		'dropForms: catalog-validated, non-catalog species dropped',
+		JSON.stringify(maps.friendCollectDropForms) === JSON.stringify({ vulpix: ['base'] }),
+		JSON.stringify(maps.friendCollectDropForms),
+	);
+	check(
+		'have-list form maps: keys canonicalized (Meowth → mauzi), junk form keys dropped',
+		JSON.stringify(maps.hundoForms) === JSON.stringify({ mauzi: ['galar'] }),
+		JSON.stringify(maps.hundoForms),
+	);
+	check('scalar junk map coerces to empty', JSON.stringify(maps.luckyForms) === '{}');
+	check(
+		'dropping every catalog form is rejected as junk',
+		JSON.stringify(
+			mergeImportedConfig({ friendCollectSpecies: ['Vulpix'], friendCollectDropForms: { Vulpix: ['base', 'alola'] } })
+				.friendCollectDropForms,
+		) === '{}',
+	);
+	const legacyMaps = mergeImportedConfig({});
+	check(
+		'legacy configs back-fill all four maps empty',
+		[legacyMaps.friendCollectGenders, legacyMaps.friendCollectDropForms, legacyMaps.hundoForms, legacyMaps.luckyForms].every(
+			(m) => m && typeof m === 'object' && Object.keys(m).length === 0,
+		),
+	);
 }
 
 console.log('\nScenario 10: species-meta snapshot shape (bad syncs must not silently empty the packs)');
@@ -333,6 +593,54 @@ console.log('\nScenario 10: species-meta snapshot shape (bad syncs must not sile
 		'specialTradeDex ∩ powerLineDex = ∅',
 		(SPECIES_META.powerLineDex || []).every((dex) => !special.has(dex)),
 	);
+	// evoParentByDex: the collectible-base remap dies silently (every species
+	// counts as its own base) if a bad sync empties this — so gate the shape.
+	const parents = SPECIES_META.evoParentByDex || {};
+	check('evoParentByDex present and populated (>400 steps)', Object.keys(parents).length > 400);
+	check('Ivysaur → Bulbasaur (2 → 1)', parents['2'] === 1);
+	check('Greedent → Skwovet (820 → 819)', parents['820'] === 819);
+	check('Pikachu → Pichu (25 → 172): babies are real parents in the raw map', parents['25'] === 172);
+	check('bases have no parent entry', parents['1'] === undefined && parents['147'] === undefined);
+	let cyclic = false;
+	for (const start of Object.keys(parents)) {
+		let cur = parseInt(start, 10);
+		for (let hops = 0; parents[String(cur)] !== undefined; hops++) {
+			if (hops >= 10) { cyclic = true; break; }
+			cur = parents[String(cur)];
+		}
+		if (cyclic) break;
+	}
+	check('parent walks always terminate (no cycles)', !cyclic);
+}
+
+console.log('\nScenario 11b: game-master evolutionBranch parser (offline sample)');
+{
+	// Shape mirrors latest.json. Must map branch targets via pokemonId → dex,
+	// skip mega temp-evos, dedupe per-form repeats, and catch cross-dex
+	// regional-form evolutions (Galarian Meowth → Perrserker).
+	const sample = [
+		{ templateId: 'V0001_POKEMON_BULBASAUR', data: { templateId: 'V0001_POKEMON_BULBASAUR', pokemonSettings: { pokemonId: 'BULBASAUR', evolutionBranch: [{ evolution: 'IVYSAUR', candyCost: 25 }] } } },
+		{ templateId: 'V0001_POKEMON_BULBASAUR_NORMAL', data: { templateId: 'V0001_POKEMON_BULBASAUR_NORMAL', pokemonSettings: { pokemonId: 'BULBASAUR', evolutionBranch: [{ evolution: 'IVYSAUR', candyCost: 25, form: 'IVYSAUR_NORMAL' }] } } },
+		{ templateId: 'V0002_POKEMON_IVYSAUR', data: { templateId: 'V0002_POKEMON_IVYSAUR', pokemonSettings: { pokemonId: 'IVYSAUR', evolutionBranch: [{ evolution: 'VENUSAUR', candyCost: 100 }] } } },
+		{ templateId: 'V0003_POKEMON_VENUSAUR', data: { templateId: 'V0003_POKEMON_VENUSAUR', pokemonSettings: { pokemonId: 'VENUSAUR', evolutionBranch: [{ temporaryEvolution: 'TEMP_EVOLUTION_MEGA' }] } } },
+		{ templateId: 'V0052_POKEMON_MEOWTH_GALARIAN', data: { templateId: 'V0052_POKEMON_MEOWTH_GALARIAN', pokemonSettings: { pokemonId: 'MEOWTH', evolutionBranch: [{ evolution: 'PERRSERKER', candyCost: 50 }] } } },
+		{ templateId: 'V0863_POKEMON_PERRSERKER', data: { templateId: 'V0863_POKEMON_PERRSERKER', pokemonSettings: { pokemonId: 'PERRSERKER' } } },
+		{ templateId: 'COMBAT_V0001_MOVE_WRAP', data: { templateId: 'COMBAT_V0001_MOVE_WRAP' } },
+		null,
+	];
+	const p = evoParentsFromGameMaster(sample);
+	check('Ivysaur → Bulbasaur', p.get(2) === 1);
+	check('Venusaur → Ivysaur', p.get(3) === 2);
+	check('Perrserker → Meowth (cross-dex regional-form evo)', p.get(863) === 52);
+	check('mega temp-evo branch ignored, per-form repeats deduped', p.size === 3, JSON.stringify([...p]));
+	check('empty/absent game master yields empty map', evoParentsFromGameMaster(null).size === 0);
+	for (const wrapper of ['template', 'templates', 'itemTemplate']) {
+		const wrapped = evoParentsFromGameMaster({ [wrapper]: sample });
+		check(
+			`wrapped game master shape '{ ${wrapper}: [...] }' parses identically`,
+			wrapped.size === 3 && wrapped.get(2) === 1 && wrapped.get(863) === 52,
+		);
+	}
 }
 
 console.log('\nScenario 11: game-master pokemonClass parser (offline sample)');

@@ -41,6 +41,16 @@
 //    lines are excluded here — they get their own packs. Emits the BASE
 //    dex of each qualifying chain (the species a friend actually catches).
 //
+//  - evoParentByDex: child dex → parent dex for every evolution step, so
+//    App.jsx can walk any species down to the base of its line (the
+//    friend-collect packs only suggest collectible bases — a lucky
+//    Skwovet must prune a meta-pack Greedent, not coexist with it).
+//    Two-source union: game-master `evolutionBranch` (authoritative,
+//    form-aware — Galarian Meowth → Perrserker lands as 863→52) wins,
+//    pogoapi's pokemon_evolutions fills anything the GM misses. Cross-dex
+//    pairs only — same-species form changes never appear because both
+//    sources key steps by species.
+//
 // Flags: --offline-ok   tolerate fetch failures if cache exists.
 
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
@@ -187,6 +197,50 @@ export function specialTradeDexFromGameMaster(templates) {
     if (m) ids.add(parseInt(m[1], 10));
   }
   return ids;
+}
+
+// Extract child-dex → parent-dex evolution pairs from the game master.
+// Every per-form template repeats its species' branches (BULBASAUR and
+// BULBASAUR_NORMAL both list IVYSAUR), so pairs dedupe naturally; branch
+// targets are pokemonId enum names, resolved to dex via the template ids
+// ("V0002_POKEMON_IVYSAUR"). Where two parents ever claim one child, the
+// lowest parent dex wins — deterministic output beats feed ordering.
+// Exported for the offline parse test in scripts/check-friend-collect.mjs.
+export function evoParentsFromGameMaster(templates) {
+  const list = Array.isArray(templates)
+    ? templates
+    : templates?.template || templates?.templates || templates?.itemTemplate || [];
+  // Pass 1: pokemonId enum name → dex, from every pokemonSettings template.
+  const dexByPokemonId = new Map();
+  for (const entry of list) {
+    const node = entry?.data || entry;
+    const ps = node?.pokemonSettings;
+    if (!ps?.pokemonId) continue;
+    const m = /^V(\d+)_POKEMON_/.exec(node?.templateId || entry?.templateId || "");
+    if (!m) continue;
+    const dex = parseInt(m[1], 10);
+    if (!dexByPokemonId.has(ps.pokemonId)) dexByPokemonId.set(ps.pokemonId, dex);
+  }
+  // Pass 2: evolutionBranch entries → child→parent pairs.
+  const parents = new Map();
+  for (const entry of list) {
+    const node = entry?.data || entry;
+    const ps = node?.pokemonSettings;
+    if (!Array.isArray(ps?.evolutionBranch)) continue;
+    const m = /^V(\d+)_POKEMON_/.exec(node?.templateId || entry?.templateId || "");
+    if (!m) continue;
+    const parentDex = parseInt(m[1], 10);
+    for (const branch of ps.evolutionBranch) {
+      // Mega/primal temp-evos carry `temporaryEvolution` instead of a target
+      // species — those aren't evolution steps in the line-walking sense.
+      if (!branch?.evolution) continue;
+      const childDex = dexByPokemonId.get(branch.evolution);
+      if (!childDex || childDex === parentDex) continue;
+      const prev = parents.get(childDex);
+      if (prev === undefined || parentDex < prev) parents.set(childDex, parentDex);
+    }
+  }
+  return parents;
 }
 
 // Tunables. The plan defaults — change here, not at consumer side.
@@ -399,6 +453,24 @@ async function main() {
   qualifying.sort((a, b) => b.bestFinal - a.bestFinal);
   const powerLines = new Set(qualifying.slice(0, POWER_LINE_TOP).map((q) => q.baseId));
 
+  // ── evoParentByDex ──
+  // GM pairs are authoritative; pogoapi fills gaps (never overrides). The
+  // pogoapi walk reuses idByName built from the evolutions feed above.
+  const evoParents = evoParentsFromGameMaster(gameMaster);
+  for (const entry of evolutions || []) {
+    const parentDex = parseInt(entry.pokemon_id, 10);
+    if (Number.isNaN(parentDex)) continue;
+    for (const ev of entry.evolutions || []) {
+      const childDex = ev.pokemon_id != null ? parseInt(ev.pokemon_id, 10) : idByName.get(ev.pokemon_name);
+      if (!childDex || Number.isNaN(childDex) || childDex === parentDex) continue;
+      if (!evoParents.has(childDex)) evoParents.set(childDex, parentDex);
+    }
+  }
+  const evoParentByDex = {};
+  for (const child of [...evoParents.keys()].sort((a, b) => a - b)) {
+    evoParentByDex[String(child)] = evoParents.get(child);
+  }
+
   const newContent = {
     startersPerGeneration: STARTERS_PER_GENERATION,
     powerLineCumulativeCandy: POWER_LINE_CUMULATIVE_CANDY,
@@ -406,6 +478,7 @@ async function main() {
     specialTradeDex: [...specialTrade].sort((a, b) => a - b),
     starterDex: [...starters].sort((a, b) => a - b),
     powerLineDex: [...powerLines].sort((a, b) => a - b),
+    evoParentByDex,
   };
 
   // Sanity gates — exit 1 turns the sync workflow red, which is the only
@@ -440,6 +513,19 @@ async function main() {
     newContent.starterDex.every((dex) => !specialTrade.has(dex)),
     "specialTradeDex ∩ starterDex = ∅",
   );
+  assertOrDie(evoParentByDex["2"] === 1, "Ivysaur (2) → Bulbasaur (1) ∈ evoParentByDex");
+  assertOrDie(evoParentByDex["25"] === 172, "Pikachu (25) → Pichu (172): baby stages are real parents");
+  assertOrDie(evoParentByDex["820"] === 819, "Greedent (820) → Skwovet (819) ∈ evoParentByDex");
+  assertOrDie(evoParentByDex["1"] === undefined, "Bulbasaur (1) is a base — no parent entry");
+  assertOrDie(Object.keys(evoParentByDex).length > 400, "evoParentByDex covers the dex (>400 steps)");
+  // No cycles: every species must reach a base within the longest real line.
+  for (const start of Object.keys(evoParentByDex)) {
+    let cur = parseInt(start, 10);
+    for (let hops = 0; evoParentByDex[String(cur)] !== undefined; hops++) {
+      assertOrDie(hops < 10, `evoParentByDex cycle detected walking up from dex ${start}`);
+      cur = evoParentByDex[String(cur)];
+    }
+  }
 
   // Preserve fetchedAt when content is unchanged so a no-op sync doesn't
   // create a noisy commit. Same trick as fetch-meta-rankings.mjs.
