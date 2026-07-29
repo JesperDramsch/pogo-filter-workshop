@@ -21,12 +21,14 @@
         "SOLGALEO": "steel,fire,water,electric,psychic,dark&@1dark,@1fire,@1ghost,@1ground&@2dark,@2fire,@2ghost,@2ground,@3dark,@3fire,@3ghost,@3ground&!<psychic&!<steel"
       },
       "lvl3": {
-        "RATICATE": "rock,ghost,steel&@1fighting&@2fighting,@3fighting&!<normal",
-        "NIDORINO": "poison,ground,rock,ghost,steel&@1ground,@1psychic&@2ground,@2psychic,@3ground,@3psychic&!<poison",
-        "GENGAR": "normal,poison,ground,rock,steel,dark&@1dark,@1ghost,@1ground,@1psychic&@2dark,@2ghost,@2ground,@2psychic,@3dark,@3ghost,@3ground,@3psychic&!<ghost&!<poison",
-        "WOBBUFFET": "steel,psychic,dark&@1bug,@1dark,@1ghost&@2bug,@2dark,@2ghost,@3bug,@3dark,@3ghost&!<psychic"
+        "LAPRAS": "steel,water,ice&@1electric,@1fighting,@1grass,@1rock&@2electric,@2fighting,@2grass,@2rock,@3electric,@3fighting,@3grass,@3rock&!<water&!<ice",
+        "VAPOREON": "water,grass,dragon&@1electric,@1grass&@2electric,@2grass,@3electric,@3grass&!<water",
+        "DRAGONITE": "rock,steel,electric,fairy&@1ice,@1dragon,@1fairy,@1rock&@2ice,@2dragon,@2fairy,@2rock,@3ice,@3dragon,@3fairy,@3rock&!<dragon&!<flying"
       },
       "lvl1": {
+        "BULBASAUR": "flying,poison,bug,ghost,steel,fire,dragon&@1fire,@1flying,@1ice,@1psychic&@2fire,@2flying,@2ice,@2psychic,@3fire,@3flying,@3ice,@3psychic&!<grass&!<poison",
+        "CHARMANDER": "rock,fire,water,dragon&@1ground,@1rock,@1water&@2ground,@2rock,@2water,@3ground,@3rock,@3water&!<fire",
+        "SQUIRTLE": "water,grass,dragon&@1electric,@1grass&@2electric,@2grass,@3electric,@3grass&!<water",
         "PIKACHU": "ground,grass,electric,dragon&@1ground&@2ground,@3ground&!<electric"
       },
       "shadow_lvl5": {
@@ -124,12 +126,14 @@
         "SOLGALEO": "stahl,feuer,wasser,elektro,psycho,unlicht&@1unlicht,@1feuer,@1geist,@1boden&@2unlicht,@2feuer,@2geist,@2boden,@3unlicht,@3feuer,@3geist,@3boden&!<psycho&!<stahl"
       },
       "lvl3": {
-        "RATICATE": "gestein,geist,stahl&@1kampf&@2kampf,@3kampf&!<normal",
-        "NIDORINO": "gift,boden,gestein,geist,stahl&@1boden,@1psycho&@2boden,@2psycho,@3boden,@3psycho&!<gift",
-        "GENGAR": "normal,gift,boden,gestein,stahl,unlicht&@1unlicht,@1geist,@1boden,@1psycho&@2unlicht,@2geist,@2boden,@2psycho,@3unlicht,@3geist,@3boden,@3psycho&!<geist&!<gift",
-        "WOBBUFFET": "stahl,psycho,unlicht&@1käfer,@1unlicht,@1geist&@2käfer,@2unlicht,@2geist,@3käfer,@3unlicht,@3geist&!<psycho"
+        "LAPRAS": "stahl,wasser,eis&@1elektro,@1kampf,@1pflanze,@1gestein&@2elektro,@2kampf,@2pflanze,@2gestein,@3elektro,@3kampf,@3pflanze,@3gestein&!<wasser&!<eis",
+        "VAPOREON": "wasser,pflanze,drache&@1elektro,@1pflanze&@2elektro,@2pflanze,@3elektro,@3pflanze&!<wasser",
+        "DRAGONITE": "gestein,stahl,elektro,fee&@1eis,@1drache,@1fee,@1gestein&@2eis,@2drache,@2fee,@2gestein,@3eis,@3drache,@3fee,@3gestein&!<drache&!<flug"
       },
       "lvl1": {
+        "BULBASAUR": "flug,gift,käfer,geist,stahl,feuer,drache&@1feuer,@1flug,@1eis,@1psycho&@2feuer,@2flug,@2eis,@2psycho,@3feuer,@3flug,@3eis,@3psycho&!<pflanze&!<gift",
+        "CHARMANDER": "gestein,feuer,wasser,drache&@1boden,@1gestein,@1wasser&@2boden,@2gestein,@2wasser,@3boden,@3gestein,@3wasser&!<feuer",
+        "SQUIRTLE": "wasser,pflanze,drache&@1elektro,@1pflanze&@2elektro,@2pflanze,@3elektro,@3pflanze&!<wasser",
         "PIKACHU": "boden,pflanze,elektro,drache&@1boden&@2boden,@3boden&!<elektro"
       },
       "shadow_lvl5": {
@@ -227,12 +231,14 @@
         "SOLGALEO": "acero,fuego,agua,eléctrico,psíquico,siniestro&@1siniestro,@1fuego,@1fantasma,@1tierra&@2siniestro,@2fuego,@2fantasma,@2tierra,@3siniestro,@3fuego,@3fantasma,@3tierra&!<psíquico&!<acero"
       },
       "lvl3": {
-        "RATICATE": "roca,fantasma,acero&@1lucha&@2lucha,@3lucha&!<normal",
-        "NIDORINO": "veneno,tierra,roca,fantasma,acero&@1tierra,@1psíquico&@2tierra,@2psíquico,@3tierra,@3psíquico&!<veneno",
-        "GENGAR": "normal,veneno,tierra,roca,acero,siniestro&@1siniestro,@1fantasma,@1tierra,@1psíquico&@2siniestro,@2fantasma,@2tierra,@2psíquico,@3siniestro,@3fantasma,@3tierra,@3psíquico&!<fantasma&!<veneno",
-        "WOBBUFFET": "acero,psíquico,siniestro&@1bicho,@1siniestro,@1fantasma&@2bicho,@2siniestro,@2fantasma,@3bicho,@3siniestro,@3fantasma&!<psíquico"
+        "LAPRAS": "acero,agua,hielo&@1eléctrico,@1lucha,@1planta,@1roca&@2eléctrico,@2lucha,@2planta,@2roca,@3eléctrico,@3lucha,@3planta,@3roca&!<agua&!<hielo",
+        "VAPOREON": "agua,planta,dragón&@1eléctrico,@1planta&@2eléctrico,@2planta,@3eléctrico,@3planta&!<agua",
+        "DRAGONITE": "roca,acero,eléctrico,hada&@1hielo,@1dragón,@1hada,@1roca&@2hielo,@2dragón,@2hada,@2roca,@3hielo,@3dragón,@3hada,@3roca&!<dragón&!<volador"
       },
       "lvl1": {
+        "BULBASAUR": "volador,veneno,bicho,fantasma,acero,fuego,dragón&@1fuego,@1volador,@1hielo,@1psíquico&@2fuego,@2volador,@2hielo,@2psíquico,@3fuego,@3volador,@3hielo,@3psíquico&!<planta&!<veneno",
+        "CHARMANDER": "roca,fuego,agua,dragón&@1tierra,@1roca,@1agua&@2tierra,@2roca,@2agua,@3tierra,@3roca,@3agua&!<fuego",
+        "SQUIRTLE": "agua,planta,dragón&@1eléctrico,@1planta&@2eléctrico,@2planta,@3eléctrico,@3planta&!<agua",
         "PIKACHU": "tierra,planta,eléctrico,dragón&@1tierra&@2tierra,@3tierra&!<eléctrico"
       },
       "shadow_lvl5": {
@@ -330,12 +336,14 @@
         "SOLGALEO": "acier,feu,eau,électrik,psy,ténèbres&@1ténèbres,@1feu,@1spectre,@1sol&@2ténèbres,@2feu,@2spectre,@2sol,@3ténèbres,@3feu,@3spectre,@3sol&!<psy&!<acier"
       },
       "lvl3": {
-        "RATICATE": "roche,spectre,acier&@1combat&@2combat,@3combat&!<normal",
-        "NIDORINO": "poison,sol,roche,spectre,acier&@1sol,@1psy&@2sol,@2psy,@3sol,@3psy&!<poison",
-        "GENGAR": "normal,poison,sol,roche,acier,ténèbres&@1ténèbres,@1spectre,@1sol,@1psy&@2ténèbres,@2spectre,@2sol,@2psy,@3ténèbres,@3spectre,@3sol,@3psy&!<spectre&!<poison",
-        "WOBBUFFET": "acier,psy,ténèbres&@1insecte,@1ténèbres,@1spectre&@2insecte,@2ténèbres,@2spectre,@3insecte,@3ténèbres,@3spectre&!<psy"
+        "LAPRAS": "acier,eau,glace&@1électrik,@1combat,@1plante,@1roche&@2électrik,@2combat,@2plante,@2roche,@3électrik,@3combat,@3plante,@3roche&!<eau&!<glace",
+        "VAPOREON": "eau,plante,dragon&@1électrik,@1plante&@2électrik,@2plante,@3électrik,@3plante&!<eau",
+        "DRAGONITE": "roche,acier,électrik,fée&@1glace,@1dragon,@1fée,@1roche&@2glace,@2dragon,@2fée,@2roche,@3glace,@3dragon,@3fée,@3roche&!<dragon&!<vol"
       },
       "lvl1": {
+        "BULBASAUR": "vol,poison,insecte,spectre,acier,feu,dragon&@1feu,@1vol,@1glace,@1psy&@2feu,@2vol,@2glace,@2psy,@3feu,@3vol,@3glace,@3psy&!<plante&!<poison",
+        "CHARMANDER": "roche,feu,eau,dragon&@1sol,@1roche,@1eau&@2sol,@2roche,@2eau,@3sol,@3roche,@3eau&!<feu",
+        "SQUIRTLE": "eau,plante,dragon&@1électrik,@1plante&@2électrik,@2plante,@3électrik,@3plante&!<eau",
         "PIKACHU": "sol,plante,électrik,dragon&@1sol&@2sol,@3sol&!<électrik"
       },
       "shadow_lvl5": {
@@ -433,12 +441,14 @@
         "SOLGALEO": "鋼,火,水,電,超能力,惡&@1惡,@1火,@1幽靈,@1地面&@2惡,@2火,@2幽靈,@2地面,@3惡,@3火,@3幽靈,@3地面&!<超能力&!<鋼"
       },
       "lvl3": {
-        "RATICATE": "岩石,幽靈,鋼&@1格鬥&@2格鬥,@3格鬥&!<一般",
-        "NIDORINO": "毒,地面,岩石,幽靈,鋼&@1地面,@1超能力&@2地面,@2超能力,@3地面,@3超能力&!<毒",
-        "GENGAR": "一般,毒,地面,岩石,鋼,惡&@1惡,@1幽靈,@1地面,@1超能力&@2惡,@2幽靈,@2地面,@2超能力,@3惡,@3幽靈,@3地面,@3超能力&!<幽靈&!<毒",
-        "WOBBUFFET": "鋼,超能力,惡&@1蟲,@1惡,@1幽靈&@2蟲,@2惡,@2幽靈,@3蟲,@3惡,@3幽靈&!<超能力"
+        "LAPRAS": "鋼,水,冰&@1電,@1格鬥,@1草,@1岩石&@2電,@2格鬥,@2草,@2岩石,@3電,@3格鬥,@3草,@3岩石&!<水&!<冰",
+        "VAPOREON": "水,草,龍&@1電,@1草&@2電,@2草,@3電,@3草&!<水",
+        "DRAGONITE": "岩石,鋼,電,妖精&@1冰,@1龍,@1妖精,@1岩石&@2冰,@2龍,@2妖精,@2岩石,@3冰,@3龍,@3妖精,@3岩石&!<龍&!<飛行"
       },
       "lvl1": {
+        "BULBASAUR": "飛行,毒,蟲,幽靈,鋼,火,龍&@1火,@1飛行,@1冰,@1超能力&@2火,@2飛行,@2冰,@2超能力,@3火,@3飛行,@3冰,@3超能力&!<草&!<毒",
+        "CHARMANDER": "岩石,火,水,龍&@1地面,@1岩石,@1水&@2地面,@2岩石,@2水,@3地面,@3岩石,@3水&!<火",
+        "SQUIRTLE": "水,草,龍&@1電,@1草&@2電,@2草,@3電,@3草&!<水",
         "PIKACHU": "地面,草,電,龍&@1地面&@2地面,@3地面&!<電"
       },
       "shadow_lvl5": {
@@ -536,12 +546,14 @@
         "SOLGALEO": "टल,फ़ायर,वॉटर,इलटक,साइकक,डाक&@1डाक,@1फ़ायर,@1घोट,@1ाउंड&@2डाक,@2फ़ायर,@2घोट,@2ाउंड,@3डाक,@3फ़ायर,@3घोट,@3ाउंड&!<साइकक&!<टल"
       },
       "lvl3": {
-        "RATICATE": "रॉक,घोट,टल&@1फ़ाइटंग&@2फ़ाइटंग,@3फ़ाइटंग&!<नॉमल",
-        "NIDORINO": "पॉइज़न,ाउंड,रॉक,घोट,टल&@1ाउंड,@1साइकक&@2ाउंड,@2साइकक,@3ाउंड,@3साइकक&!<पॉइज़न",
-        "GENGAR": "नॉमल,पॉइज़न,ाउंड,रॉक,टल,डाक&@1डाक,@1घोट,@1ाउंड,@1साइकक&@2डाक,@2घोट,@2ाउंड,@2साइकक,@3डाक,@3घोट,@3ाउंड,@3साइकक&!<घोट&!<पॉइज़न",
-        "WOBBUFFET": "टल,साइकक,डाक&@1बग,@1डाक,@1घोट&@2बग,@2डाक,@2घोट,@3बग,@3डाक,@3घोट&!<साइकक"
+        "LAPRAS": "टल,वॉटर,आइस&@1इलटक,@1फ़ाइटंग,@1ास,@1रॉक&@2इलटक,@2फ़ाइटंग,@2ास,@2रॉक,@3इलटक,@3फ़ाइटंग,@3ास,@3रॉक&!<वॉटर&!<आइस",
+        "VAPOREON": "वॉटर,ास,डैगन&@1इलटक,@1ास&@2इलटक,@2ास,@3इलटक,@3ास&!<वॉटर",
+        "DRAGONITE": "रॉक,टल,इलटक,फ़ेर&@1आइस,@1डैगन,@1फ़ेर,@1रॉक&@2आइस,@2डैगन,@2फ़ेर,@2रॉक,@3आइस,@3डैगन,@3फ़ेर,@3रॉक&!<डैगन&!<़लाइंग"
       },
       "lvl1": {
+        "BULBASAUR": "़लाइंग,पॉइज़न,बग,घोट,टल,फ़ायर,डैगन&@1फ़ायर,@1़लाइंग,@1आइस,@1साइकक&@2फ़ायर,@2़लाइंग,@2आइस,@2साइकक,@3फ़ायर,@3़लाइंग,@3आइस,@3साइकक&!<ास&!<पॉइज़न",
+        "CHARMANDER": "रॉक,फ़ायर,वॉटर,डैगन&@1ाउंड,@1रॉक,@1वॉटर&@2ाउंड,@2रॉक,@2वॉटर,@3ाउंड,@3रॉक,@3वॉटर&!<फ़ायर",
+        "SQUIRTLE": "वॉटर,ास,डैगन&@1इलटक,@1ास&@2इलटक,@2ास,@3इलटक,@3ास&!<वॉटर",
         "PIKACHU": "ाउंड,ास,इलटक,डैगन&@1ाउंड&@2ाउंड,@3ाउंड&!<इलटक"
       },
       "shadow_lvl5": {
@@ -639,12 +651,14 @@
         "SOLGALEO": "はがね,ほのお,みず,でんき,エスパー,あく&@1あく,@1ほのお,@1ゴースト,@1じめん&@2あく,@2ほのお,@2ゴースト,@2じめん,@3あく,@3ほのお,@3ゴースト,@3じめん&!<エスパー&!<はがね"
       },
       "lvl3": {
-        "RATICATE": "いわ,ゴースト,はがね&@1かくとう&@2かくとう,@3かくとう&!<ノーマル",
-        "NIDORINO": "どく,じめん,いわ,ゴースト,はがね&@1じめん,@1エスパー&@2じめん,@2エスパー,@3じめん,@3エスパー&!<どく",
-        "GENGAR": "ノーマル,どく,じめん,いわ,はがね,あく&@1あく,@1ゴースト,@1じめん,@1エスパー&@2あく,@2ゴースト,@2じめん,@2エスパー,@3あく,@3ゴースト,@3じめん,@3エスパー&!<ゴースト&!<どく",
-        "WOBBUFFET": "はがね,エスパー,あく&@1むし,@1あく,@1ゴースト&@2むし,@2あく,@2ゴースト,@3むし,@3あく,@3ゴースト&!<エスパー"
+        "LAPRAS": "はがね,みず,こおり&@1でんき,@1かくとう,@1くさ,@1いわ&@2でんき,@2かくとう,@2くさ,@2いわ,@3でんき,@3かくとう,@3くさ,@3いわ&!<みず&!<こおり",
+        "VAPOREON": "みず,くさ,ドラゴン&@1でんき,@1くさ&@2でんき,@2くさ,@3でんき,@3くさ&!<みず",
+        "DRAGONITE": "いわ,はがね,でんき,フェアリー&@1こおり,@1ドラゴン,@1フェアリー,@1いわ&@2こおり,@2ドラゴン,@2フェアリー,@2いわ,@3こおり,@3ドラゴン,@3フェアリー,@3いわ&!<ドラゴン&!<ひこう"
       },
       "lvl1": {
+        "BULBASAUR": "ひこう,どく,むし,ゴースト,はがね,ほのお,ドラゴン&@1ほのお,@1ひこう,@1こおり,@1エスパー&@2ほのお,@2ひこう,@2こおり,@2エスパー,@3ほのお,@3ひこう,@3こおり,@3エスパー&!<くさ&!<どく",
+        "CHARMANDER": "いわ,ほのお,みず,ドラゴン&@1じめん,@1いわ,@1みず&@2じめん,@2いわ,@2みず,@3じめん,@3いわ,@3みず&!<ほのお",
+        "SQUIRTLE": "みず,くさ,ドラゴン&@1でんき,@1くさ&@2でんき,@2くさ,@3でんき,@3くさ&!<みず",
         "PIKACHU": "じめん,くさ,でんき,ドラゴン&@1じめん&@2じめん,@3じめん&!<でんき"
       },
       "shadow_lvl5": {

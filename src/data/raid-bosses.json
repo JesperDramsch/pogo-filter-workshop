@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-07-24T09:58:49.348Z",
+  "fetchedAt": "2026-07-29T10:15:29.269Z",
   "raids": {
     "mega": [
       {
@@ -65,111 +65,167 @@
     ],
     "lvl3": [
       {
-        "id": "RATICATE",
+        "id": "LAPRAS",
         "names": {
-          "en": "Raticate",
-          "de": "Rattikarl",
-          "fr": "Rattatac",
-          "it": "Raticate",
-          "ja": "ラッタ",
-          "ko": "레트라",
-          "es": "Raticate"
+          "en": "Lapras",
+          "de": "Lapras",
+          "fr": "Lokhlass",
+          "it": "Lapras",
+          "ja": "ラプラス",
+          "ko": "라프라스",
+          "es": "Lapras"
         },
         "types": [
-          "normal"
-        ],
-        "resistorTypes": [
-          "rock",
-          "ghost",
-          "steel"
-        ],
-        "seMoveTypes": [
-          "fighting"
-        ]
-      },
-      {
-        "id": "NIDORINO",
-        "names": {
-          "en": "Nidorino",
-          "de": "Nidorino",
-          "fr": "Nidorino",
-          "it": "Nidorino",
-          "ja": "ニドリーノ",
-          "ko": "니드리노",
-          "es": "Nidorino"
-        },
-        "types": [
-          "poison"
-        ],
-        "resistorTypes": [
-          "poison",
-          "ground",
-          "rock",
-          "ghost",
-          "steel"
-        ],
-        "seMoveTypes": [
-          "ground",
-          "psychic"
-        ]
-      },
-      {
-        "id": "GENGAR",
-        "names": {
-          "en": "Gengar",
-          "de": "Gengar",
-          "fr": "Ectoplasma",
-          "it": "Gengar",
-          "ja": "ゲンガー",
-          "ko": "팬텀",
-          "es": "Gengar"
-        },
-        "types": [
-          "ghost",
-          "poison"
-        ],
-        "resistorTypes": [
-          "normal",
-          "poison",
-          "ground",
-          "rock",
-          "steel",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "ghost",
-          "ground",
-          "psychic"
-        ]
-      },
-      {
-        "id": "WOBBUFFET",
-        "names": {
-          "en": "Wobbuffet",
-          "de": "Woingenau",
-          "fr": "Qulbutoké",
-          "it": "Wobbuffet",
-          "ja": "ソーナンス",
-          "ko": "마자용",
-          "es": "Wobbuffet"
-        },
-        "types": [
-          "psychic"
+          "water",
+          "ice"
         ],
         "resistorTypes": [
           "steel",
-          "psychic",
-          "dark"
+          "water",
+          "ice"
         ],
         "seMoveTypes": [
-          "bug",
-          "dark",
-          "ghost"
+          "electric",
+          "fighting",
+          "grass",
+          "rock"
+        ]
+      },
+      {
+        "id": "VAPOREON",
+        "names": {
+          "en": "Vaporeon",
+          "de": "Aquana",
+          "fr": "Aquali",
+          "it": "Vaporeon",
+          "ja": "シャワーズ",
+          "ko": "샤미드",
+          "es": "Vaporeon"
+        },
+        "types": [
+          "water"
+        ],
+        "resistorTypes": [
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "electric",
+          "grass"
+        ]
+      },
+      {
+        "id": "DRAGONITE",
+        "names": {
+          "en": "Dragonite",
+          "de": "Dragoran",
+          "fr": "Dracolosse",
+          "it": "Dragonite",
+          "ja": "カイリュー",
+          "ko": "망나뇽",
+          "es": "Dragonite"
+        },
+        "types": [
+          "dragon",
+          "flying"
+        ],
+        "resistorTypes": [
+          "rock",
+          "steel",
+          "electric",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "ice",
+          "dragon",
+          "fairy",
+          "rock"
         ]
       }
     ],
     "lvl1": [
+      {
+        "id": "BULBASAUR",
+        "names": {
+          "en": "Bulbasaur",
+          "de": "Bisasam",
+          "fr": "Bulbizarre",
+          "it": "Bulbasaur",
+          "ja": "フシギダネ",
+          "ko": "이상해씨",
+          "es": "Bulbasaur"
+        },
+        "types": [
+          "grass",
+          "poison"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "steel",
+          "fire",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "fire",
+          "flying",
+          "ice",
+          "psychic"
+        ]
+      },
+      {
+        "id": "CHARMANDER",
+        "names": {
+          "en": "Charmander",
+          "de": "Glumanda",
+          "fr": "Salamèche",
+          "it": "Charmander",
+          "ja": "ヒトカゲ",
+          "ko": "파이리",
+          "es": "Charmander"
+        },
+        "types": [
+          "fire"
+        ],
+        "resistorTypes": [
+          "rock",
+          "fire",
+          "water",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground",
+          "rock",
+          "water"
+        ]
+      },
+      {
+        "id": "SQUIRTLE",
+        "names": {
+          "en": "Squirtle",
+          "de": "Schiggy",
+          "fr": "Carapuce",
+          "it": "Squirtle",
+          "ja": "ゼニガメ",
+          "ko": "꼬부기",
+          "es": "Squirtle"
+        },
+        "types": [
+          "water"
+        ],
+        "resistorTypes": [
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "electric",
+          "grass"
+        ]
+      },
       {
         "id": "PIKACHU",
         "names": {
@@ -524,6 +580,111 @@
             "steel",
             "dragon",
             "fairy"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-blaziken-in-mega-raids-august-2026",
+      "name": "Mega Blaziken in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-08-05T06:00:00.000",
+      "end": "2026-08-11T22:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "BLAZIKEN",
+          "names": {
+            "en": "Blaziken"
+          },
+          "types": [
+            "fire",
+            "fighting"
+          ],
+          "resistorTypes": [
+            "flying",
+            "poison",
+            "ghost",
+            "fire",
+            "water",
+            "psychic",
+            "dragon",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "ground",
+            "water",
+            "psychic"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "uxie-mesprit-azelf-in-5-star-raid-battles-august-2026",
+      "name": "Uxie, Mesprit, and Azelf in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-08-05T06:00:00.000",
+      "end": "2026-08-11T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "UXIE",
+          "names": {
+            "en": "Uxie"
+          },
+          "types": [
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "ghost",
+            "dark"
+          ]
+        },
+        {
+          "id": "MESPRIT",
+          "names": {
+            "en": "Mesprit"
+          },
+          "types": [
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "ghost",
+            "dark"
+          ]
+        },
+        {
+          "id": "AZELF",
+          "names": {
+            "en": "Azelf"
+          },
+          "types": [
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "ghost",
+            "dark"
           ]
         }
       ]
