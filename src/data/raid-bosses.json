@@ -550,41 +550,6 @@
       ]
     },
     {
-      "eventID": "raidhour20260729",
-      "name": "Kyurem Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-07-29T18:00:00.000",
-      "end": "2026-07-29T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "KYUREM",
-          "names": {
-            "en": "Kyurem"
-          },
-          "types": [
-            "dragon",
-            "ice"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "ice",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "rock",
-            "steel",
-            "dragon",
-            "fairy"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "mega-blaziken-in-mega-raids-august-2026",
       "name": "Mega Blaziken in Mega Raids",
       "eventType": "raid-battles",
@@ -627,6 +592,74 @@
       "eventType": "raid-battles",
       "start": "2026-08-05T06:00:00.000",
       "end": "2026-08-11T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "UXIE",
+          "names": {
+            "en": "Uxie"
+          },
+          "types": [
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "ghost",
+            "dark"
+          ]
+        },
+        {
+          "id": "MESPRIT",
+          "names": {
+            "en": "Mesprit"
+          },
+          "types": [
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "ghost",
+            "dark"
+          ]
+        },
+        {
+          "id": "AZELF",
+          "names": {
+            "en": "Azelf"
+          },
+          "types": [
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "ghost",
+            "dark"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20260805",
+      "name": "Uxie, Mesprit, and Azelf Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-08-05T18:00:00.000",
+      "end": "2026-08-05T19:00:00.000",
       "isShadow": false,
       "isMega": false,
       "bosses": [
