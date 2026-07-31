@@ -1,253 +1,261 @@
 {
-  "fetchedAt": "2026-07-29T10:15:29.269Z",
+  "fetchedAt": "2026-07-31T10:11:17.632Z",
   "raids": {
     "mega": [
       {
-        "id": "SALAMENCE",
+        "id": "AGGRON",
         "names": {
-          "en": "Mega Salamence",
-          "de": "Mega-Brutalanda",
-          "fr": "Méga-Drattak",
-          "it": "MegaSalamence",
-          "ja": "メガボーマンダ",
-          "ko": "메가보만다",
-          "es": "Mega-Salamence"
+          "en": "Mega Aggron",
+          "de": "Mega-Stolloss",
+          "fr": "Méga-Galeking",
+          "it": "MegaAggron",
+          "ja": "メガボスゴドラ",
+          "ko": "메가보스로라",
+          "es": "Mega-Aggron"
         },
         "types": [
-          "dragon",
-          "flying"
-        ],
-        "resistorTypes": [
-          "rock",
-          "steel",
-          "electric",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "ice",
-          "dragon",
-          "fairy",
-          "rock"
-        ]
-      }
-    ],
-    "lvl5": [
-      {
-        "id": "SOLGALEO",
-        "names": {
-          "en": "Solgaleo",
-          "de": "Solgaleo",
-          "fr": "Solgaleo",
-          "it": "Solgaleo",
-          "ja": "ソルガレオ",
-          "ko": "솔가레오",
-          "es": "Solgaleo"
-        },
-        "types": [
-          "psychic",
           "steel"
         ],
         "resistorTypes": [
           "steel",
           "fire",
           "water",
-          "electric",
-          "psychic",
-          "dark"
+          "electric"
         ],
         "seMoveTypes": [
-          "dark",
+          "fighting",
           "fire",
-          "ghost",
           "ground"
+        ]
+      }
+    ],
+    "lvl5": [
+      {
+        "id": "KYUREM",
+        "names": {
+          "en": "Kyurem",
+          "de": "Kyurem",
+          "fr": "Kyurem",
+          "it": "Kyurem",
+          "ja": "キュレム",
+          "ko": "큐레무",
+          "es": "Kyurem"
+        },
+        "types": [
+          "dragon",
+          "ice"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "ice",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "dragon",
+          "fairy",
+          "fighting",
+          "rock",
+          "steel"
         ]
       }
     ],
     "lvl3": [
       {
-        "id": "LAPRAS",
+        "id": "SAMUROTT",
         "names": {
-          "en": "Lapras",
-          "de": "Lapras",
-          "fr": "Lokhlass",
-          "it": "Lapras",
-          "ja": "ラプラス",
-          "ko": "라프라스",
-          "es": "Lapras"
+          "en": "Hisuian Samurott",
+          "de": "Hisuian-Admurai",
+          "fr": "Clamiral de Hisuian",
+          "it": "Samurott di Hisuian",
+          "ja": "ダイケンキ",
+          "ko": "대검귀",
+          "es": "Samurott de Galar"
         },
         "types": [
           "water",
-          "ice"
+          "dark"
         ],
         "resistorTypes": [
-          "steel",
-          "water",
-          "ice"
-        ],
-        "seMoveTypes": [
-          "electric",
           "fighting",
-          "grass",
-          "rock"
-        ]
-      },
-      {
-        "id": "VAPOREON",
-        "names": {
-          "en": "Vaporeon",
-          "de": "Aquana",
-          "fr": "Aquali",
-          "it": "Vaporeon",
-          "ja": "シャワーズ",
-          "ko": "샤미드",
-          "es": "Vaporeon"
-        },
-        "types": [
-          "water"
-        ],
-        "resistorTypes": [
           "water",
           "grass",
-          "dragon"
+          "dragon",
+          "dark",
+          "fairy"
         ],
         "seMoveTypes": [
+          "bug",
           "electric",
+          "fairy",
+          "fighting",
           "grass"
         ]
       },
       {
-        "id": "DRAGONITE",
+        "id": "EXCADRILL",
         "names": {
-          "en": "Dragonite",
-          "de": "Dragoran",
-          "fr": "Dracolosse",
-          "it": "Dragonite",
-          "ja": "カイリュー",
-          "ko": "망나뇽",
-          "es": "Dragonite"
+          "en": "Excadrill",
+          "de": "Stalobor",
+          "fr": "Minotaupe",
+          "it": "Excadrill",
+          "ja": "ドリュウズ",
+          "ko": "몰드류",
+          "es": "Excadrill"
         },
         "types": [
-          "dragon",
-          "flying"
+          "ground",
+          "steel"
+        ],
+        "resistorTypes": [
+          "flying",
+          "bug",
+          "water",
+          "grass"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "fire",
+          "ground",
+          "water"
+        ]
+      },
+      {
+        "id": "DRAMPA",
+        "names": {
+          "en": "Drampa",
+          "de": "Sen-Long",
+          "fr": "Draïeul",
+          "it": "Drampa",
+          "ja": "ジジーロン",
+          "ko": "할비롱",
+          "es": "Drampa"
+        },
+        "types": [
+          "normal",
+          "dragon"
         ],
         "resistorTypes": [
           "rock",
+          "ghost",
           "steel",
-          "electric",
           "fairy"
         ],
         "seMoveTypes": [
-          "ice",
           "dragon",
           "fairy",
-          "rock"
+          "fighting",
+          "ice"
         ]
       }
     ],
     "lvl1": [
       {
-        "id": "BULBASAUR",
+        "id": "LARVITAR",
         "names": {
-          "en": "Bulbasaur",
-          "de": "Bisasam",
-          "fr": "Bulbizarre",
-          "it": "Bulbasaur",
-          "ja": "フシギダネ",
-          "ko": "이상해씨",
-          "es": "Bulbasaur"
+          "en": "Larvitar",
+          "de": "Larvitar",
+          "fr": "Embrylex",
+          "it": "Larvitar",
+          "ja": "ヨーギラス",
+          "ko": "애버라스",
+          "es": "Larvitar"
         },
         "types": [
-          "grass",
-          "poison"
-        ],
-        "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
-          "ghost",
-          "steel",
-          "fire",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "fire",
-          "flying",
-          "ice",
-          "psychic"
-        ]
-      },
-      {
-        "id": "CHARMANDER",
-        "names": {
-          "en": "Charmander",
-          "de": "Glumanda",
-          "fr": "Salamèche",
-          "it": "Charmander",
-          "ja": "ヒトカゲ",
-          "ko": "파이리",
-          "es": "Charmander"
-        },
-        "types": [
-          "fire"
-        ],
-        "resistorTypes": [
           "rock",
-          "fire",
-          "water",
-          "dragon"
+          "ground"
         ],
-        "seMoveTypes": [
+        "resistorTypes": [
+          "fighting",
           "ground",
-          "rock",
-          "water"
-        ]
-      },
-      {
-        "id": "SQUIRTLE",
-        "names": {
-          "en": "Squirtle",
-          "de": "Schiggy",
-          "fr": "Carapuce",
-          "it": "Squirtle",
-          "ja": "ゼニガメ",
-          "ko": "꼬부기",
-          "es": "Squirtle"
-        },
-        "types": [
-          "water"
-        ],
-        "resistorTypes": [
-          "water",
-          "grass",
-          "dragon"
+          "grass"
         ],
         "seMoveTypes": [
-          "electric",
-          "grass"
+          "grass",
+          "water",
+          "fighting",
+          "ground",
+          "ice",
+          "steel"
         ]
       },
       {
-        "id": "PIKACHU",
+        "id": "CRANIDOS",
         "names": {
-          "en": "Pikachu",
-          "de": "Pikachu",
-          "fr": "Pikachu",
-          "it": "Pikachu",
-          "ja": "ピカチュウ",
-          "ko": "피카츄",
-          "es": "Pikachu"
+          "en": "Cranidos",
+          "de": "Koknodon",
+          "fr": "Kranidos",
+          "it": "Cranidos",
+          "ja": "ズガイドス",
+          "ko": "두개도스",
+          "es": "Cranidos"
         },
         "types": [
+          "rock"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "ground",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "grass",
+          "ground",
+          "steel",
+          "water"
+        ]
+      },
+      {
+        "id": "SHIELDON",
+        "names": {
+          "en": "Shieldon",
+          "de": "Schilterus",
+          "fr": "Dinoclier",
+          "it": "Shieldon",
+          "ja": "タテトプス",
+          "ko": "방패톱스",
+          "es": "Shieldon"
+        },
+        "types": [
+          "rock",
+          "steel"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "ground",
+          "steel",
+          "water",
           "electric"
         ],
-        "resistorTypes": [
+        "seMoveTypes": [
+          "fighting",
           "ground",
-          "grass",
-          "electric",
-          "dragon"
+          "water"
+        ]
+      },
+      {
+        "id": "SINISTEA",
+        "names": {
+          "en": "Sinistea",
+          "de": "Fatalitee",
+          "fr": "Théffroi",
+          "it": "Sinistea",
+          "ja": "ヤバチャ",
+          "ko": "데인차",
+          "es": "Sinistea"
+        },
+        "types": [
+          "ghost"
+        ],
+        "resistorTypes": [
+          "normal",
+          "dark"
         ],
         "seMoveTypes": [
-          "ground"
+          "dark",
+          "ghost"
         ]
       }
     ],
@@ -481,74 +489,6 @@
   },
   "maxBattles": {},
   "eventRaids": [
-    {
-      "eventID": "kyurem-in-5-star-raid-battles-july-2026",
-      "name": "Kyurem in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-07-29T06:00:00.000",
-      "end": "2026-08-04T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "KYUREM",
-          "names": {
-            "en": "Kyurem"
-          },
-          "types": [
-            "dragon",
-            "ice"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "ice",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "rock",
-            "steel",
-            "dragon",
-            "fairy"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "mega-aggron-in-mega-raids-july-2026",
-      "name": "Mega Aggron in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-07-29T06:00:00.000",
-      "end": "2026-08-04T22:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "AGGRON",
-          "names": {
-            "en": "Aggron"
-          },
-          "types": [
-            "steel",
-            "rock"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "ground",
-            "steel",
-            "water",
-            "electric"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "ground",
-            "water"
-          ]
-        }
-      ]
-    },
     {
       "eventID": "mega-blaziken-in-mega-raids-august-2026",
       "name": "Mega Blaziken in Mega Raids",
