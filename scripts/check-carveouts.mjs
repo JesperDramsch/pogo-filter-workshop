@@ -263,5 +263,42 @@ console.log("\nMap-marked bazaar species protected in TRASH (Choreogel regressio
   check("empty bazaar list leaves trash byte-identical", before.trash === after.trash);
 }
 
+console.log("\nS1 — shadow purify-floor: default keeps the blanket !crypto");
+{
+  const def = buildFilters([], [], mergeImportedConfig({}), [], "de", tFn);
+  check("default trash has blanket !crypto", hasClauseMatching(def.trash, /^!crypto$/i));
+  check("default trash has NO purify-floor clause", !hasClauseMatching(def.trash, /^!crypto,/i));
+  check("trade always excludes shadows, independent of the split", hasClauseMatching(def.trade, /^!crypto$/i));
+}
+
+console.log("\nS2 — purify-floor ON (protectShadows off): three scoped clauses replace the blanket");
+{
+  const floor = buildFilters([], [], mergeImportedConfig({ protectShadows: false, protectShadowPurifyOnly: true }), [], "de", tFn);
+  check("no blanket !crypto anymore", !hasClauseMatching(floor.trash, /^!crypto$/i));
+  check("keeps purify-hundo IVs (!crypto,0-2…)", hasClauseMatching(floor.trash, /^!crypto,0-2/i), floor.trash);
+  check("keeps cheap-to-purify (!crypto,bonbonkm3-)", hasClauseMatching(floor.trash, /^!crypto,bonbonkm3-$/i));
+  check("keeps TM'd investment (!crypto,@frustration)", hasClauseMatching(floor.trash, /^!crypto,@frustration$/i));
+  check("exactly three purify-floor clauses", clauses(floor.trash).filter(c => /^!crypto,/i.test(c)).length === 3);
+  check("trade still hard-excludes shadows", hasClauseMatching(floor.trade, /^!crypto$/i));
+}
+
+console.log("\nS3 — migration: a legacy protectShadows:false config keeps releasing ALL shadows");
+{
+  const migrated = mergeImportedConfig({ protectShadows: false });
+  check("floor pinned off for legacy protectShadows:false", migrated.protectShadowPurifyOnly === false);
+  const r = buildFilters([], [], migrated, [], "de", tFn);
+  check("no shadow clause at all (neither blanket nor floor)", !hasClauseMatching(r.trash, /crypto/i));
+}
+
+console.log("\nS4 — floor differs from blanket by exactly the shadow clauses (byte-level diff)");
+{
+  const blanket = buildFilters([], [], mergeImportedConfig({}), [], "de", tFn);
+  const floor = buildFilters([], [], mergeImportedConfig({ protectShadows: false, protectShadowPurifyOnly: true }), [], "de", tFn);
+  const onlyInBlanket = clauses(blanket.trash).filter(c => !clauses(floor.trash).includes(c));
+  const onlyInFloor = clauses(floor.trash).filter(c => !clauses(blanket.trash).includes(c));
+  check("blanket drops exactly the bare !crypto", onlyInBlanket.length === 1 && /^!crypto$/i.test(onlyInBlanket[0]), onlyInBlanket.join("|"));
+  check("floor adds exactly the three scoped clauses", onlyInFloor.length === 3, onlyInFloor.join("|"));
+}
+
 console.log(`\n${failures === 0 ? "✓ All carve-out checks passed." : `✗ ${failures} failure(s).`}`);
 process.exit(failures === 0 ? 0 : 1);

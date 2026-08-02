@@ -22,6 +22,7 @@
   "test:migration": "vite-node scripts/check-import-migration.mjs",
   "test:buddy": "vite-node scripts/check-buddy-catch.mjs",
   "test:regionals": "vite-node scripts/verify-regionals.mjs",
+  "test:carveouts": "vite-node scripts/check-carveouts.mjs",
   "test:lucky": "vite-node scripts/check-lucky-logic.mjs",
   "test:friendcollect": "vite-node scripts/check-friend-collect.mjs",
   "fixtures:update": "vite-node scripts/generate-fixtures.mjs",
