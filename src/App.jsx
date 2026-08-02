@@ -299,6 +299,12 @@ export const DEFAULT_CONFIG = {
 	mythTooManyOf: ['meltan', 'genesect'], // species you have spares of (canonicalized on load)
 	protectUltraBeasts: true,
 	protectShadows: true, // Crypto in trash; trade ALWAYS excludes (untradeable)
+	// Narrow floor for the shadow carve-out (mirrors protectGigantamax under
+	// protectDynamax): only bites when protectShadows is OFF. Keeps purify-worthy
+	// shadows (purify-hundo IVs / cheap-to-purify / TM'd) out of trash and lets
+	// expensive low-IV junk go. Default true but suppressed while the broad flag
+	// is on, so default output stays byte-identical.
+	protectShadowPurifyOnly: true,
 	protectPurified: true,
 	protectCostumes: true,
 	protectBackgrounds: true,
@@ -937,6 +943,13 @@ export function mergeImportedConfig(raw, notices = []) {
 	if (raw?.protectGigantamax === undefined && raw?.protectDynamax === false) {
 		merged.protectGigantamax = false;
 	}
+	// Same story for the shadow purify-floor: a config predating it back-fills the
+	// default (true). For users who explicitly saved protectShadows:false (release
+	// ALL shadows), the floor would newly keep purify-worthy shadows — pin it off to
+	// preserve their output until they opt in.
+	if (raw?.protectShadowPurifyOnly === undefined && raw?.protectShadows === false) {
+		merged.protectShadowPurifyOnly = false;
+	}
 	// Canonicalize seeded defaults to the storage locale so chips render
 	// consistently. Idempotent on already-canonical user input.
 	const canonicalize = (arr) => (arr || []).map((s) => resolveSpecies(s) || s);
@@ -1345,7 +1358,35 @@ export function buildFilters(
 		);
 	}
 	if (cfg.protectUltraBeasts) push(trashClauses, `!${kw.flag.ultra_beast}`, tFn('app.clause_why.ultra_beasts'));
-	if (cfg.protectShadows) push(trashClauses, `!${kw.flag.shadow}`, tFn('app.clause_why.shadows'));
+	// Shadow carve-out (trash-only; trade always excludes crypto). Broad-wins /
+	// narrow-floor split, mirroring maxProtectClause: protectShadows keeps ALL
+	// shadows out of trash; when it's off, the protectShadowPurifyOnly floor keeps
+	// only the purify-worthy ones and lets expensive low-IV junk go. Each floor
+	// clause is a scoped implication `!crypto,X` = keep unless X (OR binds tighter
+	// than `&`, same trick as legacyMovesClause): a shadow is releasable only if it
+	// has a low IV somewhere (not a purify-hundo candidate) AND costs ≥3km-candy to
+	// purify (not a cheap event-task purify) AND still has Frustration (not a
+	// Charge-TM'd investment).
+	if (cfg.protectShadows) {
+		push(trashClauses, `!${kw.flag.shadow}`, tFn('app.clause_why.shadows'));
+	} else if (cfg.protectShadowPurifyOnly) {
+		push(
+			trashClauses,
+			`!${kw.flag.shadow},0-2${kw.iv.atk},0-2${kw.iv.def},0-2${kw.iv.hp}`,
+			tFn('app.clause_why.shadow_purify_hundo'),
+		);
+		push(
+			trashClauses,
+			`!${kw.flag.shadow},${kw.numeric.candy_km}3-`,
+			tFn('app.clause_why.shadow_purify_cheap'),
+		);
+		if (kw.flag.frustration)
+			push(
+				trashClauses,
+				`!${kw.flag.shadow},@${kw.flag.frustration}`,
+				tFn('app.clause_why.shadow_purify_frustration'),
+			);
+	}
 	if (cfg.protectCostumes) push(trashClauses, `!${kw.flag.costume}`, tFn('app.clause_why.costumes'));
 	if (cfg.protectLuckies) push(trashClauses, `!${kw.flag.lucky}`, tFn('app.clause_why.luckies'));
 	if (cfg.protectBackgrounds) push(trashClauses, `!${kw.flag.background}`, tFn('app.clause_why.backgrounds'));
@@ -7742,6 +7783,7 @@ function ConfigPanel({
 		['protectMythicals', 'app.protect.mythicals', { expertOnly: true }],
 		['protectUltraBeasts', 'app.protect.ultra_beasts', { expertOnly: true }],
 		['protectShadows', 'app.protect.shadows', { expertOnly: true }],
+		['protectShadowPurifyOnly', 'app.protect.shadow_purify_only', { expertOnly: true }],
 		['protectPurified', 'app.protect.purified', { expertOnly: true }],
 		['protectCostumes', 'app.protect.costumes'],
 		['protectBackgrounds', 'app.protect.backgrounds'],
@@ -7874,6 +7916,11 @@ function ConfigPanel({
 				{!config.protectDynamax && config.protectGigantamax && (
 					<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
 						{t('app.protect.dynamax_off_note')}
+					</div>
+				)}
+				{!config.protectShadows && config.protectShadowPurifyOnly && (
+					<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
+						{t('app.protect.shadows_off_note')}
 					</div>
 				)}
 			</div>
