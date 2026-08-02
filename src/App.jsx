@@ -1158,6 +1158,46 @@ export function buildFilters(
 	const hundosForTrade = hundos.filter((h) => !luckyHundoSet.has(h));
 	const H_trade = hundosForTrade.map((h) => `+${speciesForOutput(h, outputLocale)}`).join(',');
 
+	// Shared De Morgan encoding for a form predicate's NEGATION — same idiom as the
+	// buddy drop-form guards: ¬(inc₁∧inc₂∧¬exc) = ¬inc₁ ∨ ¬inc₂ ∨ exc, rendered as
+	// comma-OR type terms in the output locale. Empty string means the form carries no
+	// type predicate (shouldn't happen with catalog data). Hoisted above the sort
+	// blocks so the browse-sort form-scoping (below) can reuse it.
+	const formDropTerms = (f) =>
+		[
+			...(f.include || []).map((ty) => `!${kw.type[ty] || ty}`),
+			...(f.exclude || []).map((ty) => kw.type[ty] || ty),
+		].join(',');
+
+	// Non-owned regional forms to HIDE from a `+family` browse-sort member, so the
+	// sort surfaces only the annotated form's duplicates. Returns [] for the
+	// whole-family cases (unannotated, every form owned, or no type-separable forms).
+	// Forms whose predicate renders empty are skipped (can't be isolated in search).
+	const formScopedSortGuards = (canonName, ownedKeys) => {
+		const catalog = regionalFormsFor(canonName) || [];
+		if (catalog.length === 0 || !Array.isArray(ownedKeys) || ownedKeys.length === 0) return [];
+		const ownedSet = new Set(ownedKeys);
+		const owned = catalog.filter((f) => ownedSet.has(f.key));
+		if (owned.length === 0 || owned.length >= catalog.length) return [];
+		return catalog.filter((f) => !ownedSet.has(f.key) && formDropTerms(f));
+	};
+
+	// Lucky-hundo-sort intersection: the regional forms where BOTH the hundo and the
+	// lucky chase are done (an unannotated side counts as every form). null → keep the
+	// whole family (no separable forms, or every form jointly done); a non-empty Form[]
+	// → scope the union to those forms; [] → NO jointly-done form → drop the species.
+	const jointlyDoneForms = (canonName) => {
+		const catalog = regionalFormsFor(canonName) || [];
+		if (catalog.length === 0) return null;
+		const allKeys = catalog.map((f) => f.key);
+		const annSet = (ann) =>
+			new Set(Array.isArray(ann?.[canonName]) && ann[canonName].length > 0 ? ann[canonName] : allKeys);
+		const hSet = annSet(cfg.hundoForms);
+		const lSet = annSet(cfg.luckyForms);
+		const done = catalog.filter((f) => hSet.has(f.key) && lSet.has(f.key));
+		return done.length >= catalog.length ? null : done;
+	};
+
 	// Personal allowlists for the two PvE-counter contexts. Different rosters
 	// because most raid meta attackers (Mewtwo, Rayquaza, Garchomp, …) aren't
 	// Dynamax-capable, so a separate Max-Battle list avoids polluting the
@@ -1744,6 +1784,23 @@ export function buildFilters(
 	const sortClauses = [];
 	if (hundos.length > 0) {
 		push(sortClauses, H, tFn('app.clause_why.all_hundo_families'));
+		// Regional form-scoping: when a hundo is annotated to specific form(s),
+		// narrow its `+family` term to only the owned form's duplicates so the
+		// other regional forms (still chase-worthy) stay hidden.
+		for (const h of hundos) {
+			const key = canonKey(h);
+			const hide = formScopedSortGuards(key, cfg.hundoForms?.[key]);
+			if (hide.length === 0) continue;
+			const out = speciesForOutput(h, outputLocale);
+			for (const f of hide)
+				push(
+					sortClauses,
+					`!+${out},${formDropTerms(f)}`,
+					tFn('app.clause_why.sort_form_scope', {
+						params: { species: capFirst(out), region: formRegionLabel(f, tFn) },
+					}),
+				);
+		}
 		if (cfg.protectAnyTag) push(sortClauses, '!#', tFn('app.clause_why.all_tags_protected'));
 		if (cfg.protectFavorites) push(sortClauses, `!${kw.flag.favorite}`, tFn('app.clause_why.favorites_protected'));
 		if (cfg.protectShinies) push(sortClauses, `!${kw.flag.shiny}`, tFn('app.clause_why.shinies_protected'));
@@ -1756,10 +1813,41 @@ export function buildFilters(
 	// the IV chase and the lucky-friend chase are done. Surface duplicates
 	// so the user can bulk-review and trash. Same protections — the original
 	// hundo/lucky copies stay hidden (they carry favorite / lucky / shiny flags).
+	// Regional forms: a species qualifies only for the form(s) where BOTH a hundo
+	// AND a lucky are owned (jointlyDoneForms); a mismatched form (e.g. Alolan
+	// hundo + Kanto lucky) drops out entirely. Derives a SEPARATE member list —
+	// luckyHundoSet itself feeds hundosForTrade/the trade filter and must stay
+	// species-level. Gates on the surviving members, not luckyHundoSet.size, so an
+	// all-mismatched set emits nothing (not a guards-only string over the whole box).
 	const luckySortClauses = [];
-	if (luckyHundoSet.size > 0) {
-		const H_lucky = [...luckyHundoSet].map((h) => `+${speciesForOutput(h, outputLocale)}`).join(',');
-		push(luckySortClauses, H_lucky, tFn('app.clause_why.all_lucky_hundo_families'));
+	const luckySortMembers = [];
+	const luckySortGuards = [];
+	for (const h of luckyHundoSet) {
+		const key = canonKey(h);
+		const done = jointlyDoneForms(key); // null | Form[] | []
+		if (Array.isArray(done) && done.length === 0) continue; // no jointly-done form → drop
+		const out = speciesForOutput(h, outputLocale);
+		luckySortMembers.push(out);
+		if (Array.isArray(done)) {
+			const doneSet = new Set(done.map((f) => f.key));
+			for (const f of regionalFormsFor(key) || [])
+				if (!doneSet.has(f.key) && formDropTerms(f)) luckySortGuards.push({ out, form: f });
+		}
+	}
+	if (luckySortMembers.length > 0) {
+		push(
+			luckySortClauses,
+			luckySortMembers.map((o) => `+${o}`).join(','),
+			tFn('app.clause_why.all_lucky_hundo_families'),
+		);
+		for (const g of luckySortGuards)
+			push(
+				luckySortClauses,
+				`!+${g.out},${formDropTerms(g.form)}`,
+				tFn('app.clause_why.lucky_hundo_form_scope', {
+					params: { species: capFirst(g.out), region: formRegionLabel(g.form, tFn) },
+				}),
+			);
 		if (cfg.protectAnyTag) push(luckySortClauses, '!#', tFn('app.clause_why.all_tags_protected'));
 		if (cfg.protectFavorites)
 			push(luckySortClauses, `!${kw.flag.favorite}`, tFn('app.clause_why.favorites_protected'));
@@ -1767,6 +1855,37 @@ export function buildFilters(
 		if (cfg.protectLuckies) push(luckySortClauses, `!${kw.flag.lucky}`, tFn('app.clause_why.luckies_protected'));
 	}
 	const luckySort = luckySortClauses.map((c) => c.clause).join('&');
+
+	// ── LUCKY-SORT ─────────────────────────────────────────────────────────
+	// Lucky analogue of HUNDO-SORT keyed on the luckies list: surface every member
+	// of your lucky families so you can pin/review them. Unlike the two sorts above
+	// it emits NO !lucky guard — the whole point is to see the lucky copies. Regional
+	// form-scoped via cfg.luckyForms, exactly like the hundo-sort.
+	const luckyFamilySortClauses = [];
+	if (luckies.length > 0) {
+		const L = luckies.map((l) => `+${speciesForOutput(l, outputLocale)}`).join(',');
+		push(luckyFamilySortClauses, L, tFn('app.clause_why.all_lucky_families'));
+		for (const l of luckies) {
+			const key = canonKey(l);
+			const hide = formScopedSortGuards(key, cfg.luckyForms?.[key]);
+			if (hide.length === 0) continue;
+			const out = speciesForOutput(l, outputLocale);
+			for (const f of hide)
+				push(
+					luckyFamilySortClauses,
+					`!+${out},${formDropTerms(f)}`,
+					tFn('app.clause_why.sort_form_scope', {
+						params: { species: capFirst(out), region: formRegionLabel(f, tFn) },
+					}),
+				);
+		}
+		if (cfg.protectAnyTag) push(luckyFamilySortClauses, '!#', tFn('app.clause_why.all_tags_protected'));
+		if (cfg.protectFavorites)
+			push(luckyFamilySortClauses, `!${kw.flag.favorite}`, tFn('app.clause_why.favorites_protected'));
+		if (cfg.protectShinies)
+			push(luckyFamilySortClauses, `!${kw.flag.shiny}`, tFn('app.clause_why.shinies_protected'));
+	}
+	const luckyFamilySort = luckyFamilySortClauses.map((c) => c.clause).join('&');
 
 	// ── NUNDO-SORT ─────────────────────────────────────────────────────────
 	// Surface every 0/0/0 IV catch. PoGo's storage UI doesn't expose appraisal
@@ -1887,16 +2006,6 @@ export function buildFilters(
 		push(clauses, `!${kw.flag.background}`, tFn('app.clause_why.friend_no_background'));
 		push(clauses, `!${kw.flag.purified}`, tFn('app.clause_why.friend_no_purified'));
 	};
-
-	// Shared De Morgan encoding for a form predicate's NEGATION — same idiom
-	// as the buddy drop-form guards: ¬(inc₁∧inc₂∧¬exc) = ¬inc₁ ∨ ¬inc₂ ∨ exc,
-	// rendered as comma-OR type terms in the output locale. Empty string means
-	// the form carries no type predicate (shouldn't happen with catalog data).
-	const formDropTerms = (f) =>
-		[
-			...(f.include || []).map((ty) => `!${kw.type[ty] || ty}`),
-			...(f.exclude || []).map((ty) => kw.type[ty] || ty),
-		].join(',');
 
 	// Form-scoped exclusion plans for the fallback wishlists. An owned entry
 	// annotated to specific regional form(s) (cfg.luckyForms / cfg.hundoForms,
@@ -2995,6 +3104,7 @@ export function buildFilters(
 		trade,
 		sort,
 		luckySort,
+		luckyFamilySort,
 		nundoSort,
 		prestaged,
 		gift,
@@ -3019,6 +3129,7 @@ export function buildFilters(
 		tradeClauses,
 		sortClauses,
 		luckySortClauses,
+		luckyFamilySortClauses,
 		nundoSortClauses,
 		prestagedClauses,
 		giftClauses,
@@ -3714,6 +3825,7 @@ export default function App() {
 	const [showSetTheory, setShowSetTheory] = useState(false);
 	const [showAuxShadows, setShowAuxShadows] = useState(false);
 	const [showAuxEvos, setShowAuxEvos] = useState(false);
+	const [showBrowseSort, setShowBrowseSort] = useState(false);
 	const [showAuxTrades, setShowAuxTrades] = useState(false);
 	const [showFriendWishlist, setShowFriendWishlist] = useState(false);
 	// Friend lucky wishlist: restrict to old catches guaranteed Lucky on trade.
@@ -3774,6 +3886,7 @@ export default function App() {
 		trade: false,
 		sort: false,
 		luckySort: false,
+		luckyFamilySort: false,
 		nundoSort: false,
 		prestaged: false,
 		gift: false,
@@ -4013,6 +4126,7 @@ export default function App() {
 		trade,
 		sort,
 		luckySort,
+		luckyFamilySort,
 		nundoSort,
 		prestaged,
 		gift,
@@ -4032,6 +4146,7 @@ export default function App() {
 		tradeClauses,
 		sortClauses,
 		luckySortClauses,
+		luckyFamilySortClauses,
 		nundoSortClauses,
 		prestagedClauses,
 		giftClauses,
@@ -4605,36 +4720,6 @@ export default function App() {
 										onCopy={() => copyToClipboard('trade', trade)}
 										hint={t('app.filter.trade_hint')}
 									/>
-									{sort && (
-										<FilterBox
-											label={t('app.filter.sort_label')}
-											accent='#F5B82E'
-											filterStr={sort}
-											copied={copied.sort}
-											onCopy={() => copyToClipboard('sort', sort)}
-											hint={t('app.filter.sort_hint')}
-										/>
-									)}
-									{luckySort && (
-										<FilterBox
-											label={t('app.filter.lucky_sort_label')}
-											accent='#F5B82E'
-											filterStr={luckySort}
-											copied={copied.luckySort}
-											onCopy={() => copyToClipboard('luckySort', luckySort)}
-											hint={t('app.filter.lucky_sort_hint')}
-										/>
-									)}
-									{nundoSort && (
-										<FilterBox
-											label={t('app.filter.nundo_sort_label')}
-											accent='#F5B82E'
-											filterStr={nundoSort}
-											copied={copied.nundoSort}
-											onCopy={() => copyToClipboard('nundoSort', nundoSort)}
-											hint={t('app.filter.nundo_sort_hint')}
-										/>
-									)}
 									{buddyCatchFilters.length > 0 && (
 										<BuddyCatchSection
 											buddyCatchFilters={buddyCatchFilters}
@@ -4663,6 +4748,57 @@ export default function App() {
                     PvE encounters grouped by source. Within each PvE group
                     the more frequently-used surface sits on top. */}
 									<div className='space-y-3 pt-2'>
+										{(sort || luckySort || luckyFamilySort || nundoSort) && (
+											<Collapsible
+												icon='✨'
+												label={t('app.collapsible.browse_sort')}
+												open={showBrowseSort}
+												onToggle={() => setShowBrowseSort((s) => !s)}
+											>
+												<div className='space-y-4'>
+													{sort && (
+														<FilterBox
+															label={t('app.filter.sort_label')}
+															accent='#F5B82E'
+															filterStr={sort}
+															copied={copied.sort}
+															onCopy={() => copyToClipboard('sort', sort)}
+															hint={t('app.filter.sort_hint')}
+														/>
+													)}
+													{luckySort && (
+														<FilterBox
+															label={t('app.filter.lucky_sort_label')}
+															accent='#F5B82E'
+															filterStr={luckySort}
+															copied={copied.luckySort}
+															onCopy={() => copyToClipboard('luckySort', luckySort)}
+															hint={t('app.filter.lucky_sort_hint')}
+														/>
+													)}
+													{luckyFamilySort && (
+														<FilterBox
+															label={t('app.filter.lucky_family_sort_label')}
+															accent='#F5B82E'
+															filterStr={luckyFamilySort}
+															copied={copied.luckyFamilySort}
+															onCopy={() => copyToClipboard('luckyFamilySort', luckyFamilySort)}
+															hint={t('app.filter.lucky_family_sort_hint')}
+														/>
+													)}
+													{nundoSort && (
+														<FilterBox
+															label={t('app.filter.nundo_sort_label')}
+															accent='#F5B82E'
+															filterStr={nundoSort}
+															copied={copied.nundoSort}
+															onCopy={() => copyToClipboard('nundoSort', nundoSort)}
+															hint={t('app.filter.nundo_sort_hint')}
+														/>
+													)}
+												</div>
+											</Collapsible>
+										)}
 										<Collapsible
 											icon='🛬'
 											label={t('app.collapsible.aux_trades')}

@@ -119,5 +119,55 @@ console.log("\nScenario 9: empty HAVE-lists → guards only, lucky and hundo ide
   }
 }
 
+console.log("\nScenario 10: hundo-sort regional form-scoping");
+{
+  // Vulpix hundo annotated Alolan → the hundo-sort narrows +vulpix to the Alolan
+  // branch (drops the Kanto/fire form, which may still be chase-worthy). Vulpix
+  // dex 37: base include:[fire], alola include:[ice] → dropping base = "!fire".
+  const ann = buildFilters(["vulpix"], [], { ...DEFAULT_CONFIG, hundoForms: { vulpix: ["alola"] } }, [], "en", t);
+  check("hundo-sort keeps the +vulpix union", ann.sort.includes("+vulpix"));
+  check("hundo-sort scopes to the owned Alolan branch (!+vulpix,!fire)", ann.sort.includes("!+vulpix,!fire"), ann.sort);
+  // Exclude-based catalog predicate: Kanto Raichu isolates as NOT-psychic, so a
+  // Kanto-owned hundo drops the Alolan branch via the negated `!psychic` term.
+  const raichu = buildFilters(["raichu"], [], { ...DEFAULT_CONFIG, hundoForms: { raichu: ["base"] } }, [], "en", t);
+  check("exclude-based predicate handled (Kanto Raichu hundo → !+raichu,!psychic)", raichu.sort.includes("!+raichu,!psychic"), raichu.sort);
+  // Unannotated hundo → whole family, byte-identical to the pre-feature output.
+  const plain = buildFilters(["vulpix"], [], DEFAULT_CONFIG, [], "en", t);
+  check("unannotated hundo-sort has no form-scope guard", !plain.sort.includes("!+vulpix,"), plain.sort);
+  check("unannotated hundo-sort still surfaces the family", plain.sort.includes("+vulpix"));
+}
+
+console.log("\nScenario 11: lucky-hundo-sort jointly-done form intersection");
+{
+  // Both a hundo AND a lucky of Alolan Vulpix → surface the Alolan dupes only.
+  const both = buildFilters(["vulpix"], ["vulpix"], { ...DEFAULT_CONFIG, hundoForms: { vulpix: ["alola"] }, luckyForms: { vulpix: ["alola"] } }, [], "en", t);
+  check("jointly-done Alolan surfaces +vulpix", both.luckySort.includes("+vulpix"));
+  check("jointly-done Alolan scopes to !+vulpix,!fire", both.luckySort.includes("!+vulpix,!fire"), both.luckySort);
+  // Alolan hundo + Kanto lucky → no jointly-done form → the species drops out.
+  const mismatch = buildFilters(["vulpix"], ["vulpix"], { ...DEFAULT_CONFIG, hundoForms: { vulpix: ["alola"] }, luckyForms: { vulpix: ["base"] } }, [], "en", t);
+  check("mismatched forms drop vulpix from lucky-sort", !mismatch.luckySort.includes("+vulpix"));
+  check("lucky-sort empty when the only member is mismatched", mismatch.luckySort === "", JSON.stringify(mismatch.luckySort));
+  check("mismatch leaves luckyHundoSet intact (size 1)", mismatch.luckyHundoSet.size === 1);
+  check("mismatch does not pull vulpix into trade", !mismatch.trade.includes("+vulpix"));
+  // A second, unannotated member keeps its whole family while the mismatch drops.
+  const partial = buildFilters(["vulpix", "pikachu"], ["vulpix", "pikachu"], { ...DEFAULT_CONFIG, hundoForms: { vulpix: ["alola"] }, luckyForms: { vulpix: ["base"] } }, [], "en", t);
+  check("unannotated pikachu survives the mismatch drop", partial.luckySort.includes("+pikachu"));
+  check("mismatched vulpix still dropped in the mixed set", !partial.luckySort.includes("+vulpix"));
+}
+
+console.log("\nScenario 12: standalone lucky-sort (lucky family browser)");
+{
+  const r = buildFilters([], ["pikachu"], DEFAULT_CONFIG, [], "en", t);
+  check("lucky-sort surfaces the lucky family", r.luckyFamilySort.includes("+pikachu"));
+  check("lucky-sort keeps lucky copies visible (no !lucky guard)", !r.luckyFamilySort.includes("!lucky"), r.luckyFamilySort);
+  check("lucky-sort carries tag/favorite/shiny guards",
+    r.luckyFamilySort.includes("!#") && r.luckyFamilySort.includes("!favorite") && r.luckyFamilySort.includes("!shiny"));
+  // Regional-form scoped via luckyForms, same idiom as the hundo-sort.
+  const annL = buildFilters([], ["vulpix"], { ...DEFAULT_CONFIG, luckyForms: { vulpix: ["alola"] } }, [], "en", t);
+  check("lucky-sort scopes an annotated lucky to its owned form", annL.luckyFamilySort.includes("!+vulpix,!fire"), annL.luckyFamilySort);
+  const empty = buildFilters([], [], DEFAULT_CONFIG, [], "en", t);
+  check("lucky-sort empty with no luckies", empty.luckyFamilySort === "");
+}
+
 console.log(`\n${failures === 0 ? "✓ All lucky-logic checks passed." : `✗ ${failures} failure(s).`}`);
 process.exit(failures === 0 ? 0 : 1);
