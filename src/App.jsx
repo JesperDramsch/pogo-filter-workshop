@@ -1179,7 +1179,7 @@ export function buildFilters(
 		const ownedSet = new Set(ownedKeys);
 		const owned = catalog.filter((f) => ownedSet.has(f.key));
 		if (owned.length === 0 || owned.length >= catalog.length) return [];
-		return catalog.filter((f) => !ownedSet.has(f.key) && formDropTerms(f));
+		return catalog.filter((f) => !ownedSet.has(f.key) && formDropTerms(f).length > 0);
 	};
 
 	// Lucky-hundo-sort intersection: the regional forms where BOTH the hundo and the
