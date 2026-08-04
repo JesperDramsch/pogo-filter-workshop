@@ -2292,10 +2292,19 @@ export function buildFilters(
 	// locale for the pack-preview chips in the editor.
 	const friendCollectCuratedSet = new Set((cfg.friendCollectSpecies || []).map(canonKey));
 	const friendCollectSuggestions = [];
-	const pushFriendCollectSuggestion = (kind, id, title, meta, inputs, { cap = Infinity, keepStages = false } = {}) => {
+	// timeLimited (event/egg packs): covered and curated species stay in the
+	// pack, flagged via parallel `owned` / `curated` arrays, instead of pruning
+	// it — a roster that owns or already hunts every spawn would otherwise
+	// silently swallow an event pack, indistinguishable from "no event". Owned
+	// entries queue behind the addable ones and curated ones last, so a cap
+	// never costs an addable species its slot; curated entries are purely
+	// informational (an Add never touches them — re-adding is a no-op union).
+	// Evergreen/meta packs keep prune-to-vanish: consumed means done.
+	const pushFriendCollectSuggestion = (kind, id, title, meta, inputs, { cap = Infinity, keepStages = false, timeLimited = false } = {}) => {
 		const seen = new Set();
-		const species = [];
-		const display = [];
+		const picked = [];
+		const ownedQueue = [];
+		const curatedQueue = [];
 		for (const input of inputs || []) {
 			const info = resolveSpeciesInfo(input);
 			if (!info) continue;
@@ -2305,12 +2314,35 @@ export function buildFilters(
 			const stored = pokemonNameFor(String(dex));
 			if (!stored || seen.has(stored)) continue;
 			seen.add(stored);
-			if (friendCollectCuratedSet.has(stored) || friendCollectCovered(stored)) continue;
-			species.push(stored);
-			display.push(pokemonNameFor(String(dex), outputLocale) || stored);
-			if (species.length >= cap) break;
+			const curated = friendCollectCuratedSet.has(stored);
+			const covered = !curated && friendCollectCovered(stored);
+			if ((curated || covered) && !timeLimited) continue;
+			const entry = { stored, disp: pokemonNameFor(String(dex), outputLocale) || stored, covered, curated };
+			if (curated) curatedQueue.push(entry);
+			else if (covered) ownedQueue.push(entry);
+			else {
+				picked.push(entry);
+				if (picked.length >= cap) break;
+			}
 		}
-		if (species.length > 0) friendCollectSuggestions.push({ kind, id, title, ...meta, species, display });
+		for (const entry of [...ownedQueue, ...curatedQueue]) {
+			if (picked.length >= cap) break;
+			picked.push(entry);
+		}
+		if (picked.length === 0) return;
+		const suggestion = {
+			kind,
+			id,
+			title,
+			...meta,
+			species: picked.map((e) => e.stored),
+			display: picked.map((e) => e.disp),
+		};
+		if (timeLimited) {
+			suggestion.owned = picked.map((e) => e.covered);
+			suggestion.curated = picked.map((e) => e.curated);
+		}
+		friendCollectSuggestions.push(suggestion);
 	};
 	// Event spawns — running or upcoming events only; one suggestion per event
 	// so the set can be refreshed for the latest event as feeds update.
@@ -2324,6 +2356,7 @@ export function buildFilters(
 			ev.title,
 			{ start: ev.start, end: ev.end },
 			(ev.spawnDex || []).map(String),
+			{ timeLimited: true },
 		);
 	}
 	// Egg pools — Season pools run for months, event pools for days; hatched
@@ -2342,7 +2375,7 @@ export function buildFilters(
 			pool.title,
 			{ start: pool.start, end: pool.end },
 			(pool.eggDex || []).map(String),
-			{ cap: 25, keepStages: true },
+			{ cap: 25, keepStages: true, timeLimited: true },
 		);
 	}
 	// Evergreen packs — always on offer (no event gate: they shrink as they're
@@ -6017,18 +6050,27 @@ function FriendCollectEditor({
 	function togglePreview(id) {
 		setOpenPreviews((prev) => ({ ...prev, [id]: !prev[id] }));
 	}
-	function togglePackSpecies(packId, name) {
+	// Species the user already covers (lucky/hundo per mode) ride along in
+	// time-limited packs, flagged via `owned`. They start deselected — the Add
+	// count stays honest — but a tap opts them back in (re-hunt during an
+	// event). Already-curated species (`curated`) ride along too, purely for
+	// the full event picture: inert, dimmed, never part of an Add.
+	function packDefaultOff(s) {
+		return s.species.filter((_, i) => (s.owned || [])[i] || (s.curated || [])[i]);
+	}
+	function togglePackSpecies(pack, name, index) {
+		if ((pack.curated || [])[index]) return;
 		setPackDeselected((prev) => {
-			const next = new Set(prev[packId] || []);
+			const next = new Set(prev[pack.id] ?? packDefaultOff(pack));
 			if (next.has(name)) next.delete(name);
 			else next.add(name);
-			return { ...prev, [packId]: [...next] };
+			return { ...prev, [pack.id]: [...next] };
 		});
 	}
 	// What an Add would actually add, after the preview de-selections.
 	function packSelection(s) {
-		const off = new Set(packDeselected[s.id] || []);
-		return s.species.filter((name) => !off.has(name));
+		const off = new Set(packDeselected[s.id] ?? packDefaultOff(s));
+		return s.species.filter((name, i) => !(s.curated || [])[i] && !off.has(name));
 	}
 
 	const suggestionLabel = (s) => {
@@ -6127,7 +6169,10 @@ function FriendCollectEditor({
 										<div className='mono text-[10px] uppercase tracking-wider text-[#5C6975]'>
 											{t(`app.filter.friend_collect_group_${group.key}`)}
 										</div>
-										{packs.map((s) => (
+										{packs.map((s) => {
+											const selected = packSelection(s);
+											const offNames = new Set(packDeselected[s.id] ?? packDefaultOff(s));
+											return (
 											<div key={s.id} className='border border-[#1F2933] rounded px-2.5 py-1.5 bg-[#0B0F14]'>
 												<div className='flex items-center justify-between gap-2'>
 													<div className='mono text-xs text-[#E6EDF3] min-w-0'>
@@ -6139,13 +6184,13 @@ function FriendCollectEditor({
 														</span>
 													</div>
 													<button
-														onClick={() => addSet(packSelection(s))}
-														disabled={packSelection(s).length === 0}
+														onClick={() => addSet(selected)}
+														disabled={selected.length === 0}
 														className='mono text-xs bg-[#27AE60] hover:bg-[#3FCF80] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-2.5 py-1 rounded transition flex items-center gap-1 shrink-0'
 													>
 														<Plus size={12} /> {t('app.collectibles.add_button')}
-														{packSelection(s).length < s.species.length &&
-															` ${packSelection(s).length}/${s.species.length}`}
+														{selected.length < s.species.length &&
+															` ${selected.length}/${s.species.length}`}
 													</button>
 												</div>
 												{/* Species preview: what would this Add actually add? Open the
@@ -6166,19 +6211,36 @@ function FriendCollectEditor({
 														<p className='mono text-[10px] text-[#5C6975]'>
 															{t('app.filter.friend_collect_preview_help')}
 														</p>
+														{(s.owned || []).some(Boolean) && (
+															<p className='mono text-[10px] text-[#5C6975]'>
+																{t('app.filter.friend_collect_preview_owned_help')}
+															</p>
+														)}
+														{(s.curated || []).some(Boolean) && (
+															<p className='mono text-[10px] text-[#5C6975]'>
+																{t('app.filter.friend_collect_preview_curated_help')}
+															</p>
+														)}
 														<div className='flex flex-wrap gap-1'>
 															{s.species.map((name, i) => {
-																const off = (packDeselected[s.id] || []).includes(name);
+																const isCurated = !!(s.curated || [])[i];
+																const isOwned = !!(s.owned || [])[i];
+																const off = offNames.has(name);
 																return (
 																	<button
 																		key={name}
-																		onClick={() => togglePackSpecies(s.id, name)}
+																		onClick={() => togglePackSpecies(s, name, i)}
 																		className={`mono text-[11px] px-2 py-0.5 rounded border transition ${
-																			off
-																				? 'bg-[#5C6975]/10 text-[#5C6975] border-[#2D3A47] line-through'
-																				: 'bg-[#27AE60]/15 text-[#27AE60] border-[#27AE60]/40'
+																			isCurated
+																				? 'bg-[#5EAFC5]/10 text-[#5EAFC5]/60 border-[#5EAFC5]/25 cursor-default'
+																				: off
+																					? isOwned
+																						? 'bg-[#F5B82E]/10 text-[#F5B82E]/70 border-[#F5B82E]/30 line-through'
+																						: 'bg-[#5C6975]/10 text-[#5C6975] border-[#2D3A47] line-through'
+																					: 'bg-[#27AE60]/15 text-[#27AE60] border-[#27AE60]/40'
 																		}`}
 																	>
+																		{isCurated ? '≡ ' : isOwned ? '✓ ' : ''}
 																		{(s.display || [])[i] || name}
 																	</button>
 																);
@@ -6197,7 +6259,8 @@ function FriendCollectEditor({
 														</p>
 													))}
 											</div>
-										))}
+											);
+										})}
 									</div>
 								);
 							})}
