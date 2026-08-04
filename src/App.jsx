@@ -6058,11 +6058,8 @@ function FriendCollectEditor({
 	function packDefaultOff(s) {
 		return s.species.filter((_, i) => (s.owned || [])[i] || (s.curated || [])[i]);
 	}
-	function packCurated(s, name) {
-		return !!(s.curated || [])[s.species.indexOf(name)];
-	}
-	function togglePackSpecies(pack, name) {
-		if (packCurated(pack, name)) return;
+	function togglePackSpecies(pack, name, index) {
+		if ((pack.curated || [])[index]) return;
 		setPackDeselected((prev) => {
 			const next = new Set(prev[pack.id] ?? packDefaultOff(pack));
 			if (next.has(name)) next.delete(name);
@@ -6073,7 +6070,7 @@ function FriendCollectEditor({
 	// What an Add would actually add, after the preview de-selections.
 	function packSelection(s) {
 		const off = new Set(packDeselected[s.id] ?? packDefaultOff(s));
-		return s.species.filter((name) => !off.has(name) && !packCurated(s, name));
+		return s.species.filter((name, i) => !(s.curated || [])[i] && !off.has(name));
 	}
 
 	const suggestionLabel = (s) => {
@@ -6172,7 +6169,10 @@ function FriendCollectEditor({
 										<div className='mono text-[10px] uppercase tracking-wider text-[#5C6975]'>
 											{t(`app.filter.friend_collect_group_${group.key}`)}
 										</div>
-										{packs.map((s) => (
+										{packs.map((s) => {
+											const selected = packSelection(s);
+											const offNames = new Set(packDeselected[s.id] ?? packDefaultOff(s));
+											return (
 											<div key={s.id} className='border border-[#1F2933] rounded px-2.5 py-1.5 bg-[#0B0F14]'>
 												<div className='flex items-center justify-between gap-2'>
 													<div className='mono text-xs text-[#E6EDF3] min-w-0'>
@@ -6184,13 +6184,13 @@ function FriendCollectEditor({
 														</span>
 													</div>
 													<button
-														onClick={() => addSet(packSelection(s))}
-														disabled={packSelection(s).length === 0}
+														onClick={() => addSet(selected)}
+														disabled={selected.length === 0}
 														className='mono text-xs bg-[#27AE60] hover:bg-[#3FCF80] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-2.5 py-1 rounded transition flex items-center gap-1 shrink-0'
 													>
 														<Plus size={12} /> {t('app.collectibles.add_button')}
-														{packSelection(s).length < s.species.length &&
-															` ${packSelection(s).length}/${s.species.length}`}
+														{selected.length < s.species.length &&
+															` ${selected.length}/${s.species.length}`}
 													</button>
 												</div>
 												{/* Species preview: what would this Add actually add? Open the
@@ -6225,11 +6225,11 @@ function FriendCollectEditor({
 															{s.species.map((name, i) => {
 																const isCurated = !!(s.curated || [])[i];
 																const isOwned = !!(s.owned || [])[i];
-																const off = (packDeselected[s.id] ?? packDefaultOff(s)).includes(name);
+																const off = offNames.has(name);
 																return (
 																	<button
 																		key={name}
-																		onClick={() => togglePackSpecies(s, name)}
+																		onClick={() => togglePackSpecies(s, name, i)}
 																		className={`mono text-[11px] px-2 py-0.5 rounded border transition ${
 																			isCurated
 																				? 'bg-[#5EAFC5]/10 text-[#5EAFC5]/60 border-[#5EAFC5]/25 cursor-default'
@@ -6259,7 +6259,8 @@ function FriendCollectEditor({
 														</p>
 													))}
 											</div>
-										))}
+											);
+										})}
 									</div>
 								);
 							})}
