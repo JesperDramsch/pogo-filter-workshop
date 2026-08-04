@@ -146,9 +146,17 @@ console.log('\nScenario 5: suggestion packs — lineup, caps, hygiene');
 		(sug.find((s) => s.kind === 'raids')?.species.length || 0) > 0,
 	);
 	check(
-		'already-curated and owned species pruned',
-		!sug.some(
-			(s) => s.species.includes('dratini') || s.species.includes('lapras') || s.species.includes('dragoran'),
+		'already-curated species pruned from every pack',
+		!sug.some((s) => s.species.includes('dratini') || s.species.includes('lapras')),
+	);
+	// Owned-but-not-curated species (lucky dragoran) may ride along in the
+	// time-limited packs — but only there, and only flagged as owned.
+	check(
+		'owned species appear at most in time-limited packs, flagged',
+		sug.every((s) =>
+			s.species.every(
+				(sp, i) => sp !== 'dragoran' || (['event', 'eggs'].includes(s.kind) && s.owned?.[i] === true),
+			),
 		),
 	);
 	check(
@@ -251,6 +259,73 @@ console.log('\nScenario 7: egg-pool sets');
 		'egg set ids map to pool ids',
 		eggSug.every((s) => activePools.some((p) => p.id === s.id)),
 	);
+}
+
+console.log('\nScenario 7b: time-limited packs keep covered species — flagged, never vanishing');
+{
+	// The live regression (the wildspawn-pack complaint): owning luckies of
+	// every spawn in an event made the whole event pack disappear, looking
+	// exactly like "no pack was added". Snapshot-agnostic: run against the
+	// first live/upcoming event whose pack survives the tradeability filters.
+	const emptyCfg = { ...cfg, friendCollectSpecies: [], friendCollectMode: 'lucky' };
+	const baseline = buildFilters([], [], emptyCfg, [], 'en', t);
+	const basePack = baseline.friendCollectSuggestions.find((s) => s.kind === 'event');
+	if (!basePack) {
+		console.log('  (no event pack in the current snapshot — skipped)');
+	} else {
+		check('event packs carry owned flags aligned with species',
+			Array.isArray(basePack.owned) && basePack.owned.length === basePack.species.length);
+		check('nothing owned → nothing flagged', basePack.owned.every((o) => o === false));
+		// Own a lucky of EVERY species in the pack: the pack must survive, fully flagged.
+		const covered = buildFilters([], basePack.species, emptyCfg, [], 'en', t);
+		const coveredPack = covered.friendCollectSuggestions.find((s) => s.id === basePack.id);
+		check('fully-covered event pack still surfaces', !!coveredPack, basePack.id);
+		check('same species lineup, every one flagged owned',
+			!!coveredPack &&
+				JSON.stringify([...coveredPack.species].sort()) === JSON.stringify([...basePack.species].sort()) &&
+				coveredPack.owned.every(Boolean),
+			JSON.stringify(coveredPack?.owned));
+		// Partial coverage: owned entries queue behind the addable ones (a cap
+		// must never cost an addable species its slot to an owned one).
+		if (basePack.species.length > 1) {
+			const partial = buildFilters([], [basePack.species[0]], emptyCfg, [], 'en', t);
+			const partialPack = partial.friendCollectSuggestions.find((s) => s.id === basePack.id);
+			check('partially-covered pack keeps the owned species, flagged',
+				!!partialPack &&
+					partialPack.species.includes(basePack.species[0]) &&
+					partialPack.owned[partialPack.species.indexOf(basePack.species[0])] === true,
+				JSON.stringify(partialPack?.owned));
+			check('owned entries sort behind addable ones',
+				!!partialPack && partialPack.owned.every((o, i, a) => i === 0 || !(a[i - 1] && !o)),
+				JSON.stringify(partialPack?.owned));
+		}
+		// Curation still consumes the pack — re-adding curated species is a no-op.
+		const curated = buildFilters([], [], { ...emptyCfg, friendCollectSpecies: basePack.species }, [], 'en', t);
+		check('fully-curated event pack still disappears',
+			!curated.friendCollectSuggestions.some((s) => s.id === basePack.id));
+	}
+	// Egg packs share the keepOwned behavior… (skip 25-capped pools: covering a
+	// capped pack pulls previously cut, uncovered species into the freed slots)
+	const eggBaseline = buildFilters([], [], emptyCfg, [], 'en', t)
+		.friendCollectSuggestions.find((s) => s.kind === 'eggs' && s.species.length < 25);
+	if (eggBaseline) {
+		const eggCovered = buildFilters([], eggBaseline.species, emptyCfg, [], 'en', t)
+			.friendCollectSuggestions.find((s) => s.id === eggBaseline.id);
+		check('fully-covered egg pack still surfaces, flagged', !!eggCovered && eggCovered.owned.every(Boolean));
+	}
+	// …while evergreen/meta packs keep prune-to-vanish and stay unflagged.
+	const powerNames = [
+		...new Set(
+			(SPECIES_META.powerLineDex || []).map((d) => pokemonNameFor(String(collectibleBaseDex(d)))).filter(Boolean),
+		),
+	];
+	const fullyOwned = buildFilters([], powerNames, emptyCfg, [], 'en', t);
+	check('fully-OWNED power-lines pack still disappears',
+		!fullyOwned.friendCollectSuggestions.some((s) => s.kind === 'powerlines'));
+	check('evergreen/meta packs carry no owned array',
+		baseline.friendCollectSuggestions
+			.filter((s) => !['event', 'eggs'].includes(s.kind))
+			.every((s) => s.owned === undefined));
 }
 
 console.log('\nScenario 8: output locale rendering');

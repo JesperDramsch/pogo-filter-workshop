@@ -2292,10 +2292,16 @@ export function buildFilters(
 	// locale for the pack-preview chips in the editor.
 	const friendCollectCuratedSet = new Set((cfg.friendCollectSpecies || []).map(canonKey));
 	const friendCollectSuggestions = [];
-	const pushFriendCollectSuggestion = (kind, id, title, meta, inputs, { cap = Infinity, keepStages = false } = {}) => {
+	// keepOwned (time-limited packs): covered species stay in the pack, flagged
+	// via a parallel `owned` array, instead of pruning it — a fully-lucky roster
+	// would otherwise silently swallow an event pack, indistinguishable from
+	// "no event". Owned entries queue behind the uncovered ones so a cap never
+	// costs an addable species its slot. Curated species still drop everywhere:
+	// re-adding them is a no-op union.
+	const pushFriendCollectSuggestion = (kind, id, title, meta, inputs, { cap = Infinity, keepStages = false, keepOwned = false } = {}) => {
 		const seen = new Set();
-		const species = [];
-		const display = [];
+		const picked = [];
+		const ownedQueue = [];
 		for (const input of inputs || []) {
 			const info = resolveSpeciesInfo(input);
 			if (!info) continue;
@@ -2305,12 +2311,31 @@ export function buildFilters(
 			const stored = pokemonNameFor(String(dex));
 			if (!stored || seen.has(stored)) continue;
 			seen.add(stored);
-			if (friendCollectCuratedSet.has(stored) || friendCollectCovered(stored)) continue;
-			species.push(stored);
-			display.push(pokemonNameFor(String(dex), outputLocale) || stored);
-			if (species.length >= cap) break;
+			if (friendCollectCuratedSet.has(stored)) continue;
+			const covered = friendCollectCovered(stored);
+			if (covered && !keepOwned) continue;
+			const entry = { stored, disp: pokemonNameFor(String(dex), outputLocale) || stored, covered };
+			if (covered) ownedQueue.push(entry);
+			else {
+				picked.push(entry);
+				if (picked.length >= cap) break;
+			}
 		}
-		if (species.length > 0) friendCollectSuggestions.push({ kind, id, title, ...meta, species, display });
+		for (const entry of ownedQueue) {
+			if (picked.length >= cap) break;
+			picked.push(entry);
+		}
+		if (picked.length === 0) return;
+		const suggestion = {
+			kind,
+			id,
+			title,
+			...meta,
+			species: picked.map((e) => e.stored),
+			display: picked.map((e) => e.disp),
+		};
+		if (keepOwned) suggestion.owned = picked.map((e) => e.covered);
+		friendCollectSuggestions.push(suggestion);
 	};
 	// Event spawns — running or upcoming events only; one suggestion per event
 	// so the set can be refreshed for the latest event as feeds update.
@@ -2324,6 +2349,7 @@ export function buildFilters(
 			ev.title,
 			{ start: ev.start, end: ev.end },
 			(ev.spawnDex || []).map(String),
+			{ keepOwned: true },
 		);
 	}
 	// Egg pools — Season pools run for months, event pools for days; hatched
@@ -2342,7 +2368,7 @@ export function buildFilters(
 			pool.title,
 			{ start: pool.start, end: pool.end },
 			(pool.eggDex || []).map(String),
-			{ cap: 25, keepStages: true },
+			{ cap: 25, keepStages: true, keepOwned: true },
 		);
 	}
 	// Evergreen packs — always on offer (no event gate: they shrink as they're
@@ -6017,17 +6043,23 @@ function FriendCollectEditor({
 	function togglePreview(id) {
 		setOpenPreviews((prev) => ({ ...prev, [id]: !prev[id] }));
 	}
-	function togglePackSpecies(packId, name) {
+	// Species the user already covers (lucky/hundo per mode) ride along in
+	// time-limited packs, flagged via `owned`. They start deselected — the Add
+	// count stays honest — but a tap opts them back in (re-hunt during an event).
+	function packDefaultOff(s) {
+		return s.species.filter((_, i) => (s.owned || [])[i]);
+	}
+	function togglePackSpecies(pack, name) {
 		setPackDeselected((prev) => {
-			const next = new Set(prev[packId] || []);
+			const next = new Set(prev[pack.id] ?? packDefaultOff(pack));
 			if (next.has(name)) next.delete(name);
 			else next.add(name);
-			return { ...prev, [packId]: [...next] };
+			return { ...prev, [pack.id]: [...next] };
 		});
 	}
 	// What an Add would actually add, after the preview de-selections.
 	function packSelection(s) {
-		const off = new Set(packDeselected[s.id] || []);
+		const off = new Set(packDeselected[s.id] ?? packDefaultOff(s));
 		return s.species.filter((name) => !off.has(name));
 	}
 
@@ -6166,19 +6198,28 @@ function FriendCollectEditor({
 														<p className='mono text-[10px] text-[#5C6975]'>
 															{t('app.filter.friend_collect_preview_help')}
 														</p>
+														{(s.owned || []).some(Boolean) && (
+															<p className='mono text-[10px] text-[#5C6975]'>
+																{t('app.filter.friend_collect_preview_owned_help')}
+															</p>
+														)}
 														<div className='flex flex-wrap gap-1'>
 															{s.species.map((name, i) => {
-																const off = (packDeselected[s.id] || []).includes(name);
+																const off = (packDeselected[s.id] ?? packDefaultOff(s)).includes(name);
+																const isOwned = !!(s.owned || [])[i];
 																return (
 																	<button
 																		key={name}
-																		onClick={() => togglePackSpecies(s.id, name)}
+																		onClick={() => togglePackSpecies(s, name)}
 																		className={`mono text-[11px] px-2 py-0.5 rounded border transition ${
 																			off
-																				? 'bg-[#5C6975]/10 text-[#5C6975] border-[#2D3A47] line-through'
+																				? isOwned
+																					? 'bg-[#F5B82E]/10 text-[#F5B82E]/70 border-[#F5B82E]/30 line-through'
+																					: 'bg-[#5C6975]/10 text-[#5C6975] border-[#2D3A47] line-through'
 																				: 'bg-[#27AE60]/15 text-[#27AE60] border-[#27AE60]/40'
 																		}`}
 																	>
+																		{isOwned ? '✓ ' : ''}
 																		{(s.display || [])[i] || name}
 																	</button>
 																);
