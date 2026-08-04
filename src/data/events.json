@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-08-03T11:42:27.137Z",
+  "fetchedAt": "2026-08-04T10:49:13.007Z",
   "events": [
     {
       "id": "event-summer-marathon-arctic-embers-2026-08-04t10-00-00",
@@ -16,10 +16,16 @@
         220,
         361,
         459,
-        582
+        582,
+        607,
+        613,
+        667
       ],
       "spawns": [
+        "Cubchoo",
         "Growlithe",
+        "Litleo",
+        "Litwick",
         "Ponyta",
         "Slugma",
         "Snorunt",
@@ -42,6 +48,33 @@
       ],
       "spawns": [
         "Nickit"
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "event-ultra-unlock-water-festival-2026-08-18t10-00-00",
+      "title": "Ultra Unlock: Water Festival",
+      "category": "Event",
+      "start": "2026-08-18T10:00:00",
+      "end": "2026-08-24T20:00:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        54,
+        118,
+        349,
+        366,
+        747,
+        767,
+        960
+      ],
+      "spawns": [
+        "Clamperl",
+        "Feebas",
+        "Goldeen",
+        "Mareanie",
+        "Psyduck",
+        "Wiglett",
+        "Wimpod"
       ],
       "unresolved": []
     }
@@ -148,11 +181,13 @@
       "eggDex": [
         215,
         554,
+        636,
         850,
         872
       ],
       "eggs": [
         "Darumaka",
+        "Larvesta",
         "Sizzlipede",
         "Sneasel",
         "Snom"
