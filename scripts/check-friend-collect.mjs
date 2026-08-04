@@ -145,18 +145,18 @@ console.log('\nScenario 5: suggestion packs — lineup, caps, hygiene');
 		'raids pack survives the special-trade filter with real picks',
 		(sug.find((s) => s.kind === 'raids')?.species.length || 0) > 0,
 	);
+	// Curated species (dratini/lapras) and owned-but-not-curated species (lucky
+	// dragoran) may ride along in the time-limited packs — but only there, and
+	// only carrying the matching flag. Evergreen/meta packs prune them outright.
 	check(
-		'already-curated species pruned from every pack',
-		!sug.some((s) => s.species.includes('dratini') || s.species.includes('lapras')),
-	);
-	// Owned-but-not-curated species (lucky dragoran) may ride along in the
-	// time-limited packs — but only there, and only flagged as owned.
-	check(
-		'owned species appear at most in time-limited packs, flagged',
+		'curated/owned species appear at most in time-limited packs, correctly flagged',
 		sug.every((s) =>
-			s.species.every(
-				(sp, i) => sp !== 'dragoran' || (['event', 'eggs'].includes(s.kind) && s.owned?.[i] === true),
-			),
+			s.species.every((sp, i) => {
+				if (sp === 'dratini' || sp === 'lapras')
+					return ['event', 'eggs'].includes(s.kind) && s.curated?.[i] === true;
+				if (sp === 'dragoran') return ['event', 'eggs'].includes(s.kind) && s.owned?.[i] === true;
+				return true;
+			}),
 		),
 	);
 	check(
@@ -261,7 +261,7 @@ console.log('\nScenario 7: egg-pool sets');
 	);
 }
 
-console.log('\nScenario 7b: time-limited packs keep covered species — flagged, never vanishing');
+console.log('\nScenario 7b: time-limited packs keep covered/curated species — flagged, never vanishing');
 {
 	// The live regression (the wildspawn-pack complaint): owning luckies of
 	// every spawn in an event made the whole event pack disappear, looking
@@ -273,9 +273,11 @@ console.log('\nScenario 7b: time-limited packs keep covered species — flagged,
 	if (!basePack) {
 		console.log('  (no event pack in the current snapshot — skipped)');
 	} else {
-		check('event packs carry owned flags aligned with species',
-			Array.isArray(basePack.owned) && basePack.owned.length === basePack.species.length);
-		check('nothing owned → nothing flagged', basePack.owned.every((o) => o === false));
+		check('event packs carry owned/curated flags aligned with species',
+			Array.isArray(basePack.owned) && basePack.owned.length === basePack.species.length &&
+				Array.isArray(basePack.curated) && basePack.curated.length === basePack.species.length);
+		check('nothing owned/curated → nothing flagged',
+			basePack.owned.every((o) => o === false) && basePack.curated.every((c) => c === false));
 		// Own a lucky of EVERY species in the pack: the pack must survive, fully flagged.
 		const covered = buildFilters([], basePack.species, emptyCfg, [], 'en', t);
 		const coveredPack = covered.friendCollectSuggestions.find((s) => s.id === basePack.id);
@@ -299,13 +301,34 @@ console.log('\nScenario 7b: time-limited packs keep covered species — flagged,
 				!!partialPack && partialPack.owned.every((o, i, a) => i === 0 || !(a[i - 1] && !o)),
 				JSON.stringify(partialPack?.owned));
 		}
-		// Curation still consumes the pack — re-adding curated species is a no-op.
+		// Curated species stay too — inert (flagged curated, never owned), so the
+		// pack survives even a fully-curated event and shows the full picture.
 		const curated = buildFilters([], [], { ...emptyCfg, friendCollectSpecies: basePack.species }, [], 'en', t);
-		check('fully-curated event pack still disappears',
-			!curated.friendCollectSuggestions.some((s) => s.id === basePack.id));
+		const curatedPack = curated.friendCollectSuggestions.find((s) => s.id === basePack.id);
+		check('fully-curated event pack still surfaces', !!curatedPack, basePack.id);
+		check('curated entries flagged curated, not owned',
+			!!curatedPack && curatedPack.curated.every(Boolean) && curatedPack.owned.every((o) => o === false),
+			JSON.stringify({ curated: curatedPack?.curated, owned: curatedPack?.owned }));
+		// Mixed state: one owned, one curated, rest addable — addable first,
+		// owned next, curated last (cap priority order).
+		if (basePack.species.length > 2) {
+			const mixed = buildFilters([], [basePack.species[0]],
+				{ ...emptyCfg, friendCollectSpecies: [basePack.species[1]] }, [], 'en', t);
+			const mixedPack = mixed.friendCollectSuggestions.find((s) => s.id === basePack.id);
+			const rank = (i) => (mixedPack.curated[i] ? 2 : mixedPack.owned[i] ? 1 : 0);
+			check('mixed pack orders addable → owned → curated',
+				!!mixedPack && mixedPack.species.every((_, i) => i === 0 || rank(i - 1) <= rank(i)),
+				JSON.stringify({ owned: mixedPack?.owned, curated: mixedPack?.curated }));
+			check('mixed pack flags exactly the one owned and the one curated species',
+				!!mixedPack &&
+					mixedPack.owned.filter(Boolean).length === 1 &&
+					mixedPack.curated.filter(Boolean).length === 1 &&
+					mixedPack.owned[mixedPack.species.indexOf(basePack.species[0])] === true &&
+					mixedPack.curated[mixedPack.species.indexOf(basePack.species[1])] === true);
+		}
 	}
-	// Egg packs share the keepOwned behavior… (skip 25-capped pools: covering a
-	// capped pack pulls previously cut, uncovered species into the freed slots)
+	// Egg packs share the timeLimited behavior… (skip 25-capped pools: covering
+	// a capped pack pulls previously cut, uncovered species into the freed slots)
 	const eggBaseline = buildFilters([], [], emptyCfg, [], 'en', t)
 		.friendCollectSuggestions.find((s) => s.kind === 'eggs' && s.species.length < 25);
 	if (eggBaseline) {
@@ -322,10 +345,10 @@ console.log('\nScenario 7b: time-limited packs keep covered species — flagged,
 	const fullyOwned = buildFilters([], powerNames, emptyCfg, [], 'en', t);
 	check('fully-OWNED power-lines pack still disappears',
 		!fullyOwned.friendCollectSuggestions.some((s) => s.kind === 'powerlines'));
-	check('evergreen/meta packs carry no owned array',
+	check('evergreen/meta packs carry no owned/curated arrays',
 		baseline.friendCollectSuggestions
 			.filter((s) => !['event', 'eggs'].includes(s.kind))
-			.every((s) => s.owned === undefined));
+			.every((s) => s.owned === undefined && s.curated === undefined));
 }
 
 console.log('\nScenario 8: output locale rendering');

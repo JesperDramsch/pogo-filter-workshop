@@ -2292,16 +2292,19 @@ export function buildFilters(
 	// locale for the pack-preview chips in the editor.
 	const friendCollectCuratedSet = new Set((cfg.friendCollectSpecies || []).map(canonKey));
 	const friendCollectSuggestions = [];
-	// keepOwned (time-limited packs): covered species stay in the pack, flagged
-	// via a parallel `owned` array, instead of pruning it — a fully-lucky roster
-	// would otherwise silently swallow an event pack, indistinguishable from
-	// "no event". Owned entries queue behind the uncovered ones so a cap never
-	// costs an addable species its slot. Curated species still drop everywhere:
-	// re-adding them is a no-op union.
-	const pushFriendCollectSuggestion = (kind, id, title, meta, inputs, { cap = Infinity, keepStages = false, keepOwned = false } = {}) => {
+	// timeLimited (event/egg packs): covered and curated species stay in the
+	// pack, flagged via parallel `owned` / `curated` arrays, instead of pruning
+	// it — a roster that owns or already hunts every spawn would otherwise
+	// silently swallow an event pack, indistinguishable from "no event". Owned
+	// entries queue behind the addable ones and curated ones last, so a cap
+	// never costs an addable species its slot; curated entries are purely
+	// informational (an Add never touches them — re-adding is a no-op union).
+	// Evergreen/meta packs keep prune-to-vanish: consumed means done.
+	const pushFriendCollectSuggestion = (kind, id, title, meta, inputs, { cap = Infinity, keepStages = false, timeLimited = false } = {}) => {
 		const seen = new Set();
 		const picked = [];
 		const ownedQueue = [];
+		const curatedQueue = [];
 		for (const input of inputs || []) {
 			const info = resolveSpeciesInfo(input);
 			if (!info) continue;
@@ -2311,17 +2314,18 @@ export function buildFilters(
 			const stored = pokemonNameFor(String(dex));
 			if (!stored || seen.has(stored)) continue;
 			seen.add(stored);
-			if (friendCollectCuratedSet.has(stored)) continue;
-			const covered = friendCollectCovered(stored);
-			if (covered && !keepOwned) continue;
-			const entry = { stored, disp: pokemonNameFor(String(dex), outputLocale) || stored, covered };
-			if (covered) ownedQueue.push(entry);
+			const curated = friendCollectCuratedSet.has(stored);
+			const covered = !curated && friendCollectCovered(stored);
+			if ((curated || covered) && !timeLimited) continue;
+			const entry = { stored, disp: pokemonNameFor(String(dex), outputLocale) || stored, covered, curated };
+			if (curated) curatedQueue.push(entry);
+			else if (covered) ownedQueue.push(entry);
 			else {
 				picked.push(entry);
 				if (picked.length >= cap) break;
 			}
 		}
-		for (const entry of ownedQueue) {
+		for (const entry of [...ownedQueue, ...curatedQueue]) {
 			if (picked.length >= cap) break;
 			picked.push(entry);
 		}
@@ -2334,7 +2338,10 @@ export function buildFilters(
 			species: picked.map((e) => e.stored),
 			display: picked.map((e) => e.disp),
 		};
-		if (keepOwned) suggestion.owned = picked.map((e) => e.covered);
+		if (timeLimited) {
+			suggestion.owned = picked.map((e) => e.covered);
+			suggestion.curated = picked.map((e) => e.curated);
+		}
 		friendCollectSuggestions.push(suggestion);
 	};
 	// Event spawns — running or upcoming events only; one suggestion per event
@@ -2349,7 +2356,7 @@ export function buildFilters(
 			ev.title,
 			{ start: ev.start, end: ev.end },
 			(ev.spawnDex || []).map(String),
-			{ keepOwned: true },
+			{ timeLimited: true },
 		);
 	}
 	// Egg pools — Season pools run for months, event pools for days; hatched
@@ -2368,7 +2375,7 @@ export function buildFilters(
 			pool.title,
 			{ start: pool.start, end: pool.end },
 			(pool.eggDex || []).map(String),
-			{ cap: 25, keepStages: true, keepOwned: true },
+			{ cap: 25, keepStages: true, timeLimited: true },
 		);
 	}
 	// Evergreen packs — always on offer (no event gate: they shrink as they're
@@ -6045,11 +6052,17 @@ function FriendCollectEditor({
 	}
 	// Species the user already covers (lucky/hundo per mode) ride along in
 	// time-limited packs, flagged via `owned`. They start deselected — the Add
-	// count stays honest — but a tap opts them back in (re-hunt during an event).
+	// count stays honest — but a tap opts them back in (re-hunt during an
+	// event). Already-curated species (`curated`) ride along too, purely for
+	// the full event picture: inert, dimmed, never part of an Add.
 	function packDefaultOff(s) {
-		return s.species.filter((_, i) => (s.owned || [])[i]);
+		return s.species.filter((_, i) => (s.owned || [])[i] || (s.curated || [])[i]);
+	}
+	function packCurated(s, name) {
+		return !!(s.curated || [])[s.species.indexOf(name)];
 	}
 	function togglePackSpecies(pack, name) {
+		if (packCurated(pack, name)) return;
 		setPackDeselected((prev) => {
 			const next = new Set(prev[pack.id] ?? packDefaultOff(pack));
 			if (next.has(name)) next.delete(name);
@@ -6060,7 +6073,7 @@ function FriendCollectEditor({
 	// What an Add would actually add, after the preview de-selections.
 	function packSelection(s) {
 		const off = new Set(packDeselected[s.id] ?? packDefaultOff(s));
-		return s.species.filter((name) => !off.has(name));
+		return s.species.filter((name) => !off.has(name) && !packCurated(s, name));
 	}
 
 	const suggestionLabel = (s) => {
@@ -6203,23 +6216,31 @@ function FriendCollectEditor({
 																{t('app.filter.friend_collect_preview_owned_help')}
 															</p>
 														)}
+														{(s.curated || []).some(Boolean) && (
+															<p className='mono text-[10px] text-[#5C6975]'>
+																{t('app.filter.friend_collect_preview_curated_help')}
+															</p>
+														)}
 														<div className='flex flex-wrap gap-1'>
 															{s.species.map((name, i) => {
-																const off = (packDeselected[s.id] ?? packDefaultOff(s)).includes(name);
+																const isCurated = !!(s.curated || [])[i];
 																const isOwned = !!(s.owned || [])[i];
+																const off = (packDeselected[s.id] ?? packDefaultOff(s)).includes(name);
 																return (
 																	<button
 																		key={name}
 																		onClick={() => togglePackSpecies(s, name)}
 																		className={`mono text-[11px] px-2 py-0.5 rounded border transition ${
-																			off
-																				? isOwned
-																					? 'bg-[#F5B82E]/10 text-[#F5B82E]/70 border-[#F5B82E]/30 line-through'
-																					: 'bg-[#5C6975]/10 text-[#5C6975] border-[#2D3A47] line-through'
-																				: 'bg-[#27AE60]/15 text-[#27AE60] border-[#27AE60]/40'
+																			isCurated
+																				? 'bg-[#5EAFC5]/10 text-[#5EAFC5]/60 border-[#5EAFC5]/25 cursor-default'
+																				: off
+																					? isOwned
+																						? 'bg-[#F5B82E]/10 text-[#F5B82E]/70 border-[#F5B82E]/30 line-through'
+																						: 'bg-[#5C6975]/10 text-[#5C6975] border-[#2D3A47] line-through'
+																					: 'bg-[#27AE60]/15 text-[#27AE60] border-[#27AE60]/40'
 																		}`}
 																	>
-																		{isOwned ? '✓ ' : ''}
+																		{isCurated ? '≡ ' : isOwned ? '✓ ' : ''}
 																		{(s.display || [])[i] || name}
 																	</button>
 																);
