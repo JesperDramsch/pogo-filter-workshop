@@ -661,6 +661,68 @@
           ]
         }
       ]
+    },
+    {
+      "eventID": "groudon-in-5-star-raid-battles-august-2026",
+      "name": "Groudon in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-08-12T06:00:00.000",
+      "end": "2026-08-18T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "GROUDON",
+          "names": {
+            "en": "Groudon"
+          },
+          "types": [
+            "ground"
+          ],
+          "resistorTypes": [
+            "flying",
+            "bug",
+            "grass"
+          ],
+          "seMoveTypes": [
+            "water",
+            "grass",
+            "ice"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-garchomp-in-mega-raids-august-2026",
+      "name": "Mega Garchomp in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-08-12T06:00:00.000",
+      "end": "2026-08-18T22:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "GARCHOMP",
+          "names": {
+            "en": "Garchomp"
+          },
+          "types": [
+            "dragon",
+            "ground"
+          ],
+          "resistorTypes": [
+            "flying",
+            "bug",
+            "grass",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "ice",
+            "dragon",
+            "fairy"
+          ]
+        }
+      ]
     }
   ]
 }
