@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-07-31T11:02:51.139Z",
+  "fetchedAt": "2026-08-06T10:58:06.068Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -508,13 +508,6 @@
     }
   },
   "gblEvents": [
-    {
-      "eventID": "gbl-forever-forward_great-league_master-premier",
-      "name": "Great League and Master Premier | Forever Forward",
-      "start": "2026-07-28T20:00:00.000Z",
-      "end": "2026-08-04T20:00:00.000Z",
-      "cups": []
-    },
     {
       "eventID": "gbl-forever-forward_ultra-league_weather-cup-great-league-edition",
       "name": "Ultra League and Weather Cup: Great League Edition | Forever Forward",
