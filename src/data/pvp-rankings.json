@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-08-06T10:58:06.068Z",
+  "fetchedAt": "2026-08-08T09:06:48.076Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -505,6 +505,133 @@
           "name": "Tauros (Aqua)"
         }
       ]
+    },
+    "evolution": {
+      "id": "evolution",
+      "name": "Evolution Cup",
+      "cpCap": 1500,
+      "species": [
+        {
+          "dex": 364,
+          "name": "Sealeo"
+        },
+        {
+          "dex": 356,
+          "name": "Dusclops"
+        },
+        {
+          "dex": 680,
+          "name": "Doublade"
+        },
+        {
+          "dex": 860,
+          "name": "Morgrem"
+        },
+        {
+          "dex": 375,
+          "name": "Metang"
+        },
+        {
+          "dex": 958,
+          "name": "Tinkatuff"
+        },
+        {
+          "dex": 737,
+          "name": "Charjabug"
+        },
+        {
+          "dex": 372,
+          "name": "Shelgon"
+        },
+        {
+          "dex": 600,
+          "name": "Klang"
+        },
+        {
+          "dex": 305,
+          "name": "Lairon"
+        },
+        {
+          "dex": 783,
+          "name": "Hakamo-o"
+        },
+        {
+          "dex": 634,
+          "name": "Zweilous (Shadow)"
+        },
+        {
+          "dex": 148,
+          "name": "Dragonair (Shadow)"
+        },
+        {
+          "dex": 67,
+          "name": "Machoke (Shadow)"
+        },
+        {
+          "dex": 57,
+          "name": "Primeape (Shadow)"
+        },
+        {
+          "dex": 705,
+          "name": "Sliggoo"
+        },
+        {
+          "dex": 933,
+          "name": "Naclstack"
+        },
+        {
+          "dex": 502,
+          "name": "Dewott (Shadow)"
+        },
+        {
+          "dex": 217,
+          "name": "Ursaring"
+        },
+        {
+          "dex": 533,
+          "name": "Gurdurr"
+        },
+        {
+          "dex": 997,
+          "name": "Arctibax"
+        },
+        {
+          "dex": 838,
+          "name": "Carkol"
+        },
+        {
+          "dex": 8,
+          "name": "Wartortle"
+        },
+        {
+          "dex": 176,
+          "name": "Togetic"
+        },
+        {
+          "dex": 536,
+          "name": "Palpitoad"
+        },
+        {
+          "dex": 259,
+          "name": "Marshtomp"
+        },
+        {
+          "dex": 113,
+          "name": "Chansey"
+        },
+        {
+          "dex": 221,
+          "name": "Piloswine"
+        },
+        {
+          "dex": 82,
+          "name": "Magneton"
+        },
+        {
+          "dex": 30,
+          "name": "Nidorina"
+        }
+      ]
     }
   },
   "gblEvents": [
@@ -522,7 +649,9 @@
       "name": "Master League and Evolution Cup: Great League Edition | Forever Forward",
       "start": "2026-08-11T20:00:00.000Z",
       "end": "2026-08-18T20:00:00.000Z",
-      "cups": []
+      "cups": [
+        "evolution"
+      ]
     },
     {
       "eventID": "gbl-forever-forward_great-league_scroll-cup-great-league-edition",
