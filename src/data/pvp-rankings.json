@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-08-08T09:06:48.076Z",
+  "fetchedAt": "2026-08-09T09:07:48.089Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -632,6 +632,133 @@
           "name": "Nidorina"
         }
       ]
+    },
+    "scroll": {
+      "id": "scroll",
+      "name": "Scroll Cup",
+      "cpCap": 1500,
+      "species": [
+        {
+          "dex": 748,
+          "name": "Toxapex"
+        },
+        {
+          "dex": 630,
+          "name": "Mandibuzz"
+        },
+        {
+          "dex": 226,
+          "name": "Mantine"
+        },
+        {
+          "dex": 877,
+          "name": "Morpeko (Hangry)"
+        },
+        {
+          "dex": 923,
+          "name": "Pawmot"
+        },
+        {
+          "dex": 230,
+          "name": "Kingdra"
+        },
+        {
+          "dex": 635,
+          "name": "Hydreigon (Shadow)"
+        },
+        {
+          "dex": 198,
+          "name": "Murkrow (Shadow)"
+        },
+        {
+          "dex": 634,
+          "name": "Zweilous"
+        },
+        {
+          "dex": 979,
+          "name": "Annihilape"
+        },
+        {
+          "dex": 752,
+          "name": "Araquanid"
+        },
+        {
+          "dex": 171,
+          "name": "Lanturn"
+        },
+        {
+          "dex": 302,
+          "name": "Sableye"
+        },
+        {
+          "dex": 184,
+          "name": "Azumarill"
+        },
+        {
+          "dex": 784,
+          "name": "Kommo-o"
+        },
+        {
+          "dex": 130,
+          "name": "Gyarados"
+        },
+        {
+          "dex": 146,
+          "name": "Moltres (Galarian)"
+        },
+        {
+          "dex": 279,
+          "name": "Pelipper"
+        },
+        {
+          "dex": 783,
+          "name": "Hakamo-o"
+        },
+        {
+          "dex": 922,
+          "name": "Pawmo"
+        },
+        {
+          "dex": 799,
+          "name": "Guzzlord"
+        },
+        {
+          "dex": 652,
+          "name": "Chesnaught (Shadow)"
+        },
+        {
+          "dex": 423,
+          "name": "Gastrodon"
+        },
+        {
+          "dex": 687,
+          "name": "Malamar (Shadow)"
+        },
+        {
+          "dex": 581,
+          "name": "Swanna"
+        },
+        {
+          "dex": 475,
+          "name": "Gallade (Shadow)"
+        },
+        {
+          "dex": 211,
+          "name": "Qwilfish (Shadow)"
+        },
+        {
+          "dex": 860,
+          "name": "Morgrem"
+        },
+        {
+          "dex": 593,
+          "name": "Jellicent"
+        },
+        {
+          "dex": 350,
+          "name": "Milotic (Shadow)"
+        }
+      ]
     }
   },
   "gblEvents": [
@@ -658,7 +785,9 @@
       "name": "Great League and Scroll Cup: Great League Edition | Forever Forward",
       "start": "2026-08-18T20:00:00.000Z",
       "end": "2026-08-25T20:00:00.000Z",
-      "cups": []
+      "cups": [
+        "scroll"
+      ]
     },
     {
       "eventID": "gbl-forever-forward_great-league_ultra-league_master-league-split-3",
