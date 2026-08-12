@@ -1,41 +1,6 @@
 {
-  "fetchedAt": "2026-08-04T10:49:13.007Z",
+  "fetchedAt": "2026-08-12T09:30:45.543Z",
   "events": [
-    {
-      "id": "event-summer-marathon-arctic-embers-2026-08-04t10-00-00",
-      "title": "Summer Marathon: Arctic Embers",
-      "category": "Event",
-      "start": "2026-08-04T10:00:00",
-      "end": "2026-08-10T20:00:00",
-      "isLocalTime": true,
-      "spawnDex": [
-        37,
-        58,
-        77,
-        218,
-        220,
-        361,
-        459,
-        582,
-        607,
-        613,
-        667
-      ],
-      "spawns": [
-        "Cubchoo",
-        "Growlithe",
-        "Litleo",
-        "Litwick",
-        "Ponyta",
-        "Slugma",
-        "Snorunt",
-        "Snover",
-        "Swinub",
-        "Vanillite",
-        "Vulpix"
-      ],
-      "unresolved": []
-    },
     {
       "id": "community-day-nickit-community-day-2026-08-16t14-00-00",
       "title": "Nickit Community Day",
@@ -75,6 +40,55 @@
         "Psyduck",
         "Wiglett",
         "Wimpod"
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "event-pok-monxp-2026-worlds-2026-08-25t10-00-00",
+      "title": "PokémonXP & 2026 Worlds",
+      "category": "Event",
+      "start": "2026-08-25T10:00:00",
+      "end": "2026-08-30T20:00:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        27,
+        56,
+        108,
+        158,
+        176,
+        194,
+        280,
+        322,
+        363,
+        374,
+        425,
+        590,
+        605,
+        633,
+        656,
+        725,
+        816,
+        921
+      ],
+      "spawns": [
+        "Beldum",
+        "Deino",
+        "Drifloon",
+        "Elgyem",
+        "Foongus",
+        "Froakie",
+        "Lickitung",
+        "Litten",
+        "Mankey",
+        "Numel",
+        "Pawmi",
+        "Ralts",
+        "Sandshrew",
+        "Sobble",
+        "Spheal",
+        "Togetic",
+        "Totodile",
+        "Wooper"
       ],
       "unresolved": []
     }
@@ -168,29 +182,6 @@
         "Tyrogue",
         "Wynaut",
         "Zigzagoon"
-      ],
-      "unresolved": []
-    },
-    {
-      "id": "event-summer-marathon-arctic-embers-2026-08-04t10-00-00-eggs",
-      "title": "Summer Marathon: Arctic Embers",
-      "category": "Event",
-      "start": "2026-08-04T10:00:00",
-      "end": "2026-08-10T20:00:00",
-      "isLocalTime": true,
-      "eggDex": [
-        215,
-        554,
-        636,
-        850,
-        872
-      ],
-      "eggs": [
-        "Darumaka",
-        "Larvesta",
-        "Sizzlipede",
-        "Sneasel",
-        "Snom"
       ],
       "unresolved": []
     }
