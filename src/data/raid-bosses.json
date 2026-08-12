@@ -635,6 +635,67 @@
           ]
         }
       ]
+    },
+    {
+      "eventID": "lunala-in-5-star-raid-battles-august-2026",
+      "name": "Lunala in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-08-19T06:00:00.000",
+      "end": "2026-08-25T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "LUNALA",
+          "names": {
+            "en": "Lunala"
+          },
+          "types": [
+            "psychic",
+            "ghost"
+          ],
+          "resistorTypes": [
+            "normal",
+            "steel",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "ghost",
+            "dark"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-swampert-in-mega-raids-august-2026",
+      "name": "Mega Swampert in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-08-19T06:00:00.000",
+      "end": "2026-08-25T22:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "SWAMPERT",
+          "names": {
+            "en": "Swampert"
+          },
+          "types": [
+            "water",
+            "ground"
+          ],
+          "resistorTypes": [
+            "flying",
+            "bug",
+            "water",
+            "grass",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "grass"
+          ]
+        }
+      ]
     }
   ]
 }
