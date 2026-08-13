@@ -1,314 +1,267 @@
 {
-  "fetchedAt": "2026-08-06T10:15:54.353Z",
+  "fetchedAt": "2026-08-13T08:52:53.838Z",
   "raids": {
     "mega": [
       {
-        "id": "BLAZIKEN",
+        "id": "GARCHOMP",
         "names": {
-          "en": "Mega Blaziken",
-          "de": "Mega-Lohgock",
-          "fr": "Méga-Braségali",
-          "it": "MegaBlaziken",
-          "ja": "メガバシャーモ",
-          "ko": "메가번치코",
-          "es": "Mega-Blaziken"
+          "en": "Mega Garchomp",
+          "de": "Mega-Knakrack",
+          "fr": "Méga-Carchacrok",
+          "it": "MegaGarchomp",
+          "ja": "メガガブリアス",
+          "ko": "메가한카리아스",
+          "es": "Mega-Garchomp"
         },
         "types": [
-          "fire",
-          "fighting"
+          "dragon",
+          "ground"
         ],
         "resistorTypes": [
           "flying",
-          "poison",
-          "ghost",
-          "fire",
-          "water",
-          "psychic",
-          "dragon",
+          "bug",
+          "grass",
           "fairy"
         ],
         "seMoveTypes": [
-          "flying",
-          "ground",
-          "psychic",
-          "water"
+          "ice",
+          "dragon",
+          "fairy"
         ]
       }
     ],
     "lvl5": [
       {
-        "id": "UXIE",
+        "id": "GROUDON",
         "names": {
-          "en": "Uxie",
-          "de": "Selfe",
-          "fr": "Créhelf",
-          "it": "Uxie",
-          "ja": "ユクシー",
-          "ko": "유크시",
-          "es": "Uxie"
+          "en": "Groudon",
+          "de": "Groudon",
+          "fr": "Groudon",
+          "it": "Groudon",
+          "ja": "グラードン",
+          "ko": "그란돈",
+          "es": "Groudon"
         },
         "types": [
-          "psychic"
+          "ground"
         ],
         "resistorTypes": [
-          "steel",
-          "psychic",
-          "dark"
+          "flying",
+          "bug",
+          "grass"
         ],
         "seMoveTypes": [
-          "bug",
-          "dark",
-          "ghost"
-        ]
-      },
-      {
-        "id": "MESPRIT",
-        "names": {
-          "en": "Mesprit",
-          "de": "Vesprit",
-          "fr": "Créfollet",
-          "it": "Mesprit",
-          "ja": "エムリット",
-          "ko": "엠라이트",
-          "es": "Mesprit"
-        },
-        "types": [
-          "psychic"
-        ],
-        "resistorTypes": [
-          "steel",
-          "psychic",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "bug",
-          "dark",
-          "ghost"
-        ]
-      },
-      {
-        "id": "AZELF",
-        "names": {
-          "en": "Azelf",
-          "de": "Tobutz",
-          "fr": "Créfadet",
-          "it": "Azelf",
-          "ja": "アグノム",
-          "ko": "아그놈",
-          "es": "Azelf"
-        },
-        "types": [
-          "psychic"
-        ],
-        "resistorTypes": [
-          "steel",
-          "psychic",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "bug",
-          "dark",
-          "ghost"
+          "grass",
+          "ice",
+          "water"
         ]
       }
     ],
     "lvl3": [
       {
-        "id": "MAROWAK",
+        "id": "MR_MIME",
         "names": {
-          "en": "Alolan Marowak",
-          "de": "Alola-Knogga",
-          "fr": "Ossatueur d'Alola",
-          "it": "Marowak di Alola",
-          "ja": "アローラ ガラガラ",
-          "ko": "알로라 텅구리",
-          "es": "Marowak de Alola"
-        },
-        "types": [
-          "fire",
-          "ghost"
-        ],
-        "resistorTypes": [
-          "normal",
-          "rock",
-          "fire",
-          "water",
-          "dragon",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "ghost",
-          "ground",
-          "rock",
-          "water"
-        ]
-      },
-      {
-        "id": "AVALUGG",
-        "names": {
-          "en": "Hisuian Avalugg",
-          "de": "Hisuian-Arktilas",
-          "fr": "Séracrawl de Hisuian",
-          "it": "Avalugg di Hisuian",
-          "ja": "クレベース",
-          "ko": "크레베이스",
-          "es": "Avalugg de Galar"
+          "en": "Galarian Mr. Mime",
+          "de": "Galar-Pantimos",
+          "fr": "M. Mime de Galar",
+          "it": "Mr. Mime di Galar",
+          "ja": "ガラル バリヤード",
+          "ko": "가라르 마임맨",
+          "es": "Mr. Mime de Galar"
         },
         "types": [
           "ice",
-          "rock"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "steel",
-          "water"
-        ],
-        "seMoveTypes": [
-          "fighting",
-          "steel",
-          "grass",
-          "ground",
-          "rock",
-          "water"
-        ]
-      },
-      {
-        "id": "WYRDEER",
-        "names": {
-          "en": "Wyrdeer",
-          "de": "Damythir",
-          "fr": "Cerbyllin",
-          "it": "Wyrdeer",
-          "ja": "アヤシシ",
-          "ko": "신비록",
-          "es": "Wyrdeer"
-        },
-        "types": [
-          "normal",
           "psychic"
         ],
         "resistorTypes": [
-          "rock",
-          "ghost",
           "steel",
+          "fire",
+          "water",
           "psychic",
+          "ice",
           "dark"
         ],
         "seMoveTypes": [
           "bug",
-          "dark"
+          "dark",
+          "fire",
+          "ghost",
+          "rock",
+          "steel"
+        ]
+      },
+      {
+        "id": "TURTONATOR",
+        "names": {
+          "en": "Turtonator",
+          "de": "Tortunator",
+          "fr": "Boumata",
+          "it": "Turtonator",
+          "ja": "バクガメス",
+          "ko": "폭거북스",
+          "es": "Turtonator"
+        },
+        "types": [
+          "fire",
+          "dragon"
+        ],
+        "resistorTypes": [
+          "rock",
+          "fire",
+          "water",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "dragon",
+          "ground",
+          "rock"
+        ]
+      },
+      {
+        "id": "KLEAVOR",
+        "names": {
+          "en": "Kleavor",
+          "de": "Axantor",
+          "fr": "Hachécateur",
+          "it": "Kleavor",
+          "ja": "バサギリ",
+          "ko": "사마자르",
+          "es": "Kleavor"
+        },
+        "types": [
+          "bug",
+          "rock"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "poison",
+          "ground",
+          "ghost",
+          "steel",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "rock",
+          "steel",
+          "water"
         ]
       }
     ],
     "lvl1": [
       {
-        "id": "SANDSHREW",
+        "id": "TIRTOUGA",
         "names": {
-          "en": "Alolan Sandshrew",
-          "de": "Alola-Sandan",
-          "fr": "Sabelette d'Alola",
-          "it": "Sandshrew di Alola",
-          "ja": "アローラ サンド",
-          "ko": "알로라 모래두지",
-          "es": "Sandshrew de Alola"
+          "en": "Tirtouga",
+          "de": "Galapaflos",
+          "fr": "Carapagos",
+          "it": "Tirtouga",
+          "ja": "プロトーガ",
+          "ko": "프로토가",
+          "es": "Tirtouga"
         },
         "types": [
-          "ice",
-          "steel"
+          "water",
+          "rock"
         ],
         "resistorTypes": [
+          "fighting",
           "steel",
-          "fire",
           "water",
-          "electric"
+          "grass",
+          "dragon"
         ],
         "seMoveTypes": [
+          "grass",
+          "electric",
           "fighting",
-          "fire",
           "ground"
         ]
       },
       {
-        "id": "GROWLITHE",
+        "id": "ARCHEN",
         "names": {
-          "en": "Hisuian Growlithe",
-          "de": "Hisuian-Fukano",
-          "fr": "Caninos de Hisuian",
-          "it": "Growlithe di Hisuian",
-          "ja": "ガーディ",
-          "ko": "가디",
-          "es": "Growlithe de Galar"
+          "en": "Archen",
+          "de": "Flapteryx",
+          "fr": "Arkéapti",
+          "it": "Archen",
+          "ja": "アーケン",
+          "ko": "아켄",
+          "es": "Archen"
         },
         "types": [
-          "fire",
-          "rock"
+          "rock",
+          "flying"
         ],
         "resistorTypes": [
-          "fighting",
           "ground",
           "rock",
-          "water",
-          "dragon"
+          "steel",
+          "electric"
         ],
         "seMoveTypes": [
-          "ground",
-          "water",
-          "fighting",
-          "rock"
+          "electric",
+          "ice",
+          "rock",
+          "steel",
+          "water"
         ]
       },
       {
-        "id": "DARUMAKA",
+        "id": "AXEW",
         "names": {
-          "en": "Galarian Darumaka",
-          "de": "Galar-Flampion",
-          "fr": "Darumarond de Galar",
-          "it": "Darumaka di Galar",
-          "ja": "ガラル ダルマッカ",
-          "ko": "가라르 달막화",
-          "es": "Darumaka de Galar"
+          "en": "Axew",
+          "de": "Milza",
+          "fr": "Coupenotte",
+          "it": "Axew",
+          "ja": "キバゴ",
+          "ko": "터검니",
+          "es": "Axew"
         },
         "types": [
-          "ice"
+          "dragon"
         ],
         "resistorTypes": [
           "steel",
-          "fire",
-          "water",
-          "ice"
+          "fairy"
         ],
         "seMoveTypes": [
-          "fighting",
-          "fire",
-          "rock",
-          "steel"
+          "dragon",
+          "fairy",
+          "ice"
         ]
       },
       {
-        "id": "DARUMAKA",
+        "id": "POLTCHAGEIST",
         "names": {
-          "en": "Darumaka",
-          "de": "Flampion",
-          "fr": "Darumarond",
-          "it": "Darumaka",
-          "ja": "ダルマッカ",
-          "ko": "달막화",
-          "es": "Darumaka"
+          "en": "Poltchageist (Counterfeit Form)",
+          "de": "Mortcha (Imitationsform)",
+          "fr": "Poltchageist (Forme Imitation)",
+          "it": "Poltchageist (Forma Taroccata)",
+          "ja": "チャデス (マガイモノのすがた)",
+          "ko": "차데스 (가짜배기의 모습)",
+          "es": "Poltchageist (Forma Fraudulenta)"
         },
         "types": [
-          "fire"
+          "grass",
+          "ghost"
         ],
         "resistorTypes": [
-          "rock",
+          "normal",
+          "flying",
+          "poison",
+          "bug",
+          "steel",
           "fire",
-          "water",
-          "dragon"
+          "grass",
+          "dragon",
+          "dark"
         ],
         "seMoveTypes": [
-          "ground",
-          "rock",
-          "water"
+          "dark",
+          "fire",
+          "flying",
+          "ghost",
+          "ice"
         ]
       }
     ],
@@ -545,98 +498,6 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "groudon-in-5-star-raid-battles-august-2026",
-      "name": "Groudon in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-08-12T06:00:00.000",
-      "end": "2026-08-18T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "GROUDON",
-          "names": {
-            "en": "Groudon"
-          },
-          "types": [
-            "ground"
-          ],
-          "resistorTypes": [
-            "flying",
-            "bug",
-            "grass"
-          ],
-          "seMoveTypes": [
-            "water",
-            "grass",
-            "ice"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "mega-garchomp-in-mega-raids-august-2026",
-      "name": "Mega Garchomp in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-08-12T06:00:00.000",
-      "end": "2026-08-18T22:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "GARCHOMP",
-          "names": {
-            "en": "Garchomp"
-          },
-          "types": [
-            "dragon",
-            "ground"
-          ],
-          "resistorTypes": [
-            "flying",
-            "bug",
-            "grass",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "ice",
-            "dragon",
-            "fairy"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20260812",
-      "name": "Groudon Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-08-12T18:00:00.000",
-      "end": "2026-08-12T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "GROUDON",
-          "names": {
-            "en": "Groudon"
-          },
-          "types": [
-            "ground"
-          ],
-          "resistorTypes": [
-            "flying",
-            "bug",
-            "grass"
-          ],
-          "seMoveTypes": [
-            "water",
-            "grass",
-            "ice"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "lunala-in-5-star-raid-battles-august-2026",
       "name": "Lunala in 5-star Raid Battles",
       "eventType": "raid-battles",
@@ -693,6 +554,36 @@
           ],
           "seMoveTypes": [
             "grass"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20260819",
+      "name": "Lunala Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-08-19T18:00:00.000",
+      "end": "2026-08-19T19:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "LUNALA",
+          "names": {
+            "en": "Lunala"
+          },
+          "types": [
+            "psychic",
+            "ghost"
+          ],
+          "resistorTypes": [
+            "normal",
+            "steel",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "ghost",
+            "dark"
           ]
         }
       ]
