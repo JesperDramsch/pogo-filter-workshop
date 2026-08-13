@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-08-09T09:07:48.089Z",
+  "fetchedAt": "2026-08-13T09:36:44.679Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -379,133 +379,6 @@
     }
   },
   "cups": {
-    "weather": {
-      "id": "weather",
-      "name": "Weather Cup",
-      "cpCap": 1500,
-      "species": [
-        {
-          "dex": 593,
-          "name": "Jellicent"
-        },
-        {
-          "dex": 230,
-          "name": "Kingdra"
-        },
-        {
-          "dex": 272,
-          "name": "Ludicolo"
-        },
-        {
-          "dex": 171,
-          "name": "Lanturn"
-        },
-        {
-          "dex": 346,
-          "name": "Cradily"
-        },
-        {
-          "dex": 460,
-          "name": "Abomasnow"
-        },
-        {
-          "dex": 752,
-          "name": "Araquanid"
-        },
-        {
-          "dex": 395,
-          "name": "Empoleon"
-        },
-        {
-          "dex": 131,
-          "name": "Lapras"
-        },
-        {
-          "dex": 28,
-          "name": "Sandslash (Alolan)"
-        },
-        {
-          "dex": 703,
-          "name": "Carbink"
-        },
-        {
-          "dex": 748,
-          "name": "Toxapex"
-        },
-        {
-          "dex": 411,
-          "name": "Bastiodon"
-        },
-        {
-          "dex": 689,
-          "name": "Barbaracle"
-        },
-        {
-          "dex": 73,
-          "name": "Tentacruel"
-        },
-        {
-          "dex": 130,
-          "name": "Gyarados"
-        },
-        {
-          "dex": 768,
-          "name": "Golisopod"
-        },
-        {
-          "dex": 345,
-          "name": "Lileep"
-        },
-        {
-          "dex": 119,
-          "name": "Seaking"
-        },
-        {
-          "dex": 423,
-          "name": "Gastrodon"
-        },
-        {
-          "dex": 279,
-          "name": "Pelipper"
-        },
-        {
-          "dex": 997,
-          "name": "Arctibax"
-        },
-        {
-          "dex": 914,
-          "name": "Quaquaval"
-        },
-        {
-          "dex": 350,
-          "name": "Milotic (Shadow)"
-        },
-        {
-          "dex": 226,
-          "name": "Mantine"
-        },
-        {
-          "dex": 503,
-          "name": "Samurott"
-        },
-        {
-          "dex": 211,
-          "name": "Qwilfish (Shadow)"
-        },
-        {
-          "dex": 121,
-          "name": "Starmie (Shadow)"
-        },
-        {
-          "dex": 558,
-          "name": "Crustle"
-        },
-        {
-          "dex": 128,
-          "name": "Tauros (Aqua)"
-        }
-      ]
-    },
     "evolution": {
       "id": "evolution",
       "name": "Evolution Cup",
@@ -762,15 +635,6 @@
     }
   },
   "gblEvents": [
-    {
-      "eventID": "gbl-forever-forward_ultra-league_weather-cup-great-league-edition",
-      "name": "Ultra League and Weather Cup: Great League Edition | Forever Forward",
-      "start": "2026-08-04T20:00:00.000Z",
-      "end": "2026-08-11T20:00:00.000Z",
-      "cups": [
-        "weather"
-      ]
-    },
     {
       "eventID": "gbl-forever-forward_master-league_evolution-cup-great-league-edition",
       "name": "Master League and Evolution Cup: Great League Edition | Forever Forward",
