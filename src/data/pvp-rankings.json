@@ -1,14 +1,10 @@
 {
-  "fetchedAt": "2026-08-13T09:36:44.679Z",
+  "fetchedAt": "2026-08-15T08:50:44.272Z",
   "topN": 30,
   "leagues": {
     "great": {
       "cpCap": 1500,
       "species": [
-        {
-          "dex": 778,
-          "name": "Mimikyu (Busted)"
-        },
         {
           "dex": 463,
           "name": "Lickilicky"
@@ -24,6 +20,10 @@
         {
           "dex": 395,
           "name": "Empoleon"
+        },
+        {
+          "dex": 778,
+          "name": "Mimikyu (Busted)"
         },
         {
           "dex": 195,
@@ -66,12 +66,12 @@
           "name": "Fearow"
         },
         {
-          "dex": 184,
-          "name": "Azumarill"
-        },
-        {
           "dex": 230,
           "name": "Kingdra"
+        },
+        {
+          "dex": 184,
+          "name": "Azumarill"
         },
         {
           "dex": 799,
@@ -227,12 +227,12 @@
           "name": "Giratina (Altered)"
         },
         {
-          "dex": 939,
-          "name": "Bellibolt"
-        },
-        {
           "dex": 979,
           "name": "Annihilape"
+        },
+        {
+          "dex": 939,
+          "name": "Bellibolt"
         },
         {
           "dex": 488,
@@ -243,12 +243,12 @@
           "name": "Milotic"
         },
         {
-          "dex": 208,
-          "name": "Steelix"
-        },
-        {
           "dex": 346,
           "name": "Cradily"
+        },
+        {
+          "dex": 119,
+          "name": "Seaking"
         }
       ]
     },
