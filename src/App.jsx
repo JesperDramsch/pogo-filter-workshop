@@ -213,22 +213,64 @@ const EVO_CHILDREN_BY_DEX = (() => {
 	return m;
 })();
 
+// Evolution lines whose branch is decided by an UNCONTROLLABLE 50:50 roll, so
+// owning one tip says nothing about the other. PoGo's `+` is the CANDY family,
+// which makes the usual `!+family` exclusion far too coarse here: `!+Schaloko`
+// also hides the friend's whole Panekon/Pudox branch — the very thing the
+// wishlist still wants. Members get bare (non-`+`) selectors instead, and the
+// line only collapses back to `!+base` once every branch is covered.
+//
+// Tyrogue is deliberately absent: its three-way split is decided by the highest
+// IV, which the player controls. (A hundo Tyrogue ties on all three and does
+// roll randomly — a rounding error against the cost of a wrong exclusion.)
+// Maushold and Dudunsparce are same-dex FORM splits rather than separate
+// species, so they cannot be enumerated by name at all.
+const SPLIT_FAMILIES = [
+	// Waumpel → Schaloko → Papinella | Panekon → Pudox
+	{ baseDex: 265, branches: [[266, 267], [268, 269]] },
+	// Perlu → Aalabyss | Saganabyss (both pure Water — no type predicate exists)
+	{ baseDex: 366, branches: [[367], [368]] },
+];
+// dex → its SPLIT_FAMILIES entry, for the base and every branch member alike.
+const SPLIT_FAMILY_BY_DEX = (() => {
+	const m = new Map();
+	for (const fam of SPLIT_FAMILIES) {
+		m.set(fam.baseDex, fam);
+		for (const branch of fam.branches) for (const d of branch) m.set(d, fam);
+	}
+	return m;
+})();
+
+// Baby stages whose `eggsonly` membership is NOT confirmed against the live
+// Game Master: its baby flag lists 18 species, and Toxel is absent even though
+// the species debuted egg-only. Widening an exclusion with `eggsonly` here
+// would risk HIDING the friend's copy — the exact failure the widening exists
+// to prevent — so these fall back to exact-name enumeration instead.
+const EGGSONLY_UNVERIFIED_DEX = new Set([848]); // Toxel
+
 // The stage a friend-collect pack should actually suggest for a species:
 // the base of its evolution line — trades re-roll IVs and luckiness sticks,
 // so the base covers the whole line by evolving, while an evolved copy can
-// never become the base (a lucky Greedent is not a lucky Skwovet). One
-// exception, per the babies rule above: when the line bottoms out in a baby,
+// never become the base (a lucky Greedent is not a lucky Skwovet). Two
+// exceptions. Per the babies rule above: when the line bottoms out in a baby,
 // the collectible base is the stage directly above it (Raichu → Pikachu, not
 // Pichu). A candidate that IS a baby hops down to its child when that child
 // is unambiguous; Tyrogue (three children) stays put — the pack preview
-// toggles let the user drop it by hand. Exported for the offline checks in
+// toggles let the user drop it by hand. And per SPLIT_FAMILIES: the walk stops
+// at the branch's own base, so a pack that wants Papinella asks for Schaloko
+// rather than a 50/50 Waumpel. Exported for the offline checks in
 // scripts/check-friend-collect.mjs.
 export function collectibleBaseDex(dex) {
 	const path = [dex];
 	let cur = dex;
 	// Cycle-guarded walk to the root of the line (real lines are ≤4 hops).
 	while (EVO_PARENT_BY_DEX[String(cur)] !== undefined && path.length < 10) {
-		cur = EVO_PARENT_BY_DEX[String(cur)];
+		const parent = EVO_PARENT_BY_DEX[String(cur)];
+		// Don't walk down INTO a coin flip — the branch base is as low as a
+		// suggestion can go and still be the thing the user asked for.
+		const fam = SPLIT_FAMILY_BY_DEX.get(parent);
+		if (fam && fam.baseDex === parent) break;
+		cur = parent;
 		if (path.includes(cur)) break;
 		path.push(cur);
 	}
@@ -236,6 +278,34 @@ export function collectibleBaseDex(dex) {
 	if (path.length >= 2) return path[path.length - 2];
 	const children = EVO_CHILDREN_BY_DEX.get(String(cur)) || [];
 	return children.length === 1 ? children[0] : cur;
+}
+
+// The baby stage at the root of a line, when the line HAS one and it isn't the
+// species itself. Babies only hatch from eggs and can never be de-evolved, so
+// an owned adult says nothing about the baby slot: a lucky Magmar is not a
+// lucky Magby. Returns null for lines without a baby, and for a baby itself
+// (evolving a lucky baby upward IS free, so the relation is directional).
+// Exported for the offline checks in scripts/check-lucky-logic.mjs.
+export function babyStageDex(dex) {
+	let cur = dex;
+	const seen = new Set([cur]);
+	while (EVO_PARENT_BY_DEX[String(cur)] !== undefined && seen.size < 10) {
+		cur = EVO_PARENT_BY_DEX[String(cur)];
+		if (seen.has(cur)) break;
+		seen.add(cur);
+	}
+	return cur !== dex && BABY_DEX.has(cur) ? cur : null;
+}
+
+// The species plus everything it can still evolve into — exactly the set one
+// owned lucky/hundo genuinely covers, since luckiness and IVs both survive
+// evolution but nothing can ever be de-evolved.
+function selfAndDescendants(dex) {
+	const out = [dex];
+	for (let i = 0; i < out.length && out.length < 10; i++)
+		for (const child of EVO_CHILDREN_BY_DEX.get(String(out[i])) || [])
+			if (!out.includes(child)) out.push(child);
+	return out;
 }
 
 // Trade-evo families: dex-keyed identity, German base name as the user-facing
@@ -2027,15 +2097,24 @@ export function buildFilters(
 	// names to negate. resolveSpeciesInfo collapses forms (mega/regional) to
 	// their base dex; unresolvable entries are dropped rather than emitting a
 	// broken selector.
+	// Each entry carries its dex as well as its name, so the exclusion planner
+	// below can reason about the LINE (baby stage, coin-flip branch) rather than
+	// just the string.
 	const ownedSpeciesNames = (names) => {
-		const seen = new Set();
+		const seen = new Map();
 		for (const n of names || []) {
 			const dex = resolveSpeciesInfo(n)?.dex;
 			const out = dex ? pokemonNameFor(String(dex), outputLocale) : null;
-			if (out) seen.add(out.toLowerCase());
+			if (out) seen.set(out.toLowerCase(), dex);
 		}
-		return [...seen].sort((a, b) => a.localeCompare(b));
+		return [...seen]
+			.map(([out, dex]) => ({ out, dex }))
+			.sort((a, b) => a.out.localeCompare(b.out));
 	};
+	// Every dex the have-list actually holds — the lookup the planner needs to
+	// answer "is the baby stage / the other branch already covered?".
+	const ownedDexSet = (names) =>
+		new Set((names || []).map((n) => resolveSpeciesInfo(n)?.dex).filter(Boolean));
 
 	// Shared trade-eligibility guards appended to every friend wishlist.
 	const pushFriendTradeGuards = (clauses) => {
@@ -2072,31 +2151,103 @@ export function buildFilters(
 	};
 	const luckyScopedExclusions = formScopedExclusions(cfg.luckyForms);
 	const hundoScopedExclusions = formScopedExclusions(cfg.hundoForms);
-	const pushOwnedExclusion = (clauses, sp, scopedMap, plainWhyKey, formWhyKey) => {
-		const scoped = scopedMap.get(sp);
-		if (!scoped) {
-			push(clauses, `!+${sp}`, tFn(plainWhyKey, { params: { species: capFirst(sp) } }));
-			return;
+	// PoGo's `+` expands to the CANDY family, which is coarser than a collection
+	// slot in two ways — so a flat `!+family` over-excludes:
+	//
+	//   babies      `+Magmar` includes Magby, but a lucky Magmar is NOT a lucky
+	//               Magby: babies only hatch from eggs and can never be
+	//               de-evolved. Widen the clause with the `eggsonly` keyword so
+	//               the friend's baby survives it — `!+magmar,nurauseiern` reads
+	//               ¬(Magmar family) ∨ eggsonly, since comma binds tighter
+	//               than `&`. The reverse needs nothing: a lucky Magby evolves
+	//               into a lucky Magmar, so the relation is directional.
+	//   coin flips  `+Schaloko` includes the Panekon branch, which a lucky
+	//               Schaloko says nothing about (SPLIT_FAMILIES). Enumerate the
+	//               owned branch's members with bare selectors instead, and
+	//               collapse back to `!+base` only once EVERY branch is covered
+	//               — otherwise a finished line starts being offered again.
+	//
+	// Both are pure widenings of a clause that already exists, so a have-list
+	// with neither a baby line nor a split line emits byte-identical output.
+	//
+	// The keyword is only embeddable in a comma group when it is a single
+	// token. The hi locale ships `eggsonly` with a space in it, and a spaced
+	// term has never been proven inside an OR group (it works standalone today
+	// via cfg.protectBabies). Those locales take the enumeration path instead —
+	// the same safe fallback Toxel uses.
+	const babyKeyword = kw.flag.baby && !/\s/.test(kw.flag.baby) ? kw.flag.baby : null;
+	const exclusionPlanFor = (dex, ownedDex) => {
+		const fam = SPLIT_FAMILY_BY_DEX.get(dex);
+		if (fam) {
+			if (fam.branches.every((b) => b.some((d) => ownedDex.has(d))))
+				return { kind: 'family', collapseTo: fam.baseDex };
+			const branch = fam.branches.find((b) => b.includes(dex));
+			// Only the coin-flip base is owned: one specimen fills ONE branch at
+			// random, so nothing in the line is settled and nothing is excluded.
+			return branch ? { kind: 'members', members: branch } : { kind: 'none' };
 		}
-		for (const f of scoped)
-			push(
-				clauses,
-				`!+${sp},${formDropTerms(f)}`,
-				tFn(formWhyKey, { params: { species: capFirst(sp), region: formRegionLabel(f, tFn) } }),
-			);
+		const baby = babyStageDex(dex);
+		if (baby === null || ownedDex.has(baby)) return { kind: 'family' };
+		if (!babyKeyword || EGGSONLY_UNVERIFIED_DEX.has(baby))
+			return { kind: 'members', members: selfAndDescendants(dex) };
+		return { kind: 'family', extra: `,${babyKeyword}` };
+	};
+
+	// Emit the owned-line exclusions for one whole have-list. Deduplicated by
+	// clause text: a fully-covered split family collapses to a single `!+base`
+	// that every member would otherwise repeat, and two owned members of one
+	// branch enumerate that branch once.
+	const pushOwnedExclusions = (clauses, names, scopedMap, whyKeys) => {
+		const ownedDex = ownedDexSet(names);
+		const emitted = new Set();
+		const once = (clause, why) => {
+			if (emitted.has(clause)) return;
+			emitted.add(clause);
+			push(clauses, clause, why);
+		};
+		for (const { out: sp, dex } of ownedSpeciesNames(names)) {
+			const plan = exclusionPlanFor(dex, ownedDex);
+			if (plan.kind === 'none') continue;
+			if (plan.kind === 'members') {
+				for (const d of plan.members) {
+					const name = pokemonNameFor(String(d), outputLocale);
+					if (!name) continue;
+					once(`!${name.toLowerCase()}`, tFn(whyKeys.branch, { params: { species: capFirst(name) } }));
+				}
+				continue;
+			}
+			const target = plan.collapseTo
+				? (pokemonNameFor(String(plan.collapseTo), outputLocale) || sp).toLowerCase()
+				: sp;
+			const extra = plan.extra || '';
+			const scoped = scopedMap.get(target);
+			if (!scoped) {
+				once(
+					`!+${target}${extra}`,
+					tFn(extra ? whyKeys.baby : whyKeys.plain, { params: { species: capFirst(target) } }),
+				);
+				continue;
+			}
+			for (const f of scoped)
+				once(
+					`!+${target},${formDropTerms(f)}${extra}`,
+					tFn(extra ? whyKeys.babyForm : whyKeys.form, {
+						params: { species: capFirst(target), region: formRegionLabel(f, tFn) },
+					}),
+				);
+		}
 	};
 
 	// Lucky wishlist — exclude every family the user already has a lucky in
 	// (form-scoped where the lucky is annotated to specific regional forms).
 	const friendLuckyClauses = [];
-	for (const sp of ownedSpeciesNames(luckies))
-		pushOwnedExclusion(
-			friendLuckyClauses,
-			sp,
-			luckyScopedExclusions,
-			'app.clause_why.friend_have_lucky',
-			'app.clause_why.friend_have_lucky_form',
-		);
+	pushOwnedExclusions(friendLuckyClauses, luckies, luckyScopedExclusions, {
+		plain: 'app.clause_why.friend_have_lucky',
+		form: 'app.clause_why.friend_have_lucky_form',
+		baby: 'app.clause_why.friend_have_lucky_baby',
+		babyForm: 'app.clause_why.friend_have_lucky_baby_form',
+		branch: 'app.clause_why.friend_have_lucky_branch',
+	});
 	pushFriendTradeGuards(friendLuckyClauses);
 	const friendLuckyWishlist = friendLuckyClauses.map((c) => c.clause).join('&');
 
@@ -2117,14 +2268,13 @@ export function buildFilters(
 	// (form-scoped where annotated, same as the lucky wishlist above).
 	// No 4* clause: IVs re-roll on trade, so any untraded specimen is fair game.
 	const friendHundoClauses = [];
-	for (const sp of ownedSpeciesNames(hundos))
-		pushOwnedExclusion(
-			friendHundoClauses,
-			sp,
-			hundoScopedExclusions,
-			'app.clause_why.friend_have_hundo',
-			'app.clause_why.friend_have_hundo_form',
-		);
+	pushOwnedExclusions(friendHundoClauses, hundos, hundoScopedExclusions, {
+		plain: 'app.clause_why.friend_have_hundo',
+		form: 'app.clause_why.friend_have_hundo_form',
+		baby: 'app.clause_why.friend_have_hundo_baby',
+		babyForm: 'app.clause_why.friend_have_hundo_baby_form',
+		branch: 'app.clause_why.friend_have_hundo_branch',
+	});
 	pushFriendTradeGuards(friendHundoClauses);
 	const friendHundoWishlist = friendHundoClauses.map((c) => c.clause).join('&');
 
