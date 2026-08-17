@@ -2209,10 +2209,11 @@ export function buildFilters(
 			const plan = exclusionPlanFor(dex, ownedDex);
 			if (plan.kind === 'none') continue;
 			if (plan.kind === 'members') {
+				const whyKey = SPLIT_FAMILY_BY_DEX.has(dex) ? whyKeys.branch : whyKeys.baby;
 				for (const d of plan.members) {
 					const name = pokemonNameFor(String(d), outputLocale);
 					if (!name) continue;
-					once(`!${name.toLowerCase()}`, tFn(whyKeys.branch, { params: { species: capFirst(name) } }));
+					once(`!${name.toLowerCase()}`, tFn(whyKey, { params: { species: capFirst(name) } }));
 				}
 				continue;
 			}
