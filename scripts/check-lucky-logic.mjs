@@ -324,6 +324,19 @@ console.log("\nScenario 19: sorts hide the gender you LACK (opposite direction)"
   const ls = buildFilters([], ["combee"], cfgWith({ luckyGenders: { wadribie: ["male"] } }), [], "en", t)
     .luckyFamilySort;
   check("the lucky-sort scopes the same way", ls.includes("!+combee,!female"), ls);
+  // Single-slot species, slot already CLOSED: the guard must not fire. Hiding ♂
+  // Wadribie protects nothing (it can never become Honweisel) and would bury
+  // the spare ♂ duplicates this sort exists to surface for binning.
+  const done = s(["combee"], cfgWith({ hundoGenders: { wadribie: ["female"] } }));
+  check("owning the slot-closing ♀ emits NO guard (♂ is a dead end, not a chase)",
+    !done.includes("!+combee,"), done);
+  check("…and the family is still surfaced", done.includes("+combee"), done);
+  // The still-open case keeps its guard: ♀ is genuinely wanted, so protect it.
+  const open = s(["combee"], cfgWith({ hundoGenders: { wadribie: ["male"] } }));
+  check("owning only ♂ still hides the wanted ♀", open.includes("!+combee,!female"), open);
+  // Two-slot species: each gender is a distinct dex entry, so both directions guard.
+  const mBoth = s(["meowstic"], cfgWith({ hundoGenders: { psiaugon: ["male"] } }));
+  check("Psiaugon ♂-owned hides the still-wanted ♀", mBoth.includes("!+meowstic,!female"), mBoth);
 }
 
 console.log("\nScenario 20: friend-collect coverage respects gender");
