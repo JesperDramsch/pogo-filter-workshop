@@ -1,4 +1,4 @@
-import { buildFilters, DEFAULT_CONFIG, prepareImport, validateImportEnvelope, SCHEMA_CURRENT, babyStageDex } from "../src/App.jsx";
+import { buildFilters, DEFAULT_CONFIG, prepareImport, validateImportEnvelope, SCHEMA_CURRENT, babyStageDex, genderSlotsFor, regionalFormsFor } from "../src/App.jsx";
 
 const t = (key, opts) => key;
 
@@ -264,6 +264,79 @@ console.log("\nScenario 16: default output is untouched (fixture safety)");
   check("an ordinary species is unchanged", plan([], ["charizard"]) === "!+charizard");
   check("form scoping alone is unchanged",
     plan([], ["vulpix"], { ...DEFAULT_CONFIG, luckyForms: { vulpix: ["alola"] } }) === "!+vulpix,!ice");
+}
+
+// Config annotation maps are keyed by the CANONICAL (German) species name, the
+// same convention mergeImportedConfig's canonMapKeys enforces.
+const cfgWith = (o) => ({ ...DEFAULT_CONFIG, ...o });
+
+console.log("\nScenario 17: gender slots — catalog shape");
+{
+  check("Wadribie (415) needs ♀ only — ♂ is a dead end",
+    JSON.stringify(genderSlotsFor("combee")) === '["female"]');
+  check("Molunk (757) needs ♀ only", JSON.stringify(genderSlotsFor("salandit")) === '["female"]');
+  check("Schneppke (361) needs ♀ only", JSON.stringify(genderSlotsFor("snorunt")) === '["female"]');
+  check("Kirlia (281) needs ♂ only", JSON.stringify(genderSlotsFor("kirlia")) === '["male"]');
+  check("Psiaugon (678) counts BOTH — gendered forms are distinct dex entries",
+    JSON.stringify(genderSlotsFor("meowstic")) === '["female","male"]');
+  check("an ordinary species has no gender slots", genderSlotsFor("charizard") === null);
+  check("Burmy is deliberately absent (cloak × gender belongs with the form work)",
+    genderSlotsFor("burmy") === null);
+  // The chip-load invariant: a have-list chip must never render two badge
+  // groups, so the two catalogs have to stay disjoint.
+  const overlap = ["combee", "salandit", "snorunt", "ralts", "kirlia", "meowstic",
+    "indeedee", "oinkologne", "pyroar", "frillish", "jellicent"]
+    .filter((s) => genderSlotsFor(s) && (regionalFormsFor(s) || []).length > 0);
+  check("gender catalog is disjoint from the regional-form catalog", overlap.length === 0,
+    JSON.stringify(overlap));
+}
+
+console.log("\nScenario 18: wishlist hides the gender you OWN");
+{
+  const own = (g) => cfgWith({ luckyGenders: { wadribie: g } });
+  check("owning ♂ keeps the friend's ♀ visible",
+    plan([], ["combee"], own(["male"])) === "!+combee,!male", plan([], ["combee"], own(["male"])));
+  check("owning ♀ completes the slot → plain family exclusion",
+    plan([], ["combee"], own(["female"])) === "!+combee");
+  check("owning both → plain family exclusion",
+    plan([], ["combee"], own(["male", "female"])) === "!+combee");
+  check("unannotated is byte-identical to before", plan([], ["combee"]) === "!+combee");
+  check("a ♂-only Psiaugon keeps ♀ visible (both genders are slots)",
+    plan([], ["meowstic"], cfgWith({ luckyGenders: { psiaugon: ["male"] } })) === "!+meowstic,!male");
+  check("the hundo wishlist behaves identically",
+    hundoPlan(["combee"], cfgWith({ hundoGenders: { wadribie: ["male"] } })) === "!+combee,!male");
+  check("de renders the localized keyword",
+    plan([], ["combee"], own(["male"]), "de") === "!+wadribie,!männlich",
+    plan([], ["combee"], own(["male"]), "de"));
+  check("a species outside the catalog is never annotated",
+    plan([], ["charizard"], cfgWith({ luckyGenders: { glurak: ["male"] } })) === "!+charizard");
+}
+
+console.log("\nScenario 19: sorts hide the gender you LACK (opposite direction)");
+{
+  const s = (h, cfg) => buildFilters(h, [], cfg, [], "en", t).sort;
+  check("owning ♀ surfaces only your ♀ duplicates",
+    s(["meowstic"], cfgWith({ hundoGenders: { psiaugon: ["female"] } })).includes("!+meowstic,!male"),
+    s(["meowstic"], cfgWith({ hundoGenders: { psiaugon: ["female"] } })));
+  check("unannotated adds no gender guard", !s(["meowstic"], DEFAULT_CONFIG).includes("!+meowstic,"));
+  check("owning both adds no gender guard",
+    !s(["meowstic"], cfgWith({ hundoGenders: { psiaugon: ["female", "male"] } })).includes("!+meowstic,"));
+  const ls = buildFilters([], ["combee"], cfgWith({ luckyGenders: { wadribie: ["male"] } }), [], "en", t)
+    .luckyFamilySort;
+  check("the lucky-sort scopes the same way", ls.includes("!+combee,!female"), ls);
+}
+
+console.log("\nScenario 20: friend-collect coverage respects gender");
+{
+  const target = { friendCollectSpecies: ["wadribie"], friendCollectGenders: { wadribie: "female" } };
+  const fc = (cfg) => buildFilters([], ["combee"], cfg, [], "en", t).friendCollectWishlist;
+  check("a ♀-locked target is NOT covered by a ♂-only lucky",
+    fc(cfgWith({ ...target, luckyGenders: { wadribie: ["male"] } })).startsWith("combee&"),
+    fc(cfgWith({ ...target, luckyGenders: { wadribie: ["male"] } })));
+  check("a ♀ lucky covers it (target drops out)",
+    fc(cfgWith({ ...target, luckyGenders: { wadribie: ["female"] } })) === "");
+  check("an UNannotated lucky still covers it — annotations opt IN",
+    fc(cfgWith(target)) === "");
 }
 
 console.log(`\n${failures === 0 ? "✓ All lucky-logic checks passed." : `✗ ${failures} failure(s).`}`);

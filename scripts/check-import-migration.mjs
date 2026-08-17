@@ -398,5 +398,42 @@ console.log("\nRegional catalog sync: additions since the last visit are applied
     JSON.stringify(again.regionalGroups) === JSON.stringify(out.regionalGroups));
 }
 
+console.log("\nGender annotation maps: defaults, canonicalization and junk rejection");
+{
+  const fresh = mergeImportedConfig({});
+  check("hundoGenders back-fills to {}", JSON.stringify(fresh.hundoGenders) === "{}");
+  check("luckyGenders back-fills to {}", JSON.stringify(fresh.luckyGenders) === "{}");
+
+  // Keys canonicalize to the German name, exactly like the form maps.
+  const canon = mergeImportedConfig({ luckyGenders: { combee: ["male"] } });
+  check("an English key canonicalizes to the German one",
+    JSON.stringify(canon.luckyGenders) === '{"wadribie":["male"]}',
+    JSON.stringify(canon.luckyGenders));
+
+  // Both genders are recordable for a slot species — the map stores what you
+  // OWN, and GENDER_SLOT_DEX decides what counts. A ♂ Wadribie is exactly the
+  // state worth recording.
+  const male = mergeImportedConfig({ hundoGenders: { wadribie: ["male"] } });
+  check("a non-slot gender is still recordable as owned",
+    JSON.stringify(male.hundoGenders) === '{"wadribie":["male"]}');
+
+  // Junk drops rather than inventing slots.
+  const junk = mergeImportedConfig({
+    luckyGenders: { wadribie: ["nonbinary", "male"], glurak: ["male"], pikachu: [], bogus: ["female"] },
+  });
+  check("unknown gender values are filtered out",
+    JSON.stringify(junk.luckyGenders) === '{"wadribie":["male"]}', JSON.stringify(junk.luckyGenders));
+  check("species outside the gender catalog drop entirely",
+    !("glurak" in junk.luckyGenders) && !("pikachu" in junk.luckyGenders));
+  check("unresolvable species drop entirely", !("bogus" in junk.luckyGenders));
+
+  const notArray = mergeImportedConfig({ luckyGenders: { wadribie: "male" } });
+  check("a scalar value drops", JSON.stringify(notArray.luckyGenders) === "{}");
+
+  const twice = mergeImportedConfig(canon);
+  check("idempotent on re-merge",
+    JSON.stringify(twice.luckyGenders) === JSON.stringify(canon.luckyGenders));
+}
+
 console.log(`\n${failures === 0 ? "✓ All migration tests passed." : `✗ ${failures} test(s) failed.`}`);
 process.exit(failures === 0 ? 0 : 1);
