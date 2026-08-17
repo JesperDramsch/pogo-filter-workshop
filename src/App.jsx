@@ -1325,15 +1325,16 @@ export function buildFilters(
 	// sets, which is correct and easy to misread:
 	//   wishlist → the genders you OWN   (hide those, keep what you lack visible)
 	//   sorts    → the genders you LACK  (hide those, surface your duplicates)
-	const GENDERS = ['female', 'male'];
 	const genderDropTerms = (g) => (kw.flag[g] ? `!${kw.flag[g]}` : '');
-	// Non-owned genders to HIDE from a `+family` browse-sort member. [] when the
-	// species has no gender slots, is unannotated, or has both genders owned.
+	// Slot genders still missing (i.e., still chase-worthy) to HIDE from a `+family`
+	// browse-sort member. [] when the species has no gender slots, is unannotated,
+	// or all slot genders are already owned.
 	const genderScopedSortGuards = (canonName, ownedGenders) => {
-		if (!genderSlotsFor(canonName)) return [];
+		const slots = genderSlotsFor(canonName);
+		if (!slots) return [];
 		if (!Array.isArray(ownedGenders) || ownedGenders.length === 0) return [];
 		const owned = new Set(ownedGenders);
-		return GENDERS.filter((g) => !owned.has(g) && genderDropTerms(g));
+		return slots.filter((g) => !owned.has(g) && genderDropTerms(g));
 	};
 
 	const formScopedSortGuards = (canonName, ownedKeys) => {
