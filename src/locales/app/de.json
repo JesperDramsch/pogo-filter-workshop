@@ -585,6 +585,7 @@
   "app.have_slots.season_note": "Dein Zuhause liegt auf der {hemisphere} → Sesokitz spawnt gerade als {season}-Form (noch bis {until}). Automatisch erkannt.",
   "app.have_slots.season_note_manual": "Manuell auf {season} gesetzt. Tippe „automatisch“, um wieder deinem Zuhause zu folgen.",
   "app.have_slots.season_note_off": "Jahreszeit-Erkennung aus. Setz sie auf automatisch oder wähl eine Jahreszeit von Hand.",
+  "app.have_slots.season_note_unknown": "Noch kein Zuhause gesetzt — ohne Halbkugel lässt sich die aktuelle Sesokitz-Form nicht ableiten. Setz dein Zuhause in Schritt 1 oder wähl die Jahreszeit von Hand.",
   "app.have_slots.season_auto": "automatisch",
   "app.have_slots.spawning_now": "spawnt gerade",
   "app.have_slots.season.spring": "Frühling",

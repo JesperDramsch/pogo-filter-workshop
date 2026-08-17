@@ -590,6 +590,7 @@
   "app.have_slots.season_note": "你的家位於{hemisphere} → 四季鹿目前以「{season}」的樣子出現(至 {until})。自動偵測。",
   "app.have_slots.season_note_manual": "已手動設為「{season}」。點擊「自動」可重新依照你的家判斷。",
   "app.have_slots.season_note_off": "季節偵測已關閉。切換為自動,或手動選擇一個季節。",
+  "app.have_slots.season_note_unknown": "尚未設定家的位置——沒有半球資訊就無法推算目前的四季鹿樣子。請在步驟一設定你的家,或手動選擇季節。",
   "app.have_slots.season_auto": "自動",
   "app.have_slots.spawning_now": "目前出現中",
   "app.have_slots.season.spring": "春天的樣子",

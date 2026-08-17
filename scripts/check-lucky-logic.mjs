@@ -398,6 +398,28 @@ console.log("\nScenario 22: incomplete slots withhold the exclusion entirely");
     hundoPlan(["deerling"], cfgWith({ hundoSlots: { sesokitz: ["spring"] } })) === "");
   check("an unrelated species is untouched",
     plan([], ["charizard"], withSlots({ sesokitz: ["spring"] })) === "!+charizard");
+  // Review catch: the withholding has to gate on the FAMILY, not the species
+  // name. `!+X` expands to the whole candy family, so a second owned member
+  // would otherwise re-hide the line whose slots are still incomplete.
+  const s1 = withSlots({ sesokitz: ["spring"] });
+  check("a same-family member does NOT re-emit the exclusion (Sesokitz + Kronjuwild)",
+    plan([], ["deerling", "sawsbuck"], s1) === "",
+    JSON.stringify(plan([], ["deerling", "sawsbuck"], s1)));
+  check("…nor the other way round (annotate the evolution, own the base)",
+    plan([], ["deerling", "sawsbuck"], withSlots({ kronjuwild: ["spring"] })) === "");
+  check("Cherubi line: annotating Kinoso suppresses Kikugi too",
+    plan([], ["cherrim", "cherubi"], withSlots({ kinoso: ["sunny"] })) === "");
+  check("Burmy line: an incomplete Burmy suppresses Burmadame's exclusion",
+    plan([], ["burmy", "wormadam"], withSlots({ burmy: ["male"] })) === "");
+  // …and once every slot is filled the whole family excludes again, collapsed.
+  const full = withSlots({ sesokitz: ["spring", "summer", "autumn", "winter"] });
+  check("all slots filled → both family members exclude normally",
+    plan([], ["deerling", "sawsbuck"], full) === "!+deerling&!+sawsbuck",
+    plan([], ["deerling", "sawsbuck"], full));
+  // A different family with incomplete slots must not bleed across.
+  check("an incomplete Sesokitz does not suppress an unrelated Kinoso",
+    plan([], ["cherrim"], withSlots({ sesokitz: ["spring"], kinoso: ["sunny", "overcast"] })) ===
+      "!+cherrim");
 }
 
 console.log("\nScenario 23: season inference (pure, hemisphere-flipped)");

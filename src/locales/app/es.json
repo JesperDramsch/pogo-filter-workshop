@@ -590,6 +590,7 @@
   "app.have_slots.season_note": "Tu casa está en el {hemisphere} → Deerling aparece ahora en su forma de {season} (hasta el {until}). Detectado automáticamente.",
   "app.have_slots.season_note_manual": "Fijado manualmente en {season}. Pulsa «auto» para volver a seguir tu casa.",
   "app.have_slots.season_note_off": "La detección de estación está desactivada. Ponla en automático o elige una estación a mano.",
+  "app.have_slots.season_note_unknown": "Aún no has fijado tu casa: sin hemisferio no se puede deducir la forma actual de Deerling. Fíjala en el paso 1 o elige la estación a mano.",
   "app.have_slots.season_auto": "auto",
   "app.have_slots.spawning_now": "aparece ahora",
   "app.have_slots.season.spring": "Primavera",

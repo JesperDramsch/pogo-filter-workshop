@@ -590,6 +590,7 @@
   "app.have_slots.season_note": "ホームは{hemisphere}です → シキジカは現在「{season}」のすがたで出現しています（{until}まで）。自動判定。",
   "app.have_slots.season_note_manual": "手動で「{season}」に設定中。「自動」をタップするとホーム基準に戻ります。",
   "app.have_slots.season_note_off": "季節の自動判定はオフです。自動に切り替えるか、季節を手動で選んでください。",
+  "app.have_slots.season_note_unknown": "ホームが未設定です — 半球がわからないと現在のシキジカのすがたを判定できません。ステップ1でホームを設定するか、季節を手動で選んでください。",
   "app.have_slots.season_auto": "自動",
   "app.have_slots.spawning_now": "現在出現中",
   "app.have_slots.season.spring": "はるのすがた",

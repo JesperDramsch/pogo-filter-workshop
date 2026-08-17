@@ -590,6 +590,7 @@
   "app.have_slots.season_note": "आपका घर {hemisphere} में है → Deerling इस समय अपने {season} रूप में आ रहा है ({until} तक)। स्वतः पहचाना गया।",
   "app.have_slots.season_note_manual": "मैन्युअल रूप से {season} पर सेट। अपने घर के अनुसार चलने के लिए “ऑटो” दबाएँ।",
   "app.have_slots.season_note_off": "मौसम पहचान बंद है। इसे ऑटो पर करें या मौसम हाथ से चुनें।",
+  "app.have_slots.season_note_unknown": "अभी तक घर सेट नहीं है — गोलार्ध के बिना Deerling का मौजूदा रूप निकाला नहीं जा सकता। स्टेप 1 में अपना घर सेट करें, या मौसम हाथ से चुनें।",
   "app.have_slots.season_auto": "ऑटो",
   "app.have_slots.spawning_now": "अभी दिख रहा है",
   "app.have_slots.season.spring": "वसंत",

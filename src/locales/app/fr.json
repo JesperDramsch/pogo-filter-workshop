@@ -590,6 +590,7 @@
   "app.have_slots.season_note": "Ton domicile est dans l'{hemisphere} → Vivaldaim apparaît actuellement sous sa forme {season} (jusqu'au {until}). Détecté automatiquement.",
   "app.have_slots.season_note_manual": "Réglé manuellement sur {season}. Appuie sur « auto » pour suivre à nouveau ton domicile.",
   "app.have_slots.season_note_off": "Détection de saison désactivée. Repasse en automatique ou choisis une saison à la main.",
+  "app.have_slots.season_note_unknown": "Domicile pas encore défini — sans hémisphère, impossible de déduire la forme actuelle de Vivaldaim. Définis-le à l'étape 1, ou choisis la saison à la main.",
   "app.have_slots.season_auto": "auto",
   "app.have_slots.spawning_now": "apparaît en ce moment",
   "app.have_slots.season.spring": "Printemps",

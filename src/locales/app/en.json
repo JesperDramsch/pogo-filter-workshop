@@ -585,6 +585,7 @@
   "app.have_slots.season_note": "Your home is in the {hemisphere} → Deerling currently spawns in its {season} form (until {until}). Auto-detected.",
   "app.have_slots.season_note_manual": "Manually set to {season}. Tap “auto” to follow your home again.",
   "app.have_slots.season_note_off": "Season detection is off. Switch it to auto or pick a season by hand.",
+  "app.have_slots.season_note_unknown": "No home set yet — without a hemisphere the current Deerling form can't be derived. Set your home in step 1, or pick the season by hand.",
   "app.have_slots.season_auto": "auto",
   "app.have_slots.spawning_now": "spawning now",
   "app.have_slots.season.spring": "Spring",

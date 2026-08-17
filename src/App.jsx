@@ -352,6 +352,21 @@ export function babyStageDex(dex) {
 	return cur !== dex && BABY_DEX.has(cur) ? cur : null;
 }
 
+// The root of a species' evolution line — the plain walk, with none of
+// collectibleBaseDex's baby / coin-flip special-casing. Two species share a
+// PoGo candy family exactly when they share this root, which is what `+name`
+// expands to.
+function lineRootDex(dex) {
+	let cur = dex;
+	const seen = new Set([cur]);
+	while (EVO_PARENT_BY_DEX[String(cur)] !== undefined && seen.size < 10) {
+		cur = EVO_PARENT_BY_DEX[String(cur)];
+		if (seen.has(cur)) break;
+		seen.add(cur);
+	}
+	return cur;
+}
+
 // The species plus everything it can still evolve into — exactly the set one
 // owned lucky/hundo genuinely covers, since luckiness and IVs both survive
 // evolution but nothing can ever be de-evolved.
@@ -2422,17 +2437,22 @@ export function buildFilters(
 			emitted.add(clause);
 			push(clauses, clause, why);
 		};
-		// Output-locale names whose un-searchable slots aren't all filled yet.
-		const slotIncomplete = new Set();
+		// Evolution-line ROOTS with an un-searchable slot still unfilled. Keyed by
+		// root rather than by species name because `!+X` expands to the whole
+		// candy family: owning a Kronjuwild would otherwise emit `!+kronjuwild`
+		// and hide the Sesokitz whose seasons are still incomplete, defeating the
+		// withholding entirely. One unfilled slot suppresses the exclusion for
+		// every member of that family.
+		const slotIncompleteRoots = new Set();
 		for (const key of Object.keys(slotAnn || {})) {
 			if (!invisibleSlotsIncomplete(key, slotAnn)) continue;
-			const out = speciesForOutput(key, outputLocale);
-			if (out) slotIncomplete.add(out);
+			const d = resolveSpeciesInfo(key)?.dex;
+			if (d) slotIncompleteRoots.add(lineRootDex(d));
 		}
 		for (const { out: sp, dex } of ownedSpeciesNames(names)) {
 			// Search can't separate these forms, so no guard can be written —
 			// withhold the exclusion instead and keep the species on the ask.
-			if (slotIncomplete.has(sp)) continue;
+			if (slotIncompleteRoots.has(lineRootDex(dex))) continue;
 			const plan = exclusionPlanFor(dex, ownedDex);
 			if (plan.kind === 'none') continue;
 			if (plan.kind === 'members') {
@@ -4662,6 +4682,11 @@ export default function App() {
 	// non-deterministic. It only ever highlights a slot and renders a note.
 	const homeHemisphere = useMemo(() => computeHomeHemisphere(homeLocation), [homeLocation]);
 	const seasonWindow = useMemo(() => currentSeasonWindow(new Date()), []);
+	// The note only appears when a seasonal species is actually on a have-list.
+	const seasonRelevant = useMemo(
+		() => [...(hundos || []), ...(luckies || [])].some((sp) => invisibleSlotsFor(sp)?.axis === 'season'),
+		[hundos, luckies],
+	);
 	const activeSeason = useMemo(() => {
 		if (effectiveConfig.seasonOverride) return effectiveConfig.seasonOverride;
 		if (effectiveConfig.seasonAuto === false) return null;
@@ -5230,6 +5255,7 @@ export default function App() {
 											window={seasonWindow}
 											auto={config.seasonAuto !== false}
 											overridden={!!config.seasonOverride}
+											relevant={seasonRelevant}
 											onAuto={() => setConfig({ ...config, seasonAuto: true, seasonOverride: null })}
 											onOverride={(sn) =>
 												setConfig({
@@ -6118,9 +6144,14 @@ function HaveSlotBadges({ species, slotsAnn, onSlotsAnnChange, activeSlot, t }) 
 
 // Explains the inferred Sesokitz season and lets the user override or switch
 // it off. Rendered once under the have-list editors rather than per chip.
-function SeasonNote({ hemisphere, season, window, auto, onAuto, onOverride, overridden, t }) {
+function SeasonNote({ hemisphere, season, window, auto, onAuto, onOverride, overridden, relevant, t }) {
 	const { locale } = useTranslation();
-	if (!season && auto) return null;
+	// Show it exactly when a seasonal species is on a have-list — otherwise it is
+	// noise for the ~everyone who owns no Sesokitz. Crucially it must NOT hide
+	// when auto is on but no season could be derived (no home pin): the auto
+	// toggle and the manual override live in here, so hiding then strands the
+	// user with no way to reach either.
+	if (!relevant) return null;
 	const until =
 		window && window.end
 			? new Date(window.end).toLocaleDateString(locale, { day: 'numeric', month: 'short' })
@@ -6136,7 +6167,9 @@ function SeasonNote({ hemisphere, season, window, auto, onAuto, onOverride, over
 								until: until || '—',
 							},
 						})
-					: t('app.have_slots.season_note_off')}
+					: auto
+						? t('app.have_slots.season_note_unknown')
+						: t('app.have_slots.season_note_off')}
 			</p>
 			<div className='mt-1.5 flex flex-wrap items-center gap-1'>
 				<button
