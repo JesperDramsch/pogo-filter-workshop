@@ -422,6 +422,17 @@ console.log('\nScenario 8c: collectible-base remap — packs suggest what a frie
 	check('Tyrogue (236) stays — three children, no unambiguous hop', collectibleBaseDex(236) === 236);
 	check('Lucario (448) stays — the stage above baby Riolu IS the target', collectibleBaseDex(448) === 448);
 	check('a base stays a base', collectibleBaseDex(147) === 147 && collectibleBaseDex(1) === 1);
+	// SPLIT_FAMILIES branch-stop: a coin-flip base is NOT a useful ask, because
+	// the friend cannot steer which branch the evolve produces. The walk stops
+	// at the branch's own base instead.
+	check('Beautifly (267) → Silcoon (266), not the 50/50 Wurmple', collectibleBaseDex(267) === 266);
+	check('Dustox (269) → Cascoon (268), not the 50/50 Wurmple', collectibleBaseDex(269) === 268);
+	check('Silcoon (266) and Cascoon (268) are already branch bases',
+		collectibleBaseDex(266) === 266 && collectibleBaseDex(268) === 268);
+	check('Huntail (367) and Gorebyss (368) stay put — Clamperl is a coin flip',
+		collectibleBaseDex(367) === 367 && collectibleBaseDex(368) === 368);
+	check('the coin-flip bases themselves are unchanged',
+		collectibleBaseDex(265) === 265 && collectibleBaseDex(366) === 366);
 
 	// The live regression (the original complaint): Greedent sits in the GL
 	// snapshot, so the pack must offer Skwovet — and a lucky Skwovet ("raffel"
@@ -569,11 +580,14 @@ console.log('\nScenario 8g: form-scoped wishlist exclusions — owned form out, 
 	const all = buildFilters([], ['vulpix'], { ...cfg, luckyForms: { vulpix: ['base', 'alola'] } }, [], 'en', t);
 	check('all-forms annotation = plain exclusion', all.friendLuckyWishlist.startsWith('!+vulpix&'), all.friendLuckyWishlist);
 	// Exclude-based form predicates (Kanto Raichu isolates as NOT-psychic)
-	// De-Morgan into a positive term.
+	// De-Morgan into a positive term. Raichu's line also bottoms out in baby
+	// Pichu, so the clause additionally carries the `eggsonly` widening — a
+	// hundo Kanto Raichu is not a hundo Pichu, and Pichu cannot be de-evolved
+	// into. This is the one catalog species where both refinements compose.
 	const raichu = buildFilters(['raichu'], [], { ...cfg, hundoForms: { raichu: ['base'] } }, [], 'en', t);
 	check(
-		'exclude-based catalog predicate handled (hundo Kanto Raichu → !+raichu,psychic)',
-		raichu.friendHundoWishlist.startsWith('!+raichu,psychic&'),
+		'exclude-based catalog predicate handled (hundo Kanto Raichu → !+raichu,psychic,eggsonly)',
+		raichu.friendHundoWishlist.startsWith('!+raichu,psychic,eggsonly&'),
 		raichu.friendHundoWishlist,
 	);
 	// The guaranteed-lucky variant inherits the scoped clauses.

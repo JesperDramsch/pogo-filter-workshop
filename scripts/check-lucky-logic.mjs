@@ -1,4 +1,4 @@
-import { buildFilters, DEFAULT_CONFIG, prepareImport, validateImportEnvelope, SCHEMA_CURRENT } from "../src/App.jsx";
+import { buildFilters, DEFAULT_CONFIG, prepareImport, validateImportEnvelope, SCHEMA_CURRENT, babyStageDex } from "../src/App.jsx";
 
 const t = (key, opts) => key;
 
@@ -167,6 +167,103 @@ console.log("\nScenario 12: standalone lucky-sort (lucky family browser)");
   check("lucky-sort scopes an annotated lucky to its owned form", annL.luckyFamilySort.includes("!+vulpix,!fire"), annL.luckyFamilySort);
   const empty = buildFilters([], [], DEFAULT_CONFIG, [], "en", t);
   check("lucky-sort empty with no luckies", empty.luckyFamilySort === "");
+}
+
+// Wishlist exclusions minus the seven fixed trade guards, so the assertions
+// below read as just the owned-line plan. Derived by subtracting the empty-list
+// baseline rather than splitting on a keyword — the guards are localized, and
+// an empty plan yields the baseline verbatim with no separator to split on.
+const stripGuards = (field) => (hundos, luckies, cfg = DEFAULT_CONFIG, loc = "en") => {
+  const guards = buildFilters([], [], cfg, [], loc, t)[field];
+  const full = buildFilters(hundos, luckies, cfg, [], loc, t)[field];
+  return full === guards ? "" : full.slice(0, full.length - guards.length - 1);
+};
+const plan = stripGuards("friendLuckyWishlist");
+const hundoPlanFull = stripGuards("friendHundoWishlist");
+const hundoPlan = (hundos, cfg = DEFAULT_CONFIG, loc = "en") => hundoPlanFull(hundos, [], cfg, loc);
+
+console.log("\nScenario 13: babyStageDex — the directional baby relation");
+{
+  check("Magmar (126) → baby Magby (240)", babyStageDex(126) === 240);
+  check("Magmortar (467) → baby Magby (240) from two stages up", babyStageDex(467) === 240);
+  check("Magby (240) itself → null (a baby is not its own gap)", babyStageDex(240) === null);
+  check("Raichu (26) → baby Pichu (172)", babyStageDex(26) === 172);
+  check("Bulbasaur (1) → null (no baby in the line)", babyStageDex(1) === null);
+  check("Toxtricity (849) → baby Toxel (848)", babyStageDex(849) === 848);
+}
+
+console.log("\nScenario 14: baby stages survive the family exclusion");
+{
+  // `+Magmar` is the CANDY family and includes Magby, so a flat !+magmar hid
+  // the one thing the user still needs. `,eggsonly` punches it back through.
+  check("owned adult widens with eggsonly", plan([], ["magmar"]) === "!+magmar,eggsonly", plan([], ["magmar"]));
+  check("owning the baby too drops the widening",
+    plan([], ["magmar", "magby"]) === "!+magby&!+magmar", plan([], ["magmar", "magby"]));
+  check("owning ONLY the baby needs no widening (evolving up is free)",
+    plan([], ["magby"]) === "!+magby", plan([], ["magby"]));
+  check("a line with no baby is byte-identical to before",
+    plan([], ["bulbasaur"]) === "!+bulbasaur", plan([], ["bulbasaur"]));
+  check("the hundo wishlist gets the same treatment",
+    hundoPlan(["magmar"]) === "!+magmar,eggsonly", hundoPlan(["magmar"]));
+  // Every member of a baby line widens, so a second entry in the SAME family
+  // cannot AND the carve-out away.
+  check("two members of one baby family both widen",
+    plan([], ["pikachu", "raichu"]) === "!+pikachu,eggsonly&!+raichu,eggsonly",
+    plan([], ["pikachu", "raichu"]));
+  // Composes with regional-form scoping (Raichu is the one overlapping case).
+  check("form scope and baby widening compose",
+    plan([], ["raichu"], { ...DEFAULT_CONFIG, luckyForms: { raichu: ["alola"] } }) ===
+      "!+raichu,!psychic,eggsonly",
+    plan([], ["raichu"], { ...DEFAULT_CONFIG, luckyForms: { raichu: ["alola"] } }));
+  check("de renders the localized keyword", plan([], ["magmar"], DEFAULT_CONFIG, "de") === "!+magmar,nurauseiern",
+    plan([], ["magmar"], DEFAULT_CONFIG, "de"));
+  // Toxel's eggsonly membership is unconfirmed against the Game Master, so it
+  // must NOT be widened — enumeration keeps the friend's Toxel visible instead.
+  check("unverified baby (Toxel) falls back to exact names",
+    plan([], ["toxtricity"]) === "!toxtricity", plan([], ["toxtricity"]));
+  // hi ships the keyword with a space; a spaced term inside an OR group is
+  // unproven, so that locale enumerates too.
+  check("a spaced keyword locale never emits the widening",
+    !plan([], ["magmar"], DEFAULT_CONFIG, "hi").includes(","),
+    plan([], ["magmar"], DEFAULT_CONFIG, "hi"));
+  // The H∩L set is name-keyed, so a baby and its adult must NOT pair up.
+  const r = buildFilters(["magby"], ["magmar"], DEFAULT_CONFIG, [], "en", t);
+  check("a hundo baby does not pair with a lucky adult", r.luckyHundoSet.size === 0);
+  check("the hundo baby stays tradeable", r.trade.includes("+magby"));
+}
+
+console.log("\nScenario 15: coin-flip branches are excluded member-by-member");
+{
+  check("one owned branch enumerates only that branch",
+    plan([], ["silcoon"]) === "!silcoon&!beautifly", plan([], ["silcoon"]));
+  check("owning the branch TIP excludes the whole branch",
+    plan([], ["beautifly"]) === "!silcoon&!beautifly", plan([], ["beautifly"]));
+  check("both branches covered collapses back to !+base",
+    plan([], ["silcoon", "dustox"]) === "!+wurmple", plan([], ["silcoon", "dustox"]));
+  check("both branch tips also collapse (no under-exclusion)",
+    plan([], ["beautifly", "dustox"]) === "!+wurmple", plan([], ["beautifly", "dustox"]));
+  check("owning ONLY the coin-flip base excludes nothing",
+    plan([], ["wurmple"]) === "", JSON.stringify(plan([], ["wurmple"])));
+  check("base + one branch still leaves the other branch visible",
+    plan([], ["wurmple", "silcoon"]) === "!silcoon&!beautifly", plan([], ["wurmple", "silcoon"]));
+  check("Clamperl's two tips are single-member branches",
+    plan([], ["huntail"]) === "!huntail", plan([], ["huntail"]));
+  check("both Clamperl tips collapse to !+clamperl",
+    plan([], ["huntail", "gorebyss"]) === "!+clamperl", plan([], ["huntail", "gorebyss"]));
+  check("duplicate members emit each clause once",
+    plan([], ["silcoon", "beautifly"]) === "!silcoon&!beautifly", plan([], ["silcoon", "beautifly"]));
+}
+
+console.log("\nScenario 16: default output is untouched (fixture safety)");
+{
+  const empty = buildFilters([], [], DEFAULT_CONFIG, [], "de", t);
+  check("empty have-lists emit guards only",
+    empty.friendLuckyWishlist ===
+      "!getauscht&!crypto&!mysteriös,808,809&!schillernd&!kostümiert&!hintergrund&!erlöst",
+    empty.friendLuckyWishlist);
+  check("an ordinary species is unchanged", plan([], ["charizard"]) === "!+charizard");
+  check("form scoping alone is unchanged",
+    plan([], ["vulpix"], { ...DEFAULT_CONFIG, luckyForms: { vulpix: ["alola"] } }) === "!+vulpix,!ice");
 }
 
 console.log(`\n${failures === 0 ? "✓ All lucky-logic checks passed." : `✗ ${failures} failure(s).`}`);
