@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-06-24T14:07:09.617Z",
+  "fetchedAt": "2026-08-17T13:20:55.114Z",
   "species": {
     "19": {
       "name": "Rattata",
@@ -892,6 +892,38 @@
         }
       ]
     },
+    "413": {
+      "name": "Wormadam",
+      "forms": [
+        {
+          "key": "cloak:plant",
+          "axis": "cloak",
+          "variant": "plant",
+          "include": [
+            "grass"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "cloak:sandy",
+          "axis": "cloak",
+          "variant": "sandy",
+          "include": [
+            "ground"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "cloak:trash",
+          "axis": "cloak",
+          "variant": "trash",
+          "include": [
+            "steel"
+          ],
+          "exclude": []
+        }
+      ]
+    },
     "503": {
       "name": "Samurott",
       "forms": [
@@ -1097,6 +1129,47 @@
           "region": "hisui",
           "include": [
             "fighting"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "741": {
+      "name": "Oricorio",
+      "forms": [
+        {
+          "key": "style:baile",
+          "axis": "style",
+          "variant": "baile",
+          "include": [
+            "fire"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "style:pau",
+          "axis": "style",
+          "variant": "pau",
+          "include": [
+            "psychic"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "style:pompom",
+          "axis": "style",
+          "variant": "pompom",
+          "include": [
+            "electric"
+          ],
+          "exclude": []
+        },
+        {
+          "key": "style:sensu",
+          "axis": "style",
+          "variant": "sensu",
+          "include": [
+            "ghost"
           ],
           "exclude": []
         }

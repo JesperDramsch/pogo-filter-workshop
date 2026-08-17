@@ -1,4 +1,4 @@
-import { buildFilters, DEFAULT_CONFIG, prepareImport, validateImportEnvelope, SCHEMA_CURRENT, babyStageDex, genderSlotsFor, regionalFormsFor } from "../src/App.jsx";
+import { buildFilters, DEFAULT_CONFIG, prepareImport, validateImportEnvelope, SCHEMA_CURRENT, babyStageDex, genderSlotsFor, regionalFormsFor, invisibleSlotsFor, deerlingSeasonFor, currentSeasonWindow } from "../src/App.jsx";
 
 const t = (key, opts) => key;
 
@@ -350,6 +350,87 @@ console.log("\nScenario 20: friend-collect coverage respects gender");
     fc(cfgWith({ ...target, luckyGenders: { wadribie: ["female"] } })) === "");
   check("an UNannotated lucky still covers it — annotations opt IN",
     fc(cfgWith(target)) === "");
+}
+
+console.log("\nScenario 21: un-searchable slots — catalog and disjointness");
+{
+  check("Sesokitz carries the four seasons",
+    JSON.stringify(invisibleSlotsFor("deerling")?.slots) === '["spring","summer","autumn","winter"]');
+  check("Kinoso carries Overcast/Sunny",
+    JSON.stringify(invisibleSlotsFor("cherrim")?.slots) === '["overcast","sunny"]');
+  check("Burmy is ONE four-slot group (gender × cloak interact)",
+    JSON.stringify(invisibleSlotsFor("burmy")?.slots) === '["male","plant","sandy","trash"]');
+  check("an ordinary species has no slots", invisibleSlotsFor("charizard") === null);
+  // Burmadame's cloaks DO differ by type, so they belong in the searchable
+  // form catalog and must NOT be tracked as invisible slots.
+  check("Burmadame is type-searchable, not an invisible-slot species",
+    invisibleSlotsFor("wormadam") === null);
+  check("Burmadame's three cloaks are in the form catalog",
+    (regionalFormsFor("wormadam") || []).map((f) => f.key).join(",") ===
+      "cloak:plant,cloak:sandy,cloak:trash");
+  check("Choreogel's four styles are in the form catalog too",
+    (regionalFormsFor("oricorio") || []).length === 4);
+  check("Burmy itself has NO searchable forms (all three cloaks are pure Bug)",
+    regionalFormsFor("burmy") === null);
+  // The chip rule again: one refinement group per chip.
+  const both = ["deerling", "sawsbuck", "cherrim", "burmy", "maushold", "dudunsparce"]
+    .filter((s) => invisibleSlotsFor(s) && (regionalFormsFor(s) || []).length > 0);
+  check("invisible-slot catalog is disjoint from the form catalog", both.length === 0, JSON.stringify(both));
+  const g = ["deerling", "sawsbuck", "cherrim", "burmy", "maushold", "dudunsparce"]
+    .filter((s) => invisibleSlotsFor(s) && genderSlotsFor(s));
+  check("…and from the gender catalog", g.length === 0, JSON.stringify(g));
+}
+
+console.log("\nScenario 22: incomplete slots withhold the exclusion entirely");
+{
+  const withSlots = (o) => cfgWith({ luckySlots: o });
+  check("unannotated behaves exactly as before", plan([], ["deerling"]) === "!+deerling");
+  check("2 of 4 seasons → NO exclusion, friend keeps seeing Sesokitz",
+    plan([], ["deerling"], withSlots({ sesokitz: ["spring", "autumn"] })) === "",
+    JSON.stringify(plan([], ["deerling"], withSlots({ sesokitz: ["spring", "autumn"] }))));
+  check("all 4 seasons → the family is finally excluded",
+    plan([], ["deerling"], withSlots({ sesokitz: ["spring", "summer", "autumn", "winter"] })) ===
+      "!+deerling");
+  check("Kinoso 1 of 2 withholds", plan([], ["cherrim"], withSlots({ kinoso: ["sunny"] })) === "");
+  check("Kinoso both excludes",
+    plan([], ["cherrim"], withSlots({ kinoso: ["sunny", "overcast"] })) === "!+cherrim");
+  check("the hundo wishlist gates the same way",
+    hundoPlan(["deerling"], cfgWith({ hundoSlots: { sesokitz: ["spring"] } })) === "");
+  check("an unrelated species is untouched",
+    plan([], ["charizard"], withSlots({ sesokitz: ["spring"] })) === "!+charizard");
+}
+
+console.log("\nScenario 23: season inference (pure, hemisphere-flipped)");
+{
+  // No feed window → falls back to meteorological month bands.
+  const d = (m) => new Date(Date.UTC(2026, m, 15));
+  check("northern July is summer", deerlingSeasonFor(d(6), "north", []) === "summer");
+  check("southern July is winter", deerlingSeasonFor(d(6), "south", []) === "winter");
+  check("northern January is winter", deerlingSeasonFor(d(0), "north", []) === "winter");
+  check("southern January is summer", deerlingSeasonFor(d(0), "south", []) === "summer");
+  check("northern April is spring", deerlingSeasonFor(d(3), "north", []) === "spring");
+  check("southern October is spring", deerlingSeasonFor(d(9), "south", []) === "spring");
+  check("no hemisphere → no guess", deerlingSeasonFor(d(6), null, []) === null);
+  // Every month resolves, and the two hemispheres are always opposites.
+  const opp = { spring: "autumn", summer: "winter", autumn: "spring", winter: "summer" };
+  const allOk = Array.from({ length: 12 }, (_, m) => {
+    const n = deerlingSeasonFor(d(m), "north", []);
+    const s = deerlingSeasonFor(d(m), "south", []);
+    return n && s && opp[n] === s;
+  }).every(Boolean);
+  check("all 12 months resolve and the hemispheres stay opposite", allOk);
+  // A live Season window overrides the month band via its MIDPOINT, which is
+  // the point of reading the feed at all.
+  const pools = [{ category: "Season", title: "Forever Forward", start: "2026-06-02T10:00:00", end: "2026-09-08T10:00:00" }];
+  check("a Season window drives the label from its midpoint (early Jun → summer)",
+    deerlingSeasonFor(new Date(Date.UTC(2026, 5, 3)), "north", pools) === "summer",
+    deerlingSeasonFor(new Date(Date.UTC(2026, 5, 3)), "north", pools));
+  check("outside the window it falls back to the month band",
+    deerlingSeasonFor(new Date(Date.UTC(2026, 0, 15)), "north", pools) === "winter");
+  check("currentSeasonWindow finds the covering window",
+    currentSeasonWindow(new Date(Date.UTC(2026, 6, 1)), pools)?.title === "Forever Forward");
+  check("currentSeasonWindow returns null outside any window",
+    currentSeasonWindow(new Date(Date.UTC(2026, 0, 1)), pools) === null);
 }
 
 console.log(`\n${failures === 0 ? "✓ All lucky-logic checks passed." : `✗ ${failures} failure(s).`}`);
