@@ -4,7 +4,7 @@
     "en": "Bulbasaur",
     "es": "Bulbasaur",
     "fr": "Bulbizarre",
-    "hi": "बबासॉर",
+    "hi": "बल्बासॉर",
     "ja": "フシギダネ",
     "zh-TW": "妙蛙種子"
   },
@@ -40,7 +40,7 @@
     "en": "Charmeleon",
     "es": "Charmeleon",
     "fr": "Reptincel",
-    "hi": "चामलयन",
+    "hi": "चार्मिलियन",
     "ja": "リザード",
     "zh-TW": "火恐龍"
   },
@@ -49,7 +49,7 @@
     "en": "Charizard",
     "es": "Charizard",
     "fr": "Dracaufeu",
-    "hi": "चारज़ाड",
+    "hi": "चारिज़ार्ड",
     "ja": "リザードン",
     "zh-TW": "噴火龍"
   },
@@ -58,7 +58,7 @@
     "en": "Squirtle",
     "es": "Squirtle",
     "fr": "Carapuce",
-    "hi": "वटल",
+    "hi": "स्क्वर्टल",
     "ja": "ゼニガメ",
     "zh-TW": "傑尼龜"
   },
@@ -67,7 +67,7 @@
     "en": "Wartortle",
     "es": "Wartortle",
     "fr": "Carabaffe",
-    "hi": "वॉरटॉटल",
+    "hi": "वॉरटॉर्टल",
     "ja": "カメール",
     "zh-TW": "卡咪龜"
   },
@@ -76,7 +76,7 @@
     "en": "Blastoise",
     "es": "Blastoise",
     "fr": "Tortank",
-    "hi": "लाटॉइस",
+    "hi": "ब्लास्टॉइस",
     "ja": "カメックス",
     "zh-TW": "水箭龜"
   },
@@ -85,7 +85,7 @@
     "en": "Caterpie",
     "es": "Caterpie",
     "fr": "Chenipan",
-    "hi": "कटरपी",
+    "hi": "कैटरपी",
     "ja": "キャタピー",
     "zh-TW": "綠毛蟲"
   },
@@ -103,7 +103,7 @@
     "en": "Butterfree",
     "es": "Butterfree",
     "fr": "Papilusion",
-    "hi": "बटर",
+    "hi": "बटरफ़्री",
     "ja": "バタフリー",
     "zh-TW": "巴大蝶"
   },
@@ -121,7 +121,7 @@
     "en": "Kakuna",
     "es": "Kakuna",
     "fr": "Coconfort",
-    "hi": "ककना",
+    "hi": "ककूना",
     "ja": "コクーン",
     "zh-TW": "鐵殼蛹"
   },
@@ -130,7 +130,7 @@
     "en": "Beedrill",
     "es": "Beedrill",
     "fr": "Dardargnan",
-    "hi": "बीडल",
+    "hi": "बीड्रिल",
     "ja": "スピアー",
     "zh-TW": "大針蜂"
   },
@@ -139,7 +139,7 @@
     "en": "Pidgey",
     "es": "Pidgey",
     "fr": "Roucool",
-    "hi": "िपजी",
+    "hi": "पिजी",
     "ja": "ポッポ",
     "zh-TW": "波波"
   },
@@ -148,7 +148,7 @@
     "en": "Pidgeotto",
     "es": "Pidgeotto",
     "fr": "Roucoups",
-    "hi": "िपजयोटो",
+    "hi": "पिजियोटो",
     "ja": "ピジョン",
     "zh-TW": "比比鳥"
   },
@@ -157,7 +157,7 @@
     "en": "Pidgeot",
     "es": "Pidgeot",
     "fr": "Roucarnage",
-    "hi": "िपजऑट",
+    "hi": "पिजिऑट",
     "ja": "ピジョット",
     "zh-TW": "大比鳥"
   },
@@ -175,7 +175,7 @@
     "en": "Raticate",
     "es": "Raticate",
     "fr": "Rattatac",
-    "hi": "रैटकट",
+    "hi": "रैटिकट",
     "ja": "ラッタ",
     "zh-TW": "拉達"
   },
@@ -184,7 +184,7 @@
     "en": "Spearow",
     "es": "Spearow",
     "fr": "Piafabec",
-    "hi": "पीरो",
+    "hi": "स्पीरो",
     "ja": "オニスズメ",
     "zh-TW": "烈雀"
   },
@@ -220,7 +220,7 @@
     "en": "Pikachu",
     "es": "Pikachu",
     "fr": "Pikachu",
-    "hi": "िपकाचू",
+    "hi": "पिकाचू",
     "ja": "ピカチュウ",
     "zh-TW": "皮卡丘"
   },
@@ -238,7 +238,7 @@
     "en": "Sandshrew",
     "es": "Sandshrew",
     "fr": "Sabelette",
-    "hi": "सैंडू",
+    "hi": "सैंडश्रू",
     "ja": "サンド",
     "zh-TW": "穿山鼠"
   },
@@ -247,7 +247,7 @@
     "en": "Sandslash",
     "es": "Sandslash",
     "fr": "Sablaireau",
-    "hi": "सैंडलैश",
+    "hi": "सैंडस्लैश",
     "ja": "サンドパン",
     "zh-TW": "穿山王"
   },
@@ -265,7 +265,7 @@
     "en": "Nidorina",
     "es": "Nidorina",
     "fr": "Nidorina",
-    "hi": "नीडोरना",
+    "hi": "नीडोरिना",
     "ja": "ニドリーナ",
     "zh-TW": "尼多娜"
   },
@@ -274,7 +274,7 @@
     "en": "Nidoqueen",
     "es": "Nidoqueen",
     "fr": "Nidoqueen",
-    "hi": "नीडोवीन",
+    "hi": "नीडोक्वीन",
     "ja": "ニドクイン",
     "zh-TW": "尼多后"
   },
@@ -292,7 +292,7 @@
     "en": "Nidorino",
     "es": "Nidorino",
     "fr": "Nidorino",
-    "hi": "नीडोरनो",
+    "hi": "नीडोरीनो",
     "ja": "ニドリーノ",
     "zh-TW": "尼多力諾"
   },
@@ -301,7 +301,7 @@
     "en": "Nidoking",
     "es": "Nidoking",
     "fr": "Nidoking",
-    "hi": "नीडोकंग",
+    "hi": "नीडोकिंग",
     "ja": "ニドキング",
     "zh-TW": "尼多王"
   },
@@ -310,7 +310,7 @@
     "en": "Clefairy",
     "es": "Clefairy",
     "fr": "Mélofée",
-    "hi": "लफ़ेर",
+    "hi": "क्लफ़ेरी",
     "ja": "ピッピ",
     "zh-TW": "皮皮"
   },
@@ -319,7 +319,7 @@
     "en": "Clefable",
     "es": "Clefable",
     "fr": "Mélodelfe",
-    "hi": "लफ़ेबल",
+    "hi": "क्लफ़ेबल",
     "ja": "ピクシー",
     "zh-TW": "皮可西"
   },
@@ -328,7 +328,7 @@
     "en": "Vulpix",
     "es": "Vulpix",
     "fr": "Goupix",
-    "hi": "वलपस",
+    "hi": "वलपिक्स",
     "ja": "ロコン",
     "zh-TW": "六尾"
   },
@@ -337,7 +337,7 @@
     "en": "Ninetales",
     "es": "Ninetales",
     "fr": "Feunard",
-    "hi": "नाइनटस",
+    "hi": "नाइनटेल्स",
     "ja": "キュウコン",
     "zh-TW": "九尾"
   },
@@ -346,7 +346,7 @@
     "en": "Jigglypuff",
     "es": "Jigglypuff",
     "fr": "Rondoudou",
-    "hi": "जलपफ़",
+    "hi": "जिग्लीपफ़",
     "ja": "プリン",
     "zh-TW": "胖丁"
   },
@@ -355,7 +355,7 @@
     "en": "Wigglytuff",
     "es": "Wigglytuff",
     "fr": "Grodoudou",
-    "hi": "वलटफ़",
+    "hi": "विग्लीटफ़",
     "ja": "プクリン",
     "zh-TW": "胖可丁"
   },
@@ -382,7 +382,7 @@
     "en": "Oddish",
     "es": "Oddish",
     "fr": "Mystherbe",
-    "hi": "ऑडश",
+    "hi": "ऑडिश",
     "ja": "ナゾノクサ",
     "zh-TW": "走路草"
   },
@@ -391,7 +391,7 @@
     "en": "Gloom",
     "es": "Gloom",
     "fr": "Ortide",
-    "hi": "लूम",
+    "hi": "ग्लूम",
     "ja": "クサイハナ",
     "zh-TW": "臭臭花"
   },
@@ -400,7 +400,7 @@
     "en": "Vileplume",
     "es": "Vileplume",
     "fr": "Rafflesia",
-    "hi": "वायललूम",
+    "hi": "वायलप्लूम",
     "ja": "ラフレシア",
     "zh-TW": "霸王花"
   },
@@ -418,7 +418,7 @@
     "en": "Parasect",
     "es": "Parasect",
     "fr": "Parasect",
-    "hi": "पैरासेट",
+    "hi": "पैरासेक्ट",
     "ja": "パラセクト",
     "zh-TW": "派拉斯特"
   },
@@ -445,7 +445,7 @@
     "en": "Diglett",
     "es": "Diglett",
     "fr": "Taupiqueur",
-    "hi": "डगलट",
+    "hi": "डिगलेट",
     "ja": "ディグダ",
     "zh-TW": "地鼠"
   },
@@ -454,7 +454,7 @@
     "en": "Dugtrio",
     "es": "Dugtrio",
     "fr": "Triopikeur",
-    "hi": "डगटयो",
+    "hi": "डगट्रियो",
     "ja": "ダグトリオ",
     "zh-TW": "三地鼠"
   },
@@ -463,7 +463,7 @@
     "en": "Meowth",
     "es": "Meowth",
     "fr": "Miaouss",
-    "hi": "याउथ",
+    "hi": "म्याउथ",
     "ja": "ニャース",
     "zh-TW": "喵喵"
   },
@@ -472,7 +472,7 @@
     "en": "Persian",
     "es": "Persian",
     "fr": "Persian",
-    "hi": "पशयन",
+    "hi": "पर्शियन",
     "ja": "ペルシアン",
     "zh-TW": "貓老大"
   },
@@ -490,7 +490,7 @@
     "en": "Golduck",
     "es": "Golduck",
     "fr": "Akwakwak",
-    "hi": "गोडक",
+    "hi": "गोल्डक",
     "ja": "ゴルダック",
     "zh-TW": "哥達鴨"
   },
@@ -499,7 +499,7 @@
     "en": "Mankey",
     "es": "Mankey",
     "fr": "Férosinge",
-    "hi": "मैंक",
+    "hi": "मैंकी",
     "ja": "マンキー",
     "zh-TW": "猴怪"
   },
@@ -508,7 +508,7 @@
     "en": "Primeape",
     "es": "Primeape",
     "fr": "Colossinge",
-    "hi": "ाइमेप",
+    "hi": "प्राइमेप",
     "ja": "オコリザル",
     "zh-TW": "火爆猴"
   },
@@ -517,7 +517,7 @@
     "en": "Growlithe",
     "es": "Growlithe",
     "fr": "Caninos",
-    "hi": "ाउलथ",
+    "hi": "ग्राउलिथ",
     "ja": "ガーディ",
     "zh-TW": "卡蒂狗"
   },
@@ -526,7 +526,7 @@
     "en": "Arcanine",
     "es": "Arcanine",
     "fr": "Arcanin",
-    "hi": "आकनाइन",
+    "hi": "आर्केनाइन",
     "ja": "ウインディ",
     "zh-TW": "風速狗"
   },
@@ -535,7 +535,7 @@
     "en": "Poliwag",
     "es": "Poliwag",
     "fr": "Ptitard",
-    "hi": "पॉलवैग",
+    "hi": "पॉलीवैग",
     "ja": "ニョロモ",
     "zh-TW": "蚊香蝌蚪"
   },
@@ -544,7 +544,7 @@
     "en": "Poliwhirl",
     "es": "Poliwhirl",
     "fr": "Têtarte",
-    "hi": "पॉलवल",
+    "hi": "पॉलीवर्ल",
     "ja": "ニョロゾ",
     "zh-TW": "蚊香君"
   },
@@ -553,7 +553,7 @@
     "en": "Poliwrath",
     "es": "Poliwrath",
     "fr": "Tartard",
-    "hi": "पॉलरैथ",
+    "hi": "पॉलीरैथ",
     "ja": "ニョロボン",
     "zh-TW": "蚊香泳士"
   },
@@ -607,7 +607,7 @@
     "en": "Machamp",
     "es": "Machamp",
     "fr": "Mackogneur",
-    "hi": "मचैप",
+    "hi": "मचैम्प",
     "ja": "カイリキー",
     "zh-TW": "怪力"
   },
@@ -616,7 +616,7 @@
     "en": "Bellsprout",
     "es": "Bellsprout",
     "fr": "Chétiflor",
-    "hi": "बेलाउट",
+    "hi": "बेलस्प्राउट",
     "ja": "マダツボミ",
     "zh-TW": "喇叭芽"
   },
@@ -625,7 +625,7 @@
     "en": "Weepinbell",
     "es": "Weepinbell",
     "fr": "Boustiflor",
-    "hi": "वीिपनबेल",
+    "hi": "वीपिनबेल",
     "ja": "ウツドン",
     "zh-TW": "口呆花"
   },
@@ -634,7 +634,7 @@
     "en": "Victreebel",
     "es": "Victreebel",
     "fr": "Empiflor",
-    "hi": "वटीबेल",
+    "hi": "विक्ट्रीबेल",
     "ja": "ウツボット",
     "zh-TW": "大食花"
   },
@@ -643,7 +643,7 @@
     "en": "Tentacool",
     "es": "Tentacool",
     "fr": "Tentacool",
-    "hi": "टंटाकल",
+    "hi": "टेंटाकूल",
     "ja": "メノクラゲ",
     "zh-TW": "瑪瑙水母"
   },
@@ -652,7 +652,7 @@
     "en": "Tentacruel",
     "es": "Tentacruel",
     "fr": "Tentacruel",
-    "hi": "टंटाूअल",
+    "hi": "टेंटाक्रूअल",
     "ja": "ドククラゲ",
     "zh-TW": "毒刺水母"
   },
@@ -661,7 +661,7 @@
     "en": "Geodude",
     "es": "Geodude",
     "fr": "Racaillou",
-    "hi": "जयोडूड",
+    "hi": "जियोडूड",
     "ja": "イシツブテ",
     "zh-TW": "小拳石"
   },
@@ -670,7 +670,7 @@
     "en": "Graveler",
     "es": "Graveler",
     "fr": "Gravalanch",
-    "hi": "ैवलर",
+    "hi": "ग्रैवलर",
     "ja": "ゴローン",
     "zh-TW": "隆隆石"
   },
@@ -679,7 +679,7 @@
     "en": "Golem",
     "es": "Golem",
     "fr": "Grolem",
-    "hi": "गोलम",
+    "hi": "गोलेम",
     "ja": "ゴローニャ",
     "zh-TW": "隆隆岩"
   },
@@ -697,7 +697,7 @@
     "en": "Rapidash",
     "es": "Rapidash",
     "fr": "Galopa",
-    "hi": "रैिपडैश",
+    "hi": "रैपिडैश",
     "ja": "ギャロップ",
     "zh-TW": "烈焰馬"
   },
@@ -706,7 +706,7 @@
     "en": "Slowpoke",
     "es": "Slowpoke",
     "fr": "Ramoloss",
-    "hi": "लोपोक",
+    "hi": "स्लोपोक",
     "ja": "ヤドン",
     "zh-TW": "呆呆獸"
   },
@@ -715,7 +715,7 @@
     "en": "Slowbro",
     "es": "Slowbro",
     "fr": "Flagadoss",
-    "hi": "लोो",
+    "hi": "स्लोब्रो",
     "ja": "ヤドラン",
     "zh-TW": "呆殼獸"
   },
@@ -724,7 +724,7 @@
     "en": "Magnemite",
     "es": "Magnemite",
     "fr": "Magnéti",
-    "hi": "मैनेमाइट",
+    "hi": "मैग्नेमाइट",
     "ja": "コイル",
     "zh-TW": "小磁怪"
   },
@@ -733,7 +733,7 @@
     "en": "Magneton",
     "es": "Magneton",
     "fr": "Magnéton",
-    "hi": "मैनेटॉन",
+    "hi": "मैग्नेटॉन",
     "ja": "レアコイル",
     "zh-TW": "三合一磁怪"
   },
@@ -742,7 +742,7 @@
     "en": "Farfetch'd",
     "es": "Farfetch'd",
     "fr": "Canarticho",
-    "hi": "फ़ारफ़ेड",
+    "hi": "फ़ारफ़ेच्ड",
     "ja": "カモネギ",
     "zh-TW": "大蔥鴨"
   },
@@ -760,7 +760,7 @@
     "en": "Dodrio",
     "es": "Dodrio",
     "fr": "Dodrio",
-    "hi": "डोडयो",
+    "hi": "डोड्रियो",
     "ja": "ドードリオ",
     "zh-TW": "嘟嘟利"
   },
@@ -778,7 +778,7 @@
     "en": "Dewgong",
     "es": "Dewgong",
     "fr": "Lamantine",
-    "hi": "डूगॉग",
+    "hi": "डूगॉन्ग",
     "ja": "ジュゴン",
     "zh-TW": "白海獅"
   },
@@ -787,7 +787,7 @@
     "en": "Grimer",
     "es": "Grimer",
     "fr": "Tadmorv",
-    "hi": "ाइमर",
+    "hi": "ग्राइमर",
     "ja": "ベトベター",
     "zh-TW": "臭泥"
   },
@@ -805,7 +805,7 @@
     "en": "Shellder",
     "es": "Shellder",
     "fr": "Kokiyas",
-    "hi": "शेडर",
+    "hi": "शेल्डर",
     "ja": "シェルダー",
     "zh-TW": "大舌貝"
   },
@@ -814,7 +814,7 @@
     "en": "Cloyster",
     "es": "Cloyster",
     "fr": "Crustabri",
-    "hi": "लॉइटर",
+    "hi": "क्लॉइस्टर",
     "ja": "パルシェン",
     "zh-TW": "刺甲貝"
   },
@@ -823,7 +823,7 @@
     "en": "Gastly",
     "es": "Gastly",
     "fr": "Fantominus",
-    "hi": "गैटल",
+    "hi": "गैस्टली",
     "ja": "ゴース",
     "zh-TW": "鬼斯"
   },
@@ -832,7 +832,7 @@
     "en": "Haunter",
     "es": "Haunter",
     "fr": "Spectrum",
-    "hi": "हॉटर",
+    "hi": "हॉन्टर",
     "ja": "ゴースト",
     "zh-TW": "鬼斯通"
   },
@@ -850,7 +850,7 @@
     "en": "Onix",
     "es": "Onix",
     "fr": "Onix",
-    "hi": "ऑनस",
+    "hi": "ऑनिक्स",
     "ja": "イワーク",
     "zh-TW": "大岩蛇"
   },
@@ -859,7 +859,7 @@
     "en": "Drowzee",
     "es": "Drowzee",
     "fr": "Soporifik",
-    "hi": "डाउज़ी",
+    "hi": "ड्राउज़ी",
     "ja": "スリープ",
     "zh-TW": "催眠貘"
   },
@@ -868,7 +868,7 @@
     "en": "Hypno",
     "es": "Hypno",
     "fr": "Hypnomade",
-    "hi": "हनो",
+    "hi": "हिप्नो",
     "ja": "スリーパー",
     "zh-TW": "引夢貘人"
   },
@@ -877,7 +877,7 @@
     "en": "Krabby",
     "es": "Krabby",
     "fr": "Krabby",
-    "hi": "ैबी",
+    "hi": "क्रैबी",
     "ja": "クラブ",
     "zh-TW": "大鉗蟹"
   },
@@ -886,7 +886,7 @@
     "en": "Kingler",
     "es": "Kingler",
     "fr": "Krabboss",
-    "hi": "कंगलर",
+    "hi": "किंगलर",
     "ja": "キングラー",
     "zh-TW": "巨鉗蟹"
   },
@@ -895,7 +895,7 @@
     "en": "Voltorb",
     "es": "Voltorb",
     "fr": "Voltorbe",
-    "hi": "वोटॉब",
+    "hi": "वोल्टॉर्ब",
     "ja": "ビリリダマ",
     "zh-TW": "霹靂電球"
   },
@@ -904,7 +904,7 @@
     "en": "Electrode",
     "es": "Electrode",
     "fr": "Électrode",
-    "hi": "इलटोड",
+    "hi": "इलेक्ट्रोड",
     "ja": "マルマイン",
     "zh-TW": "頑皮雷彈"
   },
@@ -913,7 +913,7 @@
     "en": "Exeggcute",
     "es": "Exeggcute",
     "fr": "Noeunoeuf",
-    "hi": "एज़ेगयूट",
+    "hi": "एक्ज़ेगक्यूट",
     "ja": "タマタマ",
     "zh-TW": "蛋蛋"
   },
@@ -922,7 +922,7 @@
     "en": "Exeggutor",
     "es": "Exeggutor",
     "fr": "Noadkoko",
-    "hi": "एज़ेयूटॉर",
+    "hi": "एक्ज़ेग्यूटॉर",
     "ja": "ナッシー",
     "zh-TW": "椰蛋樹"
   },
@@ -931,7 +931,7 @@
     "en": "Cubone",
     "es": "Cubone",
     "fr": "Osselait",
-    "hi": "यूबोन",
+    "hi": "क्यूबोन",
     "ja": "カラカラ",
     "zh-TW": "卡拉卡拉"
   },
@@ -949,7 +949,7 @@
     "en": "Hitmonlee",
     "es": "Hitmonlee",
     "fr": "Kicklee",
-    "hi": "हटमॉनल",
+    "hi": "हिटमॉनली",
     "ja": "サワムラー",
     "zh-TW": "飛腿郎"
   },
@@ -958,7 +958,7 @@
     "en": "Hitmonchan",
     "es": "Hitmonchan",
     "fr": "Tygnon",
-    "hi": "हटमॉनचैन",
+    "hi": "हिटमॉनचैन",
     "ja": "エビワラー",
     "zh-TW": "快拳郎"
   },
@@ -967,7 +967,7 @@
     "en": "Lickitung",
     "es": "Lickitung",
     "fr": "Excelangue",
-    "hi": "लकटंग",
+    "hi": "लिकिटंग",
     "ja": "ベロリンガ",
     "zh-TW": "大舌頭"
   },
@@ -976,7 +976,7 @@
     "en": "Koffing",
     "es": "Koffing",
     "fr": "Smogo",
-    "hi": "कॉिफ़ंग",
+    "hi": "कॉफ़िंग",
     "ja": "ドガース",
     "zh-TW": "瓦斯彈"
   },
@@ -985,7 +985,7 @@
     "en": "Weezing",
     "es": "Weezing",
     "fr": "Smogogo",
-    "hi": "वीिज़ंग",
+    "hi": "वीज़िंग",
     "ja": "マタドガス",
     "zh-TW": "雙彈瓦斯"
   },
@@ -994,7 +994,7 @@
     "en": "Rhyhorn",
     "es": "Rhyhorn",
     "fr": "Rhinocorne",
-    "hi": "राइहॉन",
+    "hi": "राइहॉर्न",
     "ja": "サイホーン",
     "zh-TW": "獨角犀牛"
   },
@@ -1030,7 +1030,7 @@
     "en": "Kangaskhan",
     "es": "Kangaskhan",
     "fr": "Kangourex",
-    "hi": "कगसखान",
+    "hi": "कैंगसखान",
     "ja": "ガルーラ",
     "zh-TW": "袋獸"
   },
@@ -1039,7 +1039,7 @@
     "en": "Horsea",
     "es": "Horsea",
     "fr": "Hypotrempe",
-    "hi": "हॉसी",
+    "hi": "हॉर्सी",
     "ja": "タッツー",
     "zh-TW": "墨海馬"
   },
@@ -1048,7 +1048,7 @@
     "en": "Seadra",
     "es": "Seadra",
     "fr": "Hypocéan",
-    "hi": "सीडा",
+    "hi": "सीड्रा",
     "ja": "シードラ",
     "zh-TW": "海刺龍"
   },
@@ -1057,7 +1057,7 @@
     "en": "Goldeen",
     "es": "Goldeen",
     "fr": "Poissirène",
-    "hi": "गोडीन",
+    "hi": "गोल्डीन",
     "ja": "トサキント",
     "zh-TW": "角金魚"
   },
@@ -1066,7 +1066,7 @@
     "en": "Seaking",
     "es": "Seaking",
     "fr": "Poissoroy",
-    "hi": "सीकंग",
+    "hi": "सीकिंग",
     "ja": "アズマオウ",
     "zh-TW": "金魚王"
   },
@@ -1075,7 +1075,7 @@
     "en": "Staryu",
     "es": "Staryu",
     "fr": "Stari",
-    "hi": "टायू",
+    "hi": "स्टार्यू",
     "ja": "ヒトデマン",
     "zh-TW": "海星星"
   },
@@ -1084,7 +1084,7 @@
     "en": "Starmie",
     "es": "Starmie",
     "fr": "Staross",
-    "hi": "टारमी",
+    "hi": "स्टारमी",
     "ja": "スターミー",
     "zh-TW": "寶石海星"
   },
@@ -1093,7 +1093,7 @@
     "en": "Mr. Mime",
     "es": "Mr. Mime",
     "fr": "M. Mime",
-    "hi": "मटर माइम",
+    "hi": "मिस्टर माइम",
     "ja": "バリヤード",
     "zh-TW": "魔牆人偶"
   },
@@ -1111,7 +1111,7 @@
     "en": "Jynx",
     "es": "Jynx",
     "fr": "Lippoutou",
-    "hi": "जंस",
+    "hi": "जिंक्स",
     "ja": "ルージュラ",
     "zh-TW": "迷唇姐"
   },
@@ -1120,7 +1120,7 @@
     "en": "Electabuzz",
     "es": "Electabuzz",
     "fr": "Élektek",
-    "hi": "इलटाबज़",
+    "hi": "इलेक्टाबज़",
     "ja": "エレブー",
     "zh-TW": "電擊獸"
   },
@@ -1129,7 +1129,7 @@
     "en": "Magmar",
     "es": "Magmar",
     "fr": "Magmar",
-    "hi": "मैमार",
+    "hi": "मैग्मार",
     "ja": "ブーバー",
     "zh-TW": "鴨嘴火獸"
   },
@@ -1138,7 +1138,7 @@
     "en": "Pinsir",
     "es": "Pinsir",
     "fr": "Scarabrute",
-    "hi": "िपंसर",
+    "hi": "पिंसर",
     "ja": "カイロス",
     "zh-TW": "凱羅斯"
   },
@@ -1156,7 +1156,7 @@
     "en": "Magikarp",
     "es": "Magikarp",
     "fr": "Magicarpe",
-    "hi": "मैजकाप",
+    "hi": "मैजिकार्प",
     "ja": "コイキング",
     "zh-TW": "鯉魚王"
   },
@@ -1174,7 +1174,7 @@
     "en": "Lapras",
     "es": "Lapras",
     "fr": "Lokhlass",
-    "hi": "लैस",
+    "hi": "लैप्रस",
     "ja": "ラプラス",
     "zh-TW": "拉普拉斯"
   },
@@ -1183,7 +1183,7 @@
     "en": "Ditto",
     "es": "Ditto",
     "fr": "Métamorph",
-    "hi": "डो",
+    "hi": "डिट्टो",
     "ja": "メタモン",
     "zh-TW": "百變怪"
   },
@@ -1201,7 +1201,7 @@
     "en": "Vaporeon",
     "es": "Vaporeon",
     "fr": "Aquali",
-    "hi": "वेपोरयॉन",
+    "hi": "वेपोरियॉन",
     "ja": "シャワーズ",
     "zh-TW": "水伊布"
   },
@@ -1210,7 +1210,7 @@
     "en": "Jolteon",
     "es": "Jolteon",
     "fr": "Voltali",
-    "hi": "जोटयॉन",
+    "hi": "जोल्टियॉन",
     "ja": "サンダース",
     "zh-TW": "雷伊布"
   },
@@ -1219,7 +1219,7 @@
     "en": "Flareon",
     "es": "Flareon",
     "fr": "Pyroli",
-    "hi": "लरयॉन",
+    "hi": "फ़्लेरियॉन",
     "ja": "ブースター",
     "zh-TW": "火伊布"
   },
@@ -1228,7 +1228,7 @@
     "en": "Porygon",
     "es": "Porygon",
     "fr": "Porygon",
-    "hi": "पोरगॉन",
+    "hi": "पोरिगॉन",
     "ja": "ポリゴン",
     "zh-TW": "多邊獸"
   },
@@ -1246,7 +1246,7 @@
     "en": "Omastar",
     "es": "Omastar",
     "fr": "Amonistar",
-    "hi": "ओमाटार",
+    "hi": "ओमास्टार",
     "ja": "オムスター",
     "zh-TW": "多刺菊石獸"
   },
@@ -1264,7 +1264,7 @@
     "en": "Kabutops",
     "es": "Kabutops",
     "fr": "Kabutops",
-    "hi": "कबूटॉस",
+    "hi": "कबूटॉप्स",
     "ja": "カブトプス",
     "zh-TW": "鐮刀盔"
   },
@@ -1273,7 +1273,7 @@
     "en": "Aerodactyl",
     "es": "Aerodactyl",
     "fr": "Ptéra",
-    "hi": "ऐरोडैटल",
+    "hi": "ऐरोडैक्टिल",
     "ja": "プテラ",
     "zh-TW": "化石翼龍"
   },
@@ -1282,7 +1282,7 @@
     "en": "Snorlax",
     "es": "Snorlax",
     "fr": "Ronflex",
-    "hi": "नोरलैस",
+    "hi": "स्नोरलैक्स",
     "ja": "カビゴン",
     "zh-TW": "卡比獸"
   },
@@ -1291,7 +1291,7 @@
     "en": "Articuno",
     "es": "Articuno",
     "fr": "Artikodin",
-    "hi": "आटकनो",
+    "hi": "आर्टिकूनो",
     "ja": "フリーザー",
     "zh-TW": "急凍鳥"
   },
@@ -1309,7 +1309,7 @@
     "en": "Moltres",
     "es": "Moltres",
     "fr": "Sulfura",
-    "hi": "मोटस",
+    "hi": "मोल्ट्रेस",
     "ja": "ファイヤー",
     "zh-TW": "火焰鳥"
   },
@@ -1318,7 +1318,7 @@
     "en": "Dratini",
     "es": "Dratini",
     "fr": "Minidraco",
-    "hi": "डटनी",
+    "hi": "ड्रटिनी",
     "ja": "ミニリュウ",
     "zh-TW": "迷你龍"
   },
@@ -1327,7 +1327,7 @@
     "en": "Dragonair",
     "es": "Dragonair",
     "fr": "Draco",
-    "hi": "डैगनेयर",
+    "hi": "ड्रैगनेयर",
     "ja": "ハクリュー",
     "zh-TW": "哈克龍"
   },
@@ -1336,7 +1336,7 @@
     "en": "Dragonite",
     "es": "Dragonite",
     "fr": "Dracolosse",
-    "hi": "डैगनाइट",
+    "hi": "ड्रैगनाइट",
     "ja": "カイリュー",
     "zh-TW": "快龍"
   },
@@ -1345,7 +1345,7 @@
     "en": "Mewtwo",
     "es": "Mewtwo",
     "fr": "Mewtwo",
-    "hi": "यूटू",
+    "hi": "म्यूटू",
     "ja": "ミュウツー",
     "zh-TW": "超夢"
   },
@@ -1354,7 +1354,7 @@
     "en": "Mew",
     "es": "Mew",
     "fr": "Mew",
-    "hi": "यू",
+    "hi": "म्यू",
     "ja": "ミュウ",
     "zh-TW": "夢幻"
   },
@@ -1363,7 +1363,7 @@
     "en": "Chikorita",
     "es": "Chikorita",
     "fr": "Germignon",
-    "hi": "चकोरटा",
+    "hi": "चिकोरीटा",
     "ja": "チコリータ",
     "zh-TW": "菊草葉"
   },
@@ -1372,7 +1372,7 @@
     "en": "Bayleef",
     "es": "Bayleef",
     "fr": "Macronium",
-    "hi": "बेलफ़",
+    "hi": "बेलीफ़",
     "ja": "ベイリーフ",
     "zh-TW": "月桂葉"
   },
@@ -1381,7 +1381,7 @@
     "en": "Meganium",
     "es": "Meganium",
     "fr": "Méganium",
-    "hi": "मैगेनयम",
+    "hi": "मैगेनियम",
     "ja": "メガニウム",
     "zh-TW": "大竺葵"
   },
@@ -1390,7 +1390,7 @@
     "en": "Cyndaquil",
     "es": "Cyndaquil",
     "fr": "Héricendre",
-    "hi": "संडावल",
+    "hi": "सिंडाक्विल",
     "ja": "ヒノアラシ",
     "zh-TW": "火球鼠"
   },
@@ -1399,7 +1399,7 @@
     "en": "Quilava",
     "es": "Quilava",
     "fr": "Feurisson",
-    "hi": "वलावा",
+    "hi": "क्विलावा",
     "ja": "マグマラシ",
     "zh-TW": "火岩鼠"
   },
@@ -1408,7 +1408,7 @@
     "en": "Typhlosion",
     "es": "Typhlosion",
     "fr": "Typhlosion",
-    "hi": "टाइलोज़न",
+    "hi": "टाइफ़्लोज़न",
     "ja": "バクフーン",
     "zh-TW": "火爆獸"
   },
@@ -1426,7 +1426,7 @@
     "en": "Croconaw",
     "es": "Croconaw",
     "fr": "Crocrodil",
-    "hi": "ॉकोनॉ",
+    "hi": "क्रॉकोनॉ",
     "ja": "アリゲイツ",
     "zh-TW": "藍鱷"
   },
@@ -1435,7 +1435,7 @@
     "en": "Feraligatr",
     "es": "Feraligatr",
     "fr": "Aligatueur",
-    "hi": "फ़रैलगेटर",
+    "hi": "फ़रैलिगेटर",
     "ja": "オーダイル",
     "zh-TW": "大力鱷"
   },
@@ -1444,7 +1444,7 @@
     "en": "Sentret",
     "es": "Sentret",
     "fr": "Fouinette",
-    "hi": "सेंटट",
+    "hi": "सेंट्रेट",
     "ja": "オタチ",
     "zh-TW": "尾立"
   },
@@ -1453,7 +1453,7 @@
     "en": "Furret",
     "es": "Furret",
     "fr": "Fouinar",
-    "hi": "फ़रट",
+    "hi": "फ़रेट",
     "ja": "オオタチ",
     "zh-TW": "大尾立"
   },
@@ -1462,7 +1462,7 @@
     "en": "Hoothoot",
     "es": "Hoothoot",
     "fr": "Hoothoot",
-    "hi": "टट",
+    "hi": "हूटहूट",
     "ja": "ホーホー",
     "zh-TW": "咕咕"
   },
@@ -1471,7 +1471,7 @@
     "en": "Noctowl",
     "es": "Noctowl",
     "fr": "Noarfang",
-    "hi": "नॉटाउल",
+    "hi": "नॉक्टाउल",
     "ja": "ヨルノズク",
     "zh-TW": "貓頭夜鷹"
   },
@@ -1480,7 +1480,7 @@
     "en": "Ledyba",
     "es": "Ledyba",
     "fr": "Coxy",
-    "hi": "लडबा",
+    "hi": "लेडिबा",
     "ja": "レディバ",
     "zh-TW": "芭瓢蟲"
   },
@@ -1489,7 +1489,7 @@
     "en": "Ledian",
     "es": "Ledian",
     "fr": "Coxyclaque",
-    "hi": "लडयन",
+    "hi": "लेडियन",
     "ja": "レディアン",
     "zh-TW": "安瓢蟲"
   },
@@ -1498,7 +1498,7 @@
     "en": "Spinarak",
     "es": "Spinarak",
     "fr": "Mimigal",
-    "hi": "िपनारैक",
+    "hi": "स्पिनारैक",
     "ja": "イトマル",
     "zh-TW": "圓絲蛛"
   },
@@ -1507,7 +1507,7 @@
     "en": "Ariados",
     "es": "Ariados",
     "fr": "Migalos",
-    "hi": "एरयाडोस",
+    "hi": "एरियाडोस",
     "ja": "アリアドス",
     "zh-TW": "阿利多斯"
   },
@@ -1516,7 +1516,7 @@
     "en": "Crobat",
     "es": "Crobat",
     "fr": "Nostenfer",
-    "hi": "ोबैट",
+    "hi": "क्रोबैट",
     "ja": "クロバット",
     "zh-TW": "叉字蝠"
   },
@@ -1525,7 +1525,7 @@
     "en": "Chinchou",
     "es": "Chinchou",
     "fr": "Loupio",
-    "hi": "चंचाओ",
+    "hi": "चिंचाओ",
     "ja": "チョンチー",
     "zh-TW": "燈籠魚"
   },
@@ -1534,7 +1534,7 @@
     "en": "Lanturn",
     "es": "Lanturn",
     "fr": "Lanturn",
-    "hi": "लैंटन",
+    "hi": "लैंटर्न",
     "ja": "ランターン",
     "zh-TW": "電燈怪"
   },
@@ -1543,7 +1543,7 @@
     "en": "Pichu",
     "es": "Pichu",
     "fr": "Pichu",
-    "hi": "िपचू",
+    "hi": "पिचू",
     "ja": "ピチュー",
     "zh-TW": "皮丘"
   },
@@ -1552,7 +1552,7 @@
     "en": "Cleffa",
     "es": "Cleffa",
     "fr": "Mélo",
-    "hi": "लफ़ा",
+    "hi": "क्लेफ़ा",
     "ja": "ピィ",
     "zh-TW": "皮寶寶"
   },
@@ -1561,7 +1561,7 @@
     "en": "Igglybuff",
     "es": "Igglybuff",
     "fr": "Toudoudou",
-    "hi": "इलबफ़",
+    "hi": "इग्लीबफ़",
     "ja": "ププリン",
     "zh-TW": "寶寶丁"
   },
@@ -1579,7 +1579,7 @@
     "en": "Togetic",
     "es": "Togetic",
     "fr": "Togetic",
-    "hi": "टोगेटक",
+    "hi": "टोगेटिक",
     "ja": "トゲチック",
     "zh-TW": "波克基古"
   },
@@ -1606,7 +1606,7 @@
     "en": "Mareep",
     "es": "Mareep",
     "fr": "Wattouat",
-    "hi": "मरप",
+    "hi": "मरीप",
     "ja": "メリープ",
     "zh-TW": "咩利羊"
   },
@@ -1615,7 +1615,7 @@
     "en": "Flaaffy",
     "es": "Flaaffy",
     "fr": "Lainergie",
-    "hi": "लैफ़ी",
+    "hi": "फ़्लैफ़ी",
     "ja": "モココ",
     "zh-TW": "茸茸羊"
   },
@@ -1624,7 +1624,7 @@
     "en": "Ampharos",
     "es": "Ampharos",
     "fr": "Pharamp",
-    "hi": "ऐफ़रॉस",
+    "hi": "ऐम्फ़रॉस",
     "ja": "デンリュウ",
     "zh-TW": "電龍"
   },
@@ -1642,7 +1642,7 @@
     "en": "Marill",
     "es": "Marill",
     "fr": "Marill",
-    "hi": "मैरल",
+    "hi": "मैरिल",
     "ja": "マリル",
     "zh-TW": "瑪力露"
   },
@@ -1651,7 +1651,7 @@
     "en": "Azumarill",
     "es": "Azumarill",
     "fr": "Azumarill",
-    "hi": "अज़ूमैरल",
+    "hi": "अज़ूमैरिल",
     "ja": "マリルリ",
     "zh-TW": "瑪力露麗"
   },
@@ -1669,7 +1669,7 @@
     "en": "Politoed",
     "es": "Politoed",
     "fr": "Tarpaud",
-    "hi": "पॉलटोड",
+    "hi": "पॉलीटोड",
     "ja": "ニョロトノ",
     "zh-TW": "蚊香蛙皇"
   },
@@ -1678,7 +1678,7 @@
     "en": "Hoppip",
     "es": "Hoppip",
     "fr": "Granivol",
-    "hi": "हॉिपप",
+    "hi": "हॉपिप",
     "ja": "ハネッコ",
     "zh-TW": "毽子草"
   },
@@ -1687,7 +1687,7 @@
     "en": "Skiploom",
     "es": "Skiploom",
     "fr": "Floravol",
-    "hi": "कलूम",
+    "hi": "स्किप्लूम",
     "ja": "ポポッコ",
     "zh-TW": "毽子花"
   },
@@ -1696,7 +1696,7 @@
     "en": "Jumpluff",
     "es": "Jumpluff",
     "fr": "Cotovol",
-    "hi": "जलफ़",
+    "hi": "जम्प्लफ़",
     "ja": "ワタッコ",
     "zh-TW": "毽子棉"
   },
@@ -1714,7 +1714,7 @@
     "en": "Sunkern",
     "es": "Sunkern",
     "fr": "Tournegrin",
-    "hi": "संकन",
+    "hi": "संकर्न",
     "ja": "ヒマナッツ",
     "zh-TW": "向日種子"
   },
@@ -1723,7 +1723,7 @@
     "en": "Sunflora",
     "es": "Sunflora",
     "fr": "Héliatronc",
-    "hi": "सनलोरा",
+    "hi": "सनफ़्लोरा",
     "ja": "キマワリ",
     "zh-TW": "向日花怪"
   },
@@ -1750,7 +1750,7 @@
     "en": "Quagsire",
     "es": "Quagsire",
     "fr": "Maraiste",
-    "hi": "वैगसायर",
+    "hi": "क्वैगसायर",
     "ja": "ヌオー",
     "zh-TW": "沼王"
   },
@@ -1759,7 +1759,7 @@
     "en": "Espeon",
     "es": "Espeon",
     "fr": "Mentali",
-    "hi": "एिपयॉन",
+    "hi": "एस्पियॉन",
     "ja": "エーフィ",
     "zh-TW": "太陽伊布"
   },
@@ -1768,7 +1768,7 @@
     "en": "Umbreon",
     "es": "Umbreon",
     "fr": "Noctali",
-    "hi": "अयॉन",
+    "hi": "अम्ब्रियॉन",
     "ja": "ブラッキー",
     "zh-TW": "月亮伊布"
   },
@@ -1777,7 +1777,7 @@
     "en": "Murkrow",
     "es": "Murkrow",
     "fr": "Cornèbre",
-    "hi": "मरो",
+    "hi": "मरक्रो",
     "ja": "ヤミカラス",
     "zh-TW": "黑暗鴉"
   },
@@ -1786,7 +1786,7 @@
     "en": "Slowking",
     "es": "Slowking",
     "fr": "Roigada",
-    "hi": "लोकंग",
+    "hi": "स्लोकिंग",
     "ja": "ヤドキング",
     "zh-TW": "呆呆王"
   },
@@ -1795,7 +1795,7 @@
     "en": "Misdreavus",
     "es": "Misdreavus",
     "fr": "Feuforêve",
-    "hi": "मसडीवस",
+    "hi": "मिसड्रीवस",
     "ja": "ムウマ",
     "zh-TW": "夢妖"
   },
@@ -1822,7 +1822,7 @@
     "en": "Girafarig",
     "es": "Girafarig",
     "fr": "Girafarig",
-    "hi": "जराफ़रग",
+    "hi": "जिराफ़रिग",
     "ja": "キリンリキ",
     "zh-TW": "麒麟奇"
   },
@@ -1840,7 +1840,7 @@
     "en": "Forretress",
     "es": "Forretress",
     "fr": "Foretress",
-    "hi": "फ़ॉरटस",
+    "hi": "फ़ॉरेट्रेस",
     "ja": "フォレトス",
     "zh-TW": "佛烈托斯"
   },
@@ -1849,7 +1849,7 @@
     "en": "Dunsparce",
     "es": "Dunsparce",
     "fr": "Insolourdo",
-    "hi": "डंपास",
+    "hi": "डंस्पार्स",
     "ja": "ノコッチ",
     "zh-TW": "土龍弟弟"
   },
@@ -1858,7 +1858,7 @@
     "en": "Gligar",
     "es": "Gligar",
     "fr": "Scorplane",
-    "hi": "लाइगार",
+    "hi": "ग्लाइगार",
     "ja": "グライガー",
     "zh-TW": "天蠍"
   },
@@ -1867,7 +1867,7 @@
     "en": "Steelix",
     "es": "Steelix",
     "fr": "Steelix",
-    "hi": "टलस",
+    "hi": "स्टीलिक्स",
     "ja": "ハガネール",
     "zh-TW": "大鋼蛇"
   },
@@ -1876,7 +1876,7 @@
     "en": "Snubbull",
     "es": "Snubbull",
     "fr": "Snubbull",
-    "hi": "नबल",
+    "hi": "स्नबल",
     "ja": "ブルー",
     "zh-TW": "布魯"
   },
@@ -1885,7 +1885,7 @@
     "en": "Granbull",
     "es": "Granbull",
     "fr": "Granbull",
-    "hi": "ैनबुल",
+    "hi": "ग्रैनबुल",
     "ja": "グランブル",
     "zh-TW": "布魯皇"
   },
@@ -1894,7 +1894,7 @@
     "en": "Qwilfish",
     "es": "Qwilfish",
     "fr": "Qwilfish",
-    "hi": "वलफ़श",
+    "hi": "क्विलफ़िश",
     "ja": "ハリーセン",
     "zh-TW": "千針魚"
   },
@@ -1903,7 +1903,7 @@
     "en": "Scizor",
     "es": "Scizor",
     "fr": "Cizayox",
-    "hi": "सज़ॉर",
+    "hi": "सिज़ॉर",
     "ja": "ハッサム",
     "zh-TW": "巨鉗螳螂"
   },
@@ -1921,7 +1921,7 @@
     "en": "Heracross",
     "es": "Heracross",
     "fr": "Scarhino",
-    "hi": "हेराॉस",
+    "hi": "हेराक्रॉस",
     "ja": "ヘラクロス",
     "zh-TW": "赫拉克羅斯"
   },
@@ -1930,7 +1930,7 @@
     "en": "Sneasel",
     "es": "Sneasel",
     "fr": "Farfuret",
-    "hi": "नीज़ल",
+    "hi": "स्नीज़ल",
     "ja": "ニューラ",
     "zh-TW": "狃拉"
   },
@@ -1939,7 +1939,7 @@
     "en": "Teddiursa",
     "es": "Teddiursa",
     "fr": "Teddiursa",
-    "hi": "टडीअसा",
+    "hi": "टेडीअर्सा",
     "ja": "ヒメグマ",
     "zh-TW": "熊寶寶"
   },
@@ -1948,7 +1948,7 @@
     "en": "Ursaring",
     "es": "Ursaring",
     "fr": "Ursaring",
-    "hi": "असारंग",
+    "hi": "अर्सारिंग",
     "ja": "リングマ",
     "zh-TW": "圈圈熊"
   },
@@ -1957,7 +1957,7 @@
     "en": "Slugma",
     "es": "Slugma",
     "fr": "Limagma",
-    "hi": "लमा",
+    "hi": "स्लग्मा",
     "ja": "マグマッグ",
     "zh-TW": "熔岩蟲"
   },
@@ -1966,7 +1966,7 @@
     "en": "Magcargo",
     "es": "Magcargo",
     "fr": "Volcaropod",
-    "hi": "मैगकागो",
+    "hi": "मैगकार्गो",
     "ja": "マグカルゴ",
     "zh-TW": "熔岩蝸牛"
   },
@@ -1975,7 +1975,7 @@
     "en": "Swinub",
     "es": "Swinub",
     "fr": "Marcacrin",
-    "hi": "वाइनब",
+    "hi": "स्वाइनब",
     "ja": "ウリムー",
     "zh-TW": "小山豬"
   },
@@ -1984,7 +1984,7 @@
     "en": "Piloswine",
     "es": "Piloswine",
     "fr": "Cochignon",
-    "hi": "पाइलोवाइन",
+    "hi": "पाइलोस्वाइन",
     "ja": "イノムー",
     "zh-TW": "長毛豬"
   },
@@ -1993,7 +1993,7 @@
     "en": "Corsola",
     "es": "Corsola",
     "fr": "Corayon",
-    "hi": "कॉसला",
+    "hi": "कॉर्सला",
     "ja": "サニーゴ",
     "zh-TW": "太陽珊瑚"
   },
@@ -2002,7 +2002,7 @@
     "en": "Remoraid",
     "es": "Remoraid",
     "fr": "Rémoraid",
-    "hi": "रमोरड",
+    "hi": "रेमोरेड",
     "ja": "テッポウオ",
     "zh-TW": "鐵炮魚"
   },
@@ -2011,7 +2011,7 @@
     "en": "Octillery",
     "es": "Octillery",
     "fr": "Octillery",
-    "hi": "ऑटलर",
+    "hi": "ऑक्टिलरी",
     "ja": "オクタン",
     "zh-TW": "章魚桶"
   },
@@ -2020,7 +2020,7 @@
     "en": "Delibird",
     "es": "Delibird",
     "fr": "Cadoizo",
-    "hi": "डेलबड",
+    "hi": "डेलीबर्ड",
     "ja": "デリバード",
     "zh-TW": "信使鳥"
   },
@@ -2029,7 +2029,7 @@
     "en": "Mantine",
     "es": "Mantine",
     "fr": "Démanta",
-    "hi": "मैंटन",
+    "hi": "मैंटीन",
     "ja": "マンタイン",
     "zh-TW": "巨翅飛魚"
   },
@@ -2038,7 +2038,7 @@
     "en": "Skarmory",
     "es": "Skarmory",
     "fr": "Airmure",
-    "hi": "कामर",
+    "hi": "स्कार्मरी",
     "ja": "エアームド",
     "zh-TW": "盔甲鳥"
   },
@@ -2065,7 +2065,7 @@
     "en": "Kingdra",
     "es": "Kingdra",
     "fr": "Hyporoi",
-    "hi": "कंगडा",
+    "hi": "किंगड्रा",
     "ja": "キングドラ",
     "zh-TW": "刺龍王"
   },
@@ -2092,7 +2092,7 @@
     "en": "Porygon2",
     "es": "Porygon2",
     "fr": "Porygon2",
-    "hi": "पोरगॉन2",
+    "hi": "पोरिगॉन2",
     "ja": "ポリゴン２",
     "zh-TW": "多邊獸Ⅱ"
   },
@@ -2101,7 +2101,7 @@
     "en": "Stantler",
     "es": "Stantler",
     "fr": "Cerfrousse",
-    "hi": "टैंट्लर",
+    "hi": "स्टैंट्लर",
     "ja": "オドシシ",
     "zh-TW": "驚角鹿"
   },
@@ -2110,7 +2110,7 @@
     "en": "Smeargle",
     "es": "Smeargle",
     "fr": "Queulorior",
-    "hi": "मीगल",
+    "hi": "स्मीर्गल",
     "ja": "ドーブル",
     "zh-TW": "圖圖犬"
   },
@@ -2128,7 +2128,7 @@
     "en": "Hitmontop",
     "es": "Hitmontop",
     "fr": "Kapoera",
-    "hi": "हटमॉनटॉप",
+    "hi": "हिटमॉनटॉप",
     "ja": "カポエラー",
     "zh-TW": "戰舞郎"
   },
@@ -2137,7 +2137,7 @@
     "en": "Smoochum",
     "es": "Smoochum",
     "fr": "Lippouti",
-    "hi": "मूचम",
+    "hi": "स्मूचम",
     "ja": "ムチュール",
     "zh-TW": "迷唇娃"
   },
@@ -2146,7 +2146,7 @@
     "en": "Elekid",
     "es": "Elekid",
     "fr": "Élekid",
-    "hi": "एलकड",
+    "hi": "एलेकिड",
     "ja": "エレキッド",
     "zh-TW": "電擊怪"
   },
@@ -2155,7 +2155,7 @@
     "en": "Magby",
     "es": "Magby",
     "fr": "Magby",
-    "hi": "मैबी",
+    "hi": "मैग्बी",
     "ja": "ブビィ",
     "zh-TW": "鴨嘴寶寶"
   },
@@ -2164,7 +2164,7 @@
     "en": "Miltank",
     "es": "Miltank",
     "fr": "Écrémeuh",
-    "hi": "मलटैंक",
+    "hi": "मिलटैंक",
     "ja": "ミルタンク",
     "zh-TW": "大奶罐"
   },
@@ -2173,7 +2173,7 @@
     "en": "Blissey",
     "es": "Blissey",
     "fr": "Leuphorie",
-    "hi": "लसी",
+    "hi": "ब्लिसी",
     "ja": "ハピナス",
     "zh-TW": "幸福蛋"
   },
@@ -2191,7 +2191,7 @@
     "en": "Entei",
     "es": "Entei",
     "fr": "Entei",
-    "hi": "एंटइ",
+    "hi": "एंटेइ",
     "ja": "エンテイ",
     "zh-TW": "炎帝"
   },
@@ -2200,7 +2200,7 @@
     "en": "Suicune",
     "es": "Suicune",
     "fr": "Suicune",
-    "hi": "सुइकन",
+    "hi": "सुइकून",
     "ja": "スイクン",
     "zh-TW": "水君"
   },
@@ -2209,7 +2209,7 @@
     "en": "Larvitar",
     "es": "Larvitar",
     "fr": "Embrylex",
-    "hi": "लावटार",
+    "hi": "लार्विटार",
     "ja": "ヨーギラス",
     "zh-TW": "幼基拉斯"
   },
@@ -2218,7 +2218,7 @@
     "en": "Pupitar",
     "es": "Pupitar",
     "fr": "Ymphect",
-    "hi": "यूिपटार",
+    "hi": "प्यूपिटार",
     "ja": "サナギラス",
     "zh-TW": "沙基拉斯"
   },
@@ -2227,7 +2227,7 @@
     "en": "Tyranitar",
     "es": "Tyranitar",
     "fr": "Tyranocif",
-    "hi": "टायरैनटार",
+    "hi": "टायरैनिटार",
     "ja": "バンギラス",
     "zh-TW": "班基拉斯"
   },
@@ -2236,7 +2236,7 @@
     "en": "Lugia",
     "es": "Lugia",
     "fr": "Lugia",
-    "hi": "लूगया",
+    "hi": "लूगिया",
     "ja": "ルギア",
     "zh-TW": "洛奇亞"
   },
@@ -2254,7 +2254,7 @@
     "en": "Celebi",
     "es": "Celebi",
     "fr": "Celebi",
-    "hi": "सेलबी",
+    "hi": "सेलेबी",
     "ja": "セレビィ",
     "zh-TW": "時拉比"
   },
@@ -2263,7 +2263,7 @@
     "en": "Treecko",
     "es": "Treecko",
     "fr": "Arcko",
-    "hi": "टीको",
+    "hi": "ट्रीको",
     "ja": "キモリ",
     "zh-TW": "木守宮"
   },
@@ -2272,7 +2272,7 @@
     "en": "Grovyle",
     "es": "Grovyle",
     "fr": "Massko",
-    "hi": "ोवाइल",
+    "hi": "ग्रोवाइल",
     "ja": "ジュプトル",
     "zh-TW": "森林蜥蜴"
   },
@@ -2281,7 +2281,7 @@
     "en": "Sceptile",
     "es": "Sceptile",
     "fr": "Jungko",
-    "hi": "सेटाइल",
+    "hi": "सेप्टाइल",
     "ja": "ジュカイン",
     "zh-TW": "蜥蜴王"
   },
@@ -2290,7 +2290,7 @@
     "en": "Torchic",
     "es": "Torchic",
     "fr": "Poussifeu",
-    "hi": "टॉचक",
+    "hi": "टॉर्चिक",
     "ja": "アチャモ",
     "zh-TW": "火稚雞"
   },
@@ -2299,7 +2299,7 @@
     "en": "Combusken",
     "es": "Combusken",
     "fr": "Galifeu",
-    "hi": "कबसकन",
+    "hi": "कम्बसकेन",
     "ja": "ワカシャモ",
     "zh-TW": "力壯雞"
   },
@@ -2308,7 +2308,7 @@
     "en": "Blaziken",
     "es": "Blaziken",
     "fr": "Braségali",
-    "hi": "लज़कन",
+    "hi": "ब्लेज़िकेन",
     "ja": "バシャーモ",
     "zh-TW": "火焰雞"
   },
@@ -2317,7 +2317,7 @@
     "en": "Mudkip",
     "es": "Mudkip",
     "fr": "Gobou",
-    "hi": "मडकप",
+    "hi": "मडकिप",
     "ja": "ミズゴロウ",
     "zh-TW": "水躍魚"
   },
@@ -2326,7 +2326,7 @@
     "en": "Marshtomp",
     "es": "Marshtomp",
     "fr": "Flobio",
-    "hi": "माशटॉप",
+    "hi": "मार्शटॉम्प",
     "ja": "ヌマクロー",
     "zh-TW": "沼躍魚"
   },
@@ -2335,7 +2335,7 @@
     "en": "Swampert",
     "es": "Swampert",
     "fr": "Laggron",
-    "hi": "वॉपट",
+    "hi": "स्वॉम्पर्ट",
     "ja": "ラグラージ",
     "zh-TW": "巨沼怪"
   },
@@ -2353,7 +2353,7 @@
     "en": "Mightyena",
     "es": "Mightyena",
     "fr": "Grahyèna",
-    "hi": "माइटएना",
+    "hi": "माइटिएना",
     "ja": "グラエナ",
     "zh-TW": "大狼犬"
   },
@@ -2362,7 +2362,7 @@
     "en": "Zigzagoon",
     "es": "Zigzagoon",
     "fr": "Zigzaton",
-    "hi": "ज़गज़ागून",
+    "hi": "ज़िगज़ागून",
     "ja": "ジグザグマ",
     "zh-TW": "蛇紋熊"
   },
@@ -2380,7 +2380,7 @@
     "en": "Wurmple",
     "es": "Wurmple",
     "fr": "Chenipotte",
-    "hi": "वमपल",
+    "hi": "वर्मपल",
     "ja": "ケムッソ",
     "zh-TW": "刺尾蟲"
   },
@@ -2389,7 +2389,7 @@
     "en": "Silcoon",
     "es": "Silcoon",
     "fr": "Armulys",
-    "hi": "सकन",
+    "hi": "सिल्कून",
     "ja": "カラサリス",
     "zh-TW": "甲殼繭"
   },
@@ -2398,7 +2398,7 @@
     "en": "Beautifly",
     "es": "Beautifly",
     "fr": "Charmillon",
-    "hi": "यूटलाई",
+    "hi": "ब्यूटीफ़्लाई",
     "ja": "アゲハント",
     "zh-TW": "狩獵鳳蝶"
   },
@@ -2407,7 +2407,7 @@
     "en": "Cascoon",
     "es": "Cascoon",
     "fr": "Blindalys",
-    "hi": "कसकन",
+    "hi": "कैसकून",
     "ja": "マユルド",
     "zh-TW": "盾甲繭"
   },
@@ -2416,7 +2416,7 @@
     "en": "Dustox",
     "es": "Dustox",
     "fr": "Papinox",
-    "hi": "डटॉस",
+    "hi": "डस्टॉक्स",
     "ja": "ドクケイル",
     "zh-TW": "毒粉蛾"
   },
@@ -2434,7 +2434,7 @@
     "en": "Lombre",
     "es": "Lombre",
     "fr": "Lombre",
-    "hi": "लॉे",
+    "hi": "लॉम्ब्रे",
     "ja": "ハスブレロ",
     "zh-TW": "蓮帽小童"
   },
@@ -2443,7 +2443,7 @@
     "en": "Ludicolo",
     "es": "Ludicolo",
     "fr": "Ludicolo",
-    "hi": "लुडकोलो",
+    "hi": "लुडिकोलो",
     "ja": "ルンパッパ",
     "zh-TW": "樂天河童"
   },
@@ -2461,7 +2461,7 @@
     "en": "Nuzleaf",
     "es": "Nuzleaf",
     "fr": "Pifeuil",
-    "hi": "नज़लफ़",
+    "hi": "नज़लीफ़",
     "ja": "コノハナ",
     "zh-TW": "長鼻葉"
   },
@@ -2470,7 +2470,7 @@
     "en": "Shiftry",
     "es": "Shiftry",
     "fr": "Tengalice",
-    "hi": "शटी",
+    "hi": "शिफ़्ट्री",
     "ja": "ダーテング",
     "zh-TW": "狡猾天狗"
   },
@@ -2479,7 +2479,7 @@
     "en": "Taillow",
     "es": "Taillow",
     "fr": "Nirondelle",
-    "hi": "टलो",
+    "hi": "टेलो",
     "ja": "スバメ",
     "zh-TW": "傲骨燕"
   },
@@ -2488,7 +2488,7 @@
     "en": "Swellow",
     "es": "Swellow",
     "fr": "Hélédelle",
-    "hi": "वेलो",
+    "hi": "स्वेलो",
     "ja": "オオスバメ",
     "zh-TW": "大王燕"
   },
@@ -2497,7 +2497,7 @@
     "en": "Wingull",
     "es": "Wingull",
     "fr": "Goélise",
-    "hi": "वंगल",
+    "hi": "विंगल",
     "ja": "キャモメ",
     "zh-TW": "長翅鷗"
   },
@@ -2506,7 +2506,7 @@
     "en": "Pelipper",
     "es": "Pelipper",
     "fr": "Bekipan",
-    "hi": "पेलपर",
+    "hi": "पेलिपर",
     "ja": "ペリッパー",
     "zh-TW": "大嘴鷗"
   },
@@ -2515,7 +2515,7 @@
     "en": "Ralts",
     "es": "Ralts",
     "fr": "Tarsal",
-    "hi": "रॉट्स",
+    "hi": "रॉल्ट्स",
     "ja": "ラルトス",
     "zh-TW": "拉魯拉絲"
   },
@@ -2524,7 +2524,7 @@
     "en": "Kirlia",
     "es": "Kirlia",
     "fr": "Kirlia",
-    "hi": "कलया",
+    "hi": "कर्लिया",
     "ja": "キルリア",
     "zh-TW": "奇魯莉安"
   },
@@ -2533,7 +2533,7 @@
     "en": "Gardevoir",
     "es": "Gardevoir",
     "fr": "Gardevoir",
-    "hi": "गाडेवुआर",
+    "hi": "गार्डेवुआर",
     "ja": "サーナイト",
     "zh-TW": "沙奈朵"
   },
@@ -2542,7 +2542,7 @@
     "en": "Surskit",
     "es": "Surskit",
     "fr": "Arakdo",
-    "hi": "सस्कट",
+    "hi": "सर्स्किट",
     "ja": "アメタマ",
     "zh-TW": "溜溜糖球"
   },
@@ -2551,7 +2551,7 @@
     "en": "Masquerain",
     "es": "Masquerain",
     "fr": "Maskadra",
-    "hi": "मैकरन",
+    "hi": "मैस्करेन",
     "ja": "アメモース",
     "zh-TW": "雨翅蛾"
   },
@@ -2560,7 +2560,7 @@
     "en": "Shroomish",
     "es": "Shroomish",
     "fr": "Balignon",
-    "hi": "ूमश",
+    "hi": "श्रूमिश",
     "ja": "キノココ",
     "zh-TW": "蘑蘑菇"
   },
@@ -2569,7 +2569,7 @@
     "en": "Breloom",
     "es": "Breloom",
     "fr": "Chapignon",
-    "hi": "ेलूम",
+    "hi": "ब्रेलूम",
     "ja": "キノガッサ",
     "zh-TW": "斗笠菇"
   },
@@ -2578,7 +2578,7 @@
     "en": "Slakoth",
     "es": "Slakoth",
     "fr": "Parecool",
-    "hi": "लैकॉथ",
+    "hi": "स्लैकॉथ",
     "ja": "ナマケロ",
     "zh-TW": "懶人獺"
   },
@@ -2587,7 +2587,7 @@
     "en": "Vigoroth",
     "es": "Vigoroth",
     "fr": "Vigoroth",
-    "hi": "वगरॉथ",
+    "hi": "विगरॉथ",
     "ja": "ヤルキモノ",
     "zh-TW": "過動猿"
   },
@@ -2596,7 +2596,7 @@
     "en": "Slaking",
     "es": "Slaking",
     "fr": "Monaflèmit",
-    "hi": "लैकंग",
+    "hi": "स्लैकिंग",
     "ja": "ケッキング",
     "zh-TW": "請假王"
   },
@@ -2605,7 +2605,7 @@
     "en": "Nincada",
     "es": "Nincada",
     "fr": "Ningale",
-    "hi": "नंकाडा",
+    "hi": "निंकाडा",
     "ja": "ツチニン",
     "zh-TW": "土居忍士"
   },
@@ -2614,7 +2614,7 @@
     "en": "Ninjask",
     "es": "Ninjask",
     "fr": "Ninjask",
-    "hi": "नंजाक",
+    "hi": "निंजास्क",
     "ja": "テッカニン",
     "zh-TW": "鐵面忍者"
   },
@@ -2623,7 +2623,7 @@
     "en": "Shedinja",
     "es": "Shedinja",
     "fr": "Munja",
-    "hi": "शेडंजा",
+    "hi": "शेडिंजा",
     "ja": "ヌケニン",
     "zh-TW": "脫殼忍者"
   },
@@ -2632,7 +2632,7 @@
     "en": "Whismur",
     "es": "Whismur",
     "fr": "Chuchmur",
-    "hi": "हमर",
+    "hi": "व्हिस्मर",
     "ja": "ゴニョニョ",
     "zh-TW": "咕妞妞"
   },
@@ -2641,7 +2641,7 @@
     "en": "Loudred",
     "es": "Loudred",
     "fr": "Ramboum",
-    "hi": "लाउडेड",
+    "hi": "लाउड्रेड",
     "ja": "ドゴーム",
     "zh-TW": "吼爆彈"
   },
@@ -2650,7 +2650,7 @@
     "en": "Exploud",
     "es": "Exploud",
     "fr": "Brouhabam",
-    "hi": "एसलाउड",
+    "hi": "एक्सप्लाउड",
     "ja": "バクオング",
     "zh-TW": "爆音怪"
   },
@@ -2659,7 +2659,7 @@
     "en": "Makuhita",
     "es": "Makuhita",
     "fr": "Makuhita",
-    "hi": "माकहता",
+    "hi": "माकुहिता",
     "ja": "マクノシタ",
     "zh-TW": "幕下力士"
   },
@@ -2668,7 +2668,7 @@
     "en": "Hariyama",
     "es": "Hariyama",
     "fr": "Hariyama",
-    "hi": "हरयामा",
+    "hi": "हरियामा",
     "ja": "ハリテヤマ",
     "zh-TW": "鐵掌力士"
   },
@@ -2677,7 +2677,7 @@
     "en": "Azurill",
     "es": "Azurill",
     "fr": "Azurill",
-    "hi": "अज़ूरल",
+    "hi": "अज़ूरिल",
     "ja": "ルリリ",
     "zh-TW": "露力麗"
   },
@@ -2695,7 +2695,7 @@
     "en": "Skitty",
     "es": "Skitty",
     "fr": "Skitty",
-    "hi": "कट",
+    "hi": "स्किटी",
     "ja": "エネコ",
     "zh-TW": "向尾喵"
   },
@@ -2704,7 +2704,7 @@
     "en": "Delcatty",
     "es": "Delcatty",
     "fr": "Delcatty",
-    "hi": "डेलकट",
+    "hi": "डेलकैटी",
     "ja": "エネコロロ",
     "zh-TW": "優雅貓"
   },
@@ -2749,7 +2749,7 @@
     "en": "Aggron",
     "es": "Aggron",
     "fr": "Galeking",
-    "hi": "ऐॉन",
+    "hi": "ऐग्रॉन",
     "ja": "ボスゴドラ",
     "zh-TW": "波士可多拉"
   },
@@ -2758,7 +2758,7 @@
     "en": "Meditite",
     "es": "Meditite",
     "fr": "Méditikka",
-    "hi": "मेडटाइट",
+    "hi": "मेडिटाइट",
     "ja": "アサナン",
     "zh-TW": "瑪沙那"
   },
@@ -2776,7 +2776,7 @@
     "en": "Electrike",
     "es": "Electrike",
     "fr": "Dynavolt",
-    "hi": "इलटाइक",
+    "hi": "इलेक्ट्राइक",
     "ja": "ラクライ",
     "zh-TW": "落雷獸"
   },
@@ -2785,7 +2785,7 @@
     "en": "Manectric",
     "es": "Manectric",
     "fr": "Élecsprint",
-    "hi": "मेनेटक",
+    "hi": "मेनेक्ट्रिक",
     "ja": "ライボルト",
     "zh-TW": "雷電獸"
   },
@@ -2794,7 +2794,7 @@
     "en": "Plusle",
     "es": "Plusle",
     "fr": "Posipi",
-    "hi": "लसल",
+    "hi": "प्लसल",
     "ja": "プラスル",
     "zh-TW": "正電拍拍"
   },
@@ -2812,7 +2812,7 @@
     "en": "Volbeat",
     "es": "Volbeat",
     "fr": "Muciole",
-    "hi": "वोबीट",
+    "hi": "वोल्बीट",
     "ja": "バルビート",
     "zh-TW": "電螢蟲"
   },
@@ -2830,7 +2830,7 @@
     "en": "Roselia",
     "es": "Roselia",
     "fr": "Rosélia",
-    "hi": "रोज़ेलया",
+    "hi": "रोज़ेलिया",
     "ja": "ロゼリア",
     "zh-TW": "毒薔薇"
   },
@@ -2839,7 +2839,7 @@
     "en": "Gulpin",
     "es": "Gulpin",
     "fr": "Gloupti",
-    "hi": "गिपन",
+    "hi": "गल्पिन",
     "ja": "ゴクリン",
     "zh-TW": "溶食獸"
   },
@@ -2848,7 +2848,7 @@
     "en": "Swalot",
     "es": "Swalot",
     "fr": "Avaltout",
-    "hi": "वलॉट",
+    "hi": "स्वलॉट",
     "ja": "マルノーム",
     "zh-TW": "吞食獸"
   },
@@ -2857,7 +2857,7 @@
     "en": "Carvanha",
     "es": "Carvanha",
     "fr": "Carvanha",
-    "hi": "कावाना",
+    "hi": "कार्वाना",
     "ja": "キバニア",
     "zh-TW": "利牙魚"
   },
@@ -2866,7 +2866,7 @@
     "en": "Sharpedo",
     "es": "Sharpedo",
     "fr": "Sharpedo",
-    "hi": "शापीडो",
+    "hi": "शार्पीडो",
     "ja": "サメハダー",
     "zh-TW": "巨牙鯊"
   },
@@ -2884,7 +2884,7 @@
     "en": "Wailord",
     "es": "Wailord",
     "fr": "Wailord",
-    "hi": "वेलॉड",
+    "hi": "वेलॉर्ड",
     "ja": "ホエルオー",
     "zh-TW": "吼鯨王"
   },
@@ -2902,7 +2902,7 @@
     "en": "Camerupt",
     "es": "Camerupt",
     "fr": "Camérupt",
-    "hi": "कमरट",
+    "hi": "कैमरप्ट",
     "ja": "バクーダ",
     "zh-TW": "噴火駝"
   },
@@ -2911,7 +2911,7 @@
     "en": "Torkoal",
     "es": "Torkoal",
     "fr": "Chartor",
-    "hi": "टॉकोल",
+    "hi": "टॉर्कोल",
     "ja": "コータス",
     "zh-TW": "煤炭龜"
   },
@@ -2920,7 +2920,7 @@
     "en": "Spoink",
     "es": "Spoink",
     "fr": "Spoink",
-    "hi": "पॉइंक",
+    "hi": "स्पॉइंक",
     "ja": "バネブー",
     "zh-TW": "跳跳豬"
   },
@@ -2929,7 +2929,7 @@
     "en": "Grumpig",
     "es": "Grumpig",
     "fr": "Groret",
-    "hi": "िपग",
+    "hi": "ग्रम्पिग",
     "ja": "ブーピッグ",
     "zh-TW": "噗噗豬"
   },
@@ -2938,7 +2938,7 @@
     "en": "Spinda",
     "es": "Spinda",
     "fr": "Spinda",
-    "hi": "िपंडा",
+    "hi": "स्पिंडा",
     "ja": "パッチール",
     "zh-TW": "晃晃斑"
   },
@@ -2947,7 +2947,7 @@
     "en": "Trapinch",
     "es": "Trapinch",
     "fr": "Kraknoix",
-    "hi": "टैिपंच",
+    "hi": "ट्रैपिंच",
     "ja": "ナックラー",
     "zh-TW": "大顎蟻"
   },
@@ -2956,7 +2956,7 @@
     "en": "Vibrava",
     "es": "Vibrava",
     "fr": "Vibraninf",
-    "hi": "वाइावा",
+    "hi": "वाइब्रावा",
     "ja": "ビブラーバ",
     "zh-TW": "超音波幼蟲"
   },
@@ -2965,7 +2965,7 @@
     "en": "Flygon",
     "es": "Flygon",
     "fr": "Libégon",
-    "hi": "लाईगॉन",
+    "hi": "फ़्लाईगॉन",
     "ja": "フライゴン",
     "zh-TW": "沙漠蜻蜓"
   },
@@ -2974,7 +2974,7 @@
     "en": "Cacnea",
     "es": "Cacnea",
     "fr": "Cacnea",
-    "hi": "कनया",
+    "hi": "कैक्निया",
     "ja": "サボネア",
     "zh-TW": "刺球仙人掌"
   },
@@ -2983,7 +2983,7 @@
     "en": "Cacturne",
     "es": "Cacturne",
     "fr": "Cacturne",
-    "hi": "कटन",
+    "hi": "कैक्टर्न",
     "ja": "ノクタス",
     "zh-TW": "夢歌仙人掌"
   },
@@ -2992,7 +2992,7 @@
     "en": "Swablu",
     "es": "Swablu",
     "fr": "Tylton",
-    "hi": "वालू",
+    "hi": "स्वाब्लू",
     "ja": "チルット",
     "zh-TW": "青綿鳥"
   },
@@ -3001,7 +3001,7 @@
     "en": "Altaria",
     "es": "Altaria",
     "fr": "Altaria",
-    "hi": "ऑटारया",
+    "hi": "ऑल्टारिया",
     "ja": "チルタリス",
     "zh-TW": "七夕青鳥"
   },
@@ -3046,7 +3046,7 @@
     "en": "Barboach",
     "es": "Barboach",
     "fr": "Barloche",
-    "hi": "बाबोच",
+    "hi": "बार्बोच",
     "ja": "ドジョッチ",
     "zh-TW": "泥泥鰍"
   },
@@ -3055,7 +3055,7 @@
     "en": "Whiscash",
     "es": "Whiscash",
     "fr": "Barbicha",
-    "hi": "वसकश",
+    "hi": "विसकैश",
     "ja": "ナマズン",
     "zh-TW": "鯰魚王"
   },
@@ -3064,7 +3064,7 @@
     "en": "Corphish",
     "es": "Corphish",
     "fr": "Écrapince",
-    "hi": "कॉफ़िश",
+    "hi": "कॉर्फ़िश",
     "ja": "ヘイガニ",
     "zh-TW": "龍蝦小兵"
   },
@@ -3073,7 +3073,7 @@
     "en": "Crawdaunt",
     "es": "Crawdaunt",
     "fr": "Colhomard",
-    "hi": "ॉडॉट",
+    "hi": "क्रॉडॉन्ट",
     "ja": "シザリガー",
     "zh-TW": "鐵螯龍蝦"
   },
@@ -3091,7 +3091,7 @@
     "en": "Claydol",
     "es": "Claydol",
     "fr": "Kaorine",
-    "hi": "लडॉल",
+    "hi": "क्लेडॉल",
     "ja": "ネンドール",
     "zh-TW": "念力土偶"
   },
@@ -3100,7 +3100,7 @@
     "en": "Lileep",
     "es": "Lileep",
     "fr": "Lilia",
-    "hi": "ललप",
+    "hi": "लिलीप",
     "ja": "リリーラ",
     "zh-TW": "觸手百合"
   },
@@ -3109,7 +3109,7 @@
     "en": "Cradily",
     "es": "Cradily",
     "fr": "Vacilys",
-    "hi": "ेडल",
+    "hi": "क्रेडिली",
     "ja": "ユレイドル",
     "zh-TW": "搖籃百合"
   },
@@ -3118,7 +3118,7 @@
     "en": "Anorith",
     "es": "Anorith",
     "fr": "Anorith",
-    "hi": "ऐनोरथ",
+    "hi": "ऐनोरिथ",
     "ja": "アノプス",
     "zh-TW": "太古羽蟲"
   },
@@ -3127,7 +3127,7 @@
     "en": "Armaldo",
     "es": "Armaldo",
     "fr": "Armaldo",
-    "hi": "आमाडो",
+    "hi": "आर्माल्डो",
     "ja": "アーマルド",
     "zh-TW": "太古盔甲"
   },
@@ -3145,7 +3145,7 @@
     "en": "Milotic",
     "es": "Milotic",
     "fr": "Milobellus",
-    "hi": "माइलोटक",
+    "hi": "माइलोटिक",
     "ja": "ミロカロス",
     "zh-TW": "美納斯"
   },
@@ -3154,7 +3154,7 @@
     "en": "Castform",
     "es": "Castform",
     "fr": "Morphéo",
-    "hi": "कटफ़ॉम",
+    "hi": "कैस्टफ़ॉर्म",
     "ja": "ポワルン",
     "zh-TW": "飄浮泡泡"
   },
@@ -3163,7 +3163,7 @@
     "en": "Kecleon",
     "es": "Kecleon",
     "fr": "Kecleon",
-    "hi": "कलयॉन",
+    "hi": "केक्लियॉन",
     "ja": "カクレオン",
     "zh-TW": "變隱龍"
   },
@@ -3190,7 +3190,7 @@
     "en": "Duskull",
     "es": "Duskull",
     "fr": "Skelénox",
-    "hi": "डकल",
+    "hi": "डस्कल",
     "ja": "ヨマワル",
     "zh-TW": "夜巡靈"
   },
@@ -3199,7 +3199,7 @@
     "en": "Dusclops",
     "es": "Dusclops",
     "fr": "Téraclope",
-    "hi": "डलॉस",
+    "hi": "डस्क्लॉप्स",
     "ja": "サマヨール",
     "zh-TW": "彷徨夜靈"
   },
@@ -3208,7 +3208,7 @@
     "en": "Tropius",
     "es": "Tropius",
     "fr": "Tropius",
-    "hi": "टॉिपयस",
+    "hi": "ट्रॉपियस",
     "ja": "トロピウス",
     "zh-TW": "熱帶龍"
   },
@@ -3226,7 +3226,7 @@
     "en": "Absol",
     "es": "Absol",
     "fr": "Absol",
-    "hi": "ऐसॉल",
+    "hi": "ऐब्सॉल",
     "ja": "アブソル",
     "zh-TW": "阿勃梭魯"
   },
@@ -3244,7 +3244,7 @@
     "en": "Snorunt",
     "es": "Snorunt",
     "fr": "Stalgamin",
-    "hi": "नोरंट",
+    "hi": "स्नोरंट",
     "ja": "ユキワラシ",
     "zh-TW": "雪童子"
   },
@@ -3253,7 +3253,7 @@
     "en": "Glalie",
     "es": "Glalie",
     "fr": "Oniglali",
-    "hi": "लल",
+    "hi": "ग्लेली",
     "ja": "オニゴーリ",
     "zh-TW": "冰鬼護"
   },
@@ -3262,7 +3262,7 @@
     "en": "Spheal",
     "es": "Spheal",
     "fr": "Obalie",
-    "hi": "फ़ील",
+    "hi": "स्फ़ील",
     "ja": "タマザラシ",
     "zh-TW": "海豹球"
   },
@@ -3271,7 +3271,7 @@
     "en": "Sealeo",
     "es": "Sealeo",
     "fr": "Phogleur",
-    "hi": "सीलयो",
+    "hi": "सीलियो",
     "ja": "トドグラー",
     "zh-TW": "海魔獅"
   },
@@ -3280,7 +3280,7 @@
     "en": "Walrein",
     "es": "Walrein",
     "fr": "Kaimorse",
-    "hi": "वॉलरन",
+    "hi": "वॉलरेन",
     "ja": "トドゼルガ",
     "zh-TW": "帝牙海獅"
   },
@@ -3289,7 +3289,7 @@
     "en": "Clamperl",
     "es": "Clamperl",
     "fr": "Coquiperl",
-    "hi": "लैपल",
+    "hi": "क्लैम्पर्ल",
     "ja": "パールル",
     "zh-TW": "珍珠貝"
   },
@@ -3298,7 +3298,7 @@
     "en": "Huntail",
     "es": "Huntail",
     "fr": "Serpang",
-    "hi": "हंटल",
+    "hi": "हंटेल",
     "ja": "ハンテール",
     "zh-TW": "獵斑魚"
   },
@@ -3307,7 +3307,7 @@
     "en": "Gorebyss",
     "es": "Gorebyss",
     "fr": "Rosabyss",
-    "hi": "गोराबस",
+    "hi": "गोराबिस",
     "ja": "サクラビス",
     "zh-TW": "櫻花魚"
   },
@@ -3316,7 +3316,7 @@
     "en": "Relicanth",
     "es": "Relicanth",
     "fr": "Relicanth",
-    "hi": "रलकथ",
+    "hi": "रेलीकैंथ",
     "ja": "ジーランス",
     "zh-TW": "古空棘魚"
   },
@@ -3325,7 +3325,7 @@
     "en": "Luvdisc",
     "es": "Luvdisc",
     "fr": "Lovdisc",
-    "hi": "लवडक",
+    "hi": "लवडिस्क",
     "ja": "ラブカス",
     "zh-TW": "愛心魚"
   },
@@ -3379,7 +3379,7 @@
     "en": "Metagross",
     "es": "Metagross",
     "fr": "Métalosse",
-    "hi": "मेटाोस",
+    "hi": "मेटाग्रोस",
     "ja": "メタグロス",
     "zh-TW": "巨金怪"
   },
@@ -3388,7 +3388,7 @@
     "en": "Regirock",
     "es": "Regirock",
     "fr": "Regirock",
-    "hi": "रजीरॉक",
+    "hi": "रेजीरॉक",
     "ja": "レジロック",
     "zh-TW": "雷吉洛克"
   },
@@ -3397,7 +3397,7 @@
     "en": "Regice",
     "es": "Regice",
     "fr": "Regice",
-    "hi": "रजाइस",
+    "hi": "रेजाइस",
     "ja": "レジアイス",
     "zh-TW": "雷吉艾斯"
   },
@@ -3406,7 +3406,7 @@
     "en": "Registeel",
     "es": "Registeel",
     "fr": "Registeel",
-    "hi": "रजीटल",
+    "hi": "रेजीस्टील",
     "ja": "レジスチル",
     "zh-TW": "雷吉斯奇魯"
   },
@@ -3415,7 +3415,7 @@
     "en": "Latias",
     "es": "Latias",
     "fr": "Latias",
-    "hi": "लाटयास",
+    "hi": "लाटियास",
     "ja": "ラティアス",
     "zh-TW": "拉帝亞斯"
   },
@@ -3424,7 +3424,7 @@
     "en": "Latios",
     "es": "Latios",
     "fr": "Latios",
-    "hi": "लाटयोस",
+    "hi": "लाटियोस",
     "ja": "ラティオス",
     "zh-TW": "拉帝歐斯"
   },
@@ -3442,7 +3442,7 @@
     "en": "Groudon",
     "es": "Groudon",
     "fr": "Groudon",
-    "hi": "ाउडॉन",
+    "hi": "ग्राउडॉन",
     "ja": "グラードン",
     "zh-TW": "固拉多"
   },
@@ -3451,7 +3451,7 @@
     "en": "Rayquaza",
     "es": "Rayquaza",
     "fr": "Rayquaza",
-    "hi": "रवेज़ा",
+    "hi": "रेक्वेज़ा",
     "ja": "レックウザ",
     "zh-TW": "烈空坐"
   },
@@ -3469,7 +3469,7 @@
     "en": "Deoxys",
     "es": "Deoxys",
     "fr": "Deoxys",
-    "hi": "डयॉसस",
+    "hi": "डियॉक्सिस",
     "ja": "デオキシス",
     "zh-TW": "代歐奇希斯"
   },
@@ -3478,7 +3478,7 @@
     "en": "Turtwig",
     "es": "Turtwig",
     "fr": "Tortipouss",
-    "hi": "टटवग",
+    "hi": "टर्टविग",
     "ja": "ナエトル",
     "zh-TW": "草苗龜"
   },
@@ -3487,7 +3487,7 @@
     "en": "Grotle",
     "es": "Grotle",
     "fr": "Boskara",
-    "hi": "ॉटल",
+    "hi": "ग्रॉटल",
     "ja": "ハヤシガメ",
     "zh-TW": "樹林龜"
   },
@@ -3496,7 +3496,7 @@
     "en": "Torterra",
     "es": "Torterra",
     "fr": "Torterra",
-    "hi": "टॉटेरा",
+    "hi": "टॉर्टेरा",
     "ja": "ドダイトス",
     "zh-TW": "土台龜"
   },
@@ -3505,7 +3505,7 @@
     "en": "Chimchar",
     "es": "Chimchar",
     "fr": "Ouisticram",
-    "hi": "चमचार",
+    "hi": "चिमचार",
     "ja": "ヒコザル",
     "zh-TW": "小火焰猴"
   },
@@ -3514,7 +3514,7 @@
     "en": "Monferno",
     "es": "Monferno",
     "fr": "Chimpenfeu",
-    "hi": "मॉफ़नो",
+    "hi": "मॉन्फ़र्नो",
     "ja": "モウカザル",
     "zh-TW": "猛火猴"
   },
@@ -3523,7 +3523,7 @@
     "en": "Infernape",
     "es": "Infernape",
     "fr": "Simiabraz",
-    "hi": "इंफ़नेप",
+    "hi": "इंफ़र्नेप",
     "ja": "ゴウカザル",
     "zh-TW": "烈焰猴"
   },
@@ -3532,7 +3532,7 @@
     "en": "Piplup",
     "es": "Piplup",
     "fr": "Tiplouf",
-    "hi": "िपपलप",
+    "hi": "पिपलप",
     "ja": "ポッチャマ",
     "zh-TW": "波加曼"
   },
@@ -3541,7 +3541,7 @@
     "en": "Prinplup",
     "es": "Prinplup",
     "fr": "Prinplouf",
-    "hi": "िनलप",
+    "hi": "प्रिनप्लप",
     "ja": "ポッタイシ",
     "zh-TW": "波皇子"
   },
@@ -3550,7 +3550,7 @@
     "en": "Empoleon",
     "es": "Empoleon",
     "fr": "Pingoléon",
-    "hi": "एपोलयॉन",
+    "hi": "एम्पोलियॉन",
     "ja": "エンペルト",
     "zh-TW": "帝王拿波"
   },
@@ -3559,7 +3559,7 @@
     "en": "Starly",
     "es": "Starly",
     "fr": "Étourmi",
-    "hi": "टाली",
+    "hi": "स्टार्ली",
     "ja": "ムックル",
     "zh-TW": "姆克兒"
   },
@@ -3568,7 +3568,7 @@
     "en": "Staravia",
     "es": "Staravia",
     "fr": "Étourvol",
-    "hi": "टारवया",
+    "hi": "स्टारेविया",
     "ja": "ムクバード",
     "zh-TW": "姆克鳥"
   },
@@ -3577,7 +3577,7 @@
     "en": "Staraptor",
     "es": "Staraptor",
     "fr": "Étouraptor",
-    "hi": "टारैटर",
+    "hi": "स्टारैप्टर",
     "ja": "ムクホーク",
     "zh-TW": "姆克鷹"
   },
@@ -3595,7 +3595,7 @@
     "en": "Bibarel",
     "es": "Bibarel",
     "fr": "Castorno",
-    "hi": "बीबरल",
+    "hi": "बीबरेल",
     "ja": "ビーダル",
     "zh-TW": "大尾狸"
   },
@@ -3604,7 +3604,7 @@
     "en": "Kricketot",
     "es": "Kricketot",
     "fr": "Crikzik",
-    "hi": "िकटॉट",
+    "hi": "क्रिकेटॉट",
     "ja": "コロボーシ",
     "zh-TW": "圓法師"
   },
@@ -3613,7 +3613,7 @@
     "en": "Kricketune",
     "es": "Kricketune",
     "fr": "Mélokrik",
-    "hi": "िकट्यून",
+    "hi": "क्रिकेट्यून",
     "ja": "コロトック",
     "zh-TW": "音箱蟀"
   },
@@ -3622,7 +3622,7 @@
     "en": "Shinx",
     "es": "Shinx",
     "fr": "Lixy",
-    "hi": "शंस",
+    "hi": "शिंक्स",
     "ja": "コリンク",
     "zh-TW": "小貓怪"
   },
@@ -3631,7 +3631,7 @@
     "en": "Luxio",
     "es": "Luxio",
     "fr": "Luxio",
-    "hi": "लसयो",
+    "hi": "लक्सियो",
     "ja": "ルクシオ",
     "zh-TW": "勒克貓"
   },
@@ -3640,7 +3640,7 @@
     "en": "Luxray",
     "es": "Luxray",
     "fr": "Luxray",
-    "hi": "लसर",
+    "hi": "लक्सरे",
     "ja": "レントラー",
     "zh-TW": "倫琴貓"
   },
@@ -3658,7 +3658,7 @@
     "en": "Roserade",
     "es": "Roserade",
     "fr": "Roserade",
-    "hi": "रोज़रड",
+    "hi": "रोज़रेड",
     "ja": "ロズレイド",
     "zh-TW": "羅絲雷朵"
   },
@@ -3667,7 +3667,7 @@
     "en": "Cranidos",
     "es": "Cranidos",
     "fr": "Kranidos",
-    "hi": "ेनडॉस",
+    "hi": "क्रेनिडॉस",
     "ja": "ズガイドス",
     "zh-TW": "頭蓋龍"
   },
@@ -3676,7 +3676,7 @@
     "en": "Rampardos",
     "es": "Rampardos",
     "fr": "Charkos",
-    "hi": "रैपराडॉस",
+    "hi": "रैम्पराडॉस",
     "ja": "ラムパルド",
     "zh-TW": "戰槌龍"
   },
@@ -3685,7 +3685,7 @@
     "en": "Shieldon",
     "es": "Shieldon",
     "fr": "Dinoclier",
-    "hi": "शीडॉन",
+    "hi": "शील्डॉन",
     "ja": "タテトプス",
     "zh-TW": "盾甲龍"
   },
@@ -3694,7 +3694,7 @@
     "en": "Bastiodon",
     "es": "Bastiodon",
     "fr": "Bastiodon",
-    "hi": "बैटयोडॉन",
+    "hi": "बैस्टियोडॉन",
     "ja": "トリデプス",
     "zh-TW": "護城龍"
   },
@@ -3703,7 +3703,7 @@
     "en": "Burmy",
     "es": "Burmy",
     "fr": "Cheniti",
-    "hi": "बमी",
+    "hi": "बर्मी",
     "ja": "ミノムッチ",
     "zh-TW": "結草兒"
   },
@@ -3712,7 +3712,7 @@
     "en": "Wormadam",
     "es": "Wormadam",
     "fr": "Cheniselle",
-    "hi": "वमाडैम",
+    "hi": "वर्माडैम",
     "ja": "ミノマダム",
     "zh-TW": "結草貴婦"
   },
@@ -3721,7 +3721,7 @@
     "en": "Mothim",
     "es": "Mothim",
     "fr": "Papilord",
-    "hi": "मॉिथम",
+    "hi": "मॉथिम",
     "ja": "ガーメイル",
     "zh-TW": "紳士蛾"
   },
@@ -3730,7 +3730,7 @@
     "en": "Combee",
     "es": "Combee",
     "fr": "Apitrini",
-    "hi": "कॉबी",
+    "hi": "कॉम्बी",
     "ja": "ミツハニー",
     "zh-TW": "三蜜蜂"
   },
@@ -3739,7 +3739,7 @@
     "en": "Vespiquen",
     "es": "Vespiquen",
     "fr": "Apireine",
-    "hi": "वेपवन",
+    "hi": "वेस्पक्विन",
     "ja": "ビークイン",
     "zh-TW": "蜂女王"
   },
@@ -3748,7 +3748,7 @@
     "en": "Pachirisu",
     "es": "Pachirisu",
     "fr": "Pachirisu",
-    "hi": "पाचीरसू",
+    "hi": "पाचीरिसू",
     "ja": "パチリス",
     "zh-TW": "帕奇利茲"
   },
@@ -3766,7 +3766,7 @@
     "en": "Floatzel",
     "es": "Floatzel",
     "fr": "Mustéflott",
-    "hi": "लोटज़ल",
+    "hi": "फ़्लोटज़ल",
     "ja": "フローゼル",
     "zh-TW": "浮潛鼬"
   },
@@ -3775,7 +3775,7 @@
     "en": "Cherubi",
     "es": "Cherubi",
     "fr": "Ceribou",
-    "hi": "चेबी",
+    "hi": "चेरुबी",
     "ja": "チェリンボ",
     "zh-TW": "櫻花寶"
   },
@@ -3784,7 +3784,7 @@
     "en": "Cherrim",
     "es": "Cherrim",
     "fr": "Ceriflor",
-    "hi": "चेरम",
+    "hi": "चेरिम",
     "ja": "チェリム",
     "zh-TW": "櫻花兒"
   },
@@ -3802,7 +3802,7 @@
     "en": "Gastrodon",
     "es": "Gastrodon",
     "fr": "Tritosor",
-    "hi": "गैटोडॉन",
+    "hi": "गैस्ट्रोडॉन",
     "ja": "トリトドン",
     "zh-TW": "海兔獸"
   },
@@ -3811,7 +3811,7 @@
     "en": "Ambipom",
     "es": "Ambipom",
     "fr": "Capidextre",
-    "hi": "ऐबपॉम",
+    "hi": "ऐम्बिपॉम",
     "ja": "エテボース",
     "zh-TW": "雙尾怪手"
   },
@@ -3820,7 +3820,7 @@
     "en": "Drifloon",
     "es": "Drifloon",
     "fr": "Baudrive",
-    "hi": "डलून",
+    "hi": "ड्रिफ़्लून",
     "ja": "フワンテ",
     "zh-TW": "飄飄球"
   },
@@ -3829,7 +3829,7 @@
     "en": "Drifblim",
     "es": "Drifblim",
     "fr": "Grodrive",
-    "hi": "डलम",
+    "hi": "ड्रिफ़्ब्लिम",
     "ja": "フワライド",
     "zh-TW": "隨風球"
   },
@@ -3838,7 +3838,7 @@
     "en": "Buneary",
     "es": "Buneary",
     "fr": "Laporeille",
-    "hi": "बनीर",
+    "hi": "बनीरी",
     "ja": "ミミロル",
     "zh-TW": "捲捲耳"
   },
@@ -3856,7 +3856,7 @@
     "en": "Mismagius",
     "es": "Mismagius",
     "fr": "Magirêve",
-    "hi": "मसमैगयस",
+    "hi": "मिसमैगियस",
     "ja": "ムウマージ",
     "zh-TW": "夢妖魔"
   },
@@ -3865,7 +3865,7 @@
     "en": "Honchkrow",
     "es": "Honchkrow",
     "fr": "Corboss",
-    "hi": "हॉचो",
+    "hi": "हॉन्चक्रो",
     "ja": "ドンカラス",
     "zh-TW": "烏鴉頭頭"
   },
@@ -3874,7 +3874,7 @@
     "en": "Glameow",
     "es": "Glameow",
     "fr": "Chaglam",
-    "hi": "लैमयाउ",
+    "hi": "ग्लैमियाउ",
     "ja": "ニャルマー",
     "zh-TW": "魅力喵"
   },
@@ -3883,7 +3883,7 @@
     "en": "Purugly",
     "es": "Purugly",
     "fr": "Chaffreux",
-    "hi": "परअल",
+    "hi": "परअग्ली",
     "ja": "ブニャット",
     "zh-TW": "東施喵"
   },
@@ -3892,7 +3892,7 @@
     "en": "Chingling",
     "es": "Chingling",
     "fr": "Korillon",
-    "hi": "चंगलग",
+    "hi": "चिंगलिंग",
     "ja": "リーシャン",
     "zh-TW": "鈴鐺響"
   },
@@ -3901,7 +3901,7 @@
     "en": "Stunky",
     "es": "Stunky",
     "fr": "Moufouette",
-    "hi": "टंक",
+    "hi": "स्टंकी",
     "ja": "スカンプー",
     "zh-TW": "臭鼬噗"
   },
@@ -3910,7 +3910,7 @@
     "en": "Skuntank",
     "es": "Skuntank",
     "fr": "Moufflair",
-    "hi": "कंटैंक",
+    "hi": "स्कंटैंक",
     "ja": "スカタンク",
     "zh-TW": "坦克臭鼬"
   },
@@ -3919,7 +3919,7 @@
     "en": "Bronzor",
     "es": "Bronzor",
     "fr": "Archéomire",
-    "hi": "ॉज़ोर",
+    "hi": "ब्रॉन्ज़ोर",
     "ja": "ドーミラー",
     "zh-TW": "銅鏡怪"
   },
@@ -3928,7 +3928,7 @@
     "en": "Bronzong",
     "es": "Bronzong",
     "fr": "Archéodong",
-    "hi": "ॉज़ॉग",
+    "hi": "ब्रॉन्ज़ॉन्ग",
     "ja": "ドータクン",
     "zh-TW": "青銅鐘"
   },
@@ -3937,7 +3937,7 @@
     "en": "Bonsly",
     "es": "Bonsly",
     "fr": "Manzaï",
-    "hi": "बॉलाइ",
+    "hi": "बॉन्स्लाइ",
     "ja": "ウソハチ",
     "zh-TW": "盆才怪"
   },
@@ -3946,7 +3946,7 @@
     "en": "Mime Jr.",
     "es": "Mime Jr.",
     "fr": "Mime Jr.",
-    "hi": "माइम जूनयर",
+    "hi": "माइम जूनियर",
     "ja": "マネネ",
     "zh-TW": "魔尼尼"
   },
@@ -3955,7 +3955,7 @@
     "en": "Happiny",
     "es": "Happiny",
     "fr": "Ptiravi",
-    "hi": "हैपीनी",
+    "hi": "हैप्पीनी",
     "ja": "ピンプク",
     "zh-TW": "小福蛋"
   },
@@ -3973,7 +3973,7 @@
     "en": "Spiritomb",
     "es": "Spiritomb",
     "fr": "Spiritomb",
-    "hi": "िपरटूब",
+    "hi": "स्पिरिटूम्ब",
     "ja": "ミカルゲ",
     "zh-TW": "花岩怪"
   },
@@ -3982,7 +3982,7 @@
     "en": "Gible",
     "es": "Gible",
     "fr": "Griknot",
-    "hi": "गबल",
+    "hi": "गिबल",
     "ja": "フカマル",
     "zh-TW": "圓陸鯊"
   },
@@ -4000,7 +4000,7 @@
     "en": "Garchomp",
     "es": "Garchomp",
     "fr": "Carchacrok",
-    "hi": "गारचॉप",
+    "hi": "गारचॉम्प",
     "ja": "ガブリアス",
     "zh-TW": "烈咬陸鯊"
   },
@@ -4009,7 +4009,7 @@
     "en": "Munchlax",
     "es": "Munchlax",
     "fr": "Goinfrex",
-    "hi": "मंचलैस",
+    "hi": "मंचलैक्स",
     "ja": "ゴンベ",
     "zh-TW": "小卡比獸"
   },
@@ -4018,7 +4018,7 @@
     "en": "Riolu",
     "es": "Riolu",
     "fr": "Riolu",
-    "hi": "रयोलु",
+    "hi": "रियोलु",
     "ja": "リオル",
     "zh-TW": "利歐路"
   },
@@ -4027,7 +4027,7 @@
     "en": "Lucario",
     "es": "Lucario",
     "fr": "Lucario",
-    "hi": "लुकारयो",
+    "hi": "लुकारियो",
     "ja": "ルカリオ",
     "zh-TW": "路卡利歐"
   },
@@ -4036,7 +4036,7 @@
     "en": "Hippopotas",
     "es": "Hippopotas",
     "fr": "Hippopotas",
-    "hi": "हपोपोटास",
+    "hi": "हिप्पोपोटास",
     "ja": "ヒポポタス",
     "zh-TW": "沙河馬"
   },
@@ -4045,7 +4045,7 @@
     "en": "Hippowdon",
     "es": "Hippowdon",
     "fr": "Hippodocus",
-    "hi": "हपाउडॉन",
+    "hi": "हिप्पाउडॉन",
     "ja": "カバルドン",
     "zh-TW": "河馬獸"
   },
@@ -4054,7 +4054,7 @@
     "en": "Skorupi",
     "es": "Skorupi",
     "fr": "Rapion",
-    "hi": "कोपी",
+    "hi": "स्कोरुपी",
     "ja": "スコルピ",
     "zh-TW": "鉗尾蠍"
   },
@@ -4063,7 +4063,7 @@
     "en": "Drapion",
     "es": "Drapion",
     "fr": "Drascore",
-    "hi": "डािपयॉन",
+    "hi": "ड्रापियॉन",
     "ja": "ドラピオン",
     "zh-TW": "龍王蠍"
   },
@@ -4072,7 +4072,7 @@
     "en": "Croagunk",
     "es": "Croagunk",
     "fr": "Cradopaud",
-    "hi": "ोगंक",
+    "hi": "क्रोगंक",
     "ja": "グレッグル",
     "zh-TW": "不良蛙"
   },
@@ -4081,7 +4081,7 @@
     "en": "Toxicroak",
     "es": "Toxicroak",
     "fr": "Coatox",
-    "hi": "टॉसोक",
+    "hi": "टॉक्सिक्रोक",
     "ja": "ドクロッグ",
     "zh-TW": "毒骷蛙"
   },
@@ -4090,7 +4090,7 @@
     "en": "Carnivine",
     "es": "Carnivine",
     "fr": "Vortente",
-    "hi": "कानवाइन",
+    "hi": "कार्निवाइन",
     "ja": "マスキッパ",
     "zh-TW": "尖牙籠"
   },
@@ -4099,7 +4099,7 @@
     "en": "Finneon",
     "es": "Finneon",
     "fr": "Écayon",
-    "hi": "फ़नयॉन",
+    "hi": "फ़िनियॉन",
     "ja": "ケイコウオ",
     "zh-TW": "螢光魚"
   },
@@ -4108,7 +4108,7 @@
     "en": "Lumineon",
     "es": "Lumineon",
     "fr": "Luminéon",
-    "hi": "लूमनयॉन",
+    "hi": "लूमिनियॉन",
     "ja": "ネオラント",
     "zh-TW": "霓虹魚"
   },
@@ -4126,7 +4126,7 @@
     "en": "Snover",
     "es": "Snover",
     "fr": "Blizzi",
-    "hi": "नोवर",
+    "hi": "स्नोवर",
     "ja": "ユキカブリ",
     "zh-TW": "雪笠怪"
   },
@@ -4135,7 +4135,7 @@
     "en": "Abomasnow",
     "es": "Abomasnow",
     "fr": "Blizzaroi",
-    "hi": "अबॉमानो",
+    "hi": "अबॉमास्नो",
     "ja": "ユキノオー",
     "zh-TW": "暴雪王"
   },
@@ -4153,7 +4153,7 @@
     "en": "Magnezone",
     "es": "Magnezone",
     "fr": "Magnézone",
-    "hi": "मैनेज़ोन",
+    "hi": "मैग्नेज़ोन",
     "ja": "ジバコイル",
     "zh-TW": "自爆磁怪"
   },
@@ -4162,7 +4162,7 @@
     "en": "Lickilicky",
     "es": "Lickilicky",
     "fr": "Coudlangue",
-    "hi": "लकलक",
+    "hi": "लिकीलिकी",
     "ja": "ベロベルト",
     "zh-TW": "大舌舔"
   },
@@ -4171,7 +4171,7 @@
     "en": "Rhyperior",
     "es": "Rhyperior",
     "fr": "Rhinastoc",
-    "hi": "राइिपरयर",
+    "hi": "राइपिरियर",
     "ja": "ドサイドン",
     "zh-TW": "超甲狂犀"
   },
@@ -4180,7 +4180,7 @@
     "en": "Tangrowth",
     "es": "Tangrowth",
     "fr": "Bouldeneu",
-    "hi": "टैंोथ",
+    "hi": "टैंग्रोथ",
     "ja": "モジャンボ",
     "zh-TW": "巨蔓藤"
   },
@@ -4189,7 +4189,7 @@
     "en": "Electivire",
     "es": "Electivire",
     "fr": "Élekable",
-    "hi": "इलटवायर",
+    "hi": "इलेक्टिवायर",
     "ja": "エレキブル",
     "zh-TW": "電擊魔獸"
   },
@@ -4198,7 +4198,7 @@
     "en": "Magmortar",
     "es": "Magmortar",
     "fr": "Maganon",
-    "hi": "मैमॉटर",
+    "hi": "मैग्मॉर्टर",
     "ja": "ブーバーン",
     "zh-TW": "鴨嘴炎獸"
   },
@@ -4207,7 +4207,7 @@
     "en": "Togekiss",
     "es": "Togekiss",
     "fr": "Togekiss",
-    "hi": "टोगेकस",
+    "hi": "टोगेकिस",
     "ja": "トゲキッス",
     "zh-TW": "波克基斯"
   },
@@ -4225,7 +4225,7 @@
     "en": "Leafeon",
     "es": "Leafeon",
     "fr": "Phyllali",
-    "hi": "लफ़यॉन",
+    "hi": "लीफ़ियॉन",
     "ja": "リーフィア",
     "zh-TW": "葉伊布"
   },
@@ -4234,7 +4234,7 @@
     "en": "Glaceon",
     "es": "Glaceon",
     "fr": "Givrali",
-    "hi": "लसयॉन",
+    "hi": "ग्लेसियॉन",
     "ja": "グレイシア",
     "zh-TW": "冰伊布"
   },
@@ -4243,7 +4243,7 @@
     "en": "Gliscor",
     "es": "Gliscor",
     "fr": "Scorvol",
-    "hi": "लाइकोर",
+    "hi": "ग्लाइस्कोर",
     "ja": "グライオン",
     "zh-TW": "天蠍王"
   },
@@ -4252,7 +4252,7 @@
     "en": "Mamoswine",
     "es": "Mamoswine",
     "fr": "Mammochon",
-    "hi": "मैमोवाइन",
+    "hi": "मैमोस्वाइन",
     "ja": "マンムー",
     "zh-TW": "象牙豬"
   },
@@ -4261,7 +4261,7 @@
     "en": "Porygon-Z",
     "es": "Porygon-Z",
     "fr": "Porygon-Z",
-    "hi": "पोरगॉन-Z",
+    "hi": "पोरिगॉन-Z",
     "ja": "ポリゴンＺ",
     "zh-TW": "多邊獸Ｚ"
   },
@@ -4270,7 +4270,7 @@
     "en": "Gallade",
     "es": "Gallade",
     "fr": "Gallame",
-    "hi": "गलड",
+    "hi": "गलेड",
     "ja": "エルレイド",
     "zh-TW": "艾路雷朵"
   },
@@ -4279,7 +4279,7 @@
     "en": "Probopass",
     "es": "Probopass",
     "fr": "Tarinorme",
-    "hi": "ोबोपास",
+    "hi": "प्रोबोपास",
     "ja": "ダイノーズ",
     "zh-TW": "大朝北鼻"
   },
@@ -4288,7 +4288,7 @@
     "en": "Dusknoir",
     "es": "Dusknoir",
     "fr": "Noctunoir",
-    "hi": "डकनुआर",
+    "hi": "डस्कनुआर",
     "ja": "ヨノワール",
     "zh-TW": "黑夜魔靈"
   },
@@ -4297,7 +4297,7 @@
     "en": "Froslass",
     "es": "Froslass",
     "fr": "Momartik",
-    "hi": "ॉलैस",
+    "hi": "फ़्रॉस्लैस",
     "ja": "ユキメノコ",
     "zh-TW": "雪妖女"
   },
@@ -4315,7 +4315,7 @@
     "en": "Uxie",
     "es": "Uxie",
     "fr": "Créhelf",
-    "hi": "युसी",
+    "hi": "युक्सी",
     "ja": "ユクシー",
     "zh-TW": "由克希"
   },
@@ -4324,7 +4324,7 @@
     "en": "Mesprit",
     "es": "Mesprit",
     "fr": "Créfollet",
-    "hi": "मेिट",
+    "hi": "मेस्प्रिट",
     "ja": "エムリット",
     "zh-TW": "艾姆利多"
   },
@@ -4333,7 +4333,7 @@
     "en": "Azelf",
     "es": "Azelf",
     "fr": "Créfadet",
-    "hi": "ऐज़ेफ़",
+    "hi": "ऐज़ेल्फ़",
     "ja": "アグノム",
     "zh-TW": "亞克諾姆"
   },
@@ -4342,7 +4342,7 @@
     "en": "Dialga",
     "es": "Dialga",
     "fr": "Dialga",
-    "hi": "डयागा",
+    "hi": "डियाल्गा",
     "ja": "ディアルガ",
     "zh-TW": "帝牙盧卡"
   },
@@ -4351,7 +4351,7 @@
     "en": "Palkia",
     "es": "Palkia",
     "fr": "Palkia",
-    "hi": "पाकया",
+    "hi": "पाल्किया",
     "ja": "パルキア",
     "zh-TW": "帕路奇亞"
   },
@@ -4360,7 +4360,7 @@
     "en": "Heatran",
     "es": "Heatran",
     "fr": "Heatran",
-    "hi": "हीटैन",
+    "hi": "हीट्रैन",
     "ja": "ヒードラン",
     "zh-TW": "席多藍恩"
   },
@@ -4369,7 +4369,7 @@
     "en": "Regigigas",
     "es": "Regigigas",
     "fr": "Regigigas",
-    "hi": "रजीगीगस",
+    "hi": "रेजीगीगस",
     "ja": "レジギガス",
     "zh-TW": "雷吉奇卡斯"
   },
@@ -4378,7 +4378,7 @@
     "en": "Giratina",
     "es": "Giratina",
     "fr": "Giratina",
-    "hi": "गराटना",
+    "hi": "गिराटीना",
     "ja": "ギラティナ",
     "zh-TW": "騎拉帝納"
   },
@@ -4387,7 +4387,7 @@
     "en": "Cresselia",
     "es": "Cresselia",
     "fr": "Cresselia",
-    "hi": "सेलया",
+    "hi": "क्रसेलिया",
     "ja": "クレセリア",
     "zh-TW": "克雷色利亞"
   },
@@ -4396,7 +4396,7 @@
     "en": "Phione",
     "es": "Phione",
     "fr": "Phione",
-    "hi": "िफ़योने",
+    "hi": "फ़ियोने",
     "ja": "フィオネ",
     "zh-TW": "霏歐納"
   },
@@ -4414,7 +4414,7 @@
     "en": "Darkrai",
     "es": "Darkrai",
     "fr": "Darkrai",
-    "hi": "डाकराय",
+    "hi": "डार्कराय",
     "ja": "ダークライ",
     "zh-TW": "達克萊伊"
   },
@@ -4423,7 +4423,7 @@
     "en": "Shaymin",
     "es": "Shaymin",
     "fr": "Shaymin",
-    "hi": "शेमन",
+    "hi": "शेमिन",
     "ja": "シェイミ",
     "zh-TW": "謝米"
   },
@@ -4432,7 +4432,7 @@
     "en": "Arceus",
     "es": "Arceus",
     "fr": "Arceus",
-    "hi": "आकयस",
+    "hi": "आर्कियस",
     "ja": "アルセウス",
     "zh-TW": "阿爾宙斯"
   },
@@ -4441,7 +4441,7 @@
     "en": "Victini",
     "es": "Victini",
     "fr": "Victini",
-    "hi": "वटनी",
+    "hi": "विक्टीनी",
     "ja": "ビクティニ",
     "zh-TW": "比克提尼"
   },
@@ -4450,7 +4450,7 @@
     "en": "Snivy",
     "es": "Snivy",
     "fr": "Vipélierre",
-    "hi": "नाइवी",
+    "hi": "स्नाइवी",
     "ja": "ツタージャ",
     "zh-TW": "藤藤蛇"
   },
@@ -4459,7 +4459,7 @@
     "en": "Servine",
     "es": "Servine",
     "fr": "Lianaja",
-    "hi": "सवाइन",
+    "hi": "सर्वाइन",
     "ja": "ジャノビー",
     "zh-TW": "青藤蛇"
   },
@@ -4468,7 +4468,7 @@
     "en": "Serperior",
     "es": "Serperior",
     "fr": "Majaspic",
-    "hi": "सपरयर",
+    "hi": "सर्पिरियर",
     "ja": "ジャローダ",
     "zh-TW": "君主蛇"
   },
@@ -4477,7 +4477,7 @@
     "en": "Tepig",
     "es": "Tepig",
     "fr": "Gruikui",
-    "hi": "टिपग",
+    "hi": "टेपिग",
     "ja": "ポカブ",
     "zh-TW": "暖暖豬"
   },
@@ -4486,7 +4486,7 @@
     "en": "Pignite",
     "es": "Pignite",
     "fr": "Grotichon",
-    "hi": "िपनाइट",
+    "hi": "पिग्नाइट",
     "ja": "チャオブー",
     "zh-TW": "炒炒豬"
   },
@@ -4495,7 +4495,7 @@
     "en": "Emboar",
     "es": "Emboar",
     "fr": "Roitiflam",
-    "hi": "एबोर",
+    "hi": "एम्बोर",
     "ja": "エンブオー",
     "zh-TW": "炎武王"
   },
@@ -4531,7 +4531,7 @@
     "en": "Patrat",
     "es": "Patrat",
     "fr": "Ratentif",
-    "hi": "पटैट",
+    "hi": "पट्रैट",
     "ja": "ミネズミ",
     "zh-TW": "探探鼠"
   },
@@ -4549,7 +4549,7 @@
     "en": "Lillipup",
     "es": "Lillipup",
     "fr": "Ponchiot",
-    "hi": "ललपप",
+    "hi": "लिलीपप",
     "ja": "ヨーテリー",
     "zh-TW": "小約克"
   },
@@ -4558,7 +4558,7 @@
     "en": "Herdier",
     "es": "Herdier",
     "fr": "Ponchien",
-    "hi": "हडयर",
+    "hi": "हर्डियर",
     "ja": "ハーデリア",
     "zh-TW": "哈約克"
   },
@@ -4567,7 +4567,7 @@
     "en": "Stoutland",
     "es": "Stoutland",
     "fr": "Mastouffe",
-    "hi": "टाउटलैंड",
+    "hi": "स्टाउटलैंड",
     "ja": "ムーランド",
     "zh-TW": "長毛狗"
   },
@@ -4576,7 +4576,7 @@
     "en": "Purrloin",
     "es": "Purrloin",
     "fr": "Chacripan",
-    "hi": "पलायन",
+    "hi": "पर्लायन",
     "ja": "チョロネコ",
     "zh-TW": "扒手貓"
   },
@@ -4585,7 +4585,7 @@
     "en": "Liepard",
     "es": "Liepard",
     "fr": "Léopardus",
-    "hi": "लाइपड",
+    "hi": "लाइपर्ड",
     "ja": "レパルダス",
     "zh-TW": "酷豹"
   },
@@ -4603,7 +4603,7 @@
     "en": "Simisage",
     "es": "Simisage",
     "fr": "Feuiloutan",
-    "hi": "समीसेज",
+    "hi": "सिमीसेज",
     "ja": "ヤナッキー",
     "zh-TW": "花椰猿"
   },
@@ -4621,7 +4621,7 @@
     "en": "Simisear",
     "es": "Simisear",
     "fr": "Flamoutan",
-    "hi": "समीसीयर",
+    "hi": "सिमीसीयर",
     "ja": "バオッキー",
     "zh-TW": "爆香猿"
   },
@@ -4639,7 +4639,7 @@
     "en": "Simipour",
     "es": "Simipour",
     "fr": "Flotoutan",
-    "hi": "समीपोर",
+    "hi": "सिमीपोर",
     "ja": "ヒヤッキー",
     "zh-TW": "冷水猿"
   },
@@ -4657,7 +4657,7 @@
     "en": "Musharna",
     "es": "Musharna",
     "fr": "Mushana",
-    "hi": "मुशना",
+    "hi": "मुशर्ना",
     "ja": "ムシャーナ",
     "zh-TW": "夢夢蝕"
   },
@@ -4666,7 +4666,7 @@
     "en": "Pidove",
     "es": "Pidove",
     "fr": "Poichigeon",
-    "hi": "िपडव",
+    "hi": "पिडव",
     "ja": "マメパト",
     "zh-TW": "豆豆鴿"
   },
@@ -4675,7 +4675,7 @@
     "en": "Tranquill",
     "es": "Tranquill",
     "fr": "Colombeau",
-    "hi": "टैंवल",
+    "hi": "ट्रैंक्विल",
     "ja": "ハトーボー",
     "zh-TW": "咕咕鴿"
   },
@@ -4693,7 +4693,7 @@
     "en": "Blitzle",
     "es": "Blitzle",
     "fr": "Zébibron",
-    "hi": "लट्ज़्ल",
+    "hi": "ब्लिट्ज़्ल",
     "ja": "シママ",
     "zh-TW": "斑斑馬"
   },
@@ -4702,7 +4702,7 @@
     "en": "Zebstrika",
     "es": "Zebstrika",
     "fr": "Zéblitz",
-    "hi": "ज़ेटाइका",
+    "hi": "ज़ेब्स्ट्राइका",
     "ja": "ゼブライカ",
     "zh-TW": "雷電斑馬"
   },
@@ -4720,7 +4720,7 @@
     "en": "Boldore",
     "es": "Boldore",
     "fr": "Géolithe",
-    "hi": "बोडोर",
+    "hi": "बोल्डोर",
     "ja": "ガントル",
     "zh-TW": "地幔岩"
   },
@@ -4729,7 +4729,7 @@
     "en": "Gigalith",
     "es": "Gigalith",
     "fr": "Gigalithe",
-    "hi": "गीगालथ",
+    "hi": "गीगालिथ",
     "ja": "ギガイアス",
     "zh-TW": "龐岩怪"
   },
@@ -4747,7 +4747,7 @@
     "en": "Swoobat",
     "es": "Swoobat",
     "fr": "Rhinolove",
-    "hi": "वूबैट",
+    "hi": "स्वूबैट",
     "ja": "ココロモリ",
     "zh-TW": "心蝙蝠"
   },
@@ -4756,7 +4756,7 @@
     "en": "Drilbur",
     "es": "Drilbur",
     "fr": "Rototaupe",
-    "hi": "डलबर",
+    "hi": "ड्रिलबर",
     "ja": "モグリュー",
     "zh-TW": "螺釘地鼠"
   },
@@ -4765,7 +4765,7 @@
     "en": "Excadrill",
     "es": "Excadrill",
     "fr": "Minotaupe",
-    "hi": "एसकाडल",
+    "hi": "एक्सकाड्रिल",
     "ja": "ドリュウズ",
     "zh-TW": "龍頭地鼠"
   },
@@ -4774,7 +4774,7 @@
     "en": "Audino",
     "es": "Audino",
     "fr": "Nanméouïe",
-    "hi": "ऑडनो",
+    "hi": "ऑडिनो",
     "ja": "タブンネ",
     "zh-TW": "差不多娃娃"
   },
@@ -4783,7 +4783,7 @@
     "en": "Timburr",
     "es": "Timburr",
     "fr": "Charpenti",
-    "hi": "टबर",
+    "hi": "टिम्बर",
     "ja": "ドッコラー",
     "zh-TW": "搬運小匠"
   },
@@ -4792,7 +4792,7 @@
     "en": "Gurdurr",
     "es": "Gurdurr",
     "fr": "Ouvrifier",
-    "hi": "गडर",
+    "hi": "गर्डर",
     "ja": "ドテッコツ",
     "zh-TW": "鐵骨土人"
   },
@@ -4801,7 +4801,7 @@
     "en": "Conkeldurr",
     "es": "Conkeldurr",
     "fr": "Bétochef",
-    "hi": "बूडाबडा",
+    "hi": "बूडाबिल्डा",
     "ja": "ローブシン",
     "zh-TW": "修建老匠"
   },
@@ -4810,7 +4810,7 @@
     "en": "Tympole",
     "es": "Tympole",
     "fr": "Tritonde",
-    "hi": "टपोल",
+    "hi": "टिम्पोल",
     "ja": "オタマロ",
     "zh-TW": "圓蝌蚪"
   },
@@ -4819,7 +4819,7 @@
     "en": "Palpitoad",
     "es": "Palpitoad",
     "fr": "Batracné",
-    "hi": "पैिपटोड",
+    "hi": "पैल्पिटोड",
     "ja": "ガマガル",
     "zh-TW": "藍蟾蜍"
   },
@@ -4828,7 +4828,7 @@
     "en": "Seismitoad",
     "es": "Seismitoad",
     "fr": "Crapustule",
-    "hi": "साइज़्मटोड",
+    "hi": "साइज़्मिटोड",
     "ja": "ガマゲロゲ",
     "zh-TW": "蟾蜍王"
   },
@@ -4837,7 +4837,7 @@
     "en": "Throh",
     "es": "Throh",
     "fr": "Judokrak",
-    "hi": "ोह",
+    "hi": "थ्रोह",
     "ja": "ナゲキ",
     "zh-TW": "投摔鬼"
   },
@@ -4864,7 +4864,7 @@
     "en": "Swadloon",
     "es": "Swadloon",
     "fr": "Couverdure",
-    "hi": "वाडलून",
+    "hi": "स्वाडलून",
     "ja": "クルマユ",
     "zh-TW": "寶包繭"
   },
@@ -4873,7 +4873,7 @@
     "en": "Leavanny",
     "es": "Leavanny",
     "fr": "Manternel",
-    "hi": "लवैनी",
+    "hi": "लीवैनी",
     "ja": "ハハコモリ",
     "zh-TW": "保母蟲"
   },
@@ -4882,7 +4882,7 @@
     "en": "Venipede",
     "es": "Venipede",
     "fr": "Venipatte",
-    "hi": "वेनपीड",
+    "hi": "वेनिपीड",
     "ja": "フシデ",
     "zh-TW": "百足蜈蚣"
   },
@@ -4891,7 +4891,7 @@
     "en": "Whirlipede",
     "es": "Whirlipede",
     "fr": "Scobolide",
-    "hi": "वलपीड",
+    "hi": "वर्लिपीड",
     "ja": "ホイーガ",
     "zh-TW": "車輪毬"
   },
@@ -4900,7 +4900,7 @@
     "en": "Scolipede",
     "es": "Scolipede",
     "fr": "Brutapode",
-    "hi": "कोलपीड",
+    "hi": "स्कोलिपीड",
     "ja": "ペンドラー",
     "zh-TW": "蜈蚣王"
   },
@@ -4918,7 +4918,7 @@
     "en": "Whimsicott",
     "es": "Whimsicott",
     "fr": "Farfaduvet",
-    "hi": "हसकॉट",
+    "hi": "व्हिम्सिकॉट",
     "ja": "エルフーン",
     "zh-TW": "風妖精"
   },
@@ -4927,7 +4927,7 @@
     "en": "Petilil",
     "es": "Petilil",
     "fr": "Chlorobule",
-    "hi": "पेटलल",
+    "hi": "पेटिलिल",
     "ja": "チュリネ",
     "zh-TW": "百合根娃娃"
   },
@@ -4936,7 +4936,7 @@
     "en": "Lilligant",
     "es": "Lilligant",
     "fr": "Fragilady",
-    "hi": "ललगेंट",
+    "hi": "लिलीगेंट",
     "ja": "ドレディア",
     "zh-TW": "裙兒小姐"
   },
@@ -4945,7 +4945,7 @@
     "en": "Basculin",
     "es": "Basculin",
     "fr": "Bargantua",
-    "hi": "बैयुलन",
+    "hi": "बैस्क्युलिन",
     "ja": "バスラオ",
     "zh-TW": "野蠻鱸魚"
   },
@@ -4963,7 +4963,7 @@
     "en": "Krokorok",
     "es": "Krokorok",
     "fr": "Escroco",
-    "hi": "ॉकोरॉक",
+    "hi": "क्रॉकोरॉक",
     "ja": "ワルビル",
     "zh-TW": "混混鱷"
   },
@@ -4972,7 +4972,7 @@
     "en": "Krookodile",
     "es": "Krookodile",
     "fr": "Crocorible",
-    "hi": "ूकोडाइल",
+    "hi": "क्रूकोडाइल",
     "ja": "ワルビアル",
     "zh-TW": "流氓鱷"
   },
@@ -4981,7 +4981,7 @@
     "en": "Darumaka",
     "es": "Darumaka",
     "fr": "Darumarond",
-    "hi": "डामाका",
+    "hi": "डारुमाका",
     "ja": "ダルマッカ",
     "zh-TW": "火紅不倒翁"
   },
@@ -4990,7 +4990,7 @@
     "en": "Darmanitan",
     "es": "Darmanitan",
     "fr": "Darumacho",
-    "hi": "डारमैनटैन",
+    "hi": "डारमैनिटैन",
     "ja": "ヒヒダルマ",
     "zh-TW": "達摩狒狒"
   },
@@ -4999,7 +4999,7 @@
     "en": "Maractus",
     "es": "Maractus",
     "fr": "Maracachi",
-    "hi": "मरैटस",
+    "hi": "मरैक्टस",
     "ja": "マラカッチ",
     "zh-TW": "沙鈴仙人掌"
   },
@@ -5017,7 +5017,7 @@
     "en": "Crustle",
     "es": "Crustle",
     "fr": "Crabaraque",
-    "hi": "टल",
+    "hi": "क्रस्टल",
     "ja": "イワパレス",
     "zh-TW": "岩殿居蟹"
   },
@@ -5026,7 +5026,7 @@
     "en": "Scraggy",
     "es": "Scraggy",
     "fr": "Baggiguane",
-    "hi": "ैगी",
+    "hi": "स्क्रैगी",
     "ja": "ズルッグ",
     "zh-TW": "滑滑小子"
   },
@@ -5035,7 +5035,7 @@
     "en": "Scrafty",
     "es": "Scrafty",
     "fr": "Baggaïd",
-    "hi": "ाट",
+    "hi": "स्क्राफ़्टी",
     "ja": "ズルズキン",
     "zh-TW": "頭巾混混"
   },
@@ -5044,7 +5044,7 @@
     "en": "Sigilyph",
     "es": "Sigilyph",
     "fr": "Cryptéro",
-    "hi": "सजलफ़",
+    "hi": "सिजिलिफ़",
     "ja": "シンボラー",
     "zh-TW": "象徵鳥"
   },
@@ -5053,7 +5053,7 @@
     "en": "Yamask",
     "es": "Yamask",
     "fr": "Tutafeh",
-    "hi": "यामैक",
+    "hi": "यामैस्क",
     "ja": "デスマス",
     "zh-TW": "哭哭面具"
   },
@@ -5062,7 +5062,7 @@
     "en": "Cofagrigus",
     "es": "Cofagrigus",
     "fr": "Tutankafer",
-    "hi": "कॉफ़ाीगस",
+    "hi": "कॉफ़ाग्रीगस",
     "ja": "デスカーン",
     "zh-TW": "死神棺"
   },
@@ -5071,7 +5071,7 @@
     "en": "Tirtouga",
     "es": "Tirtouga",
     "fr": "Carapagos",
-    "hi": "टटूगा",
+    "hi": "टिर्टूगा",
     "ja": "プロトーガ",
     "zh-TW": "原蓋海龜"
   },
@@ -5080,7 +5080,7 @@
     "en": "Carracosta",
     "es": "Carracosta",
     "fr": "Mégapagos",
-    "hi": "काराकॉटा",
+    "hi": "काराकॉस्टा",
     "ja": "アバゴーラ",
     "zh-TW": "肋骨海龜"
   },
@@ -5089,7 +5089,7 @@
     "en": "Archen",
     "es": "Archen",
     "fr": "Arkéapti",
-    "hi": "आकन",
+    "hi": "आर्केन",
     "ja": "アーケン",
     "zh-TW": "始祖小鳥"
   },
@@ -5098,7 +5098,7 @@
     "en": "Archeops",
     "es": "Archeops",
     "fr": "Aéroptéryx",
-    "hi": "आकयॉस",
+    "hi": "आर्कियॉप्स",
     "ja": "アーケオス",
     "zh-TW": "始祖大鳥"
   },
@@ -5107,7 +5107,7 @@
     "en": "Trubbish",
     "es": "Trubbish",
     "fr": "Miamiasme",
-    "hi": "टबश",
+    "hi": "ट्रबिश",
     "ja": "ヤブクロン",
     "zh-TW": "破破袋"
   },
@@ -5125,7 +5125,7 @@
     "en": "Zorua",
     "es": "Zorua",
     "fr": "Zorua",
-    "hi": "ज़ोआ",
+    "hi": "ज़ोरुआ",
     "ja": "ゾロア",
     "zh-TW": "索羅亞"
   },
@@ -5134,7 +5134,7 @@
     "en": "Zoroark",
     "es": "Zoroark",
     "fr": "Zoroark",
-    "hi": "ज़ोरोआक",
+    "hi": "ज़ोरोआर्क",
     "ja": "ゾロアーク",
     "zh-TW": "索羅亞克"
   },
@@ -5143,7 +5143,7 @@
     "en": "Minccino",
     "es": "Minccino",
     "fr": "Chinchidou",
-    "hi": "मंचीनो",
+    "hi": "मिंचीनो",
     "ja": "チラーミィ",
     "zh-TW": "泡沫栗鼠"
   },
@@ -5152,7 +5152,7 @@
     "en": "Cinccino",
     "es": "Cinccino",
     "fr": "Pashmilla",
-    "hi": "चंचीनो",
+    "hi": "चिंचीनो",
     "ja": "チラチーノ",
     "zh-TW": "奇諾栗鼠"
   },
@@ -5170,7 +5170,7 @@
     "en": "Gothorita",
     "es": "Gothorita",
     "fr": "Mesmérella",
-    "hi": "गॉथोरटा",
+    "hi": "गॉथोरीटा",
     "ja": "ゴチミル",
     "zh-TW": "哥德小童"
   },
@@ -5179,7 +5179,7 @@
     "en": "Gothitelle",
     "es": "Gothitelle",
     "fr": "Sidérella",
-    "hi": "गॉथीटल",
+    "hi": "गॉथीटेल",
     "ja": "ゴチルゼル",
     "zh-TW": "哥德小姐"
   },
@@ -5188,7 +5188,7 @@
     "en": "Solosis",
     "es": "Solosis",
     "fr": "Nucléos",
-    "hi": "सोलोसस",
+    "hi": "सोलोसिस",
     "ja": "ユニラン",
     "zh-TW": "單卵細胞球"
   },
@@ -5206,7 +5206,7 @@
     "en": "Reuniclus",
     "es": "Reuniclus",
     "fr": "Symbios",
-    "hi": "रयूनीलस",
+    "hi": "रीयूनीक्लस",
     "ja": "ランクルス",
     "zh-TW": "人造細胞卵"
   },
@@ -5215,7 +5215,7 @@
     "en": "Ducklett",
     "es": "Ducklett",
     "fr": "Couaneton",
-    "hi": "डकलट",
+    "hi": "डकलेट",
     "ja": "コアルヒー",
     "zh-TW": "鴨寶寶"
   },
@@ -5224,7 +5224,7 @@
     "en": "Swanna",
     "es": "Swanna",
     "fr": "Lakmécygne",
-    "hi": "वाना",
+    "hi": "स्वाना",
     "ja": "スワンナ",
     "zh-TW": "舞天鵝"
   },
@@ -5233,7 +5233,7 @@
     "en": "Vanillite",
     "es": "Vanillite",
     "fr": "Sorbébé",
-    "hi": "वनलाइट",
+    "hi": "वनिलाइट",
     "ja": "バニプッチ",
     "zh-TW": "迷你冰"
   },
@@ -5242,7 +5242,7 @@
     "en": "Vanillish",
     "es": "Vanillish",
     "fr": "Sorboul",
-    "hi": "वनलश",
+    "hi": "वनिलिश",
     "ja": "バニリッチ",
     "zh-TW": "多多冰"
   },
@@ -5251,7 +5251,7 @@
     "en": "Vanilluxe",
     "es": "Vanilluxe",
     "fr": "Sorbouboul",
-    "hi": "वनलस",
+    "hi": "वनिलक्स",
     "ja": "バイバニラ",
     "zh-TW": "雙倍多多冰"
   },
@@ -5260,7 +5260,7 @@
     "en": "Deerling",
     "es": "Deerling",
     "fr": "Vivaldaim",
-    "hi": "डीयलंग",
+    "hi": "डीयर्लिंग",
     "ja": "シキジカ",
     "zh-TW": "四季鹿"
   },
@@ -5269,7 +5269,7 @@
     "en": "Sawsbuck",
     "es": "Sawsbuck",
     "fr": "Haydaim",
-    "hi": "सॉबक",
+    "hi": "सॉस्बक",
     "ja": "メブキジカ",
     "zh-TW": "萌芽鹿"
   },
@@ -5278,7 +5278,7 @@
     "en": "Emolga",
     "es": "Emolga",
     "fr": "Emolga",
-    "hi": "इमोगा",
+    "hi": "इमोल्गा",
     "ja": "エモンガ",
     "zh-TW": "電飛鼠"
   },
@@ -5287,7 +5287,7 @@
     "en": "Karrablast",
     "es": "Karrablast",
     "fr": "Carabing",
-    "hi": "करालाट",
+    "hi": "कैराब्लास्ट",
     "ja": "カブルモ",
     "zh-TW": "蓋蓋蟲"
   },
@@ -5296,7 +5296,7 @@
     "en": "Escavalier",
     "es": "Escavalier",
     "fr": "Lançargot",
-    "hi": "एकावेलयर",
+    "hi": "एस्कावेलियर",
     "ja": "シュバルゴ",
     "zh-TW": "騎士蝸牛"
   },
@@ -5323,7 +5323,7 @@
     "en": "Frillish",
     "es": "Frillish",
     "fr": "Viskuse",
-    "hi": "लश",
+    "hi": "फ़्रिलिश",
     "ja": "プルリル",
     "zh-TW": "輕飄飄"
   },
@@ -5332,7 +5332,7 @@
     "en": "Jellicent",
     "es": "Jellicent",
     "fr": "Moyade",
-    "hi": "जेलसेंट",
+    "hi": "जेलिसेंट",
     "ja": "ブルンゲル",
     "zh-TW": "胖嘟嘟"
   },
@@ -5350,7 +5350,7 @@
     "en": "Joltik",
     "es": "Joltik",
     "fr": "Statitik",
-    "hi": "जोटक",
+    "hi": "जोल्टिक",
     "ja": "バチュル",
     "zh-TW": "電電蟲"
   },
@@ -5359,7 +5359,7 @@
     "en": "Galvantula",
     "es": "Galvantula",
     "fr": "Mygavolt",
-    "hi": "गैवैंचुला",
+    "hi": "गैल्वैंचुला",
     "ja": "デンチュラ",
     "zh-TW": "電蜘蛛"
   },
@@ -5377,7 +5377,7 @@
     "en": "Ferrothorn",
     "es": "Ferrothorn",
     "fr": "Noacier",
-    "hi": "फ़रोथॉन",
+    "hi": "फ़रोथॉर्न",
     "ja": "ナットレイ",
     "zh-TW": "堅果啞鈴"
   },
@@ -5386,7 +5386,7 @@
     "en": "Klink",
     "es": "Klink",
     "fr": "Tic",
-    "hi": "लक",
+    "hi": "क्लिंक",
     "ja": "ギアル",
     "zh-TW": "齒輪兒"
   },
@@ -5395,7 +5395,7 @@
     "en": "Klang",
     "es": "Klang",
     "fr": "Clic",
-    "hi": "लैंग",
+    "hi": "क्लैंग",
     "ja": "ギギアル",
     "zh-TW": "齒輪組"
   },
@@ -5404,7 +5404,7 @@
     "en": "Klinklang",
     "es": "Klinklang",
     "fr": "Cliticlic",
-    "hi": "ललैंग",
+    "hi": "क्लिंक्लैंग",
     "ja": "ギギギアル",
     "zh-TW": "齒輪怪"
   },
@@ -5422,7 +5422,7 @@
     "en": "Eelektrik",
     "es": "Eelektrik",
     "fr": "Lampéroie",
-    "hi": "ईलैटक",
+    "hi": "ईलैक्ट्रिक",
     "ja": "シビビール",
     "zh-TW": "麻麻鰻"
   },
@@ -5431,7 +5431,7 @@
     "en": "Eelektross",
     "es": "Eelektross",
     "fr": "Ohmassacre",
-    "hi": "ईलैटॉस",
+    "hi": "ईलैक्ट्रॉस",
     "ja": "シビルドン",
     "zh-TW": "麻麻鰻魚王"
   },
@@ -5440,7 +5440,7 @@
     "en": "Elgyem",
     "es": "Elgyem",
     "fr": "Lewsor",
-    "hi": "एजयेम",
+    "hi": "एल्जियेम",
     "ja": "リグレー",
     "zh-TW": "小灰怪"
   },
@@ -5449,7 +5449,7 @@
     "en": "Beheeyem",
     "es": "Beheeyem",
     "fr": "Neitram",
-    "hi": "बीहयेम",
+    "hi": "बीहियेम",
     "ja": "オーベム",
     "zh-TW": "大宇怪"
   },
@@ -5458,7 +5458,7 @@
     "en": "Litwick",
     "es": "Litwick",
     "fr": "Funécire",
-    "hi": "लट्वक",
+    "hi": "लिट्विक",
     "ja": "ヒトモシ",
     "zh-TW": "燭光靈"
   },
@@ -5467,7 +5467,7 @@
     "en": "Lampent",
     "es": "Lampent",
     "fr": "Mélancolux",
-    "hi": "लैपेंट",
+    "hi": "लैम्पेंट",
     "ja": "ランプラー",
     "zh-TW": "燈火幽靈"
   },
@@ -5476,7 +5476,7 @@
     "en": "Chandelure",
     "es": "Chandelure",
     "fr": "Lugulabre",
-    "hi": "शैंडेयुर",
+    "hi": "शैंडेल्युर",
     "ja": "シャンデラ",
     "zh-TW": "水晶燈火靈"
   },
@@ -5485,7 +5485,7 @@
     "en": "Axew",
     "es": "Axew",
     "fr": "Coupenotte",
-    "hi": "ऐयू",
+    "hi": "ऐक्स्यू",
     "ja": "キバゴ",
     "zh-TW": "牙牙"
   },
@@ -5494,7 +5494,7 @@
     "en": "Fraxure",
     "es": "Fraxure",
     "fr": "Incisache",
-    "hi": "ैयुर",
+    "hi": "फ़्रैक्श्युर",
     "ja": "オノンド",
     "zh-TW": "斧牙龍"
   },
@@ -5503,7 +5503,7 @@
     "en": "Haxorus",
     "es": "Haxorus",
     "fr": "Tranchodon",
-    "hi": "हैसोरस",
+    "hi": "हैक्सोरस",
     "ja": "オノノクス",
     "zh-TW": "雙斧戰龍"
   },
@@ -5521,7 +5521,7 @@
     "en": "Beartic",
     "es": "Beartic",
     "fr": "Polagriffe",
-    "hi": "बेयरटक",
+    "hi": "बेयरटिक",
     "ja": "ツンベアー",
     "zh-TW": "凍原熊"
   },
@@ -5530,7 +5530,7 @@
     "en": "Cryogonal",
     "es": "Cryogonal",
     "fr": "Hexagel",
-    "hi": "ायॉनल",
+    "hi": "क्रायॉग्नल",
     "ja": "フリージオ",
     "zh-TW": "幾何雪花"
   },
@@ -5548,7 +5548,7 @@
     "en": "Accelgor",
     "es": "Accelgor",
     "fr": "Limaspeed",
-    "hi": "ऐसेगोर",
+    "hi": "ऐक्सेल्गोर",
     "ja": "アギルダー",
     "zh-TW": "敏捷蟲"
   },
@@ -5557,7 +5557,7 @@
     "en": "Stunfisk",
     "es": "Stunfisk",
     "fr": "Limonde",
-    "hi": "टनफ़क",
+    "hi": "स्टनफ़िस्क",
     "ja": "マッギョ",
     "zh-TW": "泥巴魚"
   },
@@ -5575,7 +5575,7 @@
     "en": "Mienshao",
     "es": "Mienshao",
     "fr": "Shaofouine",
-    "hi": "मनशाओ",
+    "hi": "मिनशाओ",
     "ja": "コジョンド",
     "zh-TW": "師父鼬"
   },
@@ -5584,7 +5584,7 @@
     "en": "Druddigon",
     "es": "Druddigon",
     "fr": "Drakkarmin",
-    "hi": "डडगन",
+    "hi": "ड्रडिगन",
     "ja": "クリムガン",
     "zh-TW": "赤面龍"
   },
@@ -5593,7 +5593,7 @@
     "en": "Golett",
     "es": "Golett",
     "fr": "Gringolem",
-    "hi": "गोलट",
+    "hi": "गोलेट",
     "ja": "ゴビット",
     "zh-TW": "泥偶小人"
   },
@@ -5602,7 +5602,7 @@
     "en": "Golurk",
     "es": "Golurk",
     "fr": "Golemastoc",
-    "hi": "गोलक",
+    "hi": "गोलर्क",
     "ja": "ゴルーグ",
     "zh-TW": "泥偶巨人"
   },
@@ -5611,7 +5611,7 @@
     "en": "Pawniard",
     "es": "Pawniard",
     "fr": "Scalpion",
-    "hi": "पॉयाड",
+    "hi": "पॉन्यार्ड",
     "ja": "コマタナ",
     "zh-TW": "駒刀小兵"
   },
@@ -5620,7 +5620,7 @@
     "en": "Bisharp",
     "es": "Bisharp",
     "fr": "Scalproie",
-    "hi": "बशाप",
+    "hi": "बिशार्प",
     "ja": "キリキザン",
     "zh-TW": "劈斬司令"
   },
@@ -5638,7 +5638,7 @@
     "en": "Rufflet",
     "es": "Rufflet",
     "fr": "Furaiglon",
-    "hi": "रफ़लट",
+    "hi": "रफ़लेट",
     "ja": "ワシボン",
     "zh-TW": "毛頭小鷹"
   },
@@ -5647,7 +5647,7 @@
     "en": "Braviary",
     "es": "Braviary",
     "fr": "Gueriaigle",
-    "hi": "ेवअर",
+    "hi": "ब्रेविअरी",
     "ja": "ウォーグル",
     "zh-TW": "勇士雄鷹"
   },
@@ -5665,7 +5665,7 @@
     "en": "Mandibuzz",
     "es": "Mandibuzz",
     "fr": "Vaututrice",
-    "hi": "मैंडबज़",
+    "hi": "मैंडिबज़",
     "ja": "バルジーナ",
     "zh-TW": "禿鷹娜"
   },
@@ -5710,7 +5710,7 @@
     "en": "Hydreigon",
     "es": "Hydreigon",
     "fr": "Trioxhydre",
-    "hi": "हाईडैगन",
+    "hi": "हाईड्रैगन",
     "ja": "サザンドラ",
     "zh-TW": "三首惡龍"
   },
@@ -5719,7 +5719,7 @@
     "en": "Larvesta",
     "es": "Larvesta",
     "fr": "Pyronille",
-    "hi": "लावेटा",
+    "hi": "लार्वेस्टा",
     "ja": "メラルバ",
     "zh-TW": "燃燒蟲"
   },
@@ -5737,7 +5737,7 @@
     "en": "Cobalion",
     "es": "Cobalion",
     "fr": "Cobaltium",
-    "hi": "कोबेलयन",
+    "hi": "कोबेलियन",
     "ja": "コバルオン",
     "zh-TW": "勾帕路翁"
   },
@@ -5746,7 +5746,7 @@
     "en": "Terrakion",
     "es": "Terrakion",
     "fr": "Terrakium",
-    "hi": "टराकयन",
+    "hi": "टेराकियन",
     "ja": "テラキオン",
     "zh-TW": "代拉基翁"
   },
@@ -5755,7 +5755,7 @@
     "en": "Virizion",
     "es": "Virizion",
     "fr": "Viridium",
-    "hi": "वराइिज़यन",
+    "hi": "वराइज़ियन",
     "ja": "ビリジオン",
     "zh-TW": "畢力吉翁"
   },
@@ -5764,7 +5764,7 @@
     "en": "Tornadus",
     "es": "Tornadus",
     "fr": "Boréas",
-    "hi": "टोनेडस",
+    "hi": "टोर्नेडस",
     "ja": "トルネロス",
     "zh-TW": "龍捲雲"
   },
@@ -5782,7 +5782,7 @@
     "en": "Reshiram",
     "es": "Reshiram",
     "fr": "Reshiram",
-    "hi": "रशरैम",
+    "hi": "रेशिरैम",
     "ja": "レシラム",
     "zh-TW": "萊希拉姆"
   },
@@ -5791,7 +5791,7 @@
     "en": "Zekrom",
     "es": "Zekrom",
     "fr": "Zekrom",
-    "hi": "ज़ेोम",
+    "hi": "ज़ेक्रोम",
     "ja": "ゼクロム",
     "zh-TW": "捷克羅姆"
   },
@@ -5809,7 +5809,7 @@
     "en": "Kyurem",
     "es": "Kyurem",
     "fr": "Kyurem",
-    "hi": "यूरम",
+    "hi": "क्यूरेम",
     "ja": "キュレム",
     "zh-TW": "酋雷姆"
   },
@@ -5818,7 +5818,7 @@
     "en": "Keldeo",
     "es": "Keldeo",
     "fr": "Keldeo",
-    "hi": "कडयो",
+    "hi": "केल्डियो",
     "ja": "ケルディオ",
     "zh-TW": "凱路迪歐"
   },
@@ -5836,7 +5836,7 @@
     "en": "Genesect",
     "es": "Genesect",
     "fr": "Genesect",
-    "hi": "जेनेसेट",
+    "hi": "जेनेसेक्ट",
     "ja": "ゲノセクト",
     "zh-TW": "蓋諾賽克特"
   },
@@ -5845,7 +5845,7 @@
     "en": "Chespin",
     "es": "Chespin",
     "fr": "Marisson",
-    "hi": "चेिपन",
+    "hi": "चेस्पिन",
     "ja": "ハリマロン",
     "zh-TW": "哈力栗"
   },
@@ -5854,7 +5854,7 @@
     "en": "Quilladin",
     "es": "Quilladin",
     "fr": "Boguérisse",
-    "hi": "वलडन",
+    "hi": "क्विलडिन",
     "ja": "ハリボーグ",
     "zh-TW": "胖胖哈力"
   },
@@ -5881,7 +5881,7 @@
     "en": "Braixen",
     "es": "Braixen",
     "fr": "Roussil",
-    "hi": "ेसन",
+    "hi": "ब्रेक्सन",
     "ja": "テールナー",
     "zh-TW": "長尾火狐"
   },
@@ -5890,7 +5890,7 @@
     "en": "Delphox",
     "es": "Delphox",
     "fr": "Goupelin",
-    "hi": "डेलफ़ॉस",
+    "hi": "डेलफ़ॉक्स",
     "ja": "マフォクシー",
     "zh-TW": "妖火紅狐"
   },
@@ -5899,7 +5899,7 @@
     "en": "Froakie",
     "es": "Froakie",
     "fr": "Grenousse",
-    "hi": "ोक",
+    "hi": "फ़्रोकी",
     "ja": "ケロマツ",
     "zh-TW": "呱呱泡蛙"
   },
@@ -5908,7 +5908,7 @@
     "en": "Frogadier",
     "es": "Frogadier",
     "fr": "Croâporal",
-    "hi": "ॉगाडीयर",
+    "hi": "फ़्रॉगाडीयर",
     "ja": "ゲコガシラ",
     "zh-TW": "呱頭蛙"
   },
@@ -5917,7 +5917,7 @@
     "en": "Greninja",
     "es": "Greninja",
     "fr": "Amphinobi",
-    "hi": "ेनंजा",
+    "hi": "ग्रेनिंजा",
     "ja": "ゲッコウガ",
     "zh-TW": "甲賀忍蛙"
   },
@@ -5935,7 +5935,7 @@
     "en": "Diggersby",
     "es": "Diggersby",
     "fr": "Excavarenne",
-    "hi": "डगरबी",
+    "hi": "डिगरस्बी",
     "ja": "ホルード",
     "zh-TW": "掘地兔"
   },
@@ -5944,7 +5944,7 @@
     "en": "Fletchling",
     "es": "Fletchling",
     "fr": "Passerouge",
-    "hi": "लचलग",
+    "hi": "फ़्लेचलिंग",
     "ja": "ヤヤコマ",
     "zh-TW": "小箭雀"
   },
@@ -5953,7 +5953,7 @@
     "en": "Fletchinder",
     "es": "Fletchinder",
     "fr": "Braisillon",
-    "hi": "लचंडर",
+    "hi": "फ़्लेचिंडर",
     "ja": "ヒノヤコマ",
     "zh-TW": "火箭雀"
   },
@@ -5962,7 +5962,7 @@
     "en": "Talonflame",
     "es": "Talonflame",
     "fr": "Flambusard",
-    "hi": "टैलनलम",
+    "hi": "टैलनफ़्लेम",
     "ja": "ファイアロー",
     "zh-TW": "烈箭鷹"
   },
@@ -5971,7 +5971,7 @@
     "en": "Scatterbug",
     "es": "Scatterbug",
     "fr": "Lépidonille",
-    "hi": "कटरबग",
+    "hi": "स्कैटरबग",
     "ja": "コフキムシ",
     "zh-TW": "粉蝶蟲"
   },
@@ -5980,7 +5980,7 @@
     "en": "Spewpa",
     "es": "Spewpa",
     "fr": "Pérégrain",
-    "hi": "यूपा",
+    "hi": "स्प्यूपा",
     "ja": "コフーライ",
     "zh-TW": "粉蝶蛹"
   },
@@ -5989,7 +5989,7 @@
     "en": "Vivillon",
     "es": "Vivillon",
     "fr": "Prismillon",
-    "hi": "ववयॉन",
+    "hi": "विवियॉन",
     "ja": "ビビヨン",
     "zh-TW": "彩粉蝶"
   },
@@ -5998,7 +5998,7 @@
     "en": "Litleo",
     "es": "Litleo",
     "fr": "Hélionceau",
-    "hi": "लट्लयो",
+    "hi": "लिट्लियो",
     "ja": "シシコ",
     "zh-TW": "小獅獅"
   },
@@ -6016,7 +6016,7 @@
     "en": "Flabébé",
     "es": "Flabébé",
     "fr": "Flabébé",
-    "hi": "लबेबे",
+    "hi": "फ़्लबेबे",
     "ja": "フラベベ",
     "zh-TW": "花蓓蓓"
   },
@@ -6025,7 +6025,7 @@
     "en": "Floette",
     "es": "Floette",
     "fr": "Floette",
-    "hi": "लोएट",
+    "hi": "फ़्लोएट",
     "ja": "フラエッテ",
     "zh-TW": "花葉蒂"
   },
@@ -6034,7 +6034,7 @@
     "en": "Florges",
     "es": "Florges",
     "fr": "Florges",
-    "hi": "लोजेस",
+    "hi": "फ़्लोर्जेस",
     "ja": "フラージェス",
     "zh-TW": "花潔夫人"
   },
@@ -6043,7 +6043,7 @@
     "en": "Skiddo",
     "es": "Skiddo",
     "fr": "Cabriolaine",
-    "hi": "कडू",
+    "hi": "स्किडू",
     "ja": "メェークル",
     "zh-TW": "坐騎小羊"
   },
@@ -6079,7 +6079,7 @@
     "en": "Furfrou",
     "es": "Furfrou",
     "fr": "Couafarel",
-    "hi": "फ़ुरू",
+    "hi": "फ़ुरफ़्रू",
     "ja": "トリミアン",
     "zh-TW": "多麗米亞"
   },
@@ -6088,7 +6088,7 @@
     "en": "Espurr",
     "es": "Espurr",
     "fr": "Psystigri",
-    "hi": "एपर",
+    "hi": "एस्पर",
     "ja": "ニャスパー",
     "zh-TW": "妙喵"
   },
@@ -6097,7 +6097,7 @@
     "en": "Meowstic",
     "es": "Meowstic",
     "fr": "Mistigrix",
-    "hi": "मयाउटक",
+    "hi": "मियाउस्टिक",
     "ja": "ニャオニクス",
     "zh-TW": "超能妙喵"
   },
@@ -6115,7 +6115,7 @@
     "en": "Doublade",
     "es": "Doublade",
     "fr": "Dimoclès",
-    "hi": "डलड",
+    "hi": "डब्लेड",
     "ja": "ニダンギル",
     "zh-TW": "雙劍鞘"
   },
@@ -6124,7 +6124,7 @@
     "en": "Aegislash",
     "es": "Aegislash",
     "fr": "Exagide",
-    "hi": "ईजलैश",
+    "hi": "ईजिस्लैश",
     "ja": "ギルガルド",
     "zh-TW": "堅盾劍怪"
   },
@@ -6133,7 +6133,7 @@
     "en": "Spritzee",
     "es": "Spritzee",
     "fr": "Fluvetin",
-    "hi": "िट्ज़ी",
+    "hi": "स्प्रिट्ज़ी",
     "ja": "シュシュプ",
     "zh-TW": "粉香香"
   },
@@ -6142,7 +6142,7 @@
     "en": "Aromatisse",
     "es": "Aromatisse",
     "fr": "Cocotine",
-    "hi": "अरोमाटस",
+    "hi": "अरोमाटीस",
     "ja": "フレフワン",
     "zh-TW": "芳香精"
   },
@@ -6151,7 +6151,7 @@
     "en": "Swirlix",
     "es": "Swirlix",
     "fr": "Sucroquin",
-    "hi": "वलस",
+    "hi": "स्वर्लिक्स",
     "ja": "ペロッパフ",
     "zh-TW": "綿綿泡芙"
   },
@@ -6160,7 +6160,7 @@
     "en": "Slurpuff",
     "es": "Slurpuff",
     "fr": "Cupcanaille",
-    "hi": "लपफ़",
+    "hi": "स्लर्पफ़",
     "ja": "ペロリーム",
     "zh-TW": "胖甜妮"
   },
@@ -6169,7 +6169,7 @@
     "en": "Inkay",
     "es": "Inkay",
     "fr": "Sepiatop",
-    "hi": "इंक",
+    "hi": "इंके",
     "ja": "マーイーカ",
     "zh-TW": "好啦魷"
   },
@@ -6187,7 +6187,7 @@
     "en": "Binacle",
     "es": "Binacle",
     "fr": "Opermine",
-    "hi": "बायनकल",
+    "hi": "बायनिकल",
     "ja": "カメテテ",
     "zh-TW": "龜腳腳"
   },
@@ -6196,7 +6196,7 @@
     "en": "Barbaracle",
     "es": "Barbaracle",
     "fr": "Golgopathe",
-    "hi": "बाबेरकल",
+    "hi": "बार्बेरेकल",
     "ja": "ガメノデス",
     "zh-TW": "龜足巨鎧"
   },
@@ -6205,7 +6205,7 @@
     "en": "Skrelp",
     "es": "Skrelp",
     "fr": "Venalgue",
-    "hi": "प",
+    "hi": "स्क्रल्प",
     "ja": "クズモー",
     "zh-TW": "垃垃藻"
   },
@@ -6214,7 +6214,7 @@
     "en": "Dragalge",
     "es": "Dragalge",
     "fr": "Kravarech",
-    "hi": "डगैजी",
+    "hi": "ड्रगैल्जी",
     "ja": "ドラミドロ",
     "zh-TW": "毒藻龍"
   },
@@ -6223,7 +6223,7 @@
     "en": "Clauncher",
     "es": "Clauncher",
     "fr": "Flingouste",
-    "hi": "लॉचर",
+    "hi": "क्लॉन्चर",
     "ja": "ウデッポウ",
     "zh-TW": "鐵臂槍蝦"
   },
@@ -6232,7 +6232,7 @@
     "en": "Clawitzer",
     "es": "Clawitzer",
     "fr": "Gamblast",
-    "hi": "लॉवट्ज़र",
+    "hi": "क्लॉविट्ज़र",
     "ja": "ブロスター",
     "zh-TW": "鋼炮臂蝦"
   },
@@ -6241,7 +6241,7 @@
     "en": "Helioptile",
     "es": "Helioptile",
     "fr": "Galvaran",
-    "hi": "हीलयॉटाइल",
+    "hi": "हीलियॉप्टाइल",
     "ja": "エリキテル",
     "zh-TW": "傘電蜥"
   },
@@ -6250,7 +6250,7 @@
     "en": "Heliolisk",
     "es": "Heliolisk",
     "fr": "Iguolta",
-    "hi": "हलयॉलक",
+    "hi": "हिलियॉलिस्क",
     "ja": "エレザード",
     "zh-TW": "光電傘蜥"
   },
@@ -6268,7 +6268,7 @@
     "en": "Tyrantrum",
     "es": "Tyrantrum",
     "fr": "Rexillius",
-    "hi": "टाइरंटम",
+    "hi": "टाइरेंट्रम",
     "ja": "ガチゴラス",
     "zh-TW": "怪顎龍"
   },
@@ -6295,7 +6295,7 @@
     "en": "Sylveon",
     "es": "Sylveon",
     "fr": "Nymphali",
-    "hi": "सवयॉन",
+    "hi": "सिल्वियॉन",
     "ja": "ニンフィア",
     "zh-TW": "仙子伊布"
   },
@@ -6313,7 +6313,7 @@
     "en": "Dedenne",
     "es": "Dedenne",
     "fr": "Dedenne",
-    "hi": "डेडेने",
+    "hi": "डेडेन्ने",
     "ja": "デデンネ",
     "zh-TW": "咚咚鼠"
   },
@@ -6322,7 +6322,7 @@
     "en": "Carbink",
     "es": "Carbink",
     "fr": "Strassie",
-    "hi": "काबंक",
+    "hi": "कार्बिंक",
     "ja": "メレシー",
     "zh-TW": "小碎鑽"
   },
@@ -6340,7 +6340,7 @@
     "en": "Sliggoo",
     "es": "Sliggoo",
     "fr": "Colimucus",
-    "hi": "लगू",
+    "hi": "स्लिगू",
     "ja": "ヌメイル",
     "zh-TW": "黏美兒"
   },
@@ -6349,7 +6349,7 @@
     "en": "Goodra",
     "es": "Goodra",
     "fr": "Muplodocus",
-    "hi": "गूडा",
+    "hi": "गूड्रा",
     "ja": "ヌメルゴン",
     "zh-TW": "黏美龍"
   },
@@ -6358,7 +6358,7 @@
     "en": "Klefki",
     "es": "Klefki",
     "fr": "Trousselin",
-    "hi": "लक",
+    "hi": "क्लेफ़्की",
     "ja": "クレッフィ",
     "zh-TW": "鑰圈兒"
   },
@@ -6367,7 +6367,7 @@
     "en": "Phantump",
     "es": "Phantump",
     "fr": "Brocélôme",
-    "hi": "फ़ैंटप",
+    "hi": "फ़ैंटम्प",
     "ja": "ボクレー",
     "zh-TW": "小木靈"
   },
@@ -6376,7 +6376,7 @@
     "en": "Trevenant",
     "es": "Trevenant",
     "fr": "Desséliande",
-    "hi": "टवेनंट",
+    "hi": "ट्रेवेनंट",
     "ja": "オーロット",
     "zh-TW": "朽木妖"
   },
@@ -6394,7 +6394,7 @@
     "en": "Gourgeist",
     "es": "Gourgeist",
     "fr": "Banshitrouye",
-    "hi": "गॉगाइट",
+    "hi": "गॉर्गाइस्ट",
     "ja": "パンプジン",
     "zh-TW": "南瓜怪人"
   },
@@ -6403,7 +6403,7 @@
     "en": "Bergmite",
     "es": "Bergmite",
     "fr": "Grelaçon",
-    "hi": "बगमाइट",
+    "hi": "बर्गमाइट",
     "ja": "カチコール",
     "zh-TW": "冰寶"
   },
@@ -6430,7 +6430,7 @@
     "en": "Noivern",
     "es": "Noivern",
     "fr": "Bruyverne",
-    "hi": "नॉइवन",
+    "hi": "नॉइवर्न",
     "ja": "オンバーン",
     "zh-TW": "音波龍"
   },
@@ -6439,7 +6439,7 @@
     "en": "Xerneas",
     "es": "Xerneas",
     "fr": "Xerneas",
-    "hi": "ज़नयस",
+    "hi": "ज़र्नियस",
     "ja": "ゼルネアス",
     "zh-TW": "哲爾尼亞斯"
   },
@@ -6448,7 +6448,7 @@
     "en": "Yveltal",
     "es": "Yveltal",
     "fr": "Yveltal",
-    "hi": "इवेटाल",
+    "hi": "इवेल्टाल",
     "ja": "イベルタル",
     "zh-TW": "伊裴爾塔爾"
   },
@@ -6457,7 +6457,7 @@
     "en": "Zygarde",
     "es": "Zygarde",
     "fr": "Zygarde",
-    "hi": "ज़ाइगाड",
+    "hi": "ज़ाइगार्ड",
     "ja": "ジガルデ",
     "zh-TW": "基格爾德"
   },
@@ -6475,7 +6475,7 @@
     "en": "Hoopa",
     "es": "Hoopa",
     "fr": "Hoopa",
-    "hi": "पा",
+    "hi": "हूपा",
     "ja": "フーパ",
     "zh-TW": "胡帕"
   },
@@ -6484,7 +6484,7 @@
     "en": "Volcanion",
     "es": "Volcanion",
     "fr": "Volcanion",
-    "hi": "वोकनयन",
+    "hi": "वोल्केनियन",
     "ja": "ボルケニオン",
     "zh-TW": "波爾凱尼恩"
   },
@@ -6493,7 +6493,7 @@
     "en": "Rowlet",
     "es": "Rowlet",
     "fr": "Brindibou",
-    "hi": "राउलट",
+    "hi": "राउलेट",
     "ja": "モクロー",
     "zh-TW": "木木梟"
   },
@@ -6502,7 +6502,7 @@
     "en": "Dartrix",
     "es": "Dartrix",
     "fr": "Efflèche",
-    "hi": "डाटिस",
+    "hi": "डार्टि्रक्स",
     "ja": "フクスロー",
     "zh-TW": "投羽梟"
   },
@@ -6511,7 +6511,7 @@
     "en": "Decidueye",
     "es": "Decidueye",
     "fr": "Archéduc",
-    "hi": "डेसजुआई",
+    "hi": "डेसिजुआई",
     "ja": "ジュナイパー",
     "zh-TW": "狙射樹梟"
   },
@@ -6520,7 +6520,7 @@
     "en": "Litten",
     "es": "Litten",
     "fr": "Flamiaou",
-    "hi": "लटन",
+    "hi": "लिटन",
     "ja": "ニャビー",
     "zh-TW": "火斑喵"
   },
@@ -6529,7 +6529,7 @@
     "en": "Torracat",
     "es": "Torracat",
     "fr": "Matoufeu",
-    "hi": "टोराकट",
+    "hi": "टोराकैट",
     "ja": "ニャヒート",
     "zh-TW": "炎熱喵"
   },
@@ -6538,7 +6538,7 @@
     "en": "Incineroar",
     "es": "Incineroar",
     "fr": "Félinferno",
-    "hi": "इंसनरोर",
+    "hi": "इंसिनिरोर",
     "ja": "ガオガエン",
     "zh-TW": "熾焰咆哮虎"
   },
@@ -6547,7 +6547,7 @@
     "en": "Popplio",
     "es": "Popplio",
     "fr": "Otaquin",
-    "hi": "पॉलयो",
+    "hi": "पॉप्लियो",
     "ja": "アシマリ",
     "zh-TW": "球球海獅"
   },
@@ -6556,7 +6556,7 @@
     "en": "Brionne",
     "es": "Brionne",
     "fr": "Otarlette",
-    "hi": "ऑन",
+    "hi": "ब्रिऑन",
     "ja": "オシャマリ",
     "zh-TW": "花漾海獅"
   },
@@ -6565,7 +6565,7 @@
     "en": "Primarina",
     "es": "Primarina",
     "fr": "Oratoria",
-    "hi": "िमारना",
+    "hi": "प्रिमारीना",
     "ja": "アシレーヌ",
     "zh-TW": "西獅海壬"
   },
@@ -6574,7 +6574,7 @@
     "en": "Pikipek",
     "es": "Pikipek",
     "fr": "Picassaut",
-    "hi": "िपकपेक",
+    "hi": "पिकीपेक",
     "ja": "ツツケラ",
     "zh-TW": "小篤兒"
   },
@@ -6583,7 +6583,7 @@
     "en": "Trumbeak",
     "es": "Trumbeak",
     "fr": "Piclairon",
-    "hi": "टबीक",
+    "hi": "ट्रम्बीक",
     "ja": "ケララッパ",
     "zh-TW": "喇叭啄鳥"
   },
@@ -6592,7 +6592,7 @@
     "en": "Toucannon",
     "es": "Toucannon",
     "fr": "Bazoucan",
-    "hi": "टुकनन",
+    "hi": "टुकैनन",
     "ja": "ドデカバシ",
     "zh-TW": "銃嘴大鳥"
   },
@@ -6619,7 +6619,7 @@
     "en": "Grubbin",
     "es": "Grubbin",
     "fr": "Larvibule",
-    "hi": "बन",
+    "hi": "ग्रबिन",
     "ja": "アゴジムシ",
     "zh-TW": "強顎雞母蟲"
   },
@@ -6628,7 +6628,7 @@
     "en": "Charjabug",
     "es": "Charjabug",
     "fr": "Chrysapile",
-    "hi": "चाजाबग",
+    "hi": "चार्जाबग",
     "ja": "デンヂムシ",
     "zh-TW": "蟲電寶"
   },
@@ -6637,7 +6637,7 @@
     "en": "Vikavolt",
     "es": "Vikavolt",
     "fr": "Lucanon",
-    "hi": "वाइकावोट",
+    "hi": "वाइकावोल्ट",
     "ja": "クワガノン",
     "zh-TW": "鍬農炮蟲"
   },
@@ -6646,7 +6646,7 @@
     "en": "Crabrawler",
     "es": "Crabrawler",
     "fr": "Crabagarre",
-    "hi": "ैॉलर",
+    "hi": "क्रैब्रॉलर",
     "ja": "マケンカニ",
     "zh-TW": "好勝蟹"
   },
@@ -6655,7 +6655,7 @@
     "en": "Crabominable",
     "es": "Crabominable",
     "fr": "Crabominable",
-    "hi": "ैबॉमनेबल",
+    "hi": "क्रैबॉमिनेबल",
     "ja": "ケケンカニ",
     "zh-TW": "好勝毛蟹"
   },
@@ -6664,7 +6664,7 @@
     "en": "Oricorio",
     "es": "Oricorio",
     "fr": "Plumeline",
-    "hi": "ऑरकोरयो",
+    "hi": "ऑरिकोरियो",
     "ja": "オドリドリ",
     "zh-TW": "花舞鳥"
   },
@@ -6673,7 +6673,7 @@
     "en": "Cutiefly",
     "es": "Cutiefly",
     "fr": "Bombydou",
-    "hi": "यूटलाई",
+    "hi": "क्यूटीफ़्लाई",
     "ja": "アブリー",
     "zh-TW": "萌虻"
   },
@@ -6682,7 +6682,7 @@
     "en": "Ribombee",
     "es": "Ribombee",
     "fr": "Rubombelle",
-    "hi": "रबॉबी",
+    "hi": "रिबॉम्बी",
     "ja": "アブリボン",
     "zh-TW": "蝶結萌虻"
   },
@@ -6709,7 +6709,7 @@
     "en": "Wishiwashi",
     "es": "Wishiwashi",
     "fr": "Froussardine",
-    "hi": "वशीवाशी",
+    "hi": "विशीवाशी",
     "ja": "ヨワシ",
     "zh-TW": "弱丁魚"
   },
@@ -6718,7 +6718,7 @@
     "en": "Mareanie",
     "es": "Mareanie",
     "fr": "Vorastérie",
-    "hi": "मरनी",
+    "hi": "मरीनी",
     "ja": "ヒドイデ",
     "zh-TW": "好壞星"
   },
@@ -6727,7 +6727,7 @@
     "en": "Toxapex",
     "es": "Toxapex",
     "fr": "Prédastérie",
-    "hi": "टॉसापेस",
+    "hi": "टॉक्सापेक्स",
     "ja": "ドヒドイデ",
     "zh-TW": "超壞星"
   },
@@ -6736,7 +6736,7 @@
     "en": "Mudbray",
     "es": "Mudbray",
     "fr": "Tiboudet",
-    "hi": "मडे",
+    "hi": "मडब्रे",
     "ja": "ドロバンコ",
     "zh-TW": "泥驢仔"
   },
@@ -6754,7 +6754,7 @@
     "en": "Dewpider",
     "es": "Dewpider",
     "fr": "Araqua",
-    "hi": "ड्यूिपडर",
+    "hi": "ड्यूपिडर",
     "ja": "シズクモ",
     "zh-TW": "滴蛛"
   },
@@ -6763,7 +6763,7 @@
     "en": "Araquanid",
     "es": "Araquanid",
     "fr": "Tarenbulle",
-    "hi": "अरैवानड",
+    "hi": "अरैक्वानिड",
     "ja": "オニシズクモ",
     "zh-TW": "滴蛛霸"
   },
@@ -6772,7 +6772,7 @@
     "en": "Fomantis",
     "es": "Fomantis",
     "fr": "Mimantis",
-    "hi": "फ़ॉमैंटस",
+    "hi": "फ़ॉमैंटिस",
     "ja": "カリキリ",
     "zh-TW": "偽螳草"
   },
@@ -6781,7 +6781,7 @@
     "en": "Lurantis",
     "es": "Lurantis",
     "fr": "Floramantis",
-    "hi": "लुरैंटस",
+    "hi": "लुरैंटिस",
     "ja": "ラランテス",
     "zh-TW": "蘭螳花"
   },
@@ -6799,7 +6799,7 @@
     "en": "Shiinotic",
     "es": "Shiinotic",
     "fr": "Lampignon",
-    "hi": "शीनॉटक",
+    "hi": "शीनॉटिक",
     "ja": "マシェード",
     "zh-TW": "燈罩夜菇"
   },
@@ -6808,7 +6808,7 @@
     "en": "Salandit",
     "es": "Salandit",
     "fr": "Tritox",
-    "hi": "सलैंडट",
+    "hi": "सलैंडिट",
     "ja": "ヤトウモリ",
     "zh-TW": "夜盜火蜥"
   },
@@ -6826,7 +6826,7 @@
     "en": "Stufful",
     "es": "Stufful",
     "fr": "Nounourson",
-    "hi": "टफ़ल",
+    "hi": "स्टफ़ल",
     "ja": "ヌイコグマ",
     "zh-TW": "童偶熊"
   },
@@ -6844,7 +6844,7 @@
     "en": "Bounsweet",
     "es": "Bounsweet",
     "fr": "Croquine",
-    "hi": "बाउंवीट",
+    "hi": "बाउंस्वीट",
     "ja": "アマカジ",
     "zh-TW": "甜竹竹"
   },
@@ -6853,7 +6853,7 @@
     "en": "Steenee",
     "es": "Steenee",
     "fr": "Candine",
-    "hi": "टनी",
+    "hi": "स्टीनी",
     "ja": "アママイコ",
     "zh-TW": "甜舞妮"
   },
@@ -6862,7 +6862,7 @@
     "en": "Tsareena",
     "es": "Tsareena",
     "fr": "Sucreine",
-    "hi": "ज़ारना",
+    "hi": "ज़ारीना",
     "ja": "アマージョ",
     "zh-TW": "甜冷美后"
   },
@@ -6871,7 +6871,7 @@
     "en": "Comfey",
     "es": "Comfey",
     "fr": "Guérilande",
-    "hi": "कफ़े",
+    "hi": "कम्फ़े",
     "ja": "キュワワー",
     "zh-TW": "花療環環"
   },
@@ -6880,7 +6880,7 @@
     "en": "Oranguru",
     "es": "Oranguru",
     "fr": "Gouroutan",
-    "hi": "ओरैंगु",
+    "hi": "ओरैंगुरू",
     "ja": "ヤレユータン",
     "zh-TW": "智揮猩"
   },
@@ -6889,7 +6889,7 @@
     "en": "Passimian",
     "es": "Passimian",
     "fr": "Quartermac",
-    "hi": "पैसमयन",
+    "hi": "पैस्सिमियन",
     "ja": "ナゲツケサル",
     "zh-TW": "投擲猴"
   },
@@ -6898,7 +6898,7 @@
     "en": "Wimpod",
     "es": "Wimpod",
     "fr": "Sovkipou",
-    "hi": "वपॉड",
+    "hi": "विम्पॉड",
     "ja": "コソクムシ",
     "zh-TW": "膽小蟲"
   },
@@ -6916,7 +6916,7 @@
     "en": "Sandygast",
     "es": "Sandygast",
     "fr": "Bacabouh",
-    "hi": "सैंडीगैट",
+    "hi": "सैंडीगैस्ट",
     "ja": "スナバァ",
     "zh-TW": "沙丘娃"
   },
@@ -6934,7 +6934,7 @@
     "en": "Pyukumuku",
     "es": "Pyukumuku",
     "fr": "Concombaffe",
-    "hi": "युकमुक",
+    "hi": "प्युकुमुकु",
     "ja": "ナマコブシ",
     "zh-TW": "拳海參"
   },
@@ -6952,7 +6952,7 @@
     "en": "Silvally",
     "es": "Silvally",
     "fr": "Silvallié",
-    "hi": "सलवैलाइ",
+    "hi": "सिलवैलाइ",
     "ja": "シルヴァディ",
     "zh-TW": "銀伴戰獸"
   },
@@ -6961,7 +6961,7 @@
     "en": "Minior",
     "es": "Minior",
     "fr": "Météno",
-    "hi": "मनयोर",
+    "hi": "मिनियोर",
     "ja": "メテノ",
     "zh-TW": "小隕星"
   },
@@ -6979,7 +6979,7 @@
     "en": "Turtonator",
     "es": "Turtonator",
     "fr": "Boumata",
-    "hi": "टटोनेटर",
+    "hi": "टर्टोनेटर",
     "ja": "バクガメス",
     "zh-TW": "爆焰龜獸"
   },
@@ -6988,7 +6988,7 @@
     "en": "Togedemaru",
     "es": "Togedemaru",
     "fr": "Togedemaru",
-    "hi": "टोगेडेमा",
+    "hi": "टोगेडेमारू",
     "ja": "トゲデマル",
     "zh-TW": "托戈德瑪爾"
   },
@@ -6997,7 +6997,7 @@
     "en": "Mimikyu",
     "es": "Mimikyu",
     "fr": "Mimiqui",
-    "hi": "ममीयू",
+    "hi": "मिमीक्यू",
     "ja": "ミミッキュ",
     "zh-TW": "謎擬Ｑ"
   },
@@ -7006,7 +7006,7 @@
     "en": "Bruxish",
     "es": "Bruxish",
     "fr": "Denticrisse",
-    "hi": "सश",
+    "hi": "ब्रक्सिश",
     "ja": "ハギギシリ",
     "zh-TW": "磨牙彩皮魚"
   },
@@ -7015,7 +7015,7 @@
     "en": "Drampa",
     "es": "Drampa",
     "fr": "Draïeul",
-    "hi": "डैपा",
+    "hi": "ड्रैम्पा",
     "ja": "ジジーロン",
     "zh-TW": "老翁龍"
   },
@@ -7024,7 +7024,7 @@
     "en": "Dhelmise",
     "es": "Dhelmise",
     "fr": "Sinistrail",
-    "hi": "डेमाइस",
+    "hi": "डेल्माइस",
     "ja": "ダダリン",
     "zh-TW": "破破舵輪"
   },
@@ -7033,7 +7033,7 @@
     "en": "Jangmo-o",
     "es": "Jangmo-o",
     "fr": "Bébécaille",
-    "hi": "जैंमो-ओ",
+    "hi": "जैंग्मो-ओ",
     "ja": "ジャラコ",
     "zh-TW": "心鱗寶"
   },
@@ -7069,7 +7069,7 @@
     "en": "Tapu Lele",
     "es": "Tapu Lele",
     "fr": "Tokopiyon",
-    "hi": "टापू लल",
+    "hi": "टापू लेले",
     "ja": "カプ・テテフ",
     "zh-TW": "卡璞・蝶蝶"
   },
@@ -7087,7 +7087,7 @@
     "en": "Tapu Fini",
     "es": "Tapu Fini",
     "fr": "Tokopisco",
-    "hi": "टापू िफ़नी",
+    "hi": "टापू फ़िनी",
     "ja": "カプ・レヒレ",
     "zh-TW": "卡璞・鰭鰭"
   },
@@ -7096,7 +7096,7 @@
     "en": "Cosmog",
     "es": "Cosmog",
     "fr": "Cosmog",
-    "hi": "कॉ़मॉग",
+    "hi": "कॉज़्मॉग",
     "ja": "コスモッグ",
     "zh-TW": "科斯莫古"
   },
@@ -7105,7 +7105,7 @@
     "en": "Cosmoem",
     "es": "Cosmoem",
     "fr": "Cosmovum",
-    "hi": "कॉ़मोएम",
+    "hi": "कॉज़्मोएम",
     "ja": "コスモウム",
     "zh-TW": "科斯莫姆"
   },
@@ -7114,7 +7114,7 @@
     "en": "Solgaleo",
     "es": "Solgaleo",
     "fr": "Solgaleo",
-    "hi": "सोलगलयो",
+    "hi": "सोलगलेयो",
     "ja": "ソルガレオ",
     "zh-TW": "索爾迦雷歐"
   },
@@ -7132,7 +7132,7 @@
     "en": "Nihilego",
     "es": "Nihilego",
     "fr": "Zéroïd",
-    "hi": "नाइलगो",
+    "hi": "नाइलीगो",
     "ja": "ウツロイド",
     "zh-TW": "虛吾伊德"
   },
@@ -7159,7 +7159,7 @@
     "en": "Xurkitree",
     "es": "Xurkitree",
     "fr": "Câblifère",
-    "hi": "ज़कटी",
+    "hi": "ज़र्किट्री",
     "ja": "デンジュモク",
     "zh-TW": "電束木"
   },
@@ -7168,7 +7168,7 @@
     "en": "Celesteela",
     "es": "Celesteela",
     "fr": "Bamboiselle",
-    "hi": "सेलटला",
+    "hi": "सेलेस्टीला",
     "ja": "テッカグヤ",
     "zh-TW": "鐵火輝夜"
   },
@@ -7177,7 +7177,7 @@
     "en": "Kartana",
     "es": "Kartana",
     "fr": "Katagami",
-    "hi": "काताना",
+    "hi": "कार्ताना",
     "ja": "カミツルギ",
     "zh-TW": "紙御劍"
   },
@@ -7186,7 +7186,7 @@
     "en": "Guzzlord",
     "es": "Guzzlord",
     "fr": "Engloutyran",
-    "hi": "गज़लॉड",
+    "hi": "गज़लॉर्ड",
     "ja": "アクジキング",
     "zh-TW": "惡食大王"
   },
@@ -7195,7 +7195,7 @@
     "en": "Necrozma",
     "es": "Necrozma",
     "fr": "Necrozma",
-    "hi": "नैॉ़मा",
+    "hi": "नैक्रॉज़्मा",
     "ja": "ネクロズマ",
     "zh-TW": "奈克洛茲瑪"
   },
@@ -7204,7 +7204,7 @@
     "en": "Magearna",
     "es": "Magearna",
     "fr": "Magearna",
-    "hi": "मगयरना",
+    "hi": "मगियरना",
     "ja": "マギアナ",
     "zh-TW": "瑪機雅娜"
   },
@@ -7213,7 +7213,7 @@
     "en": "Marshadow",
     "es": "Marshadow",
     "fr": "Marshadow",
-    "hi": "माशैडो",
+    "hi": "मार्शैडो",
     "ja": "マーシャドー",
     "zh-TW": "瑪夏多"
   },
@@ -7240,7 +7240,7 @@
     "en": "Stakataka",
     "es": "Stakataka",
     "fr": "Ama-Ama",
-    "hi": "टैकाटैका",
+    "hi": "स्टैकाटैका",
     "ja": "ツンデツンデ",
     "zh-TW": "壘磊石"
   },
@@ -7249,7 +7249,7 @@
     "en": "Blacephalon",
     "es": "Blacephalon",
     "fr": "Pierroteknik",
-    "hi": "लसेफ़लॉन",
+    "hi": "ब्लसेफ़लॉन",
     "ja": "ズガドーン",
     "zh-TW": "砰頭小丑"
   },
@@ -7267,7 +7267,7 @@
     "en": "Meltan",
     "es": "Meltan",
     "fr": "Meltan",
-    "hi": "मेटन",
+    "hi": "मेल्टन",
     "ja": "メルタン",
     "zh-TW": "美錄坦"
   },
@@ -7285,7 +7285,7 @@
     "en": "Grookey",
     "es": "Grookey",
     "fr": "Ouistempo",
-    "hi": "ूक",
+    "hi": "ग्रूकी",
     "ja": "サルノリ",
     "zh-TW": "敲音猴"
   },
@@ -7294,7 +7294,7 @@
     "en": "Thwackey",
     "es": "Thwackey",
     "fr": "Badabouin",
-    "hi": "वैक",
+    "hi": "थ्वैकी",
     "ja": "バチンキー",
     "zh-TW": "啪咚猴"
   },
@@ -7303,7 +7303,7 @@
     "en": "Rillaboom",
     "es": "Rillaboom",
     "fr": "Gorythmic",
-    "hi": "रलाबूम",
+    "hi": "रिलाबूम",
     "ja": "ゴリランダー",
     "zh-TW": "轟擂金剛猩"
   },
@@ -7312,7 +7312,7 @@
     "en": "Scorbunny",
     "es": "Scorbunny",
     "fr": "Flambino",
-    "hi": "कोरबनी",
+    "hi": "स्कोरबनी",
     "ja": "ヒバニー",
     "zh-TW": "炎兔兒"
   },
@@ -7330,7 +7330,7 @@
     "en": "Cinderace",
     "es": "Cinderace",
     "fr": "Pyrobut",
-    "hi": "संडरएस",
+    "hi": "सिंडरएस",
     "ja": "エースバーン",
     "zh-TW": "閃焰王牌"
   },
@@ -7348,7 +7348,7 @@
     "en": "Drizzile",
     "es": "Drizzile",
     "fr": "Arrozard",
-    "hi": "डज़ाइल",
+    "hi": "ड्रिज़ाइल",
     "ja": "ジメレオン",
     "zh-TW": "變澀蜥"
   },
@@ -7357,7 +7357,7 @@
     "en": "Inteleon",
     "es": "Inteleon",
     "fr": "Lézargus",
-    "hi": "इंटलयन",
+    "hi": "इंटेलियन",
     "ja": "インテレオン",
     "zh-TW": "千面避役"
   },
@@ -7366,7 +7366,7 @@
     "en": "Skwovet",
     "es": "Skwovet",
     "fr": "Rongourmand",
-    "hi": "वोवेट",
+    "hi": "स्क्वोवेट",
     "ja": "ホシガリス",
     "zh-TW": "貪心栗鼠"
   },
@@ -7375,7 +7375,7 @@
     "en": "Greedent",
     "es": "Greedent",
     "fr": "Rongrigou",
-    "hi": "ीडेट",
+    "hi": "ग्रीडेन्ट",
     "ja": "ヨクバリス",
     "zh-TW": "藏飽栗鼠"
   },
@@ -7384,7 +7384,7 @@
     "en": "Rookidee",
     "es": "Rookidee",
     "fr": "Minisange",
-    "hi": "कडी",
+    "hi": "रुकिडी",
     "ja": "ココガラ",
     "zh-TW": "稚山雀"
   },
@@ -7393,7 +7393,7 @@
     "en": "Corvisquire",
     "es": "Corvisquire",
     "fr": "Bleuseille",
-    "hi": "कॉववायर",
+    "hi": "कॉर्विस्क्वायर",
     "ja": "アオガラス",
     "zh-TW": "藍鴉"
   },
@@ -7402,7 +7402,7 @@
     "en": "Corviknight",
     "es": "Corviknight",
     "fr": "Corvaillus",
-    "hi": "कोवनाइट",
+    "hi": "कोर्विनाइट",
     "ja": "アーマーガア",
     "zh-TW": "鋼鎧鴉"
   },
@@ -7411,7 +7411,7 @@
     "en": "Blipbug",
     "es": "Blipbug",
     "fr": "Larvadar",
-    "hi": "लपबग",
+    "hi": "ब्लिपबग",
     "ja": "サッチムシ",
     "zh-TW": "索偵蟲"
   },
@@ -7429,7 +7429,7 @@
     "en": "Orbeetle",
     "es": "Orbeetle",
     "fr": "Astronelle",
-    "hi": "ऑबीटल",
+    "hi": "ऑर्बीटल",
     "ja": "イオルブ",
     "zh-TW": "以歐路普"
   },
@@ -7438,7 +7438,7 @@
     "en": "Nickit",
     "es": "Nickit",
     "fr": "Goupilou",
-    "hi": "नकट",
+    "hi": "निकिट",
     "ja": "クスネ",
     "zh-TW": "偷兒狐"
   },
@@ -7456,7 +7456,7 @@
     "en": "Gossifleur",
     "es": "Gossifleur",
     "fr": "Tournicoton",
-    "hi": "गॉसलर",
+    "hi": "गॉसिफ़्लर",
     "ja": "ヒメンカ",
     "zh-TW": "幼棉棉"
   },
@@ -7465,7 +7465,7 @@
     "en": "Eldegoss",
     "es": "Eldegoss",
     "fr": "Blancoton",
-    "hi": "एडेगॉस",
+    "hi": "एल्डेगॉस",
     "ja": "ワタシラガ",
     "zh-TW": "白蓬蓬"
   },
@@ -7492,7 +7492,7 @@
     "en": "Chewtle",
     "es": "Chewtle",
     "fr": "Khélocrok",
-    "hi": "यूटल",
+    "hi": "च्यूटल",
     "ja": "カムカメ",
     "zh-TW": "咬咬龜"
   },
@@ -7501,7 +7501,7 @@
     "en": "Drednaw",
     "es": "Drednaw",
     "fr": "Torgamord",
-    "hi": "डेडनॉ",
+    "hi": "ड्रेडनॉ",
     "ja": "カジリガメ",
     "zh-TW": "暴噬龜"
   },
@@ -7510,7 +7510,7 @@
     "en": "Yamper",
     "es": "Yamper",
     "fr": "Voltoutou",
-    "hi": "यैपर",
+    "hi": "यैम्पर",
     "ja": "ワンパチ",
     "zh-TW": "來電汪"
   },
@@ -7519,7 +7519,7 @@
     "en": "Boltund",
     "es": "Boltund",
     "fr": "Fulgudog",
-    "hi": "बोटंड",
+    "hi": "बोल्टंड",
     "ja": "パルスワン",
     "zh-TW": "逐電犬"
   },
@@ -7528,7 +7528,7 @@
     "en": "Rolycoly",
     "es": "Rolycoly",
     "fr": "Charbi",
-    "hi": "रोलकोल",
+    "hi": "रोलीकोली",
     "ja": "タンドン",
     "zh-TW": "小炭仔"
   },
@@ -7537,7 +7537,7 @@
     "en": "Carkol",
     "es": "Carkol",
     "fr": "Wagomine",
-    "hi": "काकोल",
+    "hi": "कार्कोल",
     "ja": "トロッゴン",
     "zh-TW": "大炭車"
   },
@@ -7555,7 +7555,7 @@
     "en": "Applin",
     "es": "Applin",
     "fr": "Verpom",
-    "hi": "ऐलन",
+    "hi": "ऐप्लिन",
     "ja": "カジッチュ",
     "zh-TW": "啃果蟲"
   },
@@ -7564,7 +7564,7 @@
     "en": "Flapple",
     "es": "Flapple",
     "fr": "Pomdrapi",
-    "hi": "लैपल",
+    "hi": "फ़्लैपल",
     "ja": "アップリュー",
     "zh-TW": "蘋裹龍"
   },
@@ -7573,7 +7573,7 @@
     "en": "Appletun",
     "es": "Appletun",
     "fr": "Dratatin",
-    "hi": "ऐपलटन",
+    "hi": "ऐप्पलटन",
     "ja": "タルップル",
     "zh-TW": "豐蜜龍"
   },
@@ -7582,7 +7582,7 @@
     "en": "Silicobra",
     "es": "Silicobra",
     "fr": "Dunaja",
-    "hi": "सलकोबरा",
+    "hi": "सिलिकोबरा",
     "ja": "スナヘビ",
     "zh-TW": "沙包蛇"
   },
@@ -7591,7 +7591,7 @@
     "en": "Sandaconda",
     "es": "Sandaconda",
     "fr": "Dunaconda",
-    "hi": "सैंडाकॉडा",
+    "hi": "सैंडाकॉन्डा",
     "ja": "サダイジャ",
     "zh-TW": "沙螺蟒"
   },
@@ -7600,7 +7600,7 @@
     "en": "Cramorant",
     "es": "Cramorant",
     "fr": "Nigosier",
-    "hi": "ैमोरंट",
+    "hi": "क्रैमोरंट",
     "ja": "ウッウ",
     "zh-TW": "古月鳥"
   },
@@ -7609,7 +7609,7 @@
     "en": "Arrokuda",
     "es": "Arrokuda",
     "fr": "Embrochet",
-    "hi": "ऐरोकडा",
+    "hi": "ऐरोकुडा",
     "ja": "サシカマス",
     "zh-TW": "刺梭魚"
   },
@@ -7618,7 +7618,7 @@
     "en": "Barraskewda",
     "es": "Barraskewda",
     "fr": "Hastacuda",
-    "hi": "बैरायुडा",
+    "hi": "बैरास्क्युडा",
     "ja": "カマスジョー",
     "zh-TW": "戽斗尖梭"
   },
@@ -7627,7 +7627,7 @@
     "en": "Toxel",
     "es": "Toxel",
     "fr": "Toxizap",
-    "hi": "टॉसल",
+    "hi": "टॉक्सल",
     "ja": "エレズン",
     "zh-TW": "毒電嬰"
   },
@@ -7636,7 +7636,7 @@
     "en": "Toxtricity",
     "es": "Toxtricity",
     "fr": "Salarsen",
-    "hi": "टॉटसट",
+    "hi": "टॉक्स्ट्रिसिटी",
     "ja": "ストリンダー",
     "zh-TW": "顫弦蠑螈"
   },
@@ -7645,7 +7645,7 @@
     "en": "Sizzlipede",
     "es": "Sizzlipede",
     "fr": "Grillepattes",
-    "hi": "सज़्लपीड",
+    "hi": "सिज़्लीपीड",
     "ja": "ヤクデ",
     "zh-TW": "燒火蚣"
   },
@@ -7654,7 +7654,7 @@
     "en": "Centiskorch",
     "es": "Centiskorch",
     "fr": "Scolocendre",
-    "hi": "सेंटकॉच",
+    "hi": "सेंटीस्कॉर्च",
     "ja": "マルヤクデ",
     "zh-TW": "焚焰蚣"
   },
@@ -7663,7 +7663,7 @@
     "en": "Clobbopus",
     "es": "Clobbopus",
     "fr": "Poulpaf",
-    "hi": "लॉबोपस",
+    "hi": "क्लॉबोपस",
     "ja": "タタッコ",
     "zh-TW": "拳拳蛸"
   },
@@ -7672,7 +7672,7 @@
     "en": "Grapploct",
     "es": "Grapploct",
     "fr": "Krakos",
-    "hi": "ैपलॉट",
+    "hi": "ग्रैपलॉक्ट",
     "ja": "オトスパス",
     "zh-TW": "八爪武師"
   },
@@ -7681,7 +7681,7 @@
     "en": "Sinistea",
     "es": "Sinistea",
     "fr": "Théffroi",
-    "hi": "सनट",
+    "hi": "सिनिस्टी",
     "ja": "ヤバチャ",
     "zh-TW": "來悲茶"
   },
@@ -7690,7 +7690,7 @@
     "en": "Polteageist",
     "es": "Polteageist",
     "fr": "Polthégeist",
-    "hi": "पोटगाइट",
+    "hi": "पोल्टीगाइस्ट",
     "ja": "ポットデス",
     "zh-TW": "怖思壺"
   },
@@ -7699,7 +7699,7 @@
     "en": "Hatenna",
     "es": "Hatenna",
     "fr": "Bibichut",
-    "hi": "हैटना",
+    "hi": "हैटेना",
     "ja": "ミブリム",
     "zh-TW": "迷布莉姆"
   },
@@ -7708,7 +7708,7 @@
     "en": "Hattrem",
     "es": "Hattrem",
     "fr": "Chapotus",
-    "hi": "हैटम",
+    "hi": "हैट्रम",
     "ja": "テブリム",
     "zh-TW": "提布莉姆"
   },
@@ -7717,7 +7717,7 @@
     "en": "Hatterene",
     "es": "Hatterene",
     "fr": "Sorcilence",
-    "hi": "हैटरन",
+    "hi": "हैटेरीन",
     "ja": "ブリムオン",
     "zh-TW": "布莉姆溫"
   },
@@ -7726,7 +7726,7 @@
     "en": "Impidimp",
     "es": "Impidimp",
     "fr": "Grimalin",
-    "hi": "इंिपडंप",
+    "hi": "इंपिडिंप",
     "ja": "ベロバー",
     "zh-TW": "搗蛋小妖"
   },
@@ -7735,7 +7735,7 @@
     "en": "Morgrem",
     "es": "Morgrem",
     "fr": "Fourbelin",
-    "hi": "मॉरम",
+    "hi": "मॉरग्रम",
     "ja": "ギモー",
     "zh-TW": "詐唬魔"
   },
@@ -7744,7 +7744,7 @@
     "en": "Grimmsnarl",
     "es": "Grimmsnarl",
     "fr": "Angoliath",
-    "hi": "िमनाल",
+    "hi": "ग्रिमस्नार्ल",
     "ja": "オーロンゲ",
     "zh-TW": "長毛巨魔"
   },
@@ -7753,7 +7753,7 @@
     "en": "Obstagoon",
     "es": "Obstagoon",
     "fr": "Ixon",
-    "hi": "ऑटागून",
+    "hi": "ऑब्स्टागून",
     "ja": "タチフサグマ",
     "zh-TW": "堵攔熊"
   },
@@ -7762,7 +7762,7 @@
     "en": "Perrserker",
     "es": "Perrserker",
     "fr": "Berserkatt",
-    "hi": "पज़कर",
+    "hi": "पर्ज़र्कर",
     "ja": "ニャイキング",
     "zh-TW": "喵頭目"
   },
@@ -7771,7 +7771,7 @@
     "en": "Cursola",
     "es": "Cursola",
     "fr": "Corayôme",
-    "hi": "कसला",
+    "hi": "कर्सला",
     "ja": "サニゴーン",
     "zh-TW": "魔靈珊瑚"
   },
@@ -7780,7 +7780,7 @@
     "en": "Sirfetch'd",
     "es": "Sirfetch’d",
     "fr": "Palarticho",
-    "hi": "सरफ़ेड",
+    "hi": "सरफ़ेच्ड",
     "ja": "ネギガナイト",
     "zh-TW": "蔥遊兵"
   },
@@ -7789,7 +7789,7 @@
     "en": "Mr. Rime",
     "es": "Mr. Rime",
     "fr": "M. Glaquette",
-    "hi": "मटर राइम",
+    "hi": "मिस्टर राइम",
     "ja": "バリコオル",
     "zh-TW": "踏冰人偶"
   },
@@ -7798,7 +7798,7 @@
     "en": "Runerigus",
     "es": "Runerigus",
     "fr": "Tutétékri",
-    "hi": "नेरगस",
+    "hi": "रूनेरीगस",
     "ja": "デスバーン",
     "zh-TW": "死神板"
   },
@@ -7807,7 +7807,7 @@
     "en": "Milcery",
     "es": "Milcery",
     "fr": "Crèmy",
-    "hi": "मलसर",
+    "hi": "मिलसरी",
     "ja": "マホミル",
     "zh-TW": "小仙奶"
   },
@@ -7816,7 +7816,7 @@
     "en": "Alcremie",
     "es": "Alcremie",
     "fr": "Charmilly",
-    "hi": "एलमी",
+    "hi": "एलक्रमी",
     "ja": "マホイップ",
     "zh-TW": "霜奶仙"
   },
@@ -7825,7 +7825,7 @@
     "en": "Falinks",
     "es": "Falinks",
     "fr": "Hexadron",
-    "hi": "फ़ेलस",
+    "hi": "फ़ेलिंक्स",
     "ja": "タイレーツ",
     "zh-TW": "列陣兵"
   },
@@ -7834,7 +7834,7 @@
     "en": "Pincurchin",
     "es": "Pincurchin",
     "fr": "Wattapik",
-    "hi": "िपंकचन",
+    "hi": "पिंकर्चिन",
     "ja": "バチンウニ",
     "zh-TW": "啪嚓海膽"
   },
@@ -7843,7 +7843,7 @@
     "en": "Snom",
     "es": "Snom",
     "fr": "Frissonille",
-    "hi": "नॉम",
+    "hi": "स्नॉम",
     "ja": "ユキハミ",
     "zh-TW": "雪吞蟲"
   },
@@ -7852,7 +7852,7 @@
     "en": "Frosmoth",
     "es": "Frosmoth",
     "fr": "Beldeneige",
-    "hi": "ॉमॉथ",
+    "hi": "फ़्रॉस्मॉथ",
     "ja": "モスノウ",
     "zh-TW": "雪絨蛾"
   },
@@ -7861,7 +7861,7 @@
     "en": "Stonjourner",
     "es": "Stonjourner",
     "fr": "Dolman",
-    "hi": "टोनजनर",
+    "hi": "स्टोनजर्नर",
     "ja": "イシヘンジン",
     "zh-TW": "巨石丁"
   },
@@ -7870,7 +7870,7 @@
     "en": "Eiscue",
     "es": "Eiscue",
     "fr": "Bekaglaçon",
-    "hi": "आइयू",
+    "hi": "आइस्क्यू",
     "ja": "コオリッポ",
     "zh-TW": "冰砌鵝"
   },
@@ -7897,7 +7897,7 @@
     "en": "Cufant",
     "es": "Cufant",
     "fr": "Charibari",
-    "hi": "यूफ़ंट",
+    "hi": "क्यूफ़ंट",
     "ja": "ゾウドウ",
     "zh-TW": "銅象"
   },
@@ -7915,7 +7915,7 @@
     "en": "Dracozolt",
     "es": "Dracozolt",
     "fr": "Galvagon",
-    "hi": "डैकोज़ोट",
+    "hi": "ड्रैकोज़ोल्ट",
     "ja": "パッチラゴン",
     "zh-TW": "雷鳥龍"
   },
@@ -7924,7 +7924,7 @@
     "en": "Arctozolt",
     "es": "Arctozolt",
     "fr": "Galvagla",
-    "hi": "आकटोज़ोट",
+    "hi": "आर्कटोज़ोल्ट",
     "ja": "パッチルドン",
     "zh-TW": "雷鳥海獸"
   },
@@ -7933,7 +7933,7 @@
     "en": "Dracovish",
     "es": "Dracovish",
     "fr": "Hydragon",
-    "hi": "डैकोवश",
+    "hi": "ड्रैकोविश",
     "ja": "ウオノラゴン",
     "zh-TW": "鰓魚龍"
   },
@@ -7942,7 +7942,7 @@
     "en": "Arctovish",
     "es": "Arctovish",
     "fr": "Hydragla",
-    "hi": "आकटोवश",
+    "hi": "आर्कटोविश",
     "ja": "ウオチルドン",
     "zh-TW": "鰓魚海獸"
   },
@@ -7960,7 +7960,7 @@
     "en": "Dreepy",
     "es": "Dreepy",
     "fr": "Fantyrm",
-    "hi": "डीपी",
+    "hi": "ड्रीपी",
     "ja": "ドラメシヤ",
     "zh-TW": "多龍梅西亞"
   },
@@ -7969,7 +7969,7 @@
     "en": "Drakloak",
     "es": "Drakloak",
     "fr": "Dispareptil",
-    "hi": "डैलोक",
+    "hi": "ड्रैक्लोक",
     "ja": "ドロンチ",
     "zh-TW": "多龍奇"
   },
@@ -7978,7 +7978,7 @@
     "en": "Dragapult",
     "es": "Dragapult",
     "fr": "Lanssorien",
-    "hi": "डैगापुट",
+    "hi": "ड्रैगापुल्ट",
     "ja": "ドラパルト",
     "zh-TW": "多龍巴魯托"
   },
@@ -7987,7 +7987,7 @@
     "en": "Zacian",
     "es": "Zacian",
     "fr": "Zacian",
-    "hi": "ज़ाशयन",
+    "hi": "ज़ाशियन",
     "ja": "ザシアン",
     "zh-TW": "蒼響"
   },
@@ -8005,7 +8005,7 @@
     "en": "Eternatus",
     "es": "Eternatus",
     "fr": "Éthernatos",
-    "hi": "इटनेटस",
+    "hi": "इटर्नेटस",
     "ja": "ムゲンダイナ",
     "zh-TW": "無極汰那"
   },
@@ -8023,7 +8023,7 @@
     "en": "Urshifu",
     "es": "Urshifu",
     "fr": "Shifours",
-    "hi": "अशफ़ू",
+    "hi": "अर्शिफ़ू",
     "ja": "ウーラオス",
     "zh-TW": "武道熊師"
   },
@@ -8032,7 +8032,7 @@
     "en": "Zarude",
     "es": "Zarude",
     "fr": "Zarude",
-    "hi": "ज़ाद",
+    "hi": "ज़ारूद",
     "ja": "ザルード",
     "zh-TW": "薩戮德"
   },
@@ -8041,7 +8041,7 @@
     "en": "Regieleki",
     "es": "Regieleki",
     "fr": "Regieleki",
-    "hi": "रजीइलैक",
+    "hi": "रेजीइलैकी",
     "ja": "レジエレキ",
     "zh-TW": "雷吉艾勒奇"
   },
@@ -8050,7 +8050,7 @@
     "en": "Regidrago",
     "es": "Regidrago",
     "fr": "Regidrago",
-    "hi": "रजीडेगो",
+    "hi": "रेजीड्रेगो",
     "ja": "レジドラゴ",
     "zh-TW": "雷吉鐸拉戈"
   },
@@ -8059,7 +8059,7 @@
     "en": "Glastrier",
     "es": "Glastrier",
     "fr": "Blizzeval",
-    "hi": "लैटीयर",
+    "hi": "ग्लैस्ट्रीयर",
     "ja": "ブリザポス",
     "zh-TW": "雪暴馬"
   },
@@ -8068,7 +8068,7 @@
     "en": "Spectrier",
     "es": "Spectrier",
     "fr": "Spectreval",
-    "hi": "पैटीयर",
+    "hi": "स्पैक्ट्रीयर",
     "ja": "レイスポス",
     "zh-TW": "靈幽馬"
   },
@@ -8077,7 +8077,7 @@
     "en": "Calyrex",
     "es": "Calyrex",
     "fr": "Sylveroy",
-    "hi": "कलरैस",
+    "hi": "कैलिरैक्स",
     "ja": "バドレックス",
     "zh-TW": "蕾冠王"
   },
@@ -8086,7 +8086,7 @@
     "en": "Wyrdeer",
     "es": "Wyrdeer",
     "fr": "Cerbyllin",
-    "hi": "वयरडयर",
+    "hi": "वियरडियर",
     "ja": "アヤシシ",
     "zh-TW": "詭角鹿"
   },
@@ -8095,7 +8095,7 @@
     "en": "Kleavor",
     "es": "Kleavor",
     "fr": "Hachécateur",
-    "hi": "लवॉर",
+    "hi": "क्लीवॉर",
     "ja": "バサギリ",
     "zh-TW": "劈斧螳螂"
   },
@@ -8104,7 +8104,7 @@
     "en": "Ursaluna",
     "es": "Ursaluna",
     "fr": "Ursaking",
-    "hi": "असालूना",
+    "hi": "अर्सालूना",
     "ja": "ガチグマ",
     "zh-TW": "月月熊"
   },
@@ -8113,7 +8113,7 @@
     "en": "Basculegion",
     "es": "Basculegion",
     "fr": "Paragruel",
-    "hi": "बैयूलजन",
+    "hi": "बैस्क्यूलीजन",
     "ja": "イダイトウ",
     "zh-TW": "幽尾玄魚"
   },
@@ -8122,7 +8122,7 @@
     "en": "Sneasler",
     "es": "Sneasler",
     "fr": "Farfurex",
-    "hi": "नीज़लर",
+    "hi": "स्नीज़लर",
     "ja": "オオニューラ",
     "zh-TW": "大狃拉"
   },
@@ -8131,7 +8131,7 @@
     "en": "Overqwil",
     "es": "Overqwil",
     "fr": "Qwilpik",
-    "hi": "ओवरवल",
+    "hi": "ओवरक्विल",
     "ja": "ハリーマン",
     "zh-TW": "萬針魚"
   },
@@ -8149,7 +8149,7 @@
     "en": "Sprigatito",
     "es": "Sprigatito",
     "fr": "Poussacha",
-    "hi": "िगाटटो",
+    "hi": "स्प्रिगाटीटो",
     "ja": "ニャオハ",
     "zh-TW": "新葉喵"
   },
@@ -8158,7 +8158,7 @@
     "en": "Floragato",
     "es": "Floragato",
     "fr": "Matourgeon",
-    "hi": "लोरागाटो",
+    "hi": "फ़्लोरागाटो",
     "ja": "ニャローテ",
     "zh-TW": "蒂蕾喵"
   },
@@ -8167,7 +8167,7 @@
     "en": "Meowscarada",
     "es": "Meowscarada",
     "fr": "Miascarade",
-    "hi": "याउकराडा",
+    "hi": "म्याउस्कराडा",
     "ja": "マスカーニャ",
     "zh-TW": "魔幻假面喵"
   },
@@ -8185,7 +8185,7 @@
     "en": "Crocalor",
     "es": "Crocalor",
     "fr": "Crocogril",
-    "hi": "ॉकालॉर",
+    "hi": "क्रॉकालॉर",
     "ja": "アチゲータ",
     "zh-TW": "炙燙鱷"
   },
@@ -8194,7 +8194,7 @@
     "en": "Skeledirge",
     "es": "Skeledirge",
     "fr": "Flâmigator",
-    "hi": "कलडज",
+    "hi": "स्कैलेडर्ज",
     "ja": "ラウドボーン",
     "zh-TW": "骨紋巨聲鱷"
   },
@@ -8203,7 +8203,7 @@
     "en": "Quaxly",
     "es": "Quaxly",
     "fr": "Coiffeton",
-    "hi": "वैसल",
+    "hi": "क्वैक्सली",
     "ja": "クワッス",
     "zh-TW": "潤水鴨"
   },
@@ -8212,7 +8212,7 @@
     "en": "Quaxwell",
     "es": "Quaxwell",
     "fr": "Canarbello",
-    "hi": "वैसवेल",
+    "hi": "क्वैक्सवेल",
     "ja": "ウェルカモ",
     "zh-TW": "湧躍鴨"
   },
@@ -8221,7 +8221,7 @@
     "en": "Quaquaval",
     "es": "Quaquaval",
     "fr": "Palmaval",
-    "hi": "वैववल",
+    "hi": "क्वैक्ववल",
     "ja": "ウェーニバル",
     "zh-TW": "狂歡浪舞鴨"
   },
@@ -8230,7 +8230,7 @@
     "en": "Lechonk",
     "es": "Lechonk",
     "fr": "Gourmelet",
-    "hi": "लचॉक",
+    "hi": "लचॉन्क",
     "ja": "グルトン",
     "zh-TW": "愛吃豚"
   },
@@ -8248,7 +8248,7 @@
     "en": "Tarountula",
     "es": "Tarountula",
     "fr": "Tissenboule",
-    "hi": "टरॉट्युला",
+    "hi": "टरॉन्ट्युला",
     "ja": "タマンチュラ",
     "zh-TW": "團珠蛛"
   },
@@ -8257,7 +8257,7 @@
     "en": "Spidops",
     "es": "Spidops",
     "fr": "Filentrappe",
-    "hi": "पाइडॉस",
+    "hi": "स्पाइडॉप्स",
     "ja": "ワナイダー",
     "zh-TW": "操陷蛛"
   },
@@ -8266,7 +8266,7 @@
     "en": "Nymble",
     "es": "Nymble",
     "fr": "Lilliterelle",
-    "hi": "नबल",
+    "hi": "निम्बल",
     "ja": "マメバッタ",
     "zh-TW": "豆蟋蟀"
   },
@@ -8275,7 +8275,7 @@
     "en": "Lokix",
     "es": "Lokix",
     "fr": "Gambex",
-    "hi": "लोकस",
+    "hi": "लोकिक्स",
     "ja": "エクスレッグ",
     "zh-TW": "烈腿蝗"
   },
@@ -8320,7 +8320,7 @@
     "en": "Maushold",
     "es": "Maushold",
     "fr": "Famignol",
-    "hi": "माउसहोड",
+    "hi": "माउसहोल्ड",
     "ja": "イッカネズミ",
     "zh-TW": "一家鼠"
   },
@@ -8338,7 +8338,7 @@
     "en": "Dachsbun",
     "es": "Dachsbun",
     "fr": "Briochien",
-    "hi": "डासबन",
+    "hi": "डाक्सबन",
     "ja": "バウッツェル",
     "zh-TW": "麻花犬"
   },
@@ -8347,7 +8347,7 @@
     "en": "Smoliv",
     "es": "Smoliv",
     "fr": "Olivini",
-    "hi": "मॉलव",
+    "hi": "स्मॉलिव",
     "ja": "ミニーブ",
     "zh-TW": "迷你芙"
   },
@@ -8356,7 +8356,7 @@
     "en": "Dolliv",
     "es": "Dolliv",
     "fr": "Olivado",
-    "hi": "डॉलव",
+    "hi": "डॉलिव",
     "ja": "オリーニョ",
     "zh-TW": "奧利紐"
   },
@@ -8365,7 +8365,7 @@
     "en": "Arboliva",
     "es": "Arboliva",
     "fr": "Arboliva",
-    "hi": "आबोलवा",
+    "hi": "आर्बोलीवा",
     "ja": "オリーヴァ",
     "zh-TW": "奧利瓦"
   },
@@ -8374,7 +8374,7 @@
     "en": "Squawkabilly",
     "es": "Squawkabilly",
     "fr": "Tapatoès",
-    "hi": "वॉकाबल",
+    "hi": "स्क्वॉकाबिली",
     "ja": "イキリンコ",
     "zh-TW": "怒鸚哥"
   },
@@ -8383,7 +8383,7 @@
     "en": "Nacli",
     "es": "Nacli",
     "fr": "Selutin",
-    "hi": "नैल",
+    "hi": "नैक्ली",
     "ja": "コジオ",
     "zh-TW": "鹽石寶"
   },
@@ -8392,7 +8392,7 @@
     "en": "Naclstack",
     "es": "Naclstack",
     "fr": "Amassel",
-    "hi": "नैकलटैक",
+    "hi": "नैकलस्टैक",
     "ja": "ジオヅム",
     "zh-TW": "鹽石壘"
   },
@@ -8401,7 +8401,7 @@
     "en": "Garganacl",
     "es": "Garganacl",
     "fr": "Gigansel",
-    "hi": "गागनैकल",
+    "hi": "गार्गनैकल",
     "ja": "キョジオーン",
     "zh-TW": "鹽石巨靈"
   },
@@ -8419,7 +8419,7 @@
     "en": "Armarouge",
     "es": "Armarouge",
     "fr": "Carmadura",
-    "hi": "आमज़",
+    "hi": "आर्मरूज़",
     "ja": "グレンアルマ",
     "zh-TW": "紅蓮鎧騎"
   },
@@ -8428,7 +8428,7 @@
     "en": "Ceruledge",
     "es": "Ceruledge",
     "fr": "Malvalame",
-    "hi": "सलज",
+    "hi": "सरूलेज",
     "ja": "ソウブレイズ",
     "zh-TW": "蒼炎刃鬼"
   },
@@ -8437,7 +8437,7 @@
     "en": "Tadbulb",
     "es": "Tadbulb",
     "fr": "Têtampoule",
-    "hi": "टैडबब",
+    "hi": "टैडबल्ब",
     "ja": "ズピカ",
     "zh-TW": "光蚪仔"
   },
@@ -8446,7 +8446,7 @@
     "en": "Bellibolt",
     "es": "Bellibolt",
     "fr": "Ampibidou",
-    "hi": "बेलबोट",
+    "hi": "बेलिबोल्ट",
     "ja": "ハラバリー",
     "zh-TW": "電肚蛙"
   },
@@ -8455,7 +8455,7 @@
     "en": "Wattrel",
     "es": "Wattrel",
     "fr": "Zapétrel",
-    "hi": "वॉटल",
+    "hi": "वॉट्रल",
     "ja": "カイデン",
     "zh-TW": "電海燕"
   },
@@ -8464,7 +8464,7 @@
     "en": "Kilowattrel",
     "es": "Kilowattrel",
     "fr": "Fulgulairo",
-    "hi": "कलोवॉटल",
+    "hi": "किलोवॉट्रल",
     "ja": "タイカイデン",
     "zh-TW": "大電海燕"
   },
@@ -8473,7 +8473,7 @@
     "en": "Maschiff",
     "es": "Maschiff",
     "fr": "Grondogue",
-    "hi": "मैसचफ़",
+    "hi": "मैसचिफ़",
     "ja": "オラチフ",
     "zh-TW": "偶叫獒"
   },
@@ -8482,7 +8482,7 @@
     "en": "Mabosstiff",
     "es": "Mabosstiff",
     "fr": "Dogrino",
-    "hi": "मैबॉटफ़",
+    "hi": "मैबॉस्टिफ़",
     "ja": "マフィティフ",
     "zh-TW": "獒教父"
   },
@@ -8491,7 +8491,7 @@
     "en": "Shroodle",
     "es": "Shroodle",
     "fr": "Gribouraigne",
-    "hi": "ूडल",
+    "hi": "श्रूडल",
     "ja": "シルシュルー",
     "zh-TW": "滋汁鼴"
   },
@@ -8500,7 +8500,7 @@
     "en": "Grafaiai",
     "es": "Grafaiai",
     "fr": "Tag-Tag",
-    "hi": "फ़ायआय",
+    "hi": "ग्रफ़ायआय",
     "ja": "タギングル",
     "zh-TW": "塗標客"
   },
@@ -8509,7 +8509,7 @@
     "en": "Bramblin",
     "es": "Bramblin",
     "fr": "Virovent",
-    "hi": "ैबलन",
+    "hi": "ब्रैम्बलिन",
     "ja": "アノクサ",
     "zh-TW": "納噬草"
   },
@@ -8518,7 +8518,7 @@
     "en": "Brambleghast",
     "es": "Brambleghast",
     "fr": "Virevorreur",
-    "hi": "ैबलगैट",
+    "hi": "ब्रैम्बलगैस्ट",
     "ja": "アノホラグサ",
     "zh-TW": "怖納噬草"
   },
@@ -8527,7 +8527,7 @@
     "en": "Toedscool",
     "es": "Toedscool",
     "fr": "Terracool",
-    "hi": "टोडकल",
+    "hi": "टोडस्कूल",
     "ja": "ノノクラゲ",
     "zh-TW": "原野水母"
   },
@@ -8536,7 +8536,7 @@
     "en": "Toedscruel",
     "es": "Toedscruel",
     "fr": "Terracruel",
-    "hi": "टोडूअल",
+    "hi": "टोडस्क्रूअल",
     "ja": "リククラゲ",
     "zh-TW": "陸地水母"
   },
@@ -8545,7 +8545,7 @@
     "en": "Klawf",
     "es": "Klawf",
     "fr": "Craparoi",
-    "hi": "लॉफ़",
+    "hi": "क्लॉफ़",
     "ja": "ガケガニ",
     "zh-TW": "毛崖蟹"
   },
@@ -8554,7 +8554,7 @@
     "en": "Capsakid",
     "es": "Capsakid",
     "fr": "Pimito",
-    "hi": "कसाकड",
+    "hi": "कैप्साकिड",
     "ja": "カプサイジ",
     "zh-TW": "熱辣娃"
   },
@@ -8563,7 +8563,7 @@
     "en": "Scovillain",
     "es": "Scovillain",
     "fr": "Scovilain",
-    "hi": "कोवलन",
+    "hi": "स्कोविलन",
     "ja": "スコヴィラン",
     "zh-TW": "狠辣椒"
   },
@@ -8581,7 +8581,7 @@
     "en": "Rabsca",
     "es": "Rabsca",
     "fr": "Bérasca",
-    "hi": "रैका",
+    "hi": "रैब्स्का",
     "ja": "ベラカス",
     "zh-TW": "蟲甲聖"
   },
@@ -8590,7 +8590,7 @@
     "en": "Flittle",
     "es": "Flittle",
     "fr": "Flotillon",
-    "hi": "लटल",
+    "hi": "फ़्लिटल",
     "ja": "ヒラヒナ",
     "zh-TW": "飄飄雛"
   },
@@ -8599,7 +8599,7 @@
     "en": "Espathra",
     "es": "Espathra",
     "fr": "Cléopsytra",
-    "hi": "एपैा",
+    "hi": "एस्पैथ्रा",
     "ja": "クエスパトラ",
     "zh-TW": "超能豔鴕"
   },
@@ -8608,7 +8608,7 @@
     "en": "Tinkatink",
     "es": "Tinkatink",
     "fr": "Forgerette",
-    "hi": "टंकाटंक",
+    "hi": "टिंकाटिंक",
     "ja": "カヌチャン",
     "zh-TW": "小鍛匠"
   },
@@ -8617,7 +8617,7 @@
     "en": "Tinkatuff",
     "es": "Tinkatuff",
     "fr": "Forgella",
-    "hi": "टंकाटफ़",
+    "hi": "टिंकाटफ़",
     "ja": "ナカヌチャン",
     "zh-TW": "巧鍛匠"
   },
@@ -8626,7 +8626,7 @@
     "en": "Tinkaton",
     "es": "Tinkaton",
     "fr": "Forgelina",
-    "hi": "टंकाटन",
+    "hi": "टिंकाटन",
     "ja": "デカヌチャン",
     "zh-TW": "巨鍛匠"
   },
@@ -8635,7 +8635,7 @@
     "en": "Wiglett",
     "es": "Wiglett",
     "fr": "Taupikeau",
-    "hi": "वगलट",
+    "hi": "विगलेट",
     "ja": "ウミディグダ",
     "zh-TW": "海地鼠"
   },
@@ -8644,7 +8644,7 @@
     "en": "Wugtrio",
     "es": "Wugtrio",
     "fr": "Triopikeau",
-    "hi": "वगटयो",
+    "hi": "वगट्रियो",
     "ja": "ウミトリオ",
     "zh-TW": "三海地鼠"
   },
@@ -8653,7 +8653,7 @@
     "en": "Bombirdier",
     "es": "Bombirdier",
     "fr": "Lestombaile",
-    "hi": "बॉबडयर",
+    "hi": "बॉम्बर्डियर",
     "ja": "オトシドリ",
     "zh-TW": "下石鳥"
   },
@@ -8662,7 +8662,7 @@
     "en": "Finizen",
     "es": "Finizen",
     "fr": "Dofin",
-    "hi": "फ़नज़न",
+    "hi": "फ़िनिज़न",
     "ja": "ナミイルカ",
     "zh-TW": "波普海豚"
   },
@@ -8671,7 +8671,7 @@
     "en": "Palafin",
     "es": "Palafin",
     "fr": "Superdofin",
-    "hi": "पैलाफ़न",
+    "hi": "पैलाफ़िन",
     "ja": "イルカマン",
     "zh-TW": "海豚俠"
   },
@@ -8680,7 +8680,7 @@
     "en": "Varoom",
     "es": "Varoom",
     "fr": "Vrombi",
-    "hi": "वम",
+    "hi": "वरूम",
     "ja": "ブロロン",
     "zh-TW": "噗隆隆"
   },
@@ -8689,7 +8689,7 @@
     "en": "Revavroom",
     "es": "Revavroom",
     "fr": "Vrombotor",
-    "hi": "रवाूम",
+    "hi": "रेवाव्रूम",
     "ja": "ブロロローム",
     "zh-TW": "普隆隆姆"
   },
@@ -8698,7 +8698,7 @@
     "en": "Cyclizar",
     "es": "Cyclizar",
     "fr": "Motorizard",
-    "hi": "साइलज़ार",
+    "hi": "साइक्लिज़ार",
     "ja": "モトトカゲ",
     "zh-TW": "摩托蜥"
   },
@@ -8707,7 +8707,7 @@
     "en": "Orthworm",
     "es": "Orthworm",
     "fr": "Ferdeter",
-    "hi": "ऑथवम",
+    "hi": "ऑर्थवर्म",
     "ja": "ミミズズ",
     "zh-TW": "拖拖蚓"
   },
@@ -8716,7 +8716,7 @@
     "en": "Glimmet",
     "es": "Glimmet",
     "fr": "Germéclat",
-    "hi": "लमेट",
+    "hi": "ग्लिमेट",
     "ja": "キラーメ",
     "zh-TW": "晶光芽"
   },
@@ -8725,7 +8725,7 @@
     "en": "Glimmora",
     "es": "Glimmora",
     "fr": "Floréclat",
-    "hi": "लमोरा",
+    "hi": "ग्लिमोरा",
     "ja": "キラフロル",
     "zh-TW": "晶光花"
   },
@@ -8734,7 +8734,7 @@
     "en": "Greavard",
     "es": "Greavard",
     "fr": "Toutombe",
-    "hi": "ीवड",
+    "hi": "ग्रीवर्ड",
     "ja": "ボチ",
     "zh-TW": "墓仔狗"
   },
@@ -8743,7 +8743,7 @@
     "en": "Houndstone",
     "es": "Houndstone",
     "fr": "Tomberro",
-    "hi": "हाउंडटोन",
+    "hi": "हाउंडस्टोन",
     "ja": "ハカドッグ",
     "zh-TW": "墓揚犬"
   },
@@ -8752,7 +8752,7 @@
     "en": "Flamigo",
     "es": "Flamigo",
     "fr": "Flamenroule",
-    "hi": "लमीगो",
+    "hi": "फ़्लमीगो",
     "ja": "カラミンゴ",
     "zh-TW": "纏紅鶴"
   },
@@ -8761,7 +8761,7 @@
     "en": "Cetoddle",
     "es": "Cetoddle",
     "fr": "Piétacé",
-    "hi": "सटॉडल",
+    "hi": "सिटॉडल",
     "ja": "アルクジラ",
     "zh-TW": "走鯨"
   },
@@ -8770,7 +8770,7 @@
     "en": "Cetitan",
     "es": "Cetitan",
     "fr": "Balbalèze",
-    "hi": "सटाइटन",
+    "hi": "सिटाइटन",
     "ja": "ハルクジラ",
     "zh-TW": "浩大鯨"
   },
@@ -8797,7 +8797,7 @@
     "en": "Tatsugiri",
     "es": "Tatsugiri",
     "fr": "Nigirigon",
-    "hi": "तासुगर",
+    "hi": "तात्सुगिरी",
     "ja": "シャリタツ",
     "zh-TW": "米立龍"
   },
@@ -8806,7 +8806,7 @@
     "en": "Annihilape",
     "es": "Annihilape",
     "fr": "Courrousinge",
-    "hi": "अनायलप",
+    "hi": "अनायलेप",
     "ja": "コノヨザル",
     "zh-TW": "棄世猴"
   },
@@ -8815,7 +8815,7 @@
     "en": "Clodsire",
     "es": "Clodsire",
     "fr": "Terraiste",
-    "hi": "लॉडसायर",
+    "hi": "क्लॉडसायर",
     "ja": "ドオー",
     "zh-TW": "土王"
   },
@@ -8824,7 +8824,7 @@
     "en": "Farigiraf",
     "es": "Farigiraf",
     "fr": "Farigiraf",
-    "hi": "फ़रगरैफ़",
+    "hi": "फ़रिगरैफ़",
     "ja": "リキキリン",
     "zh-TW": "奇麒麟"
   },
@@ -8833,7 +8833,7 @@
     "en": "Dudunsparce",
     "es": "Dudunsparce",
     "fr": "Deusolourdo",
-    "hi": "डडनपास",
+    "hi": "डडनस्पार्स",
     "ja": "ノココッチ",
     "zh-TW": "土龍節節"
   },
@@ -8842,7 +8842,7 @@
     "en": "Kingambit",
     "es": "Kingambit",
     "fr": "Scalpereur",
-    "hi": "कंगैबट",
+    "hi": "किंगैम्बिट",
     "ja": "ドドゲザン",
     "zh-TW": "仆斬將軍"
   },
@@ -8851,7 +8851,7 @@
     "en": "Great Tusk",
     "es": "Colmilargo",
     "fr": "Fort-Ivoire",
-    "hi": "ेट टक",
+    "hi": "ग्रेट टस्क",
     "ja": "イダイナキバ",
     "zh-TW": "雄偉牙"
   },
@@ -8860,7 +8860,7 @@
     "en": "Scream Tail",
     "es": "Colagrito",
     "fr": "Hurle-Queue",
-    "hi": "ीम टल",
+    "hi": "स्क्रीम टेल",
     "ja": "サケブシッポ",
     "zh-TW": "吼叫尾"
   },
@@ -8869,7 +8869,7 @@
     "en": "Brute Bonnet",
     "es": "Furioseta",
     "fr": "Fongus-Furie",
-    "hi": "ूट बॉनेट",
+    "hi": "ब्रूट बॉनेट",
     "ja": "アラブルタケ",
     "zh-TW": "猛惡菇"
   },
@@ -8878,7 +8878,7 @@
     "en": "Flutter Mane",
     "es": "Melenaleteo",
     "fr": "Flotte-Mèche",
-    "hi": "लटर मेन",
+    "hi": "फ़्लटर मेन",
     "ja": "ハバタクカミ",
     "zh-TW": "振翼髮"
   },
@@ -8887,7 +8887,7 @@
     "en": "Slither Wing",
     "es": "Reptalada",
     "fr": "Rampe-Ailes",
-    "hi": "लदर वंग",
+    "hi": "स्लिदर विंग",
     "ja": "チヲハウハネ",
     "zh-TW": "爬地翅"
   },
@@ -8896,7 +8896,7 @@
     "en": "Sandy Shocks",
     "es": "Pelarena",
     "fr": "Pelage-Sablé",
-    "hi": "सैंडी शॉस",
+    "hi": "सैंडी शॉक्स",
     "ja": "スナノケガワ",
     "zh-TW": "沙鐵皮"
   },
@@ -8905,7 +8905,7 @@
     "en": "Iron Treads",
     "es": "Ferrodada",
     "fr": "Roue-de-Fer",
-    "hi": "आयरन टैड्स",
+    "hi": "आयरन ट्रैड्स",
     "ja": "テツノワダチ",
     "zh-TW": "鐵轍跡"
   },
@@ -8932,7 +8932,7 @@
     "en": "Iron Jugulis",
     "es": "Ferrocuello",
     "fr": "Têtes-de-Fer",
-    "hi": "आयरन जयुलस",
+    "hi": "आयरन जग्युलस",
     "ja": "テツノコウベ",
     "zh-TW": "鐵脖頸"
   },
@@ -8950,7 +8950,7 @@
     "en": "Iron Thorns",
     "es": "Ferropúas",
     "fr": "Épine-de-Fer",
-    "hi": "आयरन थॉन्स",
+    "hi": "आयरन थॉर्न्स",
     "ja": "テツノイバラ",
     "zh-TW": "鐵荊棘"
   },
@@ -8959,7 +8959,7 @@
     "en": "Frigibax",
     "es": "Frigibax",
     "fr": "Frigodo",
-    "hi": "जबैस",
+    "hi": "फ़्रिजिबैक्स",
     "ja": "セビエ",
     "zh-TW": "涼脊龍"
   },
@@ -8968,7 +8968,7 @@
     "en": "Arctibax",
     "es": "Arctibax",
     "fr": "Cryodo",
-    "hi": "आक्टबैस",
+    "hi": "आर्क्टबैक्स",
     "ja": "セゴール",
     "zh-TW": "凍脊龍"
   },
@@ -8977,7 +8977,7 @@
     "en": "Baxcalibur",
     "es": "Baxcalibur",
     "fr": "Glaivodo",
-    "hi": "बैककलबर",
+    "hi": "बैकस्कैलीबर",
     "ja": "セグレイブ",
     "zh-TW": "戟脊龍"
   },
@@ -8986,7 +8986,7 @@
     "en": "Gimmighoul",
     "es": "Gimmighoul",
     "fr": "Mordudor",
-    "hi": "गोडनगो",
+    "hi": "गोल्डनगो",
     "ja": "コレクレー",
     "zh-TW": "索財靈"
   },
@@ -8995,7 +8995,7 @@
     "en": "Gholdengo",
     "es": "Gholdengo",
     "fr": "Gromago",
-    "hi": "गोडनगो",
+    "hi": "गोल्डनगो",
     "ja": "サーフゴー",
     "zh-TW": "賽富豪"
   },
@@ -9004,7 +9004,7 @@
     "en": "Wo-Chien",
     "es": "Wo-Chien",
     "fr": "Chongjian",
-    "hi": "वो-चएन",
+    "hi": "वो-चिएन",
     "ja": "チオンジェン",
     "zh-TW": "古簡蝸"
   },
@@ -9013,7 +9013,7 @@
     "en": "Chien-Pao",
     "es": "Chien-Pao",
     "fr": "Baojian",
-    "hi": "चएन-पाओ",
+    "hi": "चिएन-पाओ",
     "ja": "パオジアン",
     "zh-TW": "古劍豹"
   },
@@ -9022,7 +9022,7 @@
     "en": "Ting-Lu",
     "es": "Ting-Lu",
     "fr": "Dinglu",
-    "hi": "टंग-लू",
+    "hi": "टिंग-लू",
     "ja": "ディンルー",
     "zh-TW": "古鼎鹿"
   },
@@ -9040,7 +9040,7 @@
     "en": "Roaring Moon",
     "es": "Bramaluna",
     "fr": "Rugit-Lune",
-    "hi": "रोरंग मून",
+    "hi": "रोरिंग मून",
     "ja": "トドロクツキ",
     "zh-TW": "轟鳴月"
   },
@@ -9049,7 +9049,7 @@
     "en": "Iron Valiant",
     "es": "Ferropaladín",
     "fr": "Garde-de-Fer",
-    "hi": "आयरन वैलयंट",
+    "hi": "आयरन वैलियंट",
     "ja": "テツノブジン",
     "zh-TW": "鐵武者"
   },
@@ -9067,7 +9067,7 @@
     "en": "Miraidon",
     "es": "Miraidon",
     "fr": "Miraidon",
-    "hi": "मराइडॉन",
+    "hi": "मिराइडॉन",
     "ja": "ミライドン",
     "zh-TW": "密勒頓"
   },
@@ -9076,7 +9076,7 @@
     "en": "Walking Wake",
     "es": "Ondulagua",
     "fr": "Serpente-Eau",
-    "hi": "वॉकंग वेक",
+    "hi": "वॉकिंग वेक",
     "ja": "ウネルミナモ",
     "zh-TW": "波盪水"
   },
@@ -9085,7 +9085,7 @@
     "en": "Iron Leaves",
     "es": "Ferroverdor",
     "fr": "Vert-de-Fer",
-    "hi": "आयरन लज़",
+    "hi": "आयरन लीव्ज़",
     "ja": "テツノイサハ",
     "zh-TW": "鐵斑葉"
   },
@@ -9094,7 +9094,7 @@
     "en": "Dipplin",
     "es": "Dipplin",
     "fr": "Pomdramour",
-    "hi": "शीराकरा",
+    "hi": "शीराकिरा",
     "ja": "カミッチュ",
     "zh-TW": "裹蜜蟲"
   },
@@ -9103,7 +9103,7 @@
     "en": "Poltchageist",
     "es": "Poltchageist",
     "fr": "Poltchageist",
-    "hi": "पोलचागाइट",
+    "hi": "पोलचागाइस्ट",
     "ja": "チャデス",
     "zh-TW": "斯魔茶"
   },
@@ -9112,7 +9112,7 @@
     "en": "Sinistcha",
     "es": "Sinistcha",
     "fr": "Théffroyable",
-    "hi": "सनचा",
+    "hi": "सिनिस्चा",
     "ja": "ヤバソチャ",
     "zh-TW": "來悲粗茶"
   },
@@ -9121,7 +9121,7 @@
     "en": "Okidogi",
     "es": "Okidogi",
     "fr": "Félicanis",
-    "hi": "ओकडोगी",
+    "hi": "ओकिडोगी",
     "ja": "イイネイヌ",
     "zh-TW": "夠讚狗"
   },
@@ -9130,7 +9130,7 @@
     "en": "Munkidori",
     "es": "Munkidori",
     "fr": "Fortusimia",
-    "hi": "मंकडोर",
+    "hi": "मंकिडोरी",
     "ja": "マシマシラ",
     "zh-TW": "願增猿"
   },
@@ -9139,7 +9139,7 @@
     "en": "Fezandipiti",
     "es": "Fezandipiti",
     "fr": "Favianos",
-    "hi": "फ़ेज़ंडपट",
+    "hi": "फ़ेज़ंडिपिटी",
     "ja": "キチキギス",
     "zh-TW": "吉雉雞"
   },
@@ -9157,7 +9157,7 @@
     "en": "Archaludon",
     "es": "Archaludon",
     "fr": "Pondralugon",
-    "hi": "आचैलुडॉन",
+    "hi": "आर्चैलुडॉन",
     "ja": "ブリジュラス",
     "zh-TW": "鋁鋼橋龍"
   },
@@ -9166,7 +9166,7 @@
     "en": "Hydrapple",
     "es": "Hydrapple",
     "fr": "Pomdorochi",
-    "hi": "शीरानेस",
+    "hi": "शीरास्नेक्स",
     "ja": "カミツオロチ",
     "zh-TW": "蜜集大蛇"
   },
@@ -9175,7 +9175,7 @@
     "en": "Gouging Fire",
     "es": "Flamariete",
     "fr": "Gouging Fire",
-    "hi": "गाउजंग फ़ायर",
+    "hi": "गाउजिंग फ़ायर",
     "ja": "ウガツホムラ",
     "zh-TW": "破空焰"
   },
@@ -9184,7 +9184,7 @@
     "en": "Raging Bolt",
     "es": "Electrofuria",
     "fr": "Ire-Foudre",
-    "hi": "रजंग बोट",
+    "hi": "रेजिंग बोल्ट",
     "ja": "タケルライコ",
     "zh-TW": "猛雷鼓"
   },
@@ -9193,7 +9193,7 @@
     "en": "Iron Boulder",
     "es": "Ferromole",
     "fr": "Roc-de-Fer",
-    "hi": "आयरन बोडर",
+    "hi": "आयरन बोल्डर",
     "ja": "テツノイワオ",
     "zh-TW": "鐵磐岩"
   },
@@ -9202,7 +9202,7 @@
     "en": "Iron Crown",
     "es": "Ferrotesta",
     "fr": "Chef-de-Fer",
-    "hi": "आयरन ाउन",
+    "hi": "आयरन क्राउन",
     "ja": "テツノカシラ",
     "zh-TW": "鐵頭殼"
   },
@@ -9211,7 +9211,7 @@
     "en": "Terapagos",
     "es": "Terapagos",
     "fr": "Terapagos",
-    "hi": "टरापागॉस",
+    "hi": "टेरापागॉस",
     "ja": "テラパゴス",
     "zh-TW": "太樂巴戈斯"
   },
@@ -9238,7 +9238,7 @@
     "en": "Gigantamax Venusaur",
     "es": "Venusaur Gigamax",
     "fr": "Florizarre Gigamax",
-    "hi": "जायगैंटामैस वीनासॉर",
+    "hi": "जायगैंटामैक्स वीनासॉर",
     "ja": "キョダイマックス フシギバナ",
     "zh-TW": "超極巨化妙蛙花"
   },
@@ -9247,7 +9247,7 @@
     "en": "Mega Charizard X",
     "es": "Mega-Charizard X",
     "fr": "Méga-Dracaufeu X",
-    "hi": "मेगा चारज़ाड X",
+    "hi": "मेगा चारिज़ार्ड X",
     "ja": "メガリザードンＸ",
     "zh-TW": "超級噴火龍Ｘ"
   },
@@ -9256,7 +9256,7 @@
     "en": "Mega Charizard Y",
     "es": "Mega-Charizard Y",
     "fr": "Méga-Dracaufeu Y",
-    "hi": "मेगा चारज़ाड Y",
+    "hi": "मेगा चारिज़ार्ड Y",
     "ja": "メガリザードンＹ",
     "zh-TW": "超級噴火龍Ｙ"
   },
@@ -9265,7 +9265,7 @@
     "en": "Gigantamax Charizard",
     "es": "Charizard Gigamax",
     "fr": "Dracaufeu Gigamax",
-    "hi": "जायगैंटामैस चारज़ाड",
+    "hi": "जायगैंटामैक्स चारिज़ार्ड",
     "ja": "キョダイマックス リザードン",
     "zh-TW": "超極巨化噴火龍"
   },
@@ -9274,7 +9274,7 @@
     "en": "Mega Blastoise",
     "es": "Mega-Blastoise",
     "fr": "Méga-Tortank",
-    "hi": "मेगा लाटॉइस",
+    "hi": "मेगा ब्लास्टॉइस",
     "ja": "メガカメックス",
     "zh-TW": "超級水箭龜"
   },
@@ -9283,7 +9283,7 @@
     "en": "Gigantamax Blastoise",
     "es": "Blastoise Gigamax",
     "fr": "Tortank Gigamax",
-    "hi": "जायगैंटामैस लाटॉइस",
+    "hi": "जायगैंटामैक्स ब्लास्टॉइस",
     "ja": "キョダイマックス カメックス",
     "zh-TW": "超極巨化水箭龜"
   },
@@ -9292,7 +9292,7 @@
     "en": "Gigantamax Butterfree",
     "es": "Butterfree Gigamax",
     "fr": "Papilusion Gigamax",
-    "hi": "जायगैंटामैस बटर",
+    "hi": "जायगैंटामैक्स बटरफ़्री",
     "ja": "キョダイマックス バタフリー",
     "zh-TW": "超極巨化巴大蝶"
   },
@@ -9301,7 +9301,7 @@
     "en": "Mega Beedrill",
     "es": "Mega-Beedrill",
     "fr": "Méga-Dardargnan",
-    "hi": "मेगा बीडल",
+    "hi": "मेगा बीड्रिल",
     "ja": "メガスピアー",
     "zh-TW": "超級大針蜂"
   },
@@ -9310,7 +9310,7 @@
     "en": "Mega Pidgeot",
     "es": "Mega-Pidgeot",
     "fr": "Méga-Roucarnage",
-    "hi": "मेगा िपजऑट",
+    "hi": "मेगा पिजिऑट",
     "ja": "メガピジョット",
     "zh-TW": "超級大比鳥"
   },
@@ -9319,7 +9319,7 @@
     "en": "Gigantamax Pikachu",
     "es": "Pikachu Gigamax",
     "fr": "Pikachu Gigamax",
-    "hi": "जायगैंटामैस िपकाचू",
+    "hi": "जायगैंटामैक्स पिकाचू",
     "ja": "キョダイマックス ピカチュウ",
     "zh-TW": "超極巨化皮卡丘"
   },
@@ -9355,7 +9355,7 @@
     "en": "Mega Clefable",
     "es": "Mega-Clefable",
     "fr": "Méga-Mélodelfe",
-    "hi": "मेगा लफ़ेबल",
+    "hi": "मेगा क्लफ़ेबल",
     "ja": "メガピクシー",
     "zh-TW": "超級皮可西"
   },
@@ -9364,7 +9364,7 @@
     "en": "Gigantamax Meowth",
     "es": "Meowth Gigamax",
     "fr": "Miaouss Gigamax",
-    "hi": "जायगैंटामैस याउथ",
+    "hi": "जायगैंटामैक्स म्याउथ",
     "ja": "キョダイマックス ニャース",
     "zh-TW": "超極巨化喵喵"
   },
@@ -9382,7 +9382,7 @@
     "en": "Gigantamax Machamp",
     "es": "Machamp Gigamax",
     "fr": "Mackogneur Gigamax",
-    "hi": "जायगैंटामैस मचैप",
+    "hi": "जायगैंटामैक्स मचैम्प",
     "ja": "キョダイマックス カイリキー",
     "zh-TW": "超極巨化怪力"
   },
@@ -9391,7 +9391,7 @@
     "en": "Mega Victreebel",
     "es": "Mega-Victreebel",
     "fr": "Méga-Empiflor",
-    "hi": "मेगा वटीबेल",
+    "hi": "मेगा विक्ट्रीबेल",
     "ja": "メガウツボット",
     "zh-TW": "超級大食花"
   },
@@ -9400,7 +9400,7 @@
     "en": "Mega Slowbro",
     "es": "Mega-Slowbro",
     "fr": "Méga-Flagadoss",
-    "hi": "मेगा लोो",
+    "hi": "मेगा स्लोब्रो",
     "ja": "メガヤドラン",
     "zh-TW": "超級呆殼獸"
   },
@@ -9418,7 +9418,7 @@
     "en": "Gigantamax Gengar",
     "es": "Gengar Gigamax",
     "fr": "Ectoplasma Gigamax",
-    "hi": "जायगैंटामैस गेंगार",
+    "hi": "जायगैंटामैक्स गेंगार",
     "ja": "キョダイマックス ゲンガー",
     "zh-TW": "超極巨化耿鬼"
   },
@@ -9427,7 +9427,7 @@
     "en": "Gigantamax Kingler",
     "es": "Kingler Gigamax",
     "fr": "Krabboss Gigamax",
-    "hi": "जायगैंटामैस कंगलर",
+    "hi": "जायगैंटामैक्स किंगलर",
     "ja": "キョダイマックス キングラー",
     "zh-TW": "超極巨化巨鉗蟹"
   },
@@ -9436,7 +9436,7 @@
     "en": "Mega Kangaskhan",
     "es": "Mega-Kangaskhan",
     "fr": "Méga-Kangourex",
-    "hi": "मेगा कगसखान",
+    "hi": "मेगा कैंगसखान",
     "ja": "メガガルーラ",
     "zh-TW": "超級袋獸"
   },
@@ -9445,7 +9445,7 @@
     "en": "Mega Starmie",
     "es": "Mega-Starmie",
     "fr": "Méga-Staross",
-    "hi": "मेगा टारमी",
+    "hi": "मेगा स्टारमी",
     "ja": "メガスターミー",
     "zh-TW": "超級寶石海星"
   },
@@ -9454,7 +9454,7 @@
     "en": "Mega Pinsir",
     "es": "Mega-Pinsir",
     "fr": "Méga-Scarabrute",
-    "hi": "मेगा िपंसर",
+    "hi": "मेगा पिंसर",
     "ja": "メガカイロス",
     "zh-TW": "超級凱羅斯"
   },
@@ -9472,7 +9472,7 @@
     "en": "Gigantamax Lapras",
     "es": "Lapras Gigamax",
     "fr": "Lokhlass Gigamax",
-    "hi": "जायगैंटामैस लैस",
+    "hi": "जायगैंटामैक्स लैप्रस",
     "ja": "キョダイマックス ラプラス",
     "zh-TW": "超極巨化拉普拉斯"
   },
@@ -9481,7 +9481,7 @@
     "en": "Gigantamax Eevee",
     "es": "Eevee Gigamax",
     "fr": "Évoli Gigamax",
-    "hi": "जायगैंटामैस ईवी",
+    "hi": "जायगैंटामैक्स ईवी",
     "ja": "キョダイマックス イーブイ",
     "zh-TW": "超極巨化伊布"
   },
@@ -9490,7 +9490,7 @@
     "en": "Mega Aerodactyl",
     "es": "Mega-Aerodactyl",
     "fr": "Méga-Ptéra",
-    "hi": "मेगा ऐरोडैटल",
+    "hi": "मेगा ऐरोडैक्टिल",
     "ja": "メガプテラ",
     "zh-TW": "超級化石翼龍"
   },
@@ -9499,7 +9499,7 @@
     "en": "Gigantamax Snorlax",
     "es": "Snorlax Gigamax",
     "fr": "Ronflex Gigamax",
-    "hi": "जायगैंटामैस नोरलैस",
+    "hi": "जायगैंटामैक्स स्नोरलैक्स",
     "ja": "キョダイマックス カビゴン",
     "zh-TW": "超極巨化卡比獸"
   },
@@ -9508,7 +9508,7 @@
     "en": "Mega Dragonite",
     "es": "Mega-Dragonite",
     "fr": "Méga-Dracolosse",
-    "hi": "मेगा डैगनाइट",
+    "hi": "मेगा ड्रैगनाइट",
     "ja": "メガカイリュー",
     "zh-TW": "超級快龍"
   },
@@ -9517,7 +9517,7 @@
     "en": "Mega Mewtwo X",
     "es": "Mega-Mewtwo X",
     "fr": "Méga-Mewtwo X",
-    "hi": "मेगा यूटू X",
+    "hi": "मेगा म्यूटू X",
     "ja": "メガミュウツーＸ",
     "zh-TW": "超級超夢Ｘ"
   },
@@ -9526,7 +9526,7 @@
     "en": "Mega Mewtwo Y",
     "es": "Mega-Mewtwo Y",
     "fr": "Méga-Mewtwo Y",
-    "hi": "मेगा यूटू Y",
+    "hi": "मेगा म्यूटू Y",
     "ja": "メガミュウツーＹ",
     "zh-TW": "超級超夢Ｙ"
   },
@@ -9535,7 +9535,7 @@
     "en": "Mega Meganium",
     "es": "Mega-Meganium",
     "fr": "Méga-Méganium",
-    "hi": "मेगा मैगेनयम",
+    "hi": "मेगा मैगेनियम",
     "ja": "メガメガニウム",
     "zh-TW": "超級大竺葵"
   },
@@ -9544,7 +9544,7 @@
     "en": "Mega Feraligatr",
     "es": "Mega-Feraligatr",
     "fr": "Méga-Aligatueur",
-    "hi": "मेगा फ़रैलगेटर",
+    "hi": "मेगा फ़रैलिगेटर",
     "ja": "メガオーダイル",
     "zh-TW": "超級大力鱷"
   },
@@ -9553,7 +9553,7 @@
     "en": "Mega Ampharos",
     "es": "Mega-Ampharos",
     "fr": "Méga-Pharamp",
-    "hi": "मेगा ऐफ़रॉस",
+    "hi": "मेगा ऐम्फ़रॉस",
     "ja": "メガデンリュウ",
     "zh-TW": "超級電龍"
   },
@@ -9562,7 +9562,7 @@
     "en": "Mega Steelix",
     "es": "Mega-Steelix",
     "fr": "Méga-Steelix",
-    "hi": "मेगा टलस",
+    "hi": "मेगा स्टीलिक्स",
     "ja": "メガハガネール",
     "zh-TW": "超級大鋼蛇"
   },
@@ -9571,7 +9571,7 @@
     "en": "Mega Scizor",
     "es": "Mega-Scizor",
     "fr": "Méga-Cizayox",
-    "hi": "मेगा सज़ॉर",
+    "hi": "मेगा सिज़ॉर",
     "ja": "メガハッサム",
     "zh-TW": "超級巨鉗螳螂"
   },
@@ -9580,7 +9580,7 @@
     "en": "Mega Heracross",
     "es": "Mega-Heracross",
     "fr": "Méga-Scarhino",
-    "hi": "मेगा हेराॉस",
+    "hi": "मेगा हेराक्रॉस",
     "ja": "メガヘラクロス",
     "zh-TW": "超級赫拉克羅斯"
   },
@@ -9589,7 +9589,7 @@
     "en": "Mega Skarmory",
     "es": "Mega-Skarmory",
     "fr": "Méga-Airmure",
-    "hi": "मेगा कामर",
+    "hi": "मेगा स्कार्मरी",
     "ja": "メガエアームド",
     "zh-TW": "超級盔甲鳥"
   },
@@ -9607,7 +9607,7 @@
     "en": "Mega Tyranitar",
     "es": "Mega-Tyranitar",
     "fr": "Méga-Tyranocif",
-    "hi": "मेगा टायरैनटार",
+    "hi": "मेगा टायरैनिटार",
     "ja": "メガバンギラス",
     "zh-TW": "超級班基拉斯"
   },
@@ -9616,7 +9616,7 @@
     "en": "Mega Sceptile",
     "es": "Mega-Sceptile",
     "fr": "Méga-Jungko",
-    "hi": "मेगा सेटाइल",
+    "hi": "मेगा सेप्टाइल",
     "ja": "メガジュカイン",
     "zh-TW": "超級蜥蜴王"
   },
@@ -9625,7 +9625,7 @@
     "en": "Mega Blaziken",
     "es": "Mega-Blaziken",
     "fr": "Méga-Braségali",
-    "hi": "मेगा लज़कन",
+    "hi": "मेगा ब्लेज़िकेन",
     "ja": "メガバシャーモ",
     "zh-TW": "超級火焰雞"
   },
@@ -9634,7 +9634,7 @@
     "en": "Mega Swampert",
     "es": "Mega-Swampert",
     "fr": "Méga-Laggron",
-    "hi": "मेगा वॉपट",
+    "hi": "मेगा स्वॉम्पर्ट",
     "ja": "メガラグラージ",
     "zh-TW": "超級巨沼怪"
   },
@@ -9643,7 +9643,7 @@
     "en": "Mega Gardevoir",
     "es": "Mega-Gardevoir",
     "fr": "Méga-Gardevoir",
-    "hi": "मेगा गाडेवुआर",
+    "hi": "मेगा गार्डेवुआर",
     "ja": "メガサーナイト",
     "zh-TW": "超級沙奈朵"
   },
@@ -9670,7 +9670,7 @@
     "en": "Mega Aggron",
     "es": "Mega-Aggron",
     "fr": "Méga-Galeking",
-    "hi": "मेगा ऐॉन",
+    "hi": "मेगा ऐग्रॉन",
     "ja": "メガボスゴドラ",
     "zh-TW": "超級波士可多拉"
   },
@@ -9688,7 +9688,7 @@
     "en": "Mega Manectric",
     "es": "Mega-Manectric",
     "fr": "Méga-Élecsprint",
-    "hi": "मेगा मेनेटक",
+    "hi": "मेगा मेनेक्ट्रिक",
     "ja": "メガライボルト",
     "zh-TW": "超級雷電獸"
   },
@@ -9697,7 +9697,7 @@
     "en": "Mega Sharpedo",
     "es": "Mega-Sharpedo",
     "fr": "Méga-Sharpedo",
-    "hi": "मेगा शापीडो",
+    "hi": "मेगा शार्पीडो",
     "ja": "メガサメハダー",
     "zh-TW": "超級巨牙鯊"
   },
@@ -9706,7 +9706,7 @@
     "en": "Mega Camerupt",
     "es": "Mega-Camerupt",
     "fr": "Méga-Camérupt",
-    "hi": "मेगा कमरट",
+    "hi": "मेगा कैमरप्ट",
     "ja": "メガバクーダ",
     "zh-TW": "超級噴火駝"
   },
@@ -9715,7 +9715,7 @@
     "en": "Mega Altaria",
     "es": "Mega-Altaria",
     "fr": "Méga-Altaria",
-    "hi": "मेगा ऑटारया",
+    "hi": "मेगा ऑल्टारिया",
     "ja": "メガチルタリス",
     "zh-TW": "超級七夕青鳥"
   },
@@ -9742,7 +9742,7 @@
     "en": "Mega Absol",
     "es": "Mega-Absol",
     "fr": "Méga-Absol",
-    "hi": "मेगा ऐसॉल",
+    "hi": "मेगा ऐब्सॉल",
     "ja": "メガアブソル",
     "zh-TW": "超級阿勃梭魯"
   },
@@ -9751,7 +9751,7 @@
     "en": "Mega Absol Z",
     "es": "Mega-Absol Z",
     "fr": "Méga-Absol Z",
-    "hi": "मेगा ऐसॉल Z",
+    "hi": "मेगा ऐब्सॉल Z",
     "ja": "メガアブソルＺ",
     "zh-TW": "超級阿勃梭魯Ｚ"
   },
@@ -9760,7 +9760,7 @@
     "en": "Mega Glalie",
     "es": "Mega-Glalie",
     "fr": "Méga-Oniglali",
-    "hi": "मेगा लल",
+    "hi": "मेगा ग्लेली",
     "ja": "メガオニゴーリ",
     "zh-TW": "超級冰鬼護"
   },
@@ -9778,7 +9778,7 @@
     "en": "Mega Metagross",
     "es": "Mega-Metagross",
     "fr": "Méga-Métalosse",
-    "hi": "मेगा मेटाोस",
+    "hi": "मेगा मेटाग्रोस",
     "ja": "メガメタグロス",
     "zh-TW": "超級巨金怪"
   },
@@ -9787,7 +9787,7 @@
     "en": "Mega Latias",
     "es": "Mega-Latias",
     "fr": "Méga-Latias",
-    "hi": "मेगा लाटयास",
+    "hi": "मेगा लाटियास",
     "ja": "メガラティアス",
     "zh-TW": "超級拉帝亞斯"
   },
@@ -9796,7 +9796,7 @@
     "en": "Mega Latios",
     "es": "Mega-Latios",
     "fr": "Méga-Latios",
-    "hi": "मेगा लाटयोस",
+    "hi": "मेगा लाटियोस",
     "ja": "メガラティオス",
     "zh-TW": "超級拉帝歐斯"
   },
@@ -9805,7 +9805,7 @@
     "en": "Primal Kyogre",
     "es": "Kyogre Primigenio",
     "fr": "Primo-Kyogre",
-    "hi": "ाइम कायोगर",
+    "hi": "प्राइम कायोगर",
     "ja": "ゲンシカイオーガ",
     "zh-TW": "原始蓋歐卡"
   },
@@ -9814,7 +9814,7 @@
     "en": "Primal Groudon",
     "es": "Groudon Primigenio",
     "fr": "Primo-Groudon",
-    "hi": "ाइम ाउडॉन",
+    "hi": "प्राइम ग्राउडॉन",
     "ja": "ゲンシグラードン",
     "zh-TW": "原始固拉多"
   },
@@ -9823,7 +9823,7 @@
     "en": "Mega Rayquaza",
     "es": "Mega-Rayquaza",
     "fr": "Méga-Rayquaza",
-    "hi": "मेगा रवेज़ा",
+    "hi": "मेगा रेक्वेज़ा",
     "ja": "メガレックウザ",
     "zh-TW": "超級烈空坐"
   },
@@ -9832,7 +9832,7 @@
     "en": "Mega Staraptor",
     "es": "Mega-Staraptor",
     "fr": "Méga-Étouraptor",
-    "hi": "मेगा टारैटर",
+    "hi": "मेगा स्टारैप्टर",
     "ja": "メガムクホーク",
     "zh-TW": "超級姆克鷹"
   },
@@ -9850,7 +9850,7 @@
     "en": "Mega Garchomp",
     "es": "Mega-Garchomp",
     "fr": "Méga-Carchacrok",
-    "hi": "मेगा गारचॉप",
+    "hi": "मेगा गारचॉम्प",
     "ja": "メガガブリアス",
     "zh-TW": "超級烈咬陸鯊"
   },
@@ -9859,7 +9859,7 @@
     "en": "Mega Lucario",
     "es": "Mega-Lucario",
     "fr": "Méga-Lucario",
-    "hi": "मेगा लुकारयो",
+    "hi": "मेगा लुकारियो",
     "ja": "メガルカリオ",
     "zh-TW": "超級路卡利歐"
   },
@@ -9868,7 +9868,7 @@
     "en": "Mega Lucario Z",
     "es": "Mega-Lucario Z",
     "fr": "Méga-Lucario Z",
-    "hi": "मेगा लुकारयो Z",
+    "hi": "मेगा लुकारियो Z",
     "ja": "メガルカリオＺ",
     "zh-TW": "超級路卡利歐Ｚ"
   },
@@ -9886,7 +9886,7 @@
     "en": "Mega Abomasnow",
     "es": "Mega-Abomasnow",
     "fr": "Méga-Blizzaroi",
-    "hi": "मेगा अबॉमानो",
+    "hi": "मेगा अबॉमास्नो",
     "ja": "メガユキノオー",
     "zh-TW": "超級暴雪王"
   },
@@ -9895,7 +9895,7 @@
     "en": "Mega Gallade",
     "es": "Mega-Gallade",
     "fr": "Méga-Gallame",
-    "hi": "मेगा गलड",
+    "hi": "मेगा गलेड",
     "ja": "メガエルレイド",
     "zh-TW": "超級艾路雷朵"
   },
@@ -9904,7 +9904,7 @@
     "en": "Mega Froslass",
     "es": "Mega-Froslass",
     "fr": "Méga-Momartik",
-    "hi": "मेगा ॉलैस",
+    "hi": "मेगा फ़्रॉस्लैस",
     "ja": "メガユキメノコ",
     "zh-TW": "超級雪妖女"
   },
@@ -9913,7 +9913,7 @@
     "en": "Mega Heatran",
     "es": "Mega-Heatran",
     "fr": "Méga-Heatran",
-    "hi": "मेगा हीटैन",
+    "hi": "मेगा हीट्रैन",
     "ja": "メガヒードラン",
     "zh-TW": "超級席多藍恩"
   },
@@ -9922,7 +9922,7 @@
     "en": "Mega Darkrai",
     "es": "Mega-Darkrai",
     "fr": "Méga-Darkrai",
-    "hi": "मेगा डाकराय",
+    "hi": "मेगा डार्कराय",
     "ja": "メガダークライ",
     "zh-TW": "超級達克萊伊"
   },
@@ -9931,7 +9931,7 @@
     "en": "Mega Emboar",
     "es": "Mega-Emboar",
     "fr": "Méga-Roitiflam",
-    "hi": "मेगा एबोर",
+    "hi": "मेगा एम्बोर",
     "ja": "メガエンブオー",
     "zh-TW": "超級炎武王"
   },
@@ -9940,7 +9940,7 @@
     "en": "Mega Excadrill",
     "es": "Mega-Excadrill",
     "fr": "Méga-Minotaupe",
-    "hi": "मेगा एसकाडल",
+    "hi": "मेगा एक्सकाड्रिल",
     "ja": "メガドリュウズ",
     "zh-TW": "超級龍頭地鼠"
   },
@@ -9949,7 +9949,7 @@
     "en": "Mega Audino",
     "es": "Mega-Audino",
     "fr": "Méga-Nanméouïe",
-    "hi": "मेगा ऑडनो",
+    "hi": "मेगा ऑडिनो",
     "ja": "メガタブンネ",
     "zh-TW": "超級差不多娃娃"
   },
@@ -9958,7 +9958,7 @@
     "en": "Mega Scolipede",
     "es": "Mega-Scolipede",
     "fr": "Méga-Brutapode",
-    "hi": "मेगा कोलपीड",
+    "hi": "मेगा स्कोलिपीड",
     "ja": "メガペンドラー",
     "zh-TW": "超級蜈蚣王"
   },
@@ -9967,7 +9967,7 @@
     "en": "Mega Scrafty",
     "es": "Mega-Scrafty",
     "fr": "Méga-Baggaïd",
-    "hi": "मेगा ाट",
+    "hi": "मेगा स्क्राफ़्टी",
     "ja": "メガズルズキン",
     "zh-TW": "超級頭巾混混"
   },
@@ -9976,7 +9976,7 @@
     "en": "Gigantamax Garbodor",
     "es": "Garbodor Gigamax",
     "fr": "Miasmax Gigamax",
-    "hi": "जायगैंटामैस गारबोडर",
+    "hi": "जायगैंटामैक्स गारबोडर",
     "ja": "キョダイマックス ダストダス",
     "zh-TW": "超極巨化灰塵山"
   },
@@ -9985,7 +9985,7 @@
     "en": "Mega Eelektross",
     "es": "Mega-Eelektross",
     "fr": "Méga-Ohmassacre",
-    "hi": "मेगा ईलैटॉस",
+    "hi": "मेगा ईलैक्ट्रॉस",
     "ja": "メガシビルドン",
     "zh-TW": "超級麻麻鰻魚王"
   },
@@ -9994,7 +9994,7 @@
     "en": "Mega Chandelure",
     "es": "Mega-Chandelure",
     "fr": "Méga-Lugulabre",
-    "hi": "मेगा शैंडेयुर",
+    "hi": "मेगा शैंडेल्युर",
     "ja": "メガシャンデラ",
     "zh-TW": "超級水晶燈火靈"
   },
@@ -10003,7 +10003,7 @@
     "en": "Mega Golurk",
     "es": "Mega-Golurk",
     "fr": "Méga-Golemastoc",
-    "hi": "मेगा गोलक",
+    "hi": "मेगा गोलर्क",
     "ja": "メガゴルーグ",
     "zh-TW": "超級泥偶巨人"
   },
@@ -10021,7 +10021,7 @@
     "en": "Mega Delphox",
     "es": "Mega-Delphox",
     "fr": "Méga-Goupelin",
-    "hi": "मेगा डेलफ़ॉस",
+    "hi": "मेगा डेलफ़ॉक्स",
     "ja": "メガマフォクシー",
     "zh-TW": "超級妖火紅狐"
   },
@@ -10030,7 +10030,7 @@
     "en": "Mega Greninja",
     "es": "Mega-Greninja",
     "fr": "Méga-Amphinobi",
-    "hi": "मेगा ेनंजा",
+    "hi": "मेगा ग्रेनिंजा",
     "ja": "メガゲッコウガ",
     "zh-TW": "超級甲賀忍蛙"
   },
@@ -10048,7 +10048,7 @@
     "en": "Mega Floette",
     "es": "Mega-Floette",
     "fr": "Méga-Floette",
-    "hi": "मेगा लोएट",
+    "hi": "मेगा फ़्लोएट",
     "ja": "メガフラエッテ",
     "zh-TW": "超級花葉蒂"
   },
@@ -10057,7 +10057,7 @@
     "en": "Mega Meowstic",
     "es": "Mega-Meowstic",
     "fr": "Méga-Mistigrix",
-    "hi": "मेगा मयाउटक",
+    "hi": "मेगा मियाउस्टिक",
     "ja": "メガニャオニクス",
     "zh-TW": "超級超能妙喵"
   },
@@ -10075,7 +10075,7 @@
     "en": "Mega Barbaracle",
     "es": "Mega-Barbaracle",
     "fr": "Méga-Golgopathe",
-    "hi": "मेगा बाबेरकल",
+    "hi": "मेगा बार्बेरेकल",
     "ja": "メガガメノデス",
     "zh-TW": "超級龜足巨鎧"
   },
@@ -10084,7 +10084,7 @@
     "en": "Mega Dragalge",
     "es": "Mega-Dragalge",
     "fr": "Méga-Kravarech",
-    "hi": "मेगा डगैजी",
+    "hi": "मेगा ड्रगैल्जी",
     "ja": "メガドラミドロ",
     "zh-TW": "超級毒藻龍"
   },
@@ -10102,7 +10102,7 @@
     "en": "Mega Zygarde",
     "es": "Mega-Zygarde",
     "fr": "Méga-Zygarde",
-    "hi": "मेगा ज़ाइगाड",
+    "hi": "मेगा ज़ाइगार्ड",
     "ja": "メガジガルデ",
     "zh-TW": "超級基格爾德"
   },
@@ -10120,7 +10120,7 @@
     "en": "Mega Crabominable",
     "es": "Mega-Crabominable",
     "fr": "Méga-Crabominable",
-    "hi": "मेगा ैबॉमनेबल",
+    "hi": "मेगा क्रैबॉमिनेबल",
     "ja": "メガケケンカニ",
     "zh-TW": "超級好勝毛蟹"
   },
@@ -10138,7 +10138,7 @@
     "en": "Mega Drampa",
     "es": "Mega-Drampa",
     "fr": "Méga-Draïeul",
-    "hi": "मेगा डैपा",
+    "hi": "मेगा ड्रैम्पा",
     "ja": "メガジジーロン",
     "zh-TW": "超級老翁龍"
   },
@@ -10147,7 +10147,7 @@
     "en": "Mega Magearna",
     "es": "Mega-Magearna",
     "fr": "Méga-Magearna",
-    "hi": "मेगा मगयरना",
+    "hi": "मेगा मगियरना",
     "ja": "メガマギアナ",
     "zh-TW": "超級瑪機雅娜"
   },
@@ -10165,7 +10165,7 @@
     "en": "Gigantamax Melmetal",
     "es": "Melmetal Gigamax",
     "fr": "Melmetal Gigamax",
-    "hi": "जायगैंटामैस मेलमेटल",
+    "hi": "जायगैंटामैक्स मेलमेटल",
     "ja": "キョダイマックス メルメタル",
     "zh-TW": "超極巨化美錄梅塔"
   },
@@ -10174,7 +10174,7 @@
     "en": "Gigantamax Rillaboom",
     "es": "Rillaboom Gigamax",
     "fr": "Gorythmic Gigamax",
-    "hi": "जायगैंटामैस रलाबूम",
+    "hi": "जायगैंटामैक्स रिलाबूम",
     "ja": "キョダイマックス ゴリランダー",
     "zh-TW": "超極巨化轟擂金剛猩"
   },
@@ -10183,7 +10183,7 @@
     "en": "Gigantamax Cinderace",
     "es": "Cinderace Gigamax",
     "fr": "Pyrobut Gigamax",
-    "hi": "जायगैंटामैस संडरएस",
+    "hi": "जायगैंटामैक्स सिंडरएस",
     "ja": "キョダイマックス エースバーン",
     "zh-TW": "超極巨化閃焰王牌"
   },
@@ -10192,7 +10192,7 @@
     "en": "Gigantamax Inteleon",
     "es": "Inteleon Gigamax",
     "fr": "Lézargus Gigamax",
-    "hi": "जायगैंटामैस इंटलयन",
+    "hi": "जायगैंटामैक्स इंटेलियन",
     "ja": "キョダイマックス インテレオン",
     "zh-TW": "超極巨化千面避役"
   },
@@ -10201,7 +10201,7 @@
     "en": "Gigantamax Corviknight",
     "es": "Corviknight Gigamax",
     "fr": "Corvaillus Gigamax",
-    "hi": "जायगैंटामैस कोवनाइट",
+    "hi": "जायगैंटामैक्स कोर्विनाइट",
     "ja": "キョダイマックス アーマーガア",
     "zh-TW": "超極巨化鋼鎧鴉"
   },
@@ -10210,7 +10210,7 @@
     "en": "Gigantamax Orbeetle",
     "es": "Orbeetle Gigamax",
     "fr": "Astronelle Gigamax",
-    "hi": "जायगैंटामैस ऑबीटल",
+    "hi": "जायगैंटामैक्स ऑर्बीटल",
     "ja": "キョダイマックス イオルブ",
     "zh-TW": "超極巨化以歐路普"
   },
@@ -10219,7 +10219,7 @@
     "en": "Gigantamax Drednaw",
     "es": "Drednaw Gigamax",
     "fr": "Torgamord Gigamax",
-    "hi": "जायगैंटामैस डेडनॉ",
+    "hi": "जायगैंटामैक्स ड्रेडनॉ",
     "ja": "キョダイマックス カジリガメ",
     "zh-TW": "超極巨化暴噬龜"
   },
@@ -10228,7 +10228,7 @@
     "en": "Gigantamax Coalossal",
     "es": "Coalossal Gigamax",
     "fr": "Monthracite Gigamax",
-    "hi": "जायगैंटामैस कोलॉसल",
+    "hi": "जायगैंटामैक्स कोलॉसल",
     "ja": "キョダイマックス セキタンザン",
     "zh-TW": "超極巨化巨炭山"
   },
@@ -10237,7 +10237,7 @@
     "en": "Gigantamax Flapple",
     "es": "Flapple Gigamax",
     "fr": "Pomdrapi Gigamax",
-    "hi": "जायगैंटामैस लैपल",
+    "hi": "जायगैंटामैक्स फ़्लैपल",
     "ja": "キョダイマックス アップリュー",
     "zh-TW": "超極巨化蘋裹龍"
   },
@@ -10246,7 +10246,7 @@
     "en": "Gigantamax Appletun",
     "es": "Appletun Gigamax",
     "fr": "Dratatin Gigamax",
-    "hi": "जायगैंटामैस ऐपलटन",
+    "hi": "जायगैंटामैक्स ऐप्पलटन",
     "ja": "キョダイマックス タルップル",
     "zh-TW": "超極巨化豐蜜龍"
   },
@@ -10255,7 +10255,7 @@
     "en": "Gigantamax Sandaconda",
     "es": "Sandaconda Gigamax",
     "fr": "Dunaconda Gigamax",
-    "hi": "जायगैंटामैस सैंडाकॉडा",
+    "hi": "जायगैंटामैक्स सैंडाकॉन्डा",
     "ja": "キョダイマックス サダイジャ",
     "zh-TW": "超極巨化沙螺蟒"
   },
@@ -10264,7 +10264,7 @@
     "en": "Gigantamax Toxtricity",
     "es": "Toxtricity Gigamax",
     "fr": "Salarsen Gigamax",
-    "hi": "जायगैंटामैस टॉटसट",
+    "hi": "जायगैंटामैक्स टॉक्स्ट्रिसिटी",
     "ja": "キョダイマックス ストリンダー",
     "zh-TW": "超極巨化顫弦蠑螈"
   },
@@ -10273,7 +10273,7 @@
     "en": "Gigantamax Toxtricity",
     "es": "Toxtricity Gigamax",
     "fr": "Salarsen Gigamax",
-    "hi": "जायगैंटामैस टॉटसट",
+    "hi": "जायगैंटामैक्स टॉक्स्ट्रिसिटी",
     "ja": "キョダイマックス ストリンダー",
     "zh-TW": "超極巨化顫弦蠑螈"
   },
@@ -10282,7 +10282,7 @@
     "en": "Gigantamax Centiskorch",
     "es": "Centiskorch Gigamax",
     "fr": "Scolocendre Gigamax",
-    "hi": "जायगैंटामैस सेंटकॉच",
+    "hi": "जायगैंटामैक्स सेंटीस्कॉर्च",
     "ja": "キョダイマックス マルヤクデ",
     "zh-TW": "超極巨化焚焰蚣"
   },
@@ -10291,7 +10291,7 @@
     "en": "Gigantamax Hatterene",
     "es": "Hatterene Gigamax",
     "fr": "Sorcilence Gigamax",
-    "hi": "जायगैंटामैस हैटरन",
+    "hi": "जायगैंटामैक्स हैटेरीन",
     "ja": "キョダイマックス ブリムオン",
     "zh-TW": "超極巨化布莉姆溫"
   },
@@ -10300,7 +10300,7 @@
     "en": "Gigantamax Grimmsnarl",
     "es": "Grimmsnarl Gigamax",
     "fr": "Angoliath Gigamax",
-    "hi": "जायगैंटामैस िमनाल",
+    "hi": "जायगैंटामैक्स ग्रिमस्नार्ल",
     "ja": "キョダイマックス オーロンゲ",
     "zh-TW": "超極巨化長毛巨魔"
   },
@@ -10309,7 +10309,7 @@
     "en": "Gigantamax Alcremie",
     "es": "Alcremie Gigamax",
     "fr": "Charmilly Gigamax",
-    "hi": "जायगैंटामैस एलमी",
+    "hi": "जायगैंटामैक्स एलक्रमी",
     "ja": "キョダイマックス マホイップ",
     "zh-TW": "超極巨化霜奶仙"
   },
@@ -10318,7 +10318,7 @@
     "en": "Mega Falinks",
     "es": "Mega-Falinks",
     "fr": "Méga-Hexadron",
-    "hi": "मेगा फ़ेलस",
+    "hi": "मेगा फ़ेलिंक्स",
     "ja": "メガタイレーツ",
     "zh-TW": "超級列陣兵"
   },
@@ -10327,7 +10327,7 @@
     "en": "Gigantamax Copperajah",
     "es": "Copperajah Gigamax",
     "fr": "Pachyradjah Gigamax",
-    "hi": "जायगैंटामैस कॉपरआजा",
+    "hi": "जायगैंटामैक्स कॉपरआजा",
     "ja": "キョダイマックス ダイオウドウ",
     "zh-TW": "超極巨化大王銅象"
   },
@@ -10336,7 +10336,7 @@
     "en": "Gigantamax Duraludon",
     "es": "Duraludon Gigamax",
     "fr": "Duralugon Gigamax",
-    "hi": "जायगैंटामैस डुरैलुडॉन",
+    "hi": "जायगैंटामैक्स डुरैलुडॉन",
     "ja": "キョダイマックス ジュラルドン",
     "zh-TW": "超極巨化鋁鋼龍"
   },
@@ -10345,7 +10345,7 @@
     "en": "Single Strike Style Gigantamax Urshifu",
     "es": "Urshifu Gigamax Estilo Brusco",
     "fr": "Shifours Gigamax (Style Poing Final)",
-    "hi": "संगल टाइक टाइल जायगैंटामैस अशफ़ू",
+    "hi": "सिंगल स्ट्राइक स्टाइल जायगैंटामैक्स अर्शिफ़ू",
     "ja": "キョダイマックス ウーラオス（いちげきのかた）",
     "zh-TW": "超極巨化武道熊師（一擊流）"
   },
@@ -10354,7 +10354,7 @@
     "en": "Rapid Strike Style Gigantamax Urshifu",
     "es": "Urshifu Gigamax Estilo Fluido",
     "fr": "Shifours Gigamax (Style Mille Poings)",
-    "hi": "रैिपड टाइक टाइल जायगैंटामैस अशफ़ू",
+    "hi": "रैपिड स्ट्राइक स्टाइल जायगैंटामैक्स अर्शिफ़ू",
     "ja": "キョダイマックス ウーラオス（れんげきのかた）",
     "zh-TW": "超極巨化武道熊師（連擊流）"
   },
@@ -10363,7 +10363,7 @@
     "en": "Mega Scovillain",
     "es": "Mega-Scovillain",
     "fr": "Méga-Scovilain",
-    "hi": "मेगा कोवलन",
+    "hi": "मेगा स्कोविलन",
     "ja": "メガスコヴィラン",
     "zh-TW": "超級狠辣椒"
   },
@@ -10372,7 +10372,7 @@
     "en": "Mega Glimmora",
     "es": "Mega-Glimmora",
     "fr": "Méga-Floréclat",
-    "hi": "मेगा लमोरा",
+    "hi": "मेगा ग्लिमोरा",
     "ja": "メガキラフロル",
     "zh-TW": "超級晶光花"
   },
@@ -10381,7 +10381,7 @@
     "en": "Mega Tatsugiri",
     "es": "Mega-Tatsugiri",
     "fr": "Méga-Nigirigon",
-    "hi": "मेगा तासुगर",
+    "hi": "मेगा तात्सुगिरी",
     "ja": "メガシャリタツ",
     "zh-TW": "超級米立龍"
   },
