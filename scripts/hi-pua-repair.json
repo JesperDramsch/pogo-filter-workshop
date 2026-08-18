@@ -1,0 +1,573 @@
+{
+  "_comment": [
+    "Repairs Hindi values that arrive from the upstream translation sheet as legacy-font mojibake.",
+    "The sheet's Hindi column was at some point round-tripped through a non-Unicode 8-bit Devanagari",
+    "font of the Kruti Dev / Chanakya / DevLys family, whose private-use slots carry the half-forms,",
+    "conjuncts and matra width-variants that have no ASCII equivalent. 61 such slots survive in the",
+    "published CSV, corrupting 71 of 115 ingame terms, 287 move names and 902 of 1155 Pokemon names.",
+    "",
+    "'kind' encodes placement, because the legacy font stores text in VISUAL order and Unicode stores",
+    "it in LOGICAL order:",
+    "  inline  — substitute where the marker stands",
+    "  prebase — decoded matra renders LEFT of its consonant, so move it right past the whole cluster",
+    "  repha   — decoded र् renders ABOVE the following consonant, so move it left in front of it",
+    "",
+    "Each entry carries a worked example that scripts/hi-pua-repair.mjs validateTable() re-checks on",
+    "every fetch, so an edit here cannot silently change an unrelated word.",
+    "",
+    "Every value below was derived from context and cross-checked; none of it has been confirmed",
+    "against a real Hindi Pokemon GO client. See the PR description."
+  ],
+  "suspectedSourceFont": "Kruti Dev / Chanakya / DevLys family (legacy 8-bit Devanagari)",
+  "entries": {
+    "U+F001": {
+      "to": "र्",
+      "kind": "repha",
+      "example": {
+        "from": "पाट\uf001नर",
+        "to": "पार्टनर",
+        "gloss": "partner (Buddy)"
+      }
+    },
+    "U+F005": {
+      "to": "र्",
+      "kind": "repha",
+      "example": {
+        "from": "डाक\uf005",
+        "to": "डार्क",
+        "gloss": "Dark type"
+      }
+    },
+    "U+F008": {
+      "to": "े",
+      "kind": "inline",
+      "example": {
+        "from": "र\uf008ड",
+        "to": "रेड",
+        "gloss": "raid"
+      }
+    },
+    "U+F00A": {
+      "to": "े",
+      "kind": "inline",
+      "example": {
+        "from": "दो\uf35bत का ल\uf00aवल",
+        "to": "दोस्त का लेवल",
+        "gloss": "friend level"
+      }
+    },
+    "U+F00D": {
+      "to": "े",
+      "kind": "inline",
+      "example": {
+        "from": "रॉक\uf00dट",
+        "to": "रॉकेट",
+        "gloss": "Rocket"
+      }
+    },
+    "U+F015": {
+      "to": "ै",
+      "kind": "inline",
+      "example": {
+        "from": "क\uf015\uf01bडी XL",
+        "to": "कैंडी XL",
+        "gloss": "candy XL"
+      }
+    },
+    "U+F01B": {
+      "to": "ं",
+      "kind": "inline",
+      "example": {
+        "from": "क\uf015\uf01bडी km",
+        "to": "कैंडी km",
+        "gloss": "candy km"
+      }
+    },
+    "U+F1B0": {
+      "to": "्र",
+      "kind": "inline",
+      "example": {
+        "from": "ड\uf1b0ैगन",
+        "to": "ड्रैगन",
+        "gloss": "Dragon type"
+      }
+    },
+    "U+F306": {
+      "to": "र्",
+      "kind": "repha",
+      "example": {
+        "from": "नॉम\uf306ल",
+        "to": "नॉर्मल",
+        "gloss": "Normal type"
+      }
+    },
+    "U+F30C": {
+      "to": "ि",
+      "kind": "prebase",
+      "example": {
+        "from": "\uf30cग\uf390ट",
+        "to": "गिफ़्ट",
+        "gloss": "gift"
+      }
+    },
+    "U+F30D": {
+      "to": "ि",
+      "kind": "prebase",
+      "example": {
+        "from": "\uf30dरसच\uf306",
+        "to": "रिसर्च",
+        "gloss": "research"
+      }
+    },
+    "U+F30F": {
+      "to": "ि",
+      "kind": "prebase",
+      "example": {
+        "from": "\uf30fडफ़ेंडर",
+        "to": "डिफ़ेंडर",
+        "gloss": "defender"
+      }
+    },
+    "U+F310": {
+      "to": "ि",
+      "kind": "prebase",
+      "example": {
+        "from": "फ़ाइ\uf310टंग",
+        "to": "फ़ाइटिंग",
+        "gloss": "Fighting type"
+      }
+    },
+    "U+F311": {
+      "to": "ि",
+      "kind": "prebase",
+      "example": {
+        "from": "\uf311हसुइ",
+        "to": "हिसुइ",
+        "gloss": "Hisui"
+      }
+    },
+    "U+F312": {
+      "to": "ि",
+      "kind": "prebase",
+      "example": {
+        "from": "हाइपर-ट\uf1b0\uf008\uf312नंग",
+        "to": "हाइपर-ट्रेनिंग",
+        "gloss": "hyper training"
+      }
+    },
+    "U+F314": {
+      "to": "ि",
+      "kind": "prebase",
+      "example": {
+        "from": "\uf314म\uf314थकल",
+        "to": "मिथिकल",
+        "gloss": "mythical"
+      }
+    },
+    "U+F319": {
+      "to": "ि",
+      "kind": "prebase",
+      "example": {
+        "from": "\uf319सनोह",
+        "to": "सिनोह",
+        "gloss": "Sinnoh"
+      }
+    },
+    "U+F322": {
+      "to": "ी",
+      "kind": "inline",
+      "example": {
+        "from": "दूर\uf322",
+        "to": "दूरी",
+        "gloss": "distance"
+      }
+    },
+    "U+F323": {
+      "to": "ी",
+      "kind": "inline",
+      "example": {
+        "from": "ट\uf323म",
+        "to": "टीम",
+        "gloss": "team"
+      }
+    },
+    "U+F325": {
+      "to": "ी",
+      "kind": "inline",
+      "example": {
+        "from": "डु\uf34bल\uf325क\uf00dट",
+        "to": "डुप्लीकेट",
+        "gloss": "duplicate"
+      }
+    },
+    "U+F32A": {
+      "to": "ी",
+      "kind": "inline",
+      "example": {
+        "from": "लक\uf32a",
+        "to": "लकी",
+        "gloss": "lucky"
+      }
+    },
+    "U+F33A": {
+      "to": "क्",
+      "kind": "inline",
+      "example": {
+        "from": "डायनामै\uf33aस",
+        "to": "डायनामैक्स",
+        "gloss": "Dynamax"
+      }
+    },
+    "U+F34B": {
+      "to": "प्",
+      "kind": "inline",
+      "example": {
+        "from": "डु\uf34bल\uf325क\uf00dट",
+        "to": "डुप्लीकेट",
+        "gloss": "duplicate"
+      }
+    },
+    "U+F34C": {
+      "to": "फ्",
+      "kind": "inline",
+      "example": {
+        "from": "\uf34c़लाइंग",
+        "to": "फ़्लाइंग",
+        "gloss": "Flying type"
+      }
+    },
+    "U+F353": {
+      "to": "ल्",
+      "kind": "inline",
+      "example": {
+        "from": "मेगा एवॉ\uf353व",
+        "to": "मेगा एवॉल्व",
+        "gloss": "mega evolve"
+      }
+    },
+    "U+F35B": {
+      "to": "स्",
+      "kind": "inline",
+      "example": {
+        "from": "कॉ\uf35bट्यूम",
+        "to": "कॉस्ट्यूम",
+        "gloss": "costume"
+      }
+    },
+    "U+F365": {
+      "to": "ग्र",
+      "kind": "inline",
+      "example": {
+        "from": "बैक\uf365ाउंड",
+        "to": "बैकग्राउंड",
+        "gloss": "background"
+      }
+    },
+    "U+F374": {
+      "to": "प्र",
+      "kind": "inline",
+      "example": {
+        "from": "\uf374ाइमल र\uf008ड",
+        "to": "प्राइमल रेड",
+        "gloss": "primal raid"
+      }
+    },
+    "U+F379": {
+      "to": "म्र",
+      "kind": "inline",
+      "example": {
+        "from": "उ\uf379",
+        "to": "उम्र",
+        "gloss": "age"
+      }
+    },
+    "U+F390": {
+      "to": "फ़्",
+      "kind": "inline",
+      "example": {
+        "from": "\uf390यूज़न",
+        "to": "फ़्यूज़न",
+        "gloss": "fusion"
+      }
+    },
+    "U+F46A": {
+      "to": "द्ध",
+      "kind": "inline",
+      "example": {
+        "from": "शु\uf46a",
+        "to": "शुद्ध",
+        "gloss": "purified"
+      }
+    },
+    "U+F000": {
+      "to": "र्",
+      "kind": "repha",
+      "example": {
+        "from": "गुर\uf000ाना",
+        "to": "गुर्राना",
+        "gloss": "Snarl"
+      }
+    },
+    "U+F002": {
+      "to": "र्",
+      "kind": "repha",
+      "example": {
+        "from": "\uf35bटाल\uf002ी",
+        "to": "स्टार्ली",
+        "gloss": "Starly"
+      }
+    },
+    "U+F018": {
+      "to": "ु",
+      "kind": "inline",
+      "example": {
+        "from": "माक\uf018\uf311हता",
+        "to": "माकुहिता",
+        "gloss": "Makuhita"
+      }
+    },
+    "U+F019": {
+      "to": "ू",
+      "kind": "inline",
+      "example": {
+        "from": "कक\uf019ना",
+        "to": "ककूना",
+        "gloss": "Kakuna"
+      }
+    },
+    "U+F317": {
+      "to": "ि",
+      "kind": "prebase",
+      "example": {
+        "from": "\uf317शं\uf33aस",
+        "to": "शिंक्स",
+        "gloss": "Shinx"
+      }
+    },
+    "U+F31E": {
+      "to": "ि",
+      "kind": "prebase",
+      "example": {
+        "from": "\uf31eजं\uf33aस",
+        "to": "जिंक्स",
+        "gloss": "Jynx"
+      }
+    },
+    "U+F320": {
+      "to": "ि",
+      "kind": "prebase",
+      "example": {
+        "from": "\uf320\uf35bव\uf390ट",
+        "to": "स्विफ़्ट",
+        "gloss": "Swift"
+      }
+    },
+    "U+F32B": {
+      "to": "ी",
+      "kind": "inline",
+      "example": {
+        "from": "बटर\uf389\uf32b",
+        "to": "बटरफ़्री",
+        "gloss": "Butterfree"
+      }
+    },
+    "U+F33C": {
+      "to": "ग्",
+      "kind": "inline",
+      "example": {
+        "from": "\uf31eज\uf33cल\uf325पफ़",
+        "to": "जिग्लीपफ़",
+        "gloss": "Jigglypuff"
+      }
+    },
+    "U+F33E": {
+      "to": "च्",
+      "kind": "inline",
+      "example": {
+        "from": "\uf33eयूटल",
+        "to": "च्यूटल",
+        "gloss": "Chewtle"
+      }
+    },
+    "U+F33F": {
+      "to": "ज्",
+      "kind": "inline",
+      "example": {
+        "from": "कॉ\uf33f़मॉग",
+        "to": "कॉज़्मॉग",
+        "gloss": "Cosmog"
+      }
+    },
+    "U+F346": {
+      "to": "त्",
+      "kind": "inline",
+      "example": {
+        "from": "ता\uf346सु\uf30cगर\uf322",
+        "to": "तात्सुगिरी",
+        "gloss": "Tatsugiri"
+      }
+    },
+    "U+F347": {
+      "to": "थ्",
+      "kind": "inline",
+      "example": {
+        "from": "\uf347वैक\uf32a",
+        "to": "थ्वैकी",
+        "gloss": "Thwackey"
+      }
+    },
+    "U+F34A": {
+      "to": "न्",
+      "kind": "inline",
+      "example": {
+        "from": "डूगॉ\uf34aग",
+        "to": "डूगॉन्ग",
+        "gloss": "Dewgong"
+      }
+    },
+    "U+F34D": {
+      "to": "ब्",
+      "kind": "inline",
+      "example": {
+        "from": "\uf34dला\uf35bटॉइस",
+        "to": "ब्लास्टॉइस",
+        "gloss": "Blastoise"
+      }
+    },
+    "U+F350": {
+      "to": "म्",
+      "kind": "inline",
+      "example": {
+        "from": "\uf350यूटू",
+        "to": "म्यूटू",
+        "gloss": "Mewtwo"
+      }
+    },
+    "U+F356": {
+      "to": "व्",
+      "kind": "inline",
+      "example": {
+        "from": "\uf356\uf311ह\uf35bमर",
+        "to": "व्हिस्मर",
+        "gloss": "Whismur"
+      }
+    },
+    "U+F357": {
+      "to": "श्",
+      "kind": "inline",
+      "example": {
+        "from": "\uf389ै\uf33a\uf357युर",
+        "to": "फ़्रैक्श्युर",
+        "gloss": "Fraxure"
+      }
+    },
+    "U+F36F": {
+      "to": "थ्र",
+      "kind": "inline",
+      "example": {
+        "from": "रॉक \uf36fो",
+        "to": "रॉक थ्रो",
+        "gloss": "Rock Throw"
+      }
+    },
+    "U+F376": {
+      "to": "ब्र",
+      "kind": "inline",
+      "example": {
+        "from": "\uf35bलो\uf376ो",
+        "to": "स्लोब्रो",
+        "gloss": "Slowbro"
+      }
+    },
+    "U+F37C": {
+      "to": "व्र",
+      "kind": "inline",
+      "example": {
+        "from": "र\uf008वा\uf37cूम",
+        "to": "रेवाव्रूम",
+        "gloss": "Revavroom"
+      }
+    },
+    "U+F37D": {
+      "to": "श्र",
+      "kind": "inline",
+      "example": {
+        "from": "\uf37dूडल",
+        "to": "श्रूडल",
+        "gloss": "Shroodle"
+      }
+    },
+    "U+F387": {
+      "to": "े",
+      "kind": "inline",
+      "example": {
+        "from": "आक\uf005\uf387नाइन",
+        "to": "आर्केनाइन",
+        "gloss": "Arcanine"
+      }
+    },
+    "U+F388": {
+      "to": "रु",
+      "kind": "inline",
+      "example": {
+        "from": "डा\uf388माका",
+        "to": "डारुमाका",
+        "gloss": "Darumaka"
+      }
+    },
+    "U+F389": {
+      "to": "फ़्र",
+      "kind": "inline",
+      "example": {
+        "from": "\uf389ॉ\uf35bट \uf376ेथ",
+        "to": "फ़्रॉस्ट ब्रेथ",
+        "gloss": "Frost Breath"
+      }
+    },
+    "U+F3D1": {
+      "to": "क्र",
+      "kind": "inline",
+      "example": {
+        "from": "\uf3d1ैबहैमर",
+        "to": "क्रैबहैमर",
+        "gloss": "Crabhammer"
+      }
+    },
+    "U+F555": {
+      "to": "रू",
+      "kind": "inline",
+      "example": {
+        "from": "व\uf555म",
+        "to": "वरूम",
+        "gloss": "Varoom"
+      }
+    },
+    "U+F565": {
+      "to": "हू",
+      "kind": "inline",
+      "example": {
+        "from": "\uf565ट\uf565ट",
+        "to": "हूटहूट",
+        "gloss": "Hoothoot"
+      }
+    },
+    "U+F5A2": {
+      "to": "ट्",
+      "kind": "inline",
+      "example": {
+        "from": "\uf30fड\uf5a2\uf61fो",
+        "to": "डिट्टो",
+        "gloss": "Ditto (upper ट of the ट्ट stack)"
+      }
+    },
+    "U+F61F": {
+      "to": "ट",
+      "kind": "inline",
+      "example": {
+        "from": "\uf30fड\uf5a2\uf61fो",
+        "to": "डिट्टो",
+        "gloss": "Ditto (base ट of the ट्ट stack)"
+      }
+    }
+  }
+}

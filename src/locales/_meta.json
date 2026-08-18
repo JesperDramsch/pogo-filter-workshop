@@ -29,5 +29,9 @@
     "hi": 0,
     "ja": 0
   },
+  "hindiRepair": {
+    "valuesRepaired": 1278,
+    "unmappedCodepoints": []
+  },
   "warnings": []
 }
