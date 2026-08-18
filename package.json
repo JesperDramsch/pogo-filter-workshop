@@ -26,6 +26,7 @@
   "test:lucky": "vite-node scripts/check-lucky-logic.mjs",
   "test:friendcollect": "vite-node scripts/check-friend-collect.mjs",
   "test:verify": "vite-node scripts/check-verify.mjs",
+  "test:datafilters": "vite-node scripts/check-data-filters.mjs",
   "fixtures:update": "vite-node scripts/generate-fixtures.mjs",
   "preview": "vite preview",
   "deploy": "npm run build && gh-pages -d dist"

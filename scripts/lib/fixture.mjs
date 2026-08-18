@@ -47,18 +47,37 @@ function flattenBossMap(byTier) {
 // regional and trade-evo guards untested.
 export const FIXTURE_CONFIG = mergeImportedConfig(DEFAULT_CONFIG);
 
+// Raw buildFilters output for one locale, before the stable/volatile split.
+export function buildResult(locale) {
+  return buildFilters(DEFAULT_HUNDOS, DEFAULT_LUCKIES, FIXTURE_CONFIG, [], locale, makeTFn(locale));
+}
+
+// Exact-pinned fields: everything derived from config, species data and the
+// locale glossary — inputs that only move when someone changes them on purpose.
+// A diff here means the filter LOGIC changed, which is exactly the signal a
+// snapshot is good at.
+//
+// Deliberately NOT pinned: raidFilters, maxBattleFilters, maxTank,
+// rocketLeaders, rocketTypedGrunts, rocketGenericGrunts and pvpFilters. Those
+// are projections of data that syncs daily — 17 of the last 20 commits touching
+// this fixture were automated raid/PvP syncs, one of them rewriting 126 lines.
+// Pinning a daily-changing value cannot distinguish "the boss rotation moved"
+// from "the counter logic broke": the sync regenerates the snapshot in the same
+// job, so it always heals and nobody ever reviews it. That is churn, not a test.
+// Their generators are covered by property assertions in
+// scripts/check-data-filters.mjs, which hold no matter what the data does.
 export function buildFixture() {
   const fixture = {};
   for (const locale of Object.keys(LOCALES)) {
-    const tFn = makeTFn(locale);
-    const result = buildFilters(DEFAULT_HUNDOS, DEFAULT_LUCKIES, FIXTURE_CONFIG, [], locale, tFn);
+    const result = buildResult(locale);
     fixture[locale] = {
       trash: result.trash,
       trade: result.trade,
       sort: result.sort,
       prestaged: result.prestaged,
       gift: result.gift,
-      // Aux pro-tools — task-oriented filter strings.
+      // Aux pro-tools — task-oriented filter strings. Config-derived and stable;
+      // these were written to the fixture but never compared until now.
       shadowCheap: result.shadowCheap,
       shadowSafe: result.shadowSafe,
       shadowHundoCandidates: result.shadowHundoCandidates,
@@ -67,35 +86,35 @@ export function buildFixture() {
       dexPlus: result.dexPlus,
       megaEvolve: result.megaEvolve,
       pilotLong: result.pilotLong,
-      // Raid + max-battle per-boss counters. Flattened to id→clause so the
-      // snapshot stays compact; the full clauses array is reconstructible
-      // from the raid-bosses.json artifact in src/data/.
-      raidFilters: flattenBossMap(result.raidFilters),
-      maxBattleFilters: flattenBossMap(result.maxBattleFilters),
-      // Universal Max-Battle charger filter (single clause across all 0.5s
-      // fast moves + dynamax-eligibility). Locale-sensitive: emits localized
-      // move names per the move-name dictionary.
-      maxTank: result.maxTank?.clause || "",
-      // Team Rocket counters: leaders flatten to {leaderName: {phase: clause}};
-      // grunts flatten to {trainerName: clause}.
-      rocketLeaders: Object.fromEntries(
-        (result.rocketLeaders || []).map(l => [l.name,
-          Object.fromEntries(l.phases.map(p => [String(p.slot), p.clause || ""]))])
-      ),
-      rocketTypedGrunts: Object.fromEntries(
-        (result.rocketTypedGrunts || []).map(g => [g.name, g.clause])
-      ),
-      rocketGenericGrunts: Object.fromEntries(
-        (result.rocketGenericGrunts || []).map(g => [g.name, g.clause])
-      ),
-      pvpFilters: Object.fromEntries(
-        Object.entries(result.pvpFilters || {}).map(([k, v]) => [k, v.clause || ""])
-      ),
       trashClauseCount: result.trashClauses.length,
       tradeClauseCount: result.tradeClauses.length,
     };
   }
   return fixture;
+}
+
+// The data-derived filter families, exposed for the property checks. Shapes
+// mirror what the UI consumes.
+export function buildDataFilters(locale) {
+  const result = buildResult(locale);
+  return {
+    raidFilters: flattenBossMap(result.raidFilters),
+    maxBattleFilters: flattenBossMap(result.maxBattleFilters),
+    maxTank: result.maxTank?.clause || "",
+    rocketLeaders: Object.fromEntries(
+      (result.rocketLeaders || []).map(l => [l.name,
+        Object.fromEntries(l.phases.map(p => [String(p.slot), p.clause || ""]))])
+    ),
+    rocketTypedGrunts: Object.fromEntries(
+      (result.rocketTypedGrunts || []).map(g => [g.name, g.clause])
+    ),
+    rocketGenericGrunts: Object.fromEntries(
+      (result.rocketGenericGrunts || []).map(g => [g.name, g.clause])
+    ),
+    pvpFilters: Object.fromEntries(
+      Object.entries(result.pvpFilters || {}).map(([k, v]) => [k, v.clause || ""])
+    ),
+  };
 }
 
 // Recursive structural diff. Reports dotted paths so a failure names the exact
