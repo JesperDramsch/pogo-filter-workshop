@@ -68,11 +68,16 @@ console.log("\nL3 — the async paths that matter announce");
   check("copy failure is assertive (the user must act)", /assertive: state !== 'ok'/.test(copyFn));
 
   // Destructive two-step confirms: arming is a colour + label swap only.
+  // All five are listed here on purpose. The armed-restore one was described in
+  // this file's header and in Announcer.jsx before it was actually wired —
+  // documentation claiming a behaviour that did not exist — so the check now
+  // enumerates every confirm rather than trusting the prose.
   for (const [label, marker] of [
     ["reset everything", "app.modal.danger.reset_armed"],
     ["clear list", "app.clear_list.confirm"],
     ["clear trade marks", "app.map.clear_armed"],
     ["turn a protection off", "app.protect.confirm_off"],
+    ["apply an imported backup", "app.modal.backup.import_armed"],
   ]) {
     const idx = app.indexOf(marker);
     const near = idx === -1 ? "" : app.slice(Math.max(0, idx - 700), idx + 300);
