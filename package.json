@@ -31,6 +31,7 @@
   "test:a11ykbd": "vite-node scripts/check-a11y-keyboard.mjs",
   "test:a11ydialogs": "vite-node scripts/check-a11y-dialogs.mjs",
   "test:a11ylive": "vite-node scripts/check-a11y-live.mjs",
+  "test:a11ystate": "vite-node scripts/check-a11y-state.mjs",
   "fixtures:update": "vite-node scripts/generate-fixtures.mjs",
   "preview": "vite preview",
   "deploy": "npm run build && gh-pages -d dist"

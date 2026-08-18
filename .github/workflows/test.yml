@@ -28,4 +28,5 @@ jobs:
       - run: npm run test:a11ykbd
       - run: npm run test:a11ydialogs
       - run: npm run test:a11ylive
+      - run: npm run test:a11ystate
       - run: npm run build

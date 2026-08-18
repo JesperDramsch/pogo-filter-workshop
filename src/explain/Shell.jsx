@@ -232,6 +232,7 @@ export function AppNav({
             label={tab.label}
             onClick={() => onTabClick(tab.key)}
             tone={tab.key === currentKey ? "active" : "default"}
+            current={tab.key === currentKey}
           />
         ))}
         {extras}
@@ -318,7 +319,11 @@ export function ChapterNav({ currentKey, onNavigate }) {
   );
 }
 
-function NavChip({ icon: Icon, label, onClick, tone, iconRight = false }) {
+// `current` is deliberately separate from `tone`. Which tab you are on was
+// conveyed only by the "active" tone — a lighter background — so a screen-reader
+// user heard the same thing on every chip and could not tell where they were.
+// Tone stays a purely visual concern; `current` is the semantic one.
+function NavChip({ icon: Icon, label, onClick, tone, current = false, iconRight = false }) {
   // Visual tones: active (current chapter), primary (workshop), default,
   // muted (landing back-link).
   const styles = {
@@ -330,6 +335,7 @@ function NavChip({ icon: Icon, label, onClick, tone, iconRight = false }) {
   return (
     <button
       onClick={onClick}
+      aria-current={current ? "page" : undefined}
       className="mono text-xs flex items-center gap-1.5 px-2.5 py-1.5 rounded transition"
       style={{
         backgroundColor: styles.bg,
