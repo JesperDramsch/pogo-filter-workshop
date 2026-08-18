@@ -373,6 +373,7 @@
   "app.protect.trash_traded_regionals.why": "एक बार regional ट्रेड हो जाए तो 'बाद में ट्रेड कर सकता हूँ' वाला कारण ख़त्म हो जाता है — खराब-IV ट्रेड किया हुआ Alolan Raichu, Galarian Mr. Mime, Paldean Tauros आदि बाक़ी डुप्लिकेट्स की तरह कचरे में जाते हैं। Configured trade-buddy के prefix से tagged (जैसे #Auri:abra) Pokémon अपने आप protected रहते हैं, और बाक़ी को #Trade, #Fern-Tausch या custom tag से बचा सकते हो। Off = हर regional form trade status की परवाह किए बिना protected रहती है।",
   "app.modal.settings.title": "सेटिंग्स",
   "app.modal.settings.close_aria": "बंद करें",
+  "app.modal.changelog.close_aria": "नया क्या है बंद करें",
   "app.modal.language.section_title": "भाषा",
   "app.modal.language.ui_label": "डिस्प्ले भाषा",
   "app.modal.language.ui_help": "यूज़र इंटरफ़ेस की भाषा",
