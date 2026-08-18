@@ -373,6 +373,7 @@
   "app.protect.trash_traded_regionals.why": "リージョナル種が一度交換されると「いつか交換に使う」理由は消える — 個体値の低い交換済みアローラライチュウ、ガラルバリヤード、パルデアケンタロスなどは他のダブり同様ゴミ箱行き。設定した交換バディの接頭辞付きでタグ付けされた(例 #Auri:abra)ポケモンは自動的に保護され、それ以外は#Trade・#Fern-Tausch・任意のカスタムタグで救える。オフ = すべてのリージョナル形態は交換状況に関わらず保護される。",
   "app.modal.settings.title": "設定",
   "app.modal.settings.close_aria": "閉じる",
+  "app.modal.changelog.close_aria": "新着情報を閉じる",
   "app.modal.language.section_title": "言語",
   "app.modal.language.ui_label": "表示言語",
   "app.modal.language.ui_help": "ユーザーインターフェースの言語",

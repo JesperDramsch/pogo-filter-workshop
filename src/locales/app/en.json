@@ -373,6 +373,7 @@
   "app.protect.trash_traded_regionals.why": "Once a regional has been traded, the 'might trade it later' rationale is spent — bad-IV traded Alolan Raichu, Galarian Mr. Mime, Paldean Tauros, etc. fall into trash like any other dupe. Mons tagged for a configured trade buddy (e.g. #Auri:abra) stay protected automatically, and you can tag ad-hoc keepers with #Trade, #Fern-Tausch, or any custom tag. Off = every regional form stays protected regardless of trade status.",
   "app.modal.settings.title": "Settings",
   "app.modal.settings.close_aria": "Close",
+  "app.modal.changelog.close_aria": "Close what’s new",
   "app.modal.language.section_title": "Language",
   "app.modal.language.ui_label": "Display language",
   "app.modal.language.ui_help": "Language of the user interface",

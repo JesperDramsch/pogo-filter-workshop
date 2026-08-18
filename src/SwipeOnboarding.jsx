@@ -14,6 +14,7 @@ import {
   Check, X as XIcon, Undo2, SkipForward, ArrowRight, Hand, MapPin,
 } from "lucide-react";
 import { useTranslation } from "./i18n/I18nProvider.jsx";
+import { useDialogBehavior } from "./Dialog.jsx";
 import { C } from "./explain/colors.js";
 import { AppCredit } from "./explain/Shell.jsx";
 
@@ -117,6 +118,21 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
   const [index, setIndex] = useState(0);
   const [decisions, setDecisions] = useState({});
   const [confirm, setConfirm] = useState(null); // card awaiting toss confirmation
+  // The toss confirmation is the app's only DESTRUCTIVE dialog and had none of
+  // the dialog contract — no role, no name, no focus management, no Escape.
+  // It keeps its own animated markup (motion + AnimatePresence) and borrows the
+  // behaviour. It renders inside the deck rather than a portal, so it inerts the
+  // deck container specifically; pointing at #root would inert the dialog too.
+  const confirmPanelRef = useRef(null);
+  const confirmKeepRef = useRef(null);
+  const deckRef = useRef(null);
+  const onConfirmKeyDown = useDialogBehavior({
+    panelRef: confirmPanelRef,
+    onClose: () => setConfirm(null),
+    initialFocusRef: confirmKeepRef,
+    backgroundRef: deckRef,
+    active: !!confirm,
+  });
   const busyRef = useRef(false);
   const hintPlayedRef = useRef(false);
   const hintControlsRef = useRef(null);
@@ -261,7 +277,7 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
 
   return (
     <div className="grid-bg min-h-screen flex flex-col" style={{ backgroundColor: C.bg }}>
-      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 flex flex-col">
+      <div ref={deckRef} className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 flex flex-col">
         {/* Header — brand + skip */}
         <div className="flex items-center justify-between">
           <button
@@ -565,16 +581,25 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
             animate={{ opacity: 1 }}
             exit={reduced ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.15 }}
-            onClick={() => setConfirm(null)}
+            onMouseDown={(e) => {
+              if (e.target === e.currentTarget) setConfirm(null);
+            }}
           >
             <motion.div
+              ref={confirmPanelRef}
+              // alertdialog, not dialog: this interrupts to confirm something
+              // destructive, so AT should announce it rather than wait to be asked.
+              role="alertdialog"
+              aria-modal="true"
+              aria-label={t("app.onboarding.swipe.confirm_title")}
+              tabIndex={-1}
+              onKeyDown={onConfirmKeyDown}
               className="w-full max-w-sm rounded-2xl p-6 text-center"
               style={{ backgroundColor: C.panel, border: `1px solid ${C.borderHi}` }}
               initial={reduced ? false : { scale: 0.94, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={reduced ? { opacity: 1 } : { scale: 0.94, opacity: 0 }}
               transition={spring}
-              onClick={(e) => e.stopPropagation()}
             >
               <h3 className="mono text-lg font-bold" style={{ color: C.text }}>
                 {t("app.onboarding.swipe.confirm_title")}
@@ -584,6 +609,9 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
               </p>
               <div className="flex flex-col gap-2.5 mt-6">
                 <button
+                  // Initial focus lands on the SAFE choice (keep the protection),
+                  // never the destructive one.
+                  ref={confirmKeepRef}
                   onClick={() => commit(true)}
                   className="mono text-sm font-bold px-5 py-2.5 rounded transition"
                   style={{ backgroundColor: C.green, color: C.bg }}

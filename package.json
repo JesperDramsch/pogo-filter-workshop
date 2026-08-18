@@ -29,6 +29,7 @@
   "test:datafilters": "vite-node scripts/check-data-filters.mjs",
   "test:a11ynames": "vite-node scripts/check-a11y-names.mjs",
   "test:a11ykbd": "vite-node scripts/check-a11y-keyboard.mjs",
+  "test:a11ydialogs": "vite-node scripts/check-a11y-dialogs.mjs",
   "fixtures:update": "vite-node scripts/generate-fixtures.mjs",
   "preview": "vite preview",
   "deploy": "npm run build && gh-pages -d dist"

@@ -373,6 +373,7 @@
   "app.protect.trash_traded_regionals.why": "Sobald eine Regionalform getauscht wurde, ist das „könnte ich noch tauschen“-Argument verbraucht — getauschte Alola-Raichu (Psycho), Galar-Pantimos, Paldea-Tauros usw. mit schlechten IVs landen im Müll wie jedes andere Dublette. Pokémon mit einem konfigurierten Tausch-Buddy-Tag (z.B. #Auri:abra) bleiben automatisch geschützt, und Einzelfälle lassen sich mit #Trade, #Fern-Tausch oder einem eigenen Tag retten. Aus = jede Regionalform bleibt unabhängig vom Tauschstatus geschützt.",
   "app.modal.settings.title": "Einstellungen",
   "app.modal.settings.close_aria": "Schließen",
+  "app.modal.changelog.close_aria": "Neuerungen schließen",
   "app.modal.language.section_title": "Sprache",
   "app.modal.language.ui_label": "Anzeige-Sprache",
   "app.modal.language.ui_help": "Sprache der Bedienoberfläche",
