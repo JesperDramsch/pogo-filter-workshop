@@ -397,6 +397,24 @@ export function candyFamilyNames(species, outputLocale = 'de') {
 	];
 }
 
+// Does any hundo sit in the same candy family as `species`? A raw string
+// compare gets this wrong twice over: hundos are stored in whatever output
+// locale was active when they were typed (an imported "Charizard" and a typed
+// "glurak" are the same mon), and the filter's `+name` term selects the whole
+// candy family, so a hundo Pikachu covers a Raichu. Compare on the line root —
+// the same identity `+name` itself uses. Mirrors the canonKey idea in
+// buildFilters, one level up from names to families.
+// Exported for scripts/check-verify.mjs.
+export function hundoFamilyMatch(hundos, species) {
+	const info = resolveSpeciesInfo(species);
+	if (!info) return false;
+	const root = lineRootDex(info.dex);
+	return (hundos || []).some((h) => {
+		const hi = resolveSpeciesInfo(h);
+		return !!hi && lineRootDex(hi.dex) === root;
+	});
+}
+
 // Trade-evo families: dex-keyed identity, German base name as the user-facing
 // config key (kept stable so persisted localStorage state ["abra", "machollo"]
 // keeps working across locale changes). `baseDex` is the family head for
@@ -8301,7 +8319,11 @@ function VerifyPanel({ trash, trade, hundos, outputLocale = 'de' }) {
 
 	const inTrash = useMemo(() => evalFilterDetailed(trash, mon, outputLocale), [trash, mon, outputLocale]);
 	const inTrade = useMemo(() => evalFilterDetailed(trade, mon, outputLocale), [trade, mon, outputLocale]);
-	const inH = hundos.includes(mon.families[0] || '');
+	// Keyed on the typed species alone, as a string. `mon` is rebuilt whenever any
+	// field changes and hands back a fresh `families` array each time, so keying on
+	// the array would re-resolve every hundo on every IV/flag/tag keystroke.
+	const familyKey = mon.families[0] || '';
+	const inH = useMemo(() => hundoFamilyMatch(hundos, familyKey), [hundos, familyKey]);
 
 	const flagToggles = [
 		['favorite', 'app.verify.flag_fav'],
