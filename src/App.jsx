@@ -10900,6 +10900,12 @@ function BackupRestoreSection({ onExport, onImport }) {
 		if (!pending) return;
 		if (!armed) {
 			setArmed(true);
+			// The most destructive confirm in the app — the second press replaces
+			// every list, protection and tag with the file's contents. Arming it
+			// only swapped the button label and turned it red.
+			announce(`${t('app.modal.backup.import_apply')} — ${t('app.modal.backup.import_armed')}`, {
+				assertive: true,
+			});
 			return;
 		}
 		onImport(pending.envelope);
