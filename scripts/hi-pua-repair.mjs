@@ -18,8 +18,8 @@
 // nonsense words, and nothing an Indic shaper would render as intended. So each
 // table entry carries a placement `kind` and we reorder at the akshara level.
 //
-// The repair is a strict no-op on any string that contains no private-use
-// codepoints, so it disappears by itself the day upstream ships real Unicode.
+// The repair is a strict no-op when no changes are needed (no PUA substitutions
+// and no stray visually-ordered `ि` to reorder), so it disappears once upstream ships real Unicode.
 
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
