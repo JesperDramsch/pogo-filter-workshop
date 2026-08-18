@@ -86,9 +86,9 @@ export function useDialogBehavior({ panelRef, onClose, initialFocusRef, backgrou
 		return () => {
 			document.body.style.overflow = prevOverflow;
 			releaseBackground();
-			// Return focus to whatever opened this. If that element has since
-			// unmounted (a notice that hands off to another dialog), focus would
-			// fall to <body>; send it to the panel's opener fallback instead.
+			// Return focus to whatever opened this. If that element has since unmounted,
+			// we can't reliably restore focus here; the next dialog (if any) should take
+			// focus on mount, otherwise focus will fall back to <body>.
 			const prev = restoreRef.current;
 			if (prev && document.contains(prev) && typeof prev.focus === 'function') {
 				prev.focus({ preventScroll: true });
