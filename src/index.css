@@ -15,6 +15,28 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Visible focus, everywhere.
+   23 controls in App.jsx carry Tailwind's `outline-none`, which emits
+   `outline: 2px solid transparent` — it removes the browser's focus ring and
+   nothing in the repo replaced it, so keyboard users had no idea where they
+   were. Those fields DO set `focus:border-[#5EAFC5]`, but a 1px border colour
+   change is not a reliable focus indicator (and disappears entirely in forced-
+   colours mode).
+   :focus-visible rather than :focus so mouse clicks don't draw a ring.
+   The `outline-offset` keeps the ring clear of the control's own border. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid #5EAFC5;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+/* Forced-colours / Windows high-contrast: the accent is overridden by the OS
+   palette, so ask for the system highlight instead of a fixed hex. */
+@media (forced-colors: active) {
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline-color: Highlight;
+  }
+}
+
 /* Hide the default <details> disclosure marker — TrainerAccordion uses its
    own ChevronRight icon and rotates it via .details-arrow when [open]. */
 details > summary { list-style: none; }
