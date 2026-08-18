@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-08-15T08:50:44.272Z",
+  "fetchedAt": "2026-08-18T08:59:35.135Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -66,12 +66,12 @@
           "name": "Fearow"
         },
         {
-          "dex": 230,
-          "name": "Kingdra"
-        },
-        {
           "dex": 184,
           "name": "Azumarill"
+        },
+        {
+          "dex": 230,
+          "name": "Kingdra"
         },
         {
           "dex": 799,
@@ -90,6 +90,10 @@
           "name": "Dragonair (Shadow)"
         },
         {
+          "dex": 308,
+          "name": "Medicham"
+        },
+        {
           "dex": 302,
           "name": "Sableye (Shadow)"
         },
@@ -100,10 +104,6 @@
         {
           "dex": 197,
           "name": "Umbreon"
-        },
-        {
-          "dex": 308,
-          "name": "Medicham"
         },
         {
           "dex": 663,
@@ -203,12 +203,12 @@
           "name": "Blastoise"
         },
         {
-          "dex": 663,
-          "name": "Talonflame"
-        },
-        {
           "dex": 687,
           "name": "Malamar (Shadow)"
+        },
+        {
+          "dex": 663,
+          "name": "Talonflame"
         },
         {
           "dex": 365,
@@ -227,12 +227,12 @@
           "name": "Giratina (Altered)"
         },
         {
-          "dex": 979,
-          "name": "Annihilape"
-        },
-        {
           "dex": 939,
           "name": "Bellibolt"
+        },
+        {
+          "dex": 979,
+          "name": "Annihilape"
         },
         {
           "dex": 488,
@@ -548,16 +548,16 @@
           "name": "Zweilous"
         },
         {
+          "dex": 171,
+          "name": "Lanturn"
+        },
+        {
           "dex": 979,
           "name": "Annihilape"
         },
         {
           "dex": 752,
           "name": "Araquanid"
-        },
-        {
-          "dex": 171,
-          "name": "Lanturn"
         },
         {
           "dex": 302,
@@ -592,12 +592,12 @@
           "name": "Pawmo"
         },
         {
-          "dex": 799,
-          "name": "Guzzlord"
-        },
-        {
           "dex": 652,
           "name": "Chesnaught (Shadow)"
+        },
+        {
+          "dex": 799,
+          "name": "Guzzlord"
         },
         {
           "dex": 423,
@@ -605,7 +605,7 @@
         },
         {
           "dex": 687,
-          "name": "Malamar (Shadow)"
+          "name": "Malamar"
         },
         {
           "dex": 581,
