@@ -43,15 +43,15 @@ for (const file of FILES) {
   const lineOf = (idx) => src.slice(0, idx).split("\n").length;
 
   // Collect ids that a <label htmlFor> points at, so id-paired controls pass.
+  // Capture either a template literal (e.g. `${fid}-ui`) or a simple identifier (e.g. `id`).
   const labelled = new Set(
-    [...src.matchAll(/htmlFor=\{`?\$?\{?([^}`"']+)`?\}?/g)].map((m) => m[1].trim()),
+    [...src.matchAll(/htmlFor=\{`([^`]+)`\}|htmlFor=\{([A-Za-z_$][\w$]*)\}/g)].map((m) => (m[1] ?? m[2]).trim()),
   );
   const hasPairedLabel = (attrs) => {
-    const m = attrs.match(/\bid=\{`?\$?\{?([^}`"']+)`?\}?/);
+    const m = attrs.match(/\bid=\{`([^`]+)`\}|\bid=\{([A-Za-z_$][\w$]*)\}/);
     if (!m) return false;
-    const id = m[1].trim();
-    // Template ids like `${fid}-basar` are matched by their literal suffix.
-    return [...labelled].some((l) => l === id || l.endsWith(id) || id.endsWith(l));
+    const idExpr = (m[1] ?? m[2]).trim();
+    return labelled.has(idExpr);
   };
 
   // ── form controls ────────────────────────────────────────────────────────
