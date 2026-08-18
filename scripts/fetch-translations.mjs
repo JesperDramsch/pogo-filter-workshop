@@ -19,6 +19,12 @@ import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "csv-parse/sync";
+import {
+  repairHindi,
+  findPua,
+  validateTable,
+  assertNoPuaSurvives,
+} from "./hi-pua-repair.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -166,6 +172,126 @@ function processPokemonSheet(rows) {
   return pokemon;
 }
 
+// Keyword corrections for values the SHEET gets wrong — a different problem from
+// the Hindi mojibake below, which is an encoding fault. Here the glyphs decode
+// perfectly; the resulting word just isn't what the game accepts, so no amount
+// of repair-table work fixes it. Applied after the repair, and re-applied on
+// every fetch because the sheet is re-pulled on every `npm run build`.
+//
+// Only add an entry you have TESTED in a real client of that locale. A wrong
+// entry here is worse than the sheet's own error: it looks authoritative.
+//
+// KNOWN BROKEN, awaiting an in-game check:
+//   hi / ingame.filter_key_has_duplicate
+//     Sheet says डुप्लीकेट (long ी). Confirmed not to work in the Hindi client,
+//     while the other 59 filter keywords do. The mojibake repair is NOT at
+//     fault — U+F325 → ी is corroborated across लीफ़ / लीच / ग्लीम / डिप्लीशन.
+//     Candidates, in order of likelihood:
+//       'डुप्लिकेट'      — short ि, the standard transliteration
+//       'duplicate'      — some locales leave search keywords in English
+//       a native phrase  — every other locale translates rather than
+//                          transliterates this one (Repetido / Double /
+//                          ふくすう / 兩隻以上)
+//     Uncomment the line below with whichever the client actually accepts.
+const KEYWORD_OVERRIDES = {
+  hi: {
+    // 'ingame.filter_key_has_duplicate': 'डुप्लिकेट',
+  },
+};
+
+// Apply the overrides, and be loud about entries that have gone stale: a key
+// that no longer exists, or an override the sheet has caught up with, is dead
+// weight that should be deleted rather than silently doing nothing.
+function applyKeywordOverrides(ingameByLocale) {
+  let applied = 0;
+  const stale = [];
+  for (const [loc, entries] of Object.entries(KEYWORD_OVERRIDES)) {
+    for (const [key, value] of Object.entries(entries)) {
+      const bucket = ingameByLocale[loc];
+      if (!bucket || !(key in bucket)) {
+        stale.push(`${loc}/${key} — key not present in the sheet`);
+        continue;
+      }
+      if (bucket[key] === value) {
+        stale.push(`${loc}/${key} — sheet already matches, override is redundant`);
+        continue;
+      }
+      bucket[key] = value;
+      applied++;
+    }
+  }
+  for (const s of stale) console.warn(`⚠  stale keyword override: ${s}`);
+  return applied;
+}
+
+// The sheet's Hindi column is legacy-font mojibake (see scripts/hi-pua-repair.json).
+// Rewrite it in place after fetching and before anything is written, so the rest of
+// the pipeline — and the app — only ever sees real Unicode Devanagari.
+//
+// Returns a summary for _meta.json. Throws if the repair leaves any private-use
+// codepoint behind: silent half-repaired Devanagari is worse than a failed sync,
+// because nothing downstream can tell the difference.
+function repairHindiMojibake(ingameByLocale, appByLocale, pokemonNames) {
+  const unmapped = new Map(); // codepoint → occurrence count
+  const note = (cp) => unmapped.set(cp, (unmapped.get(cp) || 0) + 1);
+  const repaired = [];
+  let changed = 0;
+
+  const fix = (label, value) => {
+    const out = repairHindi(value, note);
+    if (out !== value) changed++;
+    repaired.push({ key: label, value: out });
+    return out;
+  };
+
+  for (const bag of [ingameByLocale.hi, appByLocale.hi]) {
+    for (const [k, v] of Object.entries(bag || {})) bag[k] = fix(k, v);
+  }
+  for (const [dex, names] of Object.entries(pokemonNames)) {
+    if (names.hi) names.hi = fix(`pokemon-names.${dex}`, names.hi);
+  }
+
+  if (unmapped.size > 0) {
+    const total = [...unmapped.values()].reduce((a, b) => a + b, 0);
+    console.warn(
+      `\n⚠  ${unmapped.size} private-use codepoint(s) in the Hindi column are NOT in ` +
+        `scripts/hi-pua-repair.json (${total} occurrence(s)):`
+    );
+    for (const [cp, count] of [...unmapped.entries()].sort((a, b) => b[1] - a[1])) {
+      const sample = repaired
+        .filter((r) => findPua(r.value).has(cp))
+        .slice(0, 3)
+        .map((r) => r.key);
+      console.warn(`   ${cp} ×${count}  e.g. ${sample.join(", ")}`);
+    }
+    console.warn("   Upstream has emitted mojibake this table does not cover yet.\n");
+  }
+
+  // Other locales should never contain private-use codepoints at all. Warn rather
+  // than fail — a new corruption elsewhere is worth surfacing but is not ours to fix.
+  for (const loc of TARGET_LOCALES) {
+    if (loc === "hi") continue;
+
+    const hits = [
+      ...Object.entries(ingameByLocale[loc] || {}).filter(([, v]) => findPua(v).size).map(([k]) => k),
+      ...Object.entries(appByLocale[loc] || {}).filter(([, v]) => findPua(v).size).map(([k]) => k),
+      ...Object.entries(pokemonNames)
+        .filter(([, names]) => names[loc] && findPua(names[loc]).size)
+        .map(([dex]) => `pokemon-names.${dex}`),
+    ];
+
+    if (hits.length) {
+      console.warn(
+        `⚠  ${loc}: ${hits.length} value(s) contain private-use codepoints ` +
+          `(e.g. ${hits.slice(0, 3).join(", ")}) — not repaired, the table is Hindi-only.`
+      );
+    }
+  }
+
+  assertNoPuaSurvives(repaired);
+  return { valuesRepaired: changed, unmappedCodepoints: [...unmapped.keys()] };
+}
+
 function detectWarnings(pokemonNames, ingameByLocale) {
   const warnings = [];
 
@@ -292,18 +418,54 @@ async function main() {
     fetchError = e;
   }
 
-  if (fetchError) {
-    console.error(`✗ Fetch failed: ${fetchError.message}`);
+  // Either fall back to the committed locale files or die, depending on whether the
+  // caller can tolerate stale data. Returns true when the caller should stop quietly.
+  const bailOrUseCache = (headline) => {
+    console.error(headline);
     if (offlineOk) {
       const sentinel = resolve(LOCALES_DIR, "en.json");
       if (existsSync(sentinel)) {
         console.warn(`⚠  --offline-ok and cached locale files exist; build will use cache.`);
-        return;
+        return true;
       }
       console.error(`✗ No cached locale files at ${sentinel} — cannot proceed offline.`);
     }
     process.exit(1);
+  };
+
+  if (fetchError) {
+    if (bailOrUseCache(`✗ Fetch failed: ${fetchError.message}`)) return;
   }
+
+  // Self-check the repair table before trusting it with the whole Hindi column.
+  const tableFailures = validateTable();
+  if (tableFailures.length > 0) {
+    console.error(`✗ scripts/hi-pua-repair.json failed its own worked examples:`);
+    for (const f of tableFailures) console.error(`   ${f}`);
+    process.exit(1);
+  }
+
+  // A codepoint the table does not cover means upstream changed under us. That must
+  // be loud where someone can act on it — a manual run, and the daily sync workflow,
+  // both exit non-zero. A plain `npm run build` keeps the committed (already repaired)
+  // locale files instead of dying over a spreadsheet edit.
+  let hindiRepair;
+  try {
+    hindiRepair = repairHindiMojibake(ingameByLocale, appByLocale, pokemonNames);
+  } catch (e) {
+    if (bailOrUseCache(`✗ ${e.message}`)) return;
+  }
+  console.log(
+    `✓ Hindi mojibake repair: ${hindiRepair.valuesRepaired} value(s) rewritten, no private-use codepoints remain`
+  );
+
+  // Sheet-level keyword corrections, after the encoding repair.
+  const overridden = applyKeywordOverrides(ingameByLocale);
+  console.log(
+    overridden > 0
+      ? `✓ keyword overrides: ${overridden} value(s) corrected against the sheet`
+      : `· keyword overrides: none active`
+  );
 
   // Per-locale flat files (ingame + app namespaces).
   for (const loc of TARGET_LOCALES) {
@@ -354,6 +516,7 @@ async function main() {
       pokemonNames: Object.keys(pokemonNames).length,
     },
     missingTranslationsCount: missingByLocale,
+    hindiRepair,
     warnings,
   };
   writeJson(resolve(LOCALES_DIR, "_meta.json"), meta);

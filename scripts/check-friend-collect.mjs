@@ -145,10 +145,18 @@ console.log('\nScenario 5: suggestion packs — lineup, caps, hygiene');
 		'raids pack survives the special-trade filter with real picks',
 		(sug.find((s) => s.kind === 'raids')?.species.length || 0) > 0,
 	);
+	// Curated species (dratini/lapras) and owned-but-not-curated species (lucky
+	// dragoran) may ride along in the time-limited packs — but only there, and
+	// only carrying the matching flag. Evergreen/meta packs prune them outright.
 	check(
-		'already-curated and owned species pruned',
-		!sug.some(
-			(s) => s.species.includes('dratini') || s.species.includes('lapras') || s.species.includes('dragoran'),
+		'curated/owned species appear at most in time-limited packs, correctly flagged',
+		sug.every((s) =>
+			s.species.every((sp, i) => {
+				if (sp === 'dratini' || sp === 'lapras')
+					return ['event', 'eggs'].includes(s.kind) && s.curated?.[i] === true;
+				if (sp === 'dragoran') return ['event', 'eggs'].includes(s.kind) && s.owned?.[i] === true;
+				return true;
+			}),
 		),
 	);
 	check(
@@ -253,6 +261,96 @@ console.log('\nScenario 7: egg-pool sets');
 	);
 }
 
+console.log('\nScenario 7b: time-limited packs keep covered/curated species — flagged, never vanishing');
+{
+	// The live regression (the wildspawn-pack complaint): owning luckies of
+	// every spawn in an event made the whole event pack disappear, looking
+	// exactly like "no pack was added". Snapshot-agnostic: run against the
+	// first live/upcoming event whose pack survives the tradeability filters.
+	const emptyCfg = { ...cfg, friendCollectSpecies: [], friendCollectMode: 'lucky' };
+	const baseline = buildFilters([], [], emptyCfg, [], 'en', t);
+	const basePack = baseline.friendCollectSuggestions.find((s) => s.kind === 'event');
+	if (!basePack) {
+		console.log('  (no event pack in the current snapshot — skipped)');
+	} else {
+		check('event packs carry owned/curated flags aligned with species',
+			Array.isArray(basePack.owned) && basePack.owned.length === basePack.species.length &&
+				Array.isArray(basePack.curated) && basePack.curated.length === basePack.species.length);
+		check('nothing owned/curated → nothing flagged',
+			basePack.owned.every((o) => o === false) && basePack.curated.every((c) => c === false));
+		// Own a lucky of EVERY species in the pack: the pack must survive, fully flagged.
+		const covered = buildFilters([], basePack.species, emptyCfg, [], 'en', t);
+		const coveredPack = covered.friendCollectSuggestions.find((s) => s.id === basePack.id);
+		check('fully-covered event pack still surfaces', !!coveredPack, basePack.id);
+		check('same species lineup, every one flagged owned',
+			!!coveredPack &&
+				JSON.stringify([...coveredPack.species].sort()) === JSON.stringify([...basePack.species].sort()) &&
+				coveredPack.owned.every(Boolean),
+			JSON.stringify(coveredPack?.owned));
+		// Partial coverage: owned entries queue behind the addable ones (a cap
+		// must never cost an addable species its slot to an owned one).
+		if (basePack.species.length > 1) {
+			const partial = buildFilters([], [basePack.species[0]], emptyCfg, [], 'en', t);
+			const partialPack = partial.friendCollectSuggestions.find((s) => s.id === basePack.id);
+			check('partially-covered pack keeps the owned species, flagged',
+				!!partialPack &&
+					partialPack.species.includes(basePack.species[0]) &&
+					partialPack.owned[partialPack.species.indexOf(basePack.species[0])] === true,
+				JSON.stringify(partialPack?.owned));
+			check('owned entries sort behind addable ones',
+				!!partialPack && partialPack.owned.every((o, i, a) => i === 0 || !(a[i - 1] && !o)),
+				JSON.stringify(partialPack?.owned));
+		}
+		// Curated species stay too — inert (flagged curated, never owned), so the
+		// pack survives even a fully-curated event and shows the full picture.
+		const curated = buildFilters([], [], { ...emptyCfg, friendCollectSpecies: basePack.species }, [], 'en', t);
+		const curatedPack = curated.friendCollectSuggestions.find((s) => s.id === basePack.id);
+		check('fully-curated event pack still surfaces', !!curatedPack, basePack.id);
+		check('curated entries flagged curated, not owned',
+			!!curatedPack && curatedPack.curated.every(Boolean) && curatedPack.owned.every((o) => o === false),
+			JSON.stringify({ curated: curatedPack?.curated, owned: curatedPack?.owned }));
+		// Mixed state: one owned, one curated, rest addable — addable first,
+		// owned next, curated last (cap priority order).
+		if (basePack.species.length > 2) {
+			const mixed = buildFilters([], [basePack.species[0]],
+				{ ...emptyCfg, friendCollectSpecies: [basePack.species[1]] }, [], 'en', t);
+			const mixedPack = mixed.friendCollectSuggestions.find((s) => s.id === basePack.id);
+			const rank = (i) => (mixedPack.curated[i] ? 2 : mixedPack.owned[i] ? 1 : 0);
+			check('mixed pack orders addable → owned → curated',
+				!!mixedPack && mixedPack.species.every((_, i) => i === 0 || rank(i - 1) <= rank(i)),
+				JSON.stringify({ owned: mixedPack?.owned, curated: mixedPack?.curated }));
+			check('mixed pack flags exactly the one owned and the one curated species',
+				!!mixedPack &&
+					mixedPack.owned.filter(Boolean).length === 1 &&
+					mixedPack.curated.filter(Boolean).length === 1 &&
+					mixedPack.owned[mixedPack.species.indexOf(basePack.species[0])] === true &&
+					mixedPack.curated[mixedPack.species.indexOf(basePack.species[1])] === true);
+		}
+	}
+	// Egg packs share the timeLimited behavior… (skip 25-capped pools: covering
+	// a capped pack pulls previously cut, uncovered species into the freed slots)
+	const eggBaseline = buildFilters([], [], emptyCfg, [], 'en', t)
+		.friendCollectSuggestions.find((s) => s.kind === 'eggs' && s.species.length < 25);
+	if (eggBaseline) {
+		const eggCovered = buildFilters([], eggBaseline.species, emptyCfg, [], 'en', t)
+			.friendCollectSuggestions.find((s) => s.id === eggBaseline.id);
+		check('fully-covered egg pack still surfaces, flagged', !!eggCovered && eggCovered.owned.every(Boolean));
+	}
+	// …while evergreen/meta packs keep prune-to-vanish and stay unflagged.
+	const powerNames = [
+		...new Set(
+			(SPECIES_META.powerLineDex || []).map((d) => pokemonNameFor(String(collectibleBaseDex(d)))).filter(Boolean),
+		),
+	];
+	const fullyOwned = buildFilters([], powerNames, emptyCfg, [], 'en', t);
+	check('fully-OWNED power-lines pack still disappears',
+		!fullyOwned.friendCollectSuggestions.some((s) => s.kind === 'powerlines'));
+	check('evergreen/meta packs carry no owned/curated arrays',
+		baseline.friendCollectSuggestions
+			.filter((s) => !['event', 'eggs'].includes(s.kind))
+			.every((s) => s.owned === undefined && s.curated === undefined));
+}
+
 console.log('\nScenario 8: output locale rendering');
 {
 	const r = buildFilters(hundos, luckies, cfg, [], 'de', t);
@@ -324,6 +422,17 @@ console.log('\nScenario 8c: collectible-base remap — packs suggest what a frie
 	check('Tyrogue (236) stays — three children, no unambiguous hop', collectibleBaseDex(236) === 236);
 	check('Lucario (448) stays — the stage above baby Riolu IS the target', collectibleBaseDex(448) === 448);
 	check('a base stays a base', collectibleBaseDex(147) === 147 && collectibleBaseDex(1) === 1);
+	// SPLIT_FAMILIES branch-stop: a coin-flip base is NOT a useful ask, because
+	// the friend cannot steer which branch the evolve produces. The walk stops
+	// at the branch's own base instead.
+	check('Beautifly (267) → Silcoon (266), not the 50/50 Wurmple', collectibleBaseDex(267) === 266);
+	check('Dustox (269) → Cascoon (268), not the 50/50 Wurmple', collectibleBaseDex(269) === 268);
+	check('Silcoon (266) and Cascoon (268) are already branch bases',
+		collectibleBaseDex(266) === 266 && collectibleBaseDex(268) === 268);
+	check('Huntail (367) and Gorebyss (368) stay put — Clamperl is a coin flip',
+		collectibleBaseDex(367) === 367 && collectibleBaseDex(368) === 368);
+	check('the coin-flip bases themselves are unchanged',
+		collectibleBaseDex(265) === 265 && collectibleBaseDex(366) === 366);
 
 	// The live regression (the original complaint): Greedent sits in the GL
 	// snapshot, so the pack must offer Skwovet — and a lucky Skwovet ("raffel"
@@ -471,11 +580,14 @@ console.log('\nScenario 8g: form-scoped wishlist exclusions — owned form out, 
 	const all = buildFilters([], ['vulpix'], { ...cfg, luckyForms: { vulpix: ['base', 'alola'] } }, [], 'en', t);
 	check('all-forms annotation = plain exclusion', all.friendLuckyWishlist.startsWith('!+vulpix&'), all.friendLuckyWishlist);
 	// Exclude-based form predicates (Kanto Raichu isolates as NOT-psychic)
-	// De-Morgan into a positive term.
+	// De-Morgan into a positive term. Raichu's line also bottoms out in baby
+	// Pichu, so the clause additionally carries the `eggsonly` widening — a
+	// hundo Kanto Raichu is not a hundo Pichu, and Pichu cannot be de-evolved
+	// into. This is the one catalog species where both refinements compose.
 	const raichu = buildFilters(['raichu'], [], { ...cfg, hundoForms: { raichu: ['base'] } }, [], 'en', t);
 	check(
-		'exclude-based catalog predicate handled (hundo Kanto Raichu → !+raichu,psychic)',
-		raichu.friendHundoWishlist.startsWith('!+raichu,psychic&'),
+		'exclude-based catalog predicate handled (hundo Kanto Raichu → !+raichu,psychic,eggsonly)',
+		raichu.friendHundoWishlist.startsWith('!+raichu,psychic,eggsonly&'),
 		raichu.friendHundoWishlist,
 	);
 	// The guaranteed-lucky variant inherits the scoped clauses.

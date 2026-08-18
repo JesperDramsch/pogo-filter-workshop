@@ -39,8 +39,33 @@ function regionForForm(form) {
     const variant = form.slice("Paldea_".length).toLowerCase(); // combat / blaze / aqua
     return { key: `paldea:${variant}`, region: "paldea", variant };
   }
-  return null;
+  return NON_REGIONAL_AXES[form] || null;
 }
+
+// Form axes that are NOT regional but ARE type-separable, so the same
+// {include, exclude} predicate machinery isolates them in PoGo search. They
+// carry `axis` instead of a meaningful region, which App.jsx's formRegionLabel
+// uses to render the variant alone ("Pflanzenumhang") rather than inventing a
+// region for it.
+//
+// Wormadam's cloaks really do differ: Plant Bug/Grass, Sandy Bug/Ground, Trash
+// Bug/Steel. Oricorio's four styles differ too (Fire / Electric / Psychic /
+// Ghost, all Flying) — the app previously blanket-protected Oricorio on the
+// stated grounds that "styles aren't separately searchable", which is wrong.
+//
+// Burmy's own cloaks are listed here on purpose even though all three are pure
+// Bug: predicateFor then reports them indistinct and buildCatalog drops the
+// species with a loud warning, which is the correct outcome and self-healing
+// if Niantic ever splits the types.
+const NON_REGIONAL_AXES = {
+  Plant: { key: "cloak:plant", axis: "cloak", variant: "plant" },
+  Sandy: { key: "cloak:sandy", axis: "cloak", variant: "sandy" },
+  Trash: { key: "cloak:trash", axis: "cloak", variant: "trash" },
+  Baile: { key: "style:baile", axis: "style", variant: "baile" },
+  Pompom: { key: "style:pompom", axis: "style", variant: "pompom" },
+  Pau: { key: "style:pau", axis: "style", variant: "pau" },
+  Sensu: { key: "style:sensu", axis: "style", variant: "sensu" },
+};
 
 // Render order: the base/origin form first, then the regional variants.
 const REGION_ORDER = { alola: 1, galar: 2, hisui: 3, paldea: 4 };
@@ -120,7 +145,11 @@ function buildCatalog(rows) {
     names.set(dex, row.pokemon_name);
     byDex.get(dex).set(reg.key, {
       key: reg.key,
-      region: reg.key === "base" ? originRegion(dex) : reg.region,
+      // Axis forms (cloak / style) have no meaningful region — carry the axis
+      // instead so the label renders the variant on its own.
+      ...(reg.axis
+        ? { axis: reg.axis }
+        : { region: reg.key === "base" ? originRegion(dex) : reg.region }),
       ...(reg.variant ? { variant: reg.variant } : {}),
       types: new Set(row.type.map(t => t.toLowerCase())),
     });
@@ -142,7 +171,7 @@ function buildCatalog(rows) {
       if (!pred) { indistinct = true; break; }
       out.push({
         key: form.key,
-        region: form.region,
+        ...(form.axis ? { axis: form.axis } : { region: form.region }),
         ...(form.variant ? { variant: form.variant } : {}),
         include: pred.include,
         exclude: pred.exclude,
@@ -182,6 +211,18 @@ function validate(species) {
     ["Meowth base region",    () => find(52, "base")?.region === "kanto"],
     ["Typhlosion base region",() => find(157, "base")?.region === "johto"],
     ["Decidueye base region", () => find(724, "base")?.region === "alola"],
+    // Non-regional but type-separable axes. Wormadam's cloaks and Oricorio's
+    // styles are real search targets; a silent drop here would ship the old
+    // "not separately searchable" claim back into the UI.
+    ["Wormadam plant",  () => check(413, "cloak:plant", ["grass"], [])],
+    ["Wormadam sandy",  () => check(413, "cloak:sandy", ["ground"], [])],
+    ["Wormadam trash",  () => check(413, "cloak:trash", ["steel"], [])],
+    ["Wormadam axis",   () => find(413, "cloak:plant")?.axis === "cloak"],
+    ["Oricorio baile",  () => check(741, "style:baile", ["fire"], [])],
+    ["Oricorio sensu",  () => check(741, "style:sensu", ["ghost"], [])],
+    // Burmy's three cloaks are all pure Bug, so it must stay OUT of the
+    // catalog — if this ever starts resolving, the types changed upstream.
+    ["Burmy stays indistinct", () => species["412"] === undefined],
   ];
   const failures = checks.filter(([, fn]) => !fn()).map(([name]) => name);
   if (failures.length) {

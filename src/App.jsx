@@ -213,22 +213,119 @@ const EVO_CHILDREN_BY_DEX = (() => {
 	return m;
 })();
 
+// Species where the GENDER of an owned lucky/hundo decides whether the
+// collection slot is really filled. The value lists the gender(s) that unlock
+// something the other gender cannot — so it is a Map, not a Set: clicking ♀ on
+// Wadribie completes it, clicking ♂ does not. Two mechanically distinct groups
+// share one shape. No feed carries either fact, so this is hand-maintained
+// alongside BABY_DEX and TRADE_EVO_FAMILIES.
+//
+// Deliberately NOT here: Burmy 412, whose gender and cloak interact (♀ carries
+// the cloak into Burmadame, ♂ becomes Moterpel regardless) — it needs one
+// combined slot group, which belongs with the un-searchable form work. And
+// Salmagnis 902, which is not released in PoGo.
+//
+// Every dex below is absent from regional-forms.json, so a have-list chip can
+// never render a gender group AND a form group at once (asserted in
+// scripts/check-lucky-logic.mjs).
+const GENDER_SLOT_DEX = new Map([
+	// (a) gender-LOCKED evolutions — the other gender is a dead end
+	[415, ['female']], // Wadribie → Honweisel (♂ has no evolution at all)
+	[757, ['female']], // Molunk → Amfira (♂ dead end; only 12.5% of catches are ♀)
+	[361, ['female']], // Schneppke → Frosdedje (either gender → Firnontor)
+	[280, ['male']], // Trasla → … → Galagladi (either gender → Guardevoir)
+	[281, ['male']], // Kirlia → Galagladi
+	// (b) gender-DETERMINED forms — both genders are distinct dex entries
+	[678, ['female', 'male']], // Psiaugon (different charged moves per gender)
+	[876, ['female', 'male']], // Servol (different base stats + moves)
+	[916, ['female', 'male']], // Fragrunz (different base stats)
+	[668, ['female', 'male']], // Pyroleo
+	[592, ['female', 'male']], // Quabbel
+	[593, ['female', 'male']], // Apoquallyp
+]);
+
+// Species carrying several collection slots that PoGo search CANNOT tell
+// apart: every form shares one dex entry AND one type combination, and there
+// is no form keyword. Nothing here can ever become a filter guard — these are
+// tracked purely so the app knows the species isn't finished, and the friend
+// wishlists keep asking for it until every slot is ticked.
+//
+// No upstream feed carries this (Sesokitz isn't even in pogoapi's types
+// dataset), so it is hand-maintained. The bar for entry is deliberately high:
+// forms that DO differ by type belong in regional-forms.json instead, where
+// they become real search guards — that is where Burmadame's cloaks and
+// Choreogel's styles now live.
+const INVISIBLE_FORM_SLOTS = {
+	585: { axis: 'season', slots: ['spring', 'summer', 'autumn', 'winter'] }, // Sesokitz
+	586: { axis: 'season', slots: ['spring', 'summer', 'autumn', 'winter'] }, // Kronjuwild
+	421: { axis: 'cherrim', slots: ['overcast', 'sunny'] }, // Kinoso — fixed at evolution
+	// Burmy: gender and cloak interact rather than stacking — ♀ carries the
+	// cloak into Burmadame, ♂ becomes Moterpel and the cloak is discarded. So
+	// it is ONE four-slot group, not a gender group plus a cloak group, and the
+	// chip still renders a single row. (Burmadame itself is type-searchable.)
+	412: { axis: 'burmy', slots: ['male', 'plant', 'sandy', 'trash'] },
+	925: { axis: 'maushold', slots: ['family3', 'family4'] }, // ~99:1 roll
+	982: { axis: 'dudunsparce', slots: ['twoseg', 'threeseg'] }, // ~99:1 roll
+};
+
+// Evolution lines whose branch is decided by an UNCONTROLLABLE 50:50 roll, so
+// owning one tip says nothing about the other. PoGo's `+` is the CANDY family,
+// which makes the usual `!+family` exclusion far too coarse here: `!+Schaloko`
+// also hides the friend's whole Panekon/Pudox branch — the very thing the
+// wishlist still wants. Members get bare (non-`+`) selectors instead, and the
+// line only collapses back to `!+base` once every branch is covered.
+//
+// Tyrogue is deliberately absent: its three-way split is decided by the highest
+// IV, which the player controls. (A hundo Tyrogue ties on all three and does
+// roll randomly — a rounding error against the cost of a wrong exclusion.)
+// Maushold and Dudunsparce are same-dex FORM splits rather than separate
+// species, so they cannot be enumerated by name at all.
+const SPLIT_FAMILIES = [
+	// Waumpel → Schaloko → Papinella | Panekon → Pudox
+	{ baseDex: 265, branches: [[266, 267], [268, 269]] },
+	// Perlu → Aalabyss | Saganabyss (both pure Water — no type predicate exists)
+	{ baseDex: 366, branches: [[367], [368]] },
+];
+// dex → its SPLIT_FAMILIES entry, for the base and every branch member alike.
+const SPLIT_FAMILY_BY_DEX = (() => {
+	const m = new Map();
+	for (const fam of SPLIT_FAMILIES) {
+		m.set(fam.baseDex, fam);
+		for (const branch of fam.branches) for (const d of branch) m.set(d, fam);
+	}
+	return m;
+})();
+
+// Baby stages whose `eggsonly` membership is NOT confirmed against the live
+// Game Master: its baby flag lists 18 species, and Toxel is absent even though
+// the species debuted egg-only. Widening an exclusion with `eggsonly` here
+// would risk HIDING the friend's copy — the exact failure the widening exists
+// to prevent — so these fall back to exact-name enumeration instead.
+const EGGSONLY_UNVERIFIED_DEX = new Set([848]); // Toxel
+
 // The stage a friend-collect pack should actually suggest for a species:
 // the base of its evolution line — trades re-roll IVs and luckiness sticks,
 // so the base covers the whole line by evolving, while an evolved copy can
-// never become the base (a lucky Greedent is not a lucky Skwovet). One
-// exception, per the babies rule above: when the line bottoms out in a baby,
+// never become the base (a lucky Greedent is not a lucky Skwovet). Two
+// exceptions. Per the babies rule above: when the line bottoms out in a baby,
 // the collectible base is the stage directly above it (Raichu → Pikachu, not
 // Pichu). A candidate that IS a baby hops down to its child when that child
 // is unambiguous; Tyrogue (three children) stays put — the pack preview
-// toggles let the user drop it by hand. Exported for the offline checks in
+// toggles let the user drop it by hand. And per SPLIT_FAMILIES: the walk stops
+// at the branch's own base, so a pack that wants Papinella asks for Schaloko
+// rather than a 50/50 Waumpel. Exported for the offline checks in
 // scripts/check-friend-collect.mjs.
 export function collectibleBaseDex(dex) {
 	const path = [dex];
 	let cur = dex;
 	// Cycle-guarded walk to the root of the line (real lines are ≤4 hops).
 	while (EVO_PARENT_BY_DEX[String(cur)] !== undefined && path.length < 10) {
-		cur = EVO_PARENT_BY_DEX[String(cur)];
+		const parent = EVO_PARENT_BY_DEX[String(cur)];
+		// Don't walk down INTO a coin flip — the branch base is as low as a
+		// suggestion can go and still be the thing the user asked for.
+		const fam = SPLIT_FAMILY_BY_DEX.get(parent);
+		if (fam && fam.baseDex === parent) break;
+		cur = parent;
 		if (path.includes(cur)) break;
 		path.push(cur);
 	}
@@ -236,6 +333,49 @@ export function collectibleBaseDex(dex) {
 	if (path.length >= 2) return path[path.length - 2];
 	const children = EVO_CHILDREN_BY_DEX.get(String(cur)) || [];
 	return children.length === 1 ? children[0] : cur;
+}
+
+// The baby stage at the root of a line, when the line HAS one and it isn't the
+// species itself. Babies only hatch from eggs and can never be de-evolved, so
+// an owned adult says nothing about the baby slot: a lucky Magmar is not a
+// lucky Magby. Returns null for lines without a baby, and for a baby itself
+// (evolving a lucky baby upward IS free, so the relation is directional).
+// Exported for the offline checks in scripts/check-lucky-logic.mjs.
+export function babyStageDex(dex) {
+	let cur = dex;
+	const seen = new Set([cur]);
+	while (EVO_PARENT_BY_DEX[String(cur)] !== undefined && seen.size < 10) {
+		cur = EVO_PARENT_BY_DEX[String(cur)];
+		if (seen.has(cur)) break;
+		seen.add(cur);
+	}
+	return cur !== dex && BABY_DEX.has(cur) ? cur : null;
+}
+
+// The root of a species' evolution line — the plain walk, with none of
+// collectibleBaseDex's baby / coin-flip special-casing. Two species share a
+// PoGo candy family exactly when they share this root, which is what `+name`
+// expands to.
+function lineRootDex(dex) {
+	let cur = dex;
+	const seen = new Set([cur]);
+	while (EVO_PARENT_BY_DEX[String(cur)] !== undefined && seen.size < 10) {
+		cur = EVO_PARENT_BY_DEX[String(cur)];
+		if (seen.has(cur)) break;
+		seen.add(cur);
+	}
+	return cur;
+}
+
+// The species plus everything it can still evolve into — exactly the set one
+// owned lucky/hundo genuinely covers, since luckiness and IVs both survive
+// evolution but nothing can ever be de-evolved.
+function selfAndDescendants(dex) {
+	const out = [dex];
+	for (let i = 0; i < out.length && out.length < 10; i++)
+		for (const child of EVO_CHILDREN_BY_DEX.get(String(out[i])) || [])
+			if (!out.includes(child)) out.push(child);
+	return out;
 }
 
 // Trade-evo families: dex-keyed identity, German base name as the user-facing
@@ -382,6 +522,29 @@ export const DEFAULT_CONFIG = {
 	// are pruned in the chip handlers and ignored by consumers, not in merge.
 	hundoForms: {},
 	luckyForms: {},
+	// Gender annotations for the have-lists, the exact sibling of the form maps
+	// above ({ species: ['female' | 'male', …] }). Only for GENDER_SLOT_DEX
+	// species, where the wrong gender is a dead end (a ♂ Wadribie never becomes
+	// Honweisel) or where gender picks a distinct dex entry (Psiaugon). Absent
+	// key = gender unknown → exactly today's species-level behavior. Same
+	// stale-key rule as the form maps: pruned in the chip handlers, not in merge.
+	hundoGenders: {},
+	luckyGenders: {},
+	// Un-searchable slot annotations ({ species: [slotKey, …] }) for the
+	// INVISIBLE_FORM_SLOTS species. PoGo search cannot express these, so they
+	// never become a guard — their ONLY effect is that the friend wishlists
+	// keep asking for the species until every slot is ticked, instead of
+	// excluding the whole family the moment one copy lands.
+	hundoSlots: {},
+	luckySlots: {},
+	// Sesokitz / Kronjuwild spawn in the season matching your hemisphere. The
+	// app infers it from your home pin plus the live in-game Season window and
+	// highlights the slot you can actually fill right now. Purely a UI hint —
+	// it never reaches buildFilters, because a clock inside a pure function
+	// would make the golden fixture non-deterministic. seasonAuto turns the
+	// inference off; seasonOverride pins a season by hand and wins over both.
+	seasonAuto: true,
+	seasonOverride: null,
 	// Trade buddies — list of { id, name, tagPrefix, events: [event-names] }
 	// tagPrefix matches any sub-tag (e.g. #Auri matches #Auri:hat-pika via PoGo prefix match).
 	buddies: [],
@@ -666,6 +829,11 @@ const REGIONAL_GROUPS = {
 			Florges: 'app.regional.collectibles.notes.flabebe_forms',
 			Choreogel: 'app.regional.collectibles.notes.oricorio_forms',
 			Krawalloro: 'app.regional.collectibles.notes.squawkabilly_forms',
+			Sesokitz: 'app.regional.collectibles.notes.deerling_forms',
+			Kronjuwild: 'app.regional.collectibles.notes.deerling_forms',
+			Kikugi: 'app.regional.collectibles.notes.cherrim_forms',
+			Kinoso: 'app.regional.collectibles.notes.cherrim_forms',
+			Burmy: 'app.regional.collectibles.notes.burmy_forms',
 		},
 		collectors: [
 			// Vivillon-line — flat collectors; collapses to +Purmel if all 3 selected
@@ -692,6 +860,13 @@ const REGIONAL_GROUPS = {
 			'Florges', // Red/Yellow/Blue flowers
 			'Choreogel', // Oricorio (Pom-Pom/Sensu/Baile/Pa'u)
 			'Krawalloro', // Squawkabilly (Green E / Blue W / Yellow + White worldwide)
+			// Same-dex, same-type multi-form species — invisible to search, so the
+			// slot badges on the step-3 chips are the only way to track them.
+			'Sesokitz',
+			'Kronjuwild', // Deerling / Sawsbuck — form locked at catch, 4 seasons
+			'Kikugi',
+			'Kinoso', // Cherubi / Cherrim — Overcast vs Sunny fixed at evolution
+			'Burmy', // three cloaks, all pure Bug (Burmadame's DO differ by type)
 		],
 	},
 };
@@ -703,16 +878,40 @@ const REGIONAL_GROUPS = {
 // species with no type-distinguishable regional forms (single-form species, or
 // forms search can't separate) — those fall back to the plain exact/+family
 // target. Keyed by dex so the lookup is locale-independent.
-function regionalFormsFor(species) {
+export function regionalFormsFor(species) {
 	if (!species) return null;
 	const info = resolveSpeciesInfo(species);
 	if (!info) return null;
 	return REGIONAL_FORMS.species[String(info.dex)]?.forms || null;
 }
 
+// Gender slots for a species, or null when gender is not a collection
+// dimension for it (the overwhelming majority). Dex-keyed like
+// regionalFormsFor, so the lookup is locale-independent. Exported for the
+// offline checks in scripts/check-lucky-logic.mjs.
+export function genderSlotsFor(species) {
+	if (!species) return null;
+	const info = resolveSpeciesInfo(species);
+	if (!info) return null;
+	return GENDER_SLOT_DEX.get(info.dex) || null;
+}
+
+// Un-searchable collection slots for a species, or null when it has none.
+// Exported for the offline checks in scripts/check-lucky-logic.mjs.
+export function invisibleSlotsFor(species) {
+	if (!species) return null;
+	const info = resolveSpeciesInfo(species);
+	if (!info) return null;
+	return INVISIBLE_FORM_SLOTS[String(info.dex)] || null;
+}
+
 // Localized label for a regional form (chip text + clause-why): "Base",
 // "Alola", "Paldea (Combat)" — region plus optional Paldean breed variant.
 function formRegionLabel(form, tFn) {
+	// Non-regional axes (Burmadame cloaks, Choreogel styles) have no region to
+	// name — the variant IS the whole label ("Pflanzenumhang", not
+	// "Sinnoh (Pflanze)").
+	if (form.axis) return tFn(`app.buddy_targets.form_variant.${form.variant}`);
 	const region = tFn(`app.buddy_targets.form_region.${form.region}`);
 	if (form.variant) return `${region} (${tFn(`app.buddy_targets.form_variant.${form.variant}`)})`;
 	return region;
@@ -1001,6 +1200,30 @@ export function mergeImportedConfig(raw, notices = []) {
 	});
 	merged.hundoForms = canonMapKeys(merged.hundoForms, validFormKeys);
 	merged.luckyForms = canonMapKeys(merged.luckyForms, validFormKeys);
+	// Gender annotation values. The map records which genders you OWN, so both
+	// are valid for any gender-slot species — owning the ♂ Wadribie is exactly
+	// the state worth recording. Which genders COUNT as filling a slot is
+	// GENDER_SLOT_DEX's job, applied at emission time. Species outside the
+	// catalog drop entirely.
+	const validGenderKeys = (species, rawVal) => {
+		if (!genderSlotsFor(species) || !Array.isArray(rawVal)) return undefined;
+		const keep = [...new Set(rawVal.filter((g) => g === 'male' || g === 'female'))];
+		return keep.length > 0 ? keep : undefined;
+	};
+	merged.hundoGenders = canonMapKeys(merged.hundoGenders, validGenderKeys);
+	merged.luckyGenders = canonMapKeys(merged.luckyGenders, validGenderKeys);
+	// Un-searchable slot values: dedupe against the species' own slot list.
+	const validSlotKeys = (species, rawVal) => {
+		const entry = invisibleSlotsFor(species);
+		if (!entry || !Array.isArray(rawVal)) return undefined;
+		const keep = [...new Set(rawVal.filter((k) => entry.slots.includes(k)))];
+		return keep.length > 0 ? keep : undefined;
+	};
+	merged.hundoSlots = canonMapKeys(merged.hundoSlots, validSlotKeys);
+	merged.luckySlots = canonMapKeys(merged.luckySlots, validSlotKeys);
+	if (typeof merged.seasonAuto !== 'boolean') merged.seasonAuto = true;
+	if (!['spring', 'summer', 'autumn', 'winter'].includes(merged.seasonOverride))
+		merged.seasonOverride = null;
 	// Buddy targets: migrate legacy string[] → structured Target[] and backfill
 	// the per-buddy raw escape hatch. `rawAppend` first so an existing value wins.
 	// Dedupe by species|type so a hand-edited import can't yield colliding lines.
@@ -1186,6 +1409,25 @@ export function buildFilters(
 	// sort surfaces only the annotated form's duplicates. Returns [] for the
 	// whole-family cases (unannotated, every form owned, or no type-separable forms).
 	// Forms whose predicate renders empty are skipped (can't be isolated in search).
+	// Gender is the same shape of refinement as a regional form, one axis over:
+	// the "predicate" isolating a gender is just the keyword, so its De Morgan
+	// negation is a single `!male` / `!female` term. Both call sites below keep
+	// the exact shape of their form-scoped twins — note they iterate OPPOSITE
+	// sets, which is correct and easy to misread:
+	//   wishlist → the genders you OWN   (hide those, keep what you lack visible)
+	//   sorts    → the genders you LACK  (hide those, surface your duplicates)
+	const genderDropTerms = (g) => (kw.flag[g] ? `!${kw.flag[g]}` : '');
+	// Slot genders still missing (i.e., still chase-worthy) to HIDE from a `+family`
+	// browse-sort member. [] when the species has no gender slots, is unannotated,
+	// or all slot genders are already owned.
+	const genderScopedSortGuards = (canonName, ownedGenders) => {
+		const slots = genderSlotsFor(canonName);
+		if (!slots) return [];
+		if (!Array.isArray(ownedGenders) || ownedGenders.length === 0) return [];
+		const owned = new Set(ownedGenders);
+		return slots.filter((g) => !owned.has(g) && genderDropTerms(g));
+	};
+
 	const formScopedSortGuards = (canonName, ownedKeys) => {
 		const catalog = regionalFormsFor(canonName) || [];
 		if (catalog.length === 0 || !Array.isArray(ownedKeys) || ownedKeys.length === 0) return [];
@@ -1831,7 +2073,8 @@ export function buildFilters(
 		for (const h of hundos) {
 			const key = canonKey(h);
 			const hide = formScopedSortGuards(key, cfg.hundoForms?.[key]);
-			if (hide.length === 0) continue;
+			const hideGenders = genderScopedSortGuards(key, cfg.hundoGenders?.[key]);
+			if (hide.length === 0 && hideGenders.length === 0) continue;
 			const out = speciesForOutput(h, outputLocale);
 			for (const f of hide)
 				push(
@@ -1840,6 +2083,12 @@ export function buildFilters(
 					tFn('app.clause_why.sort_form_scope', {
 						params: { species: capFirst(out), region: formRegionLabel(f, tFn) },
 					}),
+				);
+			for (const g of hideGenders)
+				push(
+					sortClauses,
+					`!+${out},${genderDropTerms(g)}`,
+					tFn('app.clause_why.sort_gender_scope', { params: { species: capFirst(out) } }),
 				);
 		}
 		if (cfg.protectAnyTag) push(sortClauses, '!#', tFn('app.clause_why.all_tags_protected'));
@@ -1909,7 +2158,8 @@ export function buildFilters(
 		for (const l of luckies) {
 			const key = canonKey(l);
 			const hide = formScopedSortGuards(key, cfg.luckyForms?.[key]);
-			if (hide.length === 0) continue;
+			const hideGenders = genderScopedSortGuards(key, cfg.luckyGenders?.[key]);
+			if (hide.length === 0 && hideGenders.length === 0) continue;
 			const out = speciesForOutput(l, outputLocale);
 			for (const f of hide)
 				push(
@@ -1918,6 +2168,12 @@ export function buildFilters(
 					tFn('app.clause_why.sort_form_scope', {
 						params: { species: capFirst(out), region: formRegionLabel(f, tFn) },
 					}),
+				);
+			for (const g of hideGenders)
+				push(
+					luckyFamilySortClauses,
+					`!+${out},${genderDropTerms(g)}`,
+					tFn('app.clause_why.sort_gender_scope', { params: { species: capFirst(out) } }),
 				);
 		}
 		if (cfg.protectAnyTag) push(luckyFamilySortClauses, '!#', tFn('app.clause_why.all_tags_protected'));
@@ -2027,15 +2283,24 @@ export function buildFilters(
 	// names to negate. resolveSpeciesInfo collapses forms (mega/regional) to
 	// their base dex; unresolvable entries are dropped rather than emitting a
 	// broken selector.
+	// Each entry carries its dex as well as its name, so the exclusion planner
+	// below can reason about the LINE (baby stage, coin-flip branch) rather than
+	// just the string.
 	const ownedSpeciesNames = (names) => {
-		const seen = new Set();
+		const seen = new Map();
 		for (const n of names || []) {
 			const dex = resolveSpeciesInfo(n)?.dex;
 			const out = dex ? pokemonNameFor(String(dex), outputLocale) : null;
-			if (out) seen.add(out.toLowerCase());
+			if (out) seen.set(out.toLowerCase(), dex);
 		}
-		return [...seen].sort((a, b) => a.localeCompare(b));
+		return [...seen]
+			.map(([out, dex]) => ({ out, dex }))
+			.sort((a, b) => a.out.localeCompare(b.out));
 	};
+	// Every dex the have-list actually holds — the lookup the planner needs to
+	// answer "is the baby stage / the other branch already covered?".
+	const ownedDexSet = (names) =>
+		new Set((names || []).map((n) => resolveSpeciesInfo(n)?.dex).filter(Boolean));
 
 	// Shared trade-eligibility guards appended to every friend wishlist.
 	const pushFriendTradeGuards = (clauses) => {
@@ -2072,31 +2337,171 @@ export function buildFilters(
 	};
 	const luckyScopedExclusions = formScopedExclusions(cfg.luckyForms);
 	const hundoScopedExclusions = formScopedExclusions(cfg.hundoForms);
-	const pushOwnedExclusion = (clauses, sp, scopedMap, plainWhyKey, formWhyKey) => {
-		const scoped = scopedMap.get(sp);
-		if (!scoped) {
-			push(clauses, `!+${sp}`, tFn(plainWhyKey, { params: { species: capFirst(sp) } }));
-			return;
+	// PoGo's `+` expands to the CANDY family, which is coarser than a collection
+	// slot in two ways — so a flat `!+family` over-excludes:
+	//
+	//   babies      `+Magmar` includes Magby, but a lucky Magmar is NOT a lucky
+	//               Magby: babies only hatch from eggs and can never be
+	//               de-evolved. Widen the clause with the `eggsonly` keyword so
+	//               the friend's baby survives it — `!+magmar,nurauseiern` reads
+	//               ¬(Magmar family) ∨ eggsonly, since comma binds tighter
+	//               than `&`. The reverse needs nothing: a lucky Magby evolves
+	//               into a lucky Magmar, so the relation is directional.
+	//   coin flips  `+Schaloko` includes the Panekon branch, which a lucky
+	//               Schaloko says nothing about (SPLIT_FAMILIES). Enumerate the
+	//               owned branch's members with bare selectors instead, and
+	//               collapse back to `!+base` only once EVERY branch is covered
+	//               — otherwise a finished line starts being offered again.
+	//
+	// Both are pure widenings of a clause that already exists, so a have-list
+	// with neither a baby line nor a split line emits byte-identical output.
+	//
+	// The keyword is only embeddable in a comma group when it is a single
+	// token. The hi locale ships `eggsonly` with a space in it, and a spaced
+	// term has never been proven inside an OR group (it works standalone today
+	// via cfg.protectBabies). Those locales take the enumeration path instead —
+	// the same safe fallback Toxel uses.
+	const babyKeyword = kw.flag.baby && !/\s/.test(kw.flag.baby) ? kw.flag.baby : null;
+	const exclusionPlanFor = (dex, ownedDex) => {
+		const fam = SPLIT_FAMILY_BY_DEX.get(dex);
+		if (fam) {
+			if (fam.branches.every((b) => b.some((d) => ownedDex.has(d))))
+				return { kind: 'family', collapseTo: fam.baseDex };
+			const branch = fam.branches.find((b) => b.includes(dex));
+			// Only the coin-flip base is owned: one specimen fills ONE branch at
+			// random, so nothing in the line is settled and nothing is excluded.
+			return branch ? { kind: 'members', members: branch } : { kind: 'none' };
 		}
-		for (const f of scoped)
-			push(
-				clauses,
-				`!+${sp},${formDropTerms(f)}`,
-				tFn(formWhyKey, { params: { species: capFirst(sp), region: formRegionLabel(f, tFn) } }),
-			);
+		const baby = babyStageDex(dex);
+		if (baby === null || ownedDex.has(baby)) return { kind: 'family' };
+		if (!babyKeyword || EGGSONLY_UNVERIFIED_DEX.has(baby))
+			return { kind: 'members', members: selfAndDescendants(dex) };
+		return { kind: 'family', extra: `,${babyKeyword}` };
+	};
+
+	// Emit the owned-line exclusions for one whole have-list. Deduplicated by
+	// clause text: a fully-covered split family collapses to a single `!+base`
+	// that every member would otherwise repeat, and two owned members of one
+	// branch enumerate that branch once.
+	// Gender widening for the wishlists, the mirror of the baby one above: an
+	// annotation that does not yet cover every slot for the species keeps the
+	// still-wanted gender visible to the friend. Emits the negation of each
+	// gender you OWN — `!+wadribie,!männlich` reads ¬(family) ∨ ¬male, so your
+	// friend's ♀ Wadribie survives while their ♂ (a dead end) is hidden.
+	// Unannotated, or every slot gender owned → '' → exactly today's clause.
+	const genderExtraFor = (canonSpecies, genderAnn) => {
+		const slots = genderSlotsFor(canonSpecies);
+		if (!slots) return '';
+		const owned = genderAnn?.[canonSpecies];
+		if (!Array.isArray(owned) || owned.length === 0) return '';
+		if (slots.every((g) => owned.includes(g))) return '';
+		return owned
+			.map(genderDropTerms)
+			.filter(Boolean)
+			.map((term) => `,${term}`)
+			.join('');
+	};
+
+	// Output-locale-keyed plan, built exactly like formScopedExclusions so the
+	// lookup key matches ownedSpeciesNames' entries.
+	const genderScopedExclusions = (ann) => {
+		const map = new Map();
+		for (const key of Object.keys(ann || {})) {
+			const extra = genderExtraFor(key, ann);
+			if (!extra) continue;
+			const out = speciesForOutput(key, outputLocale);
+			if (out) map.set(out, extra);
+		}
+		return map;
+	};
+
+	// Un-searchable slots can't be expressed as a guard, so the only honest
+	// move is to withhold the exclusion entirely: keep asking the friend for
+	// Sesokitz until all four seasons are ticked. Unannotated behaves exactly
+	// as before — one owned copy still excludes the family — so this only bites
+	// once the user has opted in by clicking a slot badge.
+	const invisibleSlotsIncomplete = (canonSpecies, slotAnn) => {
+		const entry = invisibleSlotsFor(canonSpecies);
+		if (!entry) return false;
+		const owned = slotAnn?.[canonSpecies];
+		if (!Array.isArray(owned) || owned.length === 0) return false;
+		return !entry.slots.every((s) => owned.includes(s));
+	};
+
+	const pushOwnedExclusions = (clauses, names, scopedMap, genderAnn, slotAnn, whyKeys) => {
+		const genderExtras = genderScopedExclusions(genderAnn);
+		const ownedDex = ownedDexSet(names);
+		const emitted = new Set();
+		const once = (clause, why) => {
+			if (emitted.has(clause)) return;
+			emitted.add(clause);
+			push(clauses, clause, why);
+		};
+		// Evolution-line ROOTS with an un-searchable slot still unfilled. Keyed by
+		// root rather than by species name because `!+X` expands to the whole
+		// candy family: owning a Kronjuwild would otherwise emit `!+kronjuwild`
+		// and hide the Sesokitz whose seasons are still incomplete, defeating the
+		// withholding entirely. One unfilled slot suppresses the exclusion for
+		// every member of that family.
+		const slotIncompleteRoots = new Set();
+		for (const key of Object.keys(slotAnn || {})) {
+			if (!invisibleSlotsIncomplete(key, slotAnn)) continue;
+			const d = resolveSpeciesInfo(key)?.dex;
+			if (d) slotIncompleteRoots.add(lineRootDex(d));
+		}
+		for (const { out: sp, dex } of ownedSpeciesNames(names)) {
+			// Search can't separate these forms, so no guard can be written —
+			// withhold the exclusion instead and keep the species on the ask.
+			if (slotIncompleteRoots.has(lineRootDex(dex))) continue;
+			const plan = exclusionPlanFor(dex, ownedDex);
+			if (plan.kind === 'none') continue;
+			if (plan.kind === 'members') {
+				const whyKey = SPLIT_FAMILY_BY_DEX.has(dex) ? whyKeys.branch : whyKeys.baby;
+				for (const d of plan.members) {
+					const name = pokemonNameFor(String(d), outputLocale);
+					if (!name) continue;
+					once(`!${name.toLowerCase()}`, tFn(whyKey, { params: { species: capFirst(name) } }));
+				}
+				continue;
+			}
+			const target = plan.collapseTo
+				? (pokemonNameFor(String(plan.collapseTo), outputLocale) || sp).toLowerCase()
+				: sp;
+			// Baby and gender widenings are independent comma terms on the same
+			// clause. No species carries both today (no GENDER_SLOT_DEX line
+			// bottoms out in a baby), but they compose if that ever changes.
+			const babyExtra = plan.extra || '';
+			const genderExtra = genderExtras.get(target) || '';
+			const extra = `${babyExtra}${genderExtra}`;
+			const whyPlain = babyExtra ? whyKeys.baby : genderExtra ? whyKeys.gender : whyKeys.plain;
+			const scoped = scopedMap.get(target);
+			if (!scoped) {
+				once(`!+${target}${extra}`, tFn(whyPlain, { params: { species: capFirst(target) } }));
+				continue;
+			}
+			// Gender and regional forms are disjoint catalogs, so the form
+			// branch only ever carries the baby widening.
+			for (const f of scoped)
+				once(
+					`!+${target},${formDropTerms(f)}${extra}`,
+					tFn(babyExtra ? whyKeys.babyForm : whyKeys.form, {
+						params: { species: capFirst(target), region: formRegionLabel(f, tFn) },
+					}),
+				);
+		}
 	};
 
 	// Lucky wishlist — exclude every family the user already has a lucky in
 	// (form-scoped where the lucky is annotated to specific regional forms).
 	const friendLuckyClauses = [];
-	for (const sp of ownedSpeciesNames(luckies))
-		pushOwnedExclusion(
-			friendLuckyClauses,
-			sp,
-			luckyScopedExclusions,
-			'app.clause_why.friend_have_lucky',
-			'app.clause_why.friend_have_lucky_form',
-		);
+	pushOwnedExclusions(friendLuckyClauses, luckies, luckyScopedExclusions, cfg.luckyGenders, cfg.luckySlots, {
+		plain: 'app.clause_why.friend_have_lucky',
+		form: 'app.clause_why.friend_have_lucky_form',
+		baby: 'app.clause_why.friend_have_lucky_baby',
+		babyForm: 'app.clause_why.friend_have_lucky_baby_form',
+		branch: 'app.clause_why.friend_have_lucky_branch',
+		gender: 'app.clause_why.friend_have_lucky_gender',
+	});
 	pushFriendTradeGuards(friendLuckyClauses);
 	const friendLuckyWishlist = friendLuckyClauses.map((c) => c.clause).join('&');
 
@@ -2117,14 +2522,14 @@ export function buildFilters(
 	// (form-scoped where annotated, same as the lucky wishlist above).
 	// No 4* clause: IVs re-roll on trade, so any untraded specimen is fair game.
 	const friendHundoClauses = [];
-	for (const sp of ownedSpeciesNames(hundos))
-		pushOwnedExclusion(
-			friendHundoClauses,
-			sp,
-			hundoScopedExclusions,
-			'app.clause_why.friend_have_hundo',
-			'app.clause_why.friend_have_hundo_form',
-		);
+	pushOwnedExclusions(friendHundoClauses, hundos, hundoScopedExclusions, cfg.hundoGenders, cfg.hundoSlots, {
+		plain: 'app.clause_why.friend_have_hundo',
+		form: 'app.clause_why.friend_have_hundo_form',
+		baby: 'app.clause_why.friend_have_hundo_baby',
+		babyForm: 'app.clause_why.friend_have_hundo_baby_form',
+		branch: 'app.clause_why.friend_have_hundo_branch',
+		gender: 'app.clause_why.friend_have_hundo_gender',
+	});
 	pushFriendTradeGuards(friendHundoClauses);
 	const friendHundoWishlist = friendHundoClauses.map((c) => c.clause).join('&');
 
@@ -2166,9 +2571,15 @@ export function buildFilters(
 	// hundo's form annotation overlaps the forms the target still wants.
 	// Unannotated ownership stays species-level (covers everything — exactly
 	// today's behavior), so annotations opt IN to finer pruning and absence
-	// changes nothing. Gender restrictions deliberately do NOT affect
-	// coverage: the have-lists carry no gender, so a gender-locked hunt that
-	// outlives a species-level catch is what the forced toggle is for.
+	// changes nothing.
+	//
+	// Gender works the same way now that the have-lists carry it: a target
+	// gender-locked to ♀ is NOT covered by a have-entry annotated ♂-only,
+	// because that specimen can never become the thing the target is after (a
+	// ♂ Wadribie never becomes Honweisel). An UNannotated have-entry still
+	// counts as covered — same opt-in rule as forms — so this only ever
+	// narrows coverage for users who clicked a badge. The two checks AND
+	// together; neither can override the other.
 	const friendCollectGenderMap = cfg.friendCollectGenders || {};
 	const friendCollectDropMap = cfg.friendCollectDropForms || {};
 	// Kept-form keys for a restricted target; null = unrestricted (species
@@ -2183,20 +2594,41 @@ export function buildFilters(
 		const kept = catalog.filter((f) => !dropped.has(f.key)).map((f) => f.key);
 		return kept.length > 0 && kept.length < catalog.length ? kept : null;
 	};
-	const friendCollectGoalOwned = (canonName, ownedSpecies, formAnn, keptFormKeys) => {
+	const friendCollectGoalOwned = (canonName, ownedSpecies, formAnn, keptFormKeys, genderAnn, wantedGender) => {
 		if (!ownedSpecies) return false;
+		// Gender gate: an annotated owner missing the target's locked gender
+		// cannot satisfy it. Unannotated stays covered (opt-in rule).
+		if (wantedGender) {
+			const ownedGenders = genderAnn?.[canonName];
+			if (Array.isArray(ownedGenders) && ownedGenders.length > 0 && !ownedGenders.includes(wantedGender))
+				return false;
+		}
 		if (!keptFormKeys) return true;
 		const owned = formAnn?.[canonName];
 		if (!Array.isArray(owned) || owned.length === 0) return true;
 		return owned.some((k) => keptFormKeys.includes(k));
 	};
+	const friendCollectWantedGender = (canonName) => {
+		const g = friendCollectGenderMap[canonName];
+		return g === 'male' || g === 'female' ? g : null;
+	};
 	const friendCollectCovered = (canonName, keptFormKeys = null) => {
-		const l = friendCollectGoalOwned(canonName, luckySet.has(canonName), cfg.luckyForms, keptFormKeys);
+		const wanted = friendCollectWantedGender(canonName);
+		const l = friendCollectGoalOwned(
+			canonName,
+			luckySet.has(canonName),
+			cfg.luckyForms,
+			keptFormKeys,
+			cfg.luckyGenders,
+			wanted,
+		);
 		const h = friendCollectGoalOwned(
 			canonName,
 			friendCollectHundoSet.has(canonName),
 			cfg.hundoForms,
 			keptFormKeys,
+			cfg.hundoGenders,
+			wanted,
 		);
 		if (friendCollectMode === 'lucky') return l;
 		if (friendCollectMode === 'hundo') return h;
@@ -2211,12 +2643,19 @@ export function buildFilters(
 	const friendCollectTargets = (cfg.friendCollectSpecies || []).map((sp) => {
 		const key = canonKey(sp);
 		const kept = friendCollectKeptForms(key);
-		const gender = friendCollectGenderMap[key];
+		const gender = friendCollectWantedGender(key);
 		return {
 			species: sp,
 			display: speciesForOutput(sp, outputLocale),
-			ownedLucky: friendCollectGoalOwned(key, luckySet.has(key), cfg.luckyForms, kept),
-			ownedHundo: friendCollectGoalOwned(key, friendCollectHundoSet.has(key), cfg.hundoForms, kept),
+			ownedLucky: friendCollectGoalOwned(key, luckySet.has(key), cfg.luckyForms, kept, cfg.luckyGenders, gender),
+			ownedHundo: friendCollectGoalOwned(
+				key,
+				friendCollectHundoSet.has(key),
+				cfg.hundoForms,
+				kept,
+				cfg.hundoGenders,
+				gender,
+			),
 			owned: friendCollectCovered(key, kept),
 			forced: friendCollectForcedSet.has(key),
 			gender: gender === 'male' || gender === 'female' ? gender : null,
@@ -2292,10 +2731,19 @@ export function buildFilters(
 	// locale for the pack-preview chips in the editor.
 	const friendCollectCuratedSet = new Set((cfg.friendCollectSpecies || []).map(canonKey));
 	const friendCollectSuggestions = [];
-	const pushFriendCollectSuggestion = (kind, id, title, meta, inputs, { cap = Infinity, keepStages = false } = {}) => {
+	// timeLimited (event/egg packs): covered and curated species stay in the
+	// pack, flagged via parallel `owned` / `curated` arrays, instead of pruning
+	// it — a roster that owns or already hunts every spawn would otherwise
+	// silently swallow an event pack, indistinguishable from "no event". Owned
+	// entries queue behind the addable ones and curated ones last, so a cap
+	// never costs an addable species its slot; curated entries are purely
+	// informational (an Add never touches them — re-adding is a no-op union).
+	// Evergreen/meta packs keep prune-to-vanish: consumed means done.
+	const pushFriendCollectSuggestion = (kind, id, title, meta, inputs, { cap = Infinity, keepStages = false, timeLimited = false } = {}) => {
 		const seen = new Set();
-		const species = [];
-		const display = [];
+		const picked = [];
+		const ownedQueue = [];
+		const curatedQueue = [];
 		for (const input of inputs || []) {
 			const info = resolveSpeciesInfo(input);
 			if (!info) continue;
@@ -2305,12 +2753,35 @@ export function buildFilters(
 			const stored = pokemonNameFor(String(dex));
 			if (!stored || seen.has(stored)) continue;
 			seen.add(stored);
-			if (friendCollectCuratedSet.has(stored) || friendCollectCovered(stored)) continue;
-			species.push(stored);
-			display.push(pokemonNameFor(String(dex), outputLocale) || stored);
-			if (species.length >= cap) break;
+			const curated = friendCollectCuratedSet.has(stored);
+			const covered = !curated && friendCollectCovered(stored);
+			if ((curated || covered) && !timeLimited) continue;
+			const entry = { stored, disp: pokemonNameFor(String(dex), outputLocale) || stored, covered, curated };
+			if (curated) curatedQueue.push(entry);
+			else if (covered) ownedQueue.push(entry);
+			else {
+				picked.push(entry);
+				if (picked.length >= cap) break;
+			}
 		}
-		if (species.length > 0) friendCollectSuggestions.push({ kind, id, title, ...meta, species, display });
+		for (const entry of [...ownedQueue, ...curatedQueue]) {
+			if (picked.length >= cap) break;
+			picked.push(entry);
+		}
+		if (picked.length === 0) return;
+		const suggestion = {
+			kind,
+			id,
+			title,
+			...meta,
+			species: picked.map((e) => e.stored),
+			display: picked.map((e) => e.disp),
+		};
+		if (timeLimited) {
+			suggestion.owned = picked.map((e) => e.covered);
+			suggestion.curated = picked.map((e) => e.curated);
+		}
+		friendCollectSuggestions.push(suggestion);
 	};
 	// Event spawns — running or upcoming events only; one suggestion per event
 	// so the set can be refreshed for the latest event as feeds update.
@@ -2324,6 +2795,7 @@ export function buildFilters(
 			ev.title,
 			{ start: ev.start, end: ev.end },
 			(ev.spawnDex || []).map(String),
+			{ timeLimited: true },
 		);
 	}
 	// Egg pools — Season pools run for months, event pools for days; hatched
@@ -2342,7 +2814,7 @@ export function buildFilters(
 			pool.title,
 			{ start: pool.start, end: pool.end },
 			(pool.eggDex || []).map(String),
-			{ cap: 25, keepStages: true },
+			{ cap: 25, keepStages: true, timeLimited: true },
 		);
 	}
 	// Evergreen packs — always on offer (no event gate: they shrink as they're
@@ -3694,6 +4166,54 @@ export function computeFurfrouTrims(lonLat) {
 	return FURFROU_TRIM_REGIONS.filter((e) => pointInRegionGeom(lonLat, e.geometry)).map((e) => e.trim);
 }
 
+// Which hemisphere home sits in — 'north' | 'south', or null with no home set.
+// Reuses the EQUATOR_SPLIT polygons rather than a bare `lat >= 0` so it agrees
+// with the app's own equator (PoGo's Chatot KMZ line sits a hair below 0°).
+// Exported for the city-table checks in scripts/verify-regionals.mjs.
+export function computeHomeHemisphere(homeLocation) {
+	if (!homeLocation) return null;
+	if (pointInRegionGeom(homeLocation, { type: 'Polygon', coordinates: [EQUATOR_SPLIT.north] })) return 'north';
+	if (pointInRegionGeom(homeLocation, { type: 'Polygon', coordinates: [EQUATOR_SPLIT.south] })) return 'south';
+	return null;
+}
+
+// Which seasonal form Sesokitz / Kronjuwild currently SPAWN as. The form is
+// locked at catch and never re-rolls, so this only tells you which slot is
+// fillable right now — it is a hint, never a filter term.
+//
+// Driven by the live in-game Season window from the events feed rather than
+// hardcoded month bands: PoGo rotates Deerling with its Season, whose
+// boundaries (e.g. 2 Jun – 8 Sep) don't line up with calendar months. The
+// window's midpoint month names the season; the southern hemisphere is six
+// months out of phase. Falls back to a plain meteorological band when no
+// Season entry covers the date, so a stale feed degrades to roughly-right
+// rather than to nothing.
+const SEASON_BY_MONTH = [
+	'winter', 'winter', 'spring', 'spring', 'spring', 'summer',
+	'summer', 'summer', 'autumn', 'autumn', 'autumn', 'winter',
+];
+const OPPOSITE_SEASON = { spring: 'autumn', summer: 'winter', autumn: 'spring', winter: 'summer' };
+
+// Exported for the offline table checks in scripts/verify-regionals.mjs.
+export function currentSeasonWindow(now, pools = EVENTS.eggPools || []) {
+	const t = now.getTime();
+	for (const pool of pools) {
+		if (pool.category !== 'Season' || !pool.start || !pool.end) continue;
+		const start = new Date(pool.start).getTime();
+		const end = new Date(pool.end).getTime();
+		if (Number.isNaN(start) || Number.isNaN(end) || t < start || t > end) continue;
+		return { title: pool.title || null, start, end, mid: new Date((start + end) / 2) };
+	}
+	return null;
+}
+
+export function deerlingSeasonFor(now, hemisphere, pools = EVENTS.eggPools || []) {
+	if (hemisphere !== 'north' && hemisphere !== 'south') return null;
+	const window = currentSeasonWindow(now, pools);
+	const northern = SEASON_BY_MONTH[(window ? window.mid : now).getMonth()];
+	return hemisphere === 'north' ? northern : OPPOSITE_SEASON[northern];
+}
+
 // Exported so scripts/verify-regionals.mjs can run the exact production code
 // path against the canonical regional table.
 export function computeHomeLocals(homeLocation) {
@@ -4157,6 +4677,22 @@ export default function App() {
 		return { ...config, regionalGroups: newGroups };
 	}, [config, homeLocals]);
 
+	// Season inference lives HERE, not in buildFilters: it reads the clock, and a
+	// clock inside the pure filter function would make the golden fixture
+	// non-deterministic. It only ever highlights a slot and renders a note.
+	const homeHemisphere = useMemo(() => computeHomeHemisphere(homeLocation), [homeLocation]);
+	const seasonWindow = useMemo(() => currentSeasonWindow(new Date()), []);
+	// The note only appears when a seasonal species is actually on a have-list.
+	const seasonRelevant = useMemo(
+		() => [...(hundos || []), ...(luckies || [])].some((sp) => invisibleSlotsFor(sp)?.axis === 'season'),
+		[hundos, luckies],
+	);
+	const activeSeason = useMemo(() => {
+		if (effectiveConfig.seasonOverride) return effectiveConfig.seasonOverride;
+		if (effectiveConfig.seasonAuto === false) return null;
+		return deerlingSeasonFor(new Date(), homeHemisphere);
+	}, [effectiveConfig.seasonOverride, effectiveConfig.seasonAuto, homeHemisphere]);
+
 	// Output locale: follows UI locale unless expert mode is on and the user
 	// explicitly picked a different one (e.g. their PoGo client is set to a
 	// different language than their browser).
@@ -4264,10 +4800,25 @@ export default function App() {
 		if (goal === 'hundo' && mode === 'lucky') return [];
 		if (goal === 'lucky' && mode === 'hundo') return [];
 		const otherSet = new Set(goal === 'hundo' ? luckies : hundos);
+		// Mirror buildFilters' gender gate so the popup can't claim coverage the
+		// filter itself won't grant. Badges are click-only, so a freshly typed
+		// entry is unannotated (→ covered, unchanged); but an IMPORTED config can
+		// carry an annotation before its have-entry exists, which makes this
+		// reachable.
+		const genderSatisfied = (ann, sp) => {
+			const wanted = (config.friendCollectGenders || {})[sp];
+			if (wanted !== 'male' && wanted !== 'female') return true;
+			const owned = ann?.[sp];
+			return !Array.isArray(owned) || owned.length === 0 || owned.includes(wanted);
+		};
+		const thisAnn = goal === 'hundo' ? config.hundoGenders : config.luckyGenders;
+		const otherAnn = goal === 'hundo' ? config.luckyGenders : config.hundoGenders;
 		const notices = [];
 		for (const sp of added) {
 			if (!curated.has(sp)) continue;
-			const nowFullyCovered = mode === 'both' ? otherSet.has(sp) : true;
+			if (!genderSatisfied(thisAnn, sp)) continue;
+			const nowFullyCovered =
+				mode === 'both' ? otherSet.has(sp) && genderSatisfied(otherAnn, sp) : true;
 			notices.push({ species: sp, goal, nowFullyCovered });
 		}
 		return notices;
@@ -4314,7 +4865,16 @@ export default function App() {
 		setHundos(hundos.filter((x) => x !== h));
 		// Shed the form annotation with the entry (config map keys must not
 		// outlive their have-list species).
-		if (config.hundoForms?.[h]) setConfig({ ...config, hundoForms: omitKey(config.hundoForms, h) });
+		// Shed EVERY annotation with the entry, in ONE setConfig: each call
+		// spreads the closure's `config`, so two sequential calls would drop the
+		// first one's edit on the floor.
+		setConfig((prev) => {
+			const next = { ...prev };
+			if (prev.hundoForms?.[h]) next.hundoForms = omitKey(prev.hundoForms, h);
+			if (prev.hundoGenders?.[h]) next.hundoGenders = omitKey(prev.hundoGenders, h);
+			if (prev.hundoSlots?.[h]) next.hundoSlots = omitKey(prev.hundoSlots, h);
+			return next;
+		});
 	}
 	function addLucky() {
 		// Same parser as addHundo: comma/space/semicolon-split, multi-locale
@@ -4339,7 +4899,14 @@ export default function App() {
 	}
 	function removeLucky(s) {
 		setLuckies(luckies.filter((x) => x !== s));
-		if (config.luckyForms?.[s]) setConfig({ ...config, luckyForms: omitKey(config.luckyForms, s) });
+		// Same single-call rule as removeHundo above.
+		setConfig((prev) => {
+			const next = { ...prev };
+			if (prev.luckyForms?.[s]) next.luckyForms = omitKey(prev.luckyForms, s);
+			if (prev.luckyGenders?.[s]) next.luckyGenders = omitKey(prev.luckyGenders, s);
+			if (prev.luckySlots?.[s]) next.luckySlots = omitKey(prev.luckySlots, s);
+			return next;
+		});
 	}
 	function addTopAttacker() {
 		// Same parser as addHundo: comma/space/semicolon-split, multi-locale
@@ -4659,6 +5226,11 @@ export default function App() {
 											removeHundo={removeHundo}
 											formsAnn={config.hundoForms || {}}
 											onFormsAnnChange={(next) => setConfig({ ...config, hundoForms: next })}
+											gendersAnn={config.hundoGenders || {}}
+											onGendersAnnChange={(next) => setConfig({ ...config, hundoGenders: next })}
+											slotsAnn={config.hundoSlots || {}}
+											onSlotsAnnChange={(next) => setConfig({ ...config, hundoSlots: next })}
+											activeSlot={activeSeason}
 										/>
 										<hr className='my-8 border-[#1F2933]' />
 										<SpeciesListEditor
@@ -4671,6 +5243,27 @@ export default function App() {
 											accent='#F5B82E'
 											formsAnn={config.luckyForms || {}}
 											onFormsAnnChange={(next) => setConfig({ ...config, luckyForms: next })}
+											gendersAnn={config.luckyGenders || {}}
+											onGendersAnnChange={(next) => setConfig({ ...config, luckyGenders: next })}
+											slotsAnn={config.luckySlots || {}}
+											onSlotsAnnChange={(next) => setConfig({ ...config, luckySlots: next })}
+											activeSlot={activeSeason}
+										/>
+										<SeasonNote
+											hemisphere={homeHemisphere}
+											season={activeSeason}
+											window={seasonWindow}
+											auto={config.seasonAuto !== false}
+											overridden={!!config.seasonOverride}
+											relevant={seasonRelevant}
+											onAuto={() => setConfig({ ...config, seasonAuto: true, seasonOverride: null })}
+											onOverride={(sn) =>
+												setConfig({
+													...config,
+													seasonOverride: config.seasonOverride === sn ? null : sn,
+												})
+											}
+											t={t}
 										/>
 									</div>
 									{effectiveConfig.expertMode && effectiveConfig.protectMythicals && (
@@ -5463,6 +6056,152 @@ function HaveFormBadges({ species, formsAnn, onFormsAnnChange, t }) {
 	);
 }
 
+// ♀/♂ click-only badges on a have-list chip, the exact sibling of
+// HaveFormBadges. Renders only for GENDER_SLOT_DEX species, which are disjoint
+// from the regional-form catalog — so a chip never shows two badge groups.
+// Records which genders you OWN; GENDER_SLOT_DEX decides which of them close
+// the slot. A slot-closing pick is tinted amber so "done" reads differently
+// from "recorded but still hunting".
+function HaveGenderBadges({ species, gendersAnn, onGendersAnnChange, t }) {
+	if (!onGendersAnnChange) return null;
+	const slots = genderSlotsFor(species);
+	if (!slots) return null;
+	const owned = new Set(gendersAnn?.[species] || []);
+	const complete = slots.every((g) => owned.has(g));
+	const toggle = (g) => {
+		const next = new Set(owned);
+		if (next.has(g)) next.delete(g);
+		else next.add(g);
+		if (next.size > 0) onGendersAnnChange({ ...(gendersAnn || {}), [species]: [...next] });
+		else onGendersAnnChange(omitKey(gendersAnn, species));
+	};
+	return (
+		<span className='flex items-center gap-0.5' title={t('app.have_genders.help')}>
+			{['female', 'male'].map((g) => {
+				const on = owned.has(g);
+				const tint = complete ? '#E2B93B' : '#5EAFC5';
+				return (
+					<button
+						key={g}
+						onClick={() => toggle(g)}
+						aria-pressed={on}
+						aria-label={t(`app.buddy_targets.gender_${g}`)}
+						title={t(`app.buddy_targets.gender_${g}`)}
+						className={`text-[9px] px-1 py-px rounded border transition ${
+							on ? '' : 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
+						}`}
+						style={on ? { background: `${tint}40`, borderColor: `${tint}80`, color: tint } : undefined}
+					>
+						{g === 'female' ? '♀' : '♂'}
+					</button>
+				);
+			})}
+		</span>
+	);
+}
+
+// Slot badges for species PoGo search cannot separate at all. Same shape as
+// the form and gender badges, and disjoint from both — so a chip still renders
+// exactly one refinement row. Unlike those two this can never become a filter
+// guard: ticking every slot is what finally lets the wishlist exclude the
+// family, which is the whole mechanism.
+function HaveSlotBadges({ species, slotsAnn, onSlotsAnnChange, activeSlot, t }) {
+	if (!onSlotsAnnChange) return null;
+	const entry = invisibleSlotsFor(species);
+	if (!entry) return null;
+	const owned = new Set(slotsAnn?.[species] || []);
+	const complete = entry.slots.every((s) => owned.has(s));
+	const toggle = (slot) => {
+		const next = new Set(owned);
+		if (next.has(slot)) next.delete(slot);
+		else next.add(slot);
+		if (next.size > 0) onSlotsAnnChange({ ...(slotsAnn || {}), [species]: [...next] });
+		else onSlotsAnnChange(omitKey(slotsAnn, species));
+	};
+	return (
+		<span className='flex items-center gap-0.5' title={t('app.have_slots.help')}>
+			{entry.slots.map((slot) => {
+				const on = owned.has(slot);
+				const tint = complete ? '#E2B93B' : '#5EAFC5';
+				return (
+					<button
+						key={slot}
+						onClick={() => toggle(slot)}
+						aria-pressed={on}
+						title={slot === activeSlot ? t('app.have_slots.spawning_now') : undefined}
+						className={`text-[9px] px-1 py-px rounded border transition ${
+							on ? '' : 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
+						} ${slot === activeSlot ? 'ring-1 ring-[#E2B93B]/70' : ''}`}
+						style={on ? { background: `${tint}40`, borderColor: `${tint}80`, color: tint } : undefined}
+					>
+						{t(`app.have_slots.${entry.axis}.${slot}`)}
+					</button>
+				);
+			})}
+		</span>
+	);
+}
+
+// Explains the inferred Sesokitz season and lets the user override or switch
+// it off. Rendered once under the have-list editors rather than per chip.
+function SeasonNote({ hemisphere, season, window, auto, onAuto, onOverride, overridden, relevant, t }) {
+	const { locale } = useTranslation();
+	// Show it exactly when a seasonal species is on a have-list — otherwise it is
+	// noise for the ~everyone who owns no Sesokitz. Crucially it must NOT hide
+	// when auto is on but no season could be derived (no home pin): the auto
+	// toggle and the manual override live in here, so hiding then strands the
+	// user with no way to reach either.
+	if (!relevant) return null;
+	const until =
+		window && window.end
+			? new Date(window.end).toLocaleDateString(locale, { day: 'numeric', month: 'short' })
+			: null;
+	return (
+		<div className='mt-4 rounded border border-[#2D3A47] bg-[#141C24] px-3 py-2'>
+			<p className='mono text-[10px] leading-relaxed text-[#8B98A5]'>
+				{season
+					? t(overridden ? 'app.have_slots.season_note_manual' : 'app.have_slots.season_note', {
+							params: {
+								hemisphere: t(`app.have_slots.hemisphere.${hemisphere || 'unknown'}`),
+								season: t(`app.have_slots.season.${season}`),
+								until: until || '—',
+							},
+						})
+					: auto
+						? t('app.have_slots.season_note_unknown')
+						: t('app.have_slots.season_note_off')}
+			</p>
+			<div className='mt-1.5 flex flex-wrap items-center gap-1'>
+				<button
+					onClick={onAuto}
+					aria-pressed={auto && !overridden}
+					className={`text-[9px] px-1 py-px rounded border transition ${
+						auto && !overridden
+							? 'bg-[#5EAFC5]/25 border-[#5EAFC5]/50 text-[#5EAFC5]'
+							: 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
+					}`}
+				>
+					{t('app.have_slots.season_auto')}
+				</button>
+				{['spring', 'summer', 'autumn', 'winter'].map((sn) => (
+					<button
+						key={sn}
+						onClick={() => onOverride(sn)}
+						aria-pressed={overridden && season === sn}
+						className={`text-[9px] px-1 py-px rounded border transition ${
+							overridden && season === sn
+								? 'bg-[#E2B93B]/25 border-[#E2B93B]/50 text-[#E2B93B]'
+								: 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
+						}`}
+					>
+						{t(`app.have_slots.season.${sn}`)}
+					</button>
+				))}
+			</div>
+		</div>
+	);
+}
+
 function HundosEditor({
 	hundos,
 	setHundos,
@@ -5472,6 +6211,11 @@ function HundosEditor({
 	removeHundo,
 	formsAnn,
 	onFormsAnnChange,
+	gendersAnn,
+	onGendersAnnChange,
+	slotsAnn,
+	onSlotsAnnChange,
+	activeSlot,
 }) {
 	const { t } = useTranslation();
 	// Live preview of what's about to be added: parse the input, resolve each token,
@@ -5506,6 +6250,19 @@ function HundosEditor({
 						<span className='text-[#5EAFC5]'>+</span>
 						{h}
 						<HaveFormBadges species={h} formsAnn={formsAnn} onFormsAnnChange={onFormsAnnChange} t={t} />
+						<HaveGenderBadges
+							species={h}
+							gendersAnn={gendersAnn}
+							onGendersAnnChange={onGendersAnnChange}
+							t={t}
+						/>
+						<HaveSlotBadges
+							species={h}
+							slotsAnn={slotsAnn}
+							onSlotsAnnChange={onSlotsAnnChange}
+							activeSlot={activeSlot}
+							t={t}
+						/>
 						<button
 							onClick={() => removeHundo(h)}
 							className='opacity-40 group-hover:opacity-100 hover:text-[#E74C3C] transition'
@@ -5614,6 +6371,11 @@ function SpeciesListEditor({
 	accent,
 	formsAnn,
 	onFormsAnnChange,
+	gendersAnn,
+	onGendersAnnChange,
+	slotsAnn,
+	onSlotsAnnChange,
+	activeSlot,
 }) {
 	const { t } = useTranslation();
 	const previewTokens = useMemo(() => {
@@ -5646,6 +6408,19 @@ function SpeciesListEditor({
 						<span style={{ color: accent }}>+</span>
 						{s}
 						<HaveFormBadges species={s} formsAnn={formsAnn} onFormsAnnChange={onFormsAnnChange} t={t} />
+						<HaveGenderBadges
+							species={s}
+							gendersAnn={gendersAnn}
+							onGendersAnnChange={onGendersAnnChange}
+							t={t}
+						/>
+						<HaveSlotBadges
+							species={s}
+							slotsAnn={slotsAnn}
+							onSlotsAnnChange={onSlotsAnnChange}
+							activeSlot={activeSlot}
+							t={t}
+						/>
 						<button
 							onClick={() => removeItem(s)}
 							className='opacity-40 group-hover:opacity-100 hover:text-[#E74C3C] transition'
@@ -6017,18 +6792,27 @@ function FriendCollectEditor({
 	function togglePreview(id) {
 		setOpenPreviews((prev) => ({ ...prev, [id]: !prev[id] }));
 	}
-	function togglePackSpecies(packId, name) {
+	// Species the user already covers (lucky/hundo per mode) ride along in
+	// time-limited packs, flagged via `owned`. They start deselected — the Add
+	// count stays honest — but a tap opts them back in (re-hunt during an
+	// event). Already-curated species (`curated`) ride along too, purely for
+	// the full event picture: inert, dimmed, never part of an Add.
+	function packDefaultOff(s) {
+		return s.species.filter((_, i) => (s.owned || [])[i] || (s.curated || [])[i]);
+	}
+	function togglePackSpecies(pack, name, index) {
+		if ((pack.curated || [])[index]) return;
 		setPackDeselected((prev) => {
-			const next = new Set(prev[packId] || []);
+			const next = new Set(prev[pack.id] ?? packDefaultOff(pack));
 			if (next.has(name)) next.delete(name);
 			else next.add(name);
-			return { ...prev, [packId]: [...next] };
+			return { ...prev, [pack.id]: [...next] };
 		});
 	}
 	// What an Add would actually add, after the preview de-selections.
 	function packSelection(s) {
-		const off = new Set(packDeselected[s.id] || []);
-		return s.species.filter((name) => !off.has(name));
+		const off = new Set(packDeselected[s.id] ?? packDefaultOff(s));
+		return s.species.filter((name, i) => !(s.curated || [])[i] && !off.has(name));
 	}
 
 	const suggestionLabel = (s) => {
@@ -6127,7 +6911,10 @@ function FriendCollectEditor({
 										<div className='mono text-[10px] uppercase tracking-wider text-[#5C6975]'>
 											{t(`app.filter.friend_collect_group_${group.key}`)}
 										</div>
-										{packs.map((s) => (
+										{packs.map((s) => {
+											const selected = packSelection(s);
+											const offNames = new Set(packDeselected[s.id] ?? packDefaultOff(s));
+											return (
 											<div key={s.id} className='border border-[#1F2933] rounded px-2.5 py-1.5 bg-[#0B0F14]'>
 												<div className='flex items-center justify-between gap-2'>
 													<div className='mono text-xs text-[#E6EDF3] min-w-0'>
@@ -6139,13 +6926,13 @@ function FriendCollectEditor({
 														</span>
 													</div>
 													<button
-														onClick={() => addSet(packSelection(s))}
-														disabled={packSelection(s).length === 0}
+														onClick={() => addSet(selected)}
+														disabled={selected.length === 0}
 														className='mono text-xs bg-[#27AE60] hover:bg-[#3FCF80] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-2.5 py-1 rounded transition flex items-center gap-1 shrink-0'
 													>
 														<Plus size={12} /> {t('app.collectibles.add_button')}
-														{packSelection(s).length < s.species.length &&
-															` ${packSelection(s).length}/${s.species.length}`}
+														{selected.length < s.species.length &&
+															` ${selected.length}/${s.species.length}`}
 													</button>
 												</div>
 												{/* Species preview: what would this Add actually add? Open the
@@ -6166,19 +6953,36 @@ function FriendCollectEditor({
 														<p className='mono text-[10px] text-[#5C6975]'>
 															{t('app.filter.friend_collect_preview_help')}
 														</p>
+														{(s.owned || []).some(Boolean) && (
+															<p className='mono text-[10px] text-[#5C6975]'>
+																{t('app.filter.friend_collect_preview_owned_help')}
+															</p>
+														)}
+														{(s.curated || []).some(Boolean) && (
+															<p className='mono text-[10px] text-[#5C6975]'>
+																{t('app.filter.friend_collect_preview_curated_help')}
+															</p>
+														)}
 														<div className='flex flex-wrap gap-1'>
 															{s.species.map((name, i) => {
-																const off = (packDeselected[s.id] || []).includes(name);
+																const isCurated = !!(s.curated || [])[i];
+																const isOwned = !!(s.owned || [])[i];
+																const off = offNames.has(name);
 																return (
 																	<button
 																		key={name}
-																		onClick={() => togglePackSpecies(s.id, name)}
+																		onClick={() => togglePackSpecies(s, name, i)}
 																		className={`mono text-[11px] px-2 py-0.5 rounded border transition ${
-																			off
-																				? 'bg-[#5C6975]/10 text-[#5C6975] border-[#2D3A47] line-through'
-																				: 'bg-[#27AE60]/15 text-[#27AE60] border-[#27AE60]/40'
+																			isCurated
+																				? 'bg-[#5EAFC5]/10 text-[#5EAFC5]/60 border-[#5EAFC5]/25 cursor-default'
+																				: off
+																					? isOwned
+																						? 'bg-[#F5B82E]/10 text-[#F5B82E]/70 border-[#F5B82E]/30 line-through'
+																						: 'bg-[#5C6975]/10 text-[#5C6975] border-[#2D3A47] line-through'
+																					: 'bg-[#27AE60]/15 text-[#27AE60] border-[#27AE60]/40'
 																		}`}
 																	>
+																		{isCurated ? '≡ ' : isOwned ? '✓ ' : ''}
 																		{(s.display || [])[i] || name}
 																	</button>
 																);
@@ -6197,7 +7001,8 @@ function FriendCollectEditor({
 														</p>
 													))}
 											</div>
-										))}
+											);
+										})}
 									</div>
 								);
 							})}

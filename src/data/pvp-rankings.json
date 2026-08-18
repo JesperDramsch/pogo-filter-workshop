@@ -1,14 +1,10 @@
 {
-  "fetchedAt": "2026-07-31T11:02:51.139Z",
+  "fetchedAt": "2026-08-15T08:50:44.272Z",
   "topN": 30,
   "leagues": {
     "great": {
       "cpCap": 1500,
       "species": [
-        {
-          "dex": 778,
-          "name": "Mimikyu (Busted)"
-        },
         {
           "dex": 463,
           "name": "Lickilicky"
@@ -24,6 +20,10 @@
         {
           "dex": 395,
           "name": "Empoleon"
+        },
+        {
+          "dex": 778,
+          "name": "Mimikyu (Busted)"
         },
         {
           "dex": 195,
@@ -66,12 +66,12 @@
           "name": "Fearow"
         },
         {
-          "dex": 184,
-          "name": "Azumarill"
-        },
-        {
           "dex": 230,
           "name": "Kingdra"
+        },
+        {
+          "dex": 184,
+          "name": "Azumarill"
         },
         {
           "dex": 799,
@@ -227,12 +227,12 @@
           "name": "Giratina (Altered)"
         },
         {
-          "dex": 939,
-          "name": "Bellibolt"
-        },
-        {
           "dex": 979,
           "name": "Annihilape"
+        },
+        {
+          "dex": 939,
+          "name": "Bellibolt"
         },
         {
           "dex": 488,
@@ -243,12 +243,12 @@
           "name": "Milotic"
         },
         {
-          "dex": 208,
-          "name": "Steelix"
-        },
-        {
           "dex": 346,
           "name": "Cradily"
+        },
+        {
+          "dex": 119,
+          "name": "Seaking"
         }
       ]
     },
@@ -379,164 +379,279 @@
     }
   },
   "cups": {
-    "weather": {
-      "id": "weather",
-      "name": "Weather Cup",
+    "evolution": {
+      "id": "evolution",
+      "name": "Evolution Cup",
       "cpCap": 1500,
       "species": [
         {
-          "dex": 593,
-          "name": "Jellicent"
+          "dex": 364,
+          "name": "Sealeo"
         },
         {
-          "dex": 230,
-          "name": "Kingdra"
+          "dex": 356,
+          "name": "Dusclops"
         },
         {
-          "dex": 272,
-          "name": "Ludicolo"
+          "dex": 680,
+          "name": "Doublade"
         },
         {
-          "dex": 171,
-          "name": "Lanturn"
+          "dex": 860,
+          "name": "Morgrem"
         },
         {
-          "dex": 346,
-          "name": "Cradily"
+          "dex": 375,
+          "name": "Metang"
         },
         {
-          "dex": 460,
-          "name": "Abomasnow"
+          "dex": 958,
+          "name": "Tinkatuff"
         },
         {
-          "dex": 752,
-          "name": "Araquanid"
+          "dex": 737,
+          "name": "Charjabug"
         },
         {
-          "dex": 395,
-          "name": "Empoleon"
+          "dex": 372,
+          "name": "Shelgon"
         },
         {
-          "dex": 131,
-          "name": "Lapras"
+          "dex": 600,
+          "name": "Klang"
         },
         {
-          "dex": 28,
-          "name": "Sandslash (Alolan)"
+          "dex": 305,
+          "name": "Lairon"
         },
         {
-          "dex": 703,
-          "name": "Carbink"
+          "dex": 783,
+          "name": "Hakamo-o"
         },
         {
-          "dex": 748,
-          "name": "Toxapex"
+          "dex": 634,
+          "name": "Zweilous (Shadow)"
         },
         {
-          "dex": 411,
-          "name": "Bastiodon"
+          "dex": 148,
+          "name": "Dragonair (Shadow)"
         },
         {
-          "dex": 689,
-          "name": "Barbaracle"
+          "dex": 67,
+          "name": "Machoke (Shadow)"
         },
         {
-          "dex": 73,
-          "name": "Tentacruel"
+          "dex": 57,
+          "name": "Primeape (Shadow)"
         },
         {
-          "dex": 130,
-          "name": "Gyarados"
+          "dex": 705,
+          "name": "Sliggoo"
         },
         {
-          "dex": 768,
-          "name": "Golisopod"
+          "dex": 933,
+          "name": "Naclstack"
         },
         {
-          "dex": 345,
-          "name": "Lileep"
+          "dex": 502,
+          "name": "Dewott (Shadow)"
         },
         {
-          "dex": 119,
-          "name": "Seaking"
+          "dex": 217,
+          "name": "Ursaring"
         },
         {
-          "dex": 423,
-          "name": "Gastrodon"
-        },
-        {
-          "dex": 279,
-          "name": "Pelipper"
+          "dex": 533,
+          "name": "Gurdurr"
         },
         {
           "dex": 997,
           "name": "Arctibax"
         },
         {
-          "dex": 914,
-          "name": "Quaquaval"
+          "dex": 838,
+          "name": "Carkol"
         },
         {
-          "dex": 350,
-          "name": "Milotic (Shadow)"
+          "dex": 8,
+          "name": "Wartortle"
+        },
+        {
+          "dex": 176,
+          "name": "Togetic"
+        },
+        {
+          "dex": 536,
+          "name": "Palpitoad"
+        },
+        {
+          "dex": 259,
+          "name": "Marshtomp"
+        },
+        {
+          "dex": 113,
+          "name": "Chansey"
+        },
+        {
+          "dex": 221,
+          "name": "Piloswine"
+        },
+        {
+          "dex": 82,
+          "name": "Magneton"
+        },
+        {
+          "dex": 30,
+          "name": "Nidorina"
+        }
+      ]
+    },
+    "scroll": {
+      "id": "scroll",
+      "name": "Scroll Cup",
+      "cpCap": 1500,
+      "species": [
+        {
+          "dex": 748,
+          "name": "Toxapex"
+        },
+        {
+          "dex": 630,
+          "name": "Mandibuzz"
         },
         {
           "dex": 226,
           "name": "Mantine"
         },
         {
-          "dex": 503,
-          "name": "Samurott"
+          "dex": 877,
+          "name": "Morpeko (Hangry)"
+        },
+        {
+          "dex": 923,
+          "name": "Pawmot"
+        },
+        {
+          "dex": 230,
+          "name": "Kingdra"
+        },
+        {
+          "dex": 635,
+          "name": "Hydreigon (Shadow)"
+        },
+        {
+          "dex": 198,
+          "name": "Murkrow (Shadow)"
+        },
+        {
+          "dex": 634,
+          "name": "Zweilous"
+        },
+        {
+          "dex": 979,
+          "name": "Annihilape"
+        },
+        {
+          "dex": 752,
+          "name": "Araquanid"
+        },
+        {
+          "dex": 171,
+          "name": "Lanturn"
+        },
+        {
+          "dex": 302,
+          "name": "Sableye"
+        },
+        {
+          "dex": 184,
+          "name": "Azumarill"
+        },
+        {
+          "dex": 784,
+          "name": "Kommo-o"
+        },
+        {
+          "dex": 130,
+          "name": "Gyarados"
+        },
+        {
+          "dex": 146,
+          "name": "Moltres (Galarian)"
+        },
+        {
+          "dex": 279,
+          "name": "Pelipper"
+        },
+        {
+          "dex": 783,
+          "name": "Hakamo-o"
+        },
+        {
+          "dex": 922,
+          "name": "Pawmo"
+        },
+        {
+          "dex": 799,
+          "name": "Guzzlord"
+        },
+        {
+          "dex": 652,
+          "name": "Chesnaught (Shadow)"
+        },
+        {
+          "dex": 423,
+          "name": "Gastrodon"
+        },
+        {
+          "dex": 687,
+          "name": "Malamar (Shadow)"
+        },
+        {
+          "dex": 581,
+          "name": "Swanna"
+        },
+        {
+          "dex": 475,
+          "name": "Gallade (Shadow)"
         },
         {
           "dex": 211,
           "name": "Qwilfish (Shadow)"
         },
         {
-          "dex": 121,
-          "name": "Starmie (Shadow)"
+          "dex": 860,
+          "name": "Morgrem"
         },
         {
-          "dex": 558,
-          "name": "Crustle"
+          "dex": 593,
+          "name": "Jellicent"
         },
         {
-          "dex": 128,
-          "name": "Tauros (Aqua)"
+          "dex": 350,
+          "name": "Milotic (Shadow)"
         }
       ]
     }
   },
   "gblEvents": [
     {
-      "eventID": "gbl-forever-forward_great-league_master-premier",
-      "name": "Great League and Master Premier | Forever Forward",
-      "start": "2026-07-28T20:00:00.000Z",
-      "end": "2026-08-04T20:00:00.000Z",
-      "cups": []
-    },
-    {
-      "eventID": "gbl-forever-forward_ultra-league_weather-cup-great-league-edition",
-      "name": "Ultra League and Weather Cup: Great League Edition | Forever Forward",
-      "start": "2026-08-04T20:00:00.000Z",
-      "end": "2026-08-11T20:00:00.000Z",
-      "cups": [
-        "weather"
-      ]
-    },
-    {
       "eventID": "gbl-forever-forward_master-league_evolution-cup-great-league-edition",
       "name": "Master League and Evolution Cup: Great League Edition | Forever Forward",
       "start": "2026-08-11T20:00:00.000Z",
       "end": "2026-08-18T20:00:00.000Z",
-      "cups": []
+      "cups": [
+        "evolution"
+      ]
     },
     {
       "eventID": "gbl-forever-forward_great-league_scroll-cup-great-league-edition",
       "name": "Great League and Scroll Cup: Great League Edition | Forever Forward",
       "start": "2026-08-18T20:00:00.000Z",
       "end": "2026-08-25T20:00:00.000Z",
-      "cups": []
+      "cups": [
+        "scroll"
+      ]
     },
     {
       "eventID": "gbl-forever-forward_great-league_ultra-league_master-league-split-3",
