@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, Fragment } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useId, Fragment } from 'react';
 import * as d3 from 'd3';
 import {
 	X,
@@ -6367,6 +6367,7 @@ function HundosEditor({
 						/>
 						<button
 							onClick={() => removeHundo(h)}
+							aria-label={t('app.a11y.remove_species', { params: { name: h } })}
 							className='opacity-40 group-hover:opacity-100 hover:text-[#E74C3C] transition'
 						>
 							<X size={12} />
@@ -6384,6 +6385,7 @@ function HundosEditor({
 					value={newHundo}
 					onChange={(e) => setNewHundo(e.target.value)}
 					onKeyDown={(e) => e.key === 'Enter' && addHundo()}
+					aria-label={t('app.a11y.species_input')}
 					placeholder={t('app.hundos.input_placeholder')}
 					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
 				/>
@@ -6525,6 +6527,7 @@ function SpeciesListEditor({
 						/>
 						<button
 							onClick={() => removeItem(s)}
+							aria-label={t('app.a11y.remove_species', { params: { name: s } })}
 							className='opacity-40 group-hover:opacity-100 hover:text-[#E74C3C] transition'
 						>
 							<X size={12} />
@@ -6542,6 +6545,7 @@ function SpeciesListEditor({
 					value={newItem}
 					onChange={(e) => setNewItem(e.target.value)}
 					onKeyDown={(e) => e.key === 'Enter' && addItem()}
+					aria-label={t('app.a11y.species_input')}
 					placeholder={t(`${titleKey}.input_placeholder`)}
 					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
 				/>
@@ -6672,6 +6676,7 @@ function CustomCollectiblesEditor({ list, onChange }) {
 							{sp}
 							<button
 								onClick={() => remove(sp)}
+								aria-label={t('app.a11y.remove_species', { params: { name: sp } })}
 								className='opacity-50 group-hover:opacity-100 hover:text-[#FF6B5B] transition'
 							>
 								<X size={10} />
@@ -6688,6 +6693,7 @@ function CustomCollectiblesEditor({ list, onChange }) {
 					onChange={(e) => setInput(e.target.value)}
 					onKeyDown={(e) => e.key === 'Enter' && addAll()}
 					placeholder={t('app.collectibles.input_placeholder')}
+					aria-label={t('app.a11y.species_input')}
 					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
 				/>
 				<button
@@ -7195,6 +7201,11 @@ function FriendCollectEditor({
 												key={g}
 												onClick={() => toggleGender(tg.species, g)}
 												aria-pressed={on}
+												// The visible content is a bare ♀/♂ glyph, which screen
+												// readers announce as a symbol or not at all. Matches the
+												// two sibling implementations (HaveGenderBadges,
+												// BuddyTargetsEditor), which already name theirs.
+												aria-label={t(`app.buddy_targets.gender_${g}`)}
 												className={`text-[9px] px-1 py-px rounded border transition ${
 													on
 														? 'bg-[#5EAFC5]/25 border-[#5EAFC5]/50 text-[#5EAFC5]'
@@ -7237,6 +7248,7 @@ function FriendCollectEditor({
 								)}
 							<button
 								onClick={() => remove(tg.species)}
+								aria-label={t('app.a11y.remove_species', { params: { name: tg.display } })}
 								className='opacity-50 group-hover:opacity-100 hover:text-[#FF6B5B] transition'
 							>
 								<X size={10} />
@@ -7256,6 +7268,7 @@ function FriendCollectEditor({
 					onChange={(e) => setInput(e.target.value)}
 					onKeyDown={(e) => e.key === 'Enter' && addAll()}
 					placeholder={t('app.filter.friend_collect_input_placeholder')}
+					aria-label={t('app.a11y.species_input')}
 					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
 				/>
 				<button
@@ -8477,11 +8490,18 @@ function ResultBox({ label, result, accent }) {
 	);
 }
 
+// The label is a sibling rather than a wrapper, so it needs an explicit
+// htmlFor/id pair to name the input — without one the accessible name falls
+// back to the placeholder, which is example text, not the field's purpose (and
+// vanishes once the user types). useId keeps the pair unique across the many
+// instances of these fields on one screen.
 function FieldText({ label, value, onChange, placeholder }) {
+	const id = useId();
 	return (
 		<div>
-			<label className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>{label}</label>
+			<label htmlFor={id} className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>{label}</label>
 			<input
+				id={id}
 				type='text'
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
@@ -8492,10 +8512,12 @@ function FieldText({ label, value, onChange, placeholder }) {
 	);
 }
 function FieldNum({ label, value, onChange, min, max }) {
+	const id = useId();
 	return (
 		<div>
-			<label className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>{label}</label>
+			<label htmlFor={id} className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>{label}</label>
 			<input
+				id={id}
 				type='number'
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
@@ -9162,6 +9184,7 @@ function RegionalGroupEditor({
 					type='checkbox'
 					checked={!!state.enabled}
 					onChange={(e) => setGroup({ enabled: e.target.checked })}
+					aria-label={t('app.a11y.regional_group_enable', { params: { group: t(group.labelKey) } })}
 					className='accent-[#E74C3C]'
 				/>
 				<button onClick={() => setExpanded((x) => !x)} className='flex-1 text-left flex items-center gap-2'>
@@ -9918,6 +9941,7 @@ function RegionalMap({
 									{name}
 									<button
 										onClick={() => removeFromBazaar(name)}
+										aria-label={t('app.a11y.remove_species', { params: { name: name } })}
 										className='opacity-50 group-hover:opacity-100 hover:text-[#E74C3C] transition'
 									>
 										<X size={10} />
@@ -9951,16 +9975,22 @@ function RegionalMap({
 }
 
 function NumField({ label, value, onChange, text, hint }) {
+	const id = useId();
+	const hintId = `${id}-hint`;
 	return (
 		<div title={hint}>
-			<label className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>{label}</label>
+			<label htmlFor={id} className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>{label}</label>
 			<input
+				id={id}
 				type={text ? 'text' : 'number'}
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
+				// The hint was previously reachable only as a title tooltip, i.e. not
+				// at all on touch and inconsistently in AT. Point at the rendered copy.
+				aria-describedby={hint ? hintId : undefined}
 				className='mono text-xs w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3] mt-1'
 			/>
-			{hint && <div className='mono text-[10px] text-[#8090A0] mt-1 leading-tight'>{hint}</div>}
+			{hint && <div id={hintId} className='mono text-[10px] text-[#8090A0] mt-1 leading-tight'>{hint}</div>}
 		</div>
 	);
 }
@@ -10178,6 +10208,9 @@ function ChangelogModal({ open, onClose }) {
 }
 
 function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArmed, onExport, onImport }) {
+	// Base for the htmlFor/id pairs below: every label in this modal is a
+	// sibling of its control, so none of them named anything without one.
+	const fid = useId();
 	const { t, locale, setLocale, outputLocale, setOutputLocale, locales } = useTranslation();
 	if (!open) return null;
 	function set(k, v) {
@@ -10225,10 +10258,10 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 						</div>
 						<div className={`grid gap-3 ${expert ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
 							<div>
-								<label className='mono text-[10.5px] text-[#8090A0] block mb-1'>
+								<label htmlFor={`${fid}-ui`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
 									{t('app.modal.language.ui_label')}
 								</label>
-								<select
+								<select id={`${fid}-ui`}
 									value={locale}
 									onChange={(e) => setLocale(e.target.value)}
 									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
@@ -10245,10 +10278,11 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 							</div>
 							{expert && (
 								<div>
-									<label className='mono text-[10.5px] text-[#8090A0] block mb-1'>
+									<label htmlFor={`${fid}-out-lang`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
 										{t('app.modal.language.output_label')}
 									</label>
 									<select
+										id={`${fid}-out-lang`}
 										value={outputLocale}
 										onChange={(e) => setOutputLocale(e.target.value)}
 										className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
@@ -10308,10 +10342,10 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 						</div>
 						<div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
 							<div>
-								<label className='mono text-[10.5px] text-[#8090A0] block mb-1'>
+								<label htmlFor={`${fid}-basar`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
 									{t('app.modal.tags.basar_label')}
 								</label>
-								<input
+								<input id={`${fid}-basar`}
 									type='text'
 									value={config.basarTagName || ''}
 									onChange={(e) => set('basarTagName', e.target.value)}
@@ -10324,10 +10358,10 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 								</div>
 							</div>
 							<div>
-								<label className='mono text-[10.5px] text-[#8090A0] block mb-1'>
+								<label htmlFor={`${fid}-fern`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
 									{t('app.modal.tags.fern_label')}
 								</label>
-								<input
+								<input id={`${fid}-fern`}
 									type='text'
 									value={config.fernTauschTagName || ''}
 									onChange={(e) => set('fernTauschTagName', e.target.value)}
@@ -10340,10 +10374,10 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 							</div>
 							{expert && (
 								<div>
-									<label className='mono text-[10.5px] text-[#8090A0] block mb-1'>
+									<label htmlFor={`${fid}-frustration`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
 										{t('app.modal.tags.frustration_label')}
 									</label>
-									<input
+									<input id={`${fid}-frustration`}
 										type='text'
 										value={config.removeFrustrationTagName || ''}
 										onChange={(e) => set('removeFrustrationTagName', e.target.value)}
@@ -10357,10 +10391,10 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 							)}
 							{expert && (
 								<div>
-									<label className='mono text-[10.5px] text-[#8090A0] block mb-1'>
+									<label htmlFor={`${fid}-evoswap`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
 										{t('app.modal.tags.evo_swap_label')}
 									</label>
-									<input
+									<input id={`${fid}-evoswap`}
 										type='text'
 										value={config.evoSwapTagName || ''}
 										onChange={(e) => set('evoSwapTagName', e.target.value)}
@@ -10387,6 +10421,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 									value={config.customProtectedTags || ''}
 									onChange={(e) => set('customProtectedTags', e.target.value)}
 									placeholder={t('app.modal.custom_tags.placeholder')}
+									aria-label={t('app.modal.custom_tags.section_title')}
 									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
 								/>
 								<div className='mono text-[10px] text-[#8090A0] mt-1'>
@@ -10404,6 +10439,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 									value={config.leagueTags || ''}
 									onChange={(e) => set('leagueTags', e.target.value)}
 									placeholder={t('app.modal.league.placeholder')}
+									aria-label={t('app.modal.league.section_title')}
 									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
 								/>
 								<div className='mono text-[10px] text-[#8090A0] mt-1'>{t('app.modal.league.help')}</div>
@@ -10848,6 +10884,7 @@ function BuddyManager({ buddies, onChange }) {
 									type='checkbox'
 									checked={b.active !== false}
 									onChange={(e) => update(b.id, { active: e.target.checked })}
+									aria-label={t('app.a11y.buddy_active', { params: { name: b.name } })}
 									className='accent-[#E67E22]'
 									title={
 										b.active !== false ? t('app.buddy.active_title') : t('app.buddy.inactive_title')
@@ -10857,6 +10894,7 @@ function BuddyManager({ buddies, onChange }) {
 									type='text'
 									value={b.name}
 									onChange={(e) => update(b.id, { name: e.target.value })}
+									aria-label={t('app.a11y.buddy_name')}
 									placeholder={t('app.buddy.name_placeholder')}
 									className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1 rounded text-[#E6EDF3]'
 								/>
@@ -10865,11 +10903,13 @@ function BuddyManager({ buddies, onChange }) {
 									type='text'
 									value={b.tagPrefix}
 									onChange={(e) => update(b.id, { tagPrefix: e.target.value })}
+									aria-label={t('app.a11y.buddy_prefix')}
 									placeholder={t('app.buddy.prefix_placeholder')}
 									className='mono text-sm w-32 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1 rounded text-[#E6EDF3]'
 								/>
 								<button
 									onClick={() => remove(b.id)}
+									aria-label={t('app.a11y.remove_buddy', { params: { name: b.name } })}
 									className='text-[#8090A0] hover:text-[#FF6B5B] transition p-1'
 									title={t('app.buddy.delete_title')}
 								>
@@ -10903,6 +10943,7 @@ function BuddyManager({ buddies, onChange }) {
 					value={newName}
 					onChange={(e) => setNewName(e.target.value)}
 					onKeyDown={(e) => e.key === 'Enter' && addBuddy()}
+					aria-label={t('app.a11y.buddy_name')}
 					placeholder={t('app.buddy.add_placeholder')}
 					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-1.5 rounded text-[#E6EDF3]'
 				/>
@@ -10959,6 +11000,9 @@ function BuddyEventsEditor({ buddies, onUpdateBuddy, expertMode }) {
 
 function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 	const { t, locale } = useTranslation();
+	// The raw-filter field's label is a sibling, and its help text was reachable
+	// only visually — pair both to the input explicitly.
+	const rawId = useId();
 	const [input, setInput] = useState('');
 	// targetSpecies entries are structured Targets { species, expand, dropForms }.
 	const targets = buddy.targetSpecies || [];
@@ -11146,6 +11190,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 								)}
 								<button
 									onClick={() => removeAt(i)}
+									aria-label={t('app.a11y.remove_species', { params: { name: capFirst(tg.species) } })}
 									className='ml-auto opacity-50 group-hover:opacity-100 hover:text-[#FF6B5B] transition text-[#E67E22]'
 								>
 									<X size={10} />
@@ -11163,6 +11208,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 					onChange={(e) => setInput(e.target.value)}
 					onKeyDown={(e) => e.key === 'Enter' && addAll()}
 					placeholder={t('app.buddy_targets.input_placeholder')}
+					aria-label={t('app.a11y.species_input')}
 					className='mono text-xs flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
 				/>
 				<button
@@ -11223,17 +11269,21 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 			{/* Expert escape hatch: a verbatim, UNGUARDED filter line for this buddy. */}
 			{expertMode && (
 				<div className='border-t border-[#1F2933] pt-2 space-y-1'>
-					<label className='mono text-[10px] uppercase tracking-wider text-[#8090A0]'>
+					<label htmlFor={rawId} className='mono text-[10px] uppercase tracking-wider text-[#8090A0]'>
 						{t('app.buddy_targets.raw_label')}
 					</label>
 					<input
+						id={rawId}
 						type='text'
 						value={buddy.rawAppend || ''}
 						onChange={(e) => onChange({ rawAppend: e.target.value })}
 						placeholder={t('app.buddy_targets.raw_placeholder')}
+						aria-describedby={`${rawId}-help`}
 						className='mono text-xs w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
 					/>
-					<p className='mono text-[10px] text-[#8090A0] leading-relaxed'>{t('app.buddy_targets.raw_help')}</p>
+					<p id={`${rawId}-help`} className='mono text-[10px] text-[#8090A0] leading-relaxed'>
+						{t('app.buddy_targets.raw_help')}
+					</p>
 				</div>
 			)}
 				</>
