@@ -811,6 +811,8 @@
   "app.a11y.buddy_name": "交換夥伴名稱",
   "app.a11y.buddy_prefix": "交換夥伴標籤前綴",
   "app.a11y.buddy_active": "交換夥伴 {name} 已啟用",
+  "app.a11y.announce.copied": "已複製到剪貼簿",
+  "app.a11y.announce.copy_failed": "瀏覽器已封鎖複製 — 請選取文字後手動複製",
   "app.verify.k_keeper": "K(保留者)",
   "app.verify.p_pvp": "P(PvP)",
   "app.verify.neither": "都不是",

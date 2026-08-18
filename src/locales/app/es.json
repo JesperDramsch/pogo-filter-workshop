@@ -811,6 +811,8 @@
   "app.a11y.buddy_name": "Nombre del compañero de intercambio",
   "app.a11y.buddy_prefix": "Prefijo de etiqueta del compañero",
   "app.a11y.buddy_active": "Compañero de intercambio {name} activo",
+  "app.a11y.announce.copied": "Copiado al portapapeles",
+  "app.a11y.announce.copy_failed": "El navegador bloqueó la copia — selecciona el texto y cópialo manualmente",
   "app.verify.k_keeper": "K (guardián)",
   "app.verify.p_pvp": "P (PvP)",
   "app.verify.neither": "ninguno",

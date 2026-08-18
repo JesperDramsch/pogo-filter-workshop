@@ -811,6 +811,8 @@
   "app.a11y.buddy_name": "ट्रेड बडी का नाम",
   "app.a11y.buddy_prefix": "ट्रेड बडी टैग प्रीफ़िक्स",
   "app.a11y.buddy_active": "ट्रेड बडी {name} सक्रिय",
+  "app.a11y.announce.copied": "क्लिपबोर्ड पर कॉपी हो गया",
+  "app.a11y.announce.copy_failed": "ब्राउज़र ने कॉपी रोक दी — टेक्स्ट चुनकर खुद कॉपी करें",
   "app.verify.k_keeper": "K (कीपर)",
   "app.verify.p_pvp": "P (PvP)",
   "app.verify.neither": "कोई नहीं",

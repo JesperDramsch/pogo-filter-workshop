@@ -29,6 +29,7 @@ import SPECIES_META from './data/species-meta.json';
 import REGIONAL_FORMS from './data/regional-forms.json';
 import CHANGELOG from './data/changelog.json';
 import { useTranslation } from './i18n/I18nProvider.jsx';
+import { useAnnounce } from './Announcer.jsx';
 import Landing from './Landing.jsx';
 import General from './explain/General.jsx';
 import Regional from './explain/Regional.jsx';
@@ -4470,6 +4471,7 @@ function decodeTopo(topology, objectName) {
 
 export default function App() {
 	const { t, locale, outputLocale } = useTranslation();
+	const announce = useAnnounce();
 	const [hundos, setHundos] = useState(DEFAULT_HUNDOS);
 	const [luckies, setLuckies] = useState(DEFAULT_LUCKIES);
 	const [topAttackers, setTopAttackers] = useState(DEFAULT_TOP_ATTACKERS);
@@ -5065,9 +5067,19 @@ export default function App() {
 	function copyToClipboard(which, text) {
 		// Robust copy: try modern clipboard API, fall back to legacy execCommand,
 		// surface errors so user knows to manually select.
+		// Every copy in the app funnels through here, so announcing at this one
+		// point covers all 35 call sites. The visible feedback is a 2s icon+label
+		// swap on the button, which a screen reader never reports: pressing Copy
+		// used to produce complete silence either way.
 		const flash = (state) => {
 			setCopied((p) => ({ ...p, [which]: state }));
 			setTimeout(() => setCopied((p) => ({ ...p, [which]: false })), 2000);
+			announce(
+				state === 'ok' ? t('app.a11y.announce.copied') : t('app.a11y.announce.copy_failed'),
+				// A failed copy needs acting on (select the text manually), so it
+				// interrupts; a success is a confirmation and can wait.
+				{ assertive: state !== 'ok' },
+			);
 		};
 
 		// Modern clipboard API — but it can throw or reject in iframes without permission
@@ -5102,6 +5114,12 @@ export default function App() {
 	function resetAll() {
 		if (!resetArmed) {
 			setResetArmed(true);
+			// The most destructive action in the app — it drops the hundo list, every
+			// protection, tags and home location. Arming it only turned the button
+			// red and swapped its label, which a screen reader never reported.
+			announce(`${t('app.modal.danger.reset_button')} — ${t('app.modal.danger.reset_armed')}`, {
+				assertive: true,
+			});
 			return;
 		}
 		setHundos(DEFAULT_HUNDOS);
@@ -6784,6 +6802,7 @@ function CustomCollectiblesEditor({ list, onChange }) {
 // nothing while the list is empty.
 function ClearListButton({ count, onClear }) {
 	const { t } = useTranslation();
+	const announce = useAnnounce();
 	const [armed, setArmed] = useState(false);
 	useEffect(() => {
 		if (!armed) return;
@@ -6796,6 +6815,10 @@ function ClearListButton({ count, onClear }) {
 			onClick={() => {
 				if (!armed) {
 					setArmed(true);
+					// The armed state is a label swap plus a red fill, and it silently
+					// disarms after 3s. Announce BOTH what the button does and that it
+					// is now armed — "really clear?" on its own says nothing about what.
+					announce(`${t('app.clear_list.label')} — ${t('app.clear_list.confirm')}`, { assertive: true });
 					return;
 				}
 				setArmed(false);
@@ -9101,6 +9124,7 @@ function ConfigPanel({
 
 function ToggleRow({ k, label, why, checked, onChange, expertBadge, requireConfirmOff }) {
 	const { t } = useTranslation();
+	const announce = useAnnounce();
 	// For dangerous toggles (e.g. "always protect 4★"), turning them OFF requires
 	// a two-click confirmation. Turning them back ON is unrestricted.
 	const [armed, setArmed] = useState(false);
@@ -9116,6 +9140,11 @@ function ToggleRow({ k, label, why, checked, onChange, expertBadge, requireConfi
 			// Trying to turn OFF a dangerous toggle
 			if (!armed) {
 				setArmed(true);
+				// The checkbox stays visually ON and a red "really?" appears beside it.
+				// Without this a screen-reader user hears the checkbox refuse to change
+				// and gets no reason why. Name the protection so the confirm has a
+				// subject, and interrupt — this guards turning a safety net OFF.
+				announce(`${label} — ${t('app.protect.confirm_off')}`, { assertive: true });
 				// Don't fire change yet — keep checkbox on
 				e.preventDefault?.();
 				return;
@@ -9385,6 +9414,7 @@ function RegionalMap({
 	tradeTagName = 'Trade',
 }) {
 	const { t } = useTranslation();
+	const announce = useAnnounce();
 	const [worldData, setWorldData] = useState(null);
 	const [loadStatus, setLoadStatus] = useState('loading'); // loading | ready | error
 
@@ -9580,6 +9610,7 @@ function RegionalMap({
 		if (bazaarTags.length === 0) return;
 		if (!bazaarClearArmed) {
 			setBazaarClearArmed(true);
+			announce(`${t('app.map.clear_button')} — ${t('app.map.clear_armed')}`, { assertive: true });
 			return;
 		}
 		setBazaarTags([]);
@@ -9896,14 +9927,25 @@ function RegionalMap({
 							const all = [...new Set(previewMatches.flatMap((m) => m.german))];
 							const wanted = all.filter((n) => !homeLocalsSet.has(n));
 							const local = all.filter((n) => homeLocalsSet.has(n));
+							// The two groups used to differ ONLY by green-vs-grey text, joined
+							// by the same ' · ' that separates names WITHIN a group — so
+							// "which of these do I still need?" was answerable by colour
+							// alone. Label each run, reusing the wording the pinned view
+							// already uses for exactly this distinction.
 							return (
 								<div className='mono text-[11px] mt-1.5 leading-relaxed'>
-									{wanted.length > 0 && <span className='text-[#27AE60]'>{wanted.join(' · ')}</span>}
-									{wanted.length > 0 && local.length > 0 && (
-										<span className='text-[#8090A0]'> · </span>
+									{wanted.length > 0 && (
+										<span className='text-[#27AE60]'>
+											<span className='text-[#8090A0]'>
+												{t('app.map.bring_along', { params: { count: wanted.length } })}:{' '}
+											</span>
+											{wanted.join(' · ')}
+										</span>
 									)}
+									{wanted.length > 0 && local.length > 0 && <span className='text-[#8090A0]'> · </span>}
 									{local.length > 0 && (
 										<span className='text-[#8090A0]' title={t('app.map.local_already_title')}>
+											{t('app.map.already_home', { params: { count: local.length } })}:{' '}
 											{local.join(' · ')}
 										</span>
 									)}
@@ -10778,15 +10820,31 @@ function HomeScreenSection() {
 // their hundo list. Errors render inline (no toast inside modal).
 function BackupRestoreSection({ onExport, onImport }) {
 	const { t } = useTranslation();
+	// This whole section renders INSIDE SettingsModal, which inerts #root while
+	// open — the announcer's live regions are portalled to <body> precisely so
+	// these still reach assistive tech. See src/Announcer.jsx.
+	const announce = useAnnounce();
 	const fileInputRef = useRef(null);
 	const [pending, setPending] = useState(null); // { envelope, summary }
 	const [armed, setArmed] = useState(false);
 	const [error, setError] = useState('');
 	const [exportedNote, setExportedNote] = useState('');
 
+	// Import validation failures render as red text below the file picker with no
+	// focus move, so nothing reported them. They are errors the user must act on,
+	// hence assertive.
+	function failWith(message) {
+		setError(message);
+		announce(message, { assertive: true });
+	}
+
 	function handleExportClick() {
 		const filename = onExport();
-		setExportedNote(t('app.modal.backup.export_done', { params: { filename } }));
+		const note = t('app.modal.backup.export_done', { params: { filename } });
+		setExportedNote(note);
+		// The note appears below the button and self-clears after 4s; focus never
+		// moves, so nothing reported that the export happened at all.
+		announce(note);
 		setTimeout(() => setExportedNote(''), 4000);
 	}
 
@@ -10818,20 +10876,20 @@ function BackupRestoreSection({ onExport, onImport }) {
 		try {
 			text = await file.text();
 		} catch {
-			setError(t('app.modal.backup.import_error_invalid_json'));
+			failWith(t('app.modal.backup.import_error_invalid_json'));
 			return;
 		}
 		let parsed;
 		try {
 			parsed = JSON.parse(text);
 		} catch {
-			setError(t('app.modal.backup.import_error_invalid_json'));
+			failWith(t('app.modal.backup.import_error_invalid_json'));
 			return;
 		}
 		const result = validateImportEnvelope(parsed);
 		if (!result.ok) {
 			const { code, params } = result.error;
-			setError(t(`app.modal.backup.import_error_${code}`, params ? { params } : undefined));
+			failWith(t(`app.modal.backup.import_error_${code}`, params ? { params } : undefined));
 			return;
 		}
 		const { envelope } = result;
