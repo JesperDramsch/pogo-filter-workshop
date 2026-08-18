@@ -1,59 +1,40 @@
 // Compares current buildFilters output against the committed snapshot.
 // Fails CI if anything drifts. Run with: npx vite-node scripts/check-fixtures.mjs
+//
+// The snapshot is built by scripts/lib/fixture.mjs, shared with
+// generate-fixtures.mjs. That sharing is load-bearing: this script used to
+// rebuild its own 7-field subset and iterate `Object.keys(actual)`, so the
+// other 15 fields the generator wrote were never compared and could be
+// overwritten with anything without failing CI.
 
 import { readFileSync } from "node:fs";
-import { buildFilters, DEFAULT_CONFIG, DEFAULT_HUNDOS, DEFAULT_LUCKIES } from "../src/App.jsx";
-import { LOCALES } from "../src/i18n/index.js";
+import { buildFixture, diffFixture, countLeaves } from "./lib/fixture.mjs";
 
-function makeTFn(locale) {
-  const messages = LOCALES[locale]?.messages || LOCALES.en.messages;
-  return (key, opts) => {
-    let str = messages[key];
-    if (str === undefined && locale !== "en") str = LOCALES.en.messages[key];
-    if (str === undefined) return opts && "fallback" in opts ? opts.fallback : key;
-    if (opts?.params) {
-      for (const [k, v] of Object.entries(opts.params)) {
-        str = str.replaceAll(`{${k}}`, String(v));
-      }
-    }
-    return str;
-  };
+const FIXTURE_PATH = "src/__fixtures__/default-filter-output.json";
+const expected = JSON.parse(readFileSync(FIXTURE_PATH, "utf8"));
+const actual = buildFixture();
+
+const diffs = diffFixture(expected, actual);
+const trunc = (v) => {
+  const s = typeof v === "string" ? v : JSON.stringify(v);
+  return s !== undefined && s.length > 200 ? `${s.slice(0, 200)}…` : s;
+};
+
+for (const d of diffs.slice(0, 40)) {
+  console.error(`✗ ${d.path}`);
+  console.error(`  expected: ${trunc(d.expected)}`);
+  console.error(`  actual:   ${trunc(d.actual)}`);
 }
+if (diffs.length > 40) console.error(`… and ${diffs.length - 40} more`);
 
-const expected = JSON.parse(readFileSync("src/__fixtures__/default-filter-output.json", "utf8"));
-
-let failures = 0;
-for (const locale of Object.keys(LOCALES)) {
-  const tFn = makeTFn(locale);
-  const result = buildFilters(DEFAULT_HUNDOS, DEFAULT_LUCKIES, DEFAULT_CONFIG, [], locale, tFn);
-  const actual = {
-    trash: result.trash,
-    trade: result.trade,
-    sort: result.sort,
-    prestaged: result.prestaged,
-    gift: result.gift,
-    trashClauseCount: result.trashClauses.length,
-    tradeClauseCount: result.tradeClauses.length,
-  };
-  const exp = expected[locale];
-  if (!exp) {
-    console.error(`✗ ${locale}: no fixture entry`);
-    failures++;
-    continue;
-  }
-  for (const field of Object.keys(actual)) {
-    if (actual[field] !== exp[field]) {
-      console.error(`✗ ${locale}.${field} mismatch`);
-      console.error(`  expected: ${JSON.stringify(exp[field])}`);
-      console.error(`  actual:   ${JSON.stringify(actual[field])}`);
-      failures++;
-    }
-  }
-}
-
-if (failures > 0) {
-  console.error(`\n${failures} fixture mismatch(es). If intentional, regenerate with:`);
+if (diffs.length > 0) {
+  console.error(`\n${diffs.length} fixture mismatch(es). If intentional, regenerate with:`);
   console.error(`  npx vite-node scripts/generate-fixtures.mjs`);
   process.exit(1);
 }
-console.log(`✓ All fixtures match across ${Object.keys(LOCALES).length} locales.`);
+
+const locales = Object.keys(actual);
+console.log(
+  `✓ All fixtures match across ${locales.length} locales ` +
+  `— ${countLeaves(actual)} pinned values, ${Object.keys(actual[locales[0]]).length} fields per locale.`
+);

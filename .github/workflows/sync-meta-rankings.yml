@@ -30,16 +30,18 @@ jobs:
       - run: npm ci
       - name: Fetch Pokémon stats + moves from pogoapi.net
         run: npm run fetch-meta-rankings
-      - name: Regenerate fixture snapshot
-        run: npx vite-node scripts/generate-fixtures.mjs
+      # Deliberately does NOT regenerate the fixture: the snapshot pins only
+      # config-derived filters, and the data-derived ones this feeds are covered
+      # by property checks in scripts/check-data-filters.mjs. See the split in
+      # scripts/lib/fixture.mjs before adding a regeneration step back.
       - name: Commit + push if anything changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- src/data/meta-rankings.json src/__fixtures__/default-filter-output.json; then
+          if git diff --quiet -- src/data/meta-rankings.json; then
             echo "No meta-ranking changes — skipping commit."
             exit 0
           fi
-          git add src/data/meta-rankings.json src/__fixtures__/default-filter-output.json
+          git add src/data/meta-rankings.json
           git commit -m "chore(meta): sync top-attacker rankings from pogoapi"
           git push

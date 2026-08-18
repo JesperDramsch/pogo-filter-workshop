@@ -1,0 +1,151 @@
+// Property checks for the filter families that are projections of daily-synced
+// data: raid + max-battle counters, Team Rocket counters, PvP cup filters.
+// Run with: npx vite-node scripts/check-data-filters.mjs
+//
+// These are deliberately NOT in the exact-pinned fixture. A snapshot of a value
+// that changes every day cannot tell "the boss rotation moved" from "the
+// counter logic broke" — the sync regenerates it in the same job, so it always
+// heals and nobody reviews it. 17 of the last 20 commits touching the fixture
+// were automated syncs, one rewriting 126 lines.
+//
+// So assert PROPERTIES that hold whatever the data says:
+//   D1 — every clause is well formed (no undefined/NaN, no dangling separators)
+//   D2 — every boss/leader/cup in the data produces a clause (no silent drops)
+//   D3 — all 7 locales produce the same key set (no locale-specific gaps)
+//   D4 — non-English locales actually localize (no silent English fallback)
+//   D5 — empty filter families are reported, so upstream shape breaks surface
+
+import RAID_BOSSES from "../src/data/raid-bosses.json";
+import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
+import PVP_RANKINGS from "../src/data/pvp-rankings.json";
+import { buildDataFilters } from "./lib/fixture.mjs";
+import { LOCALES } from "../src/i18n/index.js";
+
+let failures = 0;
+function check(label, cond, detail = "") {
+  console.log(`  ${cond ? "✓" : "✗"} ${label}${detail ? ` — ${detail}` : ""}`);
+  if (!cond) failures++;
+}
+
+const localeNames = Object.keys(LOCALES);
+const byLocale = Object.fromEntries(localeNames.map((l) => [l, buildDataFilters(l)]));
+const FAMILIES = Object.keys(byLocale.en);
+
+// Walk a family to its leaf clauses, remembering the path for diagnostics.
+function leaves(node, path = "", out = []) {
+  if (typeof node === "string") out.push({ path, clause: node });
+  else if (node && typeof node === "object")
+    for (const [k, v] of Object.entries(node)) leaves(v, path ? `${path}.${k}` : k, out);
+  return out;
+}
+
+console.log("D1 — every generated clause is well formed");
+{
+  // A clause the game cannot parse is worse than no clause: it silently matches
+  // nothing, and the user reads that as "I own none of these".
+  const BAD = [
+    [/undefined/, "contains 'undefined' (a missing keyword or name)"],
+    [/NaN/, "contains 'NaN'"],
+    [/\[object /, "contains '[object Object]'"],
+    [/&&|,,/, "has an empty clause or term"],
+    [/^[&,]|[&,]$/, "has a dangling leading/trailing separator"],
+    [/!!/, "has a doubled negation"],
+  ];
+  let scanned = 0;
+  const problems = [];
+  for (const loc of localeNames)
+    for (const fam of FAMILIES)
+      for (const { path, clause } of leaves(byLocale[loc][fam], fam)) {
+        scanned++;
+        if (clause === "") continue; // emptiness is D2/D5's business
+        for (const [re, why] of BAD)
+          if (re.test(clause)) problems.push(`${loc}.${path}: ${why} — ${clause.slice(0, 80)}`);
+      }
+  check(`${scanned} clauses scanned across ${localeNames.length} locales, none malformed`,
+    problems.length === 0, problems.slice(0, 5).join(" | "));
+}
+
+console.log("\nD2 — every boss / leader / cup in the data produces a clause");
+{
+  const raidBossIds = Object.values(RAID_BOSSES.raids || {}).flat().map((b) => b.id ?? b.name);
+  const raidClauseIds = Object.values(byLocale.en.raidFilters).flatMap((t) => Object.keys(t));
+  check(`raids: ${raidBossIds.length} bosses in data → ${raidClauseIds.length} clauses`,
+    raidBossIds.length > 0 && raidClauseIds.length === raidBossIds.length,
+    raidClauseIds.length !== raidBossIds.length ? "count mismatch — a boss was dropped" : "");
+  check("no raid clause is empty",
+    leaves(byLocale.en.raidFilters).every((l) => l.clause.length > 0));
+
+  // rocket-lineups.json is a flat `trainers` array discriminated by `kind`.
+  const trainers = ROCKET_LINEUPS.trainers || [];
+  const leaders = trainers.filter((t) => t.kind === "leader");
+  const grunts = trainers.filter((t) => t.kind !== "leader");
+  check(`rocket: ${trainers.length} trainers in data (${leaders.length} leaders, ${grunts.length} grunts)`,
+    trainers.length > 0, "empty lineup data would make every check below vacuous");
+  check(`rocket leaders: ${leaders.length} in data → ${Object.keys(byLocale.en.rocketLeaders).length} with clauses`,
+    Object.keys(byLocale.en.rocketLeaders).length === leaders.length);
+  const gruntClauseCount =
+    Object.keys(byLocale.en.rocketTypedGrunts).length + Object.keys(byLocale.en.rocketGenericGrunts).length;
+  check(`rocket grunts: ${grunts.length} in data → ${gruntClauseCount} with clauses`,
+    gruntClauseCount === grunts.length,
+    gruntClauseCount !== grunts.length ? "a grunt lineup produced no counter filter" : "");
+  check("every leader exposes at least one phase clause",
+    Object.values(byLocale.en.rocketLeaders).every((ph) => Object.keys(ph).length > 0));
+
+  const leagues = Object.keys(PVP_RANKINGS.leagues || {});
+  check(`pvp: ${leagues.length} league(s) in data → ${Object.keys(byLocale.en.pvpFilters).length} filter(s)`,
+    leagues.length > 0 && Object.keys(byLocale.en.pvpFilters).length === leagues.length);
+  // Cups (PVP_RANKINGS.cups) drive a separate `cupFilters` output that
+  // buildDataFilters does not expose; not asserted here.
+}
+
+console.log("\nD3 — all 7 locales expose the same entries");
+{
+  // Typed grunts are keyed by their LOCALIZED trainer name ("Water-type Female
+  // Grunt" / "Wasser-Rüpel ♀"), so their key sets differ by design — compare
+  // counts there. Everywhere else the keys are stable ids or untranslated
+  // proper nouns, so the sets themselves must match.
+  const LOCALIZED_KEYS = new Set(["rocketTypedGrunts"]);
+  for (const fam of FAMILIES) {
+    const paths = (l) => leaves(byLocale[l][fam], fam).map((x) => x.path).sort();
+    if (LOCALIZED_KEYS.has(fam)) {
+      const n = paths("en").length;
+      const bad = localeNames.filter((l) => paths(l).length !== n);
+      check(`${fam}: entry count identical across locales (keys are localized)`,
+        bad.length === 0, bad.map((l) => `${l}=${paths(l).length} vs en=${n}`).join(", "));
+    } else {
+      const ref = paths("en").join("|");
+      const bad = localeNames.filter((l) => paths(l).join("|") !== ref);
+      check(`${fam}: key set identical across locales`, bad.length === 0, bad.join(", "));
+    }
+  }
+}
+
+console.log("\nD4 — non-English locales actually localize their clauses");
+{
+  // Raid clauses carry type keywords, which every locale translates. If DE and
+  // EN are byte-identical the locale silently fell back to English keywords.
+  for (const fam of ["raidFilters", "rocketTypedGrunts"]) {
+    const en = JSON.stringify(byLocale.en[fam]);
+    if (en === "{}") { console.log(`  · ${fam}: empty, nothing to compare`); continue; }
+    for (const loc of ["de", "es", "fr", "ja", "zh-TW", "hi"]) {
+      check(`${fam}: ${loc} differs from en`, JSON.stringify(byLocale[loc][fam]) !== en);
+    }
+  }
+}
+
+console.log("\nD5 — filter families that are entirely empty");
+{
+  // Not a hard failure: a family can be legitimately empty when the game has
+  // none of that content live. But it must be VISIBLE — an empty family is also
+  // what a silent upstream shape change looks like, and pinning `{}` in a
+  // snapshot hides it forever.
+  const empty = FAMILIES.filter((f) => leaves(byLocale.en[f], f).filter((l) => l.clause !== "").length === 0);
+  if (empty.length === 0) console.log("  ✓ none");
+  for (const f of empty) {
+    const src = f.startsWith("max") ? `raid-bosses.json maxBattles (${JSON.stringify(RAID_BOSSES.maxBattles || {}).slice(0, 40)})` : "its source data";
+    console.log(`  ! ${f} is empty — check ${src}`);
+  }
+}
+
+console.log(`\n${failures === 0 ? "✓ All data-filter property checks passed." : `✗ ${failures} failure(s).`}`);
+process.exit(failures === 0 ? 0 : 1);

@@ -33,16 +33,18 @@ jobs:
       # notification, which is the only intervention the user wants.
       - name: Fetch raid + max-battle bosses from lily-dex-api
         run: npm run fetch-raid-bosses
-      - name: Regenerate fixture snapshot
-        run: npx vite-node scripts/generate-fixtures.mjs
+      # Deliberately does NOT regenerate the fixture: the snapshot pins only
+      # config-derived filters, and the data-derived ones this feeds are covered
+      # by property checks in scripts/check-data-filters.mjs. See the split in
+      # scripts/lib/fixture.mjs before adding a regeneration step back.
       - name: Commit + push if anything changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- src/data/raid-bosses.json src/__fixtures__/default-filter-output.json; then
+          if git diff --quiet -- src/data/raid-bosses.json; then
             echo "No boss changes — skipping commit."
             exit 0
           fi
-          git add src/data/raid-bosses.json src/__fixtures__/default-filter-output.json
+          git add src/data/raid-bosses.json
           git commit -m "chore(raids): sync boss snapshot from lily-dex-api"
           git push

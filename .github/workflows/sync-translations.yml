@@ -21,6 +21,13 @@ jobs:
       - run: npm ci
       - name: Fetch translations from Google Sheet
         run: npm run fetch-translations
+      # The sheet supplies the in-game keywords that go straight into generated
+      # filters — a corrected DE word for "shiny" changes the trash string — so
+      # the snapshot has to move with the locales. It must also be listed in
+      # add-paths below, or the PR this opens fails check-fixtures with no way
+      # to fix it from inside the PR.
+      - name: Regenerate fixture snapshot
+        run: npx vite-node scripts/generate-fixtures.mjs
       - name: Open PR if locale files changed
         uses: peter-evans/create-pull-request@v6
         with:
@@ -37,3 +44,4 @@ jobs:
             Review `src/locales/_meta.json` for warnings (truncation, mojibake).
           add-paths: |
             src/locales/**
+            src/__fixtures__/default-filter-output.json
