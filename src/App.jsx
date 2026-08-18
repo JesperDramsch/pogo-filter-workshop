@@ -378,6 +378,25 @@ function selfAndDescendants(dex) {
 	return out;
 }
 
+// Every name that `+X` could use to select this species — i.e. the species plus
+// every other member of its candy family, lowercased in the output locale.
+// `+name` selects on the candy family, so owning a hundo Pikachu makes the
+// filter's `+pikachu` term match a Raichu too; anything modelling a mon for
+// evalFilter has to know that. Returns [] for unresolvable input.
+// Exported for VerifyPanel and scripts/check-verify.mjs.
+export function candyFamilyNames(species, outputLocale = 'de') {
+	const info = resolveSpeciesInfo(species);
+	if (!info) return [];
+	return [
+		...new Set(
+			selfAndDescendants(lineRootDex(info.dex))
+				.map((d) => pokemonNameFor(String(d), outputLocale))
+				.filter(Boolean)
+				.map((n) => n.toLowerCase()),
+		),
+	];
+}
+
 // Trade-evo families: dex-keyed identity, German base name as the user-facing
 // config key (kept stable so persisted localStorage state ["abra", "machollo"]
 // keeps working across locale changes). `baseDex` is the family head for
@@ -3723,21 +3742,60 @@ const FLAG_TO_MON = {
 	gigantamax: 'gigantamaxCapable',
 };
 
+// Boolean façade over evalFilterDetailed — "is this mon DEFINITELY a match".
+// Indeterminate collapses to false here, which is what the offline checks in
+// scripts/check-carveouts.mjs already assume. UI that shows a verdict to a human
+// about to mass-transfer must use evalFilterDetailed instead, so it can say
+// "I don't know" rather than a confident, wrong "not in trash".
 export function evalFilter(filterStr, mon, outputLocale = 'de') {
-	const kw = pogoKeywords(outputLocale);
-	const clauses = filterStr.split('&');
-	return clauses.every((c) => evalClause(c, mon, kw, outputLocale));
+	return evalFilterDetailed(filterStr, mon, outputLocale).verdict === true;
 }
-function evalClause(c, mon, kw, outputLocale) {
+
+// Three-valued evaluation: true / false / null (= can't tell).
+//
+// This evaluator only models the slice of PoGo's search grammar that
+// buildFilters emits, so it WILL meet terms it cannot parse. It used to treat
+// those as "skip", which quietly turned an all-unknown clause into `false` and,
+// through the AND across clauses, made the whole filter false for every
+// conceivable Pokémon. A single `!#Trade` clause was enough to make the verify
+// panel report "not in trash" for a shiny, a lucky and a hundo alike.
+//
+// Returns { verdict, unknown } where `unknown` lists the terms that forced an
+// indeterminate result (empty whenever the verdict is definite).
+export function evalFilterDetailed(filterStr, mon, outputLocale = 'de') {
+	const kw = pogoKeywords(outputLocale);
+	const unknown = [];
+	let indeterminate = false;
+	for (const c of String(filterStr).split('&')) {
+		const v = evalClause(c, mon, kw, outputLocale, unknown);
+		// Clauses are ANDed: one clause that is definitely false settles the whole
+		// filter, no matter what the other clauses could not parse.
+		if (v === false) return { verdict: false, unknown: [] };
+		if (v === null) indeterminate = true;
+	}
+	return indeterminate ? { verdict: null, unknown } : { verdict: true, unknown: [] };
+}
+
+// A clause is a comma-OR. One satisfied term settles it as true even if siblings
+// were unparseable. Only when NOTHING known matched does an unknown term matter:
+// it might have been the term that matched, so the clause is null, not false.
+function evalClause(c, mon, kw, outputLocale, unknown) {
+	const unresolved = [];
 	for (const raw of c.split(',')) {
 		const t = raw.trim();
+		if (!t) continue; // dangling/doubled separators carry no predicate
 		const negated = t.startsWith('!');
 		const term = negated ? t.slice(1) : t;
 		const v = evalTerm(term, mon, kw, outputLocale);
-		if (v === null) continue;
+		if (v === null) {
+			unresolved.push(t);
+			continue;
+		}
 		if (negated ? !v : v) return true;
 	}
-	return false;
+	if (unresolved.length === 0) return false;
+	if (unknown) unknown.push(...unresolved);
+	return null;
 }
 function evalTerm(t, mon, kw, outputLocale) {
 	if (t.startsWith('+')) {
@@ -3802,7 +3860,17 @@ function evalTerm(t, mon, kw, outputLocale) {
 	if (t === `${kw.flag.mega}1-`) return !!mon.flags?.megaEvolved;
 	if (t === `${kw.flag.mega}0`) return !mon.flags?.megaEvolved;
 	if (t === `${kw.flag.dynamax_move}1-`) return !!mon.flags?.dynamaxCapable;
-	if (t === '#') return !!mon.flags?.tagged;
+	// `#` = carries ANY tag; `#name` = carries a tag starting with `name`. The
+	// prefix semantics are what buildFilters itself banks on when it emits a
+	// per-buddy `!#<prefix>` guard. Without this branch every named-tag clause
+	// (`!#Trade`, league tags, custom protected tags, buddy prefixes) was
+	// unparseable — see evalFilterDetailed.
+	if (t === '#') return !!mon.flags?.tagged || (mon.tags || []).length > 0;
+	if (t.startsWith('#')) {
+		const want = t.slice(1).toLowerCase();
+		if (!want) return !!mon.flags?.tagged || (mon.tags || []).length > 0;
+		return (mon.tags || []).some((tag) => String(tag).toLowerCase().startsWith(want));
+	}
 	if (t === '@3move') return !mon.flags?.doubleMoved; // INVERTED per game
 	if (t === `@${kw.flag.special_move}`) return !!mon.flags?.legacyMove;
 
@@ -5879,7 +5947,6 @@ export default function App() {
 												trash={trash}
 												trade={trade}
 												hundos={hundos}
-												TE_families={TRADE_EVO_FAMILIES}
 												outputLocale={effectiveOutputLocale}
 											/>
 										</Collapsible>
@@ -8151,19 +8218,19 @@ function ClauseList({ title, accent, clauses }) {
 	);
 }
 
-function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = 'de' }) {
+function VerifyPanel({ trash, trade, hundos, outputLocale = 'de' }) {
 	const { t } = useTranslation();
 	// Raw 0-15 IVs (what the in-game appraisal screen shows). Bars and star
 	// rating are DERIVED — see ivToBar/starFromIVs — so the tester can't
 	// represent an impossible mon. Default 10/10/10 = 2/2/2 bars, 2★.
 	const [m, setM] = useState({
 		family: '',
+		tags: '',
 		ivAtk: 10,
 		ivDef: 10,
 		ivHp: 10,
 		flags: {},
 		types: [],
-		dex: 0,
 	});
 	function setFlag(k, v) {
 		setM({ ...m, flags: { ...m.flags, [k]: v } });
@@ -8174,21 +8241,26 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = 'de' })
 	const mon = useMemo(() => {
 		const fam = m.family.trim().toLowerCase().replace(/^\+/, '');
 		let families = fam ? [fam] : [];
+		let dex = 0;
 		if (fam) {
 			const info = resolveSpeciesInfo(fam);
 			if (info) {
-				for (const [, family] of Object.entries(TE_families)) {
-					if (family.memberDex && family.memberDex.includes(info.dex)) {
-						const memberNames = family.memberDex
-							.map((d) => pokemonNameFor(String(d), outputLocale))
-							.filter(Boolean);
-						families = [...new Set([...families, ...memberNames])];
-					}
-				}
+				dex = info.dex;
+				// Widen to the whole candy family. This used to widen only across the
+				// 10 TRADE_EVO_FAMILIES, which left the hundo union clause
+				// (`0*,1*,2*,+pikachu`) reporting a Raichu as safe even though the
+				// real search matches it through `+pikachu`.
+				families = [...new Set([...families, ...candyFamilyNames(fam, outputLocale)])];
 			}
 		}
 		return {
 			...m,
+			// Free-text tag list, so `#Trade` / league / buddy-prefix clauses are
+			// evaluated against something real instead of coming back unparseable.
+			tags: m.tags
+				.split(',')
+				.map((s) => s.trim())
+				.filter(Boolean),
 			// Filter terms consume bars (0attack..4attack) and stars — both
 			// derived from the raw IVs so they can never contradict each other.
 			atk: ivToBar(m.ivAtk),
@@ -8196,7 +8268,9 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = 'de' })
 			hp: ivToBar(m.ivHp),
 			star: starFromIVs(m.ivAtk, m.ivDef, m.ivHp),
 			families,
-			dex: m.dex || 0,
+			// Derived from the typed species, never user-set: bare species literals
+			// (`!Corasonn`, the Meltan/Melmetal trade carve-out) compare on dex first.
+			dex,
 			// Gigantamax-capable is physically a subset of Dynamax-capable, so a mon
 			// marked Giga in the tester is implicitly Dyna too — otherwise the
 			// verifier could represent an impossible giga-but-not-dyna state.
@@ -8206,10 +8280,10 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = 'de' })
 			distance: m.flags.farDistance ? 200 : 0,
 			year: 2025,
 		};
-	}, [m, TE_families, outputLocale]);
+	}, [m, outputLocale]);
 
-	const inTrash = useMemo(() => evalFilter(trash, mon, outputLocale), [trash, mon, outputLocale]);
-	const inTrade = useMemo(() => evalFilter(trade, mon, outputLocale), [trade, mon, outputLocale]);
+	const inTrash = useMemo(() => evalFilterDetailed(trash, mon, outputLocale), [trash, mon, outputLocale]);
+	const inTrade = useMemo(() => evalFilterDetailed(trade, mon, outputLocale), [trade, mon, outputLocale]);
 	const inH = hundos.includes(mon.families[0] || '');
 
 	const flagToggles = [
@@ -8240,6 +8314,12 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = 'de' })
 					value={m.family}
 					onChange={(v) => setM({ ...m, family: v })}
 					placeholder={t('app.verify.placeholder_family')}
+				/>
+				<FieldText
+					label={t('app.verify.field_tags')}
+					value={m.tags}
+					onChange={(v) => setM({ ...m, tags: v })}
+					placeholder={t('app.verify.placeholder_tags')}
 				/>
 				<FieldNum
 					label={t('app.verify.field_atk')}
@@ -8291,8 +8371,8 @@ function VerifyPanel({ trash, trade, hundos, TE_families, outputLocale = 'de' })
 			</div>
 
 			<div className='grid grid-cols-2 gap-3 mt-2'>
-				<ResultBox label={t('app.filter.trash_label')} verdict={inTrash} accent='#E74C3C' />
-				<ResultBox label={t('app.filter.trade_label')} verdict={inTrade} accent='#5EAFC5' />
+				<ResultBox label={t('app.filter.trash_label')} result={inTrash} accent='#E74C3C' />
+				<ResultBox label={t('app.filter.trade_label')} result={inTrade} accent='#5EAFC5' />
 			</div>
 			<div className='mono text-[11px] text-[#8090A0]'>
 				{t('app.verify.family_in_h')}{' '}
@@ -8328,14 +8408,32 @@ function classifyIV(a, d, h, t) {
 	return <span className='text-[#8090A0]'>{t('app.verify.neither')}</span>;
 }
 
-function ResultBox({ label, verdict, accent }) {
+// Three states, because the evaluator has three answers. The amber "can't tell"
+// is deliberately louder than the grey "hidden": a user reads this box seconds
+// before a permanent mass transfer, so an honest "I don't know" has to be
+// impossible to mistake for an all-clear.
+const VERDICT_UNKNOWN_ACCENT = '#D9A441';
+function ResultBox({ label, result, accent }) {
 	const { t } = useTranslation();
+	const verdict = result?.verdict ?? false;
+	const unknown = result?.unknown || [];
+	const isUnknown = verdict === null;
+	const color = isUnknown ? VERDICT_UNKNOWN_ACCENT : verdict ? accent : '#8090A0';
 	return (
-		<div className='border rounded p-3' style={{ borderColor: verdict ? accent : '#1F2933' }}>
+		<div
+			className='border rounded p-3'
+			style={{ borderColor: isUnknown || verdict ? color : '#1F2933' }}
+			role={isUnknown ? 'alert' : undefined}
+		>
 			<div className='mono text-[11px] uppercase tracking-wider text-[#8090A0]'>{label}</div>
-			<div className='mono text-lg font-bold mt-1' style={{ color: verdict ? accent : '#8090A0' }}>
-				{verdict ? t('app.verify.visible') : t('app.verify.hidden')}
+			<div className='mono text-lg font-bold mt-1' style={{ color }}>
+				{isUnknown ? t('app.verify.unknown') : verdict ? t('app.verify.visible') : t('app.verify.hidden')}
 			</div>
+			{isUnknown && (
+				<div className='mono text-[10.5px] mt-1 leading-snug' style={{ color: VERDICT_UNKNOWN_ACCENT }}>
+					{t('app.verify.unknown_hint', { params: { terms: [...new Set(unknown)].join(', ') } })}
+				</div>
+			)}
 		</div>
 	);
 }
