@@ -52,10 +52,15 @@ console.log("\nD2 — no overlay hand-rolls the old pattern");
   const usesHook = [];
   for (const f of FILES) {
     const src = readFileSync(f, "utf8");
+    const usesBehaviorHook = /\buseDialogBehavior\s*\(/.test(src);
     for (const m of src.matchAll(/role=["']dialog["']|role=["']alertdialog["']/g)) {
       const line = src.slice(0, m.index).split("\n").length;
-      // Legitimate iff this file also pulls in the shared behaviour.
-      if (/useDialogBehavior/.test(src)) {
+      const lt = src.lastIndexOf("<", m.index);
+      const gt = src.lastIndexOf(">", m.index);
+      const inDialogComponentTag = lt > gt && /<Dialog\b/.test(src.slice(lt, m.index));
+      if (inDialogComponentTag) continue;
+      // Legitimate iff this file also invokes the shared behaviour.
+      if (usesBehaviorHook) {
         usesHook.push(`${f}:${line}`);
         continue;
       }
