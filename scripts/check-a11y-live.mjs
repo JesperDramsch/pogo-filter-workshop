@@ -14,8 +14,7 @@
 // L2 is the subtle one and the reason this file exists. src/Dialog.jsx sets
 // `inert` + `aria-hidden` on #root while any modal is open. A live region
 // rendered inside #root would therefore go silent exactly where it is needed
-// most: BackupRestoreSection (import errors, export confirmation, armed
-// restore) renders INSIDE SettingsModal.
+// most: BackupRestoreSection (import errors, export confirmation) renders INSIDE SettingsModal.
 
 import { readFileSync } from "node:fs";
 
