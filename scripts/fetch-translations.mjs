@@ -219,11 +219,19 @@ function repairHindiMojibake(ingameByLocale, appByLocale, pokemonNames) {
   // than fail — a new corruption elsewhere is worth surfacing but is not ours to fix.
   for (const loc of TARGET_LOCALES) {
     if (loc === "hi") continue;
-    const hits = Object.entries(ingameByLocale[loc] || {}).filter(([, v]) => findPua(v).size);
+
+    const hits = [
+      ...Object.entries(ingameByLocale[loc] || {}).filter(([, v]) => findPua(v).size).map(([k]) => k),
+      ...Object.entries(appByLocale[loc] || {}).filter(([, v]) => findPua(v).size).map(([k]) => k),
+      ...Object.entries(pokemonNames)
+        .filter(([, names]) => names[loc] && findPua(names[loc]).size)
+        .map(([dex]) => `pokemon-names.${dex}`),
+    ];
+
     if (hits.length) {
       console.warn(
         `⚠  ${loc}: ${hits.length} value(s) contain private-use codepoints ` +
-          `(e.g. ${hits.slice(0, 3).map(([k]) => k).join(", ")}) — not repaired, the table is Hindi-only.`
+          `(e.g. ${hits.slice(0, 3).join(", ")}) — not repaired, the table is Hindi-only.`
       );
     }
   }
