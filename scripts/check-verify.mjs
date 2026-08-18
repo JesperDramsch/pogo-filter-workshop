@@ -17,7 +17,7 @@
 
 import {
   buildFilters, evalFilter, evalFilterDetailed, mergeImportedConfig, candyFamilyNames,
-  DEFAULT_CONFIG, DEFAULT_HUNDOS, DEFAULT_LUCKIES, ivToBar, starFromIVs,
+  hundoFamilyMatch, DEFAULT_CONFIG, DEFAULT_HUNDOS, DEFAULT_LUCKIES, ivToBar, starFromIVs,
 } from "../src/App.jsx";
 
 const tFn = (k) => k;
@@ -138,6 +138,44 @@ console.log("\nV4 — the fail-open scenario stays closed end to end");
     check(`  ${f} is a definite exclusion`,
       evalFilterDetailed(trashFor(REAL), mk({ flags: { [f]: true } }), "en").verdict === false);
   }
+}
+
+console.log("\nV6 — 'family in H' answers on candy-family identity, not raw strings");
+{
+  // Hundos are stored in the output locale that was active when they were typed.
+  check("cross-locale: DE-stored hundo vs EN-typed species",
+    hundoFamilyMatch(["glurak"], "charizard") === true);
+  check("cross-locale, the other direction",
+    hundoFamilyMatch(["charizard"], "glurak") === true);
+  check("cross-script too (ja / zh-TW)",
+    hundoFamilyMatch(["リザードン"], "charizard") === true &&
+    hundoFamilyMatch(["噴火龍"], "charizard") === true);
+
+  // `+name` selects the candy family, so a hundo anywhere in the line counts.
+  check("a hundo Pikachu covers a Raichu", hundoFamilyMatch(["pikachu"], "raichu") === true);
+  check("...and a Pichu", hundoFamilyMatch(["pichu"], "raichu") === true);
+  check("evolved hundo covers the base", hundoFamilyMatch(["raichu"], "pikachu") === true);
+
+  // Must not over-report: an unrelated line, empty input, junk input.
+  check("an unrelated line does not match", hundoFamilyMatch(["pikachu"], "magikarp") === false);
+  check("no hundos, no match", hundoFamilyMatch([], "pikachu") === false);
+  check("unresolvable typed species does not match", hundoFamilyMatch(["pikachu"], "zzznotamon") === false);
+  check("unresolvable hundo entry is skipped, not thrown on",
+    hundoFamilyMatch(["zzznotamon", "pikachu"], "raichu") === true);
+  check("empty species does not match", hundoFamilyMatch(["pikachu"], "") === false);
+  check("undefined hundo list is tolerated", hundoFamilyMatch(undefined, "pikachu") === false);
+
+  // Cross-check against what the filter actually emits: if `family in H` says
+  // yes, the hundo union clause must really match that mon.
+  const withHundo = buildFilters(["glurak"], DEFAULT_LUCKIES, REAL, [], "en", tFn).trash;
+  const charizard = mk({ dex: 6, species: "charizard",
+    families: [...new Set(["charizard", ...candyFamilyNames("charizard", "en")])],
+    ivAtk: 13, ivDef: 13, ivHp: 13 });
+  check("union clause built from a DE hundo still matches the EN mon",
+    evalFilterDetailed(withHundo.split("&")[0], charizard, "en").verdict === true,
+    withHundo.split("&")[0]);
+  check("...and 'family in H' agrees with it",
+    hundoFamilyMatch(["glurak"], "charizard") === true);
 }
 
 console.log("\nV5 — the boolean façade is unchanged for the other check scripts");
