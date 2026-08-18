@@ -172,6 +172,58 @@ function processPokemonSheet(rows) {
   return pokemon;
 }
 
+// Keyword corrections for values the SHEET gets wrong — a different problem from
+// the Hindi mojibake below, which is an encoding fault. Here the glyphs decode
+// perfectly; the resulting word just isn't what the game accepts, so no amount
+// of repair-table work fixes it. Applied after the repair, and re-applied on
+// every fetch because the sheet is re-pulled on every `npm run build`.
+//
+// Only add an entry you have TESTED in a real client of that locale. A wrong
+// entry here is worse than the sheet's own error: it looks authoritative.
+//
+// KNOWN BROKEN, awaiting an in-game check:
+//   hi / ingame.filter_key_has_duplicate
+//     Sheet says डुप्लीकेट (long ी). Confirmed not to work in the Hindi client,
+//     while the other 59 filter keywords do. The mojibake repair is NOT at
+//     fault — U+F325 → ी is corroborated across लीफ़ / लीच / ग्लीम / डिप्लीशन.
+//     Candidates, in order of likelihood:
+//       'डुप्लिकेट'      — short ि, the standard transliteration
+//       'duplicate'      — some locales leave search keywords in English
+//       a native phrase  — every other locale translates rather than
+//                          transliterates this one (Repetido / Double /
+//                          ふくすう / 兩隻以上)
+//     Uncomment the line below with whichever the client actually accepts.
+const KEYWORD_OVERRIDES = {
+  hi: {
+    // 'ingame.filter_key_has_duplicate': 'डुप्लिकेट',
+  },
+};
+
+// Apply the overrides, and be loud about entries that have gone stale: a key
+// that no longer exists, or an override the sheet has caught up with, is dead
+// weight that should be deleted rather than silently doing nothing.
+function applyKeywordOverrides(ingameByLocale) {
+  let applied = 0;
+  const stale = [];
+  for (const [loc, entries] of Object.entries(KEYWORD_OVERRIDES)) {
+    for (const [key, value] of Object.entries(entries)) {
+      const bucket = ingameByLocale[loc];
+      if (!bucket || !(key in bucket)) {
+        stale.push(`${loc}/${key} — key not present in the sheet`);
+        continue;
+      }
+      if (bucket[key] === value) {
+        stale.push(`${loc}/${key} — sheet already matches, override is redundant`);
+        continue;
+      }
+      bucket[key] = value;
+      applied++;
+    }
+  }
+  for (const s of stale) console.warn(`⚠  stale keyword override: ${s}`);
+  return applied;
+}
+
 // The sheet's Hindi column is legacy-font mojibake (see scripts/hi-pua-repair.json).
 // Rewrite it in place after fetching and before anything is written, so the rest of
 // the pipeline — and the app — only ever sees real Unicode Devanagari.
@@ -405,6 +457,14 @@ async function main() {
   }
   console.log(
     `✓ Hindi mojibake repair: ${hindiRepair.valuesRepaired} value(s) rewritten, no private-use codepoints remain`
+  );
+
+  // Sheet-level keyword corrections, after the encoding repair.
+  const overridden = applyKeywordOverrides(ingameByLocale);
+  console.log(
+    overridden > 0
+      ? `✓ keyword overrides: ${overridden} value(s) corrected against the sheet`
+      : `· keyword overrides: none active`
   );
 
   // Per-locale flat files (ingame + app namespaces).
