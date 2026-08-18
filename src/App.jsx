@@ -455,7 +455,11 @@ export const DEFAULT_CONFIG = {
 	protectLuckies: true,
 	protectLegendaries: true,
 	protectMythicals: true,
-	mythTooManyOf: ['meltan', 'genesect'], // species you have spares of (canonicalized on load)
+	// Species you have spares of, carved OUT of `!mythical` as `!mythical,<name>`
+	// (comma = OR, so a listed species stops being protected). Ships EMPTY on
+	// purpose: a non-empty default silently strips mythical protection from
+	// someone else's limited research/Mystery-Box catch. Opt in per account.
+	mythTooManyOf: [], // (canonicalized on load)
 	protectUltraBeasts: true,
 	protectShadows: true, // Crypto in trash; trade ALWAYS excludes (untradeable)
 	// Narrow floor for the shadow carve-out (mirrors protectGigantamax under
@@ -1651,6 +1655,13 @@ export function buildFilters(
 	if (cfg.protectCostumes) push(trashClauses, `!${kw.flag.costume}`, tFn('app.clause_why.costumes'));
 	if (cfg.protectLuckies) push(trashClauses, `!${kw.flag.lucky}`, tFn('app.clause_why.luckies'));
 	if (cfg.protectBackgrounds) push(trashClauses, `!${kw.flag.background}`, tFn('app.clause_why.backgrounds'));
+	// Purification costs stardust + candy, so the toggle sits with the other
+	// universal protections in ConfigPanel. It used to reach only trade/buddy,
+	// which left the trash filter free to release purified mons — and the age
+	// safety net below ORs `purified` in, so the flag the user believed was
+	// protective was the one widening scope. The age clause keeps its `purified`
+	// term for the protectPurified:false case.
+	if (cfg.protectPurified) push(trashClauses, `!${kw.flag.purified}`, tFn('app.clause_why.purified'));
 	{
 		const mp = maxProtectClause();
 		if (mp) push(trashClauses, mp[0], mp[1]);
@@ -5076,7 +5087,13 @@ export default function App() {
 		setLuckies(DEFAULT_LUCKIES);
 		setTopAttackers(DEFAULT_TOP_ATTACKERS);
 		setTopMaxAttackers(DEFAULT_TOP_MAX_ATTACKERS);
-		setConfig(DEFAULT_CONFIG);
+		// DEFAULT_CONFIG is a PRE-migration blob: regionalGroups is {} and
+		// enabledTradeEvos is []. Only mergeImportedConfig back-fills them, and it
+		// runs on the load and import paths — not here. Assigning it raw left the
+		// app in a state the load path can never produce, dropping every regional
+		// and trade-evo guard from the filter (89 clauses) while ConfigPanel still
+		// rendered them as active, until the next reload.
+		setConfig(mergeImportedConfig(DEFAULT_CONFIG));
 		setHomeLocation(null);
 		setLastPin(null);
 		setBazaarTags([]);
