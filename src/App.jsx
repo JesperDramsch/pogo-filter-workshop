@@ -6865,6 +6865,7 @@ function FriendCollectEditor({
 	// Packs disclosure: open for first-run discovery (nothing curated yet),
 	// collapsed once a list exists — the pack rows are tall and the chips are
 	// the primary surface after that.
+	const packsPanelId = useId();
 	const [showPacks, setShowPacks] = useState(list.length === 0);
 	// Pack preview state — session-only UI state, keyed by pack id: which
 	// packs show their species, and which species the user tapped out of the
@@ -7045,6 +7046,10 @@ function FriendCollectEditor({
 				<div className='border border-[#1F2933] rounded'>
 					<button
 						onClick={() => setShowPacks((s) => !s)}
+						// Custom disclosure, not <details> — nothing conveys open/closed
+						// but the chevron glyph, which AT does not read as state.
+						aria-expanded={showPacks}
+						aria-controls={packsPanelId}
 						className='w-full px-2.5 py-2 flex items-center gap-2 hover:bg-[#141A21] transition'
 					>
 						{showPacks ? (
@@ -7057,7 +7062,7 @@ function FriendCollectEditor({
 						</span>
 					</button>
 					{showPacks && (
-						<div className='px-2.5 pb-2.5 space-y-2.5 border-t border-[#1F2933] pt-2'>
+						<div id={packsPanelId} className='px-2.5 pb-2.5 space-y-2.5 border-t border-[#1F2933] pt-2'>
 							{SUGGESTION_GROUPS.map((group) => {
 								const packs = suggestions.filter((s) => group.kinds.includes(s.kind));
 								if (packs.length === 0) return null;
@@ -7094,6 +7099,8 @@ function FriendCollectEditor({
 												    list and tap a chip to leave that species out. */}
 												<button
 													onClick={() => togglePreview(s.id)}
+													aria-expanded={!!openPreviews[s.id]}
+													aria-controls={`fc-pack-preview-${s.id}`}
 													className='mono text-[10px] mt-1 flex items-center gap-1 text-[#5EAFC5] hover:text-[#8FD4E8] transition'
 												>
 													{openPreviews[s.id] ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
@@ -7104,7 +7111,7 @@ function FriendCollectEditor({
 													)}
 												</button>
 												{openPreviews[s.id] && (
-													<div className='mt-1.5 space-y-1'>
+													<div id={`fc-pack-preview-${s.id}`} className='mt-1.5 space-y-1'>
 														<p className='mono text-[10px] text-[#5C6975]'>
 															{t('app.filter.friend_collect_preview_help')}
 														</p>
@@ -7127,6 +7134,7 @@ function FriendCollectEditor({
 																	<button
 																		key={name}
 																		onClick={() => togglePackSpecies(s, name, i)}
+																		aria-pressed={!off}
 																		className={`mono text-[11px] px-2 py-0.5 rounded border transition ${
 																			isCurated
 																				? 'bg-[#5EAFC5]/10 text-[#5EAFC5]/60 border-[#5EAFC5]/25 cursor-default'
@@ -7197,6 +7205,7 @@ function FriendCollectEditor({
 							{tg.owned && onForcedChange ? (
 								<button
 									onClick={() => toggleForced(tg.species)}
+									aria-pressed={!dimmed}
 									title={t(
 										overridden
 											? 'app.filter.friend_collect_forced_off_tip'
@@ -8472,6 +8481,7 @@ function VerifyPanel({ trash, trade, hundos, outputLocale = 'de' }) {
 					<button
 						key={k}
 						onClick={() => setFlag(k, !m.flags[k])}
+						aria-pressed={!!m.flags[k]}
 						className={`mono text-[11px] px-2 py-1 rounded transition ${
 							m.flags[k]
 								? 'bg-[#5EAFC5] text-[#0F1419]'
@@ -8888,7 +8898,11 @@ function ConfigPanel({
 				<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
 					{t('app.pvp.section_title')}
 				</div>
-				<div className='flex flex-wrap gap-1.5'>
+				{/* Mutually exclusive, so radio semantics rather than aria-pressed:
+				    the selection was conveyed by cyan fill alone, which told a screen
+				    reader neither which option was active nor that these three belong
+				    to one choice. */}
+				<div className='flex flex-wrap gap-1.5' role='radiogroup' aria-label={t('app.pvp.section_title')}>
 					{[
 						['loose', 'app.pvp.loose_label', 'app.pvp.loose_desc'],
 						['strict', 'app.pvp.strict_label', 'app.pvp.strict_desc'],
@@ -8897,6 +8911,8 @@ function ConfigPanel({
 						<button
 							key={m}
 							onClick={() => set('pvpMode', m)}
+							role='radio'
+							aria-checked={config.pvpMode === m}
 							title={t(descKey)}
 							className={`mono text-xs px-3 py-1.5 rounded transition ${
 								config.pvpMode === m
@@ -9102,6 +9118,7 @@ function ConfigPanel({
 												: [...(config.enabledTradeEvos || []), b],
 										)
 									}
+									aria-pressed={on}
 									title={t('app.protect.te_button_title', {
 										params: { name: teDisplay(b, outputLocale) },
 									})}
@@ -9189,6 +9206,7 @@ function RegionalGroupEditor({
 	homeLocalTypeChecks = [],
 }) {
 	const { t } = useTranslation();
+	const groupPanelId = useId();
 	const [expanded, setExpanded] = useState(false);
 	const allTC = group.typeChecks.map((tc) => tc.species);
 	const allCol = group.collectors;
@@ -9254,7 +9272,12 @@ function RegionalGroupEditor({
 					aria-label={t('app.a11y.regional_group_enable', { params: { group: t(group.labelKey) } })}
 					className='accent-[#E74C3C]'
 				/>
-				<button onClick={() => setExpanded((x) => !x)} className='flex-1 text-left flex items-center gap-2'>
+				<button
+					onClick={() => setExpanded((x) => !x)}
+					aria-expanded={expanded}
+					aria-controls={groupPanelId}
+					className='flex-1 text-left flex items-center gap-2'
+				>
 					{expanded ? (
 						<ChevronDown size={12} className='text-[#5EAFC5]' />
 					) : (
@@ -9276,7 +9299,7 @@ function RegionalGroupEditor({
 				</button>
 			</div>
 			{expanded && (
-				<div className='px-3 pb-3 pt-1 space-y-2 border-t border-[#1F2933]'>
+				<div id={groupPanelId} className='px-3 pb-3 pt-1 space-y-2 border-t border-[#1F2933]'>
 					<div className='mono text-[11px] text-[#8090A0] mb-1'>{t(group.descriptionKey)}</div>
 					<div className='flex gap-2'>
 						<button
@@ -9326,6 +9349,7 @@ function RegionalGroupEditor({
 										<button
 											key={`${tc.species}_${tc.type}`}
 											onClick={() => toggleTC(tc.species)}
+											aria-pressed={on && !dropReason}
 											title={isHomeLocal ? t('app.regional_editor.home_local_title') : t(tc.noteKey)}
 											disabled={!state.enabled || !!dropReason}
 											className={`mono text-[11px] px-2 py-0.5 rounded transition ${
@@ -9365,6 +9389,7 @@ function RegionalGroupEditor({
 										<button
 											key={sp}
 											onClick={() => toggleCol(sp)}
+											aria-pressed={effectivelyOn}
 											disabled={!state.enabled || !!dropReason}
 											title={
 												isHomeLocal
@@ -10032,6 +10057,7 @@ function RegionalMap({
 													onClick={() =>
 														tagged ? removeFromBazaar(name) : addOneToBazaar(name)
 													}
+													aria-pressed={tagged}
 													className={`mono text-[11px] px-2 py-1 rounded transition ${
 														tagged
 															? 'bg-[#5EAFC5] text-[#0F1419]'
@@ -10064,6 +10090,7 @@ function RegionalMap({
 													onClick={() =>
 														tagged ? removeFromBazaar(name) : addOneToBazaar(name)
 													}
+													aria-pressed={tagged}
 													title={t('app.map.already_have_title')}
 													className={`mono text-[11px] px-2 py-1 rounded transition opacity-60 hover:opacity-100 ${
 														tagged
@@ -10476,6 +10503,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 						</div>
 						<button
 							onClick={() => set('expertMode', !expert)}
+							aria-pressed={!!expert}
 							className={`mono text-xs px-3 py-1.5 rounded transition ${
 								expert
 									? 'bg-[#F5B82E] text-[#0F1419]'
@@ -11356,6 +11384,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 												<button
 													key={f.key}
 													onClick={() => toggleForm(i, f.key)}
+													aria-pressed={!dropped}
 													className={`text-[10px] px-1.5 py-0.5 rounded border transition ${
 														dropped
 															? 'bg-transparent border-[#2D3A47] text-[#5A6673] line-through'
