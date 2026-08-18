@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useId, Fragment } from 'react';
+import { Dialog } from './Dialog.jsx';
 import * as d3 from 'd3';
 import {
 	X,
@@ -6057,12 +6058,33 @@ export default function App() {
 
 // ── Stepper-internal subcomponents ─────────────────────────────────────────
 
+// Each step is its own conditionally-rendered <StepWrapper>, so moving between
+// steps UNMOUNTS one and MOUNTS another — which means a "skip the first render"
+// guard inside the component would never fire. Module-level instead: the first
+// step mounted in a session is a page load, where stealing focus would be
+// hostile; every later mount is the result of a deliberate navigation.
+let stepMountedOnce = false;
+
 function StepWrapper({ title, hint, children, onBack, onNext, nextLabel }) {
 	const { t } = useTranslation();
+	const headingRef = useRef(null);
+	useEffect(() => {
+		// Navigating swapped the whole panel and unmounted the control that was
+		// activated (Next / Back / a nav tab), so focus fell to <body>: a keyboard
+		// user restarted from the top of the document and a screen-reader user was
+		// told nothing had happened. Send focus to the new step's heading instead.
+		if (!stepMountedOnce) {
+			stepMountedOnce = true;
+			return;
+		}
+		headingRef.current?.focus({ preventScroll: false });
+	}, []);
 	return (
 		<section className='space-y-5'>
 			<div>
-				<h2 className='mono text-xl font-bold text-[#E6EDF3]'>{title}</h2>
+				<h2 ref={headingRef} tabIndex={-1} className='mono text-xl font-bold text-[#E6EDF3]'>
+					{title}
+				</h2>
 				{hint && <p className='text-sm text-[#8B98A5] mt-1.5 max-w-2xl'>{hint}</p>}
 			</div>
 			<div>{children}</div>
@@ -10160,19 +10182,7 @@ function HundoRegionalNotice({ notices, onClose }) {
 	const { t } = useTranslation();
 	if (!notices || notices.length === 0) return null;
 	return (
-		<div
-			role='dialog'
-			aria-modal='true'
-			aria-label={t('app.hundo_regional.title')}
-			onClick={onClose}
-			style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
-			className='fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4'
-		>
-			<div
-				onClick={(e) => e.stopPropagation()}
-				style={{ backgroundColor: '#0F1419' }}
-				className='border border-[#2D3A47] rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'
-			>
+		<Dialog onClose={onClose} label={t('app.hundo_regional.title')} className='border border-[#2D3A47] rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'>
 				<h2 className='mono text-base font-semibold text-[#E6EDF3]'>{t('app.hundo_regional.title')}</h2>
 				<ul className='space-y-1'>
 					{notices.map((n) => (
@@ -10194,8 +10204,7 @@ function HundoRegionalNotice({ notices, onClose }) {
 						{t('app.regional_sync.ok')}
 					</button>
 				</div>
-			</div>
-		</div>
+		</Dialog>
 	);
 }
 
@@ -10210,19 +10219,7 @@ function FriendCollectCoveredNotice({ notices, onClose }) {
 	const anyFull = notices.some((n) => n.nowFullyCovered);
 	const anyPartial = notices.some((n) => !n.nowFullyCovered);
 	return (
-		<div
-			role='dialog'
-			aria-modal='true'
-			aria-label={t('app.friend_covered.title')}
-			onClick={onClose}
-			style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
-			className='fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4'
-		>
-			<div
-				onClick={(e) => e.stopPropagation()}
-				style={{ backgroundColor: '#0F1419' }}
-				className='border border-[#9B59B6]/40 rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'
-			>
+		<Dialog onClose={onClose} label={t('app.friend_covered.title')} className='border border-[#9B59B6]/40 rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'>
 				<h2 className='mono text-base font-semibold text-[#9B59B6]'>{t('app.friend_covered.title')}</h2>
 				<ul className='space-y-1 border border-[#9B59B6]/40 rounded p-3 bg-[#9B59B6]/5'>
 					{notices.map((n) => (
@@ -10249,8 +10246,7 @@ function FriendCollectCoveredNotice({ notices, onClose }) {
 						{t('app.regional_sync.ok')}
 					</button>
 				</div>
-			</div>
-		</div>
+		</Dialog>
 	);
 }
 
@@ -10262,19 +10258,7 @@ function RegionalSyncNotice({ notices, onClose, onShowChangelog }) {
 	const { t } = useTranslation();
 	if (!notices || notices.length === 0) return null;
 	return (
-		<div
-			role='dialog'
-			aria-modal='true'
-			aria-label={t('app.regional_sync.title')}
-			onClick={onClose}
-			style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
-			className='fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4'
-		>
-			<div
-				onClick={(e) => e.stopPropagation()}
-				style={{ backgroundColor: '#0F1419' }}
-				className='border border-[#2D3A47] rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'
-			>
+		<Dialog onClose={onClose} label={t('app.regional_sync.title')} className='border border-[#2D3A47] rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'>
 				<h2 className='mono text-base font-semibold text-[#E6EDF3]'>{t('app.regional_sync.title')}</h2>
 				<p className='mono text-xs text-[#8090A0] leading-relaxed'>{t('app.regional_sync.body')}</p>
 				<ul className='space-y-1'>
@@ -10300,8 +10284,7 @@ function RegionalSyncNotice({ notices, onClose, onShowChangelog }) {
 						{t('app.regional_sync.ok')}
 					</button>
 				</div>
-			</div>
-		</div>
+		</Dialog>
 	);
 }
 
@@ -10312,19 +10295,7 @@ function ChangelogModal({ open, onClose }) {
 	const { t } = useTranslation();
 	if (!open) return null;
 	return (
-		<div
-			role='dialog'
-			aria-modal='true'
-			aria-label={t('app.changelog.title')}
-			onClick={onClose}
-			style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
-			className='fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4'
-		>
-			<div
-				onClick={(e) => e.stopPropagation()}
-				style={{ backgroundColor: '#0F1419' }}
-				className='border border-[#2D3A47] rounded-lg w-full max-w-lg max-h-[80vh] overflow-y-auto shadow-2xl'
-			>
+		<Dialog onClose={onClose} label={t('app.changelog.title')} className='border border-[#2D3A47] rounded-lg w-full max-w-lg max-h-[80vh] overflow-y-auto shadow-2xl'>
 				<div
 					style={{ backgroundColor: '#0F1419' }}
 					className='sticky top-0 border-b border-[#1F2933] px-5 py-3 flex items-center justify-between'
@@ -10332,7 +10303,7 @@ function ChangelogModal({ open, onClose }) {
 					<h2 className='mono text-base font-semibold text-[#E6EDF3]'>{t('app.changelog.title')}</h2>
 					<button
 						onClick={onClose}
-						aria-label={t('app.modal.settings.close_aria')}
+						aria-label={t('app.modal.changelog.close_aria')}
 						className='text-[#8090A0] hover:text-[#E6EDF3] transition p-1'
 					>
 						<X size={18} />
@@ -10353,8 +10324,7 @@ function ChangelogModal({ open, onClose }) {
 						</div>
 					))}
 				</div>
-			</div>
-		</div>
+		</Dialog>
 	);
 }
 
@@ -10374,19 +10344,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 	const localeMismatch = expert && outputLocale !== locale;
 
 	return (
-		<div
-			role='dialog'
-			aria-modal='true'
-			aria-label={t('app.modal.settings.title')}
-			onClick={onClose}
-			style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
-			className='fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4'
-		>
-			<div
-				onClick={(e) => e.stopPropagation()}
-				style={{ backgroundColor: '#0F1419' }}
-				className='border border-[#2D3A47] rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl'
-			>
+		<Dialog onClose={onClose} label={t('app.modal.settings.title')} className='border border-[#2D3A47] rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl'>
 				<div
 					style={{ backgroundColor: '#0F1419' }}
 					className='sticky top-0 border-b border-[#1F2933] px-5 py-3 flex items-center justify-between'
@@ -10668,8 +10626,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 						<div className='mono text-[10px] text-[#8090A0] mt-1.5'>{t('app.modal.danger.reset_help')}</div>
 					</div>
 				</div>
-			</div>
-		</div>
+		</Dialog>
 	);
 }
 

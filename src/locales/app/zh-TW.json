@@ -373,6 +373,7 @@
   "app.protect.trash_traded_regionals.why": "一旦地區形寶可夢被交換過,「之後可能拿來交換」的理由就消耗掉了 — 個體值差的已交換阿羅拉雷丘、伽勒爾魔牆人偶、帕底亞肯泰羅等,會像其他複本一樣落入垃圾。已設定交換夥伴前綴的標籤(例如 #Auri:abra)仍會自動保護,另外可用 #Trade、#Fern-Tausch 或自訂標籤救個別寶可夢。關閉 = 所有地區形不論交換狀態都會被保護。",
   "app.modal.settings.title": "設定",
   "app.modal.settings.close_aria": "關閉",
+  "app.modal.changelog.close_aria": "關閉更新內容",
   "app.modal.language.section_title": "語言",
   "app.modal.language.ui_label": "顯示語言",
   "app.modal.language.ui_help": "使用者介面的語言",

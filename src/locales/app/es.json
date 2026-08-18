@@ -373,6 +373,7 @@
   "app.protect.trash_traded_regionals.why": "Una vez intercambiada una regional, ya no hay razón para guardarla — un Raichu de Alola, Mr. Mime de Galar o Tauros de Paldea con IVs malos caen al descarte como cualquier duplicado. Los Pokémon etiquetados con el prefijo de un compañero de intercambio configurado (p. ej. #Auri:abra) siguen protegidos automáticamente, y puedes salvar otros con #Trade, #Fern-Tausch o cualquier etiqueta personalizada. Apagado = toda forma regional sigue protegida sin importar si fue intercambiada.",
   "app.modal.settings.title": "Ajustes",
   "app.modal.settings.close_aria": "Cerrar",
+  "app.modal.changelog.close_aria": "Cerrar novedades",
   "app.modal.language.section_title": "Idioma",
   "app.modal.language.ui_label": "Idioma de visualización",
   "app.modal.language.ui_help": "Idioma de la interfaz de usuario",
