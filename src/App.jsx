@@ -4200,7 +4200,9 @@ const KMZ_TYPE_CHECKS = {
 const POGO_REGIONS_KMZ_TAGGED = POGO_REGIONS_KMZ.map((r) =>
 	KMZ_TYPE_CHECKS[r.name] ? { ...r, typeChecks: KMZ_TYPE_CHECKS[r.name] } : r,
 );
-const POGO_REGIONS = [...POGO_REGIONS_KMZ_TAGGED, ...POGO_REGIONS_ROTATING];
+// Exported for scripts/check-a11y-keyboard.mjs, which asserts the map's
+// keyboard region-jump can produce a valid centroid for every region.
+export const POGO_REGIONS = [...POGO_REGIONS_KMZ_TAGGED, ...POGO_REGIONS_ROTATING];
 
 // ─── Coiffwaff (Furfrou) trim regions ──────────────────────────────────────
 // The in-game form change (25 candy + 10,000 stardust) offers the
@@ -6368,7 +6370,7 @@ function HundosEditor({
 						<button
 							onClick={() => removeHundo(h)}
 							aria-label={t('app.a11y.remove_species', { params: { name: h } })}
-							className='opacity-40 group-hover:opacity-100 hover:text-[#E74C3C] transition'
+							className='opacity-40 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#E74C3C] transition'
 						>
 							<X size={12} />
 						</button>
@@ -6528,7 +6530,7 @@ function SpeciesListEditor({
 						<button
 							onClick={() => removeItem(s)}
 							aria-label={t('app.a11y.remove_species', { params: { name: s } })}
-							className='opacity-40 group-hover:opacity-100 hover:text-[#E74C3C] transition'
+							className='opacity-40 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#E74C3C] transition'
 						>
 							<X size={12} />
 						</button>
@@ -6677,7 +6679,7 @@ function CustomCollectiblesEditor({ list, onChange }) {
 							<button
 								onClick={() => remove(sp)}
 								aria-label={t('app.a11y.remove_species', { params: { name: sp } })}
-								className='opacity-50 group-hover:opacity-100 hover:text-[#FF6B5B] transition'
+								className='opacity-50 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#FF6B5B] transition'
 							>
 								<X size={10} />
 							</button>
@@ -7249,7 +7251,7 @@ function FriendCollectEditor({
 							<button
 								onClick={() => remove(tg.species)}
 								aria-label={t('app.a11y.remove_species', { params: { name: tg.display } })}
-								className='opacity-50 group-hover:opacity-100 hover:text-[#FF6B5B] transition'
+								className='opacity-50 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#FF6B5B] transition'
 							>
 								<X size={10} />
 							</button>
@@ -7386,6 +7388,20 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 				<code
 					ref={codeRef}
 					onClick={selectAll}
+					// `userSelect: all` means a keyboard user cannot drag-select this
+					// either, so without a key handler the select-all shortcut was
+					// pointer-only. The Copy button remains the primary path; this is
+					// the manual-selection escape hatch, so it gets a name and a
+					// handler rather than being left as a dead click target.
+					tabIndex={0}
+					role='button'
+					aria-label={t('app.filterbox.select_all_hint')}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							e.preventDefault();
+							selectAll();
+						}
+					}}
 					className='mono text-xs text-[#E6EDF3] break-all leading-relaxed cursor-text select-all block'
 					style={{ userSelect: 'all', WebkitUserSelect: 'all' }}
 					title={t('app.filterbox.select_all_hint')}
@@ -9419,6 +9435,55 @@ function RegionalMap({
 		if (lonLat) setLastPin(lonLat);
 	}
 
+	// ── Keyboard path to the pin ──────────────────────────────────────────
+	// Clicking the svg was the ONLY way to reach setLastPin, and setHomeLocation
+	// is only offered once a pin exists — so without a pointer, step 1 could not
+	// be completed at all, and with it every home-local trim, the hemisphere and
+	// season inference, and the Coiffwaff travel tips silently never engaged.
+	const coordId = useId();
+	const [latInput, setLatInput] = useState('');
+	const [lonInput, setLonInput] = useState('');
+	const [coordError, setCoordError] = useState('');
+
+	// Keep the fields showing wherever the pin actually is, however it got set,
+	// so the two input paths never disagree.
+	useEffect(() => {
+		if (!lastPin) return;
+		setLonInput(String(Math.round(lastPin[0] * 1000) / 1000));
+		setLatInput(String(Math.round(lastPin[1] * 1000) / 1000));
+	}, [lastPin]);
+
+	function submitCoords(e) {
+		e.preventDefault();
+		const latRaw = latInput.trim().replace(',', '.');
+		const lonRaw = lonInput.trim().replace(',', '.');
+		// Number('') is 0, so an empty field would otherwise pin 0°,0° — the
+		// Atlantic — instead of reporting that nothing was entered.
+		if (latRaw === '' || lonRaw === '') {
+			setCoordError(t('app.map.coord_error'));
+			return;
+		}
+		const lat = Number(latRaw);
+		const lon = Number(lonRaw);
+		if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+			setCoordError(t('app.map.coord_error'));
+			return;
+		}
+		setCoordError('');
+		setLastPin([lon, lat]);
+	}
+
+	// Region jump: drop the pin at the region's centroid. Sorted by localized
+	// label so the list is navigable by type-ahead in a native select.
+	const regionOptions = useMemo(
+		() =>
+			POGO_REGIONS.filter((r) => r.geometry?.type === 'Polygon' || r.geometry?.type === 'MultiPolygon')
+				.map((r) => ({ name: r.name, centroid: d3.geoCentroid(r.geometry) }))
+				.filter((r) => Number.isFinite(r.centroid?.[0]) && Number.isFinite(r.centroid?.[1]))
+				.sort((a, b) => a.name.localeCompare(b.name)),
+		[],
+	);
+
 	// Preview matches (hover) + locked matches (lastPin) computed separately
 	const previewMatches = useMemo(() => {
 		if (!hoverPin) return null;
@@ -9520,8 +9585,17 @@ function RegionalMap({
 		<div className='space-y-4'>
 			{/* MAP — clean, no polygon overlays */}
 			<div className='border border-[#1F2933] rounded bg-[#0B0F14] overflow-hidden relative'>
+				{/* The map is a POINTER convenience. Everything it can do is also
+				    reachable from the coordinate/region form below it, which is the
+				    keyboard and screen-reader path — so the svg names itself and hides
+				    its decorative interior rather than exposing hundreds of paths.
+				    The loading/error message lives inside the svg for layout reasons,
+				    so role='img' would swallow it; it is mirrored into a live region
+				    below (where it is also announced, which it never was before). */}
 				<svg
 					ref={svgRef}
+					role='img'
+					aria-label={t('app.map.svg_alt')}
 					viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
 					className='w-full h-auto block'
 					style={{ cursor: loadStatus === 'ready' ? 'crosshair' : 'wait' }}
@@ -9678,6 +9752,83 @@ function RegionalMap({
 					)}
 				</svg>
 			</div>
+
+			{/* Map status, mirrored out of the svg so it is actually announced. */}
+			<div className='sr-only' role='status'>
+				{loadStatus === 'loading' ? t('app.map.loading') : loadStatus === 'error' ? t('app.map.load_error') : ''}
+			</div>
+
+			{/* Keyboard/AT path to the pin — see the note by submitCoords. */}
+			<form onSubmit={submitCoords} className='border border-[#1F2933] rounded p-3 space-y-2'>
+				<div className='mono text-[10.5px] text-[#8090A0]'>{t('app.map.coord_help')}</div>
+				<div className='flex flex-wrap items-end gap-2'>
+					<div>
+						<label htmlFor={`${coordId}-lat`} className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] block'>
+							{t('app.map.lat_label')}
+						</label>
+						<input
+							id={`${coordId}-lat`}
+							type='text'
+							inputMode='decimal'
+							value={latInput}
+							onChange={(e) => setLatInput(e.target.value)}
+							aria-invalid={coordError ? 'true' : undefined}
+							aria-describedby={coordError ? `${coordId}-err` : undefined}
+							className='mono text-xs w-24 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3] mt-1'
+						/>
+					</div>
+					<div>
+						<label htmlFor={`${coordId}-lon`} className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] block'>
+							{t('app.map.lon_label')}
+						</label>
+						<input
+							id={`${coordId}-lon`}
+							type='text'
+							inputMode='decimal'
+							value={lonInput}
+							onChange={(e) => setLonInput(e.target.value)}
+							aria-invalid={coordError ? 'true' : undefined}
+							aria-describedby={coordError ? `${coordId}-err` : undefined}
+							className='mono text-xs w-24 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3] mt-1'
+						/>
+					</div>
+					<button
+						type='submit'
+						className='mono text-xs bg-[#5EAFC5] hover:bg-[#7FC7DB] text-[#0F1419] px-3 py-1.5 rounded transition'
+					>
+						{t('app.map.set_pin')}
+					</button>
+					<div className='ml-auto'>
+						<label htmlFor={`${coordId}-region`} className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] block'>
+							{t('app.map.region_select_label')}
+						</label>
+						<select
+							id={`${coordId}-region`}
+							value=''
+							onChange={(e) => {
+								const r = regionOptions.find((x) => x.name === e.target.value);
+								if (r) {
+									setCoordError('');
+									setLastPin(r.centroid);
+								}
+							}}
+							className='mono text-xs bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3] mt-1 max-w-[14rem]'
+						>
+							<option value=''>{t('app.map.region_select_placeholder')}</option>
+							{regionOptions.map((r) => (
+								<option key={r.name} value={r.name}>
+									{r.name}
+								</option>
+							))}
+						</select>
+					</div>
+				</div>
+				{coordError && (
+					<div id={`${coordId}-err`} role='alert' className='mono text-[10.5px] text-[#E74C3C]'>
+						{coordError}
+					</div>
+				)}
+			</form>
 
 			{/* Home banner */}
 			{homeLocation && (
@@ -9942,7 +10093,7 @@ function RegionalMap({
 									<button
 										onClick={() => removeFromBazaar(name)}
 										aria-label={t('app.a11y.remove_species', { params: { name: name } })}
-										className='opacity-50 group-hover:opacity-100 hover:text-[#E74C3C] transition'
+										className='opacity-50 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#E74C3C] transition'
 									>
 										<X size={10} />
 									</button>
@@ -11001,8 +11152,10 @@ function BuddyEventsEditor({ buddies, onUpdateBuddy, expertMode }) {
 function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 	const { t, locale } = useTranslation();
 	// The raw-filter field's label is a sibling, and its help text was reachable
-	// only visually — pair both to the input explicitly.
+	// only visually — pair both to the input explicitly. Also used for the
+	// accordion's aria-controls target.
 	const rawId = useId();
+	const panelId = `${rawId}-panel`;
 	const [input, setInput] = useState('');
 	// targetSpecies entries are structured Targets { species, expand, dropForms }.
 	const targets = buddy.targetSpecies || [];
@@ -11076,30 +11229,36 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 
 	return (
 		<div className='border border-[#E67E22]/20 rounded p-2.5 space-y-2'>
-			<div
-				className='flex items-baseline gap-2 flex-wrap cursor-pointer select-none hover:bg-[#E67E22]/5 -m-1 p-1 rounded transition'
-				onClick={() => setOpen((s) => !s)}
-			>
-				{open ? (
-					<ChevronDown size={12} className='text-[#E67E22] self-center shrink-0' />
-				) : (
-					<ChevronRight size={12} className='text-[#8090A0] self-center shrink-0' />
-				)}
-				<span className='mono text-sm text-[#E6EDF3] font-semibold'>{buddy.name}</span>
-				<span className='mono text-[10.5px] text-[#8090A0]'>
-					{t('app.buddy_targets.prefix_label')} <code className='text-[#E67E22]'>#{buddy.tagPrefix}</code>
-				</span>
-				<span
-					className='mono text-[10.5px] text-[#8090A0] ml-auto flex items-center gap-2'
-					onClick={(e) => e.stopPropagation()}
+			{/* The toggle is a real <button> rather than a clickable <div>: the whole
+			    editor was unreachable by keyboard otherwise. The count + clear control
+			    is a SIBLING, not a child — nesting a button inside a button is invalid
+			    and was the reason this needed an onClick stopPropagation hack. */}
+			<div className='flex items-baseline gap-2 flex-wrap'>
+				<button
+					type='button'
+					onClick={() => setOpen((s) => !s)}
+					aria-expanded={open}
+					aria-controls={panelId}
+					className='flex items-baseline gap-2 flex-wrap select-none hover:bg-[#E67E22]/5 -m-1 p-1 rounded transition text-left'
 				>
+					{open ? (
+						<ChevronDown size={12} className='text-[#E67E22] self-center shrink-0' />
+					) : (
+						<ChevronRight size={12} className='text-[#8090A0] self-center shrink-0' />
+					)}
+					<span className='mono text-sm text-[#E6EDF3] font-semibold'>{buddy.name}</span>
+					<span className='mono text-[10.5px] text-[#8090A0]'>
+						{t('app.buddy_targets.prefix_label')} <code className='text-[#E67E22]'>#{buddy.tagPrefix}</code>
+					</span>
+				</button>
+				<span className='mono text-[10.5px] text-[#8090A0] ml-auto flex items-center gap-2'>
 					{t('app.buddy_targets.count_label', { params: { count: targets.length } })}
 					<ClearListButton count={targets.length} onClear={() => onChange({ targetSpecies: [] })} />
 				</span>
 			</div>
 
 			{open && (
-				<>
+				<div id={panelId} className='space-y-2'>
 			<label
 				className='mono text-[11px] flex items-center gap-2 cursor-pointer text-[#E6EDF3] hover:bg-[#E67E22]/5 rounded px-1 py-0.5 transition w-fit'
 				title={t('app.buddy_targets.te_toggle_title')}
@@ -11191,7 +11350,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 								<button
 									onClick={() => removeAt(i)}
 									aria-label={t('app.a11y.remove_species', { params: { name: capFirst(tg.species) } })}
-									className='ml-auto opacity-50 group-hover:opacity-100 hover:text-[#FF6B5B] transition text-[#E67E22]'
+									className='ml-auto opacity-50 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#FF6B5B] transition text-[#E67E22]'
 								>
 									<X size={10} />
 								</button>
@@ -11286,7 +11445,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 					</p>
 				</div>
 			)}
-				</>
+				</div>
 			)}
 		</div>
 	);
