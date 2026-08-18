@@ -25,6 +25,7 @@
   "test:carveouts": "vite-node scripts/check-carveouts.mjs",
   "test:lucky": "vite-node scripts/check-lucky-logic.mjs",
   "test:friendcollect": "vite-node scripts/check-friend-collect.mjs",
+  "test:verify": "vite-node scripts/check-verify.mjs",
   "fixtures:update": "vite-node scripts/generate-fixtures.mjs",
   "preview": "vite preview",
   "deploy": "npm run build && gh-pages -d dist"

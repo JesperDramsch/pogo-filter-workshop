@@ -22,4 +22,5 @@ jobs:
       - run: npm run test:carveouts
       - run: npm run test:lucky
       - run: npm run test:friendcollect
+      - run: npm run test:verify
       - run: npm run build
