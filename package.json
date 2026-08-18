@@ -27,6 +27,7 @@
   "test:friendcollect": "vite-node scripts/check-friend-collect.mjs",
   "test:verify": "vite-node scripts/check-verify.mjs",
   "test:datafilters": "vite-node scripts/check-data-filters.mjs",
+  "test:a11ynames": "vite-node scripts/check-a11y-names.mjs",
   "fixtures:update": "vite-node scripts/generate-fixtures.mjs",
   "preview": "vite preview",
   "deploy": "npm run build && gh-pages -d dist"
