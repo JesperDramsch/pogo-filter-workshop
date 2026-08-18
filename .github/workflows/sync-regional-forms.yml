@@ -29,18 +29,24 @@ jobs:
           cache: npm
       - run: npm ci
       # Exits 1 on real failure (fetch error, empty/changed-shape upstream — the
-      # script self-validates known forms). The regional-form catalog isn't part
-      # of the fixture snapshot, so no fixture regeneration is needed here.
+      # script self-validates known forms).
       - name: Fetch regional-form catalog from pogoapi
         run: npm run fetch-regional-forms
+      # Any synced data can feed generated filter output, so the snapshot moves
+      # with it. Idempotent: when the new data doesn't change any filter, the
+      # fixture is unchanged and nothing extra gets committed. Doing this
+      # unconditionally means nobody has to re-derive which data reaches which
+      # filter every time the fixture definition changes.
+      - name: Regenerate fixture snapshot
+        run: npx vite-node scripts/generate-fixtures.mjs
       - name: Commit + push if anything changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- src/data/regional-forms.json; then
+          if git diff --quiet -- src/data/regional-forms.json src/__fixtures__/default-filter-output.json; then
             echo "No regional-form changes — skipping commit."
             exit 0
           fi
-          git add src/data/regional-forms.json
+          git add src/data/regional-forms.json src/__fixtures__/default-filter-output.json
           git commit -m "chore(forms): sync regional-form catalog from pogoapi"
           git push
