@@ -8319,7 +8319,11 @@ function VerifyPanel({ trash, trade, hundos, outputLocale = 'de' }) {
 
 	const inTrash = useMemo(() => evalFilterDetailed(trash, mon, outputLocale), [trash, mon, outputLocale]);
 	const inTrade = useMemo(() => evalFilterDetailed(trade, mon, outputLocale), [trade, mon, outputLocale]);
-	const inH = useMemo(() => hundoFamilyMatch(hundos, mon.families[0] || ''), [hundos, mon.families]);
+	// Keyed on the typed species alone, as a string. `mon` is rebuilt whenever any
+	// field changes and hands back a fresh `families` array each time, so keying on
+	// the array would re-resolve every hundo on every IV/flag/tag keystroke.
+	const familyKey = mon.families[0] || '';
+	const inH = useMemo(() => hundoFamilyMatch(hundos, familyKey), [hundos, familyKey]);
 
 	const flagToggles = [
 		['favorite', 'app.verify.flag_fav'],
