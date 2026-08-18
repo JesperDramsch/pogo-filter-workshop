@@ -60,7 +60,7 @@ export function AnnouncerProvider({ children }) {
 			  src/Dialog.jsx sets `inert` + `aria-hidden` on #root while any modal is
 			  open. A live region inside #root would therefore go silent exactly when
 			  it is needed most — BackupRestoreSection (import errors, export
-			  confirmation, armed restore) renders inside SettingsModal.
+			  confirmation) renders inside SettingsModal.
 			*/}
 			{typeof document !== 'undefined' &&
 				createPortal(
