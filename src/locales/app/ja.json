@@ -811,6 +811,8 @@
   "app.a11y.buddy_name": "交換相手の名前",
   "app.a11y.buddy_prefix": "交換相手のタグ接頭辞",
   "app.a11y.buddy_active": "交換相手 {name} は有効",
+  "app.a11y.announce.copied": "クリップボードにコピーしました",
+  "app.a11y.announce.copy_failed": "ブラウザにコピーを拒否されました — テキストを選択して手動でコピーしてください",
   "app.verify.k_keeper": "K (キーパー)",
   "app.verify.p_pvp": "P (PvP)",
   "app.verify.neither": "なし",

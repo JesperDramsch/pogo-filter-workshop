@@ -811,6 +811,8 @@
   "app.a11y.buddy_name": "Nom du copain d'échange",
   "app.a11y.buddy_prefix": "Préfixe d'étiquette du copain d'échange",
   "app.a11y.buddy_active": "Copain d'échange {name} actif",
+  "app.a11y.announce.copied": "Copié dans le presse-papiers",
+  "app.a11y.announce.copy_failed": "Copie bloquée par le navigateur — sélectionnez le texte et copiez-le manuellement",
   "app.verify.k_keeper": "K (gardien)",
   "app.verify.p_pvp": "P (PvP)",
   "app.verify.neither": "aucun",

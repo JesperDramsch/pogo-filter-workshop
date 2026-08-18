@@ -811,6 +811,8 @@
   "app.a11y.buddy_name": "Name des Tausch-Buddys",
   "app.a11y.buddy_prefix": "Tag-Präfix des Tausch-Buddys",
   "app.a11y.buddy_active": "Tausch-Buddy {name} aktiv",
+  "app.a11y.announce.copied": "In die Zwischenablage kopiert",
+  "app.a11y.announce.copy_failed": "Kopieren vom Browser blockiert — Text markieren und manuell kopieren",
   "app.verify.k_keeper": "K (Keeper)",
   "app.verify.p_pvp": "P (PvP)",
   "app.verify.neither": "weder noch",
