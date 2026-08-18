@@ -1,21 +1,6 @@
 {
-  "fetchedAt": "2026-08-12T09:30:45.543Z",
+  "fetchedAt": "2026-08-18T08:52:09.356Z",
   "events": [
-    {
-      "id": "community-day-nickit-community-day-2026-08-16t14-00-00",
-      "title": "Nickit Community Day",
-      "category": "Community Day",
-      "start": "2026-08-16T14:00:00",
-      "end": "2026-08-16T17:00:00",
-      "isLocalTime": true,
-      "spawnDex": [
-        827
-      ],
-      "spawns": [
-        "Nickit"
-      ],
-      "unresolved": []
-    },
     {
       "id": "event-ultra-unlock-water-festival-2026-08-18t10-00-00",
       "title": "Ultra Unlock: Water Festival",
@@ -25,19 +10,37 @@
       "isLocalTime": true,
       "spawnDex": [
         54,
+        72,
         118,
+        129,
+        130,
+        183,
+        320,
+        341,
         349,
         366,
+        580,
+        592,
         747,
+        751,
         767,
         960
       ],
       "spawns": [
         "Clamperl",
+        "Corphish",
+        "Dewpider",
+        "Ducklett",
         "Feebas",
+        "Frillish",
         "Goldeen",
+        "Gyarados",
+        "Magikarp",
         "Mareanie",
+        "Marill",
         "Psyduck",
+        "Tentacool",
+        "Wailmer",
         "Wiglett",
         "Wimpod"
       ],
@@ -89,6 +92,39 @@
         "Togetic",
         "Totodile",
         "Wooper"
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "event-mega-ascension-2026-08-31t10-00-00",
+      "title": "Mega Ascension",
+      "category": "Event",
+      "start": "2026-08-31T10:00:00",
+      "end": "2026-09-04T23:59:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        25,
+        69,
+        120,
+        147,
+        227,
+        650,
+        653,
+        656,
+        686,
+        870
+      ],
+      "spawns": [
+        "Bellsprout",
+        "Chespin",
+        "Dratini",
+        "Falinks",
+        "Fennekin",
+        "Froakie",
+        "Inkay",
+        "Pikachu",
+        "Skarmory",
+        "Staryu"
       ],
       "unresolved": []
     }
@@ -182,6 +218,27 @@
         "Tyrogue",
         "Wynaut",
         "Zigzagoon"
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "event-ultra-unlock-water-festival-2026-08-18t10-00-00-eggs",
+      "title": "Ultra Unlock: Water Festival",
+      "category": "Event",
+      "start": "2026-08-18T10:00:00",
+      "end": "2026-08-24T20:00:00",
+      "isLocalTime": true,
+      "eggDex": [
+        298,
+        458,
+        592,
+        845
+      ],
+      "eggs": [
+        "Azurill",
+        "Cramorant",
+        "Frillish",
+        "Mantyke"
       ],
       "unresolved": []
     }
