@@ -72,7 +72,7 @@ console.log("\nS2 — mutually-exclusive groups use radio semantics");
   }
   // Every radiogroup must be named, or AT announces "group" with no subject.
   check("every radiogroup is named",
-    (app.match(/role='radiogroup'[\s\S]{0,200}?aria-label=/g) || []).length === groups);
+    (app.match(/<[^>]*(?=[^>]*role='radiogroup')(?=[^>]*aria-label=)[^>]*>/g) || []).length === groups);
   check("radio children carry aria-checked",
     (app.match(/role='radio'/g) || []).length === (app.match(/aria-checked=/g) || []).length);
 }
