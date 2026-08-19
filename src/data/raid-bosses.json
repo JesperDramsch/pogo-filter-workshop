@@ -623,6 +623,110 @@
           ]
         }
       ]
+    },
+    {
+      "eventID": "mega-gyarados-in-mega-raids-august-2026",
+      "name": "Mega Gyarados in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-08-26T06:00:00.000",
+      "end": "2026-09-08T22:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "GYARADOS",
+          "names": {
+            "en": "Gyarados"
+          },
+          "types": [
+            "water",
+            "flying"
+          ],
+          "resistorTypes": [
+            "steel",
+            "water",
+            "electric",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "electric"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "regirock-regice-registeel-in-5-star-raid-battles-august-2026",
+      "name": "Regirock, Regice, and Registeel in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-08-26T06:00:00.000",
+      "end": "2026-09-08T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "REGIROCK",
+          "names": {
+            "en": "Regirock"
+          },
+          "types": [
+            "rock"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "ground",
+            "steel"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "ground",
+            "steel",
+            "water",
+            "grass"
+          ]
+        },
+        {
+          "id": "REGICE",
+          "names": {
+            "en": "Regice"
+          },
+          "types": [
+            "ice"
+          ],
+          "resistorTypes": [
+            "steel",
+            "fire",
+            "water",
+            "ice"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "rock",
+            "steel",
+            "fire"
+          ]
+        },
+        {
+          "id": "REGISTEEL",
+          "names": {
+            "en": "Registeel"
+          },
+          "types": [
+            "steel"
+          ],
+          "resistorTypes": [
+            "steel",
+            "fire",
+            "water",
+            "electric"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "ground",
+            "fire"
+          ]
+        }
+      ]
     }
   ]
 }
