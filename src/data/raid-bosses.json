@@ -1,267 +1,246 @@
 {
-  "fetchedAt": "2026-08-13T08:52:53.838Z",
+  "fetchedAt": "2026-08-20T08:08:28.365Z",
   "raids": {
     "mega": [
       {
-        "id": "GARCHOMP",
+        "id": "SWAMPERT",
         "names": {
-          "en": "Mega Garchomp",
-          "de": "Mega-Knakrack",
-          "fr": "Méga-Carchacrok",
-          "it": "MegaGarchomp",
-          "ja": "メガガブリアス",
-          "ko": "메가한카리아스",
-          "es": "Mega-Garchomp"
+          "en": "Mega Swampert",
+          "de": "Mega-Sumpex",
+          "fr": "Méga-Laggron",
+          "it": "MegaSwampert",
+          "ja": "メガラグラージ",
+          "ko": "메가대짱이",
+          "es": "Mega-Swampert"
         },
         "types": [
-          "dragon",
+          "water",
           "ground"
         ],
         "resistorTypes": [
           "flying",
           "bug",
+          "water",
           "grass",
-          "fairy"
+          "dragon"
         ],
         "seMoveTypes": [
-          "ice",
-          "dragon",
-          "fairy"
+          "grass"
         ]
       }
     ],
     "lvl5": [
       {
-        "id": "GROUDON",
+        "id": "LUNALA",
         "names": {
-          "en": "Groudon",
-          "de": "Groudon",
-          "fr": "Groudon",
-          "it": "Groudon",
-          "ja": "グラードン",
-          "ko": "그란돈",
-          "es": "Groudon"
+          "en": "Lunala",
+          "de": "Lunala",
+          "fr": "Lunala",
+          "it": "Lunala",
+          "ja": "ルナアーラ",
+          "ko": "루나아라",
+          "es": "Lunala"
         },
         "types": [
-          "ground"
+          "psychic",
+          "ghost"
         ],
         "resistorTypes": [
-          "flying",
-          "bug",
-          "grass"
+          "normal",
+          "steel",
+          "dark"
         ],
         "seMoveTypes": [
-          "grass",
-          "ice",
-          "water"
+          "dark",
+          "ghost"
         ]
       }
     ],
     "lvl3": [
       {
-        "id": "MR_MIME",
+        "id": "LAPRAS",
         "names": {
-          "en": "Galarian Mr. Mime",
-          "de": "Galar-Pantimos",
-          "fr": "M. Mime de Galar",
-          "it": "Mr. Mime di Galar",
-          "ja": "ガラル バリヤード",
-          "ko": "가라르 마임맨",
-          "es": "Mr. Mime de Galar"
+          "en": "Lapras",
+          "de": "Lapras",
+          "fr": "Lokhlass",
+          "it": "Lapras",
+          "ja": "ラプラス",
+          "ko": "라프라스",
+          "es": "Lapras"
         },
         "types": [
-          "ice",
-          "psychic"
+          "water",
+          "ice"
         ],
         "resistorTypes": [
           "steel",
-          "fire",
           "water",
-          "psychic",
-          "ice",
+          "ice"
+        ],
+        "seMoveTypes": [
+          "electric",
+          "fighting",
+          "grass",
+          "rock"
+        ]
+      },
+      {
+        "id": "SAMUROTT",
+        "names": {
+          "en": "Hisuian Samurott",
+          "de": "Hisuian-Admurai",
+          "fr": "Clamiral de Hisuian",
+          "it": "Samurott di Hisuian",
+          "ja": "ダイケンキ",
+          "ko": "대검귀",
+          "es": "Samurott de Galar"
+        },
+        "types": [
+          "water",
           "dark"
-        ],
-        "seMoveTypes": [
-          "bug",
-          "dark",
-          "fire",
-          "ghost",
-          "rock",
-          "steel"
-        ]
-      },
-      {
-        "id": "TURTONATOR",
-        "names": {
-          "en": "Turtonator",
-          "de": "Tortunator",
-          "fr": "Boumata",
-          "it": "Turtonator",
-          "ja": "バクガメス",
-          "ko": "폭거북스",
-          "es": "Turtonator"
-        },
-        "types": [
-          "fire",
-          "dragon"
-        ],
-        "resistorTypes": [
-          "rock",
-          "fire",
-          "water",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "dragon",
-          "ground",
-          "rock"
-        ]
-      },
-      {
-        "id": "KLEAVOR",
-        "names": {
-          "en": "Kleavor",
-          "de": "Axantor",
-          "fr": "Hachécateur",
-          "it": "Kleavor",
-          "ja": "バサギリ",
-          "ko": "사마자르",
-          "es": "Kleavor"
-        },
-        "types": [
-          "bug",
-          "rock"
         ],
         "resistorTypes": [
           "fighting",
-          "poison",
-          "ground",
-          "ghost",
-          "steel",
+          "water",
+          "grass",
+          "dragon",
+          "dark",
           "fairy"
         ],
         "seMoveTypes": [
-          "rock",
-          "steel",
+          "bug",
+          "electric",
+          "fairy",
+          "fighting",
+          "grass"
+        ]
+      },
+      {
+        "id": "DONDOZO",
+        "names": {
+          "en": "Dondozo",
+          "de": "Heerashai",
+          "fr": "Oyacata",
+          "it": "Dondozo",
+          "ja": "ヘイラッシャ",
+          "ko": "어써러셔",
+          "es": "Dondozo"
+        },
+        "types": [
           "water"
+        ],
+        "resistorTypes": [
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "electric",
+          "grass"
         ]
       }
     ],
     "lvl1": [
       {
-        "id": "TIRTOUGA",
+        "id": "PSYDUCK",
         "names": {
-          "en": "Tirtouga",
-          "de": "Galapaflos",
-          "fr": "Carapagos",
-          "it": "Tirtouga",
-          "ja": "プロトーガ",
-          "ko": "프로토가",
-          "es": "Tirtouga"
+          "en": "Psyduck",
+          "de": "Enton",
+          "fr": "Psykokwak",
+          "it": "Psyduck",
+          "ja": "コダック",
+          "ko": "고라파덕",
+          "es": "Psyduck"
         },
         "types": [
-          "water",
-          "rock"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "steel",
-          "water",
-          "grass",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "grass",
-          "electric",
-          "fighting",
-          "ground"
-        ]
-      },
-      {
-        "id": "ARCHEN",
-        "names": {
-          "en": "Archen",
-          "de": "Flapteryx",
-          "fr": "Arkéapti",
-          "it": "Archen",
-          "ja": "アーケン",
-          "ko": "아켄",
-          "es": "Archen"
-        },
-        "types": [
-          "rock",
-          "flying"
-        ],
-        "resistorTypes": [
-          "ground",
-          "rock",
-          "steel",
-          "electric"
-        ],
-        "seMoveTypes": [
-          "electric",
-          "ice",
-          "rock",
-          "steel",
           "water"
+        ],
+        "resistorTypes": [
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "electric",
+          "grass"
         ]
       },
       {
-        "id": "AXEW",
+        "id": "TATSUGIRI",
         "names": {
-          "en": "Axew",
-          "de": "Milza",
-          "fr": "Coupenotte",
-          "it": "Axew",
-          "ja": "キバゴ",
-          "ko": "터검니",
-          "es": "Axew"
+          "en": "Tatsugiri (Curly Form)",
+          "de": "Nigiragi (Gebogene Form)",
+          "fr": "Nigirigon (Forme Courbée)",
+          "it": "Tatsugiri (Forma Arcuata)",
+          "ja": "シャリタツ (そったすがた)",
+          "ko": "싸리용 (젖힌 모습)",
+          "es": "Tatsugiri (Forma Curvada)"
         },
         "types": [
-          "dragon"
+          "dragon",
+          "water"
         ],
         "resistorTypes": [
           "steel",
+          "water",
+          "grass",
           "fairy"
         ],
         "seMoveTypes": [
           "dragon",
-          "fairy",
-          "ice"
+          "fairy"
         ]
       },
       {
-        "id": "POLTCHAGEIST",
+        "id": "TATSUGIRI",
         "names": {
-          "en": "Poltchageist (Counterfeit Form)",
-          "de": "Mortcha (Imitationsform)",
-          "fr": "Poltchageist (Forme Imitation)",
-          "it": "Poltchageist (Forma Taroccata)",
-          "ja": "チャデス (マガイモノのすがた)",
-          "ko": "차데스 (가짜배기의 모습)",
-          "es": "Poltchageist (Forma Fraudulenta)"
+          "en": "Tatsugiri (Droopy Form)",
+          "de": "Nigiragi (Hängende Form)",
+          "fr": "Nigirigon (Forme Affalée)",
+          "it": "Tatsugiri (Forma Adagiata)",
+          "ja": "シャリタツ (たれたすがた)",
+          "ko": "싸리용 (늘어진 모습)",
+          "es": "Tatsugiri (Forma Lánguida)"
         },
         "types": [
-          "grass",
-          "ghost"
+          "dragon",
+          "water"
         ],
         "resistorTypes": [
-          "normal",
-          "flying",
-          "poison",
-          "bug",
           "steel",
-          "fire",
+          "water",
           "grass",
-          "dragon",
-          "dark"
+          "fairy"
         ],
         "seMoveTypes": [
-          "dark",
-          "fire",
-          "flying",
-          "ghost",
-          "ice"
+          "dragon",
+          "fairy"
+        ]
+      },
+      {
+        "id": "TATSUGIRI",
+        "names": {
+          "en": "Tatsugiri (Stretchy Form)",
+          "de": "Nigiragi (Gestreckte Form)",
+          "fr": "Nigirigon (Forme Raide)",
+          "it": "Tatsugiri (Forma Tesa)",
+          "ja": "シャリタツ (のびたすがた)",
+          "ko": "싸리용 (뻗은 모습)",
+          "es": "Tatsugiri (Forma Recta)"
+        },
+        "types": [
+          "dragon",
+          "water"
+        ],
+        "resistorTypes": [
+          "steel",
+          "water",
+          "grass",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "dragon",
+          "fairy"
         ]
       }
     ],
@@ -498,97 +477,6 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "lunala-in-5-star-raid-battles-august-2026",
-      "name": "Lunala in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-08-19T06:00:00.000",
-      "end": "2026-08-25T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "LUNALA",
-          "names": {
-            "en": "Lunala"
-          },
-          "types": [
-            "psychic",
-            "ghost"
-          ],
-          "resistorTypes": [
-            "normal",
-            "steel",
-            "dark"
-          ],
-          "seMoveTypes": [
-            "ghost",
-            "dark"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "mega-swampert-in-mega-raids-august-2026",
-      "name": "Mega Swampert in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-08-19T06:00:00.000",
-      "end": "2026-08-25T22:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "SWAMPERT",
-          "names": {
-            "en": "Swampert"
-          },
-          "types": [
-            "water",
-            "ground"
-          ],
-          "resistorTypes": [
-            "flying",
-            "bug",
-            "water",
-            "grass",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "grass"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20260819",
-      "name": "Lunala Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-08-19T18:00:00.000",
-      "end": "2026-08-19T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "LUNALA",
-          "names": {
-            "en": "Lunala"
-          },
-          "types": [
-            "psychic",
-            "ghost"
-          ],
-          "resistorTypes": [
-            "normal",
-            "steel",
-            "dark"
-          ],
-          "seMoveTypes": [
-            "ghost",
-            "dark"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "starmie-super-mega-raid-day-2026",
       "name": "Starmie Super Mega Raid Day",
       "eventType": "raid-day",
@@ -661,6 +549,79 @@
       "eventType": "raid-battles",
       "start": "2026-08-26T06:00:00.000",
       "end": "2026-09-08T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "REGIROCK",
+          "names": {
+            "en": "Regirock"
+          },
+          "types": [
+            "rock"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "ground",
+            "steel"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "ground",
+            "steel",
+            "water",
+            "grass"
+          ]
+        },
+        {
+          "id": "REGICE",
+          "names": {
+            "en": "Regice"
+          },
+          "types": [
+            "ice"
+          ],
+          "resistorTypes": [
+            "steel",
+            "fire",
+            "water",
+            "ice"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "rock",
+            "steel",
+            "fire"
+          ]
+        },
+        {
+          "id": "REGISTEEL",
+          "names": {
+            "en": "Registeel"
+          },
+          "types": [
+            "steel"
+          ],
+          "resistorTypes": [
+            "steel",
+            "fire",
+            "water",
+            "electric"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "ground",
+            "fire"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20260826",
+      "name": "Regirock, Regice, and Registeel Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-08-26T18:00:00.000",
+      "end": "2026-08-26T19:00:00.000",
       "isShadow": false,
       "isMega": false,
       "bosses": [
