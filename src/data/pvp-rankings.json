@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-08-20T09:02:08.876Z",
+  "fetchedAt": "2026-08-22T08:53:22.447Z",
   "topN": 30,
   "leagues": {
     "great": {
@@ -42,6 +42,10 @@
           "name": "Ninetales"
         },
         {
+          "dex": 845,
+          "name": "Cramorant"
+        },
+        {
           "dex": 160,
           "name": "Feraligatr"
         },
@@ -66,32 +70,28 @@
           "name": "Fearow"
         },
         {
-          "dex": 184,
-          "name": "Azumarill"
-        },
-        {
           "dex": 230,
           "name": "Kingdra"
+        },
+        {
+          "dex": 184,
+          "name": "Azumarill"
         },
         {
           "dex": 799,
           "name": "Guzzlord"
         },
         {
-          "dex": 131,
-          "name": "Lapras"
-        },
-        {
           "dex": 162,
           "name": "Furret"
         },
         {
-          "dex": 148,
-          "name": "Dragonair (Shadow)"
+          "dex": 131,
+          "name": "Lapras"
         },
         {
-          "dex": 308,
-          "name": "Medicham"
+          "dex": 148,
+          "name": "Dragonair (Shadow)"
         },
         {
           "dex": 302,
@@ -104,6 +104,10 @@
         {
           "dex": 197,
           "name": "Umbreon"
+        },
+        {
+          "dex": 308,
+          "name": "Medicham"
         },
         {
           "dex": 663,
@@ -120,10 +124,6 @@
         {
           "dex": 364,
           "name": "Sealeo"
-        },
-        {
-          "dex": 820,
-          "name": "Greedent"
         }
       ]
     },
@@ -151,20 +151,28 @@
           "name": "Florges"
         },
         {
-          "dex": 395,
-          "name": "Empoleon (Shadow)"
-        },
-        {
           "dex": 640,
           "name": "Virizion"
+        },
+        {
+          "dex": 395,
+          "name": "Empoleon (Shadow)"
         },
         {
           "dex": 146,
           "name": "Moltres (Galarian)"
         },
         {
+          "dex": 979,
+          "name": "Annihilape"
+        },
+        {
           "dex": 593,
           "name": "Jellicent"
+        },
+        {
+          "dex": 57,
+          "name": "Primeape"
         },
         {
           "dex": 205,
@@ -191,6 +199,10 @@
           "name": "Registeel"
         },
         {
+          "dex": 9,
+          "name": "Blastoise"
+        },
+        {
           "dex": 477,
           "name": "Dusknoir"
         },
@@ -199,12 +211,16 @@
           "name": "Lapras"
         },
         {
-          "dex": 9,
-          "name": "Blastoise"
+          "dex": 687,
+          "name": "Malamar"
         },
         {
-          "dex": 687,
-          "name": "Malamar (Shadow)"
+          "dex": 845,
+          "name": "Cramorant"
+        },
+        {
+          "dex": 895,
+          "name": "Regidrago"
         },
         {
           "dex": 663,
@@ -212,15 +228,11 @@
         },
         {
           "dex": 365,
-          "name": "Walrein (Shadow)"
+          "name": "Walrein"
         },
         {
           "dex": 977,
           "name": "Dondozo"
-        },
-        {
-          "dex": 895,
-          "name": "Regidrago"
         },
         {
           "dex": 487,
@@ -231,24 +243,12 @@
           "name": "Bellibolt"
         },
         {
-          "dex": 979,
-          "name": "Annihilape"
-        },
-        {
-          "dex": 488,
-          "name": "Cresselia"
-        },
-        {
           "dex": 350,
           "name": "Milotic"
         },
         {
-          "dex": 346,
-          "name": "Cradily"
-        },
-        {
-          "dex": 119,
-          "name": "Seaking"
+          "dex": 208,
+          "name": "Steelix"
         }
       ]
     },
@@ -401,6 +401,10 @@
           "name": "Morpeko (Hangry)"
         },
         {
+          "dex": 845,
+          "name": "Cramorant (Gorging)"
+        },
+        {
           "dex": 923,
           "name": "Pawmot"
         },
@@ -465,10 +469,6 @@
           "name": "Pawmo"
         },
         {
-          "dex": 652,
-          "name": "Chesnaught (Shadow)"
-        },
-        {
           "dex": 799,
           "name": "Guzzlord"
         },
@@ -477,8 +477,12 @@
           "name": "Gastrodon"
         },
         {
+          "dex": 652,
+          "name": "Chesnaught (Shadow)"
+        },
+        {
           "dex": 687,
-          "name": "Malamar"
+          "name": "Malamar (Shadow)"
         },
         {
           "dex": 581,
@@ -499,10 +503,6 @@
         {
           "dex": 593,
           "name": "Jellicent"
-        },
-        {
-          "dex": 350,
-          "name": "Milotic (Shadow)"
         }
       ]
     }
