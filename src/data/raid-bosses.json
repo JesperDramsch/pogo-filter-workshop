@@ -477,42 +477,6 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "starmie-super-mega-raid-day-2026",
-      "name": "Starmie Super Mega Raid Day",
-      "eventType": "raid-day",
-      "start": "2026-08-22T11:00:00.000",
-      "end": "2026-08-22T17:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "STARMIE",
-          "names": {
-            "en": "Starmie"
-          },
-          "types": [
-            "water",
-            "psychic"
-          ],
-          "resistorTypes": [
-            "steel",
-            "water",
-            "grass",
-            "psychic",
-            "dragon",
-            "dark"
-          ],
-          "seMoveTypes": [
-            "bug",
-            "ghost",
-            "grass",
-            "electric",
-            "dark"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "mega-gyarados-in-mega-raids-august-2026",
       "name": "Mega Gyarados in Mega Raids",
       "eventType": "raid-battles",
