@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-08-20T08:08:28.365Z",
+  "fetchedAt": "2026-08-26T08:21:15.935Z",
   "raids": {
     "mega": [
       {
@@ -58,61 +58,64 @@
     ],
     "lvl3": [
       {
-        "id": "LAPRAS",
+        "id": "DHELMISE",
         "names": {
-          "en": "Lapras",
-          "de": "Lapras",
-          "fr": "Lokhlass",
-          "it": "Lapras",
-          "ja": "ラプラス",
-          "ko": "라프라스",
-          "es": "Lapras"
+          "en": "Dhelmise",
+          "de": "Moruda",
+          "fr": "Sinistrail",
+          "it": "Dhelmise",
+          "ja": "ダダリン",
+          "ko": "타타륜",
+          "es": "Dhelmise"
         },
         "types": [
-          "water",
-          "ice"
+          "ghost",
+          "grass"
         ],
         "resistorTypes": [
+          "normal",
+          "flying",
+          "poison",
+          "bug",
           "steel",
-          "water",
-          "ice"
+          "fire",
+          "grass",
+          "dragon",
+          "dark"
         ],
         "seMoveTypes": [
-          "electric",
-          "fighting",
-          "grass",
-          "rock"
+          "dark",
+          "fire",
+          "flying",
+          "ghost",
+          "ice"
         ]
       },
       {
-        "id": "SAMUROTT",
+        "id": "KLAWF",
         "names": {
-          "en": "Hisuian Samurott",
-          "de": "Hisuian-Admurai",
-          "fr": "Clamiral de Hisuian",
-          "it": "Samurott di Hisuian",
-          "ja": "ダイケンキ",
-          "ko": "대검귀",
-          "es": "Samurott de Galar"
+          "en": "Klawf",
+          "de": "Klibbe",
+          "fr": "Craparoi",
+          "it": "Klawf",
+          "ja": "ガケガニ",
+          "ko": "절벼게",
+          "es": "Klawf"
         },
         "types": [
-          "water",
-          "dark"
+          "rock"
         ],
         "resistorTypes": [
           "fighting",
-          "water",
-          "grass",
-          "dragon",
-          "dark",
-          "fairy"
+          "ground",
+          "steel"
         ],
         "seMoveTypes": [
-          "bug",
-          "electric",
-          "fairy",
           "fighting",
-          "grass"
+          "grass",
+          "ground",
+          "steel",
+          "water"
         ]
       },
       {
@@ -142,15 +145,42 @@
     ],
     "lvl1": [
       {
-        "id": "PSYDUCK",
+        "id": "QWILFISH",
         "names": {
-          "en": "Psyduck",
-          "de": "Enton",
-          "fr": "Psykokwak",
-          "it": "Psyduck",
-          "ja": "コダック",
-          "ko": "고라파덕",
-          "es": "Psyduck"
+          "en": "Hisuian Qwilfish",
+          "de": "Hisuian-Baldorfish",
+          "fr": "Qwilfish de Hisuian",
+          "it": "Qwilfish di Hisuian",
+          "ja": "ハリーセン",
+          "ko": "침바루",
+          "es": "Qwilfish de Galar"
+        },
+        "types": [
+          "dark",
+          "poison"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "poison",
+          "ground",
+          "rock",
+          "steel",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "ground"
+        ]
+      },
+      {
+        "id": "FEEBAS",
+        "names": {
+          "en": "Feebas",
+          "de": "Barschwa",
+          "fr": "Barpau",
+          "it": "Feebas",
+          "ja": "ヒンバス",
+          "ko": "빈티나",
+          "es": "Feebas"
         },
         "types": [
           "water"
@@ -166,81 +196,34 @@
         ]
       },
       {
-        "id": "TATSUGIRI",
+        "id": "BRUXISH",
         "names": {
-          "en": "Tatsugiri (Curly Form)",
-          "de": "Nigiragi (Gebogene Form)",
-          "fr": "Nigirigon (Forme Courbée)",
-          "it": "Tatsugiri (Forma Arcuata)",
-          "ja": "シャリタツ (そったすがた)",
-          "ko": "싸리용 (젖힌 모습)",
-          "es": "Tatsugiri (Forma Curvada)"
+          "en": "Bruxish",
+          "de": "Knirfish",
+          "fr": "Denticrisse",
+          "it": "Bruxish",
+          "ja": "ハギギシリ",
+          "ko": "치갈기",
+          "es": "Bruxish"
         },
         "types": [
-          "dragon",
-          "water"
+          "water",
+          "psychic"
         ],
         "resistorTypes": [
           "steel",
           "water",
           "grass",
-          "fairy"
+          "psychic",
+          "dragon",
+          "dark"
         ],
         "seMoveTypes": [
-          "dragon",
-          "fairy"
-        ]
-      },
-      {
-        "id": "TATSUGIRI",
-        "names": {
-          "en": "Tatsugiri (Droopy Form)",
-          "de": "Nigiragi (Hängende Form)",
-          "fr": "Nigirigon (Forme Affalée)",
-          "it": "Tatsugiri (Forma Adagiata)",
-          "ja": "シャリタツ (たれたすがた)",
-          "ko": "싸리용 (늘어진 모습)",
-          "es": "Tatsugiri (Forma Lánguida)"
-        },
-        "types": [
-          "dragon",
-          "water"
-        ],
-        "resistorTypes": [
-          "steel",
-          "water",
-          "grass",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "dragon",
-          "fairy"
-        ]
-      },
-      {
-        "id": "TATSUGIRI",
-        "names": {
-          "en": "Tatsugiri (Stretchy Form)",
-          "de": "Nigiragi (Gestreckte Form)",
-          "fr": "Nigirigon (Forme Raide)",
-          "it": "Tatsugiri (Forma Tesa)",
-          "ja": "シャリタツ (のびたすがた)",
-          "ko": "싸리용 (뻗은 모습)",
-          "es": "Tatsugiri (Forma Recta)"
-        },
-        "types": [
-          "dragon",
-          "water"
-        ],
-        "resistorTypes": [
-          "steel",
-          "water",
-          "grass",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "dragon",
-          "fairy"
+          "bug",
+          "dark",
+          "electric",
+          "ghost",
+          "grass"
         ]
       }
     ],
