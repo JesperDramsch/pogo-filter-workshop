@@ -8767,26 +8767,6 @@ const PRESETS = {
 	},
 };
 
-// Settings that are HIDDEN in normal mode and only show with expert toggle on.
-// These are: things most people never want to touch (Ultrabestien, Mysteriös,
-// Buddies, Distance/CP/age scope, Liga-Tag custom names, etc).
-const EXPERT_ONLY_KEYS = new Set([
-	'protectMythicals',
-	'mythTooManyOf',
-	'protectUltraBeasts',
-	'protectPurified',
-	'protectBuddies',
-	'protectLuckyEligible',
-	'trashTradedRegionals',
-	'leagueTags',
-	'customProtectedTags',
-	'cpCap',
-	'ageScopeDays',
-	'distanceProtect',
-	'luckyEligibleYear',
-	'protectNundos',
-]);
-
 function ConfigPanel({
 	config,
 	setConfig,
