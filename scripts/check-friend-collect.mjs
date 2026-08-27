@@ -9,6 +9,7 @@ import {
 	collectibleBaseDex,
 	DEFAULT_CONFIG,
 	DEFAULT_TOP_ATTACKERS,
+	lineSlotCovered,
 	mergeImportedConfig,
 } from '../src/App.jsx';
 import EVENTS from '../src/data/events.json';
@@ -645,6 +646,75 @@ console.log('\nScenario 8g: form-scoped wishlist exclusions — owned form out, 
 		'no annotations → wishlists unchanged',
 		a.friendLuckyWishlist.includes('!+dragoran') || a.friendLuckyWishlist.includes('!+dragonite'),
 	);
+}
+
+console.log('\nScenario 8h: line-level pack coverage — an owned evolution retires the base ask');
+{
+	const dexSet = (...d) => new Set(d);
+	// The unit rule. A pack entry stands for its whole line, so anything in that
+	// line fills the slot — in both directions, since the pack's ask exists only
+	// to produce the evolution the pool actually wanted.
+	check('Chikorita (152) covered by an owned Meganium (154)', lineSlotCovered(152, dexSet(154)));
+	check('…by the mid-stage Bayleef (153) too', lineSlotCovered(152, dexSet(153)));
+	check('…and by an exact Chikorita', lineSlotCovered(152, dexSet(152)));
+	check('another line does not cover it', !lineSlotCovered(152, dexSet(6, 149)));
+	check('empty have-list covers nothing', !lineSlotCovered(152, dexSet()));
+	// Babies keep their own slot: nothing de-evolves, so only an exact copy
+	// fills a baby ask. The reverse IS free and stays covered.
+	check('Pichu (172) NOT covered by an owned Pikachu (25)', !lineSlotCovered(172, dexSet(25)));
+	check('…nor by a Raichu (26)', !lineSlotCovered(172, dexSet(26)));
+	check('…but an exact Pichu fills it', lineSlotCovered(172, dexSet(172)));
+	check('Pikachu (25) IS covered by an owned baby Pichu (172)', lineSlotCovered(25, dexSet(172)));
+	// Coin flips: a branch is filled only by its own members, the shared base
+	// only once EVERY branch is (mirrors exclusionPlanFor).
+	check('Silcoon (266) covered by an owned Beautifly (267)', lineSlotCovered(266, dexSet(267)));
+	check('…not by the Cascoon branch', !lineSlotCovered(266, dexSet(268, 269)));
+	check('…not by the 50/50 Wurmple base', !lineSlotCovered(266, dexSet(265)));
+	check('Wurmple (265) needs both branches', !lineSlotCovered(265, dexSet(267)));
+	check('…and is covered once both are owned', lineSlotCovered(265, dexSet(267, 269)));
+	check('Clamperl (366) needs Huntail AND Gorebyss',
+		!lineSlotCovered(366, dexSet(367)) && lineSlotCovered(366, dexSet(367, 368)));
+
+	// The live regression (the reported bug): the starters pack asks for
+	// Chikorita ('endivie' in the DE storage locale); a lucky Meganium
+	// ('meganie') must retire that ask instead of leaving it on offer.
+	const packCfg = { ...cfg, friendCollectSpecies: [] };
+	const starters = (luckies) =>
+		buildFilters([], luckies, packCfg, [], 'en', t).friendCollectSuggestions.find((s) => s.id === 'starters');
+	check('starters pack offers endivie when nothing is owned', starters([]).species.includes('endivie'));
+	check('lucky Meganie retires the endivie ask', !starters(['meganie']).species.includes('endivie'));
+	check('a mid-stage lucky Lorblatt does too', !starters(['lorblatt']).species.includes('endivie'));
+	check('an unrelated lucky leaves it alone', starters(['glurak']).species.includes('endivie'));
+	check('…while pruning its own line (glumanda)', !starters(['glurak']).species.includes('glumanda'));
+	// Curated targets stay species-exact — the widening is a PACK rule only, so
+	// an explicit pick survives an owned evolution (Scenario 1's dratini rule).
+	const curated = buildFilters([], ['meganie'], { ...cfg, friendCollectSpecies: ['endivie'] }, [], 'en', t);
+	check('curated endivie survives a lucky Meganie',
+		curated.friendCollectWishlist.startsWith('chikorita&') && curated.friendCollectTargets[0].owned === false,
+		curated.friendCollectWishlist);
+	// Un-searchable slots gate the widening exactly as they gate `!+family`:
+	// while a season is unticked the line keeps being asked for. Exact-species
+	// coverage is deliberately untouched.
+	const raidCfg = { ...packCfg, topAttackers: ['kronjuwild'] };
+	const raids = (luckies, extra = {}) =>
+		buildFilters([], luckies, { ...raidCfg, ...extra }, [], 'en', t)
+			.friendCollectSuggestions.find((s) => s.id === 'meta-raids');
+	check('a Kronjuwild attacker asks for Sesokitz', raids([])?.species.includes('sesokitz'));
+	check('lucky Kronjuwild retires it', !raids(['kronjuwild']));
+	check('…unless a season is still unticked',
+		raids(['kronjuwild'], { luckySlots: { kronjuwild: ['spring'] } })?.species.includes('sesokitz'));
+	check('all four seasons let the widening through',
+		!raids(['kronjuwild'], { luckySlots: { kronjuwild: ['spring', 'summer', 'autumn', 'winter'] } }));
+	check('exact-species coverage ignores the slot gate, as before',
+		!raids(['sesokitz'], { luckySlots: { sesokitz: ['spring'] } }));
+	// Focus composition: 'both' needs the line covered on BOTH goals.
+	const bothCfg = { ...packCfg, friendCollectMode: 'both' };
+	const bothStarters = (hundos, luckies) =>
+		buildFilters(hundos, luckies, bothCfg, [], 'en', t).friendCollectSuggestions.find((s) => s.id === 'starters');
+	check("'both' keeps asking while only the lucky landed",
+		bothStarters([], ['meganie']).species.includes('endivie'));
+	check("'both' retires the ask once the line is lucky AND hundo",
+		!bothStarters(['lorblatt'], ['meganie']).species.includes('endivie'));
 }
 
 console.log('\nScenario 9: config merge');
