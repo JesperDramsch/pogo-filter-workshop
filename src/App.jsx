@@ -257,18 +257,41 @@ const GENDER_SLOT_DEX = new Map([
 // forms that DO differ by type belong in regional-forms.json instead, where
 // they become real search guards — that is where Burmadame's cloaks and
 // Choreogel's styles now live.
+//
+// `types` is the ONE type combination every form of the species shares — the
+// very property that makes the slots un-searchable. It is not a guard (nothing
+// here can ever be isolated by type); it exists so a form-scoped exclusion
+// emitted for a SIBLING can be proven harmless to this species. See
+// formGuardHides below.
 const INVISIBLE_FORM_SLOTS = {
-	585: { axis: 'season', slots: ['spring', 'summer', 'autumn', 'winter'] }, // Sesokitz
-	586: { axis: 'season', slots: ['spring', 'summer', 'autumn', 'winter'] }, // Kronjuwild
-	421: { axis: 'cherrim', slots: ['overcast', 'sunny'] }, // Kinoso — fixed at evolution
+	585: { axis: 'season', slots: ['spring', 'summer', 'autumn', 'winter'], types: ['normal', 'grass'] }, // Sesokitz
+	586: { axis: 'season', slots: ['spring', 'summer', 'autumn', 'winter'], types: ['normal', 'grass'] }, // Kronjuwild
+	421: { axis: 'cherrim', slots: ['overcast', 'sunny'], types: ['grass'] }, // Kinoso — fixed at evolution
 	// Burmy: gender and cloak interact rather than stacking — ♀ carries the
 	// cloak into Burmadame, ♂ becomes Moterpel and the cloak is discarded. So
 	// it is ONE four-slot group, not a gender group plus a cloak group, and the
-	// chip still renders a single row. (Burmadame itself is type-searchable.)
-	412: { axis: 'burmy', slots: ['male', 'plant', 'sandy', 'trash'] },
-	925: { axis: 'maushold', slots: ['family3', 'family4'] }, // ~99:1 roll
-	982: { axis: 'dudunsparce', slots: ['twoseg', 'threeseg'] }, // ~99:1 roll
+	// chip still renders a single row. (Burmadame itself is type-searchable —
+	// and all four Burmy slots are pure Bug, which is what lets Burmadame's
+	// cloak guards coexist with an unfinished Burmy.)
+	412: { axis: 'burmy', slots: ['male', 'plant', 'sandy', 'trash'], types: ['bug'] },
+	925: { axis: 'maushold', slots: ['family3', 'family4'], types: ['normal'] }, // ~99:1 roll
+	982: { axis: 'dudunsparce', slots: ['twoseg', 'threeseg'], types: ['normal'] }, // ~99:1 roll
 };
+
+// Would the form guard `f` (an entry from regional-forms.json, applied inside a
+// `!+family,<terms>` clause) actually hide a species whose type combination is
+// `types`? The clause hides exactly the family members matching the form
+// predicate — every `include` type present and no `exclude` type present — so a
+// species missing any include type, or carrying an exclude type, walks straight
+// through it. Unknown types answer "yes": absence of proof is not proof of
+// absence, and over-excluding is the failure this check exists to prevent.
+// Exported for the offline checks in scripts/check-lucky-logic.mjs.
+export function formGuardHides(f, types) {
+	if (!Array.isArray(types) || types.length === 0) return true;
+	const has = new Set(types);
+	if (!(f.include || []).every((ty) => has.has(ty))) return false;
+	return !(f.exclude || []).some((ty) => has.has(ty));
+}
 
 // Evolution lines whose branch is decided by an UNCONTROLLABLE 50:50 roll, so
 // owning one tip says nothing about the other. PoGo's `+` is the CANDY family,
@@ -2487,25 +2510,43 @@ export function buildFilters(
 			emitted.add(clause);
 			push(clauses, clause, why);
 		};
-		// Evolution-line ROOTS with an un-searchable slot still unfilled. Keyed by
-		// root rather than by species name because `!+X` expands to the whole
-		// candy family: owning a Kronjuwild would otherwise emit `!+kronjuwild`
-		// and hide the Sesokitz whose seasons are still incomplete, defeating the
-		// withholding entirely. One unfilled slot suppresses the exclusion for
-		// every member of that family.
-		const slotIncompleteRoots = new Set();
+		// Evolution-line ROOTS with an un-searchable slot still unfilled, mapped to
+		// the unfinished species themselves. Keyed by root rather than by species
+		// name because `!+X` expands to the whole candy family: owning a
+		// Kronjuwild would otherwise emit `!+kronjuwild` and hide the Sesokitz
+		// whose seasons are still incomplete, defeating the withholding entirely.
+		// One unfilled slot suppresses the plain exclusion for every member of
+		// that family — but only the plain one; see the form branch below.
+		const slotIncompleteByRoot = new Map();
 		for (const key of Object.keys(slotAnn || {})) {
 			if (!invisibleSlotsIncomplete(key, slotAnn)) continue;
 			const d = resolveSpeciesInfo(key)?.dex;
-			if (d) slotIncompleteRoots.add(lineRootDex(d));
+			if (!d) continue;
+			const root = lineRootDex(d);
+			if (!slotIncompleteByRoot.has(root)) slotIncompleteByRoot.set(root, []);
+			slotIncompleteByRoot.get(root).push(invisibleSlotsFor(key));
 		}
+		// A form-scoped clause is NOT the blunt `!+family` the withholding guards
+		// against: `!+burmadame,!pflanze` hides only the grass-typed members of the
+		// Burmy family, and every Burmy slot is pure Bug. So an unfinished sibling
+		// suppresses only the guards that could actually hide it — Burmadame's
+		// plant cloak stays excluded while the friend keeps being asked for Burmy.
+		// Per form, not per species: a guard that WOULD reach the unfinished
+		// species drops out on its own and the rest still emit.
+		const formsSafeDespiteSlots = (root, forms) => {
+			const blocked = slotIncompleteByRoot.get(root);
+			if (!blocked) return forms;
+			return forms.filter((f) => !blocked.some((entry) => formGuardHides(f, entry?.types)));
+		};
 		for (const { out: sp, dex } of ownedSpeciesNames(names)) {
 			// Search can't separate these forms, so no guard can be written —
-			// withhold the exclusion instead and keep the species on the ask.
-			if (slotIncompleteRoots.has(lineRootDex(dex))) continue;
+			// withhold the exclusion instead and keep the species on the ask. The
+			// form-scoped branch below re-earns its clauses one guard at a time.
+			const slotBlocked = slotIncompleteByRoot.has(lineRootDex(dex));
 			const plan = exclusionPlanFor(dex, ownedDex);
 			if (plan.kind === 'none') continue;
 			if (plan.kind === 'members') {
+				if (slotBlocked) continue;
 				const whyKey = SPLIT_FAMILY_BY_DEX.has(dex) ? whyKeys.branch : whyKeys.baby;
 				for (const d of plan.members) {
 					const name = pokemonNameFor(String(d), outputLocale);
@@ -2526,12 +2567,13 @@ export function buildFilters(
 			const whyPlain = babyExtra ? whyKeys.baby : genderExtra ? whyKeys.gender : whyKeys.plain;
 			const scoped = scopedMap.get(target);
 			if (!scoped) {
+				if (slotBlocked) continue;
 				once(`!+${target}${extra}`, tFn(whyPlain, { params: { species: capFirst(target) } }));
 				continue;
 			}
 			// Gender and regional forms are disjoint catalogs, so the form
 			// branch only ever carries the baby widening.
-			for (const f of scoped)
+			for (const f of slotBlocked ? formsSafeDespiteSlots(lineRootDex(dex), scoped) : scoped)
 				once(
 					`!+${target},${formDropTerms(f)}${extra}`,
 					tFn(babyExtra ? whyKeys.babyForm : whyKeys.form, {

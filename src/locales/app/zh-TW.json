@@ -484,6 +484,8 @@
   "app.buddy_targets.gender_male": "只要公的",
   "app.hundo_regional.title": "已保護區域限定的滿值個體",
   "app.hundo_regional.body": "即使你現在擁有牠們的滿值個體，這些物種仍會被排除在垃圾篩選器之外 — 區域限定保護優先，所以重複個體不會出現。想清掉重複的話，請在區域限定步驟的收藏家標籤中取消勾選該物種。",
+  "app.changelog.entry.slot_scoped_form_exclusions.title": "披風守衛不再被未完成的結草兒拖累",
+  "app.changelog.entry.slot_scoped_form_exclusions.body": "已修復回報的錯誤：把幸運的結草貴婦標記為草木蓑衣後，只要結草兒的格位還沒全部打勾，排除條款就會整個消失——好友願望清單依然向你索取你早就擁有的那件披風。之所以要暫緩排除，是因為「非結草貴婦家族」連結草兒一起吞掉，而結草兒的披風在搜尋中根本分不出來。但披風守衛不是那條粗糙的條款：結草貴婦草木是草屬性、砂土是地面屬性、垃圾是鋼屬性，而結草兒的每個格位都是純蟲屬性，草屬性守衛碰不到它。現在未完成的寶可夢只會擋下屬性上真的可能波及自己的守衛。你的披風層級排除回來了，而結草兒本身會留在願望清單上，直到四個格位全部打勾。",
   "app.changelog.entry.friend_collect_mega_pack.title": "超級進化包:所有能超級進化的寶可夢",
   "app.changelog.entry.friend_collect_mega_pack.body": "「請朋友幫我收集」新增一個常駐包:所有可以超級進化的物種,並以朋友實際會抓到的基礎型態列出 — 是會變成超級噴火龍的小火龍,而不是噴火龍。名單直接讀取遊戲本身的超級進化(暫時進化)資料,並由每日的 species-meta 同步更新,所以新推出的超級進化會自己加進包裡,不需要更新這個 app。需要特別交換的超級進化(拉帝亞斯、拉帝歐斯、烈空坐、蒂安希)一律排除,與其他包一致。",
   "app.changelog.entry.invisible_form_slots.title": "追蹤搜尋根本看不到的形態",
