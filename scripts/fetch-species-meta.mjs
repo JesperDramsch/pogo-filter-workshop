@@ -41,6 +41,23 @@
 //    lines are excluded here — they get their own packs. Emits the BASE
 //    dex of each qualifying chain (the species a friend actually catches).
 //
+//  - megaDex: every species that can Mega Evolve, read straight from the
+//    game's own temporary-evolution data — so a newly released Mega joins
+//    the friend-collect "Mega evolutions" pack on the next daily sync with
+//    no code change (the whole point of deriving it instead of curating it).
+//    Game master ONLY, deliberately — unlike specialTradeDex there is no
+//    second source worth unioning: pogoapi's mega_pokemon feed lists Primal
+//    Kyogre/Groudon alongside the real megas and carries no field this
+//    script can key a Mega-vs-Primal split off, so a first live run tripped
+//    the Kyogre assertion below (gm 48 · pogoapi 47 · union 50). The game
+//    master is the one source that names the mechanic outright
+//    (TEMP_EVOLUTION_MEGA vs TEMP_EVOLUTION_PRIMAL), and it was also the
+//    fresher of the two. A game-master outage empties megaDex and the size
+//    gate below reddens the sync — the intended intervention signal, same as
+//    every other assertion here. Emitted as the MEGA-CAPABLE species dex
+//    (Charizard, not Charmander) — App.jsx's collectible-base remap turns
+//    that into the species a friend actually catches.
+//
 //  - evoParentByDex: child dex → parent dex for every evolution step, so
 //    App.jsx can walk any species down to the base of its line (the
 //    friend-collect packs only suggest collectible bases — a lucky
@@ -243,6 +260,42 @@ export function evoParentsFromGameMaster(templates) {
   return parents;
 }
 
+// Mega temporary evolutions. TEMP_EVOLUTION_MEGA covers plain megas and the
+// X/Y split (TEMP_EVOLUTION_MEGA_X / _MEGA_Y) — both collapse onto the one
+// species dex, since a friend catches the same Charmander either way.
+// TEMP_EVOLUTION_PRIMAL (Groudon/Kyogre) deliberately does NOT match: Primal
+// Reversion is a different mechanic, and both species are special-trade anyway.
+const MEGA_TEMP_EVO = /^TEMP_EVOLUTION_MEGA/;
+
+// Extract the Set of dex ids whose game-master entry offers a Mega. Two
+// independent signals live in the same pokemonSettings node and are unioned —
+// the live game master agrees on both today (48 species each), and a union
+// survives either one being reshaped upstream:
+//   1. evolutionBranch[].temporaryEvolution — the mega "evolution" offered.
+//   2. tempEvoOverrides[].tempEvoId — the stat block the mega form swaps in.
+// Exported for the offline parse test in scripts/check-friend-collect.mjs.
+export function megaDexFromGameMaster(templates) {
+  const list = Array.isArray(templates)
+    ? templates
+    : templates?.template || templates?.templates || templates?.itemTemplate || [];
+  const ids = new Set();
+  for (const entry of list) {
+    const node = entry?.data || entry;
+    const ps = node?.pokemonSettings;
+    if (!ps) continue;
+    const m = /^V(\d+)_POKEMON_/.exec(node?.templateId || entry?.templateId || "");
+    if (!m) continue;
+    const branchMega =
+      Array.isArray(ps.evolutionBranch) &&
+      ps.evolutionBranch.some((b) => MEGA_TEMP_EVO.test(b?.temporaryEvolution || ""));
+    const overrideMega =
+      Array.isArray(ps.tempEvoOverrides) &&
+      ps.tempEvoOverrides.some((o) => MEGA_TEMP_EVO.test(o?.tempEvoId || ""));
+    if (branchMega || overrideMega) ids.add(parseInt(m[1], 10));
+  }
+  return ids;
+}
+
 // Tunables. The plan defaults — change here, not at consumer side.
 const STARTERS_PER_GENERATION = 9;   // 3 lines × 3 stages open every regional dex
 const POWER_LINE_CUMULATIVE_CANDY = 125; // pseudo baseline (25 + 100)
@@ -356,6 +409,14 @@ async function main() {
     for (const id of collectDexIds(entries)) raritySet.add(id);
   }
   const specialTrade = new Set([...gmSet, ...raritySet]);
+
+  // ── megaDex ──
+  // Game master only — see the header note: it is the only source that
+  // separates Mega from Primal Reversion. Special-trade megas (Latias,
+  // Latios, Rayquaza, Diancie) stay in the snapshot; App.jsx's pack builder
+  // drops them, and the raw roster is the honest answer to "what can mega".
+  const megas = megaDexFromGameMaster(gameMaster);
+  console.log(`  megas: ${megas.size} from the game master`);
 
   // ── starterDex ──
   // Name→dex lookup (from the stats feed) lets the parser resolve
@@ -478,6 +539,7 @@ async function main() {
     specialTradeDex: [...specialTrade].sort((a, b) => a - b),
     starterDex: [...starters].sort((a, b) => a - b),
     powerLineDex: [...powerLines].sort((a, b) => a - b),
+    megaDex: [...megas].sort((a, b) => a - b),
     evoParentByDex,
   };
 
@@ -509,6 +571,28 @@ async function main() {
     "Victini (494) ∉ starterDex — Unova's dex opens with a mythical, not the trios",
   );
   assertOrDie(newContent.powerLineDex.includes(147), "Dratini (147) ∈ powerLineDex");
+  for (const [dex, name] of [[3, "Venusaur"], [6, "Charizard"], [9, "Blastoise"], [15, "Beedrill"], [94, "Gengar"]]) {
+    assertOrDie(newContent.megaDex.includes(dex), `${name} (${dex}) ∈ megaDex`);
+  }
+  assertOrDie(
+    !newContent.megaDex.includes(1),
+    "Bulbasaur (1) ∉ megaDex — the Mega sits on the evolved stage, not the base",
+  );
+  assertOrDie(
+    !newContent.megaDex.includes(382),
+    "Kyogre (382) ∉ megaDex — Primal Reversion is not a Mega Evolution",
+  );
+  // Lower gate: an emptied/halved roster means the game-master fetch or its
+  // temp-evo shape broke. Upper gate: a shape drift leaking unrelated ids
+  // would balloon this past a roster — better a red sync than a whole-dex pack.
+  assertOrDie(
+    newContent.megaDex.length >= 40,
+    `megaDex covers the released Mega roster (${newContent.megaDex.length} ≥ 40)`,
+  );
+  assertOrDie(
+    newContent.megaDex.length <= 200,
+    `megaDex is a roster, not the whole dex (${newContent.megaDex.length} ≤ 200)`,
+  );
   assertOrDie(
     newContent.starterDex.every((dex) => !specialTrade.has(dex)),
     "specialTradeDex ∩ starterDex = ∅",
@@ -546,6 +630,7 @@ async function main() {
   console.log(`  special-trade: ${newContent.specialTradeDex.length} dex`);
   console.log(`  starters:      ${newContent.starterDex.length} dex`);
   console.log(`  power lines:   ${newContent.powerLineDex.length} base dex`);
+  console.log(`  megas:         ${newContent.megaDex.length} dex`);
 }
 
 // Only run when executed directly — check-friend-collect.mjs imports the

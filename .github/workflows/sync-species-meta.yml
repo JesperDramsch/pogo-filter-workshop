@@ -44,5 +44,5 @@ jobs:
             exit 0
           fi
           git add src/data/species-meta.json
-          git commit -m "chore(species-meta): sync special-trade/starter/power-line pools from pogoapi"
+          git commit -m "chore(species-meta): sync special-trade/starter/power-line/mega pools"
           git push
