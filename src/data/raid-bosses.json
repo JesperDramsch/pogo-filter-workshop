@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-08-26T08:21:15.935Z",
+  "fetchedAt": "2026-08-27T18:24:09.230Z",
   "raids": {
     "mega": [
       {
@@ -56,174 +56,56 @@
         ]
       }
     ],
-    "lvl3": [
-      {
-        "id": "DHELMISE",
-        "names": {
-          "en": "Dhelmise",
-          "de": "Moruda",
-          "fr": "Sinistrail",
-          "it": "Dhelmise",
-          "ja": "ダダリン",
-          "ko": "타타륜",
-          "es": "Dhelmise"
-        },
-        "types": [
-          "ghost",
-          "grass"
-        ],
-        "resistorTypes": [
-          "normal",
-          "flying",
-          "poison",
-          "bug",
-          "steel",
-          "fire",
-          "grass",
-          "dragon",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "fire",
-          "flying",
-          "ghost",
-          "ice"
-        ]
-      },
-      {
-        "id": "KLAWF",
-        "names": {
-          "en": "Klawf",
-          "de": "Klibbe",
-          "fr": "Craparoi",
-          "it": "Klawf",
-          "ja": "ガケガニ",
-          "ko": "절벼게",
-          "es": "Klawf"
-        },
-        "types": [
-          "rock"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "ground",
-          "steel"
-        ],
-        "seMoveTypes": [
-          "fighting",
-          "grass",
-          "ground",
-          "steel",
-          "water"
-        ]
-      },
-      {
-        "id": "DONDOZO",
-        "names": {
-          "en": "Dondozo",
-          "de": "Heerashai",
-          "fr": "Oyacata",
-          "it": "Dondozo",
-          "ja": "ヘイラッシャ",
-          "ko": "어써러셔",
-          "es": "Dondozo"
-        },
-        "types": [
-          "water"
-        ],
-        "resistorTypes": [
-          "water",
-          "grass",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "electric",
-          "grass"
-        ]
-      }
-    ],
     "lvl1": [
       {
-        "id": "QWILFISH",
+        "id": "PIKACHU",
         "names": {
-          "en": "Hisuian Qwilfish",
-          "de": "Hisuian-Baldorfish",
-          "fr": "Qwilfish de Hisuian",
-          "it": "Qwilfish di Hisuian",
-          "ja": "ハリーセン",
-          "ko": "침바루",
-          "es": "Qwilfish de Galar"
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
         },
         "types": [
-          "dark",
-          "poison"
+          "electric"
         ],
         "resistorTypes": [
-          "fighting",
-          "poison",
           "ground",
-          "rock",
-          "steel",
-          "dark"
+          "grass",
+          "electric",
+          "dragon"
         ],
         "seMoveTypes": [
           "ground"
         ]
       },
       {
-        "id": "FEEBAS",
+        "id": "IMPIDIMP",
         "names": {
-          "en": "Feebas",
-          "de": "Barschwa",
-          "fr": "Barpau",
-          "it": "Feebas",
-          "ja": "ヒンバス",
-          "ko": "빈티나",
-          "es": "Feebas"
+          "en": "Impidimp",
+          "de": "Bähmon",
+          "fr": "Grimalin",
+          "it": "Impidimp",
+          "ja": "ベロバー",
+          "ko": "메롱꿍",
+          "es": "Impidimp"
         },
         "types": [
-          "water"
-        ],
-        "resistorTypes": [
-          "water",
-          "grass",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "electric",
-          "grass"
-        ]
-      },
-      {
-        "id": "BRUXISH",
-        "names": {
-          "en": "Bruxish",
-          "de": "Knirfish",
-          "fr": "Denticrisse",
-          "it": "Bruxish",
-          "ja": "ハギギシリ",
-          "ko": "치갈기",
-          "es": "Bruxish"
-        },
-        "types": [
-          "water",
-          "psychic"
-        ],
-        "resistorTypes": [
-          "steel",
-          "water",
-          "grass",
-          "psychic",
-          "dragon",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "bug",
           "dark",
-          "electric",
-          "ghost",
-          "grass"
+          "fairy"
+        ],
+        "resistorTypes": [
+          "poison",
+          "steel",
+          "fire",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "fairy",
+          "poison",
+          "steel"
         ]
       }
     ],
@@ -564,11 +446,11 @@
       ]
     },
     {
-      "eventID": "raidhour20260826",
+      "eventID": "raidhour20260902",
       "name": "Regirock, Regice, and Registeel Raid Hour",
       "eventType": "raid-hour",
-      "start": "2026-08-26T18:00:00.000",
-      "end": "2026-08-26T19:00:00.000",
+      "start": "2026-09-02T18:00:00.000",
+      "end": "2026-09-02T19:00:00.000",
       "isShadow": false,
       "isMega": false,
       "bosses": [
