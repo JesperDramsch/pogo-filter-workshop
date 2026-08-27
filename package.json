@@ -23,6 +23,7 @@
   "test:buddy": "vite-node scripts/check-buddy-catch.mjs",
   "test:regionals": "vite-node scripts/verify-regionals.mjs",
   "test:carveouts": "vite-node scripts/check-carveouts.mjs",
+  "test:pvpmeta": "vite-node scripts/check-pvp-meta.mjs",
   "test:lucky": "vite-node scripts/check-lucky-logic.mjs",
   "test:friendcollect": "vite-node scripts/check-friend-collect.mjs",
   "test:verify": "vite-node scripts/check-verify.mjs",
