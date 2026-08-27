@@ -168,7 +168,7 @@ const UNTRADEABLE_MYTHICAL_DEX = new Set([
 // list here. Note Meltan/Melmetal ARE in this set: tradeable (unlike other
 // mythicals, hence the `!mythical,808,809` wishlist guard keeps them), but
 // only as a Special Trade — so packs never suggest them. The same snapshot
-// supplies the starter and "power line" pack pools below.
+// supplies the starter, "power line" and mega pack pools below.
 const SPECIAL_TRADE_DEX = new Set(SPECIES_META.specialTradeDex);
 
 // Baby stages (Pichu, Riolu, Toxel & co.) — the fixed 19-species game
@@ -2978,6 +2978,22 @@ export function buildFilters(
 		null,
 		{ hintKey: 'app.filter.friend_collect_hint_starters' },
 		(SPECIES_META.starterDex || []).map(String),
+	);
+	// Mega-capable species (species-meta feed, derived from the game master's
+	// own temporary-evolution data): everything that can Mega Evolve. Mega
+	// Energy is per-species and a Mega is only worth building on a good copy,
+	// so spare copies from friends are exactly the supply this needs. The pool
+	// updates itself — a Mega released upstream joins this pack on the next
+	// species-meta sync, no code change. Uncapped: "all the ones that can
+	// mega" is the whole point, and the preview toggles handle the rest.
+	// The collectible-base remap runs as everywhere else, so the pack asks for
+	// the Charmander that becomes a Mega Charizard, not the Charizard itself.
+	pushFriendCollectSuggestion(
+		'mega',
+		'mega-evos',
+		null,
+		{ hintKey: 'app.filter.friend_collect_hint_mega' },
+		(SPECIES_META.megaDex || []).map(String),
 	);
 	// Valuable keepers — the user's raid-meta roster (score-sorted, so the cap
 	// keeps the strongest) and the current PvP league metas, split per league
@@ -7111,6 +7127,7 @@ function FriendCollectEditor({
 		if (s.kind === 'candy') return `🍬 ${t('app.filter.friend_collect_suggest_candy')}`;
 		if (s.kind === 'powerlines') return `🐲 ${t('app.filter.friend_collect_suggest_powerlines')}`;
 		if (s.kind === 'starters') return `🌱 ${t('app.filter.friend_collect_suggest_starters')}`;
+		if (s.kind === 'mega') return `💠 ${t('app.filter.friend_collect_suggest_mega')}`;
 		if (s.kind === 'raids') return `⚔️ ${t('app.filter.friend_collect_suggest_raid')}`;
 		if (s.kind === 'pvp-great') return `🥇 ${t('app.filter.friend_collect_suggest_pvp_great')}`;
 		return `🥈 ${t('app.filter.friend_collect_suggest_pvp_ultra')}`;
@@ -7119,7 +7136,7 @@ function FriendCollectEditor({
 	// meta-driven pools. Groups render only when they have surviving packs.
 	const SUGGESTION_GROUPS = [
 		{ key: 'live', kinds: ['event', 'eggs'] },
-		{ key: 'evergreen', kinds: ['tradeevo', 'candy', 'powerlines', 'starters'] },
+		{ key: 'evergreen', kinds: ['tradeevo', 'candy', 'powerlines', 'starters', 'mega'] },
 		{ key: 'meta', kinds: ['raids', 'pvp-great', 'pvp-ultra'] },
 	];
 
