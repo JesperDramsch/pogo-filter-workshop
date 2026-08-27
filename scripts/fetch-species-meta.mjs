@@ -45,9 +45,16 @@
 //    game's own temporary-evolution data — so a newly released Mega joins
 //    the friend-collect "Mega evolutions" pack on the next daily sync with
 //    no code change (the whole point of deriving it instead of curating it).
-//    Two-source union, same reasoning as specialTradeDex: the game master's
-//    mega temp-evo entries ∪ pogoapi's mega roster, so one upstream outage
-//    can't silently empty the pack. Emitted as the MEGA-CAPABLE species dex
+//    Game master ONLY, deliberately — unlike specialTradeDex there is no
+//    second source worth unioning: pogoapi's mega_pokemon feed lists Primal
+//    Kyogre/Groudon alongside the real megas and carries no field this
+//    script can key a Mega-vs-Primal split off, so a first live run tripped
+//    the Kyogre assertion below (gm 48 · pogoapi 47 · union 50). The game
+//    master is the one source that names the mechanic outright
+//    (TEMP_EVOLUTION_MEGA vs TEMP_EVOLUTION_PRIMAL), and it was also the
+//    fresher of the two. A game-master outage empties megaDex and the size
+//    gate below reddens the sync — the intended intervention signal, same as
+//    every other assertion here. Emitted as the MEGA-CAPABLE species dex
 //    (Charizard, not Charmander) — App.jsx's collectible-base remap turns
 //    that into the species a friend actually catches.
 //
@@ -78,10 +85,6 @@ const ENDPOINTS = {
   evolutions:  "https://pogoapi.net/api/v1/pokemon_evolutions.json",
   stats:       "https://pogoapi.net/api/v1/pokemon_stats.json",
   released:    "https://pogoapi.net/api/v1/released_pokemon.json",
-  // Mega roster — fetched separately from the batch above so a hiccup on this
-  // one endpoint degrades megaDex to the game-master source instead of
-  // reddening the whole sync.
-  megas:       "https://pogoapi.net/api/v1/mega_pokemon.json",
   // PokeMiners game master (same org the grunt-quote fetcher uses). Big file
   // (~tens of MB) but this script only runs in the daily sync workflow.
   gameMaster:  "https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/latest.json",
@@ -395,15 +398,6 @@ async function main() {
   } catch (e) {
     console.warn(`⚠  game master fetch failed (${e.message}).`);
   }
-  // Same deal for the mega roster: optional second source for megaDex. If it
-  // fails, the game master alone still has to satisfy the mega assertions.
-  let megaFeed = null;
-  try {
-    console.log("→ Fetching pogoapi mega roster");
-    megaFeed = await fetchJson(ENDPOINTS.megas);
-  } catch (e) {
-    console.warn(`⚠  mega feed fetch failed (${e.message}).`);
-  }
 
   // ── specialTradeDex ──
   // Per-source sets kept separate so an assertion failure can name the
@@ -417,18 +411,12 @@ async function main() {
   const specialTrade = new Set([...gmSet, ...raritySet]);
 
   // ── megaDex ──
-  // Game master (authoritative — the game's own temp-evo data) ∪ pogoapi's
-  // mega roster. collectDexIds pulls every pokemon_id out of the mega feed
-  // whatever shape it arrives in; every entry in that feed IS a mega-capable
-  // species, so nothing needs filtering on that side. Special-trade megas
-  // (Latias, Latios, Rayquaza) stay in the snapshot — App.jsx's pack builder
+  // Game master only — see the header note: it is the only source that
+  // separates Mega from Primal Reversion. Special-trade megas (Latias,
+  // Latios, Rayquaza, Diancie) stay in the snapshot; App.jsx's pack builder
   // drops them, and the raw roster is the honest answer to "what can mega".
-  const megaGmSet = megaDexFromGameMaster(gameMaster);
-  const megaFeedSet = megaFeed ? collectDexIds(megaFeed) : new Set();
-  const megas = new Set([...megaGmSet, ...megaFeedSet]);
-  console.log(
-    `  megas: game master ${megaGmSet.size} · pogoapi ${megaFeedSet.size} · union ${megas.size}`,
-  );
+  const megas = megaDexFromGameMaster(gameMaster);
+  console.log(`  megas: ${megas.size} from the game master`);
 
   // ── starterDex ──
   // Name→dex lookup (from the stats feed) lets the parser resolve
@@ -594,9 +582,9 @@ async function main() {
     !newContent.megaDex.includes(382),
     "Kyogre (382) ∉ megaDex — Primal Reversion is not a Mega Evolution",
   );
-  // Lower gate: an emptied/halved roster means both sources broke. Upper gate:
-  // a shape drift in the mega feed leaking unrelated pokemon_ids would balloon
-  // this well past a roster — better a red sync than a pack of the whole dex.
+  // Lower gate: an emptied/halved roster means the game-master fetch or its
+  // temp-evo shape broke. Upper gate: a shape drift leaking unrelated ids
+  // would balloon this past a roster — better a red sync than a whole-dex pack.
   assertOrDie(
     newContent.megaDex.length >= 40,
     `megaDex covers the released Mega roster (${newContent.megaDex.length} ≥ 40)`,
