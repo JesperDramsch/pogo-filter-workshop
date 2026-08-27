@@ -452,7 +452,16 @@ export const DEFAULT_CONFIG = {
 	expertMode: false, // hides niche toggles in normal mode
 
 	// PvP
-	pvpMode: 'strict', // "loose" | "strict" | "none"
+	pvpMode: 'strict', // "loose" | "intelligent" | "strict" | "none"
+	// "Intelligent" splits the PvP carve-out in two: everything gets the base
+	// tier (strict by default — a perfect 0/3-4/3-4 spread is cheap insurance
+	// against a future buff), and the species you actually play get the wider
+	// meta tier. The list starts EMPTY on purpose; one tap seeds it from the
+	// Superliga/Hyperliga packs (pvpMetaPacks), and it is curated from there.
+	// With an empty list, intelligent is byte-identical to the base tier.
+	pvpMetaSpecies: [],
+	pvpMetaTier: 'loose', // IV tier for the curated list — "loose" | "strict"
+	pvpBaseTier: 'strict', // IV tier for everything else — "loose" | "strict" | "none"
 
 	// Universal protections (most always-on in normal mode; visible in expert)
 	protectFavorites: true,
@@ -1197,6 +1206,16 @@ export function mergeImportedConfig(raw, notices = []) {
 	const canonicalize = (arr) => (arr || []).map((s) => resolveSpecies(s) || s);
 	merged.mythTooManyOf = canonicalize(merged.mythTooManyOf);
 	merged.shadowKeeperSpecies = canonicalize(merged.shadowKeeperSpecies);
+	// Deduped as well as canonicalized: an import carrying the same species under
+	// two locale names ("Medicham" + "meditalis") collapses to one entry, so it
+	// cannot emit the same carve-out clause twice.
+	merged.pvpMetaSpecies = [...new Set(canonicalize(merged.pvpMetaSpecies))];
+	// PvP knobs: coerce junk (and hand-edited imports) to the defaults. A config
+	// predating `intelligent` simply never selects it, so the two tier fields stay
+	// inert — no back-fill pin needed the way protectShadowPurifyOnly needed one.
+	if (!['loose', 'intelligent', 'strict', 'none'].includes(merged.pvpMode)) merged.pvpMode = 'strict';
+	if (!['loose', 'strict'].includes(merged.pvpMetaTier)) merged.pvpMetaTier = 'loose';
+	if (!['loose', 'strict', 'none'].includes(merged.pvpBaseTier)) merged.pvpBaseTier = 'strict';
 	merged.friendCollectSpecies = canonicalize(merged.friendCollectSpecies);
 	if (!['lucky', 'hundo', 'both'].includes(merged.friendCollectMode)) merged.friendCollectMode = 'lucky';
 	// Legacy configs (and junk values) coerce to the off default.
@@ -1526,8 +1545,53 @@ export function buildFilters(
 	const ivK3Bad = `0-2${kw.iv.atk},0-3${kw.iv.def},0-3${kw.iv.hp}`;
 	const ivPvPLoose = `2-4${kw.iv.atk},0-2${kw.iv.def},0-2${kw.iv.hp}`;
 	const ivPvPStrict = `1-4${kw.iv.atk},0-2${kw.iv.def},0-2${kw.iv.hp}`;
+	const IV_PVP_TIER = { loose: ivPvPLoose, strict: ivPvPStrict, none: null };
+	// Protection width, so we can tell when a carve-out would be redundant.
+	const PVP_TIER_RANK = { none: 0, strict: 1, loose: 2 };
 
-	const notP = cfg.pvpMode === 'loose' ? ivPvPLoose : cfg.pvpMode === 'strict' ? ivPvPStrict : null;
+	// `intelligent` splits the carve-out into two configurable tiers; the legacy
+	// modes collapse onto the same two knobs with both tiers equal, which keeps
+	// their output byte-identical.
+	const pvpBaseTier =
+		cfg.pvpMode === 'intelligent'
+			? cfg.pvpBaseTier || 'strict'
+			: cfg.pvpMode === 'loose' || cfg.pvpMode === 'strict'
+				? cfg.pvpMode
+				: 'none';
+	const pvpMetaTier = cfg.pvpMode === 'intelligent' ? cfg.pvpMetaTier || 'loose' : pvpBaseTier;
+	const notP = IV_PVP_TIER[pvpBaseTier];
+
+	// The curated "relevant now" list — species you actually battle with, seeded
+	// one tap at a time from the league packs. Rendered into the user's PoGo
+	// locale, same as shadowKeeperSpecies (`keeperResolved`).
+	const pvpMetaList =
+		cfg.pvpMode === 'intelligent'
+			? [
+					...new Set(
+						(cfg.pvpMetaSpecies || [])
+							.map((sp) => speciesForOutput(sp, outputLocale))
+							.filter(Boolean),
+					),
+				]
+			: [];
+	// Widening a tier for SOME species needs one clause per species, not one
+	// clause listing them all: clauses are comma-OR, so `!+a,!+b,…` is satisfied
+	// by any species you are NOT and would go vacuously true for everyone. The
+	// per-species shape mirrors the trade-evo carve-out below. Skipped entirely
+	// when the meta tier is not strictly wider than the base tier — then the base
+	// clause already implies every carve-out (`2-4atk` ⟹ `1-4atk`).
+	const pvpMetaWidens =
+		pvpMetaList.length > 0 && PVP_TIER_RANK[pvpMetaTier] > PVP_TIER_RANK[pvpBaseTier];
+	const pushPvPMetaClauses = (arr) => {
+		if (!pvpMetaWidens) return;
+		for (const name of pvpMetaList) {
+			push(
+				arr,
+				`!+${name},${IV_PVP_TIER[pvpMetaTier]}`,
+				tFn('app.clause_why.not_p_meta', { params: { name } }),
+			);
+		}
+	};
 
 	const S012 = '0*,1*,2*';
 
@@ -1580,6 +1644,7 @@ export function buildFilters(
 	push(trashClauses, `${S012},${ivK2Bad}`, tFn('app.clause_why.not_k2'));
 	push(trashClauses, `${S012},${ivK3Bad}`, tFn('app.clause_why.not_k3'));
 	if (notP) push(trashClauses, notP, tFn('app.clause_why.not_p', { params: { mode: cfg.pvpMode } }));
+	pushPvPMetaClauses(trashClauses);
 
 	if (cfg.protectTradeEvos && TE_full.length > 0) {
 		for (const base of TE_full) {
@@ -1839,6 +1904,7 @@ export function buildFilters(
 	push(tradeClauses, [S012, TE_full_str, ivK2Bad].filter(Boolean).join(','), tFn('app.clause_why.not_k2_te'));
 	push(tradeClauses, [S012, TE_full_str, ivK3Bad].filter(Boolean).join(','), tFn('app.clause_why.not_k3_te'));
 	if (notP) push(tradeClauses, notP, tFn('app.clause_why.not_p', { params: { mode: cfg.pvpMode } }));
+	pushPvPMetaClauses(tradeClauses);
 
 	// Mandatory trade constraints (physical game rules — always apply)
 	push(tradeClauses, `!${kw.flag.traded}`, tFn('app.clause_why.must_traded'));
@@ -3647,6 +3713,34 @@ export function buildFilters(
 	}
 	const pvpRankingsFetchedAt = PVP_RANKINGS.fetchedAt || null;
 
+	// One-tap seeds for the intelligent-mode list. `species` holds STORAGE-locale
+	// names (what resolveSpecies produces) so they compare against the curated
+	// list directly; `display` is the same set rendered for the user's PoGo
+	// locale. pokemonNameFor(dex) collapses form suffixes ("Mimikyu (Busted)",
+	// "Quagsire (Shadow)") to the base species, which is what a +family search
+	// wants anyway — the Set drops the dupes that fall out of that.
+	//
+	// Meisterliga is deliberately NOT offered: it has no CP cap, so a low-attack
+	// PvP spread is actively WORSE there than a hundo. Seeding it would protect
+	// spreads the user would never play. Hand-adding a Master species still works.
+	const PVP_META_PACK_LEAGUES = ['great', 'ultra'];
+	const pvpMetaPacks = PVP_META_PACK_LEAGUES.flatMap((key) => {
+		const league = PVP_RANKINGS.leagues?.[key];
+		if (!league?.species?.length) return [];
+		const stored = [
+			...new Set(league.species.map((sp) => pokemonNameFor(String(sp.dex))).filter(Boolean)),
+		];
+		if (stored.length === 0) return [];
+		return [
+			{
+				id: key,
+				labelKey: `app.pvp.meta_pack_${key}`,
+				species: stored,
+				display: stored.map((sp) => speciesForOutput(sp, outputLocale) || sp),
+			},
+		];
+	});
+
 	// Active GBL cups — pair lily-dex's cup rankings with the ScrapedDuck
 	// event windows that mention each cup. Filter clauses reuse the league
 	// pipeline (species OR-list + cup CP cap + loose IV pattern), so the
@@ -3751,6 +3845,7 @@ export function buildFilters(
 		// PvP league meta filters
 		pvpFilters,
 		pvpRankingsFetchedAt,
+		pvpMetaPacks,
 		cupFilters,
 	};
 }
@@ -4879,6 +4974,7 @@ export default function App() {
 		rocketTypeLabels,
 		pvpFilters,
 		pvpRankingsFetchedAt,
+		pvpMetaPacks,
 		cupFilters,
 	} = useMemo(
 		() =>
@@ -5339,6 +5435,7 @@ export default function App() {
 									homeLocalTypeChecks={homeLocalTypeChecks}
 									friendCollectTargets={friendCollectTargets}
 									friendCollectSuggestions={friendCollectSuggestions}
+									pvpMetaPacks={pvpMetaPacks}
 								/>
 							</StepWrapper>
 						)}
@@ -6523,6 +6620,37 @@ function HundosEditor({
 // hundos editor, but parameterized by `titleKey` so the i18n strings live
 // under any namespace (e.g. `app.top_attackers.*`). Used for personal
 // roster lists. Accent color drives the add-button hue.
+// One-tap seeds for a curated species list. Plain actions, not toggles — the
+// label IS the accessible name, so no aria-pressed here. The counter reports
+// what an Add would actually add, so a second tap on an exhausted pack reads as
+// "0/30" and disables rather than silently no-opping.
+function PackAddButtons({ packs, items, onAddPack, accent }) {
+	const { t } = useTranslation();
+	if (!packs?.length || !onAddPack) return null;
+	return (
+		<div className='flex flex-wrap gap-1.5'>
+			{packs.map((pack) => {
+				const fresh = pack.species.filter((sp) => !items.includes(sp));
+				return (
+					<button
+						key={pack.id}
+						onClick={() => onAddPack(pack)}
+						disabled={fresh.length === 0}
+						title={pack.display?.join(', ')}
+						className='mono text-xs bg-[#1F2933] hover:bg-[#2D3A47] disabled:opacity-40 disabled:hover:bg-[#1F2933] text-[#E6EDF3] px-2.5 py-1 rounded flex items-center gap-1.5 transition'
+					>
+						<Plus size={12} style={{ color: accent }} />
+						{t(pack.labelKey)}
+						<span className='text-[#8090A0]'>
+							{fresh.length}/{pack.species.length}
+						</span>
+					</button>
+				);
+			})}
+		</div>
+	);
+}
+
 function SpeciesListEditor({
 	items,
 	newItem,
@@ -6538,6 +6666,8 @@ function SpeciesListEditor({
 	slotsAnn,
 	onSlotsAnnChange,
 	activeSlot,
+	packs = [],
+	onAddPack,
 }) {
 	const { t } = useTranslation();
 	const previewTokens = useMemo(() => {
@@ -6560,6 +6690,8 @@ function SpeciesListEditor({
 			<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
 				{t(`${titleKey}.count`, { params: { count: items.length } })}
 			</div>
+
+			<PackAddButtons packs={packs} items={items} onAddPack={onAddPack} accent={accent} />
 
 			<div className='flex flex-wrap gap-1.5'>
 				{items.map((s) => (
@@ -8221,7 +8353,9 @@ function SetTheory({ hundos, luckies, luckyHundoSet, TE_full, TE_trim, cfg }) {
 			? '(0-1, 3-4, 3-4)'
 			: cfg.pvpMode === 'strict'
 				? '(0, 3-4, 3-4)'
-				: t('app.set_theory.p_disabled');
+				: cfg.pvpMode === 'intelligent'
+					? t('app.set_theory.p_intelligent')
+					: t('app.set_theory.p_disabled');
 	// Rule-1 help splits around the bold {auto} marker so we keep it styled as <em>.
 	const autoMarker = t('app.set_theory.rule1_help_auto');
 	const ruleParts = t('app.set_theory.rule1_help', { params: { auto: autoMarker } }).split(autoMarker);
@@ -8787,6 +8921,115 @@ const EXPERT_ONLY_KEYS = new Set([
 	'protectNundos',
 ]);
 
+// Intelligent-PvP controls, rendered under the mode radio when that mode is
+// active. Two audiences share it: a normal user gets the one-tap league packs
+// and a live count (the mode is inert with an empty list, so hiding the packs
+// entirely would make "Intelligent" silently mean "Strict"), while expert mode
+// adds the full curated chip list, free-text adding, and both IV tiers.
+function PvpMetaPanel({ config, set, expert, packs, newItem, setNewItem }) {
+	const { t } = useTranslation();
+	const items = config.pvpMetaSpecies || [];
+	const metaTier = config.pvpMetaTier || 'loose';
+	const baseTier = config.pvpBaseTier || 'strict';
+	// Same rank order buildFilters uses to decide whether the carve-out is
+	// redundant — surfaced here so the UI can say so instead of the user
+	// wondering why the string did not move.
+	const RANK = { none: 0, strict: 1, loose: 2 };
+	const redundant = items.length > 0 && RANK[metaTier] <= RANK[baseTier];
+
+	function addPack(pack) {
+		set('pvpMetaSpecies', [...new Set([...items, ...pack.species])].sort());
+	}
+	function addTyped() {
+		const tokens = newItem.split(/[,;\s]+/).filter(Boolean);
+		if (tokens.length === 0) return;
+		const next = new Set(items);
+		const unresolved = [];
+		for (const tok of tokens) {
+			const r = resolveSpecies(tok);
+			if (r) next.add(r);
+			else unresolved.push(tok);
+		}
+		set('pvpMetaSpecies', [...next].sort());
+		setNewItem(unresolved.length > 0 ? unresolved.join(', ') : '');
+	}
+	function removeOne(name) {
+		set(
+			'pvpMetaSpecies',
+			items.filter((x) => x !== name),
+		);
+	}
+
+	const tierSelect = (key, value, options) => (
+		<label className='mono text-[11px] text-[#8B98A5] flex flex-col gap-1'>
+			{t(`app.pvp.${key === 'pvpMetaTier' ? 'meta' : 'base'}_tier_label`)}
+			<select
+				value={value}
+				onChange={(e) => set(key, e.target.value)}
+				className='mono text-xs bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
+			>
+				{options.map((o) => (
+					<option key={o} value={o}>
+						{t(`app.pvp.tier_${o}`)}
+					</option>
+				))}
+			</select>
+		</label>
+	);
+
+	return (
+		<div className='mt-3 space-y-3 border border-[#1F2933] rounded p-3 bg-[#0B0F14]'>
+			{items.length === 0 && (
+				<p className='mono text-[11px] text-[#D9A441] leading-snug'>{t('app.pvp.meta_empty_hint')}</p>
+			)}
+			{redundant && (
+				<p className='mono text-[11px] text-[#D9A441] leading-snug'>
+					{t('app.pvp.meta_redundant_hint')}
+				</p>
+			)}
+			{expert ? (
+				<>
+					<div className='flex flex-wrap gap-3'>
+						{tierSelect('pvpMetaTier', metaTier, ['loose', 'strict'])}
+						{tierSelect('pvpBaseTier', baseTier, ['loose', 'strict', 'none'])}
+					</div>
+					<SpeciesListEditor
+						items={items}
+						newItem={newItem}
+						setNewItem={setNewItem}
+						addItem={addTyped}
+						removeItem={removeOne}
+						titleKey='app.pvp.meta_list'
+						accent='#F5B82E'
+						packs={packs}
+						onAddPack={addPack}
+					/>
+				</>
+			) : (
+				<>
+					<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
+						{t('app.pvp.meta_list.count', { params: { count: items.length } })}
+					</div>
+					<div className='flex flex-wrap gap-1.5 items-start'>
+						<PackAddButtons packs={packs} items={items} onAddPack={addPack} accent='#F5B82E' />
+						{items.length > 0 && (
+							<button
+								onClick={() => set('pvpMetaSpecies', [])}
+								className='mono text-xs bg-[#1F2933] hover:bg-[#2D3A47] text-[#8B98A5] hover:text-[#E74C3C] px-2.5 py-1 rounded transition'
+							>
+								{t('app.pvp.meta_clear')}
+							</button>
+						)}
+					</div>
+					<p className='mono text-[10.5px] text-[#5C6975] leading-snug'>
+						{t('app.pvp.meta_expert_hint')}
+					</p>
+				</>
+			)}
+		</div>
+	);
+}
+
 function ConfigPanel({
 	config,
 	setConfig,
@@ -8794,11 +9037,16 @@ function ConfigPanel({
 	homeLocalTypeChecks = [],
 	friendCollectTargets = [],
 	friendCollectSuggestions = [],
+	pvpMetaPacks = [],
 }) {
 	const { t, outputLocale } = useTranslation();
 	// "Lass Freunde für dich sammeln" — collapsed by default; the target lists
 	// get long, and the section is a sibling of the buddy wish-species cards.
 	const [showFriendCollect, setShowFriendCollect] = useState(false);
+	// Free-text species input for the intelligent-PvP list (expert only) — the
+	// raw string lives here so unresolved tokens survive a failed add, same as
+	// the other SpeciesListEditor call sites in App.
+	const [newPvpMeta, setNewPvpMeta] = useState('');
 	// Any individual change in ConfigPanel clears the preset marker — the
 	// marker means "this preset is currently in effect"; the moment the
 	// user tweaks anything, that's no longer literally true.
@@ -8922,6 +9170,7 @@ function ConfigPanel({
 				<div className='flex flex-wrap gap-1.5' role='radiogroup' aria-label={t('app.pvp.section_title')}>
 					{[
 						['loose', 'app.pvp.loose_label', 'app.pvp.loose_desc'],
+						['intelligent', 'app.pvp.intelligent_label', 'app.pvp.intelligent_desc'],
 						['strict', 'app.pvp.strict_label', 'app.pvp.strict_desc'],
 						['none', 'app.pvp.none_label', 'app.pvp.none_desc'],
 					].map(([m, labelKey, descKey]) => (
@@ -8944,6 +9193,16 @@ function ConfigPanel({
 				<p className='mono text-[11px] text-[#8B98A5] mt-2 leading-snug'>
 					{t(`app.pvp.help_${config.pvpMode}`)}
 				</p>
+				{config.pvpMode === 'intelligent' && (
+					<PvpMetaPanel
+						config={config}
+						set={set}
+						expert={expert}
+						packs={pvpMetaPacks}
+						newItem={newPvpMeta}
+						setNewItem={setNewPvpMeta}
+					/>
+				)}
 			</div>
 
 			<hr className='border-[#1F2933]' />
