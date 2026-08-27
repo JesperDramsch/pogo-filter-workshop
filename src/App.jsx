@@ -396,21 +396,26 @@ function selfAndDescendants(dex) {
 //               `,eggsonly` widening on the wishlist clause.
 //   coin flips  a lucky Papinella says nothing about the Panekon branch
 //               (SPLIT_FAMILIES), so a branch is filled only by its own
-//               members, and the shared base only once EVERY branch is.
+//               members, and the shared base only once EVERY branch is —
+//               owning the base itself settles nothing, since that one
+//               specimen evolves into exactly one of the two branches. The
+//               split rules therefore run BEFORE the plain "I own this dex"
+//               shortcut, or a lucky Waumpel would fill its own slot and
+//               retire an ask the line has not finished.
 //
 // `ownedRoots` is the have-list's line roots, hoisted out of the loop by
 // callers that ask this for hundreds of candidates; it is derived on the spot
 // when omitted. Exported for the offline checks in
 // scripts/check-friend-collect.mjs.
 export function lineSlotCovered(dex, ownedDex, ownedRoots = null) {
-	if (ownedDex.has(dex)) return true;
-	if (BABY_DEX.has(dex)) return false;
 	const fam = SPLIT_FAMILY_BY_DEX.get(dex);
 	if (fam) {
 		const branch = fam.branches.find((b) => b.includes(dex));
 		if (branch) return branch.some((d) => ownedDex.has(d));
 		return fam.branches.every((b) => b.some((d) => ownedDex.has(d)));
 	}
+	if (ownedDex.has(dex)) return true;
+	if (BABY_DEX.has(dex)) return false;
 	const roots = ownedRoots || new Set([...ownedDex].map(lineRootDex));
 	return roots.has(lineRootDex(dex));
 }
@@ -423,8 +428,8 @@ export function lineSlotCovered(dex, ownedDex, ownedRoots = null) {
 // the member out, and scans the have-list to do it, so it is the display path
 // only — the packs ask the boolean. Exported for the offline checks.
 export function lineSlotOwner(dex, ownedDex) {
-	if (ownedDex.has(dex)) return dex;
 	if (!lineSlotCovered(dex, ownedDex)) return null;
+	if (ownedDex.has(dex)) return dex;
 	const fam = SPLIT_FAMILY_BY_DEX.get(dex);
 	if (fam) {
 		const pool = fam.branches.find((b) => b.includes(dex)) || fam.branches.flat();
@@ -2776,6 +2781,9 @@ export function buildFilters(
 	const friendCollectHundoLine = ownedLine(hundos, cfg.hundoSlots);
 	const friendCollectLineOwned = (dex, { dexSet, roots, slotGaps }) => {
 		if (!dex) return false;
+		// A coin-flip line is never settled by one specimen — its own base
+		// included — so the split rules decide before exact ownership does.
+		if (SPLIT_FAMILY_BY_DEX.has(dex)) return lineSlotCovered(dex, dexSet, roots);
 		if (dexSet.has(dex)) return true;
 		if (slotGaps.has(lineRootDex(dex))) return false;
 		return lineSlotCovered(dex, dexSet, roots);

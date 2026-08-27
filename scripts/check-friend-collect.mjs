@@ -672,7 +672,13 @@ console.log('\nScenario 8h: line-level pack coverage — an owned evolution reti
 	check('…not by the Cascoon branch', !lineSlotCovered(266, dexSet(268, 269)));
 	check('…not by the 50/50 Wurmple base', !lineSlotCovered(266, dexSet(265)));
 	check('Wurmple (265) needs both branches', !lineSlotCovered(265, dexSet(267)));
+	// The split rules outrank the plain "I own this dex" shortcut: one Wurmple
+	// evolves into exactly ONE branch, so owning it settles neither.
+	check('…owning the shared base itself settles nothing', !lineSlotCovered(265, dexSet(265)));
+	check('…not even together with one branch', !lineSlotCovered(265, dexSet(265, 267)));
 	check('…and is covered once both are owned', lineSlotCovered(265, dexSet(267, 269)));
+	check('Clamperl (366) behaves the same', !lineSlotCovered(366, dexSet(366)));
+	check('a branch member is still filled by its own copy', lineSlotCovered(266, dexSet(266)));
 	check('Clamperl (366) needs Huntail AND Gorebyss',
 		!lineSlotCovered(366, dexSet(367)) && lineSlotCovered(366, dexSet(367, 368)));
 
@@ -708,6 +714,14 @@ console.log('\nScenario 8h: line-level pack coverage — an owned evolution reti
 		!raids(['kronjuwild'], { luckySlots: { kronjuwild: ['spring', 'summer', 'autumn', 'winter'] } }));
 	check('exact-species coverage ignores the slot gate, as before',
 		!raids(['sesokitz'], { luckySlots: { sesokitz: ['spring'] } }));
+	// …and the same rule through the pack path: an owned coin-flip base must not
+	// retire its own ask (Wurmple sits in event pools, so this is reachable).
+	const flip = (luckies) =>
+		buildFilters([], luckies, { ...packCfg, topAttackers: ['waumpel'] }, [], 'en', t)
+			.friendCollectSuggestions.find((s) => s.id === 'meta-raids');
+	check('a lucky Waumpel does NOT retire the Waumpel ask', flip(['waumpel'])?.species.includes('waumpel'));
+	check('…one branch alone does not either', flip(['papinella'])?.species.includes('waumpel'));
+	check('…both branches do', !flip(['papinella', 'pudox']));
 	// Focus composition: 'both' needs the line covered on BOTH goals.
 	const bothCfg = { ...packCfg, friendCollectMode: 'both' };
 	const bothStarters = (hundos, luckies) =>
@@ -730,6 +744,8 @@ console.log('\nScenario 8i: family have-badges on curated chips — informationa
 	check('baby carve-out holds: Pichu (172) is not named by a Pikachu', lineSlotOwner(172, dexSet(25)) === null);
 	check('coin flip: Silcoon (266) named by Beautifly, not by the Cascoon branch',
 		lineSlotOwner(266, dexSet(267, 269)) === 267 && lineSlotOwner(266, dexSet(268, 269)) === null);
+	check('the shared base names nobody until both branches are owned',
+		lineSlotOwner(265, dexSet(265, 267)) === null && lineSlotOwner(265, dexSet(267, 269)) === 267);
 	check('agrees with lineSlotCovered everywhere it matters',
 		[[152, dexSet(154)], [172, dexSet(25)], [266, dexSet(269)], [265, dexSet(267, 269)]].every(
 			([d, owned]) => lineSlotCovered(d, owned) === (lineSlotOwner(d, owned) !== null)));
