@@ -20,6 +20,7 @@ jobs:
       - run: npm run test:buddy
       - run: npm run test:regionals
       - run: npm run test:carveouts
+      - run: npm run test:pvpmeta
       - run: npm run test:lucky
       - run: npm run test:friendcollect
       - run: npm run test:verify
