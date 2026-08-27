@@ -23,7 +23,8 @@
 //   P5 — behaviour: listed species keep the wider spread, unlisted ones do not
 //   P6 — families: a pre-evolution of a listed species is covered (`+` semantics)
 //   P7 — clauses render in the user's PoGo output locale
-//   P8 — migration coerces junk and leaves legacy configs untouched
+//   P8 — the league packs are well formed and usable as seeds
+//   P9 — migration coerces junk and leaves legacy configs untouched
 
 import { buildFilters, evalFilter, mergeImportedConfig, DEFAULT_CONFIG } from "../src/App.jsx";
 

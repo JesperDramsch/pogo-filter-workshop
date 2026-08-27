@@ -1250,7 +1250,7 @@
   "app.pvp.tier_strict": "嚴格 (0, 3-4, 3-4)",
   "app.pvp.tier_none": "關閉——不保護",
   "app.pvp.meta_list.count": "主流清單上有 {count} 隻寶可夢——整個家族",
-  "app.pvp.meta_list.empty": "清單是空的——從上方加入聯盟包，或在下方輸入species",
+  "app.pvp.meta_list.empty": "清單是空的——從上方加入聯盟包，或在下方輸入物種名稱",
   "app.pvp.meta_list.input_placeholder": "編號或名稱——例如 瑪力露麗、恰雷姆、463",
   "app.pvp.meta_list.add_button": "加入",
   "app.pvp.meta_list.preview_summary": "預覽．{new} 個新增、{dupes} 個已存在、{unresolved} 個無法辨識",
