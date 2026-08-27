@@ -17,6 +17,7 @@ import PVP_RANKINGS from '../src/data/pvp-rankings.json';
 import { pokemonNameFor, resolveSpeciesInfo } from '../src/data/species.js';
 import {
 	evoParentsFromGameMaster,
+	megaDexFromGameMaster,
 	specialTradeDexFromGameMaster,
 	starterDexFromGenerations,
 } from './fetch-species-meta.mjs';
@@ -117,7 +118,7 @@ console.log('\nScenario 5: suggestion packs — lineup, caps, hygiene');
 	const r = buildFilters(hundos, luckies, cfg, [], 'en', t);
 	const sug = r.friendCollectSuggestions;
 	const kinds = new Set(sug.map((s) => s.kind));
-	for (const kind of ['tradeevo', 'candy', 'powerlines', 'starters', 'raids', 'pvp-great', 'pvp-ultra']) {
+	for (const kind of ['tradeevo', 'candy', 'powerlines', 'starters', 'mega', 'raids', 'pvp-great', 'pvp-ultra']) {
 		check(`'${kind}' pack present`, kinds.has(kind), JSON.stringify([...kinds]));
 	}
 	check("gated 'rare' pack retired", !kinds.has('rare'));
@@ -208,7 +209,7 @@ console.log('\nScenario 5: suggestion packs — lineup, caps, hygiene');
 	);
 	check(
 		'packs carry hint keys for the UI',
-		['tradeevo', 'candy', 'powerlines', 'starters', 'raids', 'pvp-great', 'pvp-ultra'].every(
+		['tradeevo', 'candy', 'powerlines', 'starters', 'mega', 'raids', 'pvp-great', 'pvp-ultra'].every(
 			(kind) => typeof sug.find((s) => s.kind === kind)?.hintKey === 'string',
 		),
 	);
@@ -219,7 +220,7 @@ console.log('\nScenario 6: evergreen packs — no event gate, prune-to-vanish');
 	// Nothing curated/owned → the evergreen packs are always on offer,
 	// regardless of the events snapshot (the old rare set was event-gated).
 	const base = buildFilters([], [], { ...cfg, friendCollectSpecies: [] }, [], 'en', t);
-	for (const kind of ['tradeevo', 'candy', 'powerlines', 'starters'])
+	for (const kind of ['tradeevo', 'candy', 'powerlines', 'starters', 'mega'])
 		check(`'${kind}' offered with nothing curated`, base.friendCollectSuggestions.some((s) => s.kind === kind));
 
 	// Curating a pack's entire pool consumes it (prune still works). The pool
@@ -236,6 +237,49 @@ console.log('\nScenario 6: evergreen packs — no event gate, prune-to-vanish');
 	check(
 		'fully-curated power-lines pack disappears',
 		!r.friendCollectSuggestions.some((s) => s.kind === 'powerlines'),
+	);
+}
+
+console.log('\nScenario 6b: mega pack — every mega-capable line, as collectible bases');
+{
+	const r = buildFilters([], [], { ...cfg, friendCollectSpecies: [] }, [], 'en', t);
+	const mega = r.friendCollectSuggestions.find((s) => s.kind === 'mega');
+	check('mega pack offered', !!mega);
+	// The pack is the megaDex snapshot put through the same two filters every
+	// pack gets: collapse to the collectible base, drop special-trade species.
+	// Mega Latias/Latios/Rayquaza exist in game but are Special Trades only.
+	const special = new Set(SPECIES_META.specialTradeDex || []);
+	const expected = [
+		...new Set(
+			(SPECIES_META.megaDex || [])
+				.map((d) => collectibleBaseDex(d))
+				.filter((d) => !special.has(d))
+				.map((d) => pokemonNameFor(String(d)))
+				.filter(Boolean),
+		),
+	];
+	check(
+		'mega pack === collectible bases of megaDex minus special trades',
+		JSON.stringify(mega?.species) === JSON.stringify(expected),
+		JSON.stringify(mega?.species),
+	);
+	check(
+		'special-trade megas (Latias 380 / Latios 381 / Rayquaza 384) filtered out',
+		[380, 381, 384].every((d) => !(mega?.species || []).includes(pokemonNameFor(String(d)))),
+	);
+	check(
+		'Mega Charizard is asked for as Charmander (base remap)',
+		(mega?.species || []).includes(pokemonNameFor('4')) && !(mega?.species || []).includes(pokemonNameFor('6')),
+	);
+	// Uncapped on purpose — "all the ones that can mega" is the ask. Guard the
+	// intent so a stray cap can't quietly halve it.
+	check('mega pack uncapped (carries the whole surviving roster)', (mega?.species || []).length > 25, String(mega?.species?.length));
+	check('mega pack carries a hint key', typeof mega?.hintKey === 'string');
+	// Prune-to-vanish like every other evergreen pack.
+	const consumed = buildFilters([], [], { ...cfg, friendCollectSpecies: expected }, [], 'en', t);
+	check(
+		'fully-curated mega pack disappears',
+		!consumed.friendCollectSuggestions.some((s) => s.kind === 'mega'),
 	);
 }
 
@@ -694,6 +738,17 @@ console.log('\nScenario 10: species-meta snapshot shape (bad syncs must not sile
 	check('specialTradeDex non-empty', special.size > 0);
 	check('starterDex non-empty, whole trios (3 per gen)', (SPECIES_META.starterDex || []).length >= 27 && SPECIES_META.starterDex.length % 3 === 0);
 	check('powerLineDex non-empty', (SPECIES_META.powerLineDex || []).length > 0);
+	// megaDex feeds the mega pack; a bad sync must not empty it silently. It is
+	// the RAW mega-capable roster (evolved stages, special-trade megas and all)
+	// — the pack builder does the base remap and the trade filtering.
+	const megaDex = SPECIES_META.megaDex || [];
+	check('megaDex non-empty (>= 40 released megas)', megaDex.length >= 40, String(megaDex.length));
+	check('megaDex is a roster, not the whole dex', megaDex.length <= 200, String(megaDex.length));
+	check(
+		'megaDex holds the mega-capable stage, not the base',
+		[3, 6, 9, 15, 94].every((d) => megaDex.includes(d)) && ![1, 4, 7].some((d) => megaDex.includes(d)),
+	);
+	check('Primal Reversion is not a Mega (Kyogre 382 / Groudon 383 out)', !megaDex.includes(382) && !megaDex.includes(383));
 	check('Nihilego (Ultra Beast) is special-trade', special.has(793));
 	check('Mewtwo is special-trade', special.has(150));
 	check('Meltan is special-trade (tradeable, but never a regular trade)', special.has(808) && special.has(809));
@@ -753,6 +808,41 @@ console.log('\nScenario 11b: game-master evolutionBranch parser (offline sample)
 			wrapped.size === 3 && wrapped.get(2) === 1 && wrapped.get(863) === 52,
 		);
 	}
+}
+
+console.log('\nScenario 11c: game-master mega parser (offline sample)');
+{
+	// Both signals must work alone (either could be reshaped upstream), X/Y
+	// must collapse onto the one species dex, and PRIMAL must not count.
+	const sample = [
+		{ templateId: 'V0003_POKEMON_VENUSAUR', data: { templateId: 'V0003_POKEMON_VENUSAUR', pokemonSettings: { pokemonId: 'VENUSAUR', evolutionBranch: [{ temporaryEvolution: 'TEMP_EVOLUTION_MEGA', temporaryEvolutionEnergyCost: 200 }], tempEvoOverrides: [{ tempEvoId: 'TEMP_EVOLUTION_MEGA' }] } } },
+		// branch-only signal
+		{ templateId: 'V0006_POKEMON_CHARIZARD', data: { templateId: 'V0006_POKEMON_CHARIZARD', pokemonSettings: { pokemonId: 'CHARIZARD', evolutionBranch: [{ temporaryEvolution: 'TEMP_EVOLUTION_MEGA_X' }, { temporaryEvolution: 'TEMP_EVOLUTION_MEGA_Y' }] } } },
+		// override-only signal
+		{ templateId: 'V0094_POKEMON_GENGAR', data: { templateId: 'V0094_POKEMON_GENGAR', pokemonSettings: { pokemonId: 'GENGAR', tempEvoOverrides: [{ tempEvoId: 'TEMP_EVOLUTION_MEGA' }] } } },
+		// Primal Reversion is a different mechanic — must not land in megaDex.
+		{ templateId: 'V0382_POKEMON_KYOGRE', data: { templateId: 'V0382_POKEMON_KYOGRE', pokemonSettings: { pokemonId: 'KYOGRE', evolutionBranch: [{ temporaryEvolution: 'TEMP_EVOLUTION_PRIMAL' }], tempEvoOverrides: [{ tempEvoId: 'TEMP_EVOLUTION_PRIMAL' }] } } },
+		// A plain evolution branch is not a mega.
+		{ templateId: 'V0001_POKEMON_BULBASAUR', data: { templateId: 'V0001_POKEMON_BULBASAUR', pokemonSettings: { pokemonId: 'BULBASAUR', evolutionBranch: [{ evolution: 'IVYSAUR', candyCost: 25 }] } } },
+		{ templateId: 'COMBAT_V0001_MOVE_WRAP', data: { templateId: 'COMBAT_V0001_MOVE_WRAP' } },
+		null,
+	];
+	const ids = megaDexFromGameMaster(sample);
+	check('both signals → Venusaur (3)', ids.has(3));
+	check('evolutionBranch alone → Charizard (6)', ids.has(6));
+	check('tempEvoOverrides alone → Gengar (94)', ids.has(94));
+	check('Primal Kyogre (382) is not a mega', !ids.has(382));
+	check('plain evolution branch is not a mega', !ids.has(1));
+	check('Mega X/Y collapse onto one dex — exactly three species', ids.size === 3, JSON.stringify([...ids]));
+	check('empty/absent game master yields empty set', megaDexFromGameMaster(null).size === 0);
+	for (const wrapper of ['template', 'templates', 'itemTemplate']) {
+		const wrapped = megaDexFromGameMaster({ [wrapper]: sample });
+		check(
+			`wrapped game master shape '{ ${wrapper}: [...] }' parses identically`,
+			wrapped.size === 3 && wrapped.has(3) && wrapped.has(94),
+		);
+	}
+	check('unrecognized object payload yields empty set', megaDexFromGameMaster({ foo: 1 }).size === 0);
 }
 
 console.log('\nScenario 11: game-master pokemonClass parser (offline sample)');
