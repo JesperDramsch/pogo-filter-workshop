@@ -380,6 +380,66 @@ function selfAndDescendants(dex) {
 	return out;
 }
 
+// Is the collection slot an evolution line stands for already filled by the
+// have-list (passed as a dex Set)? This is the LINE-level question the friend-
+// collect PACKS ask, one level coarser than "do I own this exact species": a
+// pack entry is a proxy for its whole line (that is what the collectible-base
+// remap makes it), so a lucky Meganie fills the slot the pack's Endivie ask
+// exists to fill, and the ask is spent. It is the same identity the fallback
+// wishlists' `!+family` exclusions already use — PoGo's `+` IS the candy family
+// — with the same two carve-outs those exclusions widen for:
+//
+//   babies      a lucky Magmar is not a lucky Magby: babies only hatch from
+//               eggs and nothing de-evolves, so a baby ask is filled by an
+//               exact copy alone. (The reverse is free and stays covered: a
+//               lucky Magby evolves into a lucky Magmar.) This mirrors the
+//               `,eggsonly` widening on the wishlist clause.
+//   coin flips  a lucky Papinella says nothing about the Panekon branch
+//               (SPLIT_FAMILIES), so a branch is filled only by its own
+//               members, and the shared base only once EVERY branch is —
+//               owning the base itself settles nothing, since that one
+//               specimen evolves into exactly one of the two branches. The
+//               split rules therefore run BEFORE the plain "I own this dex"
+//               shortcut, or a lucky Waumpel would fill its own slot and
+//               retire an ask the line has not finished.
+//
+// `ownedRoots` is the have-list's line roots, hoisted out of the loop by
+// callers that ask this for hundreds of candidates; it is derived on the spot
+// when omitted. Exported for the offline checks in
+// scripts/check-friend-collect.mjs.
+export function lineSlotCovered(dex, ownedDex, ownedRoots = null) {
+	const fam = SPLIT_FAMILY_BY_DEX.get(dex);
+	if (fam) {
+		const branch = fam.branches.find((b) => b.includes(dex));
+		if (branch) return branch.some((d) => ownedDex.has(d));
+		return fam.branches.every((b) => b.some((d) => ownedDex.has(d)));
+	}
+	if (ownedDex.has(dex)) return true;
+	if (BABY_DEX.has(dex)) return false;
+	const roots = ownedRoots || new Set([...ownedDex].map(lineRootDex));
+	return roots.has(lineRootDex(dex));
+}
+
+// The same answer with the culprit named: WHICH have-list member fills the slot
+// (the species itself when it is owned outright). Feeds the have-badges on the
+// curated collect chips — the have-lists render as `+name`, so a lucky anywhere
+// in the line is worth showing on the chip even though it deliberately does not
+// prune an explicit pick. Rules live in lineSlotCovered above; this only picks
+// the member out, and scans the have-list to do it, so it is the display path
+// only — the packs ask the boolean. Exported for the offline checks.
+export function lineSlotOwner(dex, ownedDex) {
+	if (!lineSlotCovered(dex, ownedDex)) return null;
+	if (ownedDex.has(dex)) return dex;
+	const fam = SPLIT_FAMILY_BY_DEX.get(dex);
+	if (fam) {
+		const pool = fam.branches.find((b) => b.includes(dex)) || fam.branches.flat();
+		return pool.find((d) => ownedDex.has(d)) ?? null;
+	}
+	const root = lineRootDex(dex);
+	for (const d of ownedDex) if (lineRootDex(d) === root) return d;
+	return null;
+}
+
 // Every name that `+X` could use to select this species — i.e. the species plus
 // every other member of its candy family, lowercased in the output locale.
 // `+name` selects on the candy family, so owning a hundo Pikachu makes the
@@ -2543,6 +2603,22 @@ export function buildFilters(
 		if (!Array.isArray(owned) || owned.length === 0) return false;
 		return !entry.slots.every((s) => owned.includes(s));
 	};
+	// Evolution-line ROOTS with an un-searchable slot still unfilled. Keyed by
+	// root rather than by species name because family-wide reasoning is what
+	// both callers do: `!+X` expands to the whole candy family, so owning a
+	// Kronjuwild would otherwise emit `!+kronjuwild` and hide the Sesokitz whose
+	// seasons are still incomplete, defeating the withholding entirely — and the
+	// packs' line-level coverage would drop the same ask by the other route. One
+	// unfilled slot suppresses both for every member of that family.
+	const incompleteSlotRoots = (slotAnn) => {
+		const roots = new Set();
+		for (const key of Object.keys(slotAnn || {})) {
+			if (!invisibleSlotsIncomplete(key, slotAnn)) continue;
+			const d = resolveSpeciesInfo(key)?.dex;
+			if (d) roots.add(lineRootDex(d));
+		}
+		return roots;
+	};
 
 	const pushOwnedExclusions = (clauses, names, scopedMap, genderAnn, slotAnn, whyKeys) => {
 		const genderExtras = genderScopedExclusions(genderAnn);
@@ -2553,18 +2629,7 @@ export function buildFilters(
 			emitted.add(clause);
 			push(clauses, clause, why);
 		};
-		// Evolution-line ROOTS with an un-searchable slot still unfilled. Keyed by
-		// root rather than by species name because `!+X` expands to the whole
-		// candy family: owning a Kronjuwild would otherwise emit `!+kronjuwild`
-		// and hide the Sesokitz whose seasons are still incomplete, defeating the
-		// withholding entirely. One unfilled slot suppresses the exclusion for
-		// every member of that family.
-		const slotIncompleteRoots = new Set();
-		for (const key of Object.keys(slotAnn || {})) {
-			if (!invisibleSlotsIncomplete(key, slotAnn)) continue;
-			const d = resolveSpeciesInfo(key)?.dex;
-			if (d) slotIncompleteRoots.add(lineRootDex(d));
-		}
+		const slotIncompleteRoots = incompleteSlotRoots(slotAnn);
 		for (const { out: sp, dex } of ownedSpeciesNames(names)) {
 			// Search can't separate these forms, so no guard can be written —
 			// withhold the exclusion instead and keep the species on the ask.
@@ -2728,11 +2793,13 @@ export function buildFilters(
 		const g = friendCollectGenderMap[canonName];
 		return g === 'male' || g === 'female' ? g : null;
 	};
-	const friendCollectCovered = (canonName, keptFormKeys = null) => {
+	// Shared shape for both coverage questions below: the two goals run through
+	// the same form/gender gates, then the focus decides how they combine.
+	const friendCollectCoveredBy = (canonName, keptFormKeys, ownedLucky, ownedHundo) => {
 		const wanted = friendCollectWantedGender(canonName);
 		const l = friendCollectGoalOwned(
 			canonName,
-			luckySet.has(canonName),
+			ownedLucky,
 			cfg.luckyForms,
 			keptFormKeys,
 			cfg.luckyGenders,
@@ -2740,7 +2807,7 @@ export function buildFilters(
 		);
 		const h = friendCollectGoalOwned(
 			canonName,
-			friendCollectHundoSet.has(canonName),
+			ownedHundo,
 			cfg.hundoForms,
 			keptFormKeys,
 			cfg.hundoGenders,
@@ -2749,6 +2816,62 @@ export function buildFilters(
 		if (friendCollectMode === 'lucky') return l;
 		if (friendCollectMode === 'hundo') return h;
 		return l && h;
+	};
+	// Curated targets: EXACT-species ownership, per the no-family-subtraction
+	// rule above — an explicit pick is an explicit pick, and a lucky Raichu must
+	// not cancel a curated Pikachu.
+	const friendCollectCovered = (canonName, keptFormKeys = null) =>
+		friendCollectCoveredBy(canonName, keptFormKeys, luckySet.has(canonName), friendCollectHundoSet.has(canonName));
+	// Suggested packs: LINE-level ownership instead (lineSlotCovered). A pack
+	// entry is nobody's explicit pick — it is a proxy for its evolution line,
+	// which is exactly what the collectible-base remap below makes it. The only
+	// reason the pack asks a friend for an Endivie is the lucky Meganie at the
+	// end of that line, so once that Meganie is in the have-list the ask is
+	// spent and the pack must stop offering it — the same line identity the
+	// fallback wishlists' `!+family` exclusions have always used. Babies and
+	// coin-flip branches keep their own slots (see lineSlotCovered), and a line
+	// with an un-searchable slot still unticked keeps being asked for: the
+	// widening stops at the roots incompleteSlotRoots names, while EXACT-species
+	// coverage there stays as it was.
+	// Both have-lists are walked once here, not once per pack candidate — the
+	// packs ask this question for hundreds of species on every rebuild.
+	const ownedLine = (names, slotAnn) => {
+		const dexSet = ownedDexSet(names);
+		return {
+			dexSet,
+			roots: new Set([...dexSet].map(lineRootDex)),
+			slotGaps: incompleteSlotRoots(slotAnn),
+		};
+	};
+	const friendCollectLuckyLine = ownedLine(luckies, cfg.luckySlots);
+	const friendCollectHundoLine = ownedLine(hundos, cfg.hundoSlots);
+	const friendCollectLineOwned = (dex, { dexSet, roots, slotGaps }) => {
+		if (!dex) return false;
+		// A coin-flip line is never settled by one specimen — its own base
+		// included — so the split rules decide before exact ownership does.
+		if (SPLIT_FAMILY_BY_DEX.has(dex)) return lineSlotCovered(dex, dexSet, roots);
+		if (dexSet.has(dex)) return true;
+		if (slotGaps.has(lineRootDex(dex))) return false;
+		return lineSlotCovered(dex, dexSet, roots);
+	};
+	// Display-only mirror for the curated chips: the have-list member that fills
+	// a target's line, when it isn't the target species itself. Same gates as the
+	// packs (babies, coin-flip branches, un-searchable slots), so one rule feeds
+	// both surfaces — this one just names the mon instead of pruning the ask.
+	const friendCollectLineOwner = (dex, { dexSet, slotGaps }) => {
+		if (!dex || dexSet.has(dex)) return null;
+		if (slotGaps.has(lineRootDex(dex))) return null;
+		const owner = lineSlotOwner(dex, dexSet);
+		return owner ? pokemonNameFor(String(owner), outputLocale) : null;
+	};
+	const friendCollectPackCovered = (canonName) => {
+		const dex = resolveSpeciesInfo(canonName)?.dex;
+		return friendCollectCoveredBy(
+			canonName,
+			null,
+			friendCollectLineOwned(dex, friendCollectLuckyLine),
+			friendCollectLineOwned(dex, friendCollectHundoLine),
+		);
 	};
 	// Coverage overrides: a curated species the user explicitly re-activated
 	// even though the focus counts it as owned — the lucky Furfrou is in, but
@@ -2773,6 +2896,11 @@ export function buildFilters(
 				gender,
 			),
 			owned: friendCollectCovered(key, kept),
+			// Family have-badges: a lucky/hundo elsewhere in this target's line.
+			// Purely informational — an explicit pick still needs the exact
+			// species before it drops out of the string.
+			lineLucky: friendCollectLineOwner(resolveSpeciesInfo(key)?.dex, friendCollectLuckyLine),
+			lineHundo: friendCollectLineOwner(resolveSpeciesInfo(key)?.dex, friendCollectHundoLine),
 			forced: friendCollectForcedSet.has(key),
 			gender: gender === 'male' || gender === 'female' ? gender : null,
 			keptForms: kept,
@@ -2870,7 +2998,7 @@ export function buildFilters(
 			if (!stored || seen.has(stored)) continue;
 			seen.add(stored);
 			const curated = friendCollectCuratedSet.has(stored);
-			const covered = !curated && friendCollectCovered(stored);
+			const covered = !curated && friendCollectPackCovered(stored);
 			if ((curated || covered) && !timeLimited) continue;
 			const entry = { stored, disp: pokemonNameFor(String(dex), outputLocale) || stored, covered, curated };
 			if (curated) curatedQueue.push(entry);
@@ -7386,6 +7514,31 @@ function FriendCollectEditor({
 									className='text-[9px] px-1 py-px rounded bg-[#9B59B6]/20 text-[#9B59B6] border border-[#9B59B6]/40'
 								>
 									4★
+								</span>
+							)}
+							{/* Family have-badges — a lucky / hundo elsewhere in this
+							    target's evolution line. The have-lists read as `+name`, so
+							    the line is worth surfacing; the quieter outline (and the `+`)
+							    says it is NOT this species, and the target stays in the
+							    string until the exact one lands. */}
+							{tg.lineLucky && (
+								<span
+									title={t('app.filter.friend_collect_badge_lucky_family', {
+										params: { species: capFirst(tg.lineLucky) },
+									})}
+									className='text-[9px] px-1 py-px rounded text-[#F5B82E]/70 border border-[#F5B82E]/25'
+								>
+									+✦
+								</span>
+							)}
+							{tg.lineHundo && (
+								<span
+									title={t('app.filter.friend_collect_badge_hundo_family', {
+										params: { species: capFirst(tg.lineHundo) },
+									})}
+									className='text-[9px] px-1 py-px rounded text-[#9B59B6]/70 border border-[#9B59B6]/25'
+								>
+									+4★
 								</span>
 							)}
 							{/* Click-only refinements — buddy-target semantics, but the QUIET
