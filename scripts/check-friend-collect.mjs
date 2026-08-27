@@ -10,6 +10,7 @@ import {
 	DEFAULT_CONFIG,
 	DEFAULT_TOP_ATTACKERS,
 	lineSlotCovered,
+	lineSlotOwner,
 	mergeImportedConfig,
 } from '../src/App.jsx';
 import EVENTS from '../src/data/events.json';
@@ -715,6 +716,55 @@ console.log('\nScenario 8h: line-level pack coverage — an owned evolution reti
 		bothStarters([], ['meganie']).species.includes('endivie'));
 	check("'both' retires the ask once the line is lucky AND hundo",
 		!bothStarters(['lorblatt'], ['meganie']).species.includes('endivie'));
+}
+
+console.log('\nScenario 8i: family have-badges on curated chips — informational, never pruning');
+{
+	const dexSet = (...d) => new Set(d);
+	// lineSlotOwner names the member lineSlotCovered found; same rules, same
+	// carve-outs, and the species itself wins when it is owned outright.
+	check('Chikorita (152) → the owned Bayleef (153)', lineSlotOwner(152, dexSet(153)) === 153);
+	check('Meganium (154) → the owned Bayleef too', lineSlotOwner(154, dexSet(153)) === 153);
+	check('an exact copy names itself', lineSlotOwner(152, dexSet(152, 154)) === 152);
+	check('nothing in the line → null', lineSlotOwner(152, dexSet(6)) === null);
+	check('baby carve-out holds: Pichu (172) is not named by a Pikachu', lineSlotOwner(172, dexSet(25)) === null);
+	check('coin flip: Silcoon (266) named by Beautifly, not by the Cascoon branch',
+		lineSlotOwner(266, dexSet(267, 269)) === 267 && lineSlotOwner(266, dexSet(268, 269)) === null);
+	check('agrees with lineSlotCovered everywhere it matters',
+		[[152, dexSet(154)], [172, dexSet(25)], [266, dexSet(269)], [265, dexSet(267, 269)]].every(
+			([d, owned]) => lineSlotCovered(d, owned) === (lineSlotOwner(d, owned) !== null)));
+
+	// On the targets: a lucky/hundo elsewhere in the line rides along as a badge
+	// while the target itself stays fully active in the string.
+	const lineCfg = { ...cfg, friendCollectSpecies: ['endivie', 'meganie', 'glumanda'], friendCollectMode: 'lucky' };
+	const r = buildFilters(['lorblatt'], ['lorblatt'], lineCfg, [], 'en', t);
+	check('curated chips carry the line owner, in the output locale',
+		JSON.stringify(r.friendCollectTargets.map((x) => [x.display, x.lineLucky, x.lineHundo])) ===
+			JSON.stringify([
+				['chikorita', 'bayleef', 'bayleef'],
+				['meganium', 'bayleef', 'bayleef'],
+				['charmander', null, null],
+			]),
+		JSON.stringify(r.friendCollectTargets.map((x) => [x.display, x.lineLucky, x.lineHundo])));
+	check('…and none of them counts as owned', r.friendCollectTargets.every((x) => !x.owned && !x.ownedLucky));
+	check('the string is untouched — an explicit pick survives its family',
+		r.friendCollectWishlist.startsWith('chikorita,meganium,charmander&'), r.friendCollectWishlist);
+	// The exact owner keeps the solid badge alone — no doubled-up family badge.
+	const exact = buildFilters([], ['endivie'], lineCfg, [], 'en', t);
+	check('an exactly-owned target badges exact, not family',
+		exact.friendCollectTargets[0].ownedLucky === true && exact.friendCollectTargets[0].lineLucky === null);
+	check('…while its line-mates badge family', exact.friendCollectTargets[1].lineLucky === 'chikorita');
+	// Carve-outs reach the badge too.
+	const babies = buildFilters([], ['pikachu'], { ...cfg, friendCollectSpecies: ['pichu', 'raichu'] }, [], 'en', t);
+	check('a lucky Pikachu badges Raichu but never Pichu',
+		babies.friendCollectTargets[0].lineLucky === null && babies.friendCollectTargets[1].lineLucky === 'pikachu',
+		JSON.stringify(babies.friendCollectTargets.map((x) => [x.display, x.lineLucky])));
+	const slots = buildFilters([], ['kronjuwild'], { ...cfg, friendCollectSpecies: ['sesokitz'] }, [], 'en', t);
+	check('an un-searchable slot line badges while every slot is unannotated',
+		slots.friendCollectTargets[0].lineLucky === 'sawsbuck');
+	const slotGap = buildFilters([], ['kronjuwild'], { ...cfg, friendCollectSpecies: ['sesokitz'], luckySlots: { kronjuwild: ['spring'] } }, [], 'en', t);
+	check('…and withholds the badge once a slot is ticked but incomplete',
+		slotGap.friendCollectTargets[0].lineLucky === null);
 }
 
 console.log('\nScenario 9: config merge');

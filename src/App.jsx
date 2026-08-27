@@ -415,6 +415,26 @@ export function lineSlotCovered(dex, ownedDex, ownedRoots = null) {
 	return roots.has(lineRootDex(dex));
 }
 
+// The same answer with the culprit named: WHICH have-list member fills the slot
+// (the species itself when it is owned outright). Feeds the have-badges on the
+// curated collect chips — the have-lists render as `+name`, so a lucky anywhere
+// in the line is worth showing on the chip even though it deliberately does not
+// prune an explicit pick. Rules live in lineSlotCovered above; this only picks
+// the member out, and scans the have-list to do it, so it is the display path
+// only — the packs ask the boolean. Exported for the offline checks.
+export function lineSlotOwner(dex, ownedDex) {
+	if (ownedDex.has(dex)) return dex;
+	if (!lineSlotCovered(dex, ownedDex)) return null;
+	const fam = SPLIT_FAMILY_BY_DEX.get(dex);
+	if (fam) {
+		const pool = fam.branches.find((b) => b.includes(dex)) || fam.branches.flat();
+		return pool.find((d) => ownedDex.has(d)) ?? null;
+	}
+	const root = lineRootDex(dex);
+	for (const d of ownedDex) if (lineRootDex(d) === root) return d;
+	return null;
+}
+
 // Every name that `+X` could use to select this species — i.e. the species plus
 // every other member of its candy family, lowercased in the output locale.
 // `+name` selects on the candy family, so owning a hundo Pikachu makes the
@@ -2760,6 +2780,16 @@ export function buildFilters(
 		if (slotGaps.has(lineRootDex(dex))) return false;
 		return lineSlotCovered(dex, dexSet, roots);
 	};
+	// Display-only mirror for the curated chips: the have-list member that fills
+	// a target's line, when it isn't the target species itself. Same gates as the
+	// packs (babies, coin-flip branches, un-searchable slots), so one rule feeds
+	// both surfaces — this one just names the mon instead of pruning the ask.
+	const friendCollectLineOwner = (dex, { dexSet, slotGaps }) => {
+		if (!dex || dexSet.has(dex)) return null;
+		if (slotGaps.has(lineRootDex(dex))) return null;
+		const owner = lineSlotOwner(dex, dexSet);
+		return owner ? pokemonNameFor(String(owner), outputLocale) : null;
+	};
 	const friendCollectPackCovered = (canonName) => {
 		const dex = resolveSpeciesInfo(canonName)?.dex;
 		return friendCollectCoveredBy(
@@ -2792,6 +2822,11 @@ export function buildFilters(
 				gender,
 			),
 			owned: friendCollectCovered(key, kept),
+			// Family have-badges: a lucky/hundo elsewhere in this target's line.
+			// Purely informational — an explicit pick still needs the exact
+			// species before it drops out of the string.
+			lineLucky: friendCollectLineOwner(resolveSpeciesInfo(key)?.dex, friendCollectLuckyLine),
+			lineHundo: friendCollectLineOwner(resolveSpeciesInfo(key)?.dex, friendCollectHundoLine),
 			forced: friendCollectForcedSet.has(key),
 			gender: gender === 'male' || gender === 'female' ? gender : null,
 			keptForms: kept,
@@ -7339,6 +7374,31 @@ function FriendCollectEditor({
 									className='text-[9px] px-1 py-px rounded bg-[#9B59B6]/20 text-[#9B59B6] border border-[#9B59B6]/40'
 								>
 									4★
+								</span>
+							)}
+							{/* Family have-badges — a lucky / hundo elsewhere in this
+							    target's evolution line. The have-lists read as `+name`, so
+							    the line is worth surfacing; the quieter outline (and the `+`)
+							    says it is NOT this species, and the target stays in the
+							    string until the exact one lands. */}
+							{tg.lineLucky && (
+								<span
+									title={t('app.filter.friend_collect_badge_lucky_family', {
+										params: { species: capFirst(tg.lineLucky) },
+									})}
+									className='text-[9px] px-1 py-px rounded text-[#F5B82E]/70 border border-[#F5B82E]/25'
+								>
+									+✦
+								</span>
+							)}
+							{tg.lineHundo && (
+								<span
+									title={t('app.filter.friend_collect_badge_hundo_family', {
+										params: { species: capFirst(tg.lineHundo) },
+									})}
+									className='text-[9px] px-1 py-px rounded text-[#9B59B6]/70 border border-[#9B59B6]/25'
+								>
+									+4★
 								</span>
 							)}
 							{/* Click-only refinements — buddy-target semantics, but the QUIET
