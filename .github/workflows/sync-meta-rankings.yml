@@ -28,7 +28,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Derive raid-attacker rankings from the PokeMiners game master
+      - name: Derive raid-attacker rankings from the game master (alexelgt, PokeMiners fallback)
         run: npm run fetch-meta-rankings
       # Deliberately does NOT regenerate the fixture: the snapshot pins only
       # config-derived filters, and the data-derived ones this feeds are covered
