@@ -26,6 +26,7 @@ function check(label, cond, detail = "") {
 const dialogSrc = readFileSync("src/Dialog.jsx", "utf8");
 const FILES = [
   "src/App.jsx",
+  "src/refinements.jsx",
   "src/Landing.jsx",
   "src/SwipeOnboarding.jsx",
   ...readdirSync("src/explain").filter((f) => f.endsWith(".jsx")).map((f) => `src/explain/${f}`),

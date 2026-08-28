@@ -1,4 +1,12 @@
 import { buildFilters, DEFAULT_CONFIG, prepareImport, validateImportEnvelope, SCHEMA_CURRENT, babyStageDex, genderSlotsFor, regionalFormsFor, invisibleSlotsFor, deerlingSeasonFor, currentSeasonWindow } from "../src/App.jsx";
+import {
+  AXIS_FORM,
+  AXIS_GENDER,
+  AXIS_SLOT,
+  GENDER_LOCK_AXIS,
+  refinementAxisFor,
+  refinementComplete,
+} from "../src/refinements.jsx";
 
 const t = (key, opts) => key;
 
@@ -379,6 +387,49 @@ console.log("\nScenario 21: un-searchable slots — catalog and disjointness");
   const g = ["deerling", "sawsbuck", "cherrim", "burmy", "maushold", "dudunsparce"]
     .filter((s) => invisibleSlotsFor(s) && genderSlotsFor(s));
   check("…and from the gender catalog", g.length === 0, JSON.stringify(g));
+
+  // refinementAxisFor is the single lookup every chip surface now uses. It has
+  // to agree with the three catalogs it replaced, and — because the catalogs
+  // are disjoint — it can only ever name one axis per species.
+  const cases = [
+    ["wormadam", AXIS_FORM],
+    ["meowth", AXIS_FORM],
+    ["combee", AXIS_GENDER],
+    ["meowstic", AXIS_GENDER],
+    ["burmy", AXIS_SLOT],
+    ["deerling", AXIS_SLOT],
+    ["cherrim", AXIS_SLOT],
+    ["charizard", null],
+  ];
+  const wrong = cases.filter(([sp, axis]) => (refinementAxisFor(sp)?.axis ?? null) !== axis);
+  check("refinementAxisFor names the right axis per species", wrong.length === 0,
+    JSON.stringify(wrong.map(([sp]) => [sp, refinementAxisFor(sp)?.axis ?? null])));
+  check("the form axis carries the catalog keys",
+    JSON.stringify(refinementAxisFor("wormadam").keys) === JSON.stringify(["cloak:plant", "cloak:sandy", "cloak:trash"]));
+  check("the slot axis carries the slot keys and its label group",
+    JSON.stringify(refinementAxisFor("burmy").keys) === '["male","plant","sandy","trash"]' &&
+      refinementAxisFor("burmy").group === "burmy");
+  // Only the slot axis is un-expressible in PoGo search — the flag the chips
+  // read instead of re-deriving it from whichever catalog they happened to hit.
+  check("only the slot axis is marked un-searchable",
+    refinementAxisFor("wormadam").searchable === true &&
+      refinementAxisFor("combee").searchable === true &&
+      refinementAxisFor("burmy").searchable === false);
+  // Completeness: gender needs the SLOT-closing genders, not merely both.
+  check("a gender axis is complete only once every slot-closing gender is owned",
+    !refinementComplete(refinementAxisFor("combee"), ["male"]) &&
+      refinementComplete(refinementAxisFor("combee"), ["female"]) &&
+      !refinementComplete(refinementAxisFor("meowstic"), ["female"]) &&
+      refinementComplete(refinementAxisFor("meowstic"), ["female", "male"]));
+  check("a slot axis is complete only once every slot is owned",
+    !refinementComplete(refinementAxisFor("burmy"), ["plant", "sandy"]) &&
+      refinementComplete(refinementAxisFor("burmy"), ["male", "plant", "sandy", "trash"]));
+  // The wishlist gender lock is deliberately NOT gated on GENDER_SLOT_DEX: any
+  // species can be asked for as ♀ or ♂, since PoGo's gender keyword is universal.
+  check("the wishlist gender lock offers both genders for any species",
+    GENDER_LOCK_AXIS.axis === AXIS_GENDER &&
+      JSON.stringify(GENDER_LOCK_AXIS.keys) === '["female","male"]' &&
+      refinementComplete(GENDER_LOCK_AXIS, ["female", "male"]));
 }
 
 console.log("\nScenario 22: incomplete slots withhold the exclusion entirely");
