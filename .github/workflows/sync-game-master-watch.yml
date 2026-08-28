@@ -1,0 +1,47 @@
+name: Sync game master watch
+
+on:
+  schedule:
+    - cron: "07 9 * * *" # daily at 09:07 UTC, after the PvP sync at 08:29 so a
+                         # rebalance and the rankings that respond to it land in order
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      # Push as the Pushologist GitHub App so the commit can bypass the
+      # branch protection on main (GITHUB_TOKEN pushes are rejected there).
+      - name: Mint Pushologist app token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_SECRET }}
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Snapshot PvP move stats and probe the PokeMiners mirror
+        run: npm run fetch-game-master-watch
+      # Nothing imports this file, so there is no fixture and no filter output to
+      # regenerate. The commit IS the notification: its `history[0].changes` names
+      # every move whose Trainer-Battle stats moved.
+      - name: Commit + push if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- src/data/game-master-watch.json; then
+            echo "No game master changes — skipping commit."
+            exit 0
+          fi
+          git add src/data/game-master-watch.json
+          git commit -m "chore(data): sync game master move stats"
+          git push

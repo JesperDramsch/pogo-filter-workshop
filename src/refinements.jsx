@@ -64,18 +64,41 @@ const GENDER_SLOT_DEX = new Map([
 // forms that DO differ by type belong in regional-forms.json instead, where
 // they become real search guards — that is where Burmadame's cloaks and
 // Choreogel's styles now live.
+//
+// `types` is the ONE type combination every form of the species shares — the
+// very property that makes the slots un-searchable. It is not a guard (nothing
+// here can ever be isolated by type); it exists so a form-scoped exclusion
+// emitted for a SIBLING can be proven harmless to this species. See
+// formGuardHides below.
 const INVISIBLE_FORM_SLOTS = {
-	585: { axis: 'season', slots: ['spring', 'summer', 'autumn', 'winter'] }, // Sesokitz
-	586: { axis: 'season', slots: ['spring', 'summer', 'autumn', 'winter'] }, // Kronjuwild
-	421: { axis: 'cherrim', slots: ['overcast', 'sunny'] }, // Kinoso — fixed at evolution
+	585: { axis: 'season', slots: ['spring', 'summer', 'autumn', 'winter'], types: ['normal', 'grass'] }, // Sesokitz
+	586: { axis: 'season', slots: ['spring', 'summer', 'autumn', 'winter'], types: ['normal', 'grass'] }, // Kronjuwild
+	421: { axis: 'cherrim', slots: ['overcast', 'sunny'], types: ['grass'] }, // Kinoso — fixed at evolution
 	// Burmy: gender and cloak interact rather than stacking — ♀ carries the
 	// cloak into Burmadame, ♂ becomes Moterpel and the cloak is discarded. So
 	// it is ONE four-slot group, not a gender group plus a cloak group, and the
-	// chip still renders a single row. (Burmadame itself is type-searchable.)
-	412: { axis: 'burmy', slots: ['male', 'plant', 'sandy', 'trash'] },
-	925: { axis: 'maushold', slots: ['family3', 'family4'] }, // ~99:1 roll
-	982: { axis: 'dudunsparce', slots: ['twoseg', 'threeseg'] }, // ~99:1 roll
+	// chip still renders a single row. (Burmadame itself is type-searchable —
+	// and all four Burmy slots are pure Bug, which is what lets Burmadame's
+	// cloak guards coexist with an unfinished Burmy.)
+	412: { axis: 'burmy', slots: ['male', 'plant', 'sandy', 'trash'], types: ['bug'] },
+	925: { axis: 'maushold', slots: ['family3', 'family4'], types: ['normal'] }, // ~99:1 roll
+	982: { axis: 'dudunsparce', slots: ['twoseg', 'threeseg'], types: ['normal'] }, // ~99:1 roll
 };
+
+// Would the form guard `f` (an entry from regional-forms.json, applied inside a
+// `!+family,<terms>` clause) actually hide a species whose type combination is
+// `types`? The clause hides exactly the family members matching the form
+// predicate — every `include` type present and no `exclude` type present — so a
+// species missing any include type, or carrying an exclude type, walks straight
+// through it. Unknown types answer "yes": absence of proof is not proof of
+// absence, and over-excluding is the failure this check exists to prevent.
+// Exported for the offline checks in scripts/check-lucky-logic.mjs.
+export function formGuardHides(f, types) {
+	if (!Array.isArray(types) || types.length === 0) return true;
+	const has = new Set(types);
+	if (!(f.include || []).every((ty) => has.has(ty))) return false;
+	return !(f.exclude || []).some((ty) => has.has(ty));
+}
 
 // Resolve a buddy-target species (any-locale name or dex) to its regional-form
 // catalog entry from src/data/regional-forms.json — the ordered list of forms

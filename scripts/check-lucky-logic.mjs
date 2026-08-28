@@ -1,4 +1,4 @@
-import { buildFilters, DEFAULT_CONFIG, prepareImport, validateImportEnvelope, SCHEMA_CURRENT, babyStageDex, genderSlotsFor, regionalFormsFor, invisibleSlotsFor, deerlingSeasonFor, currentSeasonWindow } from "../src/App.jsx";
+import { buildFilters, DEFAULT_CONFIG, prepareImport, validateImportEnvelope, SCHEMA_CURRENT, babyStageDex, genderSlotsFor, regionalFormsFor, invisibleSlotsFor, formGuardHides, deerlingSeasonFor, currentSeasonWindow } from "../src/App.jsx";
 import {
   AXIS_FORM,
   AXIS_GENDER,
@@ -504,6 +504,78 @@ console.log("\nScenario 23: season inference (pure, hemisphere-flipped)");
     currentSeasonWindow(new Date(Date.UTC(2026, 6, 1)), pools)?.title === "Forever Forward");
   check("currentSeasonWindow returns null outside any window",
     currentSeasonWindow(new Date(Date.UTC(2026, 0, 1)), pools) === null);
+}
+
+console.log("\nScenario 24: an unfinished sibling only blocks the guards that could hide it");
+{
+  const withSlots = (o) => cfgWith({ luckySlots: o });
+  // The reported bug: a lucky Burmadame annotated to the plant cloak stopped
+  // being excluded the moment Burmy carried a half-ticked slot group, so the
+  // friend kept being asked for the very cloak the user already had. The plain
+  // `!+burmadame` deserves the withholding (it swallows the whole candy family,
+  // Burmy included); `!+burmadame,!grass` does not — every Burmy slot is pure
+  // Bug and walks straight through a grass guard.
+  const plant = { burmadame: ["cloak:plant"] };
+  check("a plant-cloak lucky still excludes while Burmy is unfinished",
+    plan([], ["wormadam"], cfgWith({ luckyForms: plant, luckySlots: { burmy: ["male"] } })) ===
+      "!+wormadam,!grass",
+    plan([], ["wormadam"], cfgWith({ luckyForms: plant, luckySlots: { burmy: ["male"] } })));
+  check("…and a stale slot annotation on an unlisted Burmy no longer kills it either",
+    plan([], ["wormadam"], cfgWith({ luckyForms: plant, luckySlots: { burmy: ["plant"] } })) ===
+      "!+wormadam,!grass");
+  check("Burmy's OWN exclusion stays withheld — the friend keeps being asked for it",
+    plan([], ["wormadam", "burmy"], cfgWith({ luckyForms: plant, luckySlots: { burmy: ["male"] } })) ===
+      "!+wormadam,!grass",
+    plan([], ["wormadam", "burmy"], cfgWith({ luckyForms: plant, luckySlots: { burmy: ["male"] } })));
+  check("the sandy and trash cloaks are equally safe (ground / steel, not bug)",
+    plan([], ["wormadam"], cfgWith({
+      luckyForms: { burmadame: ["cloak:sandy", "cloak:trash"] },
+      luckySlots: { burmy: ["male"] },
+    })) === "!+wormadam,!ground&!+wormadam,!steel");
+  // The guard-rail: no form scoping means the blunt family clause, which still
+  // has to be withheld. Owning every cloak collapses to exactly that clause.
+  check("an UNannotated Burmadame is still withheld (Scenario 22 unchanged)",
+    plan([], ["wormadam"], withSlots({ burmy: ["male"] })) === "");
+  check("owning all three cloaks collapses to `!+family` — withheld again",
+    plan([], ["wormadam"], cfgWith({
+      luckyForms: { burmadame: ["cloak:plant", "cloak:sandy", "cloak:trash"] },
+      luckySlots: { burmy: ["male"] },
+    })) === "");
+  check("a COMPLETE Burmy blocks nothing at all",
+    plan([], ["wormadam"], cfgWith({
+      luckyForms: plant,
+      luckySlots: { burmy: ["male", "plant", "sandy", "trash"] },
+    })) === "!+wormadam,!grass");
+  check("the hundo wishlist behaves identically",
+    hundoPlan(["wormadam"], cfgWith({ hundoForms: plant, hundoSlots: { burmy: ["male"] } })) ===
+      "!+wormadam,!grass");
+  check("an unrelated unfinished line never reaches Burmadame",
+    plan([], ["wormadam"], cfgWith({ luckyForms: plant, luckySlots: { sesokitz: ["spring"] } })) ===
+      "!+wormadam,!grass");
+  check("…nor does an unfinished Burmy reach an unrelated form-scoped lucky",
+    plan([], ["vulpix"], cfgWith({ luckyForms: { vulpix: ["alola"] }, luckySlots: { burmy: ["male"] } })) ===
+      "!+vulpix,!ice");
+}
+
+console.log("\nScenario 25: formGuardHides — the type proof behind Scenario 24");
+{
+  check("a grass guard cannot reach a pure-Bug Burmy",
+    formGuardHides({ include: ["grass"], exclude: [] }, ["bug"]) === false);
+  check("a grass guard DOES reach a Normal/Grass Sesokitz",
+    formGuardHides({ include: ["grass"], exclude: [] }, ["normal", "grass"]) === true);
+  check("every include type must be present",
+    formGuardHides({ include: ["grass", "flying"], exclude: [] }, ["normal", "grass"]) === false);
+  check("an exclude type present lets the species through",
+    formGuardHides({ include: ["grass"], exclude: ["normal"] }, ["normal", "grass"]) === false);
+  check("unknown types answer 'hidden' — over-exclusion is the failure to avoid",
+    formGuardHides({ include: ["grass"], exclude: [] }, []) === true &&
+      formGuardHides({ include: ["grass"], exclude: [] }, undefined) === true);
+  // Every catalog entry has to carry the types the proof runs on, or the check
+  // above silently degrades to "hidden" and the withholding goes back to blunt.
+  const missing = ["deerling", "sawsbuck", "cherrim", "burmy", "maushold", "dudunsparce"]
+    .filter((s) => !(invisibleSlotsFor(s)?.types?.length > 0));
+  check("every invisible-slot species declares its type combination", missing.length === 0,
+    JSON.stringify(missing));
 }
 
 console.log(`\n${failures === 0 ? "✓ All lucky-logic checks passed." : `✗ ${failures} failure(s).`}`);

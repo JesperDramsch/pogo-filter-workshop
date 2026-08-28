@@ -36,6 +36,7 @@ import {
 	AXIS_SLOT,
 	GENDER_LOCK_AXIS,
 	RefinementBadges,
+	formGuardHides,
 	formRegionLabel,
 	genderSlotsFor,
 	invisibleSlotsFor,
@@ -340,6 +341,66 @@ function selfAndDescendants(dex) {
 	return out;
 }
 
+// Is the collection slot an evolution line stands for already filled by the
+// have-list (passed as a dex Set)? This is the LINE-level question the friend-
+// collect PACKS ask, one level coarser than "do I own this exact species": a
+// pack entry is a proxy for its whole line (that is what the collectible-base
+// remap makes it), so a lucky Meganie fills the slot the pack's Endivie ask
+// exists to fill, and the ask is spent. It is the same identity the fallback
+// wishlists' `!+family` exclusions already use — PoGo's `+` IS the candy family
+// — with the same two carve-outs those exclusions widen for:
+//
+//   babies      a lucky Magmar is not a lucky Magby: babies only hatch from
+//               eggs and nothing de-evolves, so a baby ask is filled by an
+//               exact copy alone. (The reverse is free and stays covered: a
+//               lucky Magby evolves into a lucky Magmar.) This mirrors the
+//               `,eggsonly` widening on the wishlist clause.
+//   coin flips  a lucky Papinella says nothing about the Panekon branch
+//               (SPLIT_FAMILIES), so a branch is filled only by its own
+//               members, and the shared base only once EVERY branch is —
+//               owning the base itself settles nothing, since that one
+//               specimen evolves into exactly one of the two branches. The
+//               split rules therefore run BEFORE the plain "I own this dex"
+//               shortcut, or a lucky Waumpel would fill its own slot and
+//               retire an ask the line has not finished.
+//
+// `ownedRoots` is the have-list's line roots, hoisted out of the loop by
+// callers that ask this for hundreds of candidates; it is derived on the spot
+// when omitted. Exported for the offline checks in
+// scripts/check-friend-collect.mjs.
+export function lineSlotCovered(dex, ownedDex, ownedRoots = null) {
+	const fam = SPLIT_FAMILY_BY_DEX.get(dex);
+	if (fam) {
+		const branch = fam.branches.find((b) => b.includes(dex));
+		if (branch) return branch.some((d) => ownedDex.has(d));
+		return fam.branches.every((b) => b.some((d) => ownedDex.has(d)));
+	}
+	if (ownedDex.has(dex)) return true;
+	if (BABY_DEX.has(dex)) return false;
+	const roots = ownedRoots || new Set([...ownedDex].map(lineRootDex));
+	return roots.has(lineRootDex(dex));
+}
+
+// The same answer with the culprit named: WHICH have-list member fills the slot
+// (the species itself when it is owned outright). Feeds the have-badges on the
+// curated collect chips — the have-lists render as `+name`, so a lucky anywhere
+// in the line is worth showing on the chip even though it deliberately does not
+// prune an explicit pick. Rules live in lineSlotCovered above; this only picks
+// the member out, and scans the have-list to do it, so it is the display path
+// only — the packs ask the boolean. Exported for the offline checks.
+export function lineSlotOwner(dex, ownedDex) {
+	if (!lineSlotCovered(dex, ownedDex)) return null;
+	if (ownedDex.has(dex)) return dex;
+	const fam = SPLIT_FAMILY_BY_DEX.get(dex);
+	if (fam) {
+		const pool = fam.branches.find((b) => b.includes(dex)) || fam.branches.flat();
+		return pool.find((d) => ownedDex.has(d)) ?? null;
+	}
+	const root = lineRootDex(dex);
+	for (const d of ownedDex) if (lineRootDex(d) === root) return d;
+	return null;
+}
+
 // Every name that `+X` could use to select this species — i.e. the species plus
 // every other member of its candy family, lowercased in the output locale.
 // `+name` selects on the candy family, so owning a hundo Pikachu makes the
@@ -412,7 +473,16 @@ export const DEFAULT_CONFIG = {
 	expertMode: false, // hides niche toggles in normal mode
 
 	// PvP
-	pvpMode: 'strict', // "loose" | "strict" | "none"
+	pvpMode: 'strict', // "loose" | "intelligent" | "strict" | "none"
+	// "Intelligent" splits the PvP carve-out in two: everything gets the base
+	// tier (strict by default — a perfect 0/3-4/3-4 spread is cheap insurance
+	// against a future buff), and the species you actually play get the wider
+	// meta tier. The list starts EMPTY on purpose; one tap seeds it from the
+	// Superliga/Hyperliga packs (pvpMetaPacks), and it is curated from there.
+	// With an empty list, intelligent is byte-identical to the base tier.
+	pvpMetaSpecies: [],
+	pvpMetaTier: 'loose', // IV tier for the curated list — "loose" | "strict"
+	pvpBaseTier: 'strict', // IV tier for everything else — "loose" | "strict" | "none"
 
 	// Universal protections (most always-on in normal mode; visible in expert)
 	protectFavorites: true,
@@ -886,7 +956,7 @@ const REGIONAL_GROUPS = {
 // Re-exported so scripts/check-lucky-logic.mjs (and anything else that already
 // treats App.jsx as the public surface) keeps importing them from here after
 // the move into refinements.jsx.
-export { genderSlotsFor, invisibleSlotsFor, regionalFormsFor };
+export { formGuardHides, genderSlotsFor, invisibleSlotsFor, regionalFormsFor };
 
 // Family expansion: when collectors include all members of a +family,
 // collapse to "+Family" instead of repeated entries (saves chars + protects whole line).
@@ -1125,6 +1195,16 @@ export function mergeImportedConfig(raw, notices = []) {
 	const canonicalize = (arr) => (arr || []).map((s) => resolveSpecies(s) || s);
 	merged.mythTooManyOf = canonicalize(merged.mythTooManyOf);
 	merged.shadowKeeperSpecies = canonicalize(merged.shadowKeeperSpecies);
+	// Deduped as well as canonicalized: an import carrying the same species under
+	// two locale names ("Medicham" + "meditalis") collapses to one entry, so it
+	// cannot emit the same carve-out clause twice.
+	merged.pvpMetaSpecies = [...new Set(canonicalize(merged.pvpMetaSpecies))];
+	// PvP knobs: coerce junk (and hand-edited imports) to the defaults. A config
+	// predating `intelligent` simply never selects it, so the two tier fields stay
+	// inert — no back-fill pin needed the way protectShadowPurifyOnly needed one.
+	if (!['loose', 'intelligent', 'strict', 'none'].includes(merged.pvpMode)) merged.pvpMode = 'strict';
+	if (!['loose', 'strict'].includes(merged.pvpMetaTier)) merged.pvpMetaTier = 'loose';
+	if (!['loose', 'strict', 'none'].includes(merged.pvpBaseTier)) merged.pvpBaseTier = 'strict';
 	merged.friendCollectSpecies = canonicalize(merged.friendCollectSpecies);
 	if (!['lucky', 'hundo', 'both'].includes(merged.friendCollectMode)) merged.friendCollectMode = 'lucky';
 	// Legacy configs (and junk values) coerce to the off default.
@@ -1464,8 +1544,53 @@ export function buildFilters(
 	const ivK3Bad = `0-2${kw.iv.atk},0-3${kw.iv.def},0-3${kw.iv.hp}`;
 	const ivPvPLoose = `2-4${kw.iv.atk},0-2${kw.iv.def},0-2${kw.iv.hp}`;
 	const ivPvPStrict = `1-4${kw.iv.atk},0-2${kw.iv.def},0-2${kw.iv.hp}`;
+	const IV_PVP_TIER = { loose: ivPvPLoose, strict: ivPvPStrict, none: null };
+	// Protection width, so we can tell when a carve-out would be redundant.
+	const PVP_TIER_RANK = { none: 0, strict: 1, loose: 2 };
 
-	const notP = cfg.pvpMode === 'loose' ? ivPvPLoose : cfg.pvpMode === 'strict' ? ivPvPStrict : null;
+	// `intelligent` splits the carve-out into two configurable tiers; the legacy
+	// modes collapse onto the same two knobs with both tiers equal, which keeps
+	// their output byte-identical.
+	const pvpBaseTier =
+		cfg.pvpMode === 'intelligent'
+			? cfg.pvpBaseTier || 'strict'
+			: cfg.pvpMode === 'loose' || cfg.pvpMode === 'strict'
+				? cfg.pvpMode
+				: 'none';
+	const pvpMetaTier = cfg.pvpMode === 'intelligent' ? cfg.pvpMetaTier || 'loose' : pvpBaseTier;
+	const notP = IV_PVP_TIER[pvpBaseTier];
+
+	// The curated "relevant now" list — species you actually battle with, seeded
+	// one tap at a time from the league packs. Rendered into the user's PoGo
+	// locale, same as shadowKeeperSpecies (`keeperResolved`).
+	const pvpMetaList =
+		cfg.pvpMode === 'intelligent'
+			? [
+					...new Set(
+						(cfg.pvpMetaSpecies || [])
+							.map((sp) => speciesForOutput(sp, outputLocale))
+							.filter(Boolean),
+					),
+				]
+			: [];
+	// Widening a tier for SOME species needs one clause per species, not one
+	// clause listing them all: clauses are comma-OR, so `!+a,!+b,…` is satisfied
+	// by any species you are NOT and would go vacuously true for everyone. The
+	// per-species shape mirrors the trade-evo carve-out below. Skipped entirely
+	// when the meta tier is not strictly wider than the base tier — then the base
+	// clause already implies every carve-out (`2-4atk` ⟹ `1-4atk`).
+	const pvpMetaWidens =
+		pvpMetaList.length > 0 && PVP_TIER_RANK[pvpMetaTier] > PVP_TIER_RANK[pvpBaseTier];
+	const pushPvPMetaClauses = (arr) => {
+		if (!pvpMetaWidens) return;
+		for (const name of pvpMetaList) {
+			push(
+				arr,
+				`!+${name},${IV_PVP_TIER[pvpMetaTier]}`,
+				tFn('app.clause_why.not_p_meta', { params: { name } }),
+			);
+		}
+	};
 
 	const S012 = '0*,1*,2*';
 
@@ -1518,6 +1643,7 @@ export function buildFilters(
 	push(trashClauses, `${S012},${ivK2Bad}`, tFn('app.clause_why.not_k2'));
 	push(trashClauses, `${S012},${ivK3Bad}`, tFn('app.clause_why.not_k3'));
 	if (notP) push(trashClauses, notP, tFn('app.clause_why.not_p', { params: { mode: cfg.pvpMode } }));
+	pushPvPMetaClauses(trashClauses);
 
 	if (cfg.protectTradeEvos && TE_full.length > 0) {
 		for (const base of TE_full) {
@@ -1777,6 +1903,7 @@ export function buildFilters(
 	push(tradeClauses, [S012, TE_full_str, ivK2Bad].filter(Boolean).join(','), tFn('app.clause_why.not_k2_te'));
 	push(tradeClauses, [S012, TE_full_str, ivK3Bad].filter(Boolean).join(','), tFn('app.clause_why.not_k3_te'));
 	if (notP) push(tradeClauses, notP, tFn('app.clause_why.not_p', { params: { mode: cfg.pvpMode } }));
+	pushPvPMetaClauses(tradeClauses);
 
 	// Mandatory trade constraints (physical game rules — always apply)
 	push(tradeClauses, `!${kw.flag.traded}`, tFn('app.clause_why.must_traded'));
@@ -2415,6 +2542,29 @@ export function buildFilters(
 		if (!Array.isArray(owned) || owned.length === 0) return false;
 		return !entry.slots.every((s) => owned.includes(s));
 	};
+	// Evolution-line ROOTS with an un-searchable slot still unfilled, each mapped
+	// to the unfinished species' catalog entries. Keyed by root rather than by
+	// species name because family-wide reasoning is what every caller does:
+	// `!+X` expands to the whole candy family, so owning a Kronjuwild would
+	// otherwise emit `!+kronjuwild` and hide the Sesokitz whose seasons are still
+	// incomplete, defeating the withholding entirely — and the packs' line-level
+	// coverage would drop the same ask by the other route. One unfilled slot
+	// suppresses both for every member of that family. The callers that only ask
+	// "is this line unfinished?" read it as a plain `.has(root)`; the entries are
+	// there for the one caller that also needs their types (see
+	// formsSafeDespiteSlots).
+	const incompleteSlotsByRoot = (slotAnn) => {
+		const roots = new Map();
+		for (const key of Object.keys(slotAnn || {})) {
+			if (!invisibleSlotsIncomplete(key, slotAnn)) continue;
+			const d = resolveSpeciesInfo(key)?.dex;
+			if (!d) continue;
+			const root = lineRootDex(d);
+			if (!roots.has(root)) roots.set(root, []);
+			roots.get(root).push(invisibleSlotsFor(key));
+		}
+		return roots;
+	};
 
 	const pushOwnedExclusions = (clauses, names, scopedMap, genderAnn, slotAnn, whyKeys) => {
 		const genderExtras = genderScopedExclusions(genderAnn);
@@ -2425,25 +2575,28 @@ export function buildFilters(
 			emitted.add(clause);
 			push(clauses, clause, why);
 		};
-		// Evolution-line ROOTS with an un-searchable slot still unfilled. Keyed by
-		// root rather than by species name because `!+X` expands to the whole
-		// candy family: owning a Kronjuwild would otherwise emit `!+kronjuwild`
-		// and hide the Sesokitz whose seasons are still incomplete, defeating the
-		// withholding entirely. One unfilled slot suppresses the exclusion for
-		// every member of that family.
-		const slotIncompleteRoots = new Set();
-		for (const key of Object.keys(slotAnn || {})) {
-			if (!invisibleSlotsIncomplete(key, slotAnn)) continue;
-			const d = resolveSpeciesInfo(key)?.dex;
-			if (d) slotIncompleteRoots.add(lineRootDex(d));
-		}
+		const slotIncompleteByRoot = incompleteSlotsByRoot(slotAnn);
+		// A form-scoped clause is NOT the blunt `!+family` the withholding guards
+		// against: `!+burmadame,!pflanze` hides only the grass-typed members of the
+		// Burmy family, and every Burmy slot is pure Bug. So an unfinished sibling
+		// suppresses only the guards that could actually hide it — Burmadame's
+		// plant cloak stays excluded while the friend keeps being asked for Burmy.
+		// Per form, not per species: a guard that WOULD reach the unfinished
+		// species drops out on its own and the rest still emit.
+		const formsSafeDespiteSlots = (root, forms) => {
+			const blocked = slotIncompleteByRoot.get(root);
+			if (!blocked) return forms;
+			return forms.filter((f) => !blocked.some((entry) => formGuardHides(f, entry?.types)));
+		};
 		for (const { out: sp, dex } of ownedSpeciesNames(names)) {
 			// Search can't separate these forms, so no guard can be written —
-			// withhold the exclusion instead and keep the species on the ask.
-			if (slotIncompleteRoots.has(lineRootDex(dex))) continue;
+			// withhold the exclusion instead and keep the species on the ask. The
+			// form-scoped branch below re-earns its clauses one guard at a time.
+			const slotBlocked = slotIncompleteByRoot.has(lineRootDex(dex));
 			const plan = exclusionPlanFor(dex, ownedDex);
 			if (plan.kind === 'none') continue;
 			if (plan.kind === 'members') {
+				if (slotBlocked) continue;
 				const whyKey = SPLIT_FAMILY_BY_DEX.has(dex) ? whyKeys.branch : whyKeys.baby;
 				for (const d of plan.members) {
 					const name = pokemonNameFor(String(d), outputLocale);
@@ -2464,12 +2617,13 @@ export function buildFilters(
 			const whyPlain = babyExtra ? whyKeys.baby : genderExtra ? whyKeys.gender : whyKeys.plain;
 			const scoped = scopedMap.get(target);
 			if (!scoped) {
+				if (slotBlocked) continue;
 				once(`!+${target}${extra}`, tFn(whyPlain, { params: { species: capFirst(target) } }));
 				continue;
 			}
 			// Gender and regional forms are disjoint catalogs, so the form
 			// branch only ever carries the baby widening.
-			for (const f of scoped)
+			for (const f of slotBlocked ? formsSafeDespiteSlots(lineRootDex(dex), scoped) : scoped)
 				once(
 					`!+${target},${formDropTerms(f)}${extra}`,
 					tFn(babyExtra ? whyKeys.babyForm : whyKeys.form, {
@@ -2639,13 +2793,71 @@ export function buildFilters(
 		forms: friendCollectKeptForms(canonName),
 		slots: friendCollectKeptSlots(canonName),
 	});
-	const friendCollectCovered = (canonName, want = null) => {
+	// Shared shape for both coverage questions below: the two goals run through
+	// the same form/gender/slot gates, then the focus decides how they combine.
+	const friendCollectCoveredBy = (canonName, want, ownedLucky, ownedHundo) => {
 		const w = want || friendCollectWants(canonName);
-		const l = friendCollectGoalOwned(canonName, luckySet.has(canonName), friendCollectLuckyAnn, w);
-		const h = friendCollectGoalOwned(canonName, friendCollectHundoSet.has(canonName), friendCollectHundoAnn, w);
+		const l = friendCollectGoalOwned(canonName, ownedLucky, friendCollectLuckyAnn, w);
+		const h = friendCollectGoalOwned(canonName, ownedHundo, friendCollectHundoAnn, w);
 		if (friendCollectMode === 'lucky') return l;
 		if (friendCollectMode === 'hundo') return h;
 		return l && h;
+	};
+	// Curated targets: EXACT-species ownership, per the no-family-subtraction
+	// rule above — an explicit pick is an explicit pick, and a lucky Raichu must
+	// not cancel a curated Pikachu.
+	const friendCollectCovered = (canonName, want = null) =>
+		friendCollectCoveredBy(canonName, want, luckySet.has(canonName), friendCollectHundoSet.has(canonName));
+	// Suggested packs: LINE-level ownership instead (lineSlotCovered). A pack
+	// entry is nobody's explicit pick — it is a proxy for its evolution line,
+	// which is exactly what the collectible-base remap below makes it. The only
+	// reason the pack asks a friend for an Endivie is the lucky Meganie at the
+	// end of that line, so once that Meganie is in the have-list the ask is
+	// spent and the pack must stop offering it — the same line identity the
+	// fallback wishlists' `!+family` exclusions have always used. Babies and
+	// coin-flip branches keep their own slots (see lineSlotCovered), and a line
+	// with an un-searchable slot still unticked keeps being asked for: the
+	// widening stops at the roots incompleteSlotsByRoot names, while EXACT-species
+	// coverage there stays as it was.
+	// Both have-lists are walked once here, not once per pack candidate — the
+	// packs ask this question for hundreds of species on every rebuild.
+	const ownedLine = (names, slotAnn) => {
+		const dexSet = ownedDexSet(names);
+		return {
+			dexSet,
+			roots: new Set([...dexSet].map(lineRootDex)),
+			slotGaps: incompleteSlotsByRoot(slotAnn),
+		};
+	};
+	const friendCollectLuckyLine = ownedLine(luckies, cfg.luckySlots);
+	const friendCollectHundoLine = ownedLine(hundos, cfg.hundoSlots);
+	const friendCollectLineOwned = (dex, { dexSet, roots, slotGaps }) => {
+		if (!dex) return false;
+		// A coin-flip line is never settled by one specimen — its own base
+		// included — so the split rules decide before exact ownership does.
+		if (SPLIT_FAMILY_BY_DEX.has(dex)) return lineSlotCovered(dex, dexSet, roots);
+		if (dexSet.has(dex)) return true;
+		if (slotGaps.has(lineRootDex(dex))) return false;
+		return lineSlotCovered(dex, dexSet, roots);
+	};
+	// Display-only mirror for the curated chips: the have-list member that fills
+	// a target's line, when it isn't the target species itself. Same gates as the
+	// packs (babies, coin-flip branches, un-searchable slots), so one rule feeds
+	// both surfaces — this one just names the mon instead of pruning the ask.
+	const friendCollectLineOwner = (dex, { dexSet, slotGaps }) => {
+		if (!dex || dexSet.has(dex)) return null;
+		if (slotGaps.has(lineRootDex(dex))) return null;
+		const owner = lineSlotOwner(dex, dexSet);
+		return owner ? pokemonNameFor(String(owner), outputLocale) : null;
+	};
+	const friendCollectPackCovered = (canonName) => {
+		const dex = resolveSpeciesInfo(canonName)?.dex;
+		return friendCollectCoveredBy(
+			canonName,
+			null,
+			friendCollectLineOwned(dex, friendCollectLuckyLine),
+			friendCollectLineOwned(dex, friendCollectHundoLine),
+		);
 	};
 	// Coverage overrides: a curated species the user explicitly re-activated
 	// even though the focus counts it as owned — the lucky Furfrou is in, but
@@ -2666,6 +2878,11 @@ export function buildFilters(
 			ownedLucky: friendCollectGoalOwned(key, luckySet.has(key), friendCollectLuckyAnn, want),
 			ownedHundo: friendCollectGoalOwned(key, friendCollectHundoSet.has(key), friendCollectHundoAnn, want),
 			owned: friendCollectCovered(key, want),
+			// Family have-badges: a lucky/hundo elsewhere in this target's line.
+			// Purely informational — an explicit pick still needs the exact
+			// species before it drops out of the string.
+			lineLucky: friendCollectLineOwner(resolveSpeciesInfo(key)?.dex, friendCollectLuckyLine),
+			lineHundo: friendCollectLineOwner(resolveSpeciesInfo(key)?.dex, friendCollectHundoLine),
 			forced: friendCollectForcedSet.has(key),
 			gender: want.gender,
 			keptForms: want.forms,
@@ -2770,7 +2987,7 @@ export function buildFilters(
 			if (!stored || seen.has(stored)) continue;
 			seen.add(stored);
 			const curated = friendCollectCuratedSet.has(stored);
-			const covered = !curated && friendCollectCovered(stored);
+			const covered = !curated && friendCollectPackCovered(stored);
 			if ((curated || covered) && !timeLimited) continue;
 			const entry = { stored, disp: pokemonNameFor(String(dex), outputLocale) || stored, covered, curated };
 			if (curated) curatedQueue.push(entry);
@@ -3613,6 +3830,34 @@ export function buildFilters(
 	}
 	const pvpRankingsFetchedAt = PVP_RANKINGS.fetchedAt || null;
 
+	// One-tap seeds for the intelligent-mode list. `species` holds STORAGE-locale
+	// names (what resolveSpecies produces) so they compare against the curated
+	// list directly; `display` is the same set rendered for the user's PoGo
+	// locale. pokemonNameFor(dex) collapses form suffixes ("Mimikyu (Busted)",
+	// "Quagsire (Shadow)") to the base species, which is what a +family search
+	// wants anyway — the Set drops the dupes that fall out of that.
+	//
+	// Meisterliga is deliberately NOT offered: it has no CP cap, so a low-attack
+	// PvP spread is actively WORSE there than a hundo. Seeding it would protect
+	// spreads the user would never play. Hand-adding a Master species still works.
+	const PVP_META_PACK_LEAGUES = ['great', 'ultra'];
+	const pvpMetaPacks = PVP_META_PACK_LEAGUES.flatMap((key) => {
+		const league = PVP_RANKINGS.leagues?.[key];
+		if (!league?.species?.length) return [];
+		const stored = [
+			...new Set(league.species.map((sp) => pokemonNameFor(String(sp.dex))).filter(Boolean)),
+		];
+		if (stored.length === 0) return [];
+		return [
+			{
+				id: key,
+				labelKey: `app.pvp.meta_pack_${key}`,
+				species: stored,
+				display: stored.map((sp) => speciesForOutput(sp, outputLocale) || sp),
+			},
+		];
+	});
+
 	// Active GBL cups — pair lily-dex's cup rankings with the ScrapedDuck
 	// event windows that mention each cup. Filter clauses reuse the league
 	// pipeline (species OR-list + cup CP cap + loose IV pattern), so the
@@ -3717,6 +3962,7 @@ export function buildFilters(
 		// PvP league meta filters
 		pvpFilters,
 		pvpRankingsFetchedAt,
+		pvpMetaPacks,
 		cupFilters,
 	};
 }
@@ -4845,6 +5091,7 @@ export default function App() {
 		rocketTypeLabels,
 		pvpFilters,
 		pvpRankingsFetchedAt,
+		pvpMetaPacks,
 		cupFilters,
 	} = useMemo(
 		() =>
@@ -5305,6 +5552,7 @@ export default function App() {
 									homeLocalTypeChecks={homeLocalTypeChecks}
 									friendCollectTargets={friendCollectTargets}
 									friendCollectSuggestions={friendCollectSuggestions}
+									pvpMetaPacks={pvpMetaPacks}
 								/>
 							</StepWrapper>
 						)}
@@ -6430,6 +6678,37 @@ function HundosEditor({
 // hundos editor, but parameterized by `titleKey` so the i18n strings live
 // under any namespace (e.g. `app.top_attackers.*`). Used for personal
 // roster lists. Accent color drives the add-button hue.
+// One-tap seeds for a curated species list. Plain actions, not toggles — the
+// label IS the accessible name, so no aria-pressed here. The counter reports
+// what an Add would actually add, so a second tap on an exhausted pack reads as
+// "0/30" and disables rather than silently no-opping.
+function PackAddButtons({ packs, items, onAddPack, accent }) {
+	const { t } = useTranslation();
+	if (!packs?.length || !onAddPack) return null;
+	return (
+		<div className='flex flex-wrap gap-1.5'>
+			{packs.map((pack) => {
+				const fresh = pack.species.filter((sp) => !items.includes(sp));
+				return (
+					<button
+						key={pack.id}
+						onClick={() => onAddPack(pack)}
+						disabled={fresh.length === 0}
+						title={pack.display?.join(', ')}
+						className='mono text-xs bg-[#1F2933] hover:bg-[#2D3A47] disabled:opacity-40 disabled:hover:bg-[#1F2933] text-[#E6EDF3] px-2.5 py-1 rounded flex items-center gap-1.5 transition'
+					>
+						<Plus size={12} style={{ color: accent }} />
+						{t(pack.labelKey)}
+						<span className='text-[#8090A0]'>
+							{fresh.length}/{pack.species.length}
+						</span>
+					</button>
+				);
+			})}
+		</div>
+	);
+}
+
 function SpeciesListEditor({
 	items,
 	newItem,
@@ -6445,6 +6724,8 @@ function SpeciesListEditor({
 	slotsAnn,
 	onSlotsAnnChange,
 	activeSlot,
+	packs = [],
+	onAddPack,
 }) {
 	const { t } = useTranslation();
 	const previewTokens = useMemo(() => {
@@ -6467,6 +6748,8 @@ function SpeciesListEditor({
 			<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
 				{t(`${titleKey}.count`, { params: { count: items.length } })}
 			</div>
+
+			<PackAddButtons packs={packs} items={items} onAddPack={onAddPack} accent={accent} />
 
 			<div className='flex flex-wrap gap-1.5'>
 				{items.map((s) => (
@@ -7187,6 +7470,31 @@ function FriendCollectEditor({
 									className='text-[9px] px-1 py-px rounded bg-[#9B59B6]/20 text-[#9B59B6] border border-[#9B59B6]/40'
 								>
 									4★
+								</span>
+							)}
+							{/* Family have-badges — a lucky / hundo elsewhere in this
+							    target's evolution line. The have-lists read as `+name`, so
+							    the line is worth surfacing; the quieter outline (and the `+`)
+							    says it is NOT this species, and the target stays in the
+							    string until the exact one lands. */}
+							{tg.lineLucky && (
+								<span
+									title={t('app.filter.friend_collect_badge_lucky_family', {
+										params: { species: capFirst(tg.lineLucky) },
+									})}
+									className='text-[9px] px-1 py-px rounded text-[#F5B82E]/70 border border-[#F5B82E]/25'
+								>
+									+✦
+								</span>
+							)}
+							{tg.lineHundo && (
+								<span
+									title={t('app.filter.friend_collect_badge_hundo_family', {
+										params: { species: capFirst(tg.lineHundo) },
+									})}
+									className='text-[9px] px-1 py-px rounded text-[#9B59B6]/70 border border-[#9B59B6]/25'
+								>
+									+4★
 								</span>
 							)}
 							{/* Click-only refinements — buddy-target semantics, but the QUIET
@@ -8134,7 +8442,9 @@ function SetTheory({ hundos, luckies, luckyHundoSet, TE_full, TE_trim, cfg }) {
 			? '(0-1, 3-4, 3-4)'
 			: cfg.pvpMode === 'strict'
 				? '(0, 3-4, 3-4)'
-				: t('app.set_theory.p_disabled');
+				: cfg.pvpMode === 'intelligent'
+					? t('app.set_theory.p_intelligent')
+					: t('app.set_theory.p_disabled');
 	// Rule-1 help splits around the bold {auto} marker so we keep it styled as <em>.
 	const autoMarker = t('app.set_theory.rule1_help_auto');
 	const ruleParts = t('app.set_theory.rule1_help', { params: { auto: autoMarker } }).split(autoMarker);
@@ -8680,25 +8990,114 @@ const PRESETS = {
 	},
 };
 
-// Settings that are HIDDEN in normal mode and only show with expert toggle on.
-// These are: things most people never want to touch (Ultrabestien, Mysteriös,
-// Buddies, Distance/CP/age scope, Liga-Tag custom names, etc).
-const EXPERT_ONLY_KEYS = new Set([
-	'protectMythicals',
-	'mythTooManyOf',
-	'protectUltraBeasts',
-	'protectPurified',
-	'protectBuddies',
-	'protectLuckyEligible',
-	'trashTradedRegionals',
-	'leagueTags',
-	'customProtectedTags',
-	'cpCap',
-	'ageScopeDays',
-	'distanceProtect',
-	'luckyEligibleYear',
-	'protectNundos',
-]);
+// Intelligent-PvP controls, rendered under the mode radio when that mode is
+// active. Two audiences share it: a normal user gets the one-tap league packs
+// and a live count (the mode is inert with an empty list, so hiding the packs
+// entirely would make "Intelligent" silently mean "Strict"), while expert mode
+// adds the full curated chip list, free-text adding, and both IV tiers.
+function PvpMetaPanel({ config, set, expert, packs, newItem, setNewItem }) {
+	const { t } = useTranslation();
+	const items = config.pvpMetaSpecies || [];
+	const metaTier = config.pvpMetaTier || 'loose';
+	const baseTier = config.pvpBaseTier || 'strict';
+	// Same rank order buildFilters uses to decide whether the carve-out is
+	// redundant — surfaced here so the UI can say so instead of the user
+	// wondering why the string did not move.
+	const RANK = { none: 0, strict: 1, loose: 2 };
+	const redundant = items.length > 0 && RANK[metaTier] <= RANK[baseTier];
+
+	function addPack(pack) {
+		set('pvpMetaSpecies', [...new Set([...items, ...pack.species])].sort());
+	}
+	function addTyped() {
+		const tokens = newItem.split(/[,;\s]+/).filter(Boolean);
+		if (tokens.length === 0) return;
+		const next = new Set(items);
+		const unresolved = [];
+		for (const tok of tokens) {
+			const r = resolveSpecies(tok);
+			if (r) next.add(r);
+			else unresolved.push(tok);
+		}
+		set('pvpMetaSpecies', [...next].sort());
+		setNewItem(unresolved.length > 0 ? unresolved.join(', ') : '');
+	}
+	function removeOne(name) {
+		set(
+			'pvpMetaSpecies',
+			items.filter((x) => x !== name),
+		);
+	}
+
+	const tierSelect = (key, value, options) => (
+		<label className='mono text-[11px] text-[#8B98A5] flex flex-col gap-1'>
+			{t(`app.pvp.${key === 'pvpMetaTier' ? 'meta' : 'base'}_tier_label`)}
+			<select
+				value={value}
+				onChange={(e) => set(key, e.target.value)}
+				className='mono text-xs bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
+			>
+				{options.map((o) => (
+					<option key={o} value={o}>
+						{t(`app.pvp.tier_${o}`)}
+					</option>
+				))}
+			</select>
+		</label>
+	);
+
+	return (
+		<div className='mt-3 space-y-3 border border-[#1F2933] rounded p-3 bg-[#0B0F14]'>
+			{items.length === 0 && (
+				<p className='mono text-[11px] text-[#D9A441] leading-snug'>{t('app.pvp.meta_empty_hint')}</p>
+			)}
+			{redundant && (
+				<p className='mono text-[11px] text-[#D9A441] leading-snug'>
+					{t('app.pvp.meta_redundant_hint')}
+				</p>
+			)}
+			{expert ? (
+				<>
+					<div className='flex flex-wrap gap-3'>
+						{tierSelect('pvpMetaTier', metaTier, ['loose', 'strict'])}
+						{tierSelect('pvpBaseTier', baseTier, ['loose', 'strict', 'none'])}
+					</div>
+					<SpeciesListEditor
+						items={items}
+						newItem={newItem}
+						setNewItem={setNewItem}
+						addItem={addTyped}
+						removeItem={removeOne}
+						titleKey='app.pvp.meta_list'
+						accent='#F5B82E'
+						packs={packs}
+						onAddPack={addPack}
+					/>
+				</>
+			) : (
+				<>
+					<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
+						{t('app.pvp.meta_list.count', { params: { count: items.length } })}
+					</div>
+					<div className='flex flex-wrap gap-1.5 items-start'>
+						<PackAddButtons packs={packs} items={items} onAddPack={addPack} accent='#F5B82E' />
+						{items.length > 0 && (
+							<button
+								onClick={() => set('pvpMetaSpecies', [])}
+								className='mono text-xs bg-[#1F2933] hover:bg-[#2D3A47] text-[#8B98A5] hover:text-[#E74C3C] px-2.5 py-1 rounded transition'
+							>
+								{t('app.pvp.meta_clear')}
+							</button>
+						)}
+					</div>
+					<p className='mono text-[10.5px] text-[#5C6975] leading-snug'>
+						{t('app.pvp.meta_expert_hint')}
+					</p>
+				</>
+			)}
+		</div>
+	);
+}
 
 function ConfigPanel({
 	config,
@@ -8707,11 +9106,16 @@ function ConfigPanel({
 	homeLocalTypeChecks = [],
 	friendCollectTargets = [],
 	friendCollectSuggestions = [],
+	pvpMetaPacks = [],
 }) {
 	const { t, outputLocale } = useTranslation();
 	// "Lass Freunde für dich sammeln" — collapsed by default; the target lists
 	// get long, and the section is a sibling of the buddy wish-species cards.
 	const [showFriendCollect, setShowFriendCollect] = useState(false);
+	// Free-text species input for the intelligent-PvP list (expert only) — the
+	// raw string lives here so unresolved tokens survive a failed add, same as
+	// the other SpeciesListEditor call sites in App.
+	const [newPvpMeta, setNewPvpMeta] = useState('');
 	// Any individual change in ConfigPanel clears the preset marker — the
 	// marker means "this preset is currently in effect"; the moment the
 	// user tweaks anything, that's no longer literally true.
@@ -8835,6 +9239,7 @@ function ConfigPanel({
 				<div className='flex flex-wrap gap-1.5' role='radiogroup' aria-label={t('app.pvp.section_title')}>
 					{[
 						['loose', 'app.pvp.loose_label', 'app.pvp.loose_desc'],
+						['intelligent', 'app.pvp.intelligent_label', 'app.pvp.intelligent_desc'],
 						['strict', 'app.pvp.strict_label', 'app.pvp.strict_desc'],
 						['none', 'app.pvp.none_label', 'app.pvp.none_desc'],
 					].map(([m, labelKey, descKey]) => (
@@ -8857,6 +9262,16 @@ function ConfigPanel({
 				<p className='mono text-[11px] text-[#8B98A5] mt-2 leading-snug'>
 					{t(`app.pvp.help_${config.pvpMode}`)}
 				</p>
+				{config.pvpMode === 'intelligent' && (
+					<PvpMetaPanel
+						config={config}
+						set={set}
+						expert={expert}
+						packs={pvpMetaPacks}
+						newItem={newPvpMeta}
+						setNewItem={setNewPvpMeta}
+					/>
+				)}
 			</div>
 
 			<hr className='border-[#1F2933]' />

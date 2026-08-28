@@ -9,6 +9,8 @@ import {
 	collectibleBaseDex,
 	DEFAULT_CONFIG,
 	DEFAULT_TOP_ATTACKERS,
+	lineSlotCovered,
+	lineSlotOwner,
 	mergeImportedConfig,
 } from '../src/App.jsx';
 import EVENTS from '../src/data/events.json';
@@ -645,6 +647,145 @@ console.log('\nScenario 8g: form-scoped wishlist exclusions — owned form out, 
 		'no annotations → wishlists unchanged',
 		a.friendLuckyWishlist.includes('!+dragoran') || a.friendLuckyWishlist.includes('!+dragonite'),
 	);
+}
+
+console.log('\nScenario 8h: line-level pack coverage — an owned evolution retires the base ask');
+{
+	const dexSet = (...d) => new Set(d);
+	// The unit rule. A pack entry stands for its whole line, so anything in that
+	// line fills the slot — in both directions, since the pack's ask exists only
+	// to produce the evolution the pool actually wanted.
+	check('Chikorita (152) covered by an owned Meganium (154)', lineSlotCovered(152, dexSet(154)));
+	check('…by the mid-stage Bayleef (153) too', lineSlotCovered(152, dexSet(153)));
+	check('…and by an exact Chikorita', lineSlotCovered(152, dexSet(152)));
+	check('another line does not cover it', !lineSlotCovered(152, dexSet(6, 149)));
+	check('empty have-list covers nothing', !lineSlotCovered(152, dexSet()));
+	// Babies keep their own slot: nothing de-evolves, so only an exact copy
+	// fills a baby ask. The reverse IS free and stays covered.
+	check('Pichu (172) NOT covered by an owned Pikachu (25)', !lineSlotCovered(172, dexSet(25)));
+	check('…nor by a Raichu (26)', !lineSlotCovered(172, dexSet(26)));
+	check('…but an exact Pichu fills it', lineSlotCovered(172, dexSet(172)));
+	check('Pikachu (25) IS covered by an owned baby Pichu (172)', lineSlotCovered(25, dexSet(172)));
+	// Coin flips: a branch is filled only by its own members, the shared base
+	// only once EVERY branch is (mirrors exclusionPlanFor).
+	check('Silcoon (266) covered by an owned Beautifly (267)', lineSlotCovered(266, dexSet(267)));
+	check('…not by the Cascoon branch', !lineSlotCovered(266, dexSet(268, 269)));
+	check('…not by the 50/50 Wurmple base', !lineSlotCovered(266, dexSet(265)));
+	check('Wurmple (265) needs both branches', !lineSlotCovered(265, dexSet(267)));
+	// The split rules outrank the plain "I own this dex" shortcut: one Wurmple
+	// evolves into exactly ONE branch, so owning it settles neither.
+	check('…owning the shared base itself settles nothing', !lineSlotCovered(265, dexSet(265)));
+	check('…not even together with one branch', !lineSlotCovered(265, dexSet(265, 267)));
+	check('…and is covered once both are owned', lineSlotCovered(265, dexSet(267, 269)));
+	check('Clamperl (366) behaves the same', !lineSlotCovered(366, dexSet(366)));
+	check('a branch member is still filled by its own copy', lineSlotCovered(266, dexSet(266)));
+	check('Clamperl (366) needs Huntail AND Gorebyss',
+		!lineSlotCovered(366, dexSet(367)) && lineSlotCovered(366, dexSet(367, 368)));
+
+	// The live regression (the reported bug): the starters pack asks for
+	// Chikorita ('endivie' in the DE storage locale); a lucky Meganium
+	// ('meganie') must retire that ask instead of leaving it on offer.
+	const packCfg = { ...cfg, friendCollectSpecies: [] };
+	const starters = (luckies) =>
+		buildFilters([], luckies, packCfg, [], 'en', t).friendCollectSuggestions.find((s) => s.id === 'starters');
+	check('starters pack offers endivie when nothing is owned', starters([]).species.includes('endivie'));
+	check('lucky Meganie retires the endivie ask', !starters(['meganie']).species.includes('endivie'));
+	check('a mid-stage lucky Lorblatt does too', !starters(['lorblatt']).species.includes('endivie'));
+	check('an unrelated lucky leaves it alone', starters(['glurak']).species.includes('endivie'));
+	check('…while pruning its own line (glumanda)', !starters(['glurak']).species.includes('glumanda'));
+	// Curated targets stay species-exact — the widening is a PACK rule only, so
+	// an explicit pick survives an owned evolution (Scenario 1's dratini rule).
+	const curated = buildFilters([], ['meganie'], { ...cfg, friendCollectSpecies: ['endivie'] }, [], 'en', t);
+	check('curated endivie survives a lucky Meganie',
+		curated.friendCollectWishlist.startsWith('chikorita&') && curated.friendCollectTargets[0].owned === false,
+		curated.friendCollectWishlist);
+	// Un-searchable slots gate the widening exactly as they gate `!+family`:
+	// while a season is unticked the line keeps being asked for — and, since
+	// the slot gate moved into friendCollectGoalOwned, so does the EXACT
+	// species (see scenario 9b). One owned copy never stands in for four.
+	const raidCfg = { ...packCfg, topAttackers: ['kronjuwild'] };
+	const raids = (luckies, extra = {}) =>
+		buildFilters([], luckies, { ...raidCfg, ...extra }, [], 'en', t)
+			.friendCollectSuggestions.find((s) => s.id === 'meta-raids');
+	check('a Kronjuwild attacker asks for Sesokitz', raids([])?.species.includes('sesokitz'));
+	check('lucky Kronjuwild retires it', !raids(['kronjuwild']));
+	check('…unless a season is still unticked',
+		raids(['kronjuwild'], { luckySlots: { kronjuwild: ['spring'] } })?.species.includes('sesokitz'));
+	check('all four seasons let the widening through',
+		!raids(['kronjuwild'], { luckySlots: { kronjuwild: ['spring', 'summer', 'autumn', 'winter'] } }));
+	check('exact-species coverage obeys the slot gate too',
+		raids(['sesokitz'], { luckySlots: { sesokitz: ['spring'] } })?.species.includes('sesokitz'));
+	check('…and retires once every season is ticked',
+		!raids(['sesokitz'], { luckySlots: { sesokitz: ['spring', 'summer', 'autumn', 'winter'] } }));
+	check('…while an unannotated lucky Sesokitz retires it as before',
+		!raids(['sesokitz']));
+	// …and the same rule through the pack path: an owned coin-flip base must not
+	// retire its own ask (Wurmple sits in event pools, so this is reachable).
+	const flip = (luckies) =>
+		buildFilters([], luckies, { ...packCfg, topAttackers: ['waumpel'] }, [], 'en', t)
+			.friendCollectSuggestions.find((s) => s.id === 'meta-raids');
+	check('a lucky Waumpel does NOT retire the Waumpel ask', flip(['waumpel'])?.species.includes('waumpel'));
+	check('…one branch alone does not either', flip(['papinella'])?.species.includes('waumpel'));
+	check('…both branches do', !flip(['papinella', 'pudox']));
+	// Focus composition: 'both' needs the line covered on BOTH goals.
+	const bothCfg = { ...packCfg, friendCollectMode: 'both' };
+	const bothStarters = (hundos, luckies) =>
+		buildFilters(hundos, luckies, bothCfg, [], 'en', t).friendCollectSuggestions.find((s) => s.id === 'starters');
+	check("'both' keeps asking while only the lucky landed",
+		bothStarters([], ['meganie']).species.includes('endivie'));
+	check("'both' retires the ask once the line is lucky AND hundo",
+		!bothStarters(['lorblatt'], ['meganie']).species.includes('endivie'));
+}
+
+console.log('\nScenario 8i: family have-badges on curated chips — informational, never pruning');
+{
+	const dexSet = (...d) => new Set(d);
+	// lineSlotOwner names the member lineSlotCovered found; same rules, same
+	// carve-outs, and the species itself wins when it is owned outright.
+	check('Chikorita (152) → the owned Bayleef (153)', lineSlotOwner(152, dexSet(153)) === 153);
+	check('Meganium (154) → the owned Bayleef too', lineSlotOwner(154, dexSet(153)) === 153);
+	check('an exact copy names itself', lineSlotOwner(152, dexSet(152, 154)) === 152);
+	check('nothing in the line → null', lineSlotOwner(152, dexSet(6)) === null);
+	check('baby carve-out holds: Pichu (172) is not named by a Pikachu', lineSlotOwner(172, dexSet(25)) === null);
+	check('coin flip: Silcoon (266) named by Beautifly, not by the Cascoon branch',
+		lineSlotOwner(266, dexSet(267, 269)) === 267 && lineSlotOwner(266, dexSet(268, 269)) === null);
+	check('the shared base names nobody until both branches are owned',
+		lineSlotOwner(265, dexSet(265, 267)) === null && lineSlotOwner(265, dexSet(267, 269)) === 267);
+	check('agrees with lineSlotCovered everywhere it matters',
+		[[152, dexSet(154)], [172, dexSet(25)], [266, dexSet(269)], [265, dexSet(267, 269)]].every(
+			([d, owned]) => lineSlotCovered(d, owned) === (lineSlotOwner(d, owned) !== null)));
+
+	// On the targets: a lucky/hundo elsewhere in the line rides along as a badge
+	// while the target itself stays fully active in the string.
+	const lineCfg = { ...cfg, friendCollectSpecies: ['endivie', 'meganie', 'glumanda'], friendCollectMode: 'lucky' };
+	const r = buildFilters(['lorblatt'], ['lorblatt'], lineCfg, [], 'en', t);
+	check('curated chips carry the line owner, in the output locale',
+		JSON.stringify(r.friendCollectTargets.map((x) => [x.display, x.lineLucky, x.lineHundo])) ===
+			JSON.stringify([
+				['chikorita', 'bayleef', 'bayleef'],
+				['meganium', 'bayleef', 'bayleef'],
+				['charmander', null, null],
+			]),
+		JSON.stringify(r.friendCollectTargets.map((x) => [x.display, x.lineLucky, x.lineHundo])));
+	check('…and none of them counts as owned', r.friendCollectTargets.every((x) => !x.owned && !x.ownedLucky));
+	check('the string is untouched — an explicit pick survives its family',
+		r.friendCollectWishlist.startsWith('chikorita,meganium,charmander&'), r.friendCollectWishlist);
+	// The exact owner keeps the solid badge alone — no doubled-up family badge.
+	const exact = buildFilters([], ['endivie'], lineCfg, [], 'en', t);
+	check('an exactly-owned target badges exact, not family',
+		exact.friendCollectTargets[0].ownedLucky === true && exact.friendCollectTargets[0].lineLucky === null);
+	check('…while its line-mates badge family', exact.friendCollectTargets[1].lineLucky === 'chikorita');
+	// Carve-outs reach the badge too.
+	const babies = buildFilters([], ['pikachu'], { ...cfg, friendCollectSpecies: ['pichu', 'raichu'] }, [], 'en', t);
+	check('a lucky Pikachu badges Raichu but never Pichu',
+		babies.friendCollectTargets[0].lineLucky === null && babies.friendCollectTargets[1].lineLucky === 'pikachu',
+		JSON.stringify(babies.friendCollectTargets.map((x) => [x.display, x.lineLucky])));
+	const slots = buildFilters([], ['kronjuwild'], { ...cfg, friendCollectSpecies: ['sesokitz'] }, [], 'en', t);
+	check('an un-searchable slot line badges while every slot is unannotated',
+		slots.friendCollectTargets[0].lineLucky === 'sawsbuck');
+	const slotGap = buildFilters([], ['kronjuwild'], { ...cfg, friendCollectSpecies: ['sesokitz'], luckySlots: { kronjuwild: ['spring'] } }, [], 'en', t);
+	check('…and withholds the badge once a slot is ticked but incomplete',
+		slotGap.friendCollectTargets[0].lineLucky === null);
 }
 
 console.log('\nScenario 9: config merge');
