@@ -1,5 +1,6 @@
 [
 	{ "id": "meta_rankings_simulated", "date": "2026-08-28" },
+	{ "id": "friend_collect_slot_parity", "date": "2026-08-28" },
 	{ "id": "slot_scoped_form_exclusions", "date": "2026-08-27" },
 	{ "id": "friend_collect_pack_line_coverage", "date": "2026-08-27" },
 	{ "id": "friend_collect_mega_pack", "date": "2026-08-27" },

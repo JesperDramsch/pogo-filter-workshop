@@ -26,8 +26,24 @@ import PVP_RANKINGS from './data/pvp-rankings.json';
 import META_RANKINGS from './data/meta-rankings.json';
 import EVOLUTION_COSTS from './data/evolution-costs.json';
 import SPECIES_META from './data/species-meta.json';
-import REGIONAL_FORMS from './data/regional-forms.json';
 import CHANGELOG from './data/changelog.json';
+// Species refinement axes (regional forms / gender slots / un-searchable
+// slots) and the shared badge row every chip surface renders. Re-exported
+// below so the offline checks keep importing them from App.jsx.
+import {
+	AXIS_FORM,
+	AXIS_GENDER,
+	AXIS_SLOT,
+	GENDER_LOCK_AXIS,
+	RefinementBadges,
+	formGuardHides,
+	formRegionLabel,
+	genderSlotsFor,
+	invisibleSlotsFor,
+	refinementAxisFor,
+	refinementComplete,
+	regionalFormsFor,
+} from './refinements.jsx';
 import { useTranslation } from './i18n/I18nProvider.jsx';
 import { useAnnounce } from './Announcer.jsx';
 import Landing from './Landing.jsx';
@@ -223,84 +239,6 @@ const EVO_CHILDREN_BY_DEX = (() => {
 	}
 	return m;
 })();
-
-// Species where the GENDER of an owned lucky/hundo decides whether the
-// collection slot is really filled. The value lists the gender(s) that unlock
-// something the other gender cannot — so it is a Map, not a Set: clicking ♀ on
-// Wadribie completes it, clicking ♂ does not. Two mechanically distinct groups
-// share one shape. No feed carries either fact, so this is hand-maintained
-// alongside BABY_DEX and TRADE_EVO_FAMILIES.
-//
-// Deliberately NOT here: Burmy 412, whose gender and cloak interact (♀ carries
-// the cloak into Burmadame, ♂ becomes Moterpel regardless) — it needs one
-// combined slot group, which belongs with the un-searchable form work. And
-// Salmagnis 902, which is not released in PoGo.
-//
-// Every dex below is absent from regional-forms.json, so a have-list chip can
-// never render a gender group AND a form group at once (asserted in
-// scripts/check-lucky-logic.mjs).
-const GENDER_SLOT_DEX = new Map([
-	// (a) gender-LOCKED evolutions — the other gender is a dead end
-	[415, ['female']], // Wadribie → Honweisel (♂ has no evolution at all)
-	[757, ['female']], // Molunk → Amfira (♂ dead end; only 12.5% of catches are ♀)
-	[361, ['female']], // Schneppke → Frosdedje (either gender → Firnontor)
-	[280, ['male']], // Trasla → … → Galagladi (either gender → Guardevoir)
-	[281, ['male']], // Kirlia → Galagladi
-	// (b) gender-DETERMINED forms — both genders are distinct dex entries
-	[678, ['female', 'male']], // Psiaugon (different charged moves per gender)
-	[876, ['female', 'male']], // Servol (different base stats + moves)
-	[916, ['female', 'male']], // Fragrunz (different base stats)
-	[668, ['female', 'male']], // Pyroleo
-	[592, ['female', 'male']], // Quabbel
-	[593, ['female', 'male']], // Apoquallyp
-]);
-
-// Species carrying several collection slots that PoGo search CANNOT tell
-// apart: every form shares one dex entry AND one type combination, and there
-// is no form keyword. Nothing here can ever become a filter guard — these are
-// tracked purely so the app knows the species isn't finished, and the friend
-// wishlists keep asking for it until every slot is ticked.
-//
-// No upstream feed carries this (Sesokitz isn't even in pogoapi's types
-// dataset), so it is hand-maintained. The bar for entry is deliberately high:
-// forms that DO differ by type belong in regional-forms.json instead, where
-// they become real search guards — that is where Burmadame's cloaks and
-// Choreogel's styles now live.
-//
-// `types` is the ONE type combination every form of the species shares — the
-// very property that makes the slots un-searchable. It is not a guard (nothing
-// here can ever be isolated by type); it exists so a form-scoped exclusion
-// emitted for a SIBLING can be proven harmless to this species. See
-// formGuardHides below.
-const INVISIBLE_FORM_SLOTS = {
-	585: { axis: 'season', slots: ['spring', 'summer', 'autumn', 'winter'], types: ['normal', 'grass'] }, // Sesokitz
-	586: { axis: 'season', slots: ['spring', 'summer', 'autumn', 'winter'], types: ['normal', 'grass'] }, // Kronjuwild
-	421: { axis: 'cherrim', slots: ['overcast', 'sunny'], types: ['grass'] }, // Kinoso — fixed at evolution
-	// Burmy: gender and cloak interact rather than stacking — ♀ carries the
-	// cloak into Burmadame, ♂ becomes Moterpel and the cloak is discarded. So
-	// it is ONE four-slot group, not a gender group plus a cloak group, and the
-	// chip still renders a single row. (Burmadame itself is type-searchable —
-	// and all four Burmy slots are pure Bug, which is what lets Burmadame's
-	// cloak guards coexist with an unfinished Burmy.)
-	412: { axis: 'burmy', slots: ['male', 'plant', 'sandy', 'trash'], types: ['bug'] },
-	925: { axis: 'maushold', slots: ['family3', 'family4'], types: ['normal'] }, // ~99:1 roll
-	982: { axis: 'dudunsparce', slots: ['twoseg', 'threeseg'], types: ['normal'] }, // ~99:1 roll
-};
-
-// Would the form guard `f` (an entry from regional-forms.json, applied inside a
-// `!+family,<terms>` clause) actually hide a species whose type combination is
-// `types`? The clause hides exactly the family members matching the form
-// predicate — every `include` type present and no `exclude` type present — so a
-// species missing any include type, or carrying an exclude type, walks straight
-// through it. Unknown types answer "yes": absence of proof is not proof of
-// absence, and over-excluding is the failure this check exists to prevent.
-// Exported for the offline checks in scripts/check-lucky-logic.mjs.
-export function formGuardHides(f, types) {
-	if (!Array.isArray(types) || types.length === 0) return true;
-	const has = new Set(types);
-	if (!(f.include || []).every((ty) => has.has(ty))) return false;
-	return !(f.exclude || []).some((ty) => has.has(ty));
-}
 
 // Evolution lines whose branch is decided by an UNCONTROLLABLE 50:50 roll, so
 // owning one tip says nothing about the other. PoGo's `+` is the CANDY family,
@@ -655,8 +593,17 @@ export const DEFAULT_CONFIG = {
 	//     the friend should NOT collect, buddy dropForms semantics; emits one
 	//     `!species,<De Morgan types>` guard per dropped form. Only species
 	//     in the regional-forms catalog.
+	//   friendCollectDropSlots: { species: [slotKey, …] } — the un-searchable
+	//     slots (INVISIBLE_FORM_SLOTS: Burmy cloaks, Sesokitz seasons, …) the
+	//     friend should NOT hunt. The have-list mirror of this is
+	//     hundoSlots/luckySlots, and like those it can never become a guard —
+	//     PoGo search cannot name these forms at all. Its whole effect is on
+	//     COVERAGE: the target only counts as done once every slot still
+	//     asked for is ticked on the matching have-list. Only species in the
+	//     INVISIBLE_FORM_SLOTS catalog.
 	friendCollectGenders: {},
 	friendCollectDropForms: {},
+	friendCollectDropSlots: {},
 	// Form annotations for the have-lists: which regional form(s) the owned
 	// lucky/hundo actually is ({ species: [formKey, …] }). Click-only badges
 	// on the step-3 chips; absent key = form unknown → exactly today's
@@ -974,51 +921,10 @@ const REGIONAL_GROUPS = {
 	},
 };
 
-// Resolve a buddy-target species (any-locale name or dex) to its regional-form
-// catalog entry from src/data/regional-forms.json — the ordered list of forms
-// (Kanto base / Alola / Galar / Hisui / Paldea) each carrying the {include,
-// exclude} type predicate that isolates it in PoGo search. Returns null for
-// species with no type-distinguishable regional forms (single-form species, or
-// forms search can't separate) — those fall back to the plain exact/+family
-// target. Keyed by dex so the lookup is locale-independent.
-export function regionalFormsFor(species) {
-	if (!species) return null;
-	const info = resolveSpeciesInfo(species);
-	if (!info) return null;
-	return REGIONAL_FORMS.species[String(info.dex)]?.forms || null;
-}
-
-// Gender slots for a species, or null when gender is not a collection
-// dimension for it (the overwhelming majority). Dex-keyed like
-// regionalFormsFor, so the lookup is locale-independent. Exported for the
-// offline checks in scripts/check-lucky-logic.mjs.
-export function genderSlotsFor(species) {
-	if (!species) return null;
-	const info = resolveSpeciesInfo(species);
-	if (!info) return null;
-	return GENDER_SLOT_DEX.get(info.dex) || null;
-}
-
-// Un-searchable collection slots for a species, or null when it has none.
-// Exported for the offline checks in scripts/check-lucky-logic.mjs.
-export function invisibleSlotsFor(species) {
-	if (!species) return null;
-	const info = resolveSpeciesInfo(species);
-	if (!info) return null;
-	return INVISIBLE_FORM_SLOTS[String(info.dex)] || null;
-}
-
-// Localized label for a regional form (chip text + clause-why): "Base",
-// "Alola", "Paldea (Combat)" — region plus optional Paldean breed variant.
-function formRegionLabel(form, tFn) {
-	// Non-regional axes (Burmadame cloaks, Choreogel styles) have no region to
-	// name — the variant IS the whole label ("Pflanzenumhang", not
-	// "Sinnoh (Pflanze)").
-	if (form.axis) return tFn(`app.buddy_targets.form_variant.${form.variant}`);
-	const region = tFn(`app.buddy_targets.form_region.${form.region}`);
-	if (form.variant) return `${region} (${tFn(`app.buddy_targets.form_variant.${form.variant}`)})`;
-	return region;
-}
+// Re-exported so scripts/check-lucky-logic.mjs (and anything else that already
+// treats App.jsx as the public surface) keeps importing them from here after
+// the move into refinements.jsx.
+export { formGuardHides, genderSlotsFor, invisibleSlotsFor, regionalFormsFor };
 
 // Family expansion: when collectors include all members of a +family,
 // collapse to "+Family" instead of repeated entries (saves chars + protects whole line).
@@ -1388,6 +1294,23 @@ export function mergeImportedConfig(raw, notices = []) {
 		const catalog = (regionalFormsFor(key) || []).map((f) => f.key);
 		return keep.length < catalog.length ? keep : undefined;
 	});
+	// Un-searchable slot annotation values: dedupe against the species' own slot
+	// list. Declared here (rather than beside hundoSlots below) because the
+	// friend-collect drop map validates against it too.
+	const validSlotKeys = (species, rawVal) => {
+		const entry = invisibleSlotsFor(species);
+		if (!entry || !Array.isArray(rawVal)) return undefined;
+		const keep = [...new Set(rawVal.filter((k) => entry.slots.includes(k)))];
+		return keep.length > 0 ? keep : undefined;
+	};
+	merged.friendCollectDropSlots = canonMapKeys(merged.friendCollectDropSlots, (key, v) => {
+		if (!friendCollectSet.has(key)) return undefined;
+		const keep = validSlotKeys(key, v);
+		if (!keep) return undefined;
+		// Dropping every slot would ask for nothing at all — the picker blocks
+		// it, so a full drop here can only be import junk.
+		return keep.length < (invisibleSlotsFor(key)?.slots.length || 0) ? keep : undefined;
+	});
 	merged.hundoForms = canonMapKeys(merged.hundoForms, validFormKeys);
 	merged.luckyForms = canonMapKeys(merged.luckyForms, validFormKeys);
 	// Gender annotation values. The map records which genders you OWN, so both
@@ -1402,13 +1325,6 @@ export function mergeImportedConfig(raw, notices = []) {
 	};
 	merged.hundoGenders = canonMapKeys(merged.hundoGenders, validGenderKeys);
 	merged.luckyGenders = canonMapKeys(merged.luckyGenders, validGenderKeys);
-	// Un-searchable slot values: dedupe against the species' own slot list.
-	const validSlotKeys = (species, rawVal) => {
-		const entry = invisibleSlotsFor(species);
-		if (!entry || !Array.isArray(rawVal)) return undefined;
-		const keep = [...new Set(rawVal.filter((k) => entry.slots.includes(k)))];
-		return keep.length > 0 ? keep : undefined;
-	};
 	merged.hundoSlots = canonMapKeys(merged.hundoSlots, validSlotKeys);
 	merged.luckySlots = canonMapKeys(merged.luckySlots, validSlotKeys);
 	if (typeof merged.seasonAuto !== 'boolean') merged.seasonAuto = true;
@@ -2895,58 +2811,99 @@ export function buildFilters(
 	// counts as covered — same opt-in rule as forms — so this only ever
 	// narrows coverage for users who clicked a badge. The two checks AND
 	// together; neither can override the other.
+	//
+	// Un-searchable slots (Burmy cloaks, Sesokitz seasons, …) join on the same
+	// terms, and close the last gap between the have-list chips and these ones:
+	// the have-lists could already say "my lucky Burmy is the plant cloak", but
+	// the curated wishlist then counted the whole species as done and stopped
+	// asking friends for the other three. Now a target whose slots are only
+	// partly owned stays on the ask — which is exactly what the automatic lucky
+	// wishlist has always done (see invisibleSlotsIncomplete, where withholding
+	// the `!+family` exclusion achieves the same thing by the only means a
+	// filter string has). Opt-in as ever: an unannotated have-entry covers the
+	// species as before, and dropping slots narrows what has to be owned.
 	const friendCollectGenderMap = cfg.friendCollectGenders || {};
 	const friendCollectDropMap = cfg.friendCollectDropForms || {};
-	// Kept-form keys for a restricted target; null = unrestricted (species
-	// without catalog forms, nothing dropped, or junk that dropped every form).
-	const friendCollectKeptForms = (canonName) => {
-		const catalog = regionalFormsFor(canonName) || [];
-		if (catalog.length === 0) return null;
-		const dropped = new Set(
-			Array.isArray(friendCollectDropMap[canonName]) ? friendCollectDropMap[canonName] : [],
-		);
-		if (dropped.size === 0) return null;
-		const kept = catalog.filter((f) => !dropped.has(f.key)).map((f) => f.key);
+	const friendCollectDropSlotMap = cfg.friendCollectDropSlots || {};
+	// Kept keys for a drop-restricted target, against a catalog of option keys;
+	// null = unrestricted (no catalog, nothing dropped, or junk that dropped
+	// every option).
+	const friendCollectKept = (catalog, dropped) => {
+		if (catalog.length === 0 || dropped.size === 0) return null;
+		const kept = catalog.filter((k) => !dropped.has(k));
 		return kept.length > 0 && kept.length < catalog.length ? kept : null;
 	};
-	const friendCollectGoalOwned = (canonName, ownedSpecies, formAnn, keptFormKeys, genderAnn, wantedGender) => {
+	const friendCollectKeptForms = (canonName) =>
+		friendCollectKept(
+			(regionalFormsFor(canonName) || []).map((f) => f.key),
+			new Set(Array.isArray(friendCollectDropMap[canonName]) ? friendCollectDropMap[canonName] : []),
+		);
+	const friendCollectKeptSlots = (canonName) =>
+		friendCollectKept(
+			invisibleSlotsFor(canonName)?.slots || [],
+			new Set(Array.isArray(friendCollectDropSlotMap[canonName]) ? friendCollectDropSlotMap[canonName] : []),
+		);
+	// Does one have-list (luckies or hundos) already satisfy a target? `ann`
+	// carries that list's three annotation maps; `want` the target's own
+	// restrictions.
+	const friendCollectGoalOwned = (canonName, ownedSpecies, ann, want) => {
 		if (!ownedSpecies) return false;
 		// Gender gate: an annotated owner missing the target's locked gender
 		// cannot satisfy it. Unannotated stays covered (opt-in rule).
-		if (wantedGender) {
-			const ownedGenders = genderAnn?.[canonName];
-			if (Array.isArray(ownedGenders) && ownedGenders.length > 0 && !ownedGenders.includes(wantedGender))
+		if (want.gender) {
+			const ownedGenders = ann.genders?.[canonName];
+			if (Array.isArray(ownedGenders) && ownedGenders.length > 0 && !ownedGenders.includes(want.gender))
 				return false;
 		}
-		if (!keptFormKeys) return true;
-		const owned = formAnn?.[canonName];
+		// Slot gate: every slot still being asked for has to be ticked. One
+		// owned copy no longer stands in for a species with four cloaks.
+		const slotCatalog = invisibleSlotsFor(canonName)?.slots;
+		if (slotCatalog) {
+			const ownedSlots = ann.slots?.[canonName];
+			if (Array.isArray(ownedSlots) && ownedSlots.length > 0) {
+				const wantedSlots = want.slots || slotCatalog;
+				if (!wantedSlots.every((k) => ownedSlots.includes(k))) return false;
+			}
+		}
+		if (!want.forms) return true;
+		const owned = ann.forms?.[canonName];
 		if (!Array.isArray(owned) || owned.length === 0) return true;
-		return owned.some((k) => keptFormKeys.includes(k));
+		return owned.some((k) => want.forms.includes(k));
 	};
+	const friendCollectLuckyAnn = { forms: cfg.luckyForms, genders: cfg.luckyGenders, slots: cfg.luckySlots };
+	const friendCollectHundoAnn = { forms: cfg.hundoForms, genders: cfg.hundoGenders, slots: cfg.hundoSlots };
 	const friendCollectWantedGender = (canonName) => {
 		const g = friendCollectGenderMap[canonName];
 		return g === 'male' || g === 'female' ? g : null;
 	};
+	// Everything a target restricts itself to, derived once per species.
+	const friendCollectWants = (canonName) => ({
+		gender: friendCollectWantedGender(canonName),
+		forms: friendCollectKeptForms(canonName),
+		slots: friendCollectKeptSlots(canonName),
+	});
+	// Which un-searchable slots the ACTIVE focus already holds — the chip marks
+	// those, so a partly-collected Burmy reads as "these three are still open"
+	// rather than four undifferentiated tags. In 'both' mode that is the
+	// INTERSECTION of the two have-lists, because that is what coverage demands
+	// there: a slot the lucky list holds but the hundo list does not is not done,
+	// and marking it so would promise a hundo hunt was over before it started.
+	// null for species with no slot axis, so the chip can tell "no axis" from
+	// "axis, nothing owned".
+	const friendCollectSlotsOwned = (canonName) => {
+		if (!invisibleSlotsFor(canonName)) return null;
+		const l = cfg.luckySlots?.[canonName] || [];
+		const h = cfg.hundoSlots?.[canonName] || [];
+		if (friendCollectMode === 'lucky') return l;
+		if (friendCollectMode === 'hundo') return h;
+		return l.filter((slot) => h.includes(slot));
+	};
 	// Shared shape for both coverage questions below: the two goals run through
-	// the same form/gender gates, then the focus decides how they combine.
-	const friendCollectCoveredBy = (canonName, keptFormKeys, ownedLucky, ownedHundo) => {
-		const wanted = friendCollectWantedGender(canonName);
-		const l = friendCollectGoalOwned(
-			canonName,
-			ownedLucky,
-			cfg.luckyForms,
-			keptFormKeys,
-			cfg.luckyGenders,
-			wanted,
-		);
-		const h = friendCollectGoalOwned(
-			canonName,
-			ownedHundo,
-			cfg.hundoForms,
-			keptFormKeys,
-			cfg.hundoGenders,
-			wanted,
-		);
+	// the same form/gender/slot gates, then the focus decides how they combine.
+	const friendCollectCoveredBy = (canonName, want, ownedLucky, ownedHundo) => {
+		const w = want || friendCollectWants(canonName);
+		const l = friendCollectGoalOwned(canonName, ownedLucky, friendCollectLuckyAnn, w);
+		const h = friendCollectGoalOwned(canonName, ownedHundo, friendCollectHundoAnn, w);
 		if (friendCollectMode === 'lucky') return l;
 		if (friendCollectMode === 'hundo') return h;
 		return l && h;
@@ -2954,8 +2911,8 @@ export function buildFilters(
 	// Curated targets: EXACT-species ownership, per the no-family-subtraction
 	// rule above — an explicit pick is an explicit pick, and a lucky Raichu must
 	// not cancel a curated Pikachu.
-	const friendCollectCovered = (canonName, keptFormKeys = null) =>
-		friendCollectCoveredBy(canonName, keptFormKeys, luckySet.has(canonName), friendCollectHundoSet.has(canonName));
+	const friendCollectCovered = (canonName, want = null) =>
+		friendCollectCoveredBy(canonName, want, luckySet.has(canonName), friendCollectHundoSet.has(canonName));
 	// Suggested packs: LINE-level ownership instead (lineSlotCovered). A pack
 	// entry is nobody's explicit pick — it is a proxy for its evolution line,
 	// which is exactly what the collectible-base remap below makes it. The only
@@ -3015,29 +2972,23 @@ export function buildFilters(
 	const friendCollectForcedSet = new Set((cfg.friendCollectForced || []).map(canonKey));
 	const friendCollectTargets = (cfg.friendCollectSpecies || []).map((sp) => {
 		const key = canonKey(sp);
-		const kept = friendCollectKeptForms(key);
-		const gender = friendCollectWantedGender(key);
+		const want = friendCollectWants(key);
 		return {
 			species: sp,
 			display: speciesForOutput(sp, outputLocale),
-			ownedLucky: friendCollectGoalOwned(key, luckySet.has(key), cfg.luckyForms, kept, cfg.luckyGenders, gender),
-			ownedHundo: friendCollectGoalOwned(
-				key,
-				friendCollectHundoSet.has(key),
-				cfg.hundoForms,
-				kept,
-				cfg.hundoGenders,
-				gender,
-			),
-			owned: friendCollectCovered(key, kept),
+			ownedLucky: friendCollectGoalOwned(key, luckySet.has(key), friendCollectLuckyAnn, want),
+			ownedHundo: friendCollectGoalOwned(key, friendCollectHundoSet.has(key), friendCollectHundoAnn, want),
+			owned: friendCollectCovered(key, want),
 			// Family have-badges: a lucky/hundo elsewhere in this target's line.
 			// Purely informational — an explicit pick still needs the exact
 			// species before it drops out of the string.
 			lineLucky: friendCollectLineOwner(resolveSpeciesInfo(key)?.dex, friendCollectLuckyLine),
 			lineHundo: friendCollectLineOwner(resolveSpeciesInfo(key)?.dex, friendCollectHundoLine),
 			forced: friendCollectForcedSet.has(key),
-			gender: gender === 'male' || gender === 'female' ? gender : null,
-			keptForms: kept,
+			gender: want.gender,
+			keptForms: want.forms,
+			keptSlots: want.slots,
+			slotsOwned: friendCollectSlotsOwned(key),
 		};
 	});
 	const friendCollectClauses = [];
@@ -3051,6 +3002,11 @@ export function buildFilters(
 		// Per-target refinement guards — the same scoped implication the buddy
 		// filters use: `!<species>,<terms>` constrains only that species inside
 		// the OR-union. One clause per dropped form, one per gender pick.
+		//
+		// Dropped SLOTS emit nothing, and can't: PoGo search has no keyword for
+		// a Burmy cloak or a Sesokitz season. They have already done their work
+		// upstream, in friendCollectGoalOwned — narrowing what must be owned
+		// before the target leaves the string at all.
 		for (const tg of friendCollectActive) {
 			const key = canonKey(tg.species);
 			if (tg.keptForms) {
@@ -6542,126 +6498,70 @@ function BuddyCatchSection({ buddyCatchFilters, copied, onCopy }) {
 	);
 }
 
-// Shared chip add-on for the have-list editors: regional-form annotation
-// badges. Click-only — marks WHICH form(s) the owned lucky/hundo actually is
-// for the ~51 catalog species; no badge active = form unknown = species-level
-// behavior everywhere (exactly the pre-annotation semantics). Feeds the
-// friend-collect coverage predicate and the form-scoped wishlist exclusions.
-function HaveFormBadges({ species, formsAnn, onFormsAnnChange, t }) {
-	if (!onFormsAnnChange) return null;
-	const catalog = regionalFormsFor(species) || [];
-	if (catalog.length === 0) return null;
-	const owned = new Set(formsAnn?.[species] || []);
-	const toggle = (formKey) => {
-		const next = new Set(owned);
-		if (next.has(formKey)) next.delete(formKey);
-		else next.add(formKey);
-		if (next.size > 0) onFormsAnnChange({ ...(formsAnn || {}), [species]: [...next] });
-		else onFormsAnnChange(omitKey(formsAnn, species));
-	};
-	return (
-		<span className='flex items-center gap-0.5' title={t('app.have_forms.help')}>
-			{catalog.map((f) => (
-				<button
-					key={f.key}
-					onClick={() => toggle(f.key)}
-					aria-pressed={owned.has(f.key)}
-					className={`text-[9px] px-1 py-px rounded border transition ${
-						owned.has(f.key)
-							? 'bg-[#5EAFC5]/25 border-[#5EAFC5]/50 text-[#5EAFC5]'
-							: 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
-					}`}
-				>
-					{formRegionLabel(f, t)}
-				</button>
-			))}
-		</span>
-	);
-}
-
-// ♀/♂ click-only badges on a have-list chip, the exact sibling of
-// HaveFormBadges. Renders only for GENDER_SLOT_DEX species, which are disjoint
-// from the regional-form catalog — so a chip never shows two badge groups.
-// Records which genders you OWN; GENDER_SLOT_DEX decides which of them close
-// the slot. A slot-closing pick is tinted amber so "done" reads differently
-// from "recorded but still hunting".
-function HaveGenderBadges({ species, gendersAnn, onGendersAnnChange, t }) {
-	if (!onGendersAnnChange) return null;
-	const slots = genderSlotsFor(species);
-	if (!slots) return null;
-	const owned = new Set(gendersAnn?.[species] || []);
-	const complete = slots.every((g) => owned.has(g));
-	const toggle = (g) => {
-		const next = new Set(owned);
-		if (next.has(g)) next.delete(g);
-		else next.add(g);
-		if (next.size > 0) onGendersAnnChange({ ...(gendersAnn || {}), [species]: [...next] });
-		else onGendersAnnChange(omitKey(gendersAnn, species));
-	};
-	return (
-		<span className='flex items-center gap-0.5' title={t('app.have_genders.help')}>
-			{['female', 'male'].map((g) => {
-				const on = owned.has(g);
-				const tint = complete ? '#E2B93B' : '#5EAFC5';
-				return (
-					<button
-						key={g}
-						onClick={() => toggle(g)}
-						aria-pressed={on}
-						aria-label={t(`app.buddy_targets.gender_${g}`)}
-						title={t(`app.buddy_targets.gender_${g}`)}
-						className={`text-[9px] px-1 py-px rounded border transition ${
-							on ? '' : 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
-						}`}
-						style={on ? { background: `${tint}40`, borderColor: `${tint}80`, color: tint } : undefined}
-					>
-						{g === 'female' ? '♀' : '♂'}
-					</button>
-				);
-			})}
-		</span>
-	);
-}
-
-// Slot badges for species PoGo search cannot separate at all. Same shape as
-// the form and gender badges, and disjoint from both — so a chip still renders
-// exactly one refinement row. Unlike those two this can never become a filter
-// guard: ticking every slot is what finally lets the wishlist exclude the
-// family, which is the whole mechanism.
-function HaveSlotBadges({ species, slotsAnn, onSlotsAnnChange, activeSlot, t }) {
-	if (!onSlotsAnnChange) return null;
-	const entry = invisibleSlotsFor(species);
+// The have-list chip add-on: one refinement row per chip, whatever axis the
+// species happens to carry. Click-only — typed input never sets an annotation,
+// and no badge active = unknown = species-level behaviour everywhere (exactly
+// the pre-annotation semantics).
+//
+// All three axes record what you OWN, additively, into their own config map:
+//   form   → hundoForms   / luckyForms   — which regional form(s) this copy is.
+//            Feeds the friend-collect coverage predicate and the form-scoped
+//            `!+family` exclusions in the fallback wishlists.
+//   gender → hundoGenders / luckyGenders — for GENDER_SLOT_DEX species, where
+//            the wrong gender is a dead end. Which genders CLOSE the slot is
+//            the catalog's call, so a recorded-but-not-closing pick stays blue
+//            and only a complete set turns amber.
+//   slot   → hundoSlots   / luckySlots   — un-searchable slots. These can never
+//            become a guard; ticking every one of them is what finally lets a
+//            wishlist exclude the family, which is the whole mechanism.
+// The catalogs are disjoint, so a chip always renders exactly one row.
+function HaveRefinementBadges({
+	species,
+	formsAnn,
+	onFormsAnnChange,
+	gendersAnn,
+	onGendersAnnChange,
+	slotsAnn,
+	onSlotsAnnChange,
+	activeSlot,
+	t,
+}) {
+	const entry = refinementAxisFor(species);
 	if (!entry) return null;
-	const owned = new Set(slotsAnn?.[species] || []);
-	const complete = entry.slots.every((s) => owned.has(s));
-	const toggle = (slot) => {
+	const [ann, onChange, helpKey] = {
+		[AXIS_FORM]: [formsAnn, onFormsAnnChange, 'app.have_forms.help'],
+		[AXIS_GENDER]: [gendersAnn, onGendersAnnChange, 'app.have_genders.help'],
+		[AXIS_SLOT]: [slotsAnn, onSlotsAnnChange, 'app.have_slots.help'],
+	}[entry.axis];
+	if (!onChange) return null;
+	const owned = new Set(ann?.[species] || []);
+	// Amber = this axis is finished, so "done" reads differently from "recorded
+	// but still hunting". Forms stay blue: a species-level lucky is never
+	// "complete" just because every catalog form is ticked — the wishlists
+	// scope by form rather than closing a slot.
+	const complete = entry.axis !== AXIS_FORM && refinementComplete(entry, owned);
+	const toggle = (key) => {
 		const next = new Set(owned);
-		if (next.has(slot)) next.delete(slot);
-		else next.add(slot);
-		if (next.size > 0) onSlotsAnnChange({ ...(slotsAnn || {}), [species]: [...next] });
-		else onSlotsAnnChange(omitKey(slotsAnn, species));
+		if (next.has(key)) next.delete(key);
+		else next.add(key);
+		if (next.size > 0) onChange({ ...(ann || {}), [species]: [...next] });
+		else onChange(omitKey(ann, species));
 	};
 	return (
-		<span className='flex items-center gap-0.5' title={t('app.have_slots.help')}>
-			{entry.slots.map((slot) => {
-				const on = owned.has(slot);
-				const tint = complete ? '#E2B93B' : '#5EAFC5';
-				return (
-					<button
-						key={slot}
-						onClick={() => toggle(slot)}
-						aria-pressed={on}
-						title={slot === activeSlot ? t('app.have_slots.spawning_now') : undefined}
-						className={`text-[9px] px-1 py-px rounded border transition ${
-							on ? '' : 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
-						} ${slot === activeSlot ? 'ring-1 ring-[#E2B93B]/70' : ''}`}
-						style={on ? { background: `${tint}40`, borderColor: `${tint}80`, color: tint } : undefined}
-					>
-						{t(`app.have_slots.${entry.axis}.${slot}`)}
-					</button>
-				);
-			})}
-		</span>
+		<RefinementBadges
+			entry={entry}
+			t={t}
+			title={t(helpKey)}
+			tint={complete ? '#E2B93B' : '#5EAFC5'}
+			stateFor={(key) => (owned.has(key) ? 'on' : 'off')}
+			onToggle={toggle}
+			ringFor={entry.axis === AXIS_SLOT ? (key) => key === activeSlot : undefined}
+			titleFor={
+				entry.axis === AXIS_SLOT
+					? (key) => (key === activeSlot ? t('app.have_slots.spawning_now') : undefined)
+					: undefined
+			}
+		/>
 	);
 }
 
@@ -6772,15 +6672,12 @@ function HundosEditor({
 					>
 						<span className='text-[#5EAFC5]'>+</span>
 						{h}
-						<HaveFormBadges species={h} formsAnn={formsAnn} onFormsAnnChange={onFormsAnnChange} t={t} />
-						<HaveGenderBadges
+						<HaveRefinementBadges
 							species={h}
+							formsAnn={formsAnn}
+							onFormsAnnChange={onFormsAnnChange}
 							gendersAnn={gendersAnn}
 							onGendersAnnChange={onGendersAnnChange}
-							t={t}
-						/>
-						<HaveSlotBadges
-							species={h}
 							slotsAnn={slotsAnn}
 							onSlotsAnnChange={onSlotsAnnChange}
 							activeSlot={activeSlot}
@@ -6967,15 +6864,12 @@ function SpeciesListEditor({
 					>
 						<span style={{ color: accent }}>+</span>
 						{s}
-						<HaveFormBadges species={s} formsAnn={formsAnn} onFormsAnnChange={onFormsAnnChange} t={t} />
-						<HaveGenderBadges
+						<HaveRefinementBadges
 							species={s}
+							formsAnn={formsAnn}
+							onFormsAnnChange={onFormsAnnChange}
 							gendersAnn={gendersAnn}
 							onGendersAnnChange={onGendersAnnChange}
-							t={t}
-						/>
-						<HaveSlotBadges
-							species={s}
 							slotsAnn={slotsAnn}
 							onSlotsAnnChange={onSlotsAnnChange}
 							activeSlot={activeSlot}
@@ -7273,6 +7167,8 @@ function FriendCollectEditor({
 	onGendersChange,
 	dropForms = {},
 	onDropFormsChange,
+	dropSlots = {},
+	onDropSlotsChange,
 }) {
 	const { t } = useTranslation();
 	const [input, setInput] = useState('');
@@ -7323,12 +7219,14 @@ function FriendCollectEditor({
 		if (onForcedChange && forced.includes(name)) onForcedChange(forced.filter((n) => n !== name));
 		if (onGendersChange && name in genders) onGendersChange(omitKey(genders, name));
 		if (onDropFormsChange && name in dropForms) onDropFormsChange(omitKey(dropForms, name));
+		if (onDropSlotsChange && name in dropSlots) onDropSlotsChange(omitKey(dropSlots, name));
 	}
 	function clearAll() {
 		onChange([]);
 		if (onForcedChange && forced.length > 0) onForcedChange([]);
 		if (onGendersChange && Object.keys(genders).length > 0) onGendersChange({});
 		if (onDropFormsChange && Object.keys(dropForms).length > 0) onDropFormsChange({});
+		if (onDropSlotsChange && Object.keys(dropSlots).length > 0) onDropSlotsChange({});
 	}
 	// Click-only refinements — same semantics as the buddy target pickers.
 	// Gender: click ♀ or ♂ to lock, click the active one again to clear.
@@ -7337,20 +7235,33 @@ function FriendCollectEditor({
 		if (genders[name] === g) onGendersChange(omitKey(genders, name));
 		else onGendersChange({ ...genders, [name]: g });
 	}
-	// Forms: every form collected by default; click to drop one (the picker
-	// never lets the LAST kept form drop — a target that catches nothing).
-	function toggleDropForm(name, formKey) {
-		if (!onDropFormsChange) return;
-		const dropped = new Set(dropForms[name] || []);
-		if (dropped.has(formKey)) {
-			dropped.delete(formKey);
+	// Forms and un-searchable slots share one affordance: every option is
+	// collected by default, and a click drops one. The picker never lets the
+	// LAST kept option drop — a target that asks for nothing.
+	//
+	// What a drop MEANS differs by axis, and only the axis descriptor knows
+	// which: a dropped regional form becomes a scoped De-Morgan guard in the
+	// string, while a dropped slot can never be expressed in PoGo search at
+	// all and instead narrows what has to be owned before the target counts
+	// as done. Both are stored the same way, so the toggle doesn't care.
+	const dropStateFor = (axis) =>
+		axis.axis === AXIS_SLOT ? [dropSlots, onDropSlotsChange] : [dropForms, onDropFormsChange];
+	function dropListFor(name, axis) {
+		const [map] = dropStateFor(axis);
+		return Array.isArray(map[name]) ? map[name] : [];
+	}
+	function toggleDrop(name, axis, optionKey) {
+		const [map, onChange] = dropStateFor(axis);
+		if (!onChange) return;
+		const dropped = new Set(dropListFor(name, axis));
+		if (dropped.has(optionKey)) {
+			dropped.delete(optionKey);
 		} else {
-			const catalog = regionalFormsFor(name) || [];
-			if (catalog.filter((f) => !dropped.has(f.key)).length <= 1) return;
-			dropped.add(formKey);
+			if (axis.keys.filter((k) => !dropped.has(k)).length <= 1) return;
+			dropped.add(optionKey);
 		}
-		if (dropped.size > 0) onDropFormsChange({ ...dropForms, [name]: [...dropped] });
-		else onDropFormsChange(omitKey(dropForms, name));
+		if (dropped.size > 0) onChange({ ...map, [name]: [...dropped] });
+		else onChange(omitKey(map, name));
 	}
 	// Owned chips toggle their coverage override: forced targets re-enter the
 	// string (keep hunting the hundo although the lucky already landed).
@@ -7456,6 +7367,13 @@ function FriendCollectEditor({
 			<p className='mono text-[10.5px] text-[#8090A0] leading-relaxed'>
 				{t('app.filter.friend_collect_xl_note')}
 			</p>
+			{/* Only worth saying once a curated target actually carries un-searchable
+			    slots — for everyone else it is a paragraph about nothing. */}
+			{targets.some((tg) => tg.slotsOwned) && (
+				<p className='mono text-[10.5px] text-[#8090A0] leading-relaxed'>
+					{t('app.filter.friend_collect_slots_note')}
+				</p>
+			)}
 
 			{suggestions.length > 0 && (
 				<div className='border border-[#1F2933] rounded'>
@@ -7598,6 +7516,11 @@ function FriendCollectEditor({
 					// already-lucky species). Tapping the name toggles the override.
 					const overridden = tg.owned && tg.forced;
 					const dimmed = tg.owned && !tg.forced;
+					// The species' own refinement axis, if it has one. Gender-axis
+					// species need no second row — the universal ♀/♂ lock above IS
+					// their axis — so only forms and slots render here.
+					const axis = refinementAxisFor(tg.species);
+					const dropAxis = axis && axis.axis !== AXIS_GENDER ? axis : null;
 					return (
 						<span
 							key={tg.species}
@@ -7684,64 +7607,44 @@ function FriendCollectEditor({
 							    set) so a big chip cloud stays calm: untouched chips show dim
 							    gray tags, and color only appears where the user made a pick.
 							    ♀/♂ locks the wanted gender (scoped `!species,<gender>` guard;
-							    Combee/Salandit gender-locked evolutions). Form tags drop
-							    regional forms the friend should skip (one scoped De-Morgan
-							    guard per dropped form; kept forms turn blue once a restriction
-							    exists); hidden for species without catalog forms. */}
+							    Combee/Salandit gender-locked evolutions) and is offered for
+							    every species, since PoGo's gender keyword is universal. Below
+							    it sits the species' own refinement axis, drop-based: everything
+							    is asked for by default and a click leaves one option out. */}
 							{onGendersChange && (
-								<span className='flex items-center gap-0.5' title={t('app.filter.friend_collect_gender_help')}>
-									{['female', 'male'].map((g) => {
-										const on = genders[tg.species] === g;
-										return (
-											<button
-												key={g}
-												onClick={() => toggleGender(tg.species, g)}
-												aria-pressed={on}
-												// The visible content is a bare ♀/♂ glyph, which screen
-												// readers announce as a symbol or not at all. Matches the
-												// two sibling implementations (HaveGenderBadges,
-												// BuddyTargetsEditor), which already name theirs.
-												aria-label={t(`app.buddy_targets.gender_${g}`)}
-												className={`text-[9px] px-1 py-px rounded border transition ${
-													on
-														? 'bg-[#5EAFC5]/25 border-[#5EAFC5]/50 text-[#5EAFC5]'
-														: 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
-												}`}
-											>
-												{g === 'female' ? '♀' : '♂'}
-											</button>
-										);
-									})}
-								</span>
+								<RefinementBadges
+									entry={GENDER_LOCK_AXIS}
+									t={t}
+									title={t('app.filter.friend_collect_gender_help')}
+									stateFor={(g) => (genders[tg.species] === g ? 'on' : 'off')}
+									onToggle={(g) => toggleGender(tg.species, g)}
+								/>
 							)}
-							{onDropFormsChange &&
-								(regionalFormsFor(tg.species) || []).length > 0 && (
-									<span
-										className='flex items-center gap-0.5 flex-wrap'
-										title={t('app.filter.friend_collect_forms_help')}
-									>
-										{(regionalFormsFor(tg.species) || []).map((f) => {
-											const droppedHere = (dropForms[tg.species] || []).includes(f.key);
-											const restricted = (dropForms[tg.species] || []).length > 0;
-											return (
-												<button
-													key={f.key}
-													onClick={() => toggleDropForm(tg.species, f.key)}
-													aria-pressed={restricted && !droppedHere}
-													className={`text-[9px] px-1 py-px rounded border transition ${
-														droppedHere
-															? 'bg-transparent border-[#2D3A47] text-[#3E4854] line-through'
-															: restricted
-																? 'bg-[#5EAFC5]/25 border-[#5EAFC5]/50 text-[#5EAFC5]'
-																: 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
-													}`}
-												>
-													{formRegionLabel(f, t)}
-												</button>
-											);
-										})}
-									</span>
-								)}
+							{dropAxis && (
+								<RefinementBadges
+									entry={dropAxis}
+									t={t}
+									title={t(
+										dropAxis.axis === AXIS_SLOT
+											? 'app.filter.friend_collect_slots_help'
+											: 'app.filter.friend_collect_forms_help',
+									)}
+									stateFor={(key) => {
+										const dropped = dropListFor(tg.species, dropAxis);
+										if (dropped.includes(key)) return 'dropped';
+										return dropped.length > 0 ? 'on' : 'off';
+									}}
+									onToggle={(key) => toggleDrop(tg.species, dropAxis, key)}
+									titleFor={
+										dropAxis.axis === AXIS_SLOT
+											? (key) =>
+													tg.slotsOwned?.includes(key)
+														? t('app.filter.friend_collect_slot_owned')
+														: undefined
+											: undefined
+									}
+								/>
+							)}
 							<button
 								onClick={() => remove(tg.species)}
 								aria-label={t('app.a11y.remove_species', { params: { name: tg.display } })}
@@ -9631,6 +9534,8 @@ function ConfigPanel({
 						onGendersChange={(next) => set('friendCollectGenders', next)}
 						dropForms={config.friendCollectDropForms || {}}
 						onDropFormsChange={(next) => set('friendCollectDropForms', next)}
+						dropSlots={config.friendCollectDropSlots || {}}
+						onDropSlotsChange={(next) => set('friendCollectDropSlots', next)}
 					/>
 				</div>
 			</Collapsible>
@@ -11872,7 +11777,10 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 			{targets.length > 0 && (
 				<div className='flex flex-col gap-1.5'>
 					{targets.map((tg, i) => {
-						const forms = regionalFormsFor(tg.species);
+						// Buddy catch-targets are always searchable asks, so only the
+						// regional-form axis applies; the gender lock below is universal.
+						const axis = refinementAxisFor(tg.species);
+						const formAxis = axis?.axis === AXIS_FORM ? axis : null;
 						const dropSet = new Set(tg.dropForms || []);
 						return (
 							<div
@@ -11897,52 +11805,28 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 								{/* Gender picker: ♀/♂ — click to catch only that gender, click the
                     active one again to go back to both. Emits the scoped
                     `!<species>,<gender>` guard. */}
-								<span className='flex items-center gap-1' title={t('app.buddy_targets.gender_help')}>
-									{['female', 'male'].map((g) => {
-										const on = tg.gender === g;
-										return (
-											<button
-												key={g}
-												onClick={() => updateAt(i, { gender: on ? 'any' : g })}
-												aria-pressed={on}
-												aria-label={t(`app.buddy_targets.gender_${g}`)}
-												className={`text-[10px] px-1.5 py-0.5 rounded border transition ${
-													on
-														? 'bg-[#E67E22]/25 border-[#E67E22]/50 text-[#E67E22]'
-														: 'bg-transparent border-[#2D3A47] text-[#8090A0] hover:text-[#E6EDF3]'
-												}`}
-											>
-												{g === 'female' ? '♀' : '♂'}
-											</button>
-										);
-									})}
-								</span>
+								<RefinementBadges
+									entry={GENDER_LOCK_AXIS}
+									t={t}
+									title={t('app.buddy_targets.gender_help')}
+									size='sm'
+									tint='#E67E22'
+									stateFor={(g) => (tg.gender === g ? 'on' : 'off')}
+									onToggle={(g) => updateAt(i, { gender: tg.gender === g ? 'any' : g })}
+								/>
 								{/* Regional-form picker: every form is catch-on by default; click
                     a chip to drop that form (struck through). Hidden for species
                     with no type-distinguishable regional forms. */}
-								{forms && forms.length > 0 && (
-									<span
-										className='flex items-center gap-1 flex-wrap'
+								{formAxis && (
+									<RefinementBadges
+										entry={formAxis}
+										t={t}
 										title={t('app.buddy_targets.forms_help')}
-									>
-										{forms.map((f) => {
-											const dropped = dropSet.has(f.key);
-											return (
-												<button
-													key={f.key}
-													onClick={() => toggleForm(i, f.key)}
-													aria-pressed={!dropped}
-													className={`text-[10px] px-1.5 py-0.5 rounded border transition ${
-														dropped
-															? 'bg-transparent border-[#2D3A47] text-[#5A6673] line-through'
-															: 'bg-[#E67E22]/25 border-[#E67E22]/50 text-[#E67E22]'
-													}`}
-												>
-													{formRegionLabel(f, t)}
-												</button>
-											);
-										})}
-									</span>
+										size='sm'
+										tint='#E67E22'
+										stateFor={(key) => (dropSet.has(key) ? 'dropped' : 'on')}
+										onToggle={(key) => toggleForm(i, key)}
+									/>
 								)}
 								<button
 									onClick={() => removeAt(i)}

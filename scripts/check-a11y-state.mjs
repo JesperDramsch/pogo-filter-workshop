@@ -27,8 +27,14 @@ function check(label, cond, detail = "") {
 
 const app = readFileSync("src/App.jsx", "utf8");
 const shell = readFileSync("src/explain/Shell.jsx", "utf8");
+const chips = readFileSync("src/refinements.jsx", "utf8");
+// The species refinement badge rows moved out of App.jsx into their own
+// module, so the toggle audit has to follow them there. Counting over both
+// keeps the threshold measuring the same set of controls it always did.
+const appChips = app + chips;
 const FILES = [
   "src/App.jsx",
+  "src/refinements.jsx",
   "src/Landing.jsx",
   "src/SwipeOnboarding.jsx",
   ...readdirSync("src/explain").filter((f) => f.endsWith(".jsx")).map((f) => `src/explain/${f}`),
@@ -36,8 +42,15 @@ const FILES = [
 
 console.log("S1 — two-state toggles expose aria-pressed");
 {
-  const n = (app.match(/aria-pressed=/g) || []).length;
-  check(`${n} aria-pressed attributes in App.jsx`, n >= 15);
+  // Toggle SURFACES, not raw attributes: a <RefinementBadges> call site is a
+  // whole group of toggles whose pressed state the shared row guarantees (see
+  // the structural checks below). Counting it as one keeps the ratchet at the
+  // same height it stood at when all five refinement rows were written out by
+  // hand in App.jsx.
+  const attrs = (appChips.match(/aria-pressed=/g) || []).length;
+  const groups = (app.match(/<RefinementBadges\b/g) || []).length;
+  const n = attrs + groups;
+  check(`${n} toggle surfaces (${attrs} aria-pressed + ${groups} badge rows)`, n >= 15);
   // The specific toggles this slice wired, by their handler.
   for (const [handler, label] of [
     ["setFlag(k, !m.flags[k])", "VerifyPanel flag chips"],
@@ -45,11 +58,25 @@ console.log("S1 — two-state toggles expose aria-pressed");
     ["toggleForced(tg.species)", "FriendCollect forced override"],
     ["toggleTC(tc.species)", "regional type-check chips"],
     ["toggleCol(sp)", "regional collector chips"],
-    ["toggleForm(i, f.key)", "buddy form-drop chips"],
     ["set('expertMode', !expert)", "expert-mode switch"],
   ]) {
     const i = app.indexOf(`onClick={() => ${handler}}`);
     check(label, i !== -1 && app.slice(i, i + 300).includes("aria-pressed"));
+  }
+  // The five species refinement rows (two have-lists, friend-collect gender +
+  // axis, buddy gender + forms) all render through RefinementBadges, so the
+  // per-handler audit above is replaced by one check on the shared row plus a
+  // check that every call site actually drives it.
+  {
+    const i = chips.indexOf("export function RefinementBadges");
+    const body = i === -1 ? "" : chips.slice(i);
+    check("RefinementBadges emits aria-pressed", /onClick=\{\(\) => onToggle\(key\)\}[\s\S]{0,200}aria-pressed=\{on\}/.test(body));
+    check("RefinementBadges derives `on` from the call site's stateFor",
+      /const state = stateFor\(key\);[\s\S]{0,80}const on = state === 'on';/.test(body));
+    const rows = [...app.matchAll(/<RefinementBadges\b[\s\S]{0,900}?\/>/g)].map((m) => m[0]);
+    check(`${rows.length} RefinementBadges call site(s)`, rows.length >= 4);
+    const unwired = rows.filter((r) => !/stateFor=/.test(r) || !/onToggle=/.test(r));
+    check("every call site passes stateFor + onToggle", unwired.length === 0, `${unwired.length} unwired`);
   }
   const bazaar = [...app.matchAll(/tagged \? removeFromBazaar\(name\) : addOneToBazaar\(name\)/g)];
   check(`both bazaar chip lists (${bazaar.length}) expose pressed state`,
