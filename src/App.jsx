@@ -116,6 +116,17 @@ function navigateView(target) {
 
 // ─── DATA ──────────────────────────────────────────────────────────────────
 
+// What the in-game search bar takes before it truncates, empirically verified
+// and documented in the pokemon-go-filters skill. Two places need it: FilterBox
+// flags a filter that crosses it, and the intelligent-PvP panel prices its
+// carve-out against it — a filter is over budget for reasons that are decided
+// several screens away from where the number is shown.
+export const SEARCH_CHAR_BUDGET = 5000;
+// Share of that budget at which the PvP meta carve-out is worth warning about.
+// 20% is ~18 species: past there the list is the single biggest thing in the
+// filter and every further tap costs another ~56 characters.
+const PVP_META_COST_WARN = 0.2 * SEARCH_CHAR_BUDGET;
+
 export const DEFAULT_HUNDOS = [];
 // Personal "lucky Pokémon" roster — species the user has at least one
 // lucky of. Where this overlaps with DEFAULT_HUNDOS, duplicate copies
@@ -4014,12 +4025,23 @@ export function buildFilters(
 	// PvP spread is actively WORSE there than a hundo. Seeding it would protect
 	// spreads the user would never play. Hand-adding a Master species still works.
 	const PVP_META_PACK_LEAGUES = ['great', 'ultra'];
+	// How deep each pack seeds. The snapshot carries 30 per league, ranked by
+	// PvPoke score, and a pack used to seed all of them — one tap on each put 47
+	// deduped species in the list and 2.6 kB of carve-out clauses in the trash
+	// filter, more than doubling it. The carve-out costs ~56 characters PER
+	// SPECIES and cannot be made cheaper (see pushPvPMetaClauses), so depth is
+	// the only knob, and the top of a rank-ordered list is where the value is:
+	// the 30th pick is a fraction of a rating point from the 40th and you are
+	// unlikely to be playing it. Ten each, deduped, is ~15 species and ~840
+	// characters. Anyone who wants the 11th can add it by name — the pack is a
+	// seed, not a cap.
+	const PVP_META_PACK_DEPTH = 10;
 	const pvpMetaPacks = PVP_META_PACK_LEAGUES.flatMap((key) => {
 		const league = PVP_RANKINGS.leagues?.[key];
 		if (!league?.species?.length) return [];
 		const stored = [
 			...new Set(league.species.map((sp) => pokemonNameFor(String(sp.dex))).filter(Boolean)),
-		];
+		].slice(0, PVP_META_PACK_DEPTH);
 		if (stored.length === 0) return [];
 		return [
 			{
@@ -7805,14 +7827,12 @@ function FriendCollectEditor({
 function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 	const { t } = useTranslation();
 	const len = filterStr.length;
-	// The in-game search bar takes ~5000 characters; past that the string is
-	// silently truncated and the filter quietly means something else. The bar
-	// used to clamp at 100% with no other signal, so an over-budget filter (a
-	// full-league PvP meta list plus the shadow-keeper floor will get you there)
-	// looked exactly like one that just fits. Flag it instead.
-	const CHAR_BUDGET = 5000;
-	const over = len > CHAR_BUDGET;
-	const pct = Math.min(100, (len / CHAR_BUDGET) * 100);
+	// Past the budget the string is silently truncated and the filter quietly
+	// means something else. The bar used to clamp at 100% with no other signal,
+	// so an over-budget filter (a deep PvP meta list plus the shadow-keeper
+	// floor will get you there) looked exactly like one that just fits.
+	const over = len > SEARCH_CHAR_BUDGET;
+	const pct = Math.min(100, (len / SEARCH_CHAR_BUDGET) * 100);
 	const codeRef = useRef(null);
 
 	// Tap the filter text to select-all — on mobile this lets long-press → "Copy"
@@ -7875,7 +7895,7 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 					className='px-4 py-2 text-xs mono leading-snug border-b border-[#1F2933] bg-[#FF6B5B]/10 text-[#FF6B5B]'
 				>
 					{t('app.filterbox.over_budget', {
-						params: { over: (len - CHAR_BUDGET).toLocaleString() },
+						params: { over: (len - SEARCH_CHAR_BUDGET).toLocaleString() },
 					})}
 				</p>
 			)}
@@ -9214,7 +9234,7 @@ const PRESETS = {
 // entirely would make "Intelligent" silently mean "Strict"), while expert mode
 // adds the full curated chip list, free-text adding, and both IV tiers.
 function PvpMetaPanel({ config, set, expert, packs, newItem, setNewItem }) {
-	const { t } = useTranslation();
+	const { t, outputLocale } = useTranslation();
 	const items = config.pvpMetaSpecies || [];
 	const metaTier = config.pvpMetaTier || 'loose';
 	const baseTier = config.pvpBaseTier || 'strict';
@@ -9223,6 +9243,20 @@ function PvpMetaPanel({ config, set, expert, packs, newItem, setNewItem }) {
 	// wondering why the string did not move.
 	const RANK = { none: 0, strict: 1, loose: 2 };
 	const redundant = items.length > 0 && RANK[metaTier] <= RANK[baseTier];
+
+	// What this list actually costs in the trash filter, computed the same way
+	// buildFilters spends it: one `&!+<species>,<iv tier>` clause per entry,
+	// rendered into the user's PoGo locale (German keywords are the long ones).
+	// The panel is where the cost is INCURRED — a tap here is what pushes the
+	// string over the in-game ceiling several screens away — so it is where the
+	// price belongs. Zero while the carve-out is redundant, because then
+	// buildFilters emits nothing at all.
+	const kw = pogoKeywords(outputLocale);
+	const ivTierLen = `2-4${kw.iv.atk},0-2${kw.iv.def},0-2${kw.iv.hp}`.length;
+	const metaCost = redundant
+		? 0
+		: items.reduce((sum, sp) => sum + 4 + speciesForOutput(sp, outputLocale).length + ivTierLen, 0);
+	const costly = metaCost >= PVP_META_COST_WARN;
 
 	function addPack(pack) {
 		set('pvpMetaSpecies', [...new Set([...items, ...pack.species])].sort());
@@ -9272,6 +9306,20 @@ function PvpMetaPanel({ config, set, expert, packs, newItem, setNewItem }) {
 			{redundant && (
 				<p className='mono text-[11px] text-[#D9A441] leading-snug'>
 					{t('app.pvp.meta_redundant_hint')}
+				</p>
+			)}
+			{metaCost > 0 && (
+				<p
+					className='mono text-[11px] leading-snug'
+					style={{ color: costly ? '#D9A441' : '#5C6975' }}
+				>
+					{t(costly ? 'app.pvp.meta_cost_warn' : 'app.pvp.meta_cost', {
+						params: {
+							count: items.length,
+							chars: metaCost.toLocaleString(),
+							budget: SEARCH_CHAR_BUDGET.toLocaleString(),
+						},
+					})}
 				</p>
 			)}
 			{expert ? (

@@ -1258,6 +1258,8 @@
   "app.pvp.meta_pack_ultra": "Hyper Ligue top 30",
   "app.pvp.meta_empty_hint": "La liste est vide, donc Intelligent se comporte exactement comme le palier appliqué au reste. Ajoute un pack de ligue pour donner le palier plus large à tes Pokémon du méta.",
   "app.pvp.meta_redundant_hint": "Le palier de ta liste n'est pas plus large que celui du reste, la liste ne change donc rien. Élargis le palier de la liste (ou resserre l'autre) pour qu'il s'applique.",
+  "app.pvp.meta_cost": "{count} espèces · {chars} de ton budget de recherche de {budget} caractères",
+  "app.pvp.meta_cost_warn": "coûteux : {count} espèces coûtent {chars} de ton budget de recherche de {budget} caractères. Chaque espèce en plus coûte encore ~56 — cette exception demande une clause par espèce et ne se compresse pas. Retire celles que tu ne joues pas.",
   "app.pvp.meta_expert_hint": "Active le mode expert pour voir la liste complète, ajouter des Pokémon isolés et modifier les deux paliers d'IV.",
   "app.pvp.meta_clear": "vider la liste",
   "app.pvp.meta_tier_label": "Palier IV · ta liste",

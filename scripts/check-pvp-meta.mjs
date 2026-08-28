@@ -25,8 +25,14 @@
 //   P7 — clauses render in the user's PoGo output locale
 //   P8 — the league packs are well formed and usable as seeds
 //   P9 — migration coerces junk and leaves legacy configs untouched
+//  P10 — the packs seed the TOP of the ranked list, and the carve-out costs
+//        what the config panel prices it at
 
-import { buildFilters, evalFilter, mergeImportedConfig, DEFAULT_CONFIG } from "../src/App.jsx";
+import {
+  buildFilters, evalFilter, mergeImportedConfig, DEFAULT_CONFIG, SEARCH_CHAR_BUDGET,
+} from "../src/App.jsx";
+import PVP_RANKINGS from "../src/data/pvp-rankings.json";
+import { pokemonNameFor } from "../src/data/species.js";
 
 const tFn = (k) => k;
 let failures = 0;
@@ -226,6 +232,60 @@ console.log("\nP9 — migration coerces junk and preserves legacy configs");
   const mixed = mergeImportedConfig({ pvpMode: "intelligent", pvpMetaSpecies: ["Medicham", "meditalis"] });
   check("mixed-locale imports canonicalize to one entry", mixed.pvpMetaSpecies.length === 1,
     JSON.stringify(mixed.pvpMetaSpecies));
+}
+
+// The carve-out costs ~56 characters PER SPECIES against a ~5000-character
+// search bar and cannot be compressed (see pushPvPMetaClauses), so pack DEPTH is
+// the only lever. A pack used to seed its whole league — 30 each, 47 deduped,
+// 2.6 kB of clauses — which more than doubled the trash filter on two taps.
+console.log("\nP10 — pack depth and the cost the panel quotes");
+{
+  const { pvpMetaPacks } = build({ pvpMode: "intelligent" });
+  for (const pack of pvpMetaPacks) {
+    const league = PVP_RANKINGS.leagues[pack.id];
+    // Rank order is the snapshot's own: the fetcher writes species by PvPoke
+    // score, descending. A pack must be the HEAD of that, not a sample of it —
+    // an arbitrary slice would drop the picks the depth exists to keep.
+    const ranked = [...new Set(league.species.map(sp => pokemonNameFor(String(sp.dex))).filter(Boolean))];
+    check(`${pack.id}: seeds the top of the ranked list, in order`,
+      pack.species.length > 0 &&
+      pack.species.every((sp, i) => sp === ranked[i]),
+      `${pack.species.length} of ${ranked.length}`);
+    check(`${pack.id}: the league snapshot is deeper than the pack seeds`,
+      ranked.length > pack.species.length,
+      "otherwise the depth cut is silently inert");
+    check(`${pack.id}: every seeded species resolves`,
+      pack.species.every(sp => typeof sp === "string" && sp.length > 0));
+  }
+  check("all packs seed the same depth",
+    new Set(pvpMetaPacks.map(p => p.species.length)).size === 1);
+
+  // Both packs, the shadow-keeper floor on, and the whole thing still has to
+  // fit in the search bar. This is the combination that motivated the cut.
+  const all = [...new Set(pvpMetaPacks.flatMap(p => p.species))];
+  // protectShadows is unset AFTER the merge on purpose: passing it to
+  // mergeImportedConfig trips the legacy migration, which pins the purify floor
+  // OFF and so measures a filter with no keeper clauses at all. Unchecking the
+  // toggle in-session is what leaves the floor on, and that is the worst case.
+  const worstCfg = mergeImportedConfig({ pvpMode: "intelligent", pvpMetaSpecies: all });
+  worstCfg.protectShadows = false;
+  const worst = buildFilters([], [], worstCfg, [], "de", tFn);
+  check("the worst case really carries the keeper floor",
+    clauses(worst.trash).some(c => /^!crypto,!\+/i.test(c)), "otherwise the budget check is vacuous");
+  check("both packs + the crypto floor fit the search budget",
+    worst.trash.length <= SEARCH_CHAR_BUDGET,
+    `${worst.trash.length} / ${SEARCH_CHAR_BUDGET}`);
+
+  // PvpMetaPanel prices the list as `4 + species.length + ivTierLen` per entry
+  // (the `&`, the `!+`, the `,`, the name, the IV tier). If the emitter's shape
+  // ever changes, the number the user reads stops matching what they pay.
+  const seeded = build({ pvpMode: "intelligent", pvpMetaSpecies: all }, "de");
+  const carve = metaClauses(seeded.trash);
+  const emitted = carve.reduce((sum, c) => sum + c.length + 1, 0); // +1 for the `&`
+  const ivTierLen = carve[0].slice(carve[0].indexOf(",") + 1).length;
+  const priced = all.reduce((sum, sp) => sum + 4 + sp.length + ivTierLen, 0);
+  check("the panel's per-species price matches what buildFilters emits",
+    emitted === priced, `emitted ${emitted}, priced ${priced}`);
 }
 
 console.log(`\n${failures === 0 ? "✓ All intelligent-PvP checks passed." : `✗ ${failures} failure(s).`}`);

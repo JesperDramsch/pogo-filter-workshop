@@ -1258,6 +1258,8 @@
   "app.pvp.meta_pack_ultra": "Liga Ultra top 30",
   "app.pvp.meta_empty_hint": "La lista está vacía, así que Inteligente se comporta exactamente igual que el nivel para el resto. Añade un pack de liga para dar a tus Pokémon del meta el nivel más amplio.",
   "app.pvp.meta_redundant_hint": "El nivel de tu lista no es más amplio que el del resto, así que la lista no cambia nada. Amplía el nivel de la lista (o reduce el otro) para que tenga efecto.",
+  "app.pvp.meta_cost": "{count} especies · {chars} de tu presupuesto de búsqueda de {budget} caracteres",
+  "app.pvp.meta_cost_warn": "caro: {count} especies cuestan {chars} de tu presupuesto de búsqueda de {budget} caracteres. Cada especie más cuesta otros ~56 — esta excepción necesita una cláusula por especie y no se puede comprimir. Quita las que no juegas.",
   "app.pvp.meta_expert_hint": "Activa el modo experto para ver la lista completa, añadir Pokémon sueltos y cambiar ambos niveles de IV.",
   "app.pvp.meta_clear": "vaciar lista",
   "app.pvp.meta_tier_label": "Nivel IV · tu lista",

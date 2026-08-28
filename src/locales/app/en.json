@@ -1258,6 +1258,8 @@
   "app.pvp.meta_pack_ultra": "Ultra League top 30",
   "app.pvp.meta_empty_hint": "The list is empty, so Intelligent currently behaves exactly like the tier for everything else. Add a league pack to give your meta Pokémon the wider tier.",
   "app.pvp.meta_redundant_hint": "The tier for your list is not wider than the tier for everything else, so the list changes nothing. Widen the list tier (or narrow the other one) to make it bite.",
+  "app.pvp.meta_cost": "{count} species · {chars} of your {budget}-character search budget",
+  "app.pvp.meta_cost_warn": "expensive: {count} species cost {chars} of your {budget}-character search budget. Each further species is another ~56 — this carve-out needs one clause per species and cannot be compressed. Remove the ones you do not actually battle with.",
   "app.pvp.meta_expert_hint": "Turn on expert mode to see the full list, add single Pokémon and change either IV tier.",
   "app.pvp.meta_clear": "clear list",
   "app.pvp.meta_tier_label": "IV tier · your list",
