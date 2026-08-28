@@ -117,8 +117,11 @@ export const DEFAULT_LUCKIES = [];
 // search — `mewtwo` covers Shadow Mewtwo and Mega Mewtwo Y both.
 //
 // Seed source: `src/data/meta-rankings.json` (regenerated daily by
-// scripts/fetch-meta-rankings.mjs from the PokeMiners game master). Each
-// species is scored by simulating a raid against a generic tier-5 boss —
+// scripts/fetch-meta-rankings.mjs). Mechanics come from the game master —
+// alexelgt primary, PokeMiners fallback, because the better-known mirror
+// stalls — overlaid with PvPoke for which species are released; the snapshot's
+// `sources` block records which mirror answered and how fresh each half is.
+// Each species is scored by simulating a raid against a generic tier-5 boss —
 // cycle DPS from its real fast/charged moveset, mixed with the total damage
 // it lives long enough to deal — and the top N of each type are unioned.
 // A data feed beats manual curation because the meta drifts every move
@@ -710,8 +713,11 @@ export const DEFAULT_CONFIG = {
 	// used as the fourth floor clause of the trash crypto guard.
 	//
 	// Seed source: `src/data/meta-rankings.json` (regenerated daily by
-	// scripts/fetch-meta-rankings.mjs from the PokeMiners game master). It is
-	// the top-N-per-type cut of every species that HAS a Shadow form, scored
+	// scripts/fetch-meta-rankings.mjs; see DEFAULT_TOP_ATTACKERS above for the
+	// upstream split and the snapshot's `sources` block for what answered). It
+	// is the top-N-per-type cut of every species that HAS a Shadow form — a
+	// union of the game master's own shadow blocks with PvPoke's roster, so
+	// neither a stalled mirror nor a flat list can drop a keeper alone — scored
 	// with the Shadow multipliers the game master itself publishes (×1.2 attack,
 	// ×0.8333333 defence) — so it answers "is Shadow the form worth keeping"
 	// rather than "is this species good", which is the question this list is
