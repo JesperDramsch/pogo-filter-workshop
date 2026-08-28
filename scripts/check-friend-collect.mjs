@@ -16,13 +16,14 @@ import {
 import EVENTS from '../src/data/events.json';
 import SPECIES_META from '../src/data/species-meta.json';
 import PVP_RANKINGS from '../src/data/pvp-rankings.json';
-import { pokemonNameFor, resolveSpeciesInfo } from '../src/data/species.js';
+import { POKEMON_NAMES_DICT, pokemonNameFor, resolveSpeciesInfo } from '../src/data/species.js';
 import {
 	evoParentsFromGameMaster,
 	megaDexFromGameMaster,
 	specialTradeDexFromGameMaster,
 	starterDexFromGenerations,
 } from './fetch-species-meta.mjs';
+import { GENERATIONS, generationOf, originRegion } from './lib/generations.mjs';
 
 const t = (key, opts) => (opts && 'fallback' in opts ? opts.fallback : key);
 
@@ -1162,85 +1163,79 @@ console.log('\nScenario 11: game-master pokemonClass parser (offline sample)');
 	check('unrecognized object payload yields empty set', specialTradeDexFromGameMaster({ foo: 1 }).size === 0);
 }
 
-console.log('\nScenario 12: generations parser — every plausible pogoapi shape yields the starter bases');
+console.log('\nScenario 12: starter derivation over the generation table');
 {
-	// Gen-1 (dex 1-12 sample) must always yield bases 1/4/7; gen-2 sample
-	// (152-160) must yield 152/155/158. One fixture per handled shape.
-	const gen1ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-	const gen2ids = [152, 153, 154, 155, 156, 157, 158, 159, 160];
-	const expect = (label, generations) => {
-		const s = starterDexFromGenerations(generations);
-		check(
-			label,
-			[1, 4, 7, 152, 155, 158].every((d) => s.has(d)) && !s.has(2) && !s.has(3) && !s.has(10),
-			JSON.stringify([...s].sort((a, b) => a - b)),
-		);
-	};
-	const entry = (id) => ({ pokemon_id: id, pokemon_name: `p${id}` });
-	expect('A: array of {pokemon_id, generation_number}', [
-		...gen1ids.map((id) => ({ pokemon_id: id, generation_number: 1 })),
-		...gen2ids.map((id) => ({ pokemon_id: id, generation_number: 2 })),
-	]);
-	expect('B: object generation → entry list', {
-		generation_1: gen1ids.map(entry),
-		generation_2: gen2ids.map(entry),
-	});
-	// B-live: the REAL feed shape captured from the 2026-07-18 sync log —
-	// "Generation 1" keys and entries with `id` (NOT pokemon_id) fields.
-	expect('B-live: { "Generation 1": [{ generation_number, id, name }] } (actual pogoapi shape)', {
-		'Generation 1': gen1ids.map((id) => ({ generation_number: 1, id, name: `p${id}` })),
-		'Generation 2': gen2ids.map((id) => ({ generation_number: 2, id, name: `p${id}` })),
-	});
-	expect('C: object generation → keyed-by-id', {
-		generation_1: Object.fromEntries(gen1ids.map((id) => [id, { name: `p${id}` }])),
-		generation_2: Object.fromEntries(gen2ids.map((id) => [id, { name: `p${id}` }])),
-	});
-	expect('D: object generation → dex range', {
-		generation_1: { min_dex: 1, max_dex: 12 },
-		generation_2: { min_dex: 152, max_dex: 160 },
-	});
-	expect('E: object pokemon-id → generation', {
-		...Object.fromEntries(gen1ids.map((id) => [id, 'generation_1'])),
-		...Object.fromEntries(gen2ids.map((id) => [id, 2])),
-	});
-	// F: name-keyed payloads need the stats-derived name→dex lookup.
-	const nameToDex = new Map([...gen1ids, ...gen2ids].map((id) => [`mon-${id}`, id]));
-	const named = starterDexFromGenerations(
-		{
-			...Object.fromEntries(gen1ids.map((id) => [`Mon ${id}`, 'generation_1'])),
-			...Object.fromEntries(gen2ids.map((id) => [`Mon ${id}`, 2])),
-		},
-		9,
-		nameToDex,
-	);
+	// pogoapi's pokemon_generations feed is gone (stale since November 2025,
+	// and its payload had changed shape often enough that the old parser
+	// handled seven of them). Generation boundaries are a constant now, so
+	// what needs testing moved with them: the table itself must be sound, and
+	// the 0/3/6 trio rule must still land on the starters.
+	const all = starterDexFromGenerations();
 	check(
-		'F: object pokemon-name → generation (via name→dex lookup)',
-		[1, 4, 7, 152, 155, 158].every((d) => named.has(d)) && !named.has(2),
-		JSON.stringify([...named].sort((a, b) => a - b)),
+		'every generation contributes exactly three starter bases',
+		all.size === GENERATIONS.length * 3,
+		`${all.size} for ${GENERATIONS.length} generations`,
 	);
-	expect('G: object pokemon-id → entry with generation field', {
-		...Object.fromEntries(gen1ids.map((id) => [id, { generation_number: 1, name: `p${id}` }])),
-		...Object.fromEntries(gen2ids.map((id) => [id, { generation_number: 2, name: `p${id}` }])),
-	});
-	expect('A2: per-generation array entries with nested species lists', [
-		{ generation_number: 1, pokemon_species: gen1ids.map(entry) },
-		{ generation_number: 2, pokemon_species: gen2ids.map(entry) },
-	]);
-	check('unrecognized payload yields empty set (assertion will trip loudly)', starterDexFromGenerations({ weird: true }).size === 0);
-	// The Victini case (caught live): Unova's dex opens with a mythical at 494
-	// before the starter trios — special-trade species are skipped before the
-	// 0/3/6 trio pattern applies.
-	const gen5 = starterDexFromGenerations(
-		{ 'Generation 5': Array.from({ length: 10 }, (_, i) => ({ generation_number: 5, id: 494 + i, name: `p${494 + i}` })) },
-		9,
-		new Map(),
-		new Set([494]),
-	);
+	const EXPECTED = [
+		1, 4, 7,          // Kanto
+		152, 155, 158,    // Johto
+		252, 255, 258,    // Hoenn
+		387, 390, 393,    // Sinnoh
+		495, 498, 501,    // Unova — see the Victini case below
+		650, 653, 656,    // Kalos
+		722, 725, 728,    // Alola
+		810, 813, 816,    // Galar
+		906, 909, 912,    // Paldea
+	];
+	// Unova is the one generation whose dex does NOT open with the trios:
+	// Victini (494, mythical) sits ahead of them, which a live run caught via
+	// the specialTradeDex ∩ starterDex guard. Exclusions are applied before
+	// the nine-lowest cut, so passing it makes 495/498/501 fall out.
+	const unova = starterDexFromGenerations(9, new Set([494]));
 	check(
 		'gen-5 starters skip Victini (494) and land on 495/498/501',
-		gen5.has(495) && gen5.has(498) && gen5.has(501) && !gen5.has(494) && !gen5.has(497) && !gen5.has(500),
-		JSON.stringify([...gen5].sort((a, b) => a - b)),
+		unova.has(495) && unova.has(498) && unova.has(501) &&
+			!unova.has(494) && !unova.has(497) && !unova.has(500),
+		JSON.stringify([...unova].filter((d) => d >= 494 && d <= 510)),
 	);
+	check(
+		'with Victini excluded, the derived set is exactly the known starter bases',
+		EXPECTED.every((d) => unova.has(d)) && unova.size === EXPECTED.length,
+		JSON.stringify([...unova].sort((a, b) => a - b)),
+	);
+	// Second and third stages must never appear: they are what the 0/3/6
+	// offsets exist to skip.
+	check(
+		'evolved stages are not starters',
+		[2, 3, 5, 6, 8, 9, 153, 156, 159, 907, 910].every((d) => !unova.has(d)),
+	);
+
+	// The table is load-bearing now, so guard its shape: contiguous, ascending,
+	// gapless coverage of the national dex. A typo here would silently move
+	// every starter after it.
+	let contiguous = GENERATIONS[0].min === 1;
+	for (let i = 0; i < GENERATIONS.length; i++) {
+		const g = GENERATIONS[i];
+		if (g.max < g.min) contiguous = false;
+		if (i > 0 && g.min !== GENERATIONS[i - 1].max + 1) contiguous = false;
+	}
+	check('generation ranges are contiguous and ascending from dex 1', contiguous,
+		GENERATIONS.map((g) => `${g.gen}:${g.min}-${g.max}`).join(' '));
+	check('generationOf agrees with the boundaries',
+		generationOf(1) === 1 && generationOf(151) === 1 && generationOf(152) === 2 &&
+			generationOf(906) === 9 && generationOf(9999) === null);
+	check('originRegion labels the base form by its origin generation',
+		originRegion(52) === 'kanto' && originRegion(157) === 'johto' &&
+			originRegion(724) === 'alola' && originRegion(906) === 'paldea');
+	// Every species the app can name must fall inside the table — a new
+	// generation shipping without a table entry is exactly the failure this
+	// catches, and it is the one maintenance cost of pinning the boundaries.
+	const beyond = Object.keys(POKEMON_NAMES_DICT)
+		.map((k) => parseInt(k, 10))
+		.filter((dex) => Number.isInteger(dex) && generationOf(dex) === null);
+	check('every named species falls inside the generation table',
+		beyond.length === 0,
+		beyond.length ? `unmapped dex: ${beyond.slice(0, 10).join(', ')}` : '');
 }
 
 if (failures > 0) {

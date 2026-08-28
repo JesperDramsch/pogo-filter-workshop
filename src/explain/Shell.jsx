@@ -359,7 +359,10 @@ function NavChip({ icon: Icon, label, onClick, tone, current = false, iconRight 
 // Sign-off used on every page (landing, chapters, workshop). Three compact
 // lines: the personal credit, the author's other projects, and the upstream
 // data sources the workshop snapshots from. Data credit is mandatory courtesy —
-// ScrapedDuck, LeekDuck, and PoGoAPI ask for attribution; lily-dex-api is MIT.
+// ScrapedDuck and LeekDuck ask for attribution; lily-dex-api and PvPoke are MIT.
+// PoGoAPI was dropped in August 2026 when the last four fetchers reading it
+// moved to the game master (docs/upstream-sources.md), so it is no longer
+// credited: crediting a source nothing reads is as wrong as omitting one.
 const CREDIT_PROJECTS = [
   { label: "ML.recipes",             url: "https://ml.recipes"          },
   { label: "data-science-gui.de",    url: "https://data-science-gui.de" },
@@ -372,8 +375,9 @@ const DATA_CREDIT_PROJECTS = [
   { label: "ScrapedDuck",  url: "https://github.com/bigfoott/ScrapedDuck"      },
   { label: "LeekDuck",     url: "https://leekduck.com"                         },
   { label: "lily-dex-api", url: "https://github.com/mknepprath/lily-dex-api"   },
-  { label: "PoGoAPI",      url: "https://pogoapi.net"                          },
+  { label: "PvPoke",       url: "https://github.com/pvpoke/pvpoke"             },
   { label: "PokeMiners",   url: "https://github.com/PokeMiners/pogo_assets"    },
+  { label: "alexelgt",     url: "https://github.com/alexelgt/game_masters"     },
 ];
 
 export function AppCredit() {

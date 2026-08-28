@@ -45,8 +45,9 @@
 // The difference is not academic. Run against the April batch, this script
 // missed thirty Dynamax-capable species released since — Rhyperior, Hydreigon,
 // Magmortar, Electivire, Milotic, Weavile, Gyarados, Registeel and more — and
-// twenty moves. GAME_MASTER_STALE_WARN_DAYS makes a stall loud rather than
-// silent, and the snapshot records which mirror answered and when.
+// twenty moves. The staleness warning in scripts/lib/game-master.mjs makes a
+// stall loud rather than silent, and the snapshot records which mirror answered
+// and when.
 //
 // The ROSTER — which species are released, and which have a Shadow form — comes
 // from PvPoke's game master instead, which fetch-pvp-rankings.mjs and
@@ -126,6 +127,7 @@
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { fetchGameMaster, fetchPvpokeGameMaster } from "./lib/game-master.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -136,42 +138,10 @@ const NAMES_PATH = resolve(ROOT, "src/locales/pokemon-names.json");
 // move has a `move.<name>` entry the app can localize (see chargerMoves below).
 const LOCALE_EN = JSON.parse(readFileSync(resolve(ROOT, "src/locales/en.json"), "utf8"));
 
-// Game-master mirrors, in preference order. Each publishes the same Niantic
-// template array; they differ only in how current the dump is, so the first one
-// that answers wins and the rest are pure fallback.
-const GAME_MASTER_MIRRORS = [
-  {
-    // Primary. Commits every one to three days — 57 times in the three months
-    // before this was written — and carries the live post-Season-27 move values.
-    // It is also, transitively, where DialgaDex's numbers come from: its
-    // resource repo (mgrann03/pokemon-resources) regenerates from this file.
-    name: "alexelgt/game_masters",
-    gameMaster: "https://raw.githubusercontent.com/alexelgt/game_masters/refs/heads/master/GAME_MASTER.json",
-    // {"batchId":"1787902550208","uploadTime":"..."} — ms since epoch, as a string.
-    timestamp: "https://raw.githubusercontent.com/alexelgt/game_masters/refs/heads/master/timestamp.json",
-    parseStamp: (text) => Number(JSON.parse(text).batchId),
-  },
-  {
-    // Fallback. The better-known mirror, and the one every guide points at, but
-    // it stalls: it served a 2026-04-17 batch for at least 133 days, still
-    // carrying pre-Season-27 values for every move that rebalance touched.
-    // Kept because a second source costs one request and a stalled mirror is
-    // still better than no mechanics at all.
-    name: "PokeMiners/game_masters",
-    gameMaster: "https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/latest.json",
-    timestamp: "https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/timestamp.txt",
-    parseStamp: (text) => Number(text.trim()),
-  },
-];
-
-// PvPoke's game master, for the ROSTER only — see the two-source note below.
-// fetch-pvp-rankings.mjs and fetch-game-master-watch.mjs already read it, so
-// this adds no new upstream to the project.
-const PVPOKE_ENDPOINT = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/gamemaster.min.json";
-
-// How stale the winning mirror may get before the sync says so out loud. Not a
-// hard failure — stale mechanics still beat none — but never silent.
-const GAME_MASTER_STALE_WARN_DAYS = 30;
+// The game master and PvPoke's roster are both fetched through
+// scripts/lib/game-master.mjs — the mirror preference list, the batch stamp,
+// the staleness warning and the download cache live there, shared with the
+// three other fetchers that read the same dump.
 
 const TYPES = [
   "normal", "fighting", "flying", "poison", "ground", "rock",
@@ -250,13 +220,7 @@ const BATTLE_ONLY_FORMS = new Set([
 
 // ── Fetch + IO helpers ──────────────────────────────────────────────────────
 
-async function fetchText(url) {
-  const res = await fetch(url, {
-    headers: { "User-Agent": "pogo-filter-workshop meta-rankings-fetcher/2.0" },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
-  return res.text();
-}
+const USER_AGENT = "pogo-filter-workshop meta-rankings-fetcher/2.0";
 
 function canonicalStringify(value) {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
@@ -653,47 +617,23 @@ async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
 
-  let templates, gameMasterBatchMs = null, mirrorName = null, pvpoke = null;
+  let templates, gameMasterBatchMs = null, mirrorName = null, gameMasterAgeDays = null, pvpoke = null;
   try {
     console.log("→ Fetching game master + PvPoke roster");
     // Roster-only, and the mechanics source is the one that cannot be missing —
     // so a PvPoke outage degrades to the game master's own release heuristic
     // rather than failing the sync. Started first so it overlaps the big fetch.
-    const pvpokePromise = fetchText(PVPOKE_ENDPOINT).then(JSON.parse).catch((e) => {
-      console.warn(`⚠  PvPoke roster unavailable (${e.message}); falling back to the game master's own release heuristic`);
-      return null;
-    });
-
-    // First mirror that answers wins; the rest are fallback. A mirror that
-    // returns something unparsable counts as a failure, not as an empty result
-    // — publishing a hole is the one outcome worse than using the fallback.
-    const failures = [];
-    for (const mirror of GAME_MASTER_MIRRORS) {
-      try {
-        const [gmText, stampText] = await Promise.all([
-          fetchText(mirror.gameMaster),
-          fetchText(mirror.timestamp).catch(() => ""),
-        ]);
-        const parsed = JSON.parse(gmText);
-        if (!Array.isArray(parsed) || parsed.length < 5000) {
-          throw new Error(`parsed as ${Array.isArray(parsed) ? `${parsed.length} templates` : typeof parsed}`);
-        }
-        templates = parsed;
-        mirrorName = mirror.name;
-        try {
-          const ms = mirror.parseStamp(stampText);
-          if (Number.isFinite(ms) && ms > 0) gameMasterBatchMs = ms;
-        } catch { /* an unreadable stamp only costs the staleness warning */ }
-        break;
-      } catch (err) {
-        failures.push(`${mirror.name}: ${err.message}`);
-      }
-    }
-    if (!templates) throw new Error(`all game-master mirrors failed — ${failures.join("; ")}`);
-    if (failures.length > 0) {
-      console.warn(`⚠  fell back to ${mirrorName} after ${failures.join("; ")}`);
-    }
+    const pvpokePromise = fetchPvpokeGameMaster({ userAgent: USER_AGENT });
+    ({
+      templates,
+      batchMs: gameMasterBatchMs,
+      mirrorName,
+      ageDays: gameMasterAgeDays,
+    } = await fetchGameMaster({ userAgent: USER_AGENT, label: "move mechanics" }));
     pvpoke = await pvpokePromise;
+    if (!pvpoke) {
+      console.warn("⚠  falling back to the game master's own release heuristic for the roster");
+    }
   } catch (e) {
     console.error(`✗ Fetch failed: ${e.message}`);
     if (offlineOk && existsSync(OUT_PATH)) {
@@ -714,18 +654,9 @@ async function main() {
   const nameFor = (dex) => names[String(dex)]?.en?.toLowerCase() || null;
 
   const roster = parsePvpokeRoster(pvpoke);
-  // Staleness report. The mirror going stale is not a failure — it is the only
-  // PvE mechanics source — but a list that advertises a daily refresh must not
-  // go quiet about its inputs having stopped moving.
-  const batchMs = gameMasterBatchMs;
-  const gameMasterAgeDays = batchMs != null
-    ? Math.floor((Date.now() - batchMs) / 86400000)
-    : null;
-  if (gameMasterAgeDays != null && gameMasterAgeDays > GAME_MASTER_STALE_WARN_DAYS) {
-    console.warn(`⚠  ${mirrorName} batch is ${gameMasterAgeDays} days old ` +
-      `(${new Date(batchMs).toISOString().slice(0, 10)}). Move mechanics may predate a rebalance; ` +
-      `the roster is taken from PvPoke regardless. See scripts/fetch-game-master-watch.mjs.`);
-  }
+  // The staleness warning itself is emitted by fetchGameMaster — a mirror going
+  // stale is not a failure here (it is the only PvE mechanics source) but it is
+  // never silent, and the age is reported alongside the roster below.
 
   const consts = battleConstants(templates);
   const cpm = cpMultiplierFor(templates, ATTACKER_LEVEL);
@@ -913,9 +844,9 @@ async function main() {
     // it is without re-deriving the split from the script.
     sources: {
       mechanics: mirrorName,
-      mechanicsBatch: Number.isFinite(batchMs) && batchMs > 0
-        ? new Date(batchMs).toISOString() : null,
-      roster: roster ? "pvpoke/pvpoke" : "PokeMiners/game_masters (fallback)",
+      mechanicsBatch: Number.isFinite(gameMasterBatchMs) && gameMasterBatchMs > 0
+        ? new Date(gameMasterBatchMs).toISOString() : null,
+      roster: roster ? "pvpoke/pvpoke" : `${mirrorName} (fallback)`,
       rosterBatch: roster?.timestamp || null,
     },
     model: {

@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-// Builds a regional-form catalog from pogoapi's pokemon_types dataset and writes
-// a slim artifact at src/data/regional-forms.json that App.jsx imports at build
-// time. Powers the buddy catch-target form picker: pick which regional forms of
-// a species (Kanto base / Alola / Galar / Hisui / Paldea) to catch for a friend.
+// Builds a regional-form catalog from the Niantic game master's per-form type
+// data and writes a slim artifact at src/data/regional-forms.json that App.jsx
+// imports at build time. Powers the buddy catch-target form picker: pick which
+// regional forms of a species (Kanto base / Alola / Galar / Hisui / Paldea) to
+// catch for a friend.
 //
 // Per form we precompute a "discriminating type predicate" {include, exclude}:
 // the minimal set of has-type / lacks-type conditions that isolates exactly that
@@ -11,32 +12,42 @@
 // "Mauzi & !Dark & !Steel". Dropping a form from the catch list then becomes one
 // De Morgan clause in App.jsx (drop Galar = `&!stahl`).
 //
+// Source note: this read pogoapi.net's pokemon_types.json until August 2026.
+// That feed had not moved since November 2025 and published no freshness signal
+// of its own, so a form retype or a newly released regional variant would have
+// gone unnoticed indefinitely. The game master carries `type`/`type2` per form
+// template first-hand and stamps every batch — see scripts/lib/game-master.mjs
+// and docs/upstream-sources.md. Species names come from
+// src/locales/pokemon-names.json, keyed by dex.
+//
 // Flags:
 //   --offline-ok   tolerate fetch failures if src/data/regional-forms.json exists.
 
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { fetchGameMaster, formSuffix, pokemonTemplates, typesOf } from "./lib/game-master.mjs";
+import { originRegion } from "./lib/generations.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const DATA_DIR = resolve(ROOT, "src/data");
 const OUT_PATH = resolve(DATA_DIR, "regional-forms.json");
+const NAMES_PATH = resolve(ROOT, "src/locales/pokemon-names.json");
 
-const TYPES_URL = "https://pogoapi.net/api/v1/pokemon_types.json";
-
-// Stable form key + region from a pogoapi `form` string. Returns null for
-// non-regional forms (costumes, weather, Unown letters, Deoxys, …) so they're
-// filtered out — only true regional variants reach the picker. The base form's
-// region is overwritten with its origin region (from dex) in buildCatalog.
+// Stable form key + region from a game-master form suffix ("MEOWTH_ALOLA" has
+// suffix "ALOLA"). Returns null for non-regional forms (costumes, weather,
+// Unown letters, Deoxys, …) so they're filtered out — only true regional
+// variants reach the picker. The base form's region is overwritten with its
+// origin region (from dex) in buildCatalog.
 function regionForForm(form) {
-  if (form === "Normal") return { key: "base", region: "base" };
-  if (form === "Alola") return { key: "alola", region: "alola" };
-  if (form === "Galarian") return { key: "galar", region: "galar" };
-  if (form === "Hisuian") return { key: "hisui", region: "hisui" };
-  if (form === "Paldea") return { key: "paldea", region: "paldea" };
-  if (form.startsWith("Paldea_")) {
-    const variant = form.slice("Paldea_".length).toLowerCase(); // combat / blaze / aqua
+  if (form === "NORMAL") return { key: "base", region: "base" };
+  if (form === "ALOLA") return { key: "alola", region: "alola" };
+  if (form === "GALARIAN") return { key: "galar", region: "galar" };
+  if (form === "HISUIAN") return { key: "hisui", region: "hisui" };
+  if (form === "PALDEA") return { key: "paldea", region: "paldea" };
+  if (form.startsWith("PALDEA_")) {
+    const variant = form.slice("PALDEA_".length).toLowerCase(); // combat / blaze / aqua
     return { key: `paldea:${variant}`, region: "paldea", variant };
   }
   return NON_REGIONAL_AXES[form] || null;
@@ -58,40 +69,40 @@ function regionForForm(form) {
 // species with a loud warning, which is the correct outcome and self-healing
 // if Niantic ever splits the types.
 const NON_REGIONAL_AXES = {
-  Plant: { key: "cloak:plant", axis: "cloak", variant: "plant" },
-  Sandy: { key: "cloak:sandy", axis: "cloak", variant: "sandy" },
-  Trash: { key: "cloak:trash", axis: "cloak", variant: "trash" },
-  Baile: { key: "style:baile", axis: "style", variant: "baile" },
-  Pompom: { key: "style:pompom", axis: "style", variant: "pompom" },
-  Pau: { key: "style:pau", axis: "style", variant: "pau" },
-  Sensu: { key: "style:sensu", axis: "style", variant: "sensu" },
+  PLANT: { key: "cloak:plant", axis: "cloak", variant: "plant" },
+  SANDY: { key: "cloak:sandy", axis: "cloak", variant: "sandy" },
+  TRASH: { key: "cloak:trash", axis: "cloak", variant: "trash" },
+  BAILE: { key: "style:baile", axis: "style", variant: "baile" },
+  POMPOM: { key: "style:pompom", axis: "style", variant: "pompom" },
+  PAU: { key: "style:pau", axis: "style", variant: "pau" },
+  SENSU: { key: "style:sensu", axis: "style", variant: "sensu" },
 };
 
 // Render order: the base/origin form first, then the regional variants.
 const REGION_ORDER = { alola: 1, galar: 2, hisui: 3, paldea: 4 };
 const formOrder = (f) => (f.key === "base" ? 0 : (REGION_ORDER[f.region] ?? 9));
 
-// Base-form region = the species' origin generation's region (National Dex
-// ranges), so the picker shows "Kanto Meowth", "Johto Typhlosion", "Alola
-// Decidueye" instead of a generic "Base".
-const GEN_REGIONS = [
-  [151, "kanto"], [251, "johto"], [386, "hoenn"], [493, "sinnoh"],
-  [649, "unova"], [721, "kalos"], [809, "alola"], [905, "galar"], [1025, "paldea"],
-];
-function originRegion(dex) {
-  for (const [max, region] of GEN_REGIONS) if (dex <= max) return region;
-  return "base";
-}
+// Base-form region ("Kanto Meowth", "Johto Typhlosion", "Alola Decidueye"
+// instead of a generic "Base") comes from the national-dex generation table in
+// scripts/lib/generations.mjs — see originRegion there.
 
-async function fetchJson(url) {
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": "pogo-filter-workshop regional-forms-fetcher/1.0",
-      Accept: "application/json",
-    },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
-  return res.json();
+// Flatten the game master into the per-form rows this catalog is built from:
+// { dex, name, form, types }, one per species form template that carries a
+// form enum. Templates with no form (the species-level entry a form template
+// duplicates) are skipped — they carry no form to key a predicate off, and
+// every species with regional variants also publishes an explicit NORMAL.
+function rowsFromGameMaster(templates, names) {
+  const rows = [];
+  for (const template of pokemonTemplates(templates)) {
+    const form = formSuffix(template);
+    if (!form) continue;
+    const types = typesOf(template.settings);
+    if (types.length === 0) continue;
+    const name = names[String(template.dex)]?.en;
+    if (!name) continue;
+    rows.push({ dex: template.dex, name, form, types });
+  }
+  return rows;
 }
 
 // Predicate that uniquely matches `form` among its `siblings`. A Pokémon matches
@@ -131,18 +142,18 @@ function predicateFor(form, siblings) {
   return { include, exclude };
 }
 
-// Collapse pogoapi rows into per-species regional-form catalogs.
-function buildCatalog(rows) {
+// Collapse per-form rows into per-species regional-form catalogs.
+export function buildCatalog(rows) {
   // dex → Map(formKey → { key, region, variant?, types:Set })
   const byDex = new Map();
   const names = new Map();
   for (const row of rows) {
     const reg = regionForForm(row.form);
     if (!reg) continue;
-    const dex = row.pokemon_id;
-    if (!Array.isArray(row.type) || row.type.length === 0) continue;
+    const dex = row.dex;
+    if (!Array.isArray(row.types) || row.types.length === 0) continue;
     if (!byDex.has(dex)) byDex.set(dex, new Map());
-    names.set(dex, row.pokemon_name);
+    names.set(dex, row.name);
     byDex.get(dex).set(reg.key, {
       key: reg.key,
       // Axis forms (cloak / style) have no meaningful region — carry the axis
@@ -151,7 +162,7 @@ function buildCatalog(rows) {
         ? { axis: reg.axis }
         : { region: reg.key === "base" ? originRegion(dex) : reg.region }),
       ...(reg.variant ? { variant: reg.variant } : {}),
-      types: new Set(row.type.map(t => t.toLowerCase())),
+      types: new Set(row.types.map(t => t.toLowerCase())),
     });
   }
 
@@ -190,9 +201,9 @@ function buildCatalog(rows) {
   return { species, indistinctCount };
 }
 
-// Self-check against hand-verified cases so a pogoapi shape/data change fails the
-// run loudly instead of silently shipping wrong predicates.
-function validate(species) {
+// Self-check against hand-verified cases so an upstream shape or data change
+// fails the run loudly instead of silently shipping wrong predicates.
+export function validate(species) {
   const find = (dex, key) => (species[String(dex)]?.forms || []).find(f => f.key === key);
   const eq = (a, b) => JSON.stringify([...(a || [])].sort()) === JSON.stringify([...b].sort());
   const check = (dex, key, inc, exc) => {
@@ -247,10 +258,13 @@ async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
 
-  let rows;
+  let templates, mirrorName, ageDays;
   try {
-    console.log("→ Fetching pogoapi pokemon_types");
-    rows = await fetchJson(TYPES_URL);
+    console.log("→ Fetching game master (per-form type source)");
+    ({ templates, mirrorName, ageDays } = await fetchGameMaster({
+      userAgent: "pogo-filter-workshop regional-forms-fetcher/1.0",
+      label: "form types",
+    }));
   } catch (e) {
     console.error(`✗ Fetch failed: ${e.message}`);
     if (offlineOk && existsSync(OUT_PATH)) {
@@ -260,8 +274,10 @@ async function main() {
     process.exit(1);
   }
 
-  if (!Array.isArray(rows) || rows.length < 500) {
-    throw new Error(`pokemon_types.json missing or too short (got ${rows?.length ?? 0} rows)`);
+  const names = JSON.parse(readFileSync(NAMES_PATH, "utf8"));
+  const rows = rowsFromGameMaster(templates, names);
+  if (rows.length < 500) {
+    throw new Error(`game master yielded only ${rows.length} typed form rows (expected ≥ 500)`);
   }
 
   const { species, indistinctCount } = buildCatalog(rows);
@@ -291,10 +307,16 @@ async function main() {
 
   writeJson(OUT_PATH, { fetchedAt, ...newContent });
   console.log(`✓ wrote ${OUT_PATH}`);
+  console.log(`  source: ${mirrorName}${ageDays != null ? ` (${ageDays}d old)` : " (unstamped)"} · ${rows.length} typed form rows`);
   console.log(`  species: ${count} with type-distinguishable regional forms · ${indistinctCount} indistinct (skipped)`);
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+// Only run when executed directly — scripts/check-regional-catalog.mjs imports
+// buildCatalog/validate above without triggering a 19 MB fetch.
+import { pathToFileURL } from "node:url";
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}
