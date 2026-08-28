@@ -87,16 +87,13 @@ Snapshots are refreshed by the scripts in `scripts/` (run on demand, also wired 
 
 - **Generated skill reference** at `skills/pokemon-go-filters/references/` — `META.md` and `pvp-meta.json`, produced by `npm run generate-pvp-meta-reference` in the same CI job that syncs the ranking snapshot, and consumed by the `pokemon-go-filters` Claude skill via its `refresh-meta.py`. Same shape as how the `pokemon-name-translate` skill pulls `src/locales/pokemon-names.json` from here: the repo is the endpoint. See [`skills/README.md`](skills/README.md).
 
-## Data provenance
-
-PvP species lists are data, never prose — see [`CLAUDE.md`](CLAUDE.md) for the rule and
-[`docs/gbl-collection-research.md`](docs/gbl-collection-research.md) for the research behind it.
-The chain is PvPoke → `src/data/pvp-rankings.json` → the app *and* the skill reference, so the two
-cannot disagree about what the meta is.
-
 ## Privacy
 
 100% client-side. No analytics, no API calls beyond the world topology basemap. All your data (hundos, buddies, home location, tagged Pokémon list) lives in your browser's localStorage.
+
+## Disclaimer
+
+This repo is for educational use only. All content found within this repo is the property of The Pokemon Company and Niantic. I did not create or modify any files found within this repo and all copyright belongs to the respective companies. Please respect the original source material.
 
 ## License
 
