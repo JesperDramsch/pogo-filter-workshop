@@ -315,19 +315,33 @@ console.log("\nM6 — the shipped snapshot");
   // can go stale (it was 133 days old when this was written); what must not
   // happen is the snapshot going quiet about which feed each half came from.
   const src = META_RANKINGS.sources || {};
-  check("mechanics source is recorded", src.mechanics === "PokeMiners/game_masters");
+  // Which mirror won is not pinned — the point of the preference list is that
+  // it may legitimately be either. What must be recorded is WHICH one, so a
+  // reader can tell a fresh batch from a fallback to a stalled one.
+  const MIRRORS = ["alexelgt/game_masters", "PokeMiners/game_masters"];
+  check("mechanics source is a known mirror", MIRRORS.includes(src.mechanics), String(src.mechanics));
   check("roster source is recorded", typeof src.roster === "string" && src.roster.length > 0,
     String(src.roster));
   check("both batch stamps are recorded",
     Boolean(src.mechanicsBatch) && Boolean(src.rosterBatch),
     JSON.stringify({ mechanics: src.mechanicsBatch, roster: src.rosterBatch }));
-  // The roster is the half that must be current — it decides which species
-  // exist at all. Nothing here fails on the mechanics mirror being behind; the
-  // fetcher warns about that and fetch-game-master-watch.mjs watches it.
-  const rosterAgeDays = (Date.now() - Date.parse(src.rosterBatch)) / 86400000;
+  const ageDays = (stamp) => (Date.now() - Date.parse(stamp)) / 86400000;
+  const rosterAgeDays = ageDays(src.rosterBatch);
   check("the roster snapshot is recent (< 30 days)",
     Number.isFinite(rosterAgeDays) && rosterAgeDays < 30,
     `${Math.floor(rosterAgeDays)}d old`);
+  // Soft: a stalled mechanics mirror is survivable and the fetcher warns about
+  // it, so this reports rather than fails — but it must be visible in CI too,
+  // because a silently-frozen mirror is what cost this pipeline 30 Dynamax
+  // species and four months of move rebalances the first time round.
+  const mechanicsAgeDays = ageDays(src.mechanicsBatch);
+  if (Number.isFinite(mechanicsAgeDays) && mechanicsAgeDays >= 30) {
+    console.log(`  ! mechanics mirror ${src.mechanics} is ${Math.floor(mechanicsAgeDays)}d old ` +
+      `— move stats may predate a rebalance (not a failure)`);
+  } else {
+    check("the mechanics snapshot is recent (< 30 days)",
+      Number.isFinite(mechanicsAgeDays), `${Math.floor(mechanicsAgeDays)}d old`);
+  }
 }
 
 console.log(`\n${failures === 0 ? "✓ All meta-ranking checks passed." : `✗ ${failures} failure(s).`}`);
