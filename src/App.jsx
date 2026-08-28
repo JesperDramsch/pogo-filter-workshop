@@ -133,18 +133,27 @@ export const DEFAULT_LUCKIES = [];
 // search — `mewtwo` covers Shadow Mewtwo and Mega Mewtwo Y both.
 //
 // Seed source: `src/data/meta-rankings.json` (regenerated daily by
-// scripts/fetch-meta-rankings.mjs from pogoapi.net stats + moves). Score
-// per (species, type) = base_attack × max charged-move power of that type;
-// top-8 per type, deduped union, sorted by best-score-across-types. Killing
-// the prior hand-curated tier-list constant: meta drifts every move
-// rebalance, so a daily-refreshed data feed beats periodic manual updates.
+// scripts/fetch-meta-rankings.mjs). Mechanics come from the game master —
+// alexelgt primary, PokeMiners fallback, because the better-known mirror
+// stalls — overlaid with PvPoke for which species are released; the snapshot's
+// `sources` block records which mirror answered and how fresh each half is.
+// Each species is scored by simulating a raid against a generic tier-5 boss —
+// cycle DPS from its real fast/charged moveset, mixed with the total damage
+// it lives long enough to deal — and the top N of each type are unioned.
+// A data feed beats manual curation because the meta drifts every move
+// rebalance; a *simulated* feed beats the previous scoring because that one
+// multiplied base attack by charged-move power and looked at nothing else,
+// which put Komala and Octillery in the list next to Mewtwo.
 export const DEFAULT_TOP_ATTACKERS = META_RANKINGS.topAttackers;
 
 // Personal "top Max Battle attackers" — same idea but only relevant to
 // Dynamax/Gigantamax encounters. Seed source: same meta-rankings.json,
-// filtered through the Dynamax-eligibility seed in fetch-meta-rankings.mjs
-// (pogoapi has no Dynamax flag, so the eligibility set is hand-maintained;
-// ranking within it is data-driven). Forms fold into base species —
+// restricted to species the game master marks Dynamax-capable and ordered by
+// the same raid rating. Eligibility used to be a hand-maintained set, because
+// pogoapi carries no Dynamax flag; the game master does carry one, under
+// Niantic's internal name for the mechanic ("bread"), so the roster is now
+// derived too — and the hand-maintained one turned out to be wrong about
+// Zacian, Zamazenta, Urshifu and Eternatus. Forms fold into base species —
 // `charizard` covers Gigantamax Charizard.
 export const DEFAULT_TOP_MAX_ATTACKERS = META_RANKINGS.topMaxAttackers;
 
@@ -646,76 +655,35 @@ export const DEFAULT_CONFIG = {
 	// Shadows you'd never purify, even during take-over events. Acts as
 	// belt-and-suspenders alongside !legendär — the legendary entries here
 	// duplicate that protection so the list stays complete if the global
-	// flag is ever toggled off. Non-legendary entries cover S / A+ / A tier
-	// shadow raid attackers per the community / META.md tier lists, focusing
-	// on species without a relevant Mega form (where Shadow IS the canonical
-	// top form). Resolved via `resolveSpecies` so users can type in any
-	// locale; expanded family-wide (+species) by shadowSafe.
-	shadowKeeperSpecies: [
-		// S tier shadows
-		'dialga',
-		'palkia',
-		'heatran',
-		'groudon',
-		'rampardos',
-		'salamence',
-		'mewtwo',
-		// A+ tier shadows
-		'greninja',
-		'hydreigon',
-		'darkrai',
-		'toucannon',
-		'vikavolt',
-		'tyrantrum',
-		'conkeldurr',
-		'darmanitan',
-		'chandelure',
-		'excadrill',
-		'regigigas',
-		'gigalith',
-		'kyogre',
-		'mamoswine',
-		'electivire',
-		'magnezone',
-		'garchomp',
-		'rhyperior',
-		'metagross',
-		'tyranitar',
-		'blaziken',
-		'ho-oh',
-		'raikou',
-		'gardevoir',
-		'swampert',
-		'dragonite',
-		'moltres',
-		'gengar',
-		'machamp',
-		// A tier shadows
-		'landorus',
-		'kingler',
-		'delphox',
-		'chesnaught',
-		'giratina',
-		'emboar',
-		'honchkrow',
-		'latios',
-		'staraptor',
-		'weavile',
-		'crawdaunt',
-		'absol',
-		'hariyama',
-		'sceptile',
-		'entei',
-		'aerodactyl',
-		'zapdos',
-		// A tier non-Mega shadow attackers (Shadow is the top form for these)
-		'togekiss',
-		'roserade',
-		'toxicroak',
-		'glaceon',
-		'espeon',
-		'sylveon',
-	],
+	// flag is ever toggled off. Resolved via `resolveSpecies` so users can
+	// type in any locale; expanded family-wide (+species) by shadowSafe, and
+	// used as the fourth floor clause of the trash crypto guard.
+	//
+	// Seed source: `src/data/meta-rankings.json` (regenerated daily by
+	// scripts/fetch-meta-rankings.mjs; see DEFAULT_TOP_ATTACKERS above for the
+	// upstream split and the snapshot's `sources` block for what answered). It
+	// is the top-N-per-type cut of every species that HAS a Shadow form — a
+	// union of the game master's own shadow blocks with PvPoke's roster, so
+	// neither a stalled mirror nor a flat list can drop a keeper alone — scored
+	// with the Shadow multipliers the game master itself publishes (×1.2 attack,
+	// ×0.8333333 defence) — so it answers "is Shadow the form worth keeping"
+	// rather than "is this species good", which is the question this list is
+	// actually asking. Killing the prior hand-curated tier-list constant: it
+	// had drifted, and not only by being out of date. It named Espeon, Sylveon,
+	// Glaceon, Togekiss and Roserade as shadow keepers, and none of the five
+	// has a Shadow form at all — neither the Eevee, Togepi nor Budew line
+	// carries a shadow entry anywhere in the game master, which the Rocket
+	// lineup snapshot independently agrees with. Five of its fifty-nine entries
+	// could never have matched a single Pokémon.
+	shadowKeeperSpecies: META_RANKINGS.shadowKeepers,
+	// The feed as it stood at the last merge, for each seeded roster. Not user
+	// settings — bookkeeping that lets reconcileSeededList tell "new since your
+	// last visit" from "you deleted this". topAttackers / topMaxAttackers live
+	// in their own storage keys, but their fingerprints ride here so the whole
+	// set travels together through export/import.
+	shadowKeeperSeen: META_RANKINGS.shadowKeepers,
+	topAttackerSeen: META_RANKINGS.topAttackers,
+	topMaxAttackerSeen: META_RANKINGS.topMaxAttackers,
 
 	// Optional tag bookkeepers can use to manually flag a non-keeper shadow
 	// for Frustration removal during a take-over (e.g. a high-IV gem they
@@ -1090,6 +1058,67 @@ export function normalizeBuddyTarget(entry) {
 // the user: one { kind: 'group'|'typeCheck'|'collector', group, species? }
 // entry per regional that was newly added to their protections (see the
 // catalog-sync block below).
+// ── Seeded-list reconciliation ─────────────────────────────────────────────
+// The attacker and keeper rosters are SEEDS from a daily sync, not user data,
+// but they are persisted like user data — the moment a first-run visitor's
+// state is written to localStorage, the saved copy shadows the shipped default
+// forever (`{ ...DEFAULT_CONFIG, ...raw }` lets the saved array win whole). So
+// without this, every returning user is frozen on the roster from their first
+// visit and the daily sync reaches nobody. That is the exact failure the
+// regional catalog sync above already fixes for regionals, in the same words:
+// "a stored config is a snapshot".
+//
+// The `seen` fingerprint — the feed as it stood at the user's last merge — is
+// what separates "new to this user" from "the user deleted it":
+//
+//   in feed, not in seen, not in saved  → new since last visit    → add
+//   in saved, in seen, not in feed      → dropped out of the feed → prune
+//   in saved, not in seen               → the user added it       → keep
+//   in seen, not in saved               → the user deleted it     → stay deleted
+//
+// A config predating the field is grandfathered to the current feed, so nobody
+// gets a retroactive pile of additions on the upgrade that introduces this.
+// Never-saved (undefined) means first run: take the feed whole.
+export function reconcileSeededList(saved, feed, seen) {
+	const feedList = Array.isArray(feed) ? feed : [];
+	if (!Array.isArray(saved)) {
+		return { list: [...feedList], seen: [...feedList], added: [], removed: [] };
+	}
+	const seenSet = new Set(Array.isArray(seen) ? seen : feedList);
+	const feedSet = new Set(feedList);
+	const savedSet = new Set(saved);
+	const removed = saved.filter((sp) => seenSet.has(sp) && !feedSet.has(sp));
+	const removedSet = new Set(removed);
+	const added = feedList.filter((sp) => !seenSet.has(sp) && !savedSet.has(sp));
+	return {
+		// User order is preserved and new entries append, so a curated list keeps
+		// the shape its owner gave it.
+		list: [...saved.filter((sp) => !removedSet.has(sp)), ...added],
+		seen: [...feedList],
+		added,
+		removed,
+	};
+}
+
+// topAttackers / topMaxAttackers live in their own storage keys rather than in
+// the config blob, so they cannot be reconciled inside mergeImportedConfig —
+// but their `seen` fingerprints ride the config, which is the thing that gets
+// merged and exported. This threads the two together for the load and import
+// paths. Returns the reconciled lists plus the config carrying the bumped
+// fingerprints; pass `undefined` for a list that was never saved.
+export function reconcileAttackerLists(config, savedTop, savedMax) {
+	const canon = (arr) => (Array.isArray(arr) ? arr.map((sp) => resolveSpecies(sp) || sp) : arr);
+	const top = reconcileSeededList(canon(savedTop), canon(META_RANKINGS.topAttackers), canon(config?.topAttackerSeen));
+	const max = reconcileSeededList(canon(savedMax), canon(META_RANKINGS.topMaxAttackers), canon(config?.topMaxAttackerSeen));
+	return {
+		topAttackers: top.list,
+		topMaxAttackers: max.list,
+		config: { ...config, topAttackerSeen: top.seen, topMaxAttackerSeen: max.seen },
+		added: { topAttackers: top.added, topMaxAttackers: max.added },
+		removed: { topAttackers: top.removed, topMaxAttackers: max.removed },
+	};
+}
+
 export function mergeImportedConfig(raw, notices = []) {
 	const merged = { ...DEFAULT_CONFIG, ...(raw || {}) };
 	if (!merged.regionalGroups || Object.keys(merged.regionalGroups).length === 0) {
@@ -1194,7 +1223,23 @@ export function mergeImportedConfig(raw, notices = []) {
 	// consistently. Idempotent on already-canonical user input.
 	const canonicalize = (arr) => (arr || []).map((s) => resolveSpecies(s) || s);
 	merged.mythTooManyOf = canonicalize(merged.mythTooManyOf);
-	merged.shadowKeeperSpecies = canonicalize(merged.shadowKeeperSpecies);
+	// Seeded roster, not user data — see reconcileSeededList. `raw` is consulted
+	// rather than `merged` so a config that never carried the field reads as
+	// never-saved (take the feed) instead of as "saved, identical to default".
+	{
+		// `canonicalize` maps a missing array to [], which for the FINGERPRINT
+		// would mean "this user has seen nothing" and dump the entire feed over
+		// their curated roster — the retroactive pile-on that grandfathering
+		// exists to prevent, and what every existing user would have got on the
+		// upgrade that introduces the field. Absent has to stay absent.
+		const rec = reconcileSeededList(
+			Array.isArray(raw?.shadowKeeperSpecies) ? canonicalize(raw.shadowKeeperSpecies) : undefined,
+			canonicalize(META_RANKINGS.shadowKeepers),
+			Array.isArray(raw?.shadowKeeperSeen) ? canonicalize(raw.shadowKeeperSeen) : undefined,
+		);
+		merged.shadowKeeperSpecies = rec.list;
+		merged.shadowKeeperSeen = rec.seen;
+	}
 	// Deduped as well as canonicalized: an import carrying the same species under
 	// two locale names ("Medicham" + "meditalis") collapses to one entry, so it
 	// cannot emit the same carve-out clause twice.
@@ -1340,9 +1385,23 @@ export function prepareImport(envelope) {
 	const out = {};
 	if (Array.isArray(d.hundos)) out.hundos = d.hundos;
 	if (Array.isArray(d.luckies)) out.luckies = canonicalize(d.luckies);
-	if (Array.isArray(d.topAttackers)) out.topAttackers = canonicalize(d.topAttackers);
-	if (Array.isArray(d.topMaxAttackers)) out.topMaxAttackers = canonicalize(d.topMaxAttackers);
 	if (d.config && typeof d.config === 'object') out.config = mergeImportedConfig(d.config);
+	// An imported roster is somebody's saved roster, so it reconciles against the
+	// current feed exactly like a loaded one — an export taken months ago must
+	// not drag its owner back to that month's meta. The fingerprints travel in
+	// the envelope's config; an envelope carrying rosters but no config falls
+	// back to DEFAULT_CONFIG's, which reads as "seen everything current" and so
+	// adds nothing the importer did not ask for.
+	if (Array.isArray(d.topAttackers) || Array.isArray(d.topMaxAttackers)) {
+		const rosters = reconcileAttackerLists(
+			out.config || DEFAULT_CONFIG,
+			Array.isArray(d.topAttackers) ? d.topAttackers : undefined,
+			Array.isArray(d.topMaxAttackers) ? d.topMaxAttackers : undefined,
+		);
+		if (Array.isArray(d.topAttackers)) out.topAttackers = rosters.topAttackers;
+		if (Array.isArray(d.topMaxAttackers)) out.topMaxAttackers = rosters.topMaxAttackers;
+		if (out.config) out.config = rosters.config;
+	}
 	if (d.homeLocation === null || (Array.isArray(d.homeLocation) && d.homeLocation.length === 2)) {
 		out.homeLocation = d.homeLocation;
 	}
@@ -1560,6 +1619,18 @@ export function buildFilters(
 	const pvpMetaTier = cfg.pvpMode === 'intelligent' ? cfg.pvpMetaTier || 'loose' : pvpBaseTier;
 	const notP = IV_PVP_TIER[pvpBaseTier];
 
+	// Meta shadow attackers, rendered into the user's PoGo locale. Hoisted up
+	// here because two very different filters need the same list: the trash
+	// crypto floor below, and the shadowSafe / shadowFrustration pro-tools
+	// further down.
+	const keeperResolved = [
+		...new Set(
+			(cfg.shadowKeeperSpecies || [])
+				.map((sp) => speciesForOutput(sp, outputLocale))
+				.filter(Boolean),
+		),
+	];
+
 	// The curated "relevant now" list — species you actually battle with, seeded
 	// one tap at a time from the league packs. Rendered into the user's PoGo
 	// locale, same as shadowKeeperSpecies (`keeperResolved`).
@@ -1735,6 +1806,24 @@ export function buildFilters(
 				`!${kw.flag.shadow},@${kw.flag.frustration}`,
 				tFn('app.clause_why.shadow_purify_frustration'),
 			);
+		// Fourth floor clause: the meta shadow attackers themselves. The three
+		// above are all about the PURIFY decision — a shadow worth purifying is
+		// worth not releasing. That says nothing about a shadow whose whole
+		// value is staying a shadow, and those are exactly the ones this list
+		// names. Without it a keeper that is cheap-to-purify, has no low IV and
+		// has already been Charge-TM'd passes all three and gets released: a
+		// Charge-TM'd Shadow Metagross is the single most expensive Pokémon in
+		// the box to have thrown away, and it was the one shape the floor let
+		// through. One clause, not one per species — `!crypto,+a,+b,…` reads as
+		// "releasable only if it is not a keeper family", and OR binds tighter
+		// than `&` (same trick as legacyMovesClause).
+		if (keeperResolved.length > 0) {
+			push(
+				trashClauses,
+				`!${kw.flag.shadow},${keeperResolved.map((sp) => `+${sp}`).join(',')}`,
+				tFn('app.clause_why.shadow_purify_keeper'),
+			);
+		}
 	}
 	if (cfg.protectCostumes) push(trashClauses, `!${kw.flag.costume}`, tFn('app.clause_why.costumes'));
 	if (cfg.protectLuckies) push(trashClauses, `!${kw.flag.lucky}`, tFn('app.clause_why.luckies'));
@@ -3197,9 +3286,6 @@ export function buildFilters(
 	// Investment gate: `@frustration` (same reasoning as shadowCheap above)
 	// — only purify shadows still in default state. A Charge-TM'd shadow
 	// is an investment; purifying it loses the TM and the +20% boost.
-	const keeperResolved = (cfg.shadowKeeperSpecies || [])
-		.map((s) => speciesForOutput(s, outputLocale))
-		.filter(Boolean);
 	const shadowSafeClauses = [];
 	push(shadowSafeClauses, kw.flag.shadow, tFn('app.clause_why.shadow_safe_pool'));
 	push(shadowSafeClauses, `!${kw.flag.legendary}`, tFn('app.clause_why.legendaries'));
@@ -4831,8 +4917,10 @@ export default function App() {
 		(async () => {
 			const h = await loadJSON(KEY_HUNDOS, DEFAULT_HUNDOS);
 			const l = await loadJSON(KEY_LUCKIES, DEFAULT_LUCKIES);
-			const ta = await loadJSON(KEY_TOP_ATTACKERS, DEFAULT_TOP_ATTACKERS);
-			const tma = await loadJSON(KEY_TOP_MAX_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS);
+			// null, not the default: reconcileAttackerLists needs to tell a
+			// never-saved roster (take the feed) from a saved one (reconcile it).
+			const ta = await loadJSON(KEY_TOP_ATTACKERS, null);
+			const tma = await loadJSON(KEY_TOP_MAX_ATTACKERS, null);
 			const c = await loadJSON(KEY_CONFIG, DEFAULT_CONFIG);
 			const home = await loadJSON(KEY_HOME, null);
 			const p = await loadJSON(KEY_LASTPIN, null);
@@ -4842,13 +4930,18 @@ export default function App() {
 			const clSeen = await loadJSON(KEY_CHANGELOG_SEEN, 0);
 			setHundos(h);
 			const catalogNotices = [];
-			setConfig(mergeImportedConfig(c, catalogNotices));
+			const mergedConfig = mergeImportedConfig(c, catalogNotices);
+			// Roster reconciliation rides on the merged config's fingerprints and
+			// hands back the config with them bumped, so the three seeded lists
+			// and their bookkeeping are always written as one consistent set.
+			const rosters = reconcileAttackerLists(mergedConfig, ta, tma);
+			setConfig(rosters.config);
 			if (catalogNotices.length > 0) setRegionalNotices(catalogNotices);
 			setChangelogSeen(clSeen);
 			const canonicalize = (arr) => (arr || []).map((s) => resolveSpecies(s) || s);
 			setLuckies(canonicalize(l));
-			setTopAttackers(canonicalize(ta));
-			setTopMaxAttackers(canonicalize(tma));
+			setTopAttackers(rosters.topAttackers);
+			setTopMaxAttackers(rosters.topMaxAttackers);
 			setHomeLocation(home);
 			setLastPin(p);
 			setBazaarTags(b);
