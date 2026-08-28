@@ -389,8 +389,20 @@ function fromLilyDex(raw) {
     // here collapsed the three Mega caps onto one entry — the app would render
     // one cup card instead of three — and silently changed the snapshot's cup
     // identity space for the duration of a fallback, then changed it back.
-    const cp = typeof cup.cp === "number" ? cup.cp : 0;
-    const id = `${cup.id}-${cp}`;
+    //
+    // A cup with no numeric `cp` is skipped rather than defaulted. Guessing a
+    // cap is not available to us: `storedCap` maps a non-number to null, and
+    // buildLeagueFilter reads a null cap as "uncapped" — so the cup would ship
+    // as a species-pool-only filter with no CP clause and no rank-1 IV clauses,
+    // which is a WRONG filter that looks right. (A genuinely uncapped cup is
+    // unaffected: lily gives it cp 10000, a number, which storedCap maps to null
+    // on purpose.) There is also no honest id for it, since the cap is the half
+    // of the key that disambiguates a cup published at several caps.
+    if (typeof cup.cp !== "number") {
+      console.warn(`  ⚠  lily cup "${cup.id}" has no numeric cp — skipping (cannot key or cap it)`);
+      continue;
+    }
+    const id = `${cup.id}-${cup.cp}`;
     cups[id] = {
       id,
       cup: cup.id,
