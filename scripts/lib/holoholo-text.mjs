@@ -117,12 +117,3 @@ export async function fetchLocaleBundle(locale, { userAgent } = {}) {
   for (const k of Object.keys(map)) map[k] = normalizeValue(map[k]);
   return map;
 }
-
-// All seven at once. Locale order in the result follows HOLOHOLO_LOCALES, not
-// completion order, so downstream key ordering is stable across runs.
-export async function fetchAllLocaleBundles(locales = Object.keys(HOLOHOLO_LOCALES), opts = {}) {
-  const entries = await Promise.all(
-    locales.map(async (loc) => [loc, await fetchLocaleBundle(loc, opts)]),
-  );
-  return Object.fromEntries(locales.map((loc) => [loc, entries.find(([l]) => l === loc)[1]]));
-}
