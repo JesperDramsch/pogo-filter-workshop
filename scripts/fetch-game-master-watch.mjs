@@ -27,9 +27,10 @@
 //
 // Flags: --offline-ok   tolerate fetch failures if cache exists.
 
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -45,6 +46,14 @@ const POKEMINERS_TS = "https://raw.githubusercontent.com/PokeMiners/game_masters
 const TRACKED = ["power", "energy", "energyGain", "cooldown", "turns", "buffs", "buffTarget", "buffApplyChance"];
 // Keep the log reviewable; a rebalance is a handful of entries a few times a year.
 const MAX_HISTORY = 40;
+// Refuse-to-shrink floor, the same guard every sibling fetcher carries
+// (fetch-regional-forms `< 500`, fetch-rocket-grunt-quotes `< 1000`). The live
+// game master carries ~349 tracked moves. A truncated parse that still yields a
+// non-empty moves[] is the dangerous case: diffMoves would emit a `removed` row
+// for every absent move, and those rows are unshifted onto `history` and sliced
+// to MAX_HISTORY — wiping every real rebalance ever recorded, then publishing the
+// fabricated mass-removal as this file's headline signal.
+const MIN_MOVES = 200;
 
 const UA = { "User-Agent": "pogo-filter-workshop gm-watch/1.0" };
 
@@ -108,18 +117,6 @@ function diffMoves(before, after) {
   return changes;
 }
 
-function canonicalStringify(value) {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonicalStringify).join(",")}]`;
-  const keys = Object.keys(value).sort();
-  return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalStringify(value[k])}`).join(",")}}`;
-}
-
-function readPrevious() {
-  if (!existsSync(OUT_PATH)) return null;
-  try { return JSON.parse(readFileSync(OUT_PATH, "utf8")); } catch { return null; }
-}
-
 // PokeMiners publishes epoch millis, despite its README documenting a
 // "gm gm_version apk_version date time" string. Tolerate both.
 function parsePokeminersTimestamp(raw) {
@@ -131,7 +128,7 @@ function parsePokeminersTimestamp(raw) {
 async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
-  const prev = readPrevious();
+  const prev = readPreviousJson(OUT_PATH);
 
   let moves;
   try {
@@ -145,26 +142,43 @@ async function main() {
     }
     process.exit(1);
   }
-  if (Object.keys(moves).length === 0) {
-    throw new Error("game master carried no moves[] — refusing to overwrite cache");
+  const moveCount = Object.keys(moves).length;
+  const prevCount = Object.keys(prev?.moves || {}).length;
+  if (moveCount < MIN_MOVES || (prevCount > 0 && moveCount < prevCount / 2)) {
+    throw new Error(
+      `game master carried ${moveCount} moves (previous ${prevCount || "none"}, floor ${MIN_MOVES}) ` +
+      "— refusing to overwrite cache",
+    );
   }
-  console.log(`  ${Object.keys(moves).length} moves tracked`);
+  console.log(`  ${moveCount} moves tracked`);
 
   // Secondary probe. Never fatal — the primary signal does not depend on it.
-  const pokeminers = { sourceEtag: null, gameMasterAt: null, stale: null };
+  //
+  // Seeded from the cache, not from nulls: a probe that 503s must not erase the
+  // ETag and timestamp we already had. Overwriting them with nulls disarmed the
+  // "mirror is stale" signal this file exists to make visible, produced a churn
+  // commit on the flake and another on recovery, and — worst — made an ETag that
+  // genuinely changed during the outage indistinguishable from the restored one.
+  const pokeminers = {
+    sourceEtag: prev?.pokeminers?.sourceEtag ?? null,
+    gameMasterAt: prev?.pokeminers?.gameMasterAt ?? null,
+  };
   try {
     pokeminers.sourceEtag = await headEtag(POKEMINERS_GM);
     pokeminers.gameMasterAt = parsePokeminersTimestamp(await fetchText(POKEMINERS_TS));
-    if (pokeminers.gameMasterAt) {
-      const ageDays = (Date.now() - Date.parse(pokeminers.gameMasterAt)) / 86400000;
-      pokeminers.stale = ageDays > 45;
-      console.log(
-        `  PokeMiners mirror: ${pokeminers.gameMasterAt.slice(0, 10)} ` +
-        `(${Math.round(ageDays)}d old)${pokeminers.stale ? " — STALE, not used as a signal" : ""}`,
-      );
-    }
   } catch (e) {
-    console.warn(`  ⚠  PokeMiners probe failed (${e.message}) — continuing`);
+    console.warn(`  ⚠  PokeMiners probe failed (${e.message}) — keeping previously recorded values`);
+  }
+  if (pokeminers.gameMasterAt) {
+    // Reported, never stored: an age is derived from the clock, so writing it
+    // into the snapshot would flip a committed field on the day it crosses the
+    // threshold with byte-identical upstream data — a churn commit whose entire
+    // diff is `"stale": false → true`. A reader has gameMasterAt and a clock.
+    const ageDays = Math.round((Date.now() - Date.parse(pokeminers.gameMasterAt)) / 86400000);
+    console.log(
+      `  PokeMiners mirror: ${pokeminers.gameMasterAt.slice(0, 10)} ` +
+      `(${ageDays}d old)${ageDays > 45 ? " — STALE, not used as a signal" : ""}`,
+    );
   }
 
   const changes = prev?.moves ? diffMoves(prev.moves, moves) : [];
@@ -178,10 +192,13 @@ async function main() {
     console.log("  ↺ no move stats changed");
   }
 
+  // No derived fields: `moveCount` restated a number the reader can count from
+  // the `moves` object below it, and `trackedFields` restated a constant that
+  // lives in this script. Both were read by nothing, and each was one more field
+  // a reader of the snapshot had to decide whether to trust as authoritative or
+  // as a stale copy.
   const newContent = {
     source: "pvpoke-gamemaster",
-    trackedFields: TRACKED,
-    moveCount: Object.keys(moves).length,
     pokeminers,
     history,
     moves,
@@ -196,8 +213,7 @@ async function main() {
     }
   }
 
-  if (!existsSync(dirname(OUT_PATH))) mkdirSync(dirname(OUT_PATH), { recursive: true });
-  writeFileSync(OUT_PATH, JSON.stringify({ fetchedAt, ...newContent }, null, 2) + "\n", "utf8");
+  writeJson(OUT_PATH, { fetchedAt, ...newContent });
   console.log(`✓ wrote ${OUT_PATH}`);
 }
 

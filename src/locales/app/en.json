@@ -200,6 +200,7 @@
   "app.filter.pvp_master_hint": "Top-30 meta picks for Master League. Uncapped — species choice dominates IV perfection (a 3★ Zacian outperforms a hundo Metagross). No IV gate is applied; low attack is a handicap here, not a bait advantage. Review your roster's IVs in-game.",
   "app.filter.pvp_cup_label": "{name} · {teaser}",
   "app.filter.pvp_cup_hint": "Top-30 meta family for {name}, deduped by base species. Includes the cup's {cap} CP cap and the loose PvP rank-1 IV pattern (atk 0-1, def 3-4, HP 3-4) — same shape as the standing-league filters above. Card hides itself when no themed cup is currently running.",
+  "app.filter.pvp_cup_hint_uncapped": "Top-30 meta family for {name}, deduped by base species. This cup is uncapped, so no CP clause and no rank-1 IV pattern are applied — with no cap to squeeze under, a low-attack spread is worse than a hundo. Card hides itself when no themed cup is currently running.",
   "app.filter.aux_rocket_empty": "No Rocket lineups in the current snapshot. Run `npm run fetch-rocket-lineups` to refresh.",
   "app.filter.rocket_phase_label": "phase {slot}",
   "app.filter.rocket_phase_hint": "Possible Pokémon this phase: {names}.",

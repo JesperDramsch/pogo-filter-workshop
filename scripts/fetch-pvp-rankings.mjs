@@ -29,9 +29,11 @@
 //
 // Flags: --offline-ok   tolerate fetch failures if cache exists.
 
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
+import { loadNameDict, unresolvableDexEntries, NAME_LOCALES } from "./lib/species-dex.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -181,27 +183,41 @@ function topNByDex(rankings, n) {
 const tokenize = (...parts) =>
   parts.join(" ").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-// Whole-token match only. The old matcher used a bare substring test, where cup
-// id `all` matched "Fall" and `catch` matched "catching".
-const hasToken = (stream, token) =>
-  new RegExp(`(^|-)${token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(-|$)`).test(stream);
+// How many consecutive slug tokens a single cup id is allowed to span. Cup ids
+// are one to three words ("mega", "copadiluvio", "championshipseries").
+const MAX_TOKEN_WINDOW = 4;
 
-function canonicalStringify(value) {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonicalStringify).join(",")}]`;
-  const keys = Object.keys(value).sort();
-  return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalStringify(value[k])}`).join(",")}}`;
+// Every run of CONSECUTIVE tokens in the stream, joined. `copa-diluvio` yields
+// {copa, copadiluvio, diluvio}.
+//
+// Whole-token matching alone is not enough, because PvPoke's cup ids concatenate
+// words that LeekDuck's slug hyphenates: `copadiluvio` vs `copa-diluvio`, and
+// likewise `championshipseries`, `ligaultra`, `coupedusillage`. A token-equality
+// test never matches those, so the cup is never fetched and the user gets no cup
+// card for the entire event, silently.
+//
+// Joining only whole tokens is what keeps the old substring bug fixed: `fall` is
+// a single token, so `all` is not in its window set and cannot match it — which
+// is the false positive the whole-token rule was introduced to kill.
+function tokenWindows(stream) {
+  const parts = stream.split("-").filter(Boolean);
+  const out = new Set();
+  for (let i = 0; i < parts.length; i++) {
+    let joined = "";
+    for (let j = i; j < parts.length && j - i < MAX_TOKEN_WINDOW; j++) {
+      joined += parts[j];
+      out.add(joined);
+    }
+  }
+  return out;
 }
 
-function writeJson(path, data) {
-  if (!existsSync(dirname(path))) mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, JSON.stringify(data, null, 2) + "\n", "utf8");
-}
+const tokenSet = (...parts) => tokenWindows(tokenize(...parts));
 
-function readPrevious() {
-  if (!existsSync(OUT_PATH)) return null;
-  try { return JSON.parse(readFileSync(OUT_PATH, "utf8")); } catch { return null; }
-}
+// Tokens are compared with separators stripped from BOTH sides, so the league
+// token `great-league` matches the window `greatleague`.
+const hasToken = (windows, token) =>
+  windows.has(String(token).toLowerCase().replace(/[^a-z0-9]/g, ""));
 
 // ---------------------------------------------------------------- PvPoke path
 
@@ -233,37 +249,90 @@ async function fromPvpoke() {
 // Discover the cups a GBL event is actually running, from the game master's
 // formats[]. Keyed `${cup}-${cp}` because `mega` appears three times (1500 /
 // 2500 / 10000) and a bare cup id would collide.
-function matchFormatsToEvent(formats, stream) {
-  const leagueTokens = Object.keys(LEAGUE_TOKEN_CP).filter(t => hasToken(stream, t));
-  const capsNamed = new Set(leagueTokens.map(t => LEAGUE_TOKEN_CP[t]));
+function matchFormatsToEvent(formats, windows) {
+  const capsNamed = new Set(
+    Object.keys(LEAGUE_TOKEN_CP).filter(t => hasToken(windows, t)).map(t => LEAGUE_TOKEN_CP[t]),
+  );
+  // How many caps each cup is published at, so the disambiguation below fires
+  // only where there is an actual ambiguity to resolve.
+  const capsPerCup = new Map();
+  for (const f of formats) {
+    if (!f || typeof f.cup !== "string" || typeof f.cp !== "number") continue;
+    if (!capsPerCup.has(f.cup)) capsPerCup.set(f.cup, new Set());
+    capsPerCup.get(f.cup).add(f.cp);
+  }
   const matched = [];
   for (const f of formats) {
     if (!f || typeof f.cup !== "string" || typeof f.cp !== "number") continue;
     if (NON_CUPS.has(f.cup)) continue;
-    if (!hasToken(stream, f.cup)) continue;
+    if (!hasToken(windows, f.cup)) continue;
     // A cup published at several caps ("Mega Great/Ultra/Master League") is
     // disambiguated by the league the event names. If the event names none,
     // every cap of that cup is running.
-    if (capsNamed.size > 0 && !capsNamed.has(f.cp)) continue;
+    //
+    // Only cups that exist at MORE THAN ONE cap are ambiguous, and only those
+    // may be filtered this way. capsNamed can only ever hold {1500, 2500,
+    // 10000}, so applying it to every cup discarded any cup at a different cap
+    // whenever the slug also named a standing league — dropping e.g. Little Cup
+    // (cp 500) from a "Great League and Little Cup" week entirely.
+    const ambiguous = (capsPerCup.get(f.cup)?.size || 0) > 1;
+    if (ambiguous && capsNamed.size > 0 && !capsNamed.has(f.cp)) continue;
     matched.push(f);
   }
-  return { matched, leagues: leagueTokens.map(t => t.replace("-league", "")) };
+  return matched;
+}
+
+// Shared by both source paths. The event record's shape and its ordering must
+// not depend on which upstream produced the cups: the fallback path never runs
+// in CI, so a divergence here would only ever surface on the day the primary
+// source breaks.
+//
+// `cupIdsFor(windows, event)` returns the cup ids this event is running.
+function buildGblEvents(sdEvents, cupIdsFor) {
+  const out = [];
+  for (const e of (Array.isArray(sdEvents) ? sdEvents : [])) {
+    if (e?.eventType !== "go-battle-league") continue;
+    // An unparseable `start` makes the comparator below return NaN, which sort
+    // treats as "equal" — leaving the array in an arbitrary order that every
+    // consumer (the cup window in the generated reference, the app's active-cup
+    // card) then reads as chronological. Drop the entry rather than corrupt the
+    // order of the rest.
+    if (!Number.isFinite(Date.parse(e.start))) {
+      console.warn(`  ⚠  GBL event with unparseable start dropped: ${e.eventID || e.name}`);
+      continue;
+    }
+    const windows = tokenSet(e.eventID || "", e.name || "");
+    out.push({
+      eventID: e.eventID,
+      name: e.name,
+      start: e.start,
+      end: e.end,
+      cups: cupIdsFor(windows, e),
+      leagues: Object.keys(LEAGUE_TOKEN_CP)
+        .filter(t => hasToken(windows, t))
+        .map(t => t.replace("-league", "")),
+    });
+  }
+  return out.sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
 }
 
 async function buildCups(formats, index, sdEvents) {
-  const events = (Array.isArray(sdEvents) ? sdEvents : []).filter(
-    e => e?.eventType === "go-battle-league",
-  );
-
   const wanted = new Map(); // `${cup}-${cp}` → format
-  const gblEvents = [];
-  for (const e of events) {
-    const stream = tokenize(e.eventID || "", e.name || "");
-    const { matched, leagues } = matchFormatsToEvent(formats, stream);
-    // A runaway matcher is the failure mode worth catching loudly: a real GBL
-    // week runs at most one cup across three caps.
-    if (matched.length > 4) {
-      console.warn(`  ⚠  "${e.name}" matched ${matched.length} formats — matcher may be too loose`);
+  const gblEvents = buildGblEvents(sdEvents, (windows, e) => {
+    const matched = matchFormatsToEvent(formats, windows);
+    // A runaway matcher is the failure mode worth catching, and this is the
+    // exact shape of it: a real GBL week runs at most ONE cup, across however
+    // many caps that cup is published at. Two distinct cups from one slug means
+    // the matcher is inventing them, so assert it rather than warning into a
+    // scheduled log nobody opens — a warn-only guard on a robot-run job is
+    // indistinguishable from no guard, and the run would still publish the
+    // bogus cups as live.
+    const cupsMatched = new Set(matched.map(f => f.cup));
+    if (cupsMatched.size > 1) {
+      throw new Error(
+        `"${e.name}" matched ${cupsMatched.size} distinct cups (${[...cupsMatched].join(", ")}) — ` +
+        "a GBL week runs at most one cup across its caps; the matcher is too loose",
+      );
     }
     const ids = [];
     for (const f of matched) {
@@ -271,16 +340,8 @@ async function buildCups(formats, index, sdEvents) {
       wanted.set(id, f);
       ids.push(id);
     }
-    gblEvents.push({
-      eventID: e.eventID,
-      name: e.name,
-      start: e.start,
-      end: e.end,
-      cups: ids,
-      leagues,
-    });
-  }
-  gblEvents.sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+    return ids;
+  });
 
   const entries = [...wanted.entries()];
   if (entries.length > 0) console.log(`→ PvPoke: ${entries.length} cup ranking file(s)`);
@@ -303,7 +364,10 @@ async function buildCups(formats, index, sdEvents) {
   for (const row of fetched) if (row) cups[row[0]] = row[1];
   // Drop ids we could not fetch, so gblEvents never references a missing cup.
   for (const e of gblEvents) e.cups = e.cups.filter(id => cups[id]);
-  return { cups, gblEvents };
+  // `matchedCount` is how many (cup, cap) pairs the live event feed asked for,
+  // counted BEFORE any ranking file was fetched. It is what lets the collapse
+  // guard tell "no cup is running this week" from "we lost the cups we wanted".
+  return { cups, gblEvents, matchedCount: wanted.size };
 }
 
 // -------------------------------------------------------------- lily-dex path
@@ -320,8 +384,15 @@ function fromLilyDex(raw) {
     if (!cup || typeof cup.id !== "string") continue;
     const list = topNByDex(cup.rankings, TOP_N);
     if (list.length === 0) continue;
-    cups[cup.id] = {
-      id: cup.id,
+    // Keyed `${cup}-${cp}`, exactly as the PvPoke path does. lily carries `cp`,
+    // so the same cup gets the same id from either upstream. A bare `cup.id`
+    // here collapsed the three Mega caps onto one entry — the app would render
+    // one cup card instead of three — and silently changed the snapshot's cup
+    // identity space for the duration of a fallback, then changed it back.
+    const cp = typeof cup.cp === "number" ? cup.cp : 0;
+    const id = `${cup.id}-${cp}`;
+    cups[id] = {
+      id,
       cup: cup.id,
       meta: cup.id,
       name: cup.name || cup.id,
@@ -334,38 +405,79 @@ function fromLilyDex(raw) {
 
 // ---------------------------------------------------------------------- guards
 
-// Every emitted dex must resolve in the name dictionary App.jsx renders from.
-// This is check-data-filters' "no undefined in a clause" pushed back to the data
-// layer, where the diagnostic can name the offending dex.
+// Every emitted dex must resolve in the name dictionary App.jsx renders from,
+// in every locale. This is check-data-filters D6 pushed back to the data layer,
+// where the diagnostic can name the offending dex — so it must be the SAME test
+// D6 runs, not a weaker local copy, or the fetcher publishes what CI rejects.
+// Shared with D6 via scripts/lib/species-dex.mjs.
+//
+// An unreadable dictionary is fatal rather than skipped: skipping turned the one
+// guard standing between a bad join and a published snapshot into a no-op
+// exactly when something was already wrong. main() routes the throw through
+// --offline-ok, so the cached snapshot still covers a build.
 function assertDexResolvable(leagues, cups) {
-  let dict;
-  try {
-    dict = JSON.parse(readFileSync(NAMES_PATH, "utf8"));
-  } catch {
-    console.warn("  ⚠  pokemon-names.json unreadable — skipping dex-resolvability check");
-    return;
-  }
-  const bad = [];
-  const scan = (label, list) => {
-    for (const s of list || []) if (!dict[String(s.dex)]) bad.push(`${label}:${s.dex} (${s.name})`);
-  };
-  for (const [key, l] of Object.entries(leagues)) scan(key, l.species);
-  for (const [id, c] of Object.entries(cups)) scan(id, c.species);
+  const dict = loadNameDict(NAMES_PATH);
+  const pools = [
+    ...Object.entries(leagues).map(([key, l]) => [key, l.species]),
+    ...Object.entries(cups).map(([id, c]) => [id, c.species]),
+  ];
+  const bad = unresolvableDexEntries(pools, dict, NAME_LOCALES);
   if (bad.length > 0) {
-    throw new Error(`dex numbers absent from pokemon-names.json: ${bad.join(", ")}`);
+    throw new Error(`dex numbers unresolvable in pokemon-names.json: ${bad.join(", ")}`);
   }
 }
 
-// Mirrors the refuse-to-shrink guard in the skill's refresh script: cups
-// rotating out is normal, cups vanishing entirely when we had some is a matcher
-// or upstream failure and must not be published.
-function assertNoCupCollapse(prev, cups) {
+// Mirrors refresh-meta.py's MIN_SPECIES_PER_LEAGUE. The invariant belongs at the
+// producer too: this is where the hole gets written, and neither D6 (shape) nor
+// M2 (agreement with the reference) counts species, so a three-species Great
+// League would pass CI and ship a filter naming three Pokémon.
+const MIN_SPECIES_PER_LEAGUE = 20;
+
+function assertLeaguesHealthy(prev, leagues) {
+  if (!leagues || Object.keys(leagues).length === 0) {
+    throw new Error("All leagues came back empty — refusing to overwrite cache");
+  }
+  const thin = [];
+  const shrunk = [];
+  for (const [key, l] of Object.entries(leagues)) {
+    const now = l.species?.length || 0;
+    if (now < MIN_SPECIES_PER_LEAGUE) thin.push(`${key}=${now}`);
+    const was = prev?.leagues?.[key]?.species?.length || 0;
+    if (was > 0 && now < was) shrunk.push(`${key} ${was} → ${now}`);
+  }
+  if (thin.length > 0) {
+    throw new Error(
+      `league(s) under ${MIN_SPECIES_PER_LEAGUE} species (${thin.join(", ")}) — refusing to overwrite cache`,
+    );
+  }
+  // A one- or two-species dip is ordinary dedupe noise (two forms folding into
+  // one base), so it is reported rather than fatal; the floor above is the guard.
+  if (shrunk.length > 0) console.warn(`  ⚠  league(s) shrank: ${shrunk.join(", ")}`);
+}
+
+// Cups rotating out is normal — most GBL weeks are plain Great/Ultra/Master, and
+// the generated META.md says so in as many words. Treating that as fatal meant
+// the daily sync would start failing the week the current cup ended, freezing
+// the snapshot with nothing but a red cron job to say so.
+//
+// The real failure is different: the live event feed named cups and NONE of them
+// survived the fetch. `matchedCount` is that count, taken before any ranking file
+// was requested, so zero means "no cup is running" and an empty result is the
+// correct answer. Pass null when the count is unknown (the lily-dex path), which
+// downgrades this to the reporting below.
+function assertNoCupCollapse(prev, cups, matchedCount) {
   const before = Object.keys(prev?.cups || {}).length;
   const after = Object.keys(cups).length;
-  if (before > 0 && after === 0) {
-    throw new Error(`cups collapsed ${before} → 0 — refusing to overwrite cache`);
+  if (matchedCount > 0 && after === 0) {
+    throw new Error(
+      `${matchedCount} cup(s) named by live events, 0 published — refusing to overwrite cache`,
+    );
   }
-  if (after < before) console.warn(`  ⚠  cups ${before} → ${after} (rotation, or a matcher regression)`);
+  if (after === 0 && before > 0) {
+    console.log("  ↺ cups rotated out — no live GBL event names a cup (normal)");
+  } else if (after < before) {
+    console.warn(`  ⚠  cups ${before} → ${after} (rotation, or a matcher regression)`);
+  }
 }
 
 // ------------------------------------------------------------------------ main
@@ -373,7 +485,7 @@ function assertNoCupCollapse(prev, cups) {
 async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
-  const prev = readPrevious();
+  const prev = readPreviousJson(OUT_PATH);
 
   let sdEvents = [];
   try {
@@ -386,6 +498,7 @@ async function main() {
   let cups = {};
   let gblEvents = [];
   let source = "pvpoke";
+  let matchedCount = null;
 
   try {
     const pv = await fromPvpoke();
@@ -393,6 +506,7 @@ async function main() {
     const built = await buildCups(pv.formats, pv.index, sdEvents);
     cups = built.cups;
     gblEvents = built.gblEvents;
+    matchedCount = built.matchedCount;
   } catch (e) {
     console.error(`✗ PvPoke failed: ${e.message}`);
     console.warn("→ falling back to lily-dex-api");
@@ -403,23 +517,19 @@ async function main() {
       leagues = lily.leagues;
       cups = lily.cups;
       source = "lily-dex";
-      const cupIds = Object.keys(cups);
-      gblEvents = (Array.isArray(sdEvents) ? sdEvents : [])
-        .filter(ev => ev?.eventType === "go-battle-league")
-        .map(ev => {
-          const stream = tokenize(ev.eventID || "", ev.name || "");
-          return {
-            eventID: ev.eventID,
-            name: ev.name,
-            start: ev.start,
-            end: ev.end,
-            cups: cupIds.filter(id => hasToken(stream, id)),
-            leagues: Object.keys(LEAGUE_TOKEN_CP)
-              .filter(t => hasToken(stream, t))
-              .map(t => t.replace("-league", "")),
-          };
-        })
-        .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+      // Same event builder the PvPoke path uses — only the cup lookup differs.
+      // lily has no formats[], so match on each cup's BASE id and expand to the
+      // `${cup}-${cp}` ids stored above.
+      const idsByBaseCup = new Map();
+      for (const [id, c] of Object.entries(cups)) {
+        if (!idsByBaseCup.has(c.cup)) idsByBaseCup.set(c.cup, []);
+        idsByBaseCup.get(c.cup).push(id);
+      }
+      gblEvents = buildGblEvents(sdEvents, (windows) =>
+        [...idsByBaseCup.entries()]
+          .filter(([base]) => hasToken(windows, base))
+          .flatMap(([, ids]) => ids),
+      );
     } catch (e2) {
       console.error(`✗ Fallback failed: ${e2.message}`);
       if (offlineOk && existsSync(OUT_PATH)) {
@@ -430,11 +540,23 @@ async function main() {
     }
   }
 
-  if (!leagues || Object.keys(leagues).length === 0) {
-    throw new Error("All leagues came back empty — refusing to overwrite cache");
+  // The post-fetch guards belong INSIDE --offline-ok's protection. They reject
+  // the data we just fetched, and rejecting it means the committed cache is the
+  // better answer — not that the build should die. `prebuild` runs this with
+  // --offline-ok, so a throw out here took down `npm run build` and the Pages
+  // deploy over a data-shape problem the cached snapshot already solved.
+  try {
+    assertLeaguesHealthy(prev, leagues);
+    assertDexResolvable(leagues, cups);
+    assertNoCupCollapse(prev, cups, matchedCount);
+  } catch (e) {
+    console.error(`✗ ${e.message}`);
+    if (offlineOk && existsSync(OUT_PATH)) {
+      console.warn(`⚠  --offline-ok and cached ${OUT_PATH} exists; build will use cache.`);
+      return;
+    }
+    process.exit(1);
   }
-  assertDexResolvable(leagues, cups);
-  assertNoCupCollapse(prev, cups);
 
   const newContent = { topN: TOP_N, source, leagues, cups, gblEvents };
   let fetchedAt = new Date().toISOString();

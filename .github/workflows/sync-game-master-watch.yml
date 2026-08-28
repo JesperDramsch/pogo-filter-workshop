@@ -3,7 +3,10 @@ name: Sync game master watch
 on:
   schedule:
     - cron: "07 9 * * *" # daily at 09:07 UTC, after the PvP sync at 08:29 so a
-                         # rebalance and the rankings that respond to it land in order
+                         # rebalance and the rankings that respond to it land in
+                         # order. This job regenerates the skill reference itself
+                         # (see below), so the reference does not wait a day for
+                         # the next PvP sync to pick the rebalance up.
   workflow_dispatch:
 
 permissions:
@@ -31,17 +34,31 @@ jobs:
       - run: npm ci
       - name: Snapshot PvP move stats and probe the PokeMiners mirror
         run: npm run fetch-game-master-watch
-      # Nothing imports this file, so there is no fixture and no filter output to
-      # regenerate. The commit IS the notification: its `history[0].changes` names
-      # every move whose Trainer-Battle stats moved.
+      # No filter output depends on this file, but the SKILL REFERENCE does:
+      # generate-pvp-meta-reference.mjs reads it into pvp-meta.json's
+      # `gameMasterWatch` and renders META.md's "Move rebalance watch" section.
+      # Committing the input without regenerating left the reference asserting
+      # "No move stat change observed since the watch began" for ~23 hours after a
+      # rebalance landed — exactly the window in which its own "rankings lag a
+      # rebalance, treat the tables with caution" warning matters most.
+      #
+      # The generator reads the committed pvp-rankings.json unchanged, so this
+      # cannot disturb M1: the reference still carries the snapshot's fetchedAt.
+      - name: Regenerate the skill-facing PvP meta reference
+        run: npm run generate-pvp-meta-reference
+      - name: Validate the regenerated reference
+        run: npm run test:metaref
+      # The commit IS the notification: `history[0].changes` names every move
+      # whose Trainer-Battle stats moved.
       - name: Commit + push if anything changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- src/data/game-master-watch.json; then
+          PATHS="src/data/game-master-watch.json skills/pokemon-go-filters/references/META.md skills/pokemon-go-filters/references/pvp-meta.json"
+          if git diff --quiet -- $PATHS; then
             echo "No game master changes — skipping commit."
             exit 0
           fi
-          git add src/data/game-master-watch.json
+          git add $PATHS
           git commit -m "chore(data): sync game master move stats"
           git push

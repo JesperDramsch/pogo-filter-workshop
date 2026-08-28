@@ -200,6 +200,7 @@
   "app.filter.pvp_master_hint": "大師聯盟前 30 meta 選擇。沒有 CP 上限 — 物種選擇勝過 IV 完美度(3★ 蒼響贏過 hundo 巨金怪)。沒有套用 IV 門檻;低攻擊在這裡是劣勢,不是誘餌優勢。在遊戲中查看你 roster 的 IV。",
   "app.filter.pvp_cup_label": "{name} · {teaser}",
   "app.filter.pvp_cup_hint": "{name} 的前 30 meta 家族,以基礎物種去重。包含該盃賽的 {cap} CP 上限與寬鬆的 PvP 排名 1 IV 模式(攻擊 0-1、防禦 3-4、HP 3-4)— 與上面的常設聯盟篩選器同樣的形狀。目前沒有主題盃賽進行時,這張卡片會自動隱藏。",
+  "app.filter.pvp_cup_hint_uncapped": "{name} 的前 30 meta 家族，以基礎物種去重。此盃賽沒有 CP 上限，因此不套用 CP 條件與排名 1 IV 模式 — 沒有上限可壓，低攻擊個體反而比完美個體差。目前沒有主題盃賽進行時，這張卡片會自動隱藏。",
   "app.filter.aux_rocket_empty": "目前快照沒有火箭隊陣容。執行 `npm run fetch-rocket-lineups` 來更新。",
   "app.filter.rocket_phase_label": "階段 {slot}",
   "app.filter.rocket_phase_hint": "此階段可能的寶可夢:{names}。",

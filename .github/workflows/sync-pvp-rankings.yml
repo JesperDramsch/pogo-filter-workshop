@@ -36,10 +36,20 @@ jobs:
       # tier list behind it.
       - name: Regenerate the skill-facing PvP meta reference
         run: npm run generate-pvp-meta-reference
-      # Deliberately does NOT regenerate the fixture: the snapshot pins only
-      # config-derived filters, and the data-derived ones this feeds are covered
-      # by property checks in scripts/check-data-filters.mjs. See the split in
-      # scripts/lib/fixture.mjs before adding a regeneration step back.
+        # Deliberately does NOT regenerate the fixture: the snapshot pins only
+        # config-derived filters, and the data-derived ones this feeds are covered
+        # by property checks in scripts/check-data-filters.mjs. See the split in
+        # scripts/lib/fixture.mjs before adding a regeneration step back.
+
+      # Fail CLOSED. This job pushes straight to a protected branch, so without a
+      # validation step here any generation that breaks M1-M6 lands on main first
+      # and is only discovered when test.yml fires on the resulting push — leaving
+      # main red with no automated revert. Running the same checks before the
+      # commit turns that into a failed sync instead.
+      - name: Validate the snapshot and the regenerated reference
+        run: |
+          npm run test:datafilters
+          npm run test:metaref
       - name: Commit + push if anything changed
         run: |
           git config user.name "github-actions[bot]"
@@ -49,6 +59,13 @@ jobs:
             echo "No PvP ranking changes — skipping commit."
             exit 0
           fi
+          # Name the upstream the snapshot actually came from. The fetcher falls
+          # back to lily-dex whenever PvPoke is unreachable, and that snapshot is
+          # materially different (no speciesId, score or forms — the reference's
+          # "Ranked form" and "Score" columns collapse to "—"). A message that
+          # always said "from PvPoke" misattributed the provenance in the git log,
+          # which is the trail CLAUDE.md points at.
+          SOURCE=$(node -p "require('./src/data/pvp-rankings.json').source")
           git add $PATHS
-          git commit -m "chore(pvp): sync ranking snapshot from PvPoke"
+          git commit -m "chore(pvp): sync ranking snapshot from ${SOURCE}"
           git push
