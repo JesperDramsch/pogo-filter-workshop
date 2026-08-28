@@ -90,17 +90,20 @@
 //
 // Flags: --offline-ok   tolerate fetch failures if cache exists.
 
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { canonicalStringify, writeJson } from "./lib/json.mjs";
 import {
   evoParentsFromSteps,
   evolutionChainsFromSteps,
   evolutionStepsFromGameMaster,
   fetchGameMaster,
   fetchPvpokeGameMaster,
+  gameMasterProvenance,
   pokemonTemplates,
   releasedDexFromPvpoke,
+  warnIfStale,
 } from "./lib/game-master.mjs";
 import { lowestDexPerGeneration } from "./lib/generations.mjs";
 
@@ -205,18 +208,6 @@ const POWER_LINE_TOP = 20;           // strongest qualifying lines by final stat
 // TRADE_EVO_FAMILIES.
 const TRADE_EVO_BASE_DEX = new Set([63, 66, 74, 92, 524, 532, 588, 616, 708, 710]);
 
-function canonicalStringify(value) {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonicalStringify).join(",")}]`;
-  const keys = Object.keys(value).sort();
-  return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalStringify(value[k])}`).join(",")}}`;
-}
-
-function writeJson(path, data) {
-  if (!existsSync(dirname(path))) mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, JSON.stringify(data, null, 2) + "\n", "utf8");
-}
-
 function assertOrDie(cond, label) {
   if (!cond) {
     console.error(`✗ sanity check failed: ${label}`);
@@ -228,17 +219,23 @@ async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
 
-  let templates, mirrorName, ageDays, pvpoke, released;
+  let templates, gmSource = { mirror: null, batchMs: null }, pvpoke, released;
   try {
-    console.log("→ Fetching game master + PvPoke release roster");
+    console.log("→ Fetching game master (pokemonClass / megaDex / evolutionBranch / stats source) + PvPoke release roster");
     // PvPoke is started first so it overlaps the big download.
     const pvpokePromise = fetchPvpokeGameMaster({
       userAgent: "pogo-filter-workshop species-meta-fetcher/1.0",
     });
-    ({ templates, mirrorName, ageDays } = await fetchGameMaster({
+    const gm = await fetchGameMaster({
       userAgent: "pogo-filter-workshop species-meta-fetcher/1.0",
-      label: "species metadata",
-    }));
+    });
+    templates = gm.templates;
+    gmSource = { mirror: gm.mirror, batchMs: gm.batchMs };
+    if (gm.failures.length > 0) {
+      console.warn(`⚠  fell back to ${gm.mirror} after ${gm.failures.join("; ")}`);
+    }
+    console.log(`  game master: ${gm.mirror}, ${templates.length} templates`);
+    warnIfStale(gmSource, "Newly released Megas and evolution branches may be missing.");
     pvpoke = await pvpokePromise;
     // An unavailable or shrunken roster is a FETCH failure, not an empty
     // result: powerLineDex gates on it, so publishing with an empty roster
@@ -299,11 +296,23 @@ async function main() {
     evoParentByDex[String(child)] = evoParents.get(child);
   }
 
-  console.log(`  source: ${mirrorName}${ageDays != null ? ` (${ageDays}d old)` : " (unstamped)"}` +
-    ` · ${steps.length} evolution steps · ${chains.size} base species` +
+  const provenance = gameMasterProvenance(gmSource);
+  console.log(`  ${steps.length} evolution steps · ${chains.size} base species` +
     ` · PvPoke roster ${pvpoke?.timestamp || "?"} (${released.size} released)`);
 
   const newContent = {
+    // Provenance, the way meta-rankings.json records it: which upstream
+    // answered each half of this snapshot, and the game master's batch stamp.
+    // Every species fact here now comes from a feed that stamps its batches —
+    // which is exactly what pogoapi.net, this file's previous source for five
+    // of them, never did. See docs/upstream-sources.md.
+    sources: {
+      classes: "game master",
+      released: "pvpoke/pvpoke",
+      generations: "scripts/lib/generations.mjs (pinned dex ranges)",
+      gameMaster: provenance.mirror,
+      gameMasterBatch: provenance.batch,
+    },
     startersPerGeneration: STARTERS_PER_GENERATION,
     powerLineCumulativeCandy: POWER_LINE_CUMULATIVE_CANDY,
     powerLineTop: POWER_LINE_TOP,

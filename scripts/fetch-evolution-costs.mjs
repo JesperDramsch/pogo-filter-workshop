@@ -40,13 +40,16 @@
 //
 // Flags: --offline-ok   tolerate fetch failures if cache exists.
 
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { canonicalStringify, writeJson } from "./lib/json.mjs";
 import {
   evolutionChainsFromSteps,
   evolutionStepsFromGameMaster,
   fetchGameMaster,
+  gameMasterAgeDays,
+  warnIfStale,
 } from "./lib/game-master.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -72,18 +75,6 @@ function normalizeName(name) {
     .replace(/\s+/g, "-");
 }
 
-function canonicalStringify(value) {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonicalStringify).join(",")}]`;
-  const keys = Object.keys(value).sort();
-  return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalStringify(value[k])}`).join(",")}}`;
-}
-
-function writeJson(path, data) {
-  if (!existsSync(dirname(path))) mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, JSON.stringify(data, null, 2) + "\n", "utf8");
-}
-
 async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
@@ -91,10 +82,16 @@ async function main() {
   let templates, mirrorName, ageDays;
   try {
     console.log("→ Fetching game master (evolutionBranch source)");
-    ({ templates, mirrorName, ageDays } = await fetchGameMaster({
+    const gm = await fetchGameMaster({
       userAgent: "pogo-filter-workshop evolution-costs-fetcher/1.0",
-      label: "evolution chains",
-    }));
+    });
+    templates = gm.templates;
+    mirrorName = gm.mirror;
+    ageDays = gameMasterAgeDays(gm.batchMs);
+    if (gm.failures.length > 0) {
+      console.warn(`⚠  fell back to ${gm.mirror} after ${gm.failures.join("; ")}`);
+    }
+    warnIfStale(gm, "A newly released evolution line may be missing from these pools.");
   } catch (e) {
     console.error(`✗ Fetch failed: ${e.message}`);
     if (offlineOk && existsSync(OUT_PATH)) {

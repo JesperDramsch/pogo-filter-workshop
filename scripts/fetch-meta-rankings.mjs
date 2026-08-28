@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Derives the raid-attacker allowlists App.jsx seeds its Step-3 chip editors
 // with — topAttackers, shadowKeepers, topMaxAttackers — by simulating raid
-// damage against a reference boss, straight from the PokeMiners game master.
+// damage against a reference boss, straight from the Niantic game master.
 //
 // WHY THIS REPLACED THE PREVIOUS SCORING. The old version ranked species by
 // `base_attack × max charged-move power of that type` off pogoapi.net. That
@@ -33,21 +33,27 @@
 // is a mirror of a Niantic dump, and mirrors stall.
 //
 // The obvious mirror, PokeMiners, is the one that stalled: it served a
-// 2026-04-17 batch for at least 133 days, still carrying pre-Season-27 values
-// for every move that rebalance touched (scripts/fetch-game-master-watch.mjs
-// documents the four). alexelgt/game_masters is the same dump, published every
-// one to three days — 57 commits in the three months before this was written —
-// and it is transitively where DialgaDex's numbers come from, since its
-// resource repo (mgrann03/pokemon-resources) regenerates from that file. So
-// alexelgt is the primary and PokeMiners the fallback: a stalled mirror still
-// beats no mechanics, and a second source costs one request.
+// 2026-04-17 batch for at least 133 days. alexelgt/game_masters is the same
+// dump, published every one to three days — 57 commits in the three months
+// before this was written — and it is transitively where DialgaDex's numbers
+// come from, since its resource repo (mgrann03/pokemon-resources) regenerates
+// from that file. So alexelgt is the primary and PokeMiners the fallback: a
+// stalled mirror still beats no mechanics, and a second source costs one
+// request. The list itself lives in scripts/lib/game-master.mjs, which two
+// other scripts read.
 //
-// The difference is not academic. Run against the April batch, this script
-// missed thirty Dynamax-capable species released since — Rhyperior, Hydreigon,
-// Magmortar, Electivire, Milotic, Weavile, Gyarados, Registeel and more — and
-// twenty moves. The staleness warning in scripts/lib/game-master.mjs makes a
-// stall loud rather than silent, and the snapshot records which mirror answered
-// and when.
+// BE PRECISE ABOUT WHAT THE STALL COSTS THIS SCRIPT, because an earlier draft
+// of this comment was not. Measured 2026-08-28, alexelgt against the April
+// PokeMiners batch: not one PvE `moveSettings` value differs between them, and
+// `battleSettings` and the CPM table are byte-identical. The Season 27
+// rebalance touched `combatMove` (PvP) only — that is what
+// scripts/fetch-game-master-watch.mjs watches, and it is invisible here. What
+// the stall cost was ADDITIONS: 32 Dynamax-capable species released since —
+// Rhyperior, Hydreigon, Magmortar, Electivire, Milotic, Weavile, Gyarados,
+// Registeel, Starmie, Centiskorch and more — and six new moves (Plasma Fists,
+// Glaive Rush, Snipe Shot, Dive, both Gulp Missiles) alongside thirteen
+// Mega-form movesets. GAME_MASTER_STALE_WARN_DAYS makes a stall loud rather
+// than silent, and the snapshot records which mirror answered and when.
 //
 // The ROSTER — which species are released, and which have a Shadow form — comes
 // from PvPoke's game master instead, which fetch-pvp-rankings.mjs and
@@ -124,10 +130,13 @@
 //
 // Flags: --offline-ok   tolerate fetch failures if cache exists.
 
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { fetchGameMaster, fetchPvpokeGameMaster } from "./lib/game-master.mjs";
+import { canonicalStringify, writeJson } from "./lib/json.mjs";
+import {
+  fetchGameMaster, warnIfStale, gameMasterProvenance, gameMasterAgeDays,
+} from "./lib/game-master.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -138,10 +147,10 @@ const NAMES_PATH = resolve(ROOT, "src/locales/pokemon-names.json");
 // move has a `move.<name>` entry the app can localize (see chargerMoves below).
 const LOCALE_EN = JSON.parse(readFileSync(resolve(ROOT, "src/locales/en.json"), "utf8"));
 
-// The game master and PvPoke's roster are both fetched through
-// scripts/lib/game-master.mjs — the mirror preference list, the batch stamp,
-// the staleness warning and the download cache live there, shared with the
-// three other fetchers that read the same dump.
+// PvPoke's game master, for the ROSTER only — see the two-source note below.
+// fetch-pvp-rankings.mjs and fetch-game-master-watch.mjs already read it, so
+// this adds no new upstream to the project.
+const PVPOKE_ENDPOINT = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/gamemaster.min.json";
 
 const TYPES = [
   "normal", "fighting", "flying", "poison", "ground", "rock",
@@ -220,18 +229,12 @@ const BATTLE_ONLY_FORMS = new Set([
 
 // ── Fetch + IO helpers ──────────────────────────────────────────────────────
 
-const USER_AGENT = "pogo-filter-workshop meta-rankings-fetcher/2.0";
-
-function canonicalStringify(value) {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonicalStringify).join(",")}]`;
-  const keys = Object.keys(value).sort();
-  return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalStringify(value[k])}`).join(",")}}`;
-}
-
-function writeJson(path, data) {
-  if (!existsSync(dirname(path))) mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, JSON.stringify(data, null, 2) + "\n", "utf8");
+async function fetchText(url) {
+  const res = await fetch(url, {
+    headers: { "User-Agent": "pogo-filter-workshop meta-rankings-fetcher/2.0" },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
+  return res.text();
 }
 
 function assertOrDie(cond, label) {
@@ -617,23 +620,28 @@ async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
 
-  let templates, gameMasterBatchMs = null, mirrorName = null, gameMasterAgeDays = null, pvpoke = null;
+  let templates, gameMasterBatchMs = null, mirrorName = null, pvpoke = null;
   try {
     console.log("→ Fetching game master + PvPoke roster");
     // Roster-only, and the mechanics source is the one that cannot be missing —
     // so a PvPoke outage degrades to the game master's own release heuristic
     // rather than failing the sync. Started first so it overlaps the big fetch.
-    const pvpokePromise = fetchPvpokeGameMaster({ userAgent: USER_AGENT });
-    ({
-      templates,
-      batchMs: gameMasterBatchMs,
-      mirrorName,
-      ageDays: gameMasterAgeDays,
-    } = await fetchGameMaster({ userAgent: USER_AGENT, label: "move mechanics" }));
-    pvpoke = await pvpokePromise;
-    if (!pvpoke) {
-      console.warn("⚠  falling back to the game master's own release heuristic for the roster");
+    const pvpokePromise = fetchText(PVPOKE_ENDPOINT).then(JSON.parse).catch((e) => {
+      console.warn(`⚠  PvPoke roster unavailable (${e.message}); falling back to the game master's own release heuristic`);
+      return null;
+    });
+
+    // First mirror that answers wins; the rest are fallback. See
+    // scripts/lib/game-master.mjs — an unparsable response counts as a failure,
+    // not as an empty result.
+    const gm = await fetchGameMaster({
+      userAgent: "pogo-filter-workshop meta-rankings-fetcher/2.0",
+    });
+    ({ templates, mirror: mirrorName, batchMs: gameMasterBatchMs } = gm);
+    if (gm.failures.length > 0) {
+      console.warn(`⚠  fell back to ${mirrorName} after ${gm.failures.join("; ")}`);
     }
+    pvpoke = await pvpokePromise;
   } catch (e) {
     console.error(`✗ Fetch failed: ${e.message}`);
     if (offlineOk && existsSync(OUT_PATH)) {
@@ -654,9 +662,13 @@ async function main() {
   const nameFor = (dex) => names[String(dex)]?.en?.toLowerCase() || null;
 
   const roster = parsePvpokeRoster(pvpoke);
-  // The staleness warning itself is emitted by fetchGameMaster — a mirror going
-  // stale is not a failure here (it is the only PvE mechanics source) but it is
-  // never silent, and the age is reported alongside the roster below.
+  // Staleness report. The mirror going stale is not a failure — it is the only
+  // PvE mechanics source — but a list that advertises a daily refresh must not
+  // go quiet about its inputs having stopped moving.
+  const batchMs = gameMasterBatchMs;
+  warnIfStale({ mirror: mirrorName, batchMs },
+    "Move mechanics may predate a rebalance; the roster is taken from PvPoke " +
+    "regardless. See scripts/fetch-game-master-watch.mjs.");
 
   const consts = battleConstants(templates);
   const cpm = cpMultiplierFor(templates, ATTACKER_LEVEL);
@@ -689,7 +701,7 @@ async function main() {
   console.log(`  roster: ${roster ? `PvPoke ${roster.timestamp} ` +
     `(${roster.releasedDex.size} released, ${roster.shadowDex.size} shadow-eligible)`
     : "game-master heuristic (PvPoke unavailable)"}` +
-    ` · mechanics: ${mirrorName} ${gameMasterAgeDays != null ? `${gameMasterAgeDays}d old` : "unstamped"}`);
+    ` · mechanics: ${mirrorName} ${gameMasterAgeDays(batchMs) != null ? `${gameMasterAgeDays(batchMs)}d old` : "unstamped"}`);
 
   // ── Reference boss ────────────────────────────────────────────────────────
   // Derived, not invented: the median released legendary-class species, at the
@@ -844,8 +856,7 @@ async function main() {
     // it is without re-deriving the split from the script.
     sources: {
       mechanics: mirrorName,
-      mechanicsBatch: Number.isFinite(gameMasterBatchMs) && gameMasterBatchMs > 0
-        ? new Date(gameMasterBatchMs).toISOString() : null,
+      mechanicsBatch: gameMasterProvenance({ mirror: mirrorName, batchMs }).batch,
       roster: roster ? "pvpoke/pvpoke" : `${mirrorName} (fallback)`,
       rosterBatch: roster?.timestamp || null,
     },

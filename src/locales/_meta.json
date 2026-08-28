@@ -1,24 +1,41 @@
 {
   "sources": [
     {
-      "gid": "1236962912",
-      "label": "In-game UI terms",
-      "namespace": "ingame"
-    },
-    {
-      "gid": "2001059420",
-      "label": "Pokémon names",
-      "namespace": "pokemon"
-    },
-    {
-      "gid": "264930304",
-      "label": "Move names",
-      "namespace": "move"
+      "name": "sora10pls/holoholo-text",
+      "path": "Release",
+      "namespaces": [
+        "ingame",
+        "move",
+        "pokemon"
+      ],
+      "locales": [
+        "en-us",
+        "de-de",
+        "es-es",
+        "fr-fr",
+        "zh-tw",
+        "hi-in",
+        "ja-jp"
+      ]
     }
   ],
+  "keySelection": {
+    "keywordFamilies": [
+      "filter_key_",
+      "filter_friend_key_",
+      "pokemon_type_"
+    ],
+    "borrowedKeys": 30,
+    "syntheticKeywords": [
+      "hardcoded_countcandy",
+      "hardcoded_countcandyxl",
+      "hardcoded_remotetrade"
+    ],
+    "missingBorrowed": []
+  },
   "counts": {
-    "ingameKeysUnion": 486,
-    "pokemonNames": 1155
+    "ingameKeysUnion": 490,
+    "pokemonNames": 1153
   },
   "missingTranslationsCount": {
     "en": 0,
@@ -29,9 +46,9 @@
     "hi": 0,
     "ja": 0
   },
-  "hindiRepair": {
-    "valuesRepaired": 1278,
-    "unmappedCodepoints": []
+  "encoding": {
+    "valuesChecked": 11501,
+    "puaHitsByLocale": {}
   },
   "warnings": []
 }

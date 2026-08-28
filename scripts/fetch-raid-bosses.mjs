@@ -15,7 +15,14 @@
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { fetchGameMaster, formSuffix, pokemonTemplates, typesOf } from "./lib/game-master.mjs";
+import {
+  fetchGameMaster,
+  formSuffix,
+  gameMasterAgeDays,
+  pokemonTemplates,
+  typesOf,
+  warnIfStale,
+} from "./lib/game-master.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -347,10 +354,7 @@ async function main() {
       fetchJson(ENDPOINTS.raidboss),
       fetchJson(ENDPOINTS.maxbattles),
       fetchJson(ENDPOINTS.events),
-      fetchGameMaster({
-        userAgent: "pogo-filter-workshop raid-fetcher/1.0",
-        label: "species types",
-      }),
+      fetchGameMaster({ userAgent: "pogo-filter-workshop raid-fetcher/1.0" }),
     ]);
   } catch (e) {
     console.error(`✗ Fetch failed: ${e.message}`);
@@ -378,6 +382,10 @@ async function main() {
   // Event raids — currently active + upcoming within the lookahead window.
   // Built after the standing-tier derivation so dedupe can prune events
   // whose bosses are already in the rotation.
+  if (gameMaster.failures.length > 0) {
+    console.warn(`⚠  fell back to ${gameMaster.mirror} after ${gameMaster.failures.join("; ")}`);
+  }
+  warnIfStale(gameMaster, "A boss released since that batch cannot be resolved out of an event title.");
   const nameIdx = buildNameIndex(
     gameMaster.templates,
     JSON.parse(readFileSync(NAMES_PATH, "utf8")),
@@ -436,8 +444,9 @@ async function main() {
   console.log(`  raids: ${totalRaids} bosses across ${Object.keys(raids).length} tiers`);
   console.log(`  maxBattles: ${totalMax} bosses across ${Object.keys(maxBattles).length} tiers`);
   console.log(`  eventRaids: ${eventRaids.length} surfaced · ${skippedDeduped} deduped against standing tiers · ${skippedUnresolved} unresolved`);
-  console.log(`  boss name index: ${nameIdx.size} species from ${gameMaster.mirrorName}` +
-    `${gameMaster.ageDays != null ? ` (${gameMaster.ageDays}d old)` : " (unstamped)"}`);
+  const gmAgeDays = gameMasterAgeDays(gameMaster.batchMs);
+  console.log(`  boss name index: ${nameIdx.size} species from ${gameMaster.mirror}` +
+    `${gmAgeDays != null ? ` (${gmAgeDays}d old)` : " (unstamped)"}`);
 }
 
 // Only run when executed directly — the offline checks import buildNameIndex

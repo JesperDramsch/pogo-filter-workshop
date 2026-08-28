@@ -1,29 +1,60 @@
-// Shared access to the Niantic game master, and the parsers every fetcher
-// that reads it needs.
+// The Niantic game-master mirrors, the one fetch that prefers the freshest, and
+// the parsers every reader of that dump needs.
 //
-// Why this file exists: four fetchers used to read pogoapi.net for species
-// facts (types, stats, evolutions, rarity, generations, release status).
-// pogoapi stopped publishing in November 2025 and carries no freshness signal
-// of its own — no batch id, no fetchedAt, only an HTTP Last-Modified nobody
-// was reading — so a nine-month-old dataset kept passing every reachability
-// check while silently missing seventeen released species. The game master
-// publishes the same facts first-hand and stamps every batch, so a stall here
-// is visible. See docs/upstream-sources.md.
+// This started life inside fetch-meta-rankings.mjs, which needed PvE move
+// mechanics and discovered the hard way that "the game master" is not one feed
+// but several mirrors of the same Niantic dump, published at wildly different
+// cadences. Six scripts now read it — the raid-attacker ranking, the
+// species-meta pools, the rebalance watch, the evolution-cost pools, the
+// regional-form catalog and the raid-boss name index — so the mirror list and
+// the preference loop live here rather than in six drifting copies.
 //
-// Everything below is deliberately shape-tolerant. The mirrors publish the
-// same Niantic template array but wrap it differently across generations of
-// the dump ({ template: [...] } / { templates: [...] } / { itemTemplate:
-// [...] } / a bare array), and a template node may or may not be nested under
-// `data`. Normalizing once here is what lets each caller's parser be three
-// lines of intent instead of three lines of defensive unwrapping.
+// The last four of those arrived when pogoapi.net was retired in August 2026.
+// It had stopped publishing in November 2025 and carried no freshness signal of
+// its own — no batch id, no fetchedAt, only an HTTP Last-Modified nobody was
+// reading — so a nine-month-old dataset kept passing every reachability check
+// while silently missing seventeen released species. The game master publishes
+// the same species facts first-hand and stamps every batch, so a stall here is
+// visible. See docs/upstream-sources.md.
+//
+// The parsers in the second half are shape-tolerant on purpose. The mirrors
+// wrap the template array differently across generations of the dump
+// ({ template: [...] } / { templates: [...] } / { itemTemplate: [...] } / a
+// bare array), and a template node may or may not be nested under `data`.
+// Normalizing once here is what lets each caller's parser be three lines of
+// intent instead of three lines of defensive unwrapping.
+//
+// THE MIRRORS, and why the order is what it is. Both publish the identical
+// template array; they differ only in how current the dump is. Verified
+// 2026-08-28, alexelgt batch 2026-08-28 against PokeMiners batch 2026-04-17:
+// the `battleSettings` block and the whole CPM table are byte-identical, and
+// not one `moveSettings` field differs between them. The stall cost ADDITIONS,
+// never changed values:
+//   - 19 more moveSettings templates: six genuinely new moves (Plasma Fists,
+//     Glaive Rush, Snipe Shot, Dive, and both Gulp Missiles) plus thirteen
+//     Mega-form movesets.
+//   - 130 more species-shaped `breadOverrides` templates, which is 32 more
+//     Dynamax-capable species — Rhyperior, Hydreigon, Magmortar, Electivire,
+//     Milotic, Weavile, Gyarados, Registeel, Starmie, Centiskorch and the rest.
+//   - 661 more templates overall (18,813 vs 18,152).
+// The Season 27 rebalance is invisible in both, because it touched `combatMove`
+// (PvP) only — 14 templates there differ — and PvE `moveSettings` did not move
+// at all. That distinction matters for anything that claims the stale mirror
+// carries "pre-rebalance values": for raids it does not, it carries pre-release
+// gaps. scripts/fetch-game-master-watch.mjs is where the PvP side is watched.
+//
+// A mirror that answers with something unparsable — HTML from a rate limit, a
+// truncated body, an object where an array belongs — counts as a FAILURE and
+// falls through to the next one. Publishing a hole is the one outcome worse
+// than using the fallback, which is what MIN_GAME_MASTER_TEMPLATES guards.
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// Game-master mirrors, in preference order. Each publishes the same Niantic
-// template array; they differ only in how current the dump is, so the first
-// one that answers wins and the rest are pure fallback.
+// Every mirror below serves the same Niantic template array. `parseStamp` maps
+// that mirror's own timestamp file to epoch millis; an unreadable stamp costs
+// the staleness warning and nothing else, so it is never fatal.
 export const GAME_MASTER_MIRRORS = [
   {
     // Primary. Commits every one to three days — 57 times in the three months
@@ -38,10 +69,9 @@ export const GAME_MASTER_MIRRORS = [
   },
   {
     // Fallback. The better-known mirror, and the one every guide points at, but
-    // it stalls: it served a 2026-04-17 batch for at least 133 days, still
-    // carrying pre-Season-27 values for every move that rebalance touched.
-    // Kept because a second source costs one request and a stalled mirror is
-    // still better than no mechanics at all.
+    // it stalls: it served a 2026-04-17 batch for at least 133 days. Kept
+    // because a second source costs one request and a stalled mirror is still
+    // better than no mechanics at all.
     name: "PokeMiners/game_masters",
     gameMaster: "https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/latest.json",
     timestamp: "https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/timestamp.txt",
@@ -49,39 +79,35 @@ export const GAME_MASTER_MIRRORS = [
   },
 ];
 
-// PvPoke's game master. The only source in the tree with a per-species
-// `released` flag that tracks the live game rather than the presence of model
-// data in a dump. fetch-pvp-rankings.mjs and fetch-game-master-watch.mjs
-// already read it, so it adds no new upstream to the project.
-export const PVPOKE_GAME_MASTER_URL =
-  "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/gamemaster.min.json";
-
 // How stale the winning mirror may get before a sync says so out loud. Not a
-// hard failure — stale data still beats none — but never silent.
+// hard failure — stale mechanics still beat none — but never silent.
 export const GAME_MASTER_STALE_WARN_DAYS = 30;
 
-// The game master is ~19 MB and ~19 000 templates. A mirror that answers with
-// materially less than that answered with something that is not a game master.
-const MIN_TEMPLATES = 5000;
+// A parse that lands below this is treated as a failed fetch, not as a small
+// game master. The real dump is ~18,800 templates; anything under five thousand
+// is a truncated body or an error page that happened to parse.
+export const MIN_GAME_MASTER_TEMPLATES = 5000;
 
-async function fetchText(url, userAgent) {
-  const res = await fetch(url, {
-    headers: { "User-Agent": userAgent, Accept: "application/json" },
-  });
+async function defaultFetchText(url, userAgent) {
+  const res = await fetch(url, { headers: { "User-Agent": userAgent } });
   if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
   return res.text();
 }
 
-// ── Batch-stamped local cache ───────────────────────────────────────────────
+// ── Batch-stamped download cache ────────────────────────────────────────────
 //
-// The game master is ~19 MB and five fetchers now read it. `npm run prebuild`
-// runs them back to back, so without a cache one build pulls ~95 MB of the
-// same bytes. The cache key is the mirror's own batch stamp, not a clock: the
-// tiny timestamp endpoint is fetched every time and the big file is downloaded
-// only when the batch id actually moved. That makes the cache
-// correctness-preserving rather than a staleness window — a new batch is never
-// served from cache, and an unreadable stamp falls through to a fresh
-// download. Cache failures are non-fatal: they cost the download, nothing else.
+// The dump is ~19 MB and six fetchers read it. `npm run prebuild` runs five of
+// them back to back, so without a cache one build pulls the same bytes five
+// times. The key is the mirror's OWN batch stamp, never a clock: the tiny
+// timestamp file is fetched on every call and the big one only when the batch
+// id actually moved. That makes this correctness-preserving rather than a
+// staleness window — a new batch is never served from cache, and an unreadable
+// stamp falls through to a fresh download. Every cache failure is non-fatal: it
+// costs the download and nothing else.
+//
+// Fetching the stamp FIRST is what buys this, and it is why the two requests
+// are no longer issued in parallel. One extra round-trip on a small file, in
+// exchange for skipping 19 MB.
 const CACHE_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "../../.cache/game-master");
 const cacheFile = (name) => resolve(CACHE_DIR, `${name.replace(/[^a-z0-9]+/gi, "-")}.json`);
 
@@ -104,58 +130,83 @@ function writeCache(name, batchMs, templates) {
   } catch { /* a cache that cannot be written just costs the next download */ }
 }
 
-// Fetch the game master from the first mirror that answers with something
-// parsable. Returns { templates, batchMs, mirrorName, ageDays, fromCache } —
-// ageDays is null when the mirror's stamp was unreadable, which costs the
-// staleness warning and the batch cache, and nothing else.
-//
-// A mirror that returns something unparsable counts as a failure, not as an
-// empty result: publishing a hole is the one outcome worse than falling back.
+// First mirror that answers with a plausible template array wins; the rest are
+// pure fallback. Returns { templates, mirror, batchMs, failures, fromCache } —
+// `failures` is the list of mirrors that were tried and rejected, so a caller
+// can say out loud that it fell back. Throws only when every mirror failed.
 export async function fetchGameMaster({
   userAgent = "pogo-filter-workshop game-master-fetcher/1.0",
-  minTemplates = MIN_TEMPLATES,
-  staleWarnDays = GAME_MASTER_STALE_WARN_DAYS,
-  label = "game master",
+  minTemplates = MIN_GAME_MASTER_TEMPLATES,
+  mirrors = GAME_MASTER_MIRRORS,
+  fetchText = (url) => defaultFetchText(url, userAgent),
+  cache = true,
 } = {}) {
   const failures = [];
-  for (const mirror of GAME_MASTER_MIRRORS) {
-    let templates, batchMs = null, fromCache = false;
+  for (const mirror of mirrors) {
     try {
-      const stampText = await fetchText(mirror.timestamp, userAgent).catch(() => "");
+      const stampText = await fetchText(mirror.timestamp).catch(() => "");
+      let batchMs = null;
       try {
         const ms = mirror.parseStamp(stampText);
         if (Number.isFinite(ms) && ms > 0) batchMs = ms;
       } catch { /* an unreadable stamp costs the staleness warning and the cache */ }
 
-      const cached = readCache(mirror.name, batchMs);
+      const cached = cache ? readCache(mirror.name, batchMs) : null;
       if (cached && cached.length >= minTemplates) {
-        templates = cached;
-        fromCache = true;
-      } else {
-        const parsed = templateList(JSON.parse(await fetchText(mirror.gameMaster, userAgent)));
-        if (parsed.length < minTemplates) {
-          throw new Error(`parsed as ${parsed.length} templates (expected ≥ ${minTemplates})`);
-        }
-        templates = parsed;
-        writeCache(mirror.name, batchMs, parsed);
+        return { templates: cached, mirror: mirror.name, batchMs, failures, fromCache: true };
       }
+
+      const parsed = JSON.parse(await fetchText(mirror.gameMaster));
+      if (!Array.isArray(parsed) || parsed.length < minTemplates) {
+        throw new Error(`parsed as ${Array.isArray(parsed) ? `${parsed.length} templates` : typeof parsed}`);
+      }
+      if (cache) writeCache(mirror.name, batchMs, parsed);
+      return { templates: parsed, mirror: mirror.name, batchMs, failures, fromCache: false };
     } catch (err) {
       failures.push(`${mirror.name}: ${err.message}`);
-      continue;
     }
-    if (failures.length > 0) {
-      console.warn(`⚠  fell back to ${mirror.name} after ${failures.join("; ")}`);
-    }
-    const ageDays = batchMs != null ? Math.floor((Date.now() - batchMs) / 86400000) : null;
-    if (ageDays != null && ageDays > staleWarnDays) {
-      console.warn(`⚠  ${mirror.name} batch is ${ageDays} days old ` +
-        `(${new Date(batchMs).toISOString().slice(0, 10)}) — ${label} may predate a game update. ` +
-        `See scripts/fetch-game-master-watch.mjs.`);
-    }
-    return { templates, batchMs, mirrorName: mirror.name, ageDays, fromCache };
   }
   throw new Error(`all game-master mirrors failed — ${failures.join("; ")}`);
 }
+
+// Whole days between a batch stamp and now; null when the stamp was unreadable.
+export function gameMasterAgeDays(batchMs, now = Date.now()) {
+  if (!Number.isFinite(batchMs) || batchMs <= 0) return null;
+  return Math.floor((now - batchMs) / 86400000);
+}
+
+// The provenance block every snapshot fed by the game master carries, so a
+// reader can tell which mirror answered and how old its dump was without
+// re-deriving it from the script. `stale` is the flag the README's freshness
+// claim rests on; `null` means the stamp could not be read at all.
+export function gameMasterProvenance({ mirror, batchMs }, now = Date.now()) {
+  const ageDays = gameMasterAgeDays(batchMs, now);
+  return {
+    mirror: mirror ?? null,
+    batch: Number.isFinite(batchMs) && batchMs > 0 ? new Date(batchMs).toISOString() : null,
+    ageDays,
+    stale: ageDays == null ? null : ageDays > GAME_MASTER_STALE_WARN_DAYS,
+  };
+}
+
+// One place that decides how a stale mirror is announced, so all three readers
+// word it the same way. Returns true when the warning fired.
+export function warnIfStale({ mirror, batchMs }, note = "") {
+  const ageDays = gameMasterAgeDays(batchMs);
+  if (ageDays == null || ageDays <= GAME_MASTER_STALE_WARN_DAYS) return false;
+  console.warn(
+    `⚠  ${mirror} batch is ${ageDays} days old (${new Date(batchMs).toISOString().slice(0, 10)}).` +
+    (note ? ` ${note}` : ""),
+  );
+  return true;
+}
+
+// PvPoke's game master. The only source in the tree with a per-species
+// `released` flag that tracks the live game rather than the presence of model
+// data in a dump. fetch-pvp-rankings.mjs and fetch-game-master-watch.mjs
+// already read it, so it adds no new upstream to the project.
+export const PVPOKE_GAME_MASTER_URL =
+  "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/gamemaster.min.json";
 
 // PvPoke's game master, parsed. Returns null on failure rather than throwing:
 // every caller uses it as an overlay on top of the Niantic dump, so an outage
@@ -164,7 +215,7 @@ export async function fetchPvpokeGameMaster({
   userAgent = "pogo-filter-workshop game-master-fetcher/1.0",
 } = {}) {
   try {
-    return JSON.parse(await fetchText(PVPOKE_GAME_MASTER_URL, userAgent));
+    return JSON.parse(await defaultFetchText(PVPOKE_GAME_MASTER_URL, userAgent));
   } catch (e) {
     console.warn(`⚠  PvPoke game master unavailable (${e.message})`);
     return null;

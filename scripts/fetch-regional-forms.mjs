@@ -23,10 +23,18 @@
 // Flags:
 //   --offline-ok   tolerate fetch failures if src/data/regional-forms.json exists.
 
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { fetchGameMaster, formSuffix, pokemonTemplates, typesOf } from "./lib/game-master.mjs";
+import { canonicalStringify, writeJson } from "./lib/json.mjs";
+import {
+  fetchGameMaster,
+  formSuffix,
+  gameMasterAgeDays,
+  pokemonTemplates,
+  typesOf,
+  warnIfStale,
+} from "./lib/game-master.mjs";
 import { originRegion } from "./lib/generations.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -241,19 +249,6 @@ export function validate(species) {
   }
 }
 
-function writeJson(path, data) {
-  if (!existsSync(dirname(path))) mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, JSON.stringify(data, null, 2) + "\n", "utf8");
-}
-
-// Order-independent stringify for content comparison (mirrors fetch-raid-bosses.mjs).
-function canonicalStringify(value) {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonicalStringify).join(",")}]`;
-  const keys = Object.keys(value).sort();
-  return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalStringify(value[k])}`).join(",")}}`;
-}
-
 async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
@@ -261,10 +256,16 @@ async function main() {
   let templates, mirrorName, ageDays;
   try {
     console.log("→ Fetching game master (per-form type source)");
-    ({ templates, mirrorName, ageDays } = await fetchGameMaster({
+    const gm = await fetchGameMaster({
       userAgent: "pogo-filter-workshop regional-forms-fetcher/1.0",
-      label: "form types",
-    }));
+    });
+    templates = gm.templates;
+    mirrorName = gm.mirror;
+    ageDays = gameMasterAgeDays(gm.batchMs);
+    if (gm.failures.length > 0) {
+      console.warn(`⚠  fell back to ${gm.mirror} after ${gm.failures.join("; ")}`);
+    }
+    warnIfStale(gm, "A newly released regional form may be missing from the picker.");
   } catch (e) {
     console.error(`✗ Fetch failed: ${e.message}`);
     if (offlineOk && existsSync(OUT_PATH)) {
