@@ -25,14 +25,19 @@
 //   P7 — clauses render in the user's PoGo output locale
 //   P8 — the league packs are well formed and usable as seeds
 //   P9 — migration coerces junk and leaves legacy configs untouched
-//  P10 — the packs seed the TOP of the ranked list, and the carve-out costs
-//        what the config panel prices it at
+//  P10 — the packs seed the TOP of the ranked list, the label quotes that depth
+//        in every locale, and the carve-out costs what the config panel prices
 
 import {
   buildFilters, evalFilter, mergeImportedConfig, DEFAULT_CONFIG, SEARCH_CHAR_BUDGET,
 } from "../src/App.jsx";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import { pokemonNameFor } from "../src/data/species.js";
+import { readdirSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const LOCALE_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "src", "locales", "app");
 
 const tFn = (k) => k;
 let failures = 0;
@@ -259,6 +264,22 @@ console.log("\nP10 — pack depth and the cost the panel quotes");
   }
   check("all packs seed the same depth",
     new Set(pvpMetaPacks.map(p => p.species.length)).size === 1);
+
+  // The pack buttons name their depth ("Great League top 10"), so the label is a
+  // second, hand-written copy of PVP_META_PACK_DEPTH — and it has already drifted
+  // once: the cut from 30 to 10 left all seven locales advertising a top-30 seed.
+  // A label must quote the depth the pack actually seeds and no other number.
+  const depth = pvpMetaPacks[0]?.species.length ?? 0;
+  for (const file of readdirSync(LOCALE_DIR).filter((f) => f.endsWith(".json"))) {
+    const strings = JSON.parse(readFileSync(join(LOCALE_DIR, file), "utf8"));
+    for (const pack of pvpMetaPacks) {
+      const label = strings[pack.labelKey];
+      const numbers = String(label ?? "").match(/\d+/g) || [];
+      check(`${file} ${pack.id}: the label quotes the seeded depth`,
+        typeof label === "string" && numbers.length === 1 && numbers[0] === String(depth),
+        `"${label}" vs depth ${depth}`);
+    }
+  }
 
   // Both packs, the shadow-keeper floor on, and the whole thing still has to
   // fit in the search bar. This is the combination that motivated the cut.
