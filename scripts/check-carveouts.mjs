@@ -16,6 +16,7 @@ import {
   regionalProtectionsFor, ivToBar, starFromIVs,
 } from "../src/App.jsx";
 import { resolveSpecies } from "../src/data/species.js";
+import META_RANKINGS from "../src/data/meta-rankings.json";
 
 const tFn = (k) => k;
 let failures = 0;
@@ -264,6 +265,15 @@ console.log("\nMap-marked bazaar species protected in TRASH (Choreogel regressio
   check("empty bazaar list leaves trash byte-identical", before.trash === after.trash);
 }
 
+// How many `!crypto,!+species` clauses the floor emits under DEFAULT protection
+// flags: one per keeper, minus the ones `!legendär` / `!mysteriös` /
+// `!ultrabestie` already cover. Derived from the same sync-emitted class map the
+// emitter reads, so the number moves with the roster instead of being pinned.
+// S6 below is what actually exercises the trim.
+const KEEPER_CLASSES = META_RANKINGS.shadowKeeperClasses || {};
+const FLOOR_KEEPER_COUNT = mergeImportedConfig({}).shadowKeeperSpecies
+  .filter(sp => !KEEPER_CLASSES[sp] && !KEEPER_CLASSES[resolveSpecies(sp, "en")]).length;
+
 console.log("\nS1 — shadow purify-floor: default keeps the blanket !crypto");
 {
   const def = buildFilters([], [], mergeImportedConfig({}), [], "de", tFn);
@@ -289,9 +299,8 @@ console.log("\nS2 — purify-floor ON (protectShadows off): four scoped clauses 
   // satisfied by a shadow that IS a keeper and false for every shadow that is
   // not — it protected the junk and released the keepers. S5 below pins the
   // semantics; this only pins the shape.
-  check("keeps meta shadow attackers (!crypto,!+name per keeper)",
-    clauses(floor.trash).filter(c => /^!crypto,!\+[^,&]+$/i.test(c)).length ===
-      mergeImportedConfig({}).shadowKeeperSpecies.length);
+  check("keeps meta shadow attackers (!crypto,!+name per uncovered keeper)",
+    clauses(floor.trash).filter(c => /^!crypto,!\+[^,&]+$/i.test(c)).length === FLOOR_KEEPER_COUNT);
   check("no positive-species keeper clause survives (the inverted shape)",
     !hasClauseMatching(floor.trash, /^!crypto,\+/i));
   check("three purify-decision floor clauses besides the keepers",
@@ -305,8 +314,8 @@ console.log("\nS2b — the keeper floor names the actual keeper roster");
   const floor = buildFilters([], [], cfg, [], "de", tFn);
   const keeperClauses = clauses(floor.trash).filter(c => /^!crypto,!\+/i.test(c));
   const terms = keeperClauses.map(c => c.split(",")[1].slice(1)); // drop the leading "!"
-  check(`one clause per keeper (${cfg.shadowKeeperSpecies.length})`,
-    terms.length === cfg.shadowKeeperSpecies.length, `found ${terms.length}`);
+  check(`one clause per keeper not already blanket-covered (${FLOOR_KEEPER_COUNT})`,
+    terms.length === FLOOR_KEEPER_COUNT, `found ${terms.length}`);
   check("every term is a negated family search", terms.every(t => t.startsWith("+") && t.length > 1));
   // The roster is a daily sync, so this asserts the projection, not the names —
   // except for Metagross, which is the case that motivated the clause and is
@@ -344,9 +353,8 @@ console.log("\nS4 — floor differs from blanket by exactly the shadow clauses (
   const onlyInBlanket = clauses(blanket.trash).filter(c => !clauses(floor.trash).includes(c));
   const onlyInFloor = clauses(floor.trash).filter(c => !clauses(blanket.trash).includes(c));
   check("blanket drops exactly the bare !crypto", onlyInBlanket.length === 1 && /^!crypto$/i.test(onlyInBlanket[0]), onlyInBlanket.join("|"));
-  check("floor adds the three purify clauses plus one per keeper",
-    onlyInFloor.length === 3 + mergeImportedConfig({}).shadowKeeperSpecies.length,
-    `${onlyInFloor.length} added`);
+  check("floor adds the three purify clauses plus one per uncovered keeper",
+    onlyInFloor.length === 3 + FLOOR_KEEPER_COUNT, `${onlyInFloor.length} added`);
 }
 
 // The bug this pins: with blanket crypto protection off, the keeper floor used
@@ -387,6 +395,80 @@ console.log("\nS5 — keeper floor semantics: junk shadows releasable, keepers p
     evalFilter(keeperFloor, mk([beldum, metagross]), "de") === false);
   check("a NON-shadow keeper is untouched by the floor",
     evalFilter(keeperFloor, mk([metagross], { flags: { shadow: false } }), "de") === true);
+}
+
+// The floor's per-keeper clauses cost ~20 characters each, and the trash filter
+// already carries `!legendär` / `!mysteriös` / `!ultrabestie`. A keeper those
+// clauses cover needs no clause of its own — but only while the matching toggle
+// is on, and only for keepers whose whole evolution family shares the class
+// (`!+latios` protects the family; the blanket clause has to cover all of it).
+// The class map is derived by the meta-rankings sync from the game master's own
+// pokemonClass; these checks read it rather than naming species.
+console.log("\nS6 — blanket-covered keepers are dropped from the floor, conditionally");
+{
+  const CLASSES = META_RANKINGS.shadowKeeperClasses || {};
+  const byClass = (bucket) => Object.entries(CLASSES)
+    .filter(([, b]) => b === bucket).map(([sp]) => resolveSpecies(sp, "de"));
+  const floorKeepers = (r) => clauses(r.trash)
+    .filter(c => /^!crypto,!\+/i.test(c)).map(c => c.split(",")[1].slice(2));
+  const withCfg = (o) => {
+    const cfg = mergeImportedConfig({});
+    Object.assign(cfg, o);
+    return buildFilters([], [], cfg, [], "de", tFn);
+  };
+
+  const all = mergeImportedConfig({}).shadowKeeperSpecies;
+  const covered = all.filter(sp => CLASSES[sp] || CLASSES[resolveSpecies(sp, "en")]);
+  check(`the sync classes some keepers (${Object.keys(CLASSES).length} of ${all.length})`,
+    Object.keys(CLASSES).length > 0 && Object.keys(CLASSES).length < all.length);
+
+  const dflt = withCfg({ protectShadows: false });
+  check("default flags: every classed keeper is dropped from the floor",
+    floorKeepers(dflt).length === all.length - covered.length,
+    `${floorKeepers(dflt).length} clauses, ${covered.length} covered`);
+  check("the floor is shorter than it would be untrimmed",
+    dflt.trash.length < withCfg({ protectShadows: false, protectLegendaries: false,
+      protectMythicals: false, protectUltraBeasts: false }).trash.length);
+
+  // Each class comes back the moment its own blanket clause goes away — and
+  // only its own: turning legendaries off must not restore the mythicals.
+  for (const [bucket, flag] of [["legendary", "protectLegendaries"],
+                                ["mythical", "protectMythicals"],
+                                ["ultraBeast", "protectUltraBeasts"]]) {
+    const members = byClass(bucket);
+    if (members.length === 0) { console.log(`  · no ${bucket} keeper in this snapshot — skipped`); continue; }
+    const on = floorKeepers(dflt);
+    const off = floorKeepers(withCfg({ protectShadows: false, [flag]: false }));
+    check(`${bucket}: absent while ${flag} is on`, members.every(sp => !on.includes(sp)));
+    check(`${bucket}: restored when ${flag} is off`, members.every(sp => off.includes(sp)));
+    const others = Object.entries(CLASSES).filter(([, b]) => b !== bucket)
+      .map(([sp]) => resolveSpecies(sp, "de"));
+    check(`${bucket}: the other classes stay dropped`, others.every(sp => !off.includes(sp)));
+  }
+
+  // A mythical carved out of `!mysteriös` has spent that protection, so its
+  // floor clause is load-bearing again.
+  const myths = byClass("mythical");
+  if (myths.length > 0) {
+    const carved = floorKeepers(withCfg({ protectShadows: false, mythTooManyOf: [myths[0]] }));
+    check(`mythTooManyOf restores the carved-out keeper's clause (${myths[0]})`,
+      carved.includes(myths[0]));
+    check("the other mythicals stay dropped",
+      myths.slice(1).every(sp => !carved.includes(sp)));
+  }
+
+  // A classless keeper keeps its clause no matter what — nothing covers it.
+  const classed = new Set(Object.keys(CLASSES).map(sp => resolveSpecies(sp, "de")));
+  const classless = all.map(sp => resolveSpecies(sp, "de")).filter(sp => !classed.has(sp));
+  check(`classless keepers keep their clause (${classless.length})`,
+    classless.length > 0 && classless.every(sp => floorKeepers(dflt).includes(sp)));
+
+  // The trim is trash-only. shadowSafe carries no blanket clause to inherit
+  // from, so it must still name every keeper — the dropped ones included.
+  const safeTerms = clauses(dflt.shadowSafe).filter(c => /^!\+/.test(c)).map(c => c.slice(2));
+  check("shadowSafe still names the full roster",
+    all.every(sp => safeTerms.includes(resolveSpecies(sp, "de"))),
+    `${safeTerms.length} of ${all.length}`);
 }
 
 console.log(`\n${failures === 0 ? "✓ All carve-out checks passed." : `✗ ${failures} failure(s).`}`);

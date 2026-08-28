@@ -1631,6 +1631,52 @@ export function buildFilters(
 		),
 	];
 
+	// The same roster minus the keepers the trash filter's own blanket clauses
+	// already protect. `!legendär` covers Shadow Latios on its own, so the
+	// floor's `!crypto,!+latios` beside it buys nothing and costs ~20
+	// characters — and the floor is the longest thing in that filter. Only the
+	// trash floor gets the trimmed list: the shadowSafe / shadowFrustration
+	// pro-tools carry no blanket clauses to inherit from and keep the full one.
+	//
+	// The classes are DERIVED, never typed — `shadowKeeperClasses` is emitted
+	// by the meta-rankings sync from the game master's own `pokemonClass`, and
+	// only for keepers whose WHOLE evolution family shares the class, since
+	// `!+species` protects the family and the blanket clause has to cover all
+	// of it. A keeper with no entry keeps its clause; silence costs characters,
+	// never protection. Same rule as everywhere else here: a hand-written list
+	// of legendaries would be wrong the first time a species is reclassified.
+	const keeperClassOf = new Map(
+		Object.entries(META_RANKINGS.shadowKeeperClasses || {}).map(([sp, bucket]) => [
+			resolveSpecies(sp) || sp,
+			bucket,
+		]),
+	);
+	// A mythical carved out of `!mythical` via mythTooManyOf has spent that
+	// protection, so its floor clause is load-bearing again.
+	const mythCarvedOut = new Set(
+		(cfg.mythTooManyOf || []).map((sp) => resolveSpecies(sp) || sp),
+	);
+	const blanketCoveredClasses = new Set(
+		[
+			cfg.protectLegendaries ? 'legendary' : null,
+			cfg.protectMythicals ? 'mythical' : null,
+			cfg.protectUltraBeasts ? 'ultraBeast' : null,
+		].filter(Boolean),
+	);
+	const floorKeeperResolved = [
+		...new Set(
+			(cfg.shadowKeeperSpecies || [])
+				.filter((sp) => {
+					const canonical = resolveSpecies(sp) || sp;
+					const bucket = keeperClassOf.get(canonical);
+					if (!bucket || !blanketCoveredClasses.has(bucket)) return true;
+					return bucket === 'mythical' && mythCarvedOut.has(canonical);
+				})
+				.map((sp) => speciesForOutput(sp, outputLocale))
+				.filter(Boolean),
+		),
+	];
+
 	// The curated "relevant now" list — species you actually battle with, seeded
 	// one tap at a time from the league packs. Rendered into the user's PoGo
 	// locale, same as shadowKeeperSpecies (`keeperResolved`).
@@ -1843,9 +1889,10 @@ export function buildFilters(
 		// n clauses is not a shape we can compress away: each `!crypto,!+kᵢ` is
 		// an essential prime implicate of the function, so any correct encoding
 		// in a parenthesis-free comma-OR/&-AND grammar costs one clause per
-		// keeper. The lever is the length of shadowKeeperSpecies (user-editable,
-		// seeded from the daily feed), not the encoding.
-		for (const sp of keeperResolved) {
+		// keeper. The levers are the length of shadowKeeperSpecies
+		// (user-editable, seeded from the daily feed) and dropping the keepers a
+		// blanket clause already covers — see floorKeeperResolved above.
+		for (const sp of floorKeeperResolved) {
 			push(
 				trashClauses,
 				`!${kw.flag.shadow},!+${sp}`,
