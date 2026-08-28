@@ -1,58 +1,212 @@
 {
-  "fetchedAt": "2026-08-27T18:24:09.230Z",
+  "fetchedAt": "2026-08-28T19:34:53.811Z",
   "raids": {
     "mega": [
       {
-        "id": "SWAMPERT",
+        "id": "GYARADOS",
         "names": {
-          "en": "Mega Swampert",
-          "de": "Mega-Sumpex",
-          "fr": "Méga-Laggron",
-          "it": "MegaSwampert",
-          "ja": "メガラグラージ",
-          "ko": "메가대짱이",
-          "es": "Mega-Swampert"
+          "en": "Mega Gyarados",
+          "de": "Mega-Garados",
+          "fr": "Méga-Léviator",
+          "it": "MegaGyarados",
+          "ja": "メガギャラドス",
+          "ko": "메가갸라도스",
+          "es": "Mega-Gyarados"
         },
         "types": [
           "water",
-          "ground"
+          "dark"
         ],
         "resistorTypes": [
-          "flying",
-          "bug",
+          "fighting",
           "water",
           "grass",
-          "dragon"
+          "dragon",
+          "dark",
+          "fairy"
         ],
         "seMoveTypes": [
+          "bug",
+          "electric",
+          "fairy",
+          "fighting",
           "grass"
         ]
       }
     ],
     "lvl5": [
       {
-        "id": "LUNALA",
+        "id": "REGIROCK",
         "names": {
-          "en": "Lunala",
-          "de": "Lunala",
-          "fr": "Lunala",
-          "it": "Lunala",
-          "ja": "ルナアーラ",
-          "ko": "루나아라",
-          "es": "Lunala"
+          "en": "Regirock",
+          "de": "Regirock",
+          "fr": "Regirock",
+          "it": "Regirock",
+          "ja": "レジロック",
+          "ko": "레지락",
+          "es": "Regirock"
         },
         "types": [
-          "psychic",
-          "ghost"
+          "rock"
         ],
         "resistorTypes": [
-          "normal",
-          "steel",
-          "dark"
+          "fighting",
+          "ground",
+          "steel"
         ],
         "seMoveTypes": [
-          "dark",
-          "ghost"
+          "fighting",
+          "grass",
+          "ground",
+          "steel",
+          "water"
+        ]
+      },
+      {
+        "id": "REGICE",
+        "names": {
+          "en": "Regice",
+          "de": "Regice",
+          "fr": "Regice",
+          "it": "Regice",
+          "ja": "レジアイス",
+          "ko": "레지아이스",
+          "es": "Regice"
+        },
+        "types": [
+          "ice"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "ice"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "fire",
+          "rock",
+          "steel"
+        ]
+      },
+      {
+        "id": "REGISTEEL",
+        "names": {
+          "en": "Registeel",
+          "de": "Registeel",
+          "fr": "Registeel",
+          "it": "Registeel",
+          "ja": "レジスチル",
+          "ko": "레지스틸",
+          "es": "Registeel"
+        },
+        "types": [
+          "steel"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "electric"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "fire",
+          "ground"
+        ]
+      }
+    ],
+    "lvl3": [
+      {
+        "id": "SNEASEL",
+        "names": {
+          "en": "Hisuian Sneasel",
+          "de": "Hisuian-Sniebel",
+          "fr": "Farfuret de Hisuian",
+          "it": "Sneasel di Hisuian",
+          "ja": "ニューラ",
+          "ko": "포푸니",
+          "es": "Sneasel de Galar"
+        },
+        "types": [
+          "fighting",
+          "poison"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "ground",
+          "bug",
+          "ghost",
+          "psychic"
+        ],
+        "seMoveTypes": [
+          "psychic",
+          "flying",
+          "ground"
+        ]
+      },
+      {
+        "id": "LILLIGANT",
+        "names": {
+          "en": "Hisuian Lilligant",
+          "de": "Hisuian-Dressella",
+          "fr": "Fragilady de Hisuian",
+          "it": "Lilligant di Hisuian",
+          "ja": "ドレディア",
+          "ko": "드레디어",
+          "es": "Lilligant de Galar"
+        },
+        "types": [
+          "grass",
+          "fighting"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "fire",
+          "grass",
+          "psychic",
+          "dragon",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "fairy",
+          "fire",
+          "ice",
+          "poison",
+          "psychic"
+        ]
+      },
+      {
+        "id": "PASSIMIAN",
+        "names": {
+          "en": "Passimian",
+          "de": "Quartermak",
+          "fr": "Quartermac",
+          "it": "Passimian",
+          "ja": "ナゲツケサル",
+          "ko": "내던숭이",
+          "es": "Passimian"
+        },
+        "types": [
+          "fighting"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "psychic",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "fairy",
+          "flying",
+          "psychic"
         ]
       }
     ],
@@ -340,183 +494,5 @@
     ]
   },
   "maxBattles": {},
-  "eventRaids": [
-    {
-      "eventID": "mega-gyarados-in-mega-raids-august-2026",
-      "name": "Mega Gyarados in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-08-26T06:00:00.000",
-      "end": "2026-09-08T22:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "GYARADOS",
-          "names": {
-            "en": "Gyarados"
-          },
-          "types": [
-            "water",
-            "flying"
-          ],
-          "resistorTypes": [
-            "steel",
-            "water",
-            "electric",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "rock",
-            "electric"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "regirock-regice-registeel-in-5-star-raid-battles-august-2026",
-      "name": "Regirock, Regice, and Registeel in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-08-26T06:00:00.000",
-      "end": "2026-09-08T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "REGIROCK",
-          "names": {
-            "en": "Regirock"
-          },
-          "types": [
-            "rock"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "ground",
-            "steel"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "ground",
-            "steel",
-            "water",
-            "grass"
-          ]
-        },
-        {
-          "id": "REGICE",
-          "names": {
-            "en": "Regice"
-          },
-          "types": [
-            "ice"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "ice"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "rock",
-            "steel",
-            "fire"
-          ]
-        },
-        {
-          "id": "REGISTEEL",
-          "names": {
-            "en": "Registeel"
-          },
-          "types": [
-            "steel"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "electric"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "ground",
-            "fire"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20260902",
-      "name": "Regirock, Regice, and Registeel Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-09-02T18:00:00.000",
-      "end": "2026-09-02T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "REGIROCK",
-          "names": {
-            "en": "Regirock"
-          },
-          "types": [
-            "rock"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "ground",
-            "steel"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "ground",
-            "steel",
-            "water",
-            "grass"
-          ]
-        },
-        {
-          "id": "REGICE",
-          "names": {
-            "en": "Regice"
-          },
-          "types": [
-            "ice"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "ice"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "rock",
-            "steel",
-            "fire"
-          ]
-        },
-        {
-          "id": "REGISTEEL",
-          "names": {
-            "en": "Registeel"
-          },
-          "types": [
-            "steel"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "electric"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "ground",
-            "fire"
-          ]
-        }
-      ]
-    }
-  ]
+  "eventRaids": []
 }
