@@ -1650,6 +1650,19 @@ export function buildFilters(
 	// per-species shape mirrors the trade-evo carve-out below. Skipped entirely
 	// when the meta tier is not strictly wider than the base tier — then the base
 	// clause already implies every carve-out (`2-4atk` ⟹ `1-4atk`).
+	//
+	// This is why a long meta list is expensive (~56 characters per species in
+	// German), and there is no cleverer encoding to find. What the filter has to
+	// say is `strict_bad ∧ (loose_bad ∨ ¬meta)`, and ¬meta is a negated union,
+	// so De Morgan spreads it over one clause per member — a grammar with only
+	// comma-OR and &-AND and no parentheses cannot factor the shared
+	// `loose_bad` tail back out. Each `loose_bad ∨ ¬mᵢ` is an essential prime
+	// implicate. Nor can the tail be trimmed: dropping `0-2def` would wrongly
+	// protect a listed species with attack bucket 1 and junk defence, and
+	// widening `2-4atk` to `!1atk` only costs more. The only lever is how many
+	// species are on the list — the packs seed a whole league (30 each), and
+	// trimming that list is the intended way to buy characters back. FilterBox
+	// flags the ~5000-character in-game ceiling when a filter crosses it.
 	const pvpMetaWidens =
 		pvpMetaList.length > 0 && PVP_TIER_RANK[pvpMetaTier] > PVP_TIER_RANK[pvpBaseTier];
 	const pushPvPMetaClauses = (arr) => {
@@ -1806,22 +1819,37 @@ export function buildFilters(
 				`!${kw.flag.shadow},@${kw.flag.frustration}`,
 				tFn('app.clause_why.shadow_purify_frustration'),
 			);
-		// Fourth floor clause: the meta shadow attackers themselves. The three
-		// above are all about the PURIFY decision — a shadow worth purifying is
-		// worth not releasing. That says nothing about a shadow whose whole
-		// value is staying a shadow, and those are exactly the ones this list
-		// names. Without it a keeper that is cheap-to-purify, has no low IV and
-		// has already been Charge-TM'd passes all three and gets released: a
+		// Fourth floor: the meta shadow attackers themselves. The three above are
+		// all about the PURIFY decision — a shadow worth purifying is worth not
+		// releasing. That says nothing about a shadow whose whole value is
+		// staying a shadow, and those are exactly the ones this list names.
+		// Without it a keeper that is cheap-to-purify, has no low IV and has
+		// already been Charge-TM'd passes all three and gets released: a
 		// Charge-TM'd Shadow Metagross is the single most expensive Pokémon in
-		// the box to have thrown away, and it was the one shape the floor let
-		// through. One clause, not one per species — `!crypto,+a,+b,…` reads as
-		// "releasable only if it is not a keeper family", and OR binds tighter
-		// than `&` (same trick as legacyMovesClause).
-		if (keeperResolved.length > 0) {
+		// the box to have thrown away.
+		//
+		// ONE CLAUSE PER KEEPER, not one clause listing them all. The floor asks
+		// for "releasable only if this is NOT a keeper family", i.e. `!crypto ∨
+		// ¬(k₁ ∨ … ∨ kₙ)` — and De Morgan turns that negated union into an AND
+		// of negations, which in this grammar is separate clauses:
+		// `!crypto,!+k₁ & !crypto,!+k₂ & …`. The compact `!crypto,+k₁,+k₂,…`
+		// this replaced says the opposite of what it reads like: comma is OR, so
+		// it is satisfied by a shadow that IS a keeper and fails for every
+		// shadow that is not — it protected all the junk and released exactly
+		// the Metagross the clause was added for. The same trap is called out in
+		// the pvpMetaWidens comment above ("`!+a,!+b,…` … would go vacuously
+		// true") and in the skill's failure modes; this is its mirror image.
+		//
+		// n clauses is not a shape we can compress away: each `!crypto,!+kᵢ` is
+		// an essential prime implicate of the function, so any correct encoding
+		// in a parenthesis-free comma-OR/&-AND grammar costs one clause per
+		// keeper. The lever is the length of shadowKeeperSpecies (user-editable,
+		// seeded from the daily feed), not the encoding.
+		for (const sp of keeperResolved) {
 			push(
 				trashClauses,
-				`!${kw.flag.shadow},${keeperResolved.map((sp) => `+${sp}`).join(',')}`,
-				tFn('app.clause_why.shadow_purify_keeper'),
+				`!${kw.flag.shadow},!+${sp}`,
+				tFn('app.clause_why.shadow_purify_keeper', { params: { name: sp } }),
 			);
 		}
 	}
@@ -7730,7 +7758,14 @@ function FriendCollectEditor({
 function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 	const { t } = useTranslation();
 	const len = filterStr.length;
-	const pct = Math.min(100, (len / 5000) * 100);
+	// The in-game search bar takes ~5000 characters; past that the string is
+	// silently truncated and the filter quietly means something else. The bar
+	// used to clamp at 100% with no other signal, so an over-budget filter (a
+	// full-league PvP meta list plus the shadow-keeper floor will get you there)
+	// looked exactly like one that just fits. Flag it instead.
+	const CHAR_BUDGET = 5000;
+	const over = len > CHAR_BUDGET;
+	const pct = Math.min(100, (len / CHAR_BUDGET) * 100);
 	const codeRef = useRef(null);
 
 	// Tap the filter text to select-all — on mobile this lets long-press → "Copy"
@@ -7769,11 +7804,14 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 					<span className='mono text-xs font-semibold uppercase tracking-wider' style={{ color: accent }}>
 						{label}
 					</span>
-					<span className='mono text-xs text-[#8090A0]'>
+					<span className='mono text-xs' style={{ color: over ? '#FF6B5B' : '#8090A0' }}>
 						{t('app.filterbox.length_label', { params: { len: len.toLocaleString() } })}
 					</span>
 					<div className='w-24 h-1 bg-[#1F2933] rounded-full overflow-hidden'>
-						<div className='h-full transition-all' style={{ width: `${pct}%`, background: accent }} />
+						<div
+							className='h-full transition-all'
+							style={{ width: `${pct}%`, background: over ? '#FF6B5B' : accent }}
+						/>
 					</div>
 				</div>
 				<button
@@ -7784,6 +7822,16 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 					{buttonLabel}
 				</button>
 			</div>
+			{over && (
+				<p
+					role='status'
+					className='px-4 py-2 text-xs mono leading-snug border-b border-[#1F2933] bg-[#FF6B5B]/10 text-[#FF6B5B]'
+				>
+					{t('app.filterbox.over_budget', {
+						params: { over: (len - CHAR_BUDGET).toLocaleString() },
+					})}
+				</p>
+			)}
 			{hint && (
 				<p className='px-4 py-2 text-xs italic text-[#8B98A5] leading-snug border-b border-[#1F2933] bg-[#0E141A]'>
 					{hint}

@@ -279,13 +279,23 @@ console.log("\nS2 — purify-floor ON (protectShadows off): four scoped clauses 
   check("keeps purify-hundo IVs (!crypto,0-2…)", hasClauseMatching(floor.trash, /^!crypto,0-2/i), floor.trash);
   check("keeps cheap-to-purify (!crypto,bonbonkm3-)", hasClauseMatching(floor.trash, /^!crypto,bonbonkm3-$/i));
   check("keeps TM'd investment (!crypto,@frustration)", hasClauseMatching(floor.trash, /^!crypto,@frustration$/i));
-  // The keeper clause is the fourth floor: the first three all reason about
-  // whether a shadow is worth PURIFYING, which says nothing about one whose
-  // value is staying a shadow. A Charge-TM'd Shadow Metagross clears all three
-  // and used to be releasable.
-  check("keeps meta shadow attackers (!crypto,+meistagrif,…)",
-    hasClauseMatching(floor.trash, /^!crypto,(\+[^,&]+)(,\+[^,&]+)+$/i));
-  check("exactly four purify-floor clauses", clauses(floor.trash).filter(c => /^!crypto,/i.test(c)).length === 4);
+  // The keeper floor is the fourth: the first three all reason about whether a
+  // shadow is worth PURIFYING, which says nothing about one whose value is
+  // staying a shadow. A Charge-TM'd Shadow Metagross clears all three and used
+  // to be releasable.
+  //
+  // It emits ONE CLAUSE PER KEEPER, `!crypto,!+name`. The compact
+  // `!crypto,+a,+b,…` it replaced was inverted: comma is OR, so it was
+  // satisfied by a shadow that IS a keeper and false for every shadow that is
+  // not — it protected the junk and released the keepers. S5 below pins the
+  // semantics; this only pins the shape.
+  check("keeps meta shadow attackers (!crypto,!+name per keeper)",
+    clauses(floor.trash).filter(c => /^!crypto,!\+[^,&]+$/i.test(c)).length ===
+      mergeImportedConfig({}).shadowKeeperSpecies.length);
+  check("no positive-species keeper clause survives (the inverted shape)",
+    !hasClauseMatching(floor.trash, /^!crypto,\+/i));
+  check("three purify-decision floor clauses besides the keepers",
+    clauses(floor.trash).filter(c => /^!crypto,/i.test(c) && !/^!crypto,!\+/i.test(c)).length === 3);
   check("trade still hard-excludes shadows", hasClauseMatching(floor.trade, /^!crypto$/i));
 }
 
@@ -293,11 +303,11 @@ console.log("\nS2b — the keeper floor names the actual keeper roster");
 {
   const cfg = mergeImportedConfig({ protectShadows: false, protectShadowPurifyOnly: true });
   const floor = buildFilters([], [], cfg, [], "de", tFn);
-  const keeperClause = clauses(floor.trash).find(c => /^!crypto,\+/i.test(c)) || "";
-  const terms = keeperClause.split(",").slice(1);
-  check(`one +family term per keeper (${cfg.shadowKeeperSpecies.length})`,
+  const keeperClauses = clauses(floor.trash).filter(c => /^!crypto,!\+/i.test(c));
+  const terms = keeperClauses.map(c => c.split(",")[1].slice(1)); // drop the leading "!"
+  check(`one clause per keeper (${cfg.shadowKeeperSpecies.length})`,
     terms.length === cfg.shadowKeeperSpecies.length, `found ${terms.length}`);
-  check("every term is a family search", terms.every(t => t.startsWith("+") && t.length > 1));
+  check("every term is a negated family search", terms.every(t => t.startsWith("+") && t.length > 1));
   // The roster is a daily sync, so this asserts the projection, not the names —
   // except for Metagross, which is the case that motivated the clause and is
   // the top Steel shadow by a wide margin in any plausible meta.
@@ -309,14 +319,14 @@ console.log("\nS2b — the keeper floor names the actual keeper roster");
   // rule as the filter emitters: species names come from the dictionary.
   const metagross = resolveSpecies("metagross", "de");
   check(`Shadow Metagross is protected by name (+${metagross})`,
-    terms.includes(`+${metagross}`), keeperClause.slice(0, 120));
+    terms.includes(`+${metagross}`), `${terms.length} keeper clauses`);
   // An empty roster must collapse the clause entirely rather than emit
   // `!crypto,` — a dangling separator the game cannot parse.
   const empty = buildFilters([], [], mergeImportedConfig({
     protectShadows: false, protectShadowPurifyOnly: true, shadowKeeperSpecies: [],
   }), [], "de", tFn);
   check("empty keeper roster emits no keeper clause",
-    !hasClauseMatching(empty.trash, /^!crypto,\+/i) && !/[&,]$|,,/.test(empty.trash));
+    !hasClauseMatching(empty.trash, /^!crypto,!?\+/i) && !/[&,]$|,,/.test(empty.trash));
 }
 
 console.log("\nS3 — migration: a legacy protectShadows:false config keeps releasing ALL shadows");
@@ -334,7 +344,49 @@ console.log("\nS4 — floor differs from blanket by exactly the shadow clauses (
   const onlyInBlanket = clauses(blanket.trash).filter(c => !clauses(floor.trash).includes(c));
   const onlyInFloor = clauses(floor.trash).filter(c => !clauses(blanket.trash).includes(c));
   check("blanket drops exactly the bare !crypto", onlyInBlanket.length === 1 && /^!crypto$/i.test(onlyInBlanket[0]), onlyInBlanket.join("|"));
-  check("floor adds exactly the four scoped clauses", onlyInFloor.length === 4, onlyInFloor.join("|"));
+  check("floor adds the three purify clauses plus one per keeper",
+    onlyInFloor.length === 3 + mergeImportedConfig({}).shadowKeeperSpecies.length,
+    `${onlyInFloor.length} added`);
+}
+
+// The bug this pins: with blanket crypto protection off, the keeper floor used
+// the positive `!crypto,+a,+b,…` shape. Comma is OR, so it read "releasable if
+// NOT crypto, OR you ARE one of these keepers" — the exact inverse of the
+// intent. Every non-keeper shadow failed it and was protected (the user saw NO
+// crypto in the trash after switching blanket protection off), and every keeper
+// satisfied it and was released. De Morgan: a negated union is an AND of
+// negations, which in this grammar means separate clauses.
+console.log("\nS5 — keeper floor semantics: junk shadows releasable, keepers protected");
+{
+  const cfg = mergeImportedConfig({});
+  cfg.protectShadows = false; // what unchecking the expert toggle actually does
+  check("unchecking the toggle in-session leaves the floor ON",
+    cfg.protectShadowPurifyOnly === true, "the migration pin is load-time only");
+  const floor = buildFilters([], [], cfg, [], "de", tFn);
+  const keeperFloor = clauses(floor.trash).filter(c => /^!crypto,!\+/i.test(c)).join("&");
+
+  const base = {
+    types: ["normal"], year: 2024, ageDays: 5, distance: 0, wp: 300,
+    flags: { traded:false, shadow:true, lucky:false, favorite:false, shiny:false, legendary:false,
+             mythical:false, ultrabeast:false, costume:false, purified:false, background:false,
+             dynamaxCapable:false, doubleMoved:false, xxl:false, xl:false, xxs:false, tagged:false,
+             legacyMove:false, newDexEvo:false, eggOnly:false, buddy:false, megaEvolved:false },
+  };
+  const mk = (families, o = {}) => ({ ...base, families, dex: 1, atk: 1, def: 1, hp: 1, star: 1, ...o,
+    flags: { ...base.flags, ...(o.flags || {}) } });
+  // Species names are DERIVED, never typed — same rule as the emitters.
+  const metagross = resolveSpecies("metagross", "de");
+  const beldum = resolveSpecies("beldum", "de");
+  const rattata = resolveSpecies("rattata", "de");
+
+  check("a junk shadow clears the keeper floor (releasable)",
+    evalFilter(keeperFloor, mk([rattata]), "de") === true);
+  check("a keeper shadow is held back by it",
+    evalFilter(keeperFloor, mk([metagross]), "de") === false);
+  check("the keeper's pre-evo is held back too (+family search)",
+    evalFilter(keeperFloor, mk([beldum, metagross]), "de") === false);
+  check("a NON-shadow keeper is untouched by the floor",
+    evalFilter(keeperFloor, mk([metagross], { flags: { shadow: false } }), "de") === true);
 }
 
 console.log(`\n${failures === 0 ? "✓ All carve-out checks passed." : `✗ ${failures} failure(s).`}`);

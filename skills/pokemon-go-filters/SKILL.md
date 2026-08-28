@@ -364,6 +364,11 @@ Recurring mistakes when building filters. Check this list before delivery.
 - **Adding "safety" terms without checking set-theoretic contribution.** A bare `gigadynamax` thrown into a species OR-list widens the match set to all Giga species, not just top-Giga. Every term in every clause should have a stated set contribution.
 - **Assuming range syntax handles missing values.** It doesn't for Dyna attributes. Use negation. `!dynawall3` not `dynawall-2` for exclusion guards.
 - **Negating a union inside a comma-OR.** `!A,!B` is trivially true. De Morgan: use `!A&!B` as separate clauses.
+- **Writing the positive union when you meant the negated one.** `!crypto,+a,+b,…` looks like
+  "keep unless it is one of these" and means the exact opposite: comma is OR, so it is satisfied by
+  the listed species and fails for everything else — it protects the junk and releases the keepers.
+  A guard of the form "X only if NOT in list L" is `!X,!L₁ & !X,!L₂ & …`, one clause per member.
+  Sanity check every such clause against two fixtures: one member of L and one non-member.
 - **Guessing at syntax instead of reading SYNTAX.md.** The cost of misremembering `+` prefix vs suffix is real. Check the reference.
 - **Verifying the filter AFTER delivery instead of during construction.** Discipline: verify each clause's contribution as you add it. The Python oracle is cheap — write it during Step 4 of the workflow, not after.
 - **Using `+` habitually.** `+species` includes the evolution family. If the rest of the filter already excludes pre-evos (e.g., via `dynaattacke1-`), `+` is redundant and costs characters.
