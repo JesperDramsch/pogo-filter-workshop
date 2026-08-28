@@ -86,10 +86,12 @@
 //
 //   rating = DPS × TOF^RATING_EXPONENT = DPS^(1−e) × TDO^e
 //
-// with e = 0.15 (the "TER" exponent the community fitted against Pokebattler's
-// Time-to-Win). e = 0 would be raw DPS and rank glass cannons top; e = 1 would
-// be raw TDO and rank blobs top. dps and tdo are emitted alongside the rating
-// so the exponent can be second-guessed without a re-fetch.
+// where e is RATING_EXPONENT, set and justified with the other tunables below
+// rather than repeated here — this comment carried a stale 0.15 through the
+// change that settled on 0.25, which is exactly the drift naming it twice
+// invites. e = 0 would be raw DPS and rank glass cannons top; e = 1 would be
+// raw TDO and rank blobs top. dps and tdo are emitted alongside the rating so
+// the exponent can be second-guessed without a re-fetch.
 //
 // The reference boss is deliberately GENERIC — neutral type effectiveness, no
 // weather. Per-boss counters are a different feature with a different source
