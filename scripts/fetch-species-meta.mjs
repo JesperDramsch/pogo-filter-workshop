@@ -51,8 +51,9 @@
 //    script can key a Mega-vs-Primal split off, so a first live run tripped
 //    the Kyogre assertion below (gm 48 · pogoapi 47 · union 50). The game
 //    master is the one source that names the mechanic outright
-//    (TEMP_EVOLUTION_MEGA vs TEMP_EVOLUTION_PRIMAL), and it was also the
-//    fresher of the two. A game-master outage empties megaDex and the size
+//    (TEMP_EVOLUTION_MEGA vs TEMP_EVOLUTION_PRIMAL), and it is also by far
+//    the fresher of the two — see scripts/lib/game-master.mjs for the mirror
+//    preference this reads through, and why it is no longer PokeMiners. A game-master outage empties megaDex and the size
 //    gate below reddens the sync — the intended intervention signal, same as
 //    every other assertion here. Emitted as the MEGA-CAPABLE species dex
 //    (Charizard, not Charmander) — App.jsx's collectible-base remap turns
@@ -70,9 +71,11 @@
 //
 // Flags: --offline-ok   tolerate fetch failures if cache exists.
 
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { canonicalStringify, writeJson } from "./lib/json.mjs";
+import { fetchGameMaster, warnIfStale, gameMasterProvenance } from "./lib/game-master.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -85,10 +88,15 @@ const ENDPOINTS = {
   evolutions:  "https://pogoapi.net/api/v1/pokemon_evolutions.json",
   stats:       "https://pogoapi.net/api/v1/pokemon_stats.json",
   released:    "https://pogoapi.net/api/v1/released_pokemon.json",
-  // PokeMiners game master (same org the grunt-quote fetcher uses). Big file
-  // (~tens of MB) but this script only runs in the daily sync workflow.
-  gameMaster:  "https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/latest.json",
 };
+
+// The game master is fetched through the shared mirror preference list rather
+// than pinned to one repo — see scripts/lib/game-master.mjs. This script used
+// to read PokeMiners directly, which by 2026-08-28 was serving a 2026-04-17
+// batch: 133 days in which no new Mega reached megaDex, no new evolution
+// branch reached evoParentByDex, and no newly reclassified species reached
+// specialTradeDex, all silently. Big file (~19 MB) but this script only runs
+// in the daily sync workflow.
 
 // Group dex ids by generation from pogoapi's pokemon_generations.json,
 // whatever shape it arrives in — the first live run tripped the starter
@@ -348,18 +356,6 @@ function collectDexIds(payload) {
   return ids;
 }
 
-function canonicalStringify(value) {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonicalStringify).join(",")}]`;
-  const keys = Object.keys(value).sort();
-  return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalStringify(value[k])}`).join(",")}}`;
-}
-
-function writeJson(path, data) {
-  if (!existsSync(dirname(path))) mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, JSON.stringify(data, null, 2) + "\n", "utf8");
-}
-
 function assertOrDie(cond, label) {
   if (!cond) {
     console.error(`✗ sanity check failed: ${label}`);
@@ -390,11 +386,23 @@ async function main() {
     process.exit(1);
   }
   // The game master may fail independently of the pogoapi batch — the union
-  // of whatever succeeds plus the assertions below is the gate.
+  // of whatever succeeds plus the assertions below is the gate. `gmSource`
+  // carries which mirror answered into the provenance block below; a total
+  // outage leaves it null and the megaDex size gate reddens the sync.
   let gameMaster = null;
+  let gmSource = { mirror: null, batchMs: null };
   try {
-    console.log("→ Fetching PokeMiners game master (pokemonClass source)");
-    gameMaster = await fetchJson(ENDPOINTS.gameMaster);
+    console.log("→ Fetching game master (pokemonClass / megaDex / evolutionBranch source)");
+    const gm = await fetchGameMaster({
+      userAgent: "pogo-filter-workshop species-meta-fetcher/1.0",
+    });
+    gameMaster = gm.templates;
+    gmSource = { mirror: gm.mirror, batchMs: gm.batchMs };
+    if (gm.failures.length > 0) {
+      console.warn(`⚠  fell back to ${gm.mirror} after ${gm.failures.join("; ")}`);
+    }
+    console.log(`  game master: ${gm.mirror}, ${gameMaster.length} templates`);
+    warnIfStale(gmSource, "Newly released Megas and evolution branches may be missing.");
   } catch (e) {
     console.warn(`⚠  game master fetch failed (${e.message}).`);
   }
@@ -533,6 +541,15 @@ async function main() {
   }
 
   const newContent = {
+    // Provenance, the way meta-rankings.json records it: which upstream
+    // answered each half of this snapshot, and the game master's batch stamp.
+    // pogoapi carries no batch stamp of its own — see the audit note in
+    // README.md's "Data sources" — so it is named without one.
+    sources: {
+      classes: "pogoapi.net + game master",
+      gameMaster: gameMasterProvenance(gmSource).mirror,
+      gameMasterBatch: gameMasterProvenance(gmSource).batch,
+    },
     startersPerGeneration: STARTERS_PER_GENERATION,
     powerLineCumulativeCandy: POWER_LINE_CUMULATIVE_CANDY,
     powerLineTop: POWER_LINE_TOP,

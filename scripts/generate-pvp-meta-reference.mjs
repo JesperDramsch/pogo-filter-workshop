@@ -41,7 +41,11 @@ function watchInfo() {
   if (!existsSync(p)) return null;
   try {
     const w = JSON.parse(readFileSync(p, "utf8"));
-    const last = w.history?.[0] || null;
+    // PvP entries only. The watch grew a second, PvE stream (raid move power,
+    // duration and energy), and this section is captioned "Trainer-Battle stat
+    // change" — rendering a PvE entry under it would be a false statement about
+    // what moved. Entries predating the `stream` tag are all PvP.
+    const last = (w.history || []).find(h => (h.stream ?? "pvp") === "pvp") || null;
     return {
       checkedAt: w.fetchedAt || null,
       lastChangeAt: last?.at || null,

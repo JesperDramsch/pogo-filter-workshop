@@ -294,10 +294,12 @@ export function assertNoPuaSurvives(repaired) {
     .sort((a, b) => b[1].length - a[1].length)
     .map(([cp, keys]) => `  ${cp} — ${keys.length} value(s), e.g. ${keys.slice(0, 4).join(", ")}`);
   throw new Error(
-    `Hindi repair incomplete: ${offenders.size} private-use codepoint(s) survived.\n` +
+    `Encoding check failed: ${offenders.size} private-use codepoint(s) in the ` +
+      `text about to be written.\n` +
       lines.join("\n") +
-      `\n\nUpstream has emitted legacy-font mojibake this table does not cover yet.\n` +
-      `Decode each codepoint from its surrounding Devanagari and add it to\n` +
-      `scripts/hi-pua-repair.json with a worked example, then re-run.`
+      `\n\nUpstream has emitted legacy-font mojibake. A private-use codepoint has\n` +
+      `no meaning outside the font that produced it, so it cannot be rendered and\n` +
+      `must not ship: find what the upstream bundle publishes for these keys and\n` +
+      `fix the source, not the symptom.`
   );
 }
