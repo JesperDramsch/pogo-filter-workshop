@@ -200,6 +200,7 @@
   "app.filter.pvp_master_hint": "マスターリーグのトップ30メタピック。CP上限なし — 種選びがIV完璧度を上回る(3★ザシアンはhundoメタグロスを上回る)。IVゲート未適用;ここでは低い攻撃はベイト優位ではなくハンデ。ロスターのIVはゲーム内で確認すること。",
   "app.filter.pvp_cup_label": "{name} · {teaser}",
   "app.filter.pvp_cup_hint": "{name}のトップ30メタファミリー、ベース種で重複排除。カップの{cap}CP上限と緩いPvPランク1 IVパターン(攻撃 0-1、防御 3-4、HP 3-4)を含む — 上のリーグフィルターと同じ形。テーマカップが開催されていないときはカード自体が非表示になる。",
+  "app.filter.pvp_cup_hint_uncapped": "{name}のトップ30メタファミリー、ベース種で重複排除。このカップはCP上限がないため、CP条件もランク1 IVパターンも適用されない — 抑えるべき上限がなければ、攻撃の低い個体はハンドレッドより弱い。テーマカップが開催されていないときはカード自体が非表示になる。",
   "app.filter.aux_rocket_empty": "現在のスナップショットにロケット団編成なし。`npm run fetch-rocket-lineups`を実行して更新。",
   "app.filter.rocket_phase_label": "フェーズ{slot}",
   "app.filter.rocket_phase_hint": "このフェーズの可能性があるポケモン:{names}。",

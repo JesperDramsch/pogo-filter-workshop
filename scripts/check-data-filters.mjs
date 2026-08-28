@@ -23,7 +23,11 @@ import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import META_RANKINGS from "../src/data/meta-rankings.json";
 import { buildDataFilters, FIXTURE_CONFIG } from "./lib/fixture.mjs";
 import { LOCALES } from "../src/i18n/index.js";
-import { pokemonNameFor, resolveSpecies } from "../src/data/species.js";
+// `resolveSpecies` is D7's; the dictionary and locale list are D6's. D6 no
+// longer imports `pokemonNameFor` — it falls back to English, which is what made
+// the old per-locale assertion unable to fail.
+import { POKEMON_NAMES_DICT, SUPPORTED_NAME_LOCALES, resolveSpecies } from "../src/data/species.js";
+import { unresolvableDexEntries, NAME_LOCALES } from "./lib/species-dex.mjs";
 
 let failures = 0;
 function check(label, cond, detail = "") {
@@ -181,7 +185,6 @@ console.log("\nD6 — the PvP snapshot is well formed and every dex resolves");
     ...Object.entries(PVP_RANKINGS.cups || {}),
   ];
   const malformed = [];
-  const unresolvable = [];
   const duplicated = [];
   for (const [label, pool] of pools) {
     const seen = new Set();
@@ -195,16 +198,29 @@ console.log("\nD6 — the PvP snapshot is well formed and every dex resolves");
       // A parenthesised form name here would emit `+quagsire (shadow)` — a
       // filter token with a space in it — via App.jsx's dex-dict fallback.
       if (/[()]/.test(sp.name)) malformed.push(`${label}:${sp.name} (form suffix, not a base name)`);
-      for (const loc of localeNames) {
-        if (!pokemonNameFor(String(sp.dex), loc)) unresolvable.push(`${label}:${sp.dex}/${loc}`);
-      }
     }
   }
+  // Via the shared strict helper, NOT pokemonNameFor. pokemonNameFor falls back
+  // to the English entry, so it returns the same truthy value for all seven
+  // locales and a per-locale hole could never fail this check — it did 7× the
+  // work of a single call and asserted exactly as much. The strict lookup is
+  // what actually catches a German filter silently carrying an English name.
+  const unresolvable = unresolvableDexEntries(
+    pools.map(([label, pool]) => [label, pool.species]),
+    POKEMON_NAMES_DICT,
+    NAME_LOCALES,
+  );
   check(`every species entry is {dex:int, name:non-empty base name} (${pools.length} pools)`,
     malformed.length === 0, malformed.slice(0, 5).join(", "));
   check("no duplicate dex within a league or cup", duplicated.length === 0, duplicated.slice(0, 5).join(", "));
-  check(`every dex resolves in all ${localeNames.length} locales`,
+  check(`every dex has a real name in all ${NAME_LOCALES.length} locales (no en fallback)`,
     unresolvable.length === 0, unresolvable.slice(0, 5).join(", "));
+  // The fetchers run under plain node and cannot import species.js, so
+  // scripts/lib/species-dex.mjs keeps its own copy of the locale list. Assert
+  // the two agree, so that copy cannot drift unnoticed.
+  check("species-dex NAME_LOCALES matches SUPPORTED_NAME_LOCALES",
+    [...NAME_LOCALES].sort().join(",") === [...SUPPORTED_NAME_LOCALES].sort().join(","),
+    `${NAME_LOCALES.join("/")} vs ${SUPPORTED_NAME_LOCALES.join("/")}`);
 }
 
 console.log("\nD7 — shadow keeper filters project the whole keeper list");

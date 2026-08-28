@@ -1,21 +1,9 @@
 {
   "fetchedAt": "2026-08-28T10:34:19.010Z",
   "source": "pvpoke-gamemaster",
-  "trackedFields": [
-    "power",
-    "energy",
-    "energyGain",
-    "cooldown",
-    "turns",
-    "buffs",
-    "buffTarget",
-    "buffApplyChance"
-  ],
-  "moveCount": 349,
   "pokeminers": {
     "sourceEtag": "W/\"21c6f605b8bdc1170de0c3b846f148dd7b893dda99605a1256b24f97bcfa3f2c\"",
-    "gameMasterAt": "2026-04-17T00:48:50.700Z",
-    "stale": true
+    "gameMasterAt": "2026-04-17T00:48:50.700Z"
   },
   "history": [],
   "moves": {

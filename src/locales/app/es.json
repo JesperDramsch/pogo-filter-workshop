@@ -200,6 +200,7 @@
   "app.filter.pvp_master_hint": "Top-30 picks meta para Liga Master. Sin tope de PC — la elección de especie supera a la perfección IV (un Zacian 3★ supera a un Metagross hundo). No se aplica barrera IV; un ataque bajo es un handicap aquí, no una ventaja de bait. Revisa los IVs de tu roster en el juego.",
   "app.filter.pvp_cup_label": "{name} · {teaser}",
   "app.filter.pvp_cup_hint": "Familia meta top-30 para {name}, deduplicada por especie base. Incluye el tope de {cap} PC de la copa y el patrón de IVs flojos rango-1 PvP (atk 0-1, def 3-4, PS 3-4) — misma forma que los filtros de liga de arriba. La tarjeta se oculta cuando no hay ninguna copa temática activa.",
+  "app.filter.pvp_cup_hint_uncapped": "Familia meta top-30 para {name}, deduplicada por especie base. Esta copa no tiene tope de PC, así que no se aplica ninguna cláusula de PC ni el patrón de IVs rango-1 — sin tope al que ajustarse, un ataque bajo es peor que un hundo. La tarjeta se oculta cuando no hay ninguna copa temática activa.",
   "app.filter.aux_rocket_empty": "No hay alineaciones de Rocket en el snapshot actual. Ejecuta `npm run fetch-rocket-lineups` para refrescar.",
   "app.filter.rocket_phase_label": "fase {slot}",
   "app.filter.rocket_phase_hint": "Pokémon posibles en esta fase: {names}.",
