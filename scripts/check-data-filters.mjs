@@ -15,13 +15,18 @@
 //   D4 — non-English locales actually localize (no silent English fallback)
 //   D5 — empty filter families are reported, so upstream shape breaks surface
 //   D6 — the PvP snapshot itself is well formed and every dex resolves
+//   D7 — the shadow keeper filters carry every keeper, in every locale
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
-import { buildDataFilters } from "./lib/fixture.mjs";
+import META_RANKINGS from "../src/data/meta-rankings.json";
+import { buildDataFilters, FIXTURE_CONFIG } from "./lib/fixture.mjs";
 import { LOCALES } from "../src/i18n/index.js";
-import { POKEMON_NAMES_DICT, SUPPORTED_NAME_LOCALES } from "../src/data/species.js";
+// `resolveSpecies` is D7's; the dictionary and locale list are D6's. D6 no
+// longer imports `pokemonNameFor` — it falls back to English, which is what made
+// the old per-locale assertion unable to fail.
+import { POKEMON_NAMES_DICT, SUPPORTED_NAME_LOCALES, resolveSpecies } from "../src/data/species.js";
 import { unresolvableDexEntries, NAME_LOCALES } from "./lib/species-dex.mjs";
 
 let failures = 0;
@@ -216,6 +221,54 @@ console.log("\nD6 — the PvP snapshot is well formed and every dex resolves");
   check("species-dex NAME_LOCALES matches SUPPORTED_NAME_LOCALES",
     [...NAME_LOCALES].sort().join(",") === [...SUPPORTED_NAME_LOCALES].sort().join(","),
     `${NAME_LOCALES.join("/")} vs ${SUPPORTED_NAME_LOCALES.join("/")}`);
+}
+
+console.log("\nD7 — shadow keeper filters project the whole keeper list");
+{
+  // shadowSafe and shadowFrustration are the two filters that name every
+  // meta shadow attacker individually, so they are the ones that break when
+  // the meta-rankings sync emits a species the app cannot resolve. That is not
+  // hypothetical: the previous pogoapi-based sync shipped "tapu-bulu",
+  // "tapu-lele" and "tapu-koko", which resolveSpecies returns null for, and
+  // App.jsx's canonicalize() passes an unresolved entry straight through — so
+  // all three reached users' filters as search terms matching nothing at all.
+  // These checks are what makes that class of failure loud.
+  const keepers = META_RANKINGS.shadowKeepers || [];
+  check(`meta-rankings ships ${keepers.length} shadow keepers`, keepers.length > 0,
+    "an empty keeper list would make every check below vacuous");
+
+  const unresolvable = keepers.filter((s) => !resolveSpecies(s));
+  check("every keeper resolves through resolveSpecies",
+    unresolvable.length === 0,
+    unresolvable.length ? `unresolvable: ${unresolvable.join(", ")}` : "");
+
+  check("keeper list has no duplicates",
+    new Set(keepers).size === keepers.length);
+
+  for (const loc of localeNames) {
+    const safe = byLocale[loc].shadowSafe || "";
+    const frustration = byLocale[loc].shadowFrustration || "";
+    // One `!+name` exclusion per keeper in shadowSafe, one `+name` include per
+    // keeper in shadowFrustration. Counting the terms rather than matching the
+    // names keeps the check locale-agnostic while still catching a keeper that
+    // silently fell out of the projection.
+    const safeTerms = (safe.match(/!\+/g) || []).length;
+    const frustrationTerms = (frustration.match(/(?:^|[&,])\+/g) || []).length;
+    check(`${loc}: shadowSafe excludes all ${keepers.length} keeper families`,
+      safeTerms === keepers.length, `found ${safeTerms}`);
+    check(`${loc}: shadowFrustration includes all ${keepers.length} keeper families`,
+      frustrationTerms === keepers.length, `found ${frustrationTerms}`);
+  }
+
+  // The trash crypto floor is the other keeper consumer, but it only fires when
+  // protectShadows is off — the fixture config leaves it on, so the pinned
+  // `trash` string is deliberately unaffected and stays exact-pinned. Assert
+  // that invariant here so a change to the default cannot quietly start
+  // churning the fixture.
+  check("default config keeps the trash crypto floor dormant",
+    FIXTURE_CONFIG.protectShadows === true,
+    FIXTURE_CONFIG.protectShadows === true ? ""
+      : "protectShadows default flipped — the keeper floor now lands in `trash`, which IS exact-pinned");
 }
 
 console.log(`\n${failures === 0 ? "✓ All data-filter property checks passed." : `✗ ${failures} failure(s).`}`);

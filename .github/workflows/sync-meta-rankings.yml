@@ -28,7 +28,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Fetch Pokémon stats + moves from pogoapi.net
+      - name: Derive raid-attacker rankings from the game master (alexelgt, PokeMiners fallback)
         run: npm run fetch-meta-rankings
       # Deliberately does NOT regenerate the fixture: the snapshot pins only
       # config-derived filters, and the data-derived ones this feeds are covered
@@ -43,5 +43,5 @@ jobs:
             exit 0
           fi
           git add src/data/meta-rankings.json
-          git commit -m "chore(meta): sync top-attacker rankings from pogoapi"
+          git commit -m "chore(meta): sync raid-attacker + shadow-keeper rankings from the game master"
           git push

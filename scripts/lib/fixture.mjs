@@ -66,9 +66,10 @@ export function buildResult(locale, { hundos = DEFAULT_HUNDOS, luckies = DEFAULT
 // snapshot is good at.
 //
 // Deliberately NOT pinned: raidFilters, maxBattleFilters, maxTank,
-// rocketLeaders, rocketTypedGrunts, rocketGenericGrunts and pvpFilters. Those
-// are projections of data that syncs daily — 17 of the last 20 commits touching
-// this fixture were automated raid/PvP syncs, one of them rewriting 126 lines.
+// rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, pvpFilters,
+// shadowSafe and shadowFrustration. Those are projections of data that syncs
+// daily — 17 of the last 20 commits touching this fixture were automated
+// raid/PvP syncs, one of them rewriting 126 lines.
 // Pinning a daily-changing value cannot distinguish "the boss rotation moved"
 // from "the counter logic broke": the sync regenerates the snapshot in the same
 // job, so it always heals and nobody ever reviews it. That is churn, not a test.
@@ -87,9 +88,14 @@ export function buildFixture() {
       // Aux pro-tools — task-oriented filter strings. Config-derived and stable;
       // these were written to the fixture but never compared until now.
       shadowCheap: result.shadowCheap,
-      shadowSafe: result.shadowSafe,
       shadowHundoCandidates: result.shadowHundoCandidates,
-      shadowFrustration: result.shadowFrustration,
+      // shadowSafe and shadowFrustration moved to buildDataFilters when
+      // shadowKeeperSpecies stopped being a hand-curated constant and became a
+      // daily sync off meta-rankings.json. Both are a keeper name per clause,
+      // so pinning them would have rewritten 150 fixture lines every time the
+      // game master shifted a species by one rank — churn that heals itself in
+      // the sync job and that nobody reads. Their structure is asserted in
+      // check-data-filters.mjs (D6) instead.
       cheapEvolve: result.cheapEvolve,
       dexPlus: result.dexPlus,
       megaEvolve: result.megaEvolve,
@@ -122,6 +128,8 @@ export function buildDataFilters(locale) {
     pvpFilters: Object.fromEntries(
       Object.entries(result.pvpFilters || {}).map(([k, v]) => [k, v.clause || ""])
     ),
+    shadowSafe: result.shadowSafe,
+    shadowFrustration: result.shadowFrustration,
   };
 }
 
