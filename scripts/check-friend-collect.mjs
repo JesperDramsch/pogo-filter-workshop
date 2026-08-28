@@ -971,6 +971,39 @@ console.log('\nScenario 9b: un-searchable slots gate coverage the same way they 
 		buildFilters([], [], { ...slotCfg, friendCollectSpecies: ['dratini'] }, [], 'en', t)
 			.friendCollectTargets[0].slotsOwned === null,
 	);
+	// 'both' mode: the chip's owned markers are the INTERSECTION of the two
+	// have-lists, because that is what coverage demands there. A slot the lucky
+	// list holds but the hundo list does not is not done, and marking it so
+	// would promise a hundo hunt was over before it started.
+	{
+		const bothCfg = {
+			...slotCfg,
+			friendCollectSpecies: ['burmy'],
+			friendCollectMode: 'both',
+			luckySlots: { burmy: ['plant', 'sandy'] },
+			hundoSlots: { burmy: ['plant'] },
+		};
+		const both = buildFilters(['burmy'], ['burmy'], bothCfg, [], 'en', t).friendCollectTargets[0];
+		check(
+			"'both' marks only the slots BOTH goals hold",
+			JSON.stringify(both.slotsOwned) === JSON.stringify(['plant']),
+			JSON.stringify(both.slotsOwned),
+		);
+		const luckyOnly = buildFilters(['burmy'], ['burmy'], { ...bothCfg, friendCollectMode: 'lucky' }, [], 'en', t)
+			.friendCollectTargets[0];
+		const hundoOnly = buildFilters(['burmy'], ['burmy'], { ...bothCfg, friendCollectMode: 'hundo' }, [], 'en', t)
+			.friendCollectTargets[0];
+		check(
+			'…while each single-goal focus reads its own have-list',
+			JSON.stringify(luckyOnly.slotsOwned) === JSON.stringify(['plant', 'sandy']) &&
+				JSON.stringify(hundoOnly.slotsOwned) === JSON.stringify(['plant']),
+			`${JSON.stringify(luckyOnly.slotsOwned)} / ${JSON.stringify(hundoOnly.slotsOwned)}`,
+		);
+		check(
+			'…and the target stays uncovered while either goal is short',
+			both.owned === false,
+		);
+	}
 	// Hundo focus reads the hundo slot map, not the lucky one.
 	const hundoFocus = buildFilters(owned, [], {
 		...slotCfg,

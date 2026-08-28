@@ -2793,6 +2793,22 @@ export function buildFilters(
 		forms: friendCollectKeptForms(canonName),
 		slots: friendCollectKeptSlots(canonName),
 	});
+	// Which un-searchable slots the ACTIVE focus already holds — the chip marks
+	// those, so a partly-collected Burmy reads as "these three are still open"
+	// rather than four undifferentiated tags. In 'both' mode that is the
+	// INTERSECTION of the two have-lists, because that is what coverage demands
+	// there: a slot the lucky list holds but the hundo list does not is not done,
+	// and marking it so would promise a hundo hunt was over before it started.
+	// null for species with no slot axis, so the chip can tell "no axis" from
+	// "axis, nothing owned".
+	const friendCollectSlotsOwned = (canonName) => {
+		if (!invisibleSlotsFor(canonName)) return null;
+		const l = cfg.luckySlots?.[canonName] || [];
+		const h = cfg.hundoSlots?.[canonName] || [];
+		if (friendCollectMode === 'lucky') return l;
+		if (friendCollectMode === 'hundo') return h;
+		return l.filter((slot) => h.includes(slot));
+	};
 	// Shared shape for both coverage questions below: the two goals run through
 	// the same form/gender/slot gates, then the focus decides how they combine.
 	const friendCollectCoveredBy = (canonName, want, ownedLucky, ownedHundo) => {
@@ -2868,10 +2884,6 @@ export function buildFilters(
 	const friendCollectTargets = (cfg.friendCollectSpecies || []).map((sp) => {
 		const key = canonKey(sp);
 		const want = friendCollectWants(key);
-		// Which un-searchable slots the ACTIVE goal already has on its have-list
-		// — the chip marks those, so a partly-collected Burmy reads as "these
-		// three are still open" rather than four undifferentiated tags.
-		const slotAnn = friendCollectMode === 'hundo' ? cfg.hundoSlots : cfg.luckySlots;
 		return {
 			species: sp,
 			display: speciesForOutput(sp, outputLocale),
@@ -2887,7 +2899,7 @@ export function buildFilters(
 			gender: want.gender,
 			keptForms: want.forms,
 			keptSlots: want.slots,
-			slotsOwned: invisibleSlotsFor(key) ? slotAnn?.[key] || [] : null,
+			slotsOwned: friendCollectSlotsOwned(key),
 		};
 	});
 	const friendCollectClauses = [];
