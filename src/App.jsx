@@ -116,6 +116,17 @@ function navigateView(target) {
 
 // ─── DATA ──────────────────────────────────────────────────────────────────
 
+// What the in-game search bar takes before it truncates, empirically verified
+// and documented in the pokemon-go-filters skill. Two places need it: FilterBox
+// flags a filter that crosses it, and the intelligent-PvP panel prices its
+// carve-out against it — a filter is over budget for reasons that are decided
+// several screens away from where the number is shown.
+export const SEARCH_CHAR_BUDGET = 5000;
+// Share of that budget at which the PvP meta carve-out is worth warning about.
+// 20% is ~18 species: past there the list is the single biggest thing in the
+// filter and every further tap costs another ~56 characters.
+const PVP_META_COST_WARN = 0.2 * SEARCH_CHAR_BUDGET;
+
 export const DEFAULT_HUNDOS = [];
 // Personal "lucky Pokémon" roster — species the user has at least one
 // lucky of. Where this overlaps with DEFAULT_HUNDOS, duplicate copies
@@ -1631,6 +1642,52 @@ export function buildFilters(
 		),
 	];
 
+	// The same roster minus the keepers the trash filter's own blanket clauses
+	// already protect. `!legendär` covers Shadow Latios on its own, so the
+	// floor's `!crypto,!+latios` beside it buys nothing and costs ~20
+	// characters — and the floor is the longest thing in that filter. Only the
+	// trash floor gets the trimmed list: the shadowSafe / shadowFrustration
+	// pro-tools carry no blanket clauses to inherit from and keep the full one.
+	//
+	// The classes are DERIVED, never typed — `shadowKeeperClasses` is emitted
+	// by the meta-rankings sync from the game master's own `pokemonClass`, and
+	// only for keepers whose WHOLE evolution family shares the class, since
+	// `!+species` protects the family and the blanket clause has to cover all
+	// of it. A keeper with no entry keeps its clause; silence costs characters,
+	// never protection. Same rule as everywhere else here: a hand-written list
+	// of legendaries would be wrong the first time a species is reclassified.
+	const keeperClassOf = new Map(
+		Object.entries(META_RANKINGS.shadowKeeperClasses || {}).map(([sp, bucket]) => [
+			resolveSpecies(sp) || sp,
+			bucket,
+		]),
+	);
+	// A mythical carved out of `!mythical` via mythTooManyOf has spent that
+	// protection, so its floor clause is load-bearing again.
+	const mythCarvedOut = new Set(
+		(cfg.mythTooManyOf || []).map((sp) => resolveSpecies(sp) || sp),
+	);
+	const blanketCoveredClasses = new Set(
+		[
+			cfg.protectLegendaries ? 'legendary' : null,
+			cfg.protectMythicals ? 'mythical' : null,
+			cfg.protectUltraBeasts ? 'ultraBeast' : null,
+		].filter(Boolean),
+	);
+	const floorKeeperResolved = [
+		...new Set(
+			(cfg.shadowKeeperSpecies || [])
+				.filter((sp) => {
+					const canonical = resolveSpecies(sp) || sp;
+					const bucket = keeperClassOf.get(canonical);
+					if (!bucket || !blanketCoveredClasses.has(bucket)) return true;
+					return bucket === 'mythical' && mythCarvedOut.has(canonical);
+				})
+				.map((sp) => speciesForOutput(sp, outputLocale))
+				.filter(Boolean),
+		),
+	];
+
 	// The curated "relevant now" list — species you actually battle with, seeded
 	// one tap at a time from the league packs. Rendered into the user's PoGo
 	// locale, same as shadowKeeperSpecies (`keeperResolved`).
@@ -1650,6 +1707,19 @@ export function buildFilters(
 	// per-species shape mirrors the trade-evo carve-out below. Skipped entirely
 	// when the meta tier is not strictly wider than the base tier — then the base
 	// clause already implies every carve-out (`2-4atk` ⟹ `1-4atk`).
+	//
+	// This is why a long meta list is expensive (~56 characters per species in
+	// German), and there is no cleverer encoding to find. What the filter has to
+	// say is `strict_bad ∧ (loose_bad ∨ ¬meta)`, and ¬meta is a negated union,
+	// so De Morgan spreads it over one clause per member — a grammar with only
+	// comma-OR and &-AND and no parentheses cannot factor the shared
+	// `loose_bad` tail back out. Each `loose_bad ∨ ¬mᵢ` is an essential prime
+	// implicate. Nor can the tail be trimmed: dropping `0-2def` would wrongly
+	// protect a listed species with attack bucket 1 and junk defence, and
+	// widening `2-4atk` to `!1atk` only costs more. The only lever is how many
+	// species are on the list — the packs seed a whole league (30 each), and
+	// trimming that list is the intended way to buy characters back. FilterBox
+	// flags the ~5000-character in-game ceiling when a filter crosses it.
 	const pvpMetaWidens =
 		pvpMetaList.length > 0 && PVP_TIER_RANK[pvpMetaTier] > PVP_TIER_RANK[pvpBaseTier];
 	const pushPvPMetaClauses = (arr) => {
@@ -1806,22 +1876,38 @@ export function buildFilters(
 				`!${kw.flag.shadow},@${kw.flag.frustration}`,
 				tFn('app.clause_why.shadow_purify_frustration'),
 			);
-		// Fourth floor clause: the meta shadow attackers themselves. The three
-		// above are all about the PURIFY decision — a shadow worth purifying is
-		// worth not releasing. That says nothing about a shadow whose whole
-		// value is staying a shadow, and those are exactly the ones this list
-		// names. Without it a keeper that is cheap-to-purify, has no low IV and
-		// has already been Charge-TM'd passes all three and gets released: a
+		// Fourth floor: the meta shadow attackers themselves. The three above are
+		// all about the PURIFY decision — a shadow worth purifying is worth not
+		// releasing. That says nothing about a shadow whose whole value is
+		// staying a shadow, and those are exactly the ones this list names.
+		// Without it a keeper that is cheap-to-purify, has no low IV and has
+		// already been Charge-TM'd passes all three and gets released: a
 		// Charge-TM'd Shadow Metagross is the single most expensive Pokémon in
-		// the box to have thrown away, and it was the one shape the floor let
-		// through. One clause, not one per species — `!crypto,+a,+b,…` reads as
-		// "releasable only if it is not a keeper family", and OR binds tighter
-		// than `&` (same trick as legacyMovesClause).
-		if (keeperResolved.length > 0) {
+		// the box to have thrown away.
+		//
+		// ONE CLAUSE PER KEEPER, not one clause listing them all. The floor asks
+		// for "releasable only if this is NOT a keeper family", i.e. `!crypto ∨
+		// ¬(k₁ ∨ … ∨ kₙ)` — and De Morgan turns that negated union into an AND
+		// of negations, which in this grammar is separate clauses:
+		// `!crypto,!+k₁ & !crypto,!+k₂ & …`. The compact `!crypto,+k₁,+k₂,…`
+		// this replaced says the opposite of what it reads like: comma is OR, so
+		// it is satisfied by a shadow that IS a keeper and fails for every
+		// shadow that is not — it protected all the junk and released exactly
+		// the Metagross the clause was added for. The same trap is called out in
+		// the pvpMetaWidens comment above ("`!+a,!+b,…` … would go vacuously
+		// true") and in the skill's failure modes; this is its mirror image.
+		//
+		// n clauses is not a shape we can compress away: each `!crypto,!+kᵢ` is
+		// an essential prime implicate of the function, so any correct encoding
+		// in a parenthesis-free comma-OR/&-AND grammar costs one clause per
+		// keeper. The levers are the length of shadowKeeperSpecies
+		// (user-editable, seeded from the daily feed) and dropping the keepers a
+		// blanket clause already covers — see floorKeeperResolved above.
+		for (const sp of floorKeeperResolved) {
 			push(
 				trashClauses,
-				`!${kw.flag.shadow},${keeperResolved.map((sp) => `+${sp}`).join(',')}`,
-				tFn('app.clause_why.shadow_purify_keeper'),
+				`!${kw.flag.shadow},!+${sp}`,
+				tFn('app.clause_why.shadow_purify_keeper', { params: { name: sp } }),
 			);
 		}
 	}
@@ -3939,12 +4025,23 @@ export function buildFilters(
 	// PvP spread is actively WORSE there than a hundo. Seeding it would protect
 	// spreads the user would never play. Hand-adding a Master species still works.
 	const PVP_META_PACK_LEAGUES = ['great', 'ultra'];
+	// How deep each pack seeds. The snapshot carries 30 per league, ranked by
+	// PvPoke score, and a pack used to seed all of them — one tap on each put 47
+	// deduped species in the list and 2.6 kB of carve-out clauses in the trash
+	// filter, more than doubling it. The carve-out costs ~56 characters PER
+	// SPECIES and cannot be made cheaper (see pushPvPMetaClauses), so depth is
+	// the only knob, and the top of a rank-ordered list is where the value is:
+	// the 30th pick is a fraction of a rating point from the 40th and you are
+	// unlikely to be playing it. Ten each, deduped, is ~15 species and ~840
+	// characters. Anyone who wants the 11th can add it by name — the pack is a
+	// seed, not a cap.
+	const PVP_META_PACK_DEPTH = 10;
 	const pvpMetaPacks = PVP_META_PACK_LEAGUES.flatMap((key) => {
 		const league = PVP_RANKINGS.leagues?.[key];
 		if (!league?.species?.length) return [];
 		const stored = [
 			...new Set(league.species.map((sp) => pokemonNameFor(String(sp.dex))).filter(Boolean)),
-		];
+		].slice(0, PVP_META_PACK_DEPTH);
 		if (stored.length === 0) return [];
 		return [
 			{
@@ -7730,7 +7827,12 @@ function FriendCollectEditor({
 function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 	const { t } = useTranslation();
 	const len = filterStr.length;
-	const pct = Math.min(100, (len / 5000) * 100);
+	// Past the budget the string is silently truncated and the filter quietly
+	// means something else. The bar used to clamp at 100% with no other signal,
+	// so an over-budget filter (a deep PvP meta list plus the shadow-keeper
+	// floor will get you there) looked exactly like one that just fits.
+	const over = len > SEARCH_CHAR_BUDGET;
+	const pct = Math.min(100, (len / SEARCH_CHAR_BUDGET) * 100);
 	const codeRef = useRef(null);
 
 	// Tap the filter text to select-all — on mobile this lets long-press → "Copy"
@@ -7769,11 +7871,14 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 					<span className='mono text-xs font-semibold uppercase tracking-wider' style={{ color: accent }}>
 						{label}
 					</span>
-					<span className='mono text-xs text-[#8090A0]'>
+					<span className='mono text-xs' style={{ color: over ? '#FF6B5B' : '#8090A0' }}>
 						{t('app.filterbox.length_label', { params: { len: len.toLocaleString() } })}
 					</span>
 					<div className='w-24 h-1 bg-[#1F2933] rounded-full overflow-hidden'>
-						<div className='h-full transition-all' style={{ width: `${pct}%`, background: accent }} />
+						<div
+							className='h-full transition-all'
+							style={{ width: `${pct}%`, background: over ? '#FF6B5B' : accent }}
+						/>
 					</div>
 				</div>
 				<button
@@ -7784,6 +7889,16 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 					{buttonLabel}
 				</button>
 			</div>
+			{over && (
+				<p
+					role='status'
+					className='px-4 py-2 text-xs mono leading-snug border-b border-[#1F2933] bg-[#FF6B5B]/10 text-[#FF6B5B]'
+				>
+					{t('app.filterbox.over_budget', {
+						params: { over: (len - SEARCH_CHAR_BUDGET).toLocaleString() },
+					})}
+				</p>
+			)}
 			{hint && (
 				<p className='px-4 py-2 text-xs italic text-[#8B98A5] leading-snug border-b border-[#1F2933] bg-[#0E141A]'>
 					{hint}
@@ -9119,7 +9234,7 @@ const PRESETS = {
 // entirely would make "Intelligent" silently mean "Strict"), while expert mode
 // adds the full curated chip list, free-text adding, and both IV tiers.
 function PvpMetaPanel({ config, set, expert, packs, newItem, setNewItem }) {
-	const { t } = useTranslation();
+	const { t, outputLocale } = useTranslation();
 	const items = config.pvpMetaSpecies || [];
 	const metaTier = config.pvpMetaTier || 'loose';
 	const baseTier = config.pvpBaseTier || 'strict';
@@ -9128,6 +9243,20 @@ function PvpMetaPanel({ config, set, expert, packs, newItem, setNewItem }) {
 	// wondering why the string did not move.
 	const RANK = { none: 0, strict: 1, loose: 2 };
 	const redundant = items.length > 0 && RANK[metaTier] <= RANK[baseTier];
+
+	// What this list actually costs in the trash filter, computed the same way
+	// buildFilters spends it: one `&!+<species>,<iv tier>` clause per entry,
+	// rendered into the user's PoGo locale (German keywords are the long ones).
+	// The panel is where the cost is INCURRED — a tap here is what pushes the
+	// string over the in-game ceiling several screens away — so it is where the
+	// price belongs. Zero while the carve-out is redundant, because then
+	// buildFilters emits nothing at all.
+	const kw = pogoKeywords(outputLocale);
+	const ivTierLen = `2-4${kw.iv.atk},0-2${kw.iv.def},0-2${kw.iv.hp}`.length;
+	const metaCost = redundant
+		? 0
+		: items.reduce((sum, sp) => sum + 4 + speciesForOutput(sp, outputLocale).length + ivTierLen, 0);
+	const costly = metaCost >= PVP_META_COST_WARN;
 
 	function addPack(pack) {
 		set('pvpMetaSpecies', [...new Set([...items, ...pack.species])].sort());
@@ -9177,6 +9306,20 @@ function PvpMetaPanel({ config, set, expert, packs, newItem, setNewItem }) {
 			{redundant && (
 				<p className='mono text-[11px] text-[#D9A441] leading-snug'>
 					{t('app.pvp.meta_redundant_hint')}
+				</p>
+			)}
+			{metaCost > 0 && (
+				<p
+					className='mono text-[11px] leading-snug'
+					style={{ color: costly ? '#D9A441' : '#5C6975' }}
+				>
+					{t(costly ? 'app.pvp.meta_cost_warn' : 'app.pvp.meta_cost', {
+						params: {
+							count: items.length,
+							chars: metaCost.toLocaleString(),
+							budget: SEARCH_CHAR_BUDGET.toLocaleString(),
+						},
+					})}
 				</p>
 			)}
 			{expert ? (
