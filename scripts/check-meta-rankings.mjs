@@ -10,7 +10,7 @@
 //   M1 — battle constants come from battleSettings (PvE), not combatSettings
 //   M2 — move parsing: fast/charged split, unnamed ids, Frustration, Hidden Power
 //   M3 — species parsing: the release gate, form dedupe, Shadow and battle-only forms
-//   M4 — Dynamax eligibility from breadOverrides
+//   M4 — Dynamax eligibility from breadOverrides, and the PvPoke roster overlay
 //   M5 — the damage model behaves the way the ranking depends on it behaving
 //   M6 — the shipped snapshot is internally consistent and app-resolvable
 
@@ -26,6 +26,7 @@ import {
   moveDamage,
   parseMaxEligibility,
   parseMoves,
+  parsePvpokeRoster,
   parseSpeciesForms,
 } from "./fetch-meta-rankings.mjs";
 
@@ -185,6 +186,41 @@ console.log("\nM4 — Dynamax eligibility from the game master's own flags");
   check("no breadOverrides ⇒ not eligible", !dynamax.has(888));
 }
 
+console.log("\nM4b — the PvPoke roster overlay");
+{
+  // Roster only. PvPoke's move stats are the turn-based PvP numbers and say
+  // nothing about raid DPS, so nothing may be read from them here.
+  const r = parsePvpokeRoster({
+    timestamp: "2026-08-27 18:30:11",
+    pokemon: [
+      { dex: 376, speciesId: "metagross", released: true, tags: ["shadoweligible"] },
+      { dex: 395, speciesId: "empoleon", released: true },
+      { dex: 133, speciesId: "eevee", released: true },
+      { dex: 1007, speciesId: "koraidon", released: false },
+      { dex: 6, speciesId: "charizard_mega_y", released: true },
+      { speciesId: "no_dex", released: true },
+    ],
+    shadowPokemon: ["empoleon", "charizard_mega_y", "not_a_species"],
+  });
+  check("released flag drives the roster", r.releasedDex.has(376) && r.releasedDex.has(133));
+  check("unreleased species excluded", !r.releasedDex.has(1007));
+  check("entries without a dex are skipped", r.releasedDex.size === 4);
+  check("shadoweligible tag counts", r.shadowDex.has(376));
+  check("shadowPokemon list counts", r.shadowDex.has(395));
+  // Forms collapse to their base dex — the granularity `+species` works at.
+  check("a mega form marks its base species shadow-eligible", r.shadowDex.has(6));
+  check("an unknown speciesId in shadowPokemon is ignored", r.shadowDex.size === 3);
+  // The Eevee line is the case three independent sources agree on: no Shadow
+  // Eevee, so no Shadow Espeon/Sylveon/Glaceon either.
+  check("Eevee is released but not shadow-eligible",
+    r.releasedDex.has(133) && !r.shadowDex.has(133));
+  check("roster timestamp carried through", r.timestamp === "2026-08-27 18:30:11");
+
+  const empty = parsePvpokeRoster(null);
+  check("a missing PvPoke payload degrades to empty sets, not a throw",
+    empty.releasedDex.size === 0 && empty.shadowDex.size === 0 && empty.timestamp === null);
+}
+
 console.log("\nM5 — the damage model");
 {
   // floor(0.5 × power × atk/def × STAB × effectiveness) + 1
@@ -274,6 +310,24 @@ console.log("\nM6 — the shipped snapshot");
       && model.shadowDefenseMultiplier < 1,
     JSON.stringify({ from: model?.constantsFrom }));
   check("a game-master batch stamp is recorded", Boolean(META_RANKINGS.gameMasterTimestamp));
+
+  // Provenance for both halves of the two-source split. The mechanics mirror
+  // can go stale (it was 133 days old when this was written); what must not
+  // happen is the snapshot going quiet about which feed each half came from.
+  const src = META_RANKINGS.sources || {};
+  check("mechanics source is recorded", src.mechanics === "PokeMiners/game_masters");
+  check("roster source is recorded", typeof src.roster === "string" && src.roster.length > 0,
+    String(src.roster));
+  check("both batch stamps are recorded",
+    Boolean(src.mechanicsBatch) && Boolean(src.rosterBatch),
+    JSON.stringify({ mechanics: src.mechanicsBatch, roster: src.rosterBatch }));
+  // The roster is the half that must be current — it decides which species
+  // exist at all. Nothing here fails on the mechanics mirror being behind; the
+  // fetcher warns about that and fetch-game-master-watch.mjs watches it.
+  const rosterAgeDays = (Date.now() - Date.parse(src.rosterBatch)) / 86400000;
+  check("the roster snapshot is recent (< 30 days)",
+    Number.isFinite(rosterAgeDays) && rosterAgeDays < 30,
+    `${Math.floor(rosterAgeDays)}d old`);
 }
 
 console.log(`\n${failures === 0 ? "✓ All meta-ranking checks passed." : `✗ ${failures} failure(s).`}`);

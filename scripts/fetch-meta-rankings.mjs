@@ -26,6 +26,32 @@
 //     DYNAMAX_ELIGIBLE_SEED, which had drifted wrong: it listed Zacian,
 //     Zamazenta, Urshifu, Eternatus, Lugia, Ho-Oh and the legendary birds as
 //     Dynamax-eligible, and none of them carry breadOverrides.
+// TWO SOURCES, SPLIT BY WHAT EACH IS ACTUALLY GOOD FOR. The PokeMiners mirror
+// is the only published source of PvE move mechanics — power, durationMs and
+// energyDelta for raids, as opposed to the turn-based PvP numbers every other
+// feed carries — so the damage model has to come from it. But it is a mirror,
+// and it goes stale: the batch this was first built against was stamped
+// 2026-04-17 and was still serving it 133 days later, carrying pre-Season-27
+// values for every move that rebalance touched (scripts/fetch-game-master-watch.mjs
+// documents the four, and watches for the mirror waking up).
+//
+// Staleness in the mechanics is survivable — a four-month-old Meteor Mash is
+// still roughly a Meteor Mash. Staleness in the ROSTER is not: a species,
+// Shadow form or Dynamax slot added since the last batch would silently not
+// exist, and a list that claims to regenerate daily would quietly stop moving.
+// So the roster is taken from PvPoke's game master instead, which
+// fetch-pvp-rankings.mjs and fetch-game-master-watch.mjs already read and which
+// rebuilds daily:
+//   - `released` — an explicit flag, replacing the modelScaleV2 heuristic below
+//     as the primary gate (the heuristic stays as the offline fallback).
+//   - `shadowPokemon` — unioned with the game master's own shadow blocks, so a
+//     Shadow added after the last PokeMiners batch is still a keeper candidate.
+// The two agree where both are current: PvPoke independently says Espeon,
+// Sylveon, Glaceon, Togekiss and Roserade have no Shadow form, which is what
+// the game master and the Rocket lineup snapshot both say too.
+// Dynamax eligibility stays PokeMiners-only — PvPoke carries no Max data at
+// all, so there is nothing to union it with.
+//
 // Dropping pogoapi also removes its name-mangling bug. It publishes display
 // names that the old script normalized by string munging, so the Tapus came
 // out as "tapu-bulu"/"tapu-lele"/"tapu-koko" — none of which resolveSpecies
@@ -102,7 +128,16 @@ const ENDPOINTS = {
   // exactly which dump the numbers came from.
   gameMaster: "https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/latest.json",
   timestamp:  "https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/timestamp.txt",
+  // PvPoke's game master, for the ROSTER only — see the two-source note below.
+  // Same feed scripts/fetch-game-master-watch.mjs watches, and the same one
+  // fetch-pvp-rankings.mjs reads, so this adds no new upstream to the project.
+  pvpoke: "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/gamemaster.min.json",
 };
+
+// How stale the PokeMiners mirror may get before the sync says so out loud.
+// It is the only source of PvE move mechanics, so going stale cannot be a hard
+// failure — but it must never be silent. See the two-source note below.
+const POKEMINERS_STALE_WARN_DAYS = 30;
 
 const TYPES = [
   "normal", "fighting", "flying", "poison", "ground", "rock",
@@ -113,11 +148,18 @@ const TYPES = [
 // ── Tunables ────────────────────────────────────────────────────────────────
 
 // Per-type cut for each list. 6 per type × 18 types, deduped, lands near the
-// ~70-100 the chip editor was sized for. shadowKeepers takes a shallower cut:
-// every keeper costs a `!+species` clause in shadowSafe and a `+species` term
-// in shadowFrustration, and those strings are typed into the game's search box.
+// ~70-100 the chip editor was sized for.
+//
+// shadowKeepers cuts at 7 by explicit choice. Each keeper costs a `!+species`
+// clause in shadowSafe, a `+species` term in shadowFrustration and one more in
+// the trash crypto floor, so the depth trades roster coverage against the
+// length of a string that gets typed into the game's search box. A shallower
+// cut of 5 dropped two picks the community treats as canonical — Shadow
+// Machamp sat 6th in Fighting and Shadow Swampert 7th in Water, both within a
+// few percent of the cut — because those are the two deepest Shadow pools.
+// Anyone who disagrees can delete chips; the list is a seed, not a verdict.
 const TOP_PER_TYPE = 6;
-const SHADOW_TOP_PER_TYPE = 5;
+const SHADOW_TOP_PER_TYPE = 7;
 
 // Attacker level. 40 is the stardust-efficient standard the community builds
 // to, and the ranking is a comparison — every candidate is evaluated at the
@@ -358,6 +400,29 @@ export function parseSpeciesForms(templates) {
   return byDex;
 }
 
+// PvPoke's game master → { releasedDex, shadowDex, timestamp }. Roster only:
+// its move stats are the turn-based PvP numbers, which say nothing about raid
+// DPS, so nothing here reads them. Entries are per form (`charizard_mega_y`)
+// and each carries its `dex`, so both sets collapse to dex level — the
+// granularity the app's `+species` family search works at anyway.
+export function parsePvpokeRoster(gamemaster) {
+  const releasedDex = new Set();
+  const shadowDex = new Set();
+  const dexById = new Map();
+  for (const p of gamemaster?.pokemon || []) {
+    if (!Number.isInteger(p?.dex)) continue;
+    if (p.speciesId) dexById.set(p.speciesId, p.dex);
+    if (p.released) releasedDex.add(p.dex);
+    // Both spellings of the same fact; a species carrying either is eligible.
+    if ((p.tags || []).includes("shadoweligible")) shadowDex.add(p.dex);
+  }
+  for (const id of gamemaster?.shadowPokemon || []) {
+    const dex = dexById.get(id);
+    if (dex != null) shadowDex.add(dex);
+  }
+  return { releasedDex, shadowDex, timestamp: gamemaster?.timestamp || null };
+}
+
 // Dynamax and Gigantamax eligibility from pokemonExtendedSettings.
 // "Bread" is Niantic's internal codename for the Max mechanic — the same
 // templates carry maxBattleVisualSettings and maxStationVisualSettings, and
@@ -554,15 +619,23 @@ async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
 
-  let templates, gameMasterTimestamp;
+  let templates, gameMasterTimestamp, pvpoke = null;
   try {
-    console.log("→ Fetching PokeMiners game master");
-    const [gmText, stampText] = await Promise.all([
+    console.log("→ Fetching PokeMiners game master + PvPoke roster");
+    const [gmText, stampText, pvpokeText] = await Promise.all([
       fetchText(ENDPOINTS.gameMaster),
       fetchText(ENDPOINTS.timestamp).catch(() => ""),
+      // Roster-only, and the mechanics source is the one that cannot be
+      // missing — so a PvPoke outage degrades to the game master's own
+      // release heuristic rather than failing the sync.
+      fetchText(ENDPOINTS.pvpoke).then(JSON.parse).catch((e) => {
+        console.warn(`⚠  PvPoke roster unavailable (${e.message}); falling back to the game master's own release heuristic`);
+        return null;
+      }),
     ]);
     templates = JSON.parse(gmText);
     gameMasterTimestamp = stampText.trim() || null;
+    pvpoke = pvpokeText;
   } catch (e) {
     console.error(`✗ Fetch failed: ${e.message}`);
     if (offlineOk && existsSync(OUT_PATH)) {
@@ -581,6 +654,20 @@ async function main() {
   const names = JSON.parse(readFileSync(NAMES_PATH, "utf8"));
   const nameFor = (dex) => names[String(dex)]?.en?.toLowerCase() || null;
 
+  const roster = parsePvpokeRoster(pvpoke);
+  // Staleness report. The mirror going stale is not a failure — it is the only
+  // PvE mechanics source — but a list that advertises a daily refresh must not
+  // go quiet about its inputs having stopped moving.
+  const batchMs = Number(gameMasterTimestamp);
+  const gameMasterAgeDays = Number.isFinite(batchMs) && batchMs > 0
+    ? Math.floor((Date.now() - batchMs) / 86400000)
+    : null;
+  if (gameMasterAgeDays != null && gameMasterAgeDays > POKEMINERS_STALE_WARN_DAYS) {
+    console.warn(`⚠  PokeMiners batch is ${gameMasterAgeDays} days old ` +
+      `(${new Date(batchMs).toISOString().slice(0, 10)}). Move mechanics may predate a rebalance; ` +
+      `the roster is taken from PvPoke instead. See scripts/fetch-game-master-watch.mjs.`);
+  }
+
   const consts = battleConstants(templates);
   const cpm = cpMultiplierFor(templates, ATTACKER_LEVEL);
   assertOrDie(cpm > 0.7 && cpm < 0.9, `CPM(${ATTACKER_LEVEL}) = ${cpm} out of range`);
@@ -588,10 +675,31 @@ async function main() {
   const formsByDex = parseSpeciesForms(templates);
   const { dynamax, gigantamax } = parseMaxEligibility(templates);
 
+  // Overlay the fresh roster. PvPoke's `released` REPLACES the game master's
+  // model-data heuristic where it is available: a species released since the
+  // last PokeMiners batch has no model data in it and would otherwise be
+  // invisible. Shadow eligibility is a UNION rather than a replacement — the
+  // game master names the whole evolution line of every Shadow, which is the
+  // relationship PvPoke's flat list does not spell out, so dropping either
+  // side loses keepers.
+  if (roster) {
+    for (const dex of [...formsByDex.keys()]) {
+      if (!roster.releasedDex.has(dex)) formsByDex.delete(dex);
+    }
+    for (const [dex, forms] of formsByDex) {
+      if (!roster.shadowDex.has(dex)) continue;
+      for (const form of forms) form.shadowCapable = true;
+    }
+  }
+
   console.log(`  battle constants from ${consts.source}: STAB ${consts.stab}, ` +
     `shadow ×${consts.shadowAttack} atk / ×${consts.shadowDefense} def`);
   console.log(`  moves ${moves.size} · released species ${formsByDex.size} · ` +
     `dynamax ${dynamax.size} (gmax ${gigantamax.size})`);
+  console.log(`  roster: ${roster ? `PvPoke ${roster.timestamp} ` +
+    `(${roster.releasedDex.size} released, ${roster.shadowDex.size} shadow-eligible)`
+    : "game-master heuristic (PvPoke unavailable)"}` +
+    ` · mechanics: PokeMiners ${gameMasterAgeDays != null ? `${gameMasterAgeDays}d old` : "unstamped"}`);
 
   // ── Reference boss ────────────────────────────────────────────────────────
   // Derived, not invented: the median released legendary-class species, at the
@@ -740,6 +848,15 @@ async function main() {
 
   const newContent = {
     gameMasterTimestamp,
+    // Provenance, so a reader of the snapshot can tell how fresh each half of
+    // it is without re-deriving the split from the script.
+    sources: {
+      mechanics: "PokeMiners/game_masters",
+      mechanicsBatch: Number.isFinite(batchMs) && batchMs > 0
+        ? new Date(batchMs).toISOString() : null,
+      roster: roster ? "pvpoke/pvpoke" : "PokeMiners/game_masters (fallback)",
+      rosterBatch: roster?.timestamp || null,
+    },
     model: {
       attackerLevel: ATTACKER_LEVEL,
       attackerIv: ATTACKER_IV,
@@ -774,8 +891,10 @@ async function main() {
   // dedupe or the type bucketing did.
   assertOrDie(topAttackers.length >= 50 && topAttackers.length <= 130,
     `topAttackers is ${topAttackers.length} species (expected 50-130)`);
-  assertOrDie(shadowKeepers.length >= 25 && shadowKeepers.length <= 90,
-    `shadowKeepers is ${shadowKeepers.length} species (expected 25-90)`);
+  // Band, not a target: it catches a collapsed parse or a runaway dedupe, and
+  // has to leave room for SHADOW_TOP_PER_TYPE to be retuned without tripping.
+  assertOrDie(shadowKeepers.length >= 25 && shadowKeepers.length <= 130,
+    `shadowKeepers is ${shadowKeepers.length} species (expected 25-130)`);
   assertOrDie(topMaxAttackers.length >= 60,
     `topMaxAttackers is ${topMaxAttackers.length} species (expected >= 60)`);
 
@@ -810,7 +929,6 @@ async function main() {
   const inType = (map, t, name) => map[t].some(e => e.species === name);
   assertOrDie(inType(shadowPerType, "ice", "mamoswine"), "Shadow Mamoswine ∈ top Ice");
   assertOrDie(inType(shadowPerType, "steel", "metagross"), "Shadow Metagross ∈ top Steel");
-  assertOrDie(inType(shadowPerType, "water", "swampert"), "Shadow Swampert ∈ top Water");
   assertOrDie(sk.has("salamence") || sk.has("dragonite"), "a top Shadow Dragon ∈ shadowKeepers");
   // Fighting is asserted by shape rather than by naming one species: the cut is
   // crowded (Blaziken, Conkeldurr, Emboar, Hariyama, Sneasler and Machamp are
@@ -819,22 +937,26 @@ async function main() {
   // working — every name in the bucket is an actual Fighting-type, not a
   // legendary carrying Focus Blast as coverage, which is what the bucket
   // returned before the gate existed.
-  const FIGHTING_REGULARS = new Set([
-    "blaziken", "conkeldurr", "emboar", "hariyama", "sneasler", "machamp",
-    "lucario", "annihilape", "terrakion", "keldeo", "pheromosa", "kartana",
-    "sawk", "throh", "breloom", "toxicroak", "gallade", "heracross",
-    "infernape", "chesnaught", "urshifu", "zamazenta", "buzzwole", "poliwrath",
-    "hitmonlee", "hitmonchan", "hariyama", "medicham", "pangoro", "passimian",
-    "crabominable", "falinks", "grapploct", "quaquaval", "mienshao", "bewear",
-    "cobalion", "virizion", "meloetta", "marshadow", "zeraora", "scrafty",
-  ]);
-  for (const e of shadowPerType.fighting) {
-    assertOrDie(FIGHTING_REGULARS.has(e.species),
-      `top Fighting shadow "${e.species}" is not a Fighting-type — STAB gate broken?`);
+  // The STAB gate, asserted structurally rather than against a list of names.
+  // An earlier version of this check kept a hand-written roster of "real"
+  // Fighting and Water types, which is the same hand-curation this whole file
+  // exists to delete — and it promptly cried wolf over Galarian Zapdos, a
+  // genuine Fighting-type. What must actually hold is that every entry in a
+  // type bucket is of that type: before the gate existed, "top Fighting
+  // attackers" came back as Latios, Mewtwo, Raikou and Darkrai carrying Aura
+  // Sphere and Focus Blast as coverage.
+  const typesByDex = new Map();
+  for (const [dex, forms] of formsByDex) {
+    typesByDex.set(dex, new Set(forms.flatMap((f) => f.types)));
   }
-  assertOrDie(ta.has("mewtwo"), "Mewtwo ∈ topAttackers");
-  assertOrDie(ta.has("rayquaza"), "Rayquaza ∈ topAttackers");
-  assertOrDie(ta.has("metagross"), "Metagross ∈ topAttackers");
+  for (const [label, map] of [["perType", perType], ["shadowPerType", shadowPerType]]) {
+    for (const t of TYPES) {
+      for (const e of map[t]) {
+        assertOrDie(typesByDex.get(e.dex)?.has(t),
+          `${label}.${t} lists "${e.species}", which is not a ${t}-type — STAB gate broken?`);
+      }
+    }
+  }
 
   // Megas stay out — Mega Rayquaza's stats must not have leaked in as a
   // separate entry, and no dex may appear twice.
