@@ -28,8 +28,14 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Fetch Great / Ultra / Master rankings from lily-dex-api
+      - name: Fetch Great / Ultra / Master + cup rankings from PvPoke (lily-dex fallback)
         run: npm run fetch-pvp-rankings
+      # The skill's meta reference is generated from the snapshot we just wrote, in
+      # THIS job, because check-meta-reference.mjs (M1) fails CI when the two drift.
+      # That is the whole guarantee: a synced snapshot can never leave a refrozen
+      # tier list behind it.
+      - name: Regenerate the skill-facing PvP meta reference
+        run: npm run generate-pvp-meta-reference
       # Deliberately does NOT regenerate the fixture: the snapshot pins only
       # config-derived filters, and the data-derived ones this feeds are covered
       # by property checks in scripts/check-data-filters.mjs. See the split in
@@ -38,10 +44,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- src/data/pvp-rankings.json; then
+          PATHS="src/data/pvp-rankings.json skills/pokemon-go-filters/references/META.md skills/pokemon-go-filters/references/pvp-meta.json"
+          if git diff --quiet -- $PATHS; then
             echo "No PvP ranking changes — skipping commit."
             exit 0
           fi
-          git add src/data/pvp-rankings.json
-          git commit -m "chore(pvp): sync ranking snapshot from lily-dex-api"
+          git add $PATHS
+          git commit -m "chore(pvp): sync ranking snapshot from PvPoke"
           git push
