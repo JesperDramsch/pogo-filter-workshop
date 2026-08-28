@@ -833,20 +833,22 @@ async function main() {
   const topAttackers = unionByBestRating(byType).map(nameFor).filter(Boolean);
   const shadowKeepers = unionByBestRating(shadowByType).map(nameFor).filter(Boolean);
 
-  // topMaxAttackers: the Dynamax-capable roster, ordered by its members' best
-  // normal-form rating. Max moves themselves are not in the game master as a
-  // per-species moveset, so a Max-specific DPS is not computable here — the
-  // ordering is "how good is this species as an attacker at all", restricted to
-  // the species that can actually Dynamax.
-  const bestByDex = new Map();
-  for (const e of normalEntries) {
-    const prev = bestByDex.get(e.dex);
-    if (!prev || e.rating > prev.rating) bestByDex.set(e.dex, e);
-  }
-  const topMaxAttackers = [...dynamax]
-    .filter(dex => bestByDex.has(dex) && nameFor(dex))
-    .sort((a, b) => bestByDex.get(b).rating - bestByDex.get(a).rating)
-    .map(nameFor);
+  // topMaxAttackers: the same top-N-per-type cut as topAttackers, taken over
+  // only the Dynamax-capable species. Max moves are not in the game master as a
+  // per-species moveset, so a Max-specific DPS is not computable — the rating is
+  // "how good is this species as an attacker at all", and the Dynamax filter is
+  // what makes it a Max list.
+  //
+  // It is a CUT, not the roster. Emitting every Dynamax-capable species ordered
+  // by rating — which is what this did, and what the hand-maintained seed before
+  // it did — is not a "top attackers" list: it put Combee, Tyrogue, Bounsweet,
+  // Wooloo, Squirtle and Beldum in a roster the user is meant to pick a raid
+  // team from, and made 151 chips of it in the expert editor. The small hand
+  // seed hid the flaw by being small. Cutting per type fixes the meaning and the
+  // chip wall in the same move.
+  const maxEntries = normalEntries.filter(e => dynamax.has(e.dex));
+  const maxByType = topPerType(maxEntries, TOP_PER_TYPE, descendants);
+  const topMaxAttackers = unionByBestRating(maxByType).map(nameFor).filter(Boolean);
   const gigantamaxSpecies = [...gigantamax]
     .filter(dex => nameFor(dex))
     .sort((a, b) => a - b)
@@ -954,8 +956,15 @@ async function main() {
   // has to leave room for SHADOW_TOP_PER_TYPE to be retuned without tripping.
   assertOrDie(shadowKeepers.length >= 25 && shadowKeepers.length <= 130,
     `shadowKeepers is ${shadowKeepers.length} species (expected 25-130)`);
-  assertOrDie(topMaxAttackers.length >= 60,
-    `topMaxAttackers is ${topMaxAttackers.length} species (expected >= 60)`);
+  assertOrDie(topMaxAttackers.length >= 30 && topMaxAttackers.length <= 110,
+    `topMaxAttackers is ${topMaxAttackers.length} species (expected 30-110)`);
+  // A top-N cut must not read as the whole roster: these are Dynamax-capable
+  // but nobody brings them to a Max Battle, and their presence is the signature
+  // of the cut having silently degraded back into a roster dump.
+  for (const n of ["combee", "tyrogue", "bounsweet", "wooloo", "hoothoot"]) {
+    assertOrDie(!topMaxAttackers.includes(n),
+      `topMaxAttackers contains "${n}" — the per-type cut has degraded into a roster dump`);
+  }
 
   // Every type must be represented, or a whole role silently vanished.
   for (const t of TYPES) {
@@ -1033,6 +1042,14 @@ async function main() {
     assertOrDie(!tma.has(n), `${n} ∉ topMaxAttackers (no breadOverrides)`);
   }
   assertOrDie(gigantamaxSpecies.includes("charizard"), "Gigantamax Charizard ∈ gigantamaxSpecies");
+  // Gigantamax is a strictly stronger claim than Dynamax, so the sets nest.
+  // Asserted against the parsed flags rather than against topMaxAttackers: that
+  // list is a top-N cut, and a weak Gigantamax species (G-Max Lapras, G-Max
+  // Pikachu) can legitimately miss it without anything being wrong.
+  for (const dex of gigantamax) {
+    assertOrDie(dynamax.has(dex),
+      `dex ${dex} is BREAD_DOUGH_MODE but not BREAD_MODE — Gigantamax without Dynamax`);
+  }
 
   assertOrDie(chargerMoves.length >= 20 && chargerMoves.length <= 120,
     `chargerMoves is ${chargerMoves.length} (expected 20-120)`);

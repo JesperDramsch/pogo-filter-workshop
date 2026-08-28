@@ -270,9 +270,19 @@ console.log("\nM6 — the shipped snapshot");
     check(`${name} has no duplicates`, new Set(list).size === list.length);
     check(`${name} is non-empty`, list.length > 0);
   }
-  check("every Gigantamax species can also Dynamax",
-    gigantamaxSpecies.every((s) => topMaxAttackers.includes(s)),
-    gigantamaxSpecies.filter((s) => !topMaxAttackers.includes(s)).join(", "));
+  // NOT "every Gigantamax species is in topMaxAttackers" — that was true only
+  // while topMaxAttackers was the whole Dynamax roster. It is a top-N cut now,
+  // so G-Max Lapras and G-Max Pikachu miss it on merit. The nesting invariant
+  // is asserted in the fetcher against the parsed flags, where it belongs.
+  check("gigantamaxSpecies is a plausible subset of the Max roster",
+    gigantamaxSpecies.length > 0 && gigantamaxSpecies.length < topMaxAttackers.length,
+    `${gigantamaxSpecies.length} G-Max vs ${topMaxAttackers.length} Max attackers`);
+  // The cut must stay a cut. These are Dynamax-capable but nobody brings them
+  // to a Max Battle; their reappearance means it degraded into a roster dump.
+  const rosterDump = ["combee", "tyrogue", "bounsweet", "wooloo", "hoothoot"]
+    .filter((s) => topMaxAttackers.includes(s));
+  check("topMaxAttackers is a top-N cut, not the whole Dynamax roster",
+    rosterDump.length === 0, rosterDump.join(", "));
 
   const enNames = new Set(Object.entries(POKEMON_NAMES)
     .filter(([k]) => /^\d+$/.test(k))
