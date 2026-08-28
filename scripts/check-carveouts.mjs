@@ -271,15 +271,44 @@ console.log("\nS1 — shadow purify-floor: default keeps the blanket !crypto");
   check("trade always excludes shadows, independent of the split", hasClauseMatching(def.trade, /^!crypto$/i));
 }
 
-console.log("\nS2 — purify-floor ON (protectShadows off): three scoped clauses replace the blanket");
+console.log("\nS2 — purify-floor ON (protectShadows off): four scoped clauses replace the blanket");
 {
   const floor = buildFilters([], [], mergeImportedConfig({ protectShadows: false, protectShadowPurifyOnly: true }), [], "de", tFn);
   check("no blanket !crypto anymore", !hasClauseMatching(floor.trash, /^!crypto$/i));
   check("keeps purify-hundo IVs (!crypto,0-2…)", hasClauseMatching(floor.trash, /^!crypto,0-2/i), floor.trash);
   check("keeps cheap-to-purify (!crypto,bonbonkm3-)", hasClauseMatching(floor.trash, /^!crypto,bonbonkm3-$/i));
   check("keeps TM'd investment (!crypto,@frustration)", hasClauseMatching(floor.trash, /^!crypto,@frustration$/i));
-  check("exactly three purify-floor clauses", clauses(floor.trash).filter(c => /^!crypto,/i.test(c)).length === 3);
+  // The keeper clause is the fourth floor: the first three all reason about
+  // whether a shadow is worth PURIFYING, which says nothing about one whose
+  // value is staying a shadow. A Charge-TM'd Shadow Metagross clears all three
+  // and used to be releasable.
+  check("keeps meta shadow attackers (!crypto,+meistagrif,…)",
+    hasClauseMatching(floor.trash, /^!crypto,(\+[^,&]+)(,\+[^,&]+)+$/i));
+  check("exactly four purify-floor clauses", clauses(floor.trash).filter(c => /^!crypto,/i.test(c)).length === 4);
   check("trade still hard-excludes shadows", hasClauseMatching(floor.trade, /^!crypto$/i));
+}
+
+console.log("\nS2b — the keeper floor names the actual keeper roster");
+{
+  const cfg = mergeImportedConfig({ protectShadows: false, protectShadowPurifyOnly: true });
+  const floor = buildFilters([], [], cfg, [], "de", tFn);
+  const keeperClause = clauses(floor.trash).find(c => /^!crypto,\+/i.test(c)) || "";
+  const terms = keeperClause.split(",").slice(1);
+  check(`one +family term per keeper (${cfg.shadowKeeperSpecies.length})`,
+    terms.length === cfg.shadowKeeperSpecies.length, `found ${terms.length}`);
+  check("every term is a family search", terms.every(t => t.startsWith("+") && t.length > 1));
+  // The roster is a daily sync, so this asserts the projection, not the names —
+  // except for Metagross, which is the case that motivated the clause and is
+  // the top Steel shadow by a wide margin in any plausible meta.
+  check("Shadow Metagross is protected by name",
+    terms.includes("+meistagrif"), keeperClause.slice(0, 120));
+  // An empty roster must collapse the clause entirely rather than emit
+  // `!crypto,` — a dangling separator the game cannot parse.
+  const empty = buildFilters([], [], mergeImportedConfig({
+    protectShadows: false, protectShadowPurifyOnly: true, shadowKeeperSpecies: [],
+  }), [], "de", tFn);
+  check("empty keeper roster emits no keeper clause",
+    !hasClauseMatching(empty.trash, /^!crypto,\+/i) && !/[&,]$|,,/.test(empty.trash));
 }
 
 console.log("\nS3 — migration: a legacy protectShadows:false config keeps releasing ALL shadows");
@@ -297,7 +326,7 @@ console.log("\nS4 — floor differs from blanket by exactly the shadow clauses (
   const onlyInBlanket = clauses(blanket.trash).filter(c => !clauses(floor.trash).includes(c));
   const onlyInFloor = clauses(floor.trash).filter(c => !clauses(blanket.trash).includes(c));
   check("blanket drops exactly the bare !crypto", onlyInBlanket.length === 1 && /^!crypto$/i.test(onlyInBlanket[0]), onlyInBlanket.join("|"));
-  check("floor adds exactly the three scoped clauses", onlyInFloor.length === 3, onlyInFloor.join("|"));
+  check("floor adds exactly the four scoped clauses", onlyInFloor.length === 4, onlyInFloor.join("|"));
 }
 
 console.log(`\n${failures === 0 ? "✓ All carve-out checks passed." : `✗ ${failures} failure(s).`}`);

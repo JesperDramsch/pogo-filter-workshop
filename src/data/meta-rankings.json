@@ -1,172 +1,2227 @@
 {
-  "fetchedAt": "2026-04-30T16:59:55.733Z",
-  "topPerType": 8,
+  "fetchedAt": "2026-08-28T10:53:55.811Z",
+  "gameMasterTimestamp": "1776386930700",
+  "model": {
+    "attackerLevel": 40,
+    "attackerIv": 15,
+    "ratingExponent": 0.25,
+    "raidBossCpm": 0.79,
+    "bossBaseAttack": 250,
+    "bossBaseDefense": 198,
+    "stab": 1.2,
+    "shadowAttackMultiplier": 1.2,
+    "shadowDefenseMultiplier": 0.8333333,
+    "energyPerHpLost": 0.5,
+    "constantsFrom": "battleSettings"
+  },
+  "topPerType": 6,
+  "shadowTopPerType": 5,
   "maxChargerDurationMs": 500,
   "topAttackers": [
     "regigigas",
-    "eternatus",
     "regieleki",
-    "deoxys",
     "blacephalon",
-    "xerneas",
+    "eternatus",
+    "regidrago",
+    "calyrex",
+    "thundurus",
+    "mewtwo",
+    "landorus",
+    "kyurem",
+    "salamence",
+    "reshiram",
+    "zacian",
+    "tinkaton",
+    "enamorus",
+    "zekrom",
+    "lucario",
+    "yveltal",
+    "hoopa",
+    "pheromosa",
+    "palkia",
     "groudon",
+    "blaziken",
+    "metagross",
+    "toucannon",
+    "rayquaza",
+    "terrakion",
+    "articuno",
+    "zapdos",
+    "cinderace",
+    "kyogre",
+    "giratina",
+    "xurkitree",
+    "lunala",
+    "tapu lele",
+    "darmanitan",
+    "kartana",
+    "dragapult",
+    "shaymin",
+    "volcarona",
+    "keldeo",
+    "glimmora",
+    "tapu koko",
+    "spectrier",
+    "zarude",
+    "decidueye",
+    "victini",
+    "rillaboom",
+    "garchomp",
+    "necrozma",
+    "tapu bulu",
+    "excadrill",
+    "nihilego",
+    "tyrantrum",
+    "melmetal",
+    "rhyperior",
+    "rampardos",
+    "tyranitar",
+    "meloetta",
+    "quaquaval",
+    "zeraora",
+    "mamoswine",
+    "hydreigon",
+    "jirachi",
+    "latios",
+    "primarina",
+    "meowscarada",
+    "samurott",
+    "porygon-z",
+    "baxcalibur",
+    "naganadel",
+    "ursaluna",
+    "greninja",
+    "sceptile",
+    "gigalith",
+    "glastrier",
+    "darkrai",
+    "absol",
+    "kingambit",
+    "gengar",
+    "xerneas",
+    "dialga",
+    "arceus",
+    "roserade",
+    "heracross",
+    "ursaring",
+    "revavroom",
+    "genesect",
+    "slaking",
+    "kleavor",
+    "vikavolt"
+  ],
+  "shadowKeepers": [
+    "regigigas",
+    "thundurus",
+    "mewtwo",
+    "landorus",
+    "salamence",
+    "toucannon",
+    "blaziken",
+    "palkia",
+    "metagross",
+    "zapdos",
+    "honchkrow",
+    "articuno",
+    "giratina",
+    "darmanitan",
+    "dialga",
+    "kyogre",
+    "groudon",
+    "garchomp",
+    "dragonite",
+    "emboar",
+    "excadrill",
+    "chandelure",
+    "tyrantrum",
+    "rhyperior",
+    "rampardos",
+    "moltres",
+    "tyranitar",
+    "hydreigon",
+    "ursaluna",
     "latios",
     "porygon-z",
-    "volcarona",
-    "solgaleo",
-    "mewtwo",
-    "tapu-bulu",
-    "pheromosa",
-    "reshiram",
-    "roserade",
-    "slaking",
-    "lugia",
-    "chandelure",
-    "ho-oh",
-    "palkia",
-    "salamence",
-    "dialga",
-    "volcanion",
-    "moltres",
-    "darkrai",
-    "haxorus",
-    "dragonite",
-    "flareon",
-    "kyurem",
-    "zekrom",
-    "alakazam",
-    "genesect",
     "gengar",
-    "garchomp",
-    "kyogre",
-    "terrakion",
-    "tapu-lele",
-    "metagross",
-    "excadrill",
-    "zapdos",
-    "gholdengo",
-    "rhyperior",
-    "magnezone",
-    "lunala",
-    "baxcalibur",
-    "xurkitree",
-    "goodra",
-    "sharpedo",
-    "tapu-koko",
-    "jolteon",
-    "nihilego",
-    "gyarados",
-    "tyrantrum",
-    "gigalith",
-    "honchkrow",
-    "primarina",
-    "magneton",
-    "blaziken",
-    "golurk",
-    "azelf",
-    "staraptor",
-    "braviary",
-    "greninja",
-    "espeon",
-    "rayquaza",
-    "revavroom",
-    "necrozma",
-    "vanilluxe",
-    "aggron",
-    "mesprit",
+    "mamoswine",
     "samurott",
-    "mienshao",
-    "dragapult",
-    "kleavor",
-    "sylveon",
-    "tyranitar",
-    "vileplume",
-    "inteleon",
-    "glimmora",
+    "greninja",
+    "conkeldurr",
+    "raikou",
+    "electivire",
+    "gigalith",
+    "alakazam",
+    "sceptile",
+    "exeggutor",
+    "swampert",
     "absol",
-    "octillery",
-    "hydreigon",
-    "muk",
-    "heracross",
-    "liepard",
-    "duraludon",
-    "lucario",
+    "annihilape",
+    "darkrai",
+    "luxray",
+    "chesnaught",
+    "weavile",
+    "hariyama",
+    "sneasler",
+    "typhlosion",
+    "aurorus",
+    "torterra",
+    "ursaring",
+    "venusaur",
+    "slaking",
+    "overqwil",
+    "gardevoir",
+    "heatran",
     "escavalier",
-    "rhydon",
-    "melmetal",
-    "machamp",
-    "crabominable",
-    "bewear",
-    "cacturne",
-    "komala"
+    "unfezant",
+    "vikavolt",
+    "toxicroak",
+    "granbull",
+    "victreebel",
+    "mr. rime",
+    "muk",
+    "scizor",
+    "pinsir",
+    "accelgor",
+    "magnezone",
+    "rapidash",
+    "ninetales",
+    "weezing"
   ],
   "topMaxAttackers": [
-    "zacian",
-    "darmanitan",
-    "eternatus",
-    "alakazam",
-    "latios",
-    "inteleon",
-    "gengar",
-    "espeon",
     "metagross",
-    "excadrill",
-    "zamazenta",
-    "urshifu",
-    "zapdos",
-    "moltres",
     "articuno",
-    "flareon",
-    "raikou",
-    "kingler",
+    "zapdos",
+    "cinderace",
+    "moltres",
+    "darmanitan",
     "rillaboom",
     "ho-oh",
-    "duraludon",
-    "cinderace",
-    "glaceon",
-    "hatterene",
+    "excadrill",
+    "entei",
+    "urshifu",
+    "latios",
+    "lugia",
+    "gengar",
+    "raikou",
+    "alakazam",
+    "gigalith",
+    "kingler",
+    "espeon",
+    "charizard",
+    "flareon",
+    "machamp",
+    "latias",
+    "tsareena",
     "gardevoir",
     "gallade",
-    "entei",
-    "machamp",
-    "jolteon",
-    "latias",
-    "grimmsnarl",
-    "melmetal",
-    "toxtricity",
-    "charizard",
-    "tsareena",
-    "stonjourner",
-    "kabutops",
-    "centiskorch",
-    "omastar",
-    "vaporeon",
-    "sylveon",
     "venusaur",
-    "lugia",
-    "falinks",
+    "unfezant",
+    "toxtricity",
+    "grimmsnarl",
+    "hatterene",
+    "glaceon",
+    "inteleon",
+    "drampa",
+    "arcanine",
+    "jolteon",
+    "vaporeon",
+    "duraludon",
+    "leafeon",
+    "haunter",
     "snorlax",
-    "cryogonal",
-    "garbodor",
-    "krabby",
-    "suicune",
-    "regice",
-    "regirock",
-    "wailord",
+    "passimian",
+    "flygon",
+    "sylveon",
+    "raichu",
+    "omastar",
     "blastoise",
-    "butterfree",
-    "lapras",
+    "walrein",
+    "kabutops",
+    "suicune",
     "corviknight",
-    "greedent",
-    "dubwool",
-    "registeel",
-    "sableye",
+    "lapras",
+    "wailord",
+    "hitmonlee",
+    "regice",
+    "cryogonal",
+    "swoobat",
+    "regirock",
+    "machoke",
     "blissey",
+    "garbodor",
+    "malamar",
+    "falinks",
+    "hitmonchan",
+    "thwackey",
+    "gastly",
+    "kubfu",
+    "krabby",
+    "drizzile",
+    "ivysaur",
+    "kadabra",
+    "boldore",
+    "butterfree",
+    "raboot",
+    "tranquill",
+    "hattrem",
+    "greedent",
+    "trapinch",
+    "sealeo",
+    "charmeleon",
+    "metang",
+    "abra",
+    "corvisquire",
+    "umbreon",
+    "darumaka",
+    "drilbur",
+    "dubwool",
+    "sableye",
+    "growlithe",
+    "grookey",
+    "sobble",
+    "bulbasaur",
+    "vibrava",
+    "machop",
+    "omanyte",
+    "scorbunny",
+    "wartortle",
+    "pikachu",
+    "kirlia",
+    "wailmer",
+    "roggenrola",
+    "kabuto",
     "eevee",
-    "wooloo",
+    "hatenna",
     "chansey",
+    "meowth",
+    "trubbish",
+    "rookidee",
+    "charmander",
+    "woobat",
+    "steenee",
+    "skwovet",
+    "squirtle",
+    "spheal",
+    "inkay",
+    "pidove",
+    "wooloo",
+    "beldum",
+    "ralts",
+    "bounsweet",
     "shuckle"
   ],
+  "gigantamaxSpecies": [
+    "venusaur",
+    "charizard",
+    "blastoise",
+    "butterfree",
+    "pikachu",
+    "meowth",
+    "machamp",
+    "gengar",
+    "kingler",
+    "lapras",
+    "snorlax",
+    "garbodor",
+    "rillaboom",
+    "cinderace",
+    "inteleon",
+    "toxtricity",
+    "grimmsnarl",
+    "urshifu"
+  ],
+  "perType": {
+    "normal": [
+      {
+        "species": "regigigas",
+        "dex": 486,
+        "rating": 56.81,
+        "dps": 27.83,
+        "tdo": 483.1,
+        "fast": "ZEN_HEADBUTT_FAST",
+        "charged": "CRUSH_GRIP"
+      },
+      {
+        "species": "meloetta",
+        "dex": 648,
+        "rating": 36.62,
+        "dps": 17.71,
+        "tdo": 323.6,
+        "fast": "CONFUSION_FAST",
+        "charged": "HYPER_BEAM",
+        "form": "MELOETTA_ARIA"
+      },
+      {
+        "species": "porygon-z",
+        "dex": 474,
+        "rating": 35.81,
+        "dps": 19.66,
+        "tdo": 216.3,
+        "fast": "LOCK_ON_FAST",
+        "charged": "HYPER_BEAM"
+      },
+      {
+        "species": "arceus",
+        "dex": 493,
+        "rating": 32.48,
+        "dps": 15.41,
+        "tdo": 303.8,
+        "fast": "SHADOW_CLAW_FAST",
+        "charged": "HYPER_BEAM"
+      },
+      {
+        "species": "ursaring",
+        "dex": 217,
+        "rating": 32.09,
+        "dps": 17.51,
+        "tdo": 197.5,
+        "fast": "METAL_CLAW_FAST",
+        "charged": "HYPER_BEAM"
+      },
+      {
+        "species": "slaking",
+        "dex": 289,
+        "rating": 31.02,
+        "dps": 15.23,
+        "tdo": 262.1,
+        "fast": "YAWN_FAST",
+        "charged": "HYPER_BEAM"
+      }
+    ],
+    "fighting": [
+      {
+        "species": "lucario",
+        "dex": 448,
+        "rating": 41.99,
+        "dps": 23.94,
+        "tdo": 226.8,
+        "fast": "FORCE_PALM_FAST",
+        "charged": "AURA_SPHERE"
+      },
+      {
+        "species": "pheromosa",
+        "dex": 795,
+        "rating": 41.45,
+        "dps": 26.41,
+        "tdo": 160.3,
+        "fast": "BUG_BITE_FAST",
+        "charged": "FOCUS_BLAST"
+      },
+      {
+        "species": "blaziken",
+        "dex": 257,
+        "rating": 41.02,
+        "dps": 22.91,
+        "tdo": 235.4,
+        "fast": "COUNTER_FAST",
+        "charged": "AURA_SPHERE"
+      },
+      {
+        "species": "terrakion",
+        "dex": 639,
+        "rating": 40.77,
+        "dps": 20.81,
+        "tdo": 306.3,
+        "fast": "DOUBLE_KICK_FAST",
+        "charged": "SACRED_SWORD"
+      },
+      {
+        "species": "keldeo",
+        "dex": 647,
+        "rating": 38.63,
+        "dps": 19.72,
+        "tdo": 290.3,
+        "fast": "POISON_JAB_FAST",
+        "charged": "SACRED_SWORD"
+      },
+      {
+        "species": "decidueye",
+        "dex": 724,
+        "rating": 38.03,
+        "dps": 20.09,
+        "tdo": 258.1,
+        "fast": "PSYCHO_CUT_FAST",
+        "charged": "AURA_SPHERE",
+        "form": "DECIDUEYE_HISUIAN"
+      }
+    ],
+    "flying": [
+      {
+        "species": "salamence",
+        "dex": 373,
+        "rating": 44.82,
+        "dps": 23.48,
+        "tdo": 311.7,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "FLY"
+      },
+      {
+        "species": "enamorus",
+        "dex": 905,
+        "rating": 43.26,
+        "dps": 23.77,
+        "tdo": 260.6,
+        "fast": "FAIRY_WIND_FAST",
+        "charged": "FLY"
+      },
+      {
+        "species": "yveltal",
+        "dex": 717,
+        "rating": 41.66,
+        "dps": 20.58,
+        "tdo": 345.4,
+        "fast": "SNARL_FAST",
+        "charged": "OBLIVION_WING"
+      },
+      {
+        "species": "toucannon",
+        "dex": 733,
+        "rating": 40.89,
+        "dps": 22.75,
+        "tdo": 237.5,
+        "fast": "PECK_FAST",
+        "charged": "BEAK_BLAST"
+      },
+      {
+        "species": "articuno",
+        "dex": 144,
+        "rating": 40.5,
+        "dps": 20.68,
+        "tdo": 304.1,
+        "fast": "CONFUSION_FAST",
+        "charged": "FLY",
+        "form": "ARTICUNO_GALARIAN"
+      },
+      {
+        "species": "zapdos",
+        "dex": 145,
+        "rating": 40.21,
+        "dps": 20.64,
+        "tdo": 297.3,
+        "fast": "COUNTER_FAST",
+        "charged": "FLY",
+        "form": "ZAPDOS_GALARIAN"
+      }
+    ],
+    "poison": [
+      {
+        "species": "eternatus",
+        "dex": 890,
+        "rating": 48.41,
+        "dps": 16.46,
+        "tdo": 1233.1,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "SLUDGE_BOMB",
+        "form": "ETERNATUS_ETERNAMAX"
+      },
+      {
+        "species": "nihilego",
+        "dex": 793,
+        "rating": 36.88,
+        "dps": 17.72,
+        "tdo": 332.4,
+        "fast": "POISON_JAB_FAST",
+        "charged": "SLUDGE_BOMB"
+      },
+      {
+        "species": "naganadel",
+        "dex": 804,
+        "rating": 35.72,
+        "dps": 19.74,
+        "tdo": 211.7,
+        "fast": "POISON_JAB_FAST",
+        "charged": "SLUDGE_BOMB"
+      },
+      {
+        "species": "gengar",
+        "dex": 94,
+        "rating": 33.62,
+        "dps": 19.54,
+        "tdo": 171.4,
+        "fast": "SUCKER_PUNCH_FAST",
+        "charged": "SLUDGE_BOMB"
+      },
+      {
+        "species": "roserade",
+        "dex": 407,
+        "rating": 32.22,
+        "dps": 17.73,
+        "tdo": 193.5,
+        "fast": "POISON_JAB_FAST",
+        "charged": "SLUDGE_BOMB"
+      },
+      {
+        "species": "revavroom",
+        "dex": 966,
+        "rating": 31.27,
+        "dps": 16.87,
+        "tdo": 199.3,
+        "fast": "POISON_JAB_FAST",
+        "charged": "GUNK_SHOT"
+      }
+    ],
+    "ground": [
+      {
+        "species": "landorus",
+        "dex": 645,
+        "rating": 44.94,
+        "dps": 23.31,
+        "tdo": 322,
+        "fast": "MUD_SHOT_FAST",
+        "charged": "SANDSEAR_STORM",
+        "form": "LANDORUS_THERIAN"
+      },
+      {
+        "species": "groudon",
+        "dex": 383,
+        "rating": 41.19,
+        "dps": 20.37,
+        "tdo": 340.7,
+        "fast": "MUD_SHOT_FAST",
+        "charged": "PRECIPICE_BLADES"
+      },
+      {
+        "species": "garchomp",
+        "dex": 445,
+        "rating": 37.8,
+        "dps": 18.72,
+        "tdo": 311.3,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "EARTHQUAKE"
+      },
+      {
+        "species": "excadrill",
+        "dex": 530,
+        "rating": 36.92,
+        "dps": 19.92,
+        "tdo": 235.1,
+        "fast": "METAL_CLAW_FAST",
+        "charged": "EARTHQUAKE"
+      },
+      {
+        "species": "mamoswine",
+        "dex": 473,
+        "rating": 36.43,
+        "dps": 19.16,
+        "tdo": 250.6,
+        "fast": "MUD_SLAP_FAST",
+        "charged": "HIGH_HORSEPOWER"
+      },
+      {
+        "species": "ursaluna",
+        "dex": 901,
+        "rating": 35.6,
+        "dps": 17.16,
+        "tdo": 318.2,
+        "fast": "TACKLE_FAST",
+        "charged": "HIGH_HORSEPOWER"
+      }
+    ],
+    "rock": [
+      {
+        "species": "glimmora",
+        "dex": 970,
+        "rating": 38.48,
+        "dps": 20.25,
+        "tdo": 264.2,
+        "fast": "ROCK_THROW_FAST",
+        "charged": "METEOR_BEAM"
+      },
+      {
+        "species": "tyrantrum",
+        "dex": 697,
+        "rating": 36.86,
+        "dps": 19.18,
+        "tdo": 261.5,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "METEOR_BEAM"
+      },
+      {
+        "species": "rhyperior",
+        "dex": 464,
+        "rating": 36.74,
+        "dps": 18.02,
+        "tdo": 311.4,
+        "fast": "MUD_SLAP_FAST",
+        "charged": "ROCK_WRECKER"
+      },
+      {
+        "species": "rampardos",
+        "dex": 409,
+        "rating": 36.69,
+        "dps": 20.97,
+        "tdo": 196.6,
+        "fast": "SMACK_DOWN_FAST",
+        "charged": "ROCK_SLIDE"
+      },
+      {
+        "species": "gigalith",
+        "dex": 526,
+        "rating": 34.63,
+        "dps": 17.82,
+        "tdo": 254.1,
+        "fast": "SMACK_DOWN_FAST",
+        "charged": "METEOR_BEAM"
+      },
+      {
+        "species": "nihilego",
+        "dex": 793,
+        "rating": 33.59,
+        "dps": 16.14,
+        "tdo": 302.7,
+        "fast": "POISON_JAB_FAST",
+        "charged": "ROCK_SLIDE"
+      }
+    ],
+    "bug": [
+      {
+        "species": "pheromosa",
+        "dex": 795,
+        "rating": 38.06,
+        "dps": 24.25,
+        "tdo": 147.2,
+        "fast": "BUG_BITE_FAST",
+        "charged": "BUG_BUZZ"
+      },
+      {
+        "species": "volcarona",
+        "dex": 637,
+        "rating": 34.23,
+        "dps": 17.75,
+        "tdo": 245.4,
+        "fast": "FIRE_SPIN_FAST",
+        "charged": "BUG_BUZZ"
+      },
+      {
+        "species": "heracross",
+        "dex": 214,
+        "rating": 32.21,
+        "dps": 16.98,
+        "tdo": 219.7,
+        "fast": "COUNTER_FAST",
+        "charged": "MEGAHORN"
+      },
+      {
+        "species": "genesect",
+        "dex": 649,
+        "rating": 31.02,
+        "dps": 16.45,
+        "tdo": 208.1,
+        "fast": "FURY_CUTTER_FAST",
+        "charged": "X_SCISSOR"
+      },
+      {
+        "species": "kleavor",
+        "dex": 900,
+        "rating": 30.49,
+        "dps": 16.77,
+        "tdo": 183.2,
+        "fast": "FURY_CUTTER_FAST",
+        "charged": "X_SCISSOR"
+      },
+      {
+        "species": "vikavolt",
+        "dex": 738,
+        "rating": 30.31,
+        "dps": 16.59,
+        "tdo": 184.9,
+        "fast": "BUG_BITE_FAST",
+        "charged": "X_SCISSOR"
+      }
+    ],
+    "ghost": [
+      {
+        "species": "calyrex",
+        "dex": 898,
+        "rating": 46.89,
+        "dps": 24.08,
+        "tdo": 346.3,
+        "fast": "CONFUSION_FAST",
+        "charged": "SHADOW_BALL",
+        "form": "CALYREX_SHADOW_RIDER"
+      },
+      {
+        "species": "blacephalon",
+        "dex": 806,
+        "rating": 40.95,
+        "dps": 24.31,
+        "tdo": 195.8,
+        "fast": "INCINERATE_FAST",
+        "charged": "SHADOW_BALL"
+      },
+      {
+        "species": "giratina",
+        "dex": 487,
+        "rating": 40.08,
+        "dps": 19.14,
+        "tdo": 368,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "SHADOW_FORCE",
+        "form": "GIRATINA_ORIGIN"
+      },
+      {
+        "species": "lunala",
+        "dex": 792,
+        "rating": 39.81,
+        "dps": 19.25,
+        "tdo": 352.1,
+        "fast": "CONFUSION_FAST",
+        "charged": "SHADOW_BALL"
+      },
+      {
+        "species": "dragapult",
+        "dex": 887,
+        "rating": 39.28,
+        "dps": 20.8,
+        "tdo": 264.8,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "SHADOW_BALL"
+      },
+      {
+        "species": "spectrier",
+        "dex": 897,
+        "rating": 38.14,
+        "dps": 20.88,
+        "tdo": 232.7,
+        "fast": "TACKLE_FAST",
+        "charged": "SHADOW_BALL"
+      }
+    ],
+    "steel": [
+      {
+        "species": "tinkaton",
+        "dex": 959,
+        "rating": 43.78,
+        "dps": 22.59,
+        "tdo": 318.8,
+        "fast": "FAIRY_WIND_FAST",
+        "charged": "GIGATON_HAMMER"
+      },
+      {
+        "species": "metagross",
+        "dex": 376,
+        "rating": 40.95,
+        "dps": 20.59,
+        "tdo": 322.4,
+        "fast": "FURY_CUTTER_FAST",
+        "charged": "METEOR_MASH"
+      },
+      {
+        "species": "lucario",
+        "dex": 448,
+        "rating": 37.65,
+        "dps": 21.46,
+        "tdo": 203.3,
+        "fast": "FORCE_PALM_FAST",
+        "charged": "METEOR_MASH"
+      },
+      {
+        "species": "melmetal",
+        "dex": 809,
+        "rating": 36.82,
+        "dps": 17.85,
+        "tdo": 323.1,
+        "fast": "THUNDER_SHOCK_FAST",
+        "charged": "DOUBLE_IRON_BASH"
+      },
+      {
+        "species": "jirachi",
+        "dex": 385,
+        "rating": 36.34,
+        "dps": 17.73,
+        "tdo": 312.7,
+        "fast": "CONFUSION_FAST",
+        "charged": "DOOM_DESIRE"
+      },
+      {
+        "species": "dialga",
+        "dex": 483,
+        "rating": 33.24,
+        "dps": 16.58,
+        "tdo": 267.7,
+        "fast": "METAL_CLAW_FAST",
+        "charged": "IRON_HEAD"
+      }
+    ],
+    "fire": [
+      {
+        "species": "blacephalon",
+        "dex": 806,
+        "rating": 49.96,
+        "dps": 29.66,
+        "tdo": 238.9,
+        "fast": "INCINERATE_FAST",
+        "charged": "MIND_BLOWN"
+      },
+      {
+        "species": "reshiram",
+        "dex": 643,
+        "rating": 44.73,
+        "dps": 22.32,
+        "tdo": 360.2,
+        "fast": "FIRE_FANG_FAST",
+        "charged": "FUSION_FLARE"
+      },
+      {
+        "species": "cinderace",
+        "dex": 815,
+        "rating": 40.21,
+        "dps": 21.74,
+        "tdo": 254.5,
+        "fast": "FIRE_SPIN_FAST",
+        "charged": "PYROBALL"
+      },
+      {
+        "species": "darmanitan",
+        "dex": 555,
+        "rating": 39.66,
+        "dps": 22.19,
+        "tdo": 226.2,
+        "fast": "FIRE_FANG_FAST",
+        "charged": "OVERHEAT"
+      },
+      {
+        "species": "volcarona",
+        "dex": 637,
+        "rating": 38.74,
+        "dps": 20.09,
+        "tdo": 277.7,
+        "fast": "FIRE_SPIN_FAST",
+        "charged": "OVERHEAT"
+      },
+      {
+        "species": "victini",
+        "dex": 494,
+        "rating": 38,
+        "dps": 18.54,
+        "tdo": 327,
+        "fast": "CONFUSION_FAST",
+        "charged": "V_CREATE"
+      }
+    ],
+    "water": [
+      {
+        "species": "kyogre",
+        "dex": 382,
+        "rating": 40.18,
+        "dps": 19.87,
+        "tdo": 332.3,
+        "fast": "WATERFALL_FAST",
+        "charged": "ORIGIN_PULSE"
+      },
+      {
+        "species": "palkia",
+        "dex": 484,
+        "rating": 38.71,
+        "dps": 19.55,
+        "tdo": 300.6,
+        "fast": "DRAGON_BREATH_FAST",
+        "charged": "HYDRO_PUMP",
+        "form": "PALKIA_ORIGIN"
+      },
+      {
+        "species": "quaquaval",
+        "dex": 914,
+        "rating": 36.58,
+        "dps": 19.69,
+        "tdo": 234.8,
+        "fast": "WATER_GUN_FAST",
+        "charged": "HYDRO_CANNON"
+      },
+      {
+        "species": "primarina",
+        "dex": 730,
+        "rating": 35.92,
+        "dps": 18.7,
+        "tdo": 254.5,
+        "fast": "WATERFALL_FAST",
+        "charged": "HYDRO_CANNON"
+      },
+      {
+        "species": "samurott",
+        "dex": 503,
+        "rating": 35.87,
+        "dps": 18.96,
+        "tdo": 242.9,
+        "fast": "FURY_CUTTER_FAST",
+        "charged": "HYDRO_CANNON"
+      },
+      {
+        "species": "greninja",
+        "dex": 658,
+        "rating": 35.52,
+        "dps": 19.79,
+        "tdo": 205.4,
+        "fast": "WATER_SHURIKEN_FAST",
+        "charged": "HYDRO_CANNON"
+      }
+    ],
+    "grass": [
+      {
+        "species": "kartana",
+        "dex": 798,
+        "rating": 39.4,
+        "dps": 22.29,
+        "tdo": 217.5,
+        "fast": "FURY_CUTTER_FAST",
+        "charged": "LEAF_BLADE"
+      },
+      {
+        "species": "shaymin",
+        "dex": 492,
+        "rating": 38.86,
+        "dps": 20.17,
+        "tdo": 278,
+        "fast": "MAGICAL_LEAF_FAST",
+        "charged": "GRASS_KNOT",
+        "form": "SHAYMIN_SKY"
+      },
+      {
+        "species": "zarude",
+        "dex": 893,
+        "rating": 38.03,
+        "dps": 18.36,
+        "tdo": 338,
+        "fast": "VINE_WHIP_FAST",
+        "charged": "POWER_WHIP"
+      },
+      {
+        "species": "rillaboom",
+        "dex": 812,
+        "rating": 37.86,
+        "dps": 19.65,
+        "tdo": 270.8,
+        "fast": "RAZOR_LEAF_FAST",
+        "charged": "FRENZY_PLANT"
+      },
+      {
+        "species": "meowscarada",
+        "dex": 908,
+        "rating": 35.87,
+        "dps": 19.75,
+        "tdo": 215,
+        "fast": "LEAFAGE_FAST",
+        "charged": "FRENZY_PLANT"
+      },
+      {
+        "species": "sceptile",
+        "dex": 254,
+        "rating": 35.23,
+        "dps": 19.42,
+        "tdo": 210.1,
+        "fast": "FURY_CUTTER_FAST",
+        "charged": "FRENZY_PLANT"
+      }
+    ],
+    "electric": [
+      {
+        "species": "regieleki",
+        "dex": 894,
+        "rating": 51.52,
+        "dps": 29.57,
+        "tdo": 272.6,
+        "fast": "LOCK_ON_FAST",
+        "charged": "THUNDER_CAGE"
+      },
+      {
+        "species": "thundurus",
+        "dex": 642,
+        "rating": 46.12,
+        "dps": 25.06,
+        "tdo": 287.3,
+        "fast": "VOLT_SWITCH_FAST",
+        "charged": "WILDBOLT_STORM",
+        "form": "THUNDURUS_THERIAN"
+      },
+      {
+        "species": "zekrom",
+        "dex": 644,
+        "rating": 43.25,
+        "dps": 21.58,
+        "tdo": 348.3,
+        "fast": "CHARGE_BEAM_FAST",
+        "charged": "FUSION_BOLT"
+      },
+      {
+        "species": "xurkitree",
+        "dex": 796,
+        "rating": 39.87,
+        "dps": 22.08,
+        "tdo": 234.8,
+        "fast": "THUNDER_SHOCK_FAST",
+        "charged": "DISCHARGE"
+      },
+      {
+        "species": "zeraora",
+        "dex": 807,
+        "rating": 36.53,
+        "dps": 18.99,
+        "tdo": 259.8,
+        "fast": "SPARK_FAST",
+        "charged": "WILD_CHARGE"
+      },
+      {
+        "species": "zapdos",
+        "dex": 145,
+        "rating": 36.03,
+        "dps": 18.54,
+        "tdo": 264.3,
+        "fast": "THUNDER_SHOCK_FAST",
+        "charged": "ZAP_CANNON"
+      }
+    ],
+    "psychic": [
+      {
+        "species": "mewtwo",
+        "dex": 150,
+        "rating": 45.77,
+        "dps": 23.45,
+        "tdo": 340.4,
+        "fast": "PSYCHO_CUT_FAST",
+        "charged": "PSYSTRIKE"
+      },
+      {
+        "species": "calyrex",
+        "dex": 898,
+        "rating": 44.98,
+        "dps": 23.09,
+        "tdo": 332.2,
+        "fast": "CONFUSION_FAST",
+        "charged": "PSYCHIC",
+        "form": "CALYREX_SHADOW_RIDER"
+      },
+      {
+        "species": "hoopa",
+        "dex": 720,
+        "rating": 41.64,
+        "dps": 22.23,
+        "tdo": 273.6,
+        "fast": "CONFUSION_FAST",
+        "charged": "PSYCHIC",
+        "form": "HOOPA_UNBOUND"
+      },
+      {
+        "species": "lunala",
+        "dex": 792,
+        "rating": 38.18,
+        "dps": 18.46,
+        "tdo": 337.7,
+        "fast": "CONFUSION_FAST",
+        "charged": "PSYCHIC"
+      },
+      {
+        "species": "necrozma",
+        "dex": 800,
+        "rating": 37.45,
+        "dps": 18.69,
+        "tdo": 301.6,
+        "fast": "PSYCHO_CUT_FAST",
+        "charged": "FUTURESIGHT",
+        "form": "NECROZMA_DAWN_WINGS"
+      },
+      {
+        "species": "latios",
+        "dex": 381,
+        "rating": 36.09,
+        "dps": 18.3,
+        "tdo": 276.7,
+        "fast": "DRAGON_BREATH_FAST",
+        "charged": "PSYCHIC"
+      }
+    ],
+    "ice": [
+      {
+        "species": "kyurem",
+        "dex": 646,
+        "rating": 44.92,
+        "dps": 22.28,
+        "tdo": 368.3,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "BLIZZARD",
+        "form": "KYUREM_BLACK"
+      },
+      {
+        "species": "calyrex",
+        "dex": 898,
+        "rating": 38.29,
+        "dps": 18.7,
+        "tdo": 328.5,
+        "fast": "CONFUSION_FAST",
+        "charged": "AVALANCHE",
+        "form": "CALYREX_ICE_RIDER"
+      },
+      {
+        "species": "darmanitan",
+        "dex": 555,
+        "rating": 36.62,
+        "dps": 20.5,
+        "tdo": 208.9,
+        "fast": "ICE_FANG_FAST",
+        "charged": "AVALANCHE",
+        "form": "DARMANITAN_GALARIAN_STANDARD"
+      },
+      {
+        "species": "baxcalibur",
+        "dex": 998,
+        "rating": 35.77,
+        "dps": 18.49,
+        "tdo": 258.9,
+        "fast": "DRAGON_BREATH_FAST",
+        "charged": "AVALANCHE"
+      },
+      {
+        "species": "mamoswine",
+        "dex": 473,
+        "rating": 35.58,
+        "dps": 18.71,
+        "tdo": 244.8,
+        "fast": "MUD_SLAP_FAST",
+        "charged": "AVALANCHE"
+      },
+      {
+        "species": "glastrier",
+        "dex": 896,
+        "rating": 34.49,
+        "dps": 16.73,
+        "tdo": 302.1,
+        "fast": "TACKLE_FAST",
+        "charged": "AVALANCHE"
+      }
+    ],
+    "dragon": [
+      {
+        "species": "regidrago",
+        "dex": 895,
+        "rating": 47.48,
+        "dps": 23.92,
+        "tdo": 371.3,
+        "fast": "BITE_FAST",
+        "charged": "DRAGON_ENERGY"
+      },
+      {
+        "species": "kyurem",
+        "dex": 646,
+        "rating": 43.32,
+        "dps": 21.49,
+        "tdo": 355.2,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "OUTRAGE",
+        "form": "KYUREM_BLACK"
+      },
+      {
+        "species": "palkia",
+        "dex": 484,
+        "rating": 41.37,
+        "dps": 20.89,
+        "tdo": 321.3,
+        "fast": "DRAGON_BREATH_FAST",
+        "charged": "DRACO_METEOR",
+        "form": "PALKIA_ORIGIN"
+      },
+      {
+        "species": "salamence",
+        "dex": 373,
+        "rating": 41.07,
+        "dps": 21.52,
+        "tdo": 285.6,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "DRACO_METEOR"
+      },
+      {
+        "species": "rayquaza",
+        "dex": 384,
+        "rating": 40.79,
+        "dps": 21.38,
+        "tdo": 283.3,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "BREAKING_SWIPE"
+      },
+      {
+        "species": "reshiram",
+        "dex": 643,
+        "rating": 40.54,
+        "dps": 20.23,
+        "tdo": 326.5,
+        "fast": "FIRE_FANG_FAST",
+        "charged": "DRACO_METEOR"
+      }
+    ],
+    "dark": [
+      {
+        "species": "tyranitar",
+        "dex": 248,
+        "rating": 36.66,
+        "dps": 17.94,
+        "tdo": 312.8,
+        "fast": "BITE_FAST",
+        "charged": "BRUTAL_SWING"
+      },
+      {
+        "species": "hoopa",
+        "dex": 720,
+        "rating": 36.48,
+        "dps": 19.48,
+        "tdo": 239.7,
+        "fast": "CONFUSION_FAST",
+        "charged": "DARK_PULSE",
+        "form": "HOOPA_UNBOUND"
+      },
+      {
+        "species": "hydreigon",
+        "dex": 635,
+        "rating": 36.42,
+        "dps": 18.62,
+        "tdo": 272.7,
+        "fast": "BITE_FAST",
+        "charged": "BRUTAL_SWING"
+      },
+      {
+        "species": "darkrai",
+        "dex": 491,
+        "rating": 33.95,
+        "dps": 18.07,
+        "tdo": 225.4,
+        "fast": "SNARL_FAST",
+        "charged": "DARK_PULSE"
+      },
+      {
+        "species": "absol",
+        "dex": 359,
+        "rating": 33.71,
+        "dps": 20.17,
+        "tdo": 157.4,
+        "fast": "SNARL_FAST",
+        "charged": "BRUTAL_SWING"
+      },
+      {
+        "species": "kingambit",
+        "dex": 983,
+        "rating": 33.68,
+        "dps": 16.78,
+        "tdo": 272.2,
+        "fast": "METAL_CLAW_FAST",
+        "charged": "FOUL_PLAY"
+      }
+    ],
+    "fairy": [
+      {
+        "species": "zacian",
+        "dex": 888,
+        "rating": 44.09,
+        "dps": 21.93,
+        "tdo": 358.4,
+        "fast": "METAL_CLAW_FAST",
+        "charged": "PLAY_ROUGH",
+        "form": "ZACIAN_CROWNED_SWORD"
+      },
+      {
+        "species": "tapu lele",
+        "dex": 786,
+        "rating": 39.8,
+        "dps": 20.74,
+        "tdo": 281.3,
+        "fast": "CONFUSION_FAST",
+        "charged": "NATURES_MADNESS"
+      },
+      {
+        "species": "tapu koko",
+        "dex": 785,
+        "rating": 38.3,
+        "dps": 20.64,
+        "tdo": 244.7,
+        "fast": "QUICK_ATTACK_FAST",
+        "charged": "NATURES_MADNESS"
+      },
+      {
+        "species": "tapu bulu",
+        "dex": 787,
+        "rating": 37.14,
+        "dps": 19.24,
+        "tdo": 267,
+        "fast": "BULLET_SEED_FAST",
+        "charged": "NATURES_MADNESS"
+      },
+      {
+        "species": "enamorus",
+        "dex": 905,
+        "rating": 35.87,
+        "dps": 19.72,
+        "tdo": 216.1,
+        "fast": "FAIRY_WIND_FAST",
+        "charged": "DAZZLING_GLEAM"
+      },
+      {
+        "species": "xerneas",
+        "dex": 716,
+        "rating": 33.46,
+        "dps": 16.53,
+        "tdo": 277.5,
+        "fast": "GEOMANCY_FAST",
+        "charged": "MOONBLAST"
+      }
+    ]
+  },
+  "shadowPerType": {
+    "normal": [
+      {
+        "species": "regigigas",
+        "dex": 486,
+        "rating": 69.4,
+        "dps": 36,
+        "tdo": 497.3,
+        "fast": "ZEN_HEADBUTT_FAST",
+        "charged": "CRUSH_GRIP"
+      },
+      {
+        "species": "porygon-z",
+        "dex": 474,
+        "rating": 42.47,
+        "dps": 24.19,
+        "tdo": 229.7,
+        "fast": "LOCK_ON_FAST",
+        "charged": "HYPER_BEAM"
+      },
+      {
+        "species": "ursaring",
+        "dex": 217,
+        "rating": 38.75,
+        "dps": 21.96,
+        "tdo": 212.7,
+        "fast": "METAL_CLAW_FAST",
+        "charged": "HYPER_BEAM"
+      },
+      {
+        "species": "slaking",
+        "dex": 289,
+        "rating": 38.32,
+        "dps": 19.6,
+        "tdo": 286.6,
+        "fast": "YAWN_FAST",
+        "charged": "HYPER_BEAM"
+      },
+      {
+        "species": "unfezant",
+        "dex": 521,
+        "rating": 35.83,
+        "dps": 20.67,
+        "tdo": 186.6,
+        "fast": "AIR_SLASH_FAST",
+        "charged": "HYPER_BEAM"
+      }
+    ],
+    "fighting": [
+      {
+        "species": "blaziken",
+        "dex": 257,
+        "rating": 49.79,
+        "dps": 29.14,
+        "tdo": 248.4,
+        "fast": "COUNTER_FAST",
+        "charged": "AURA_SPHERE"
+      },
+      {
+        "species": "conkeldurr",
+        "dex": 534,
+        "rating": 42.06,
+        "dps": 22.92,
+        "tdo": 259.9,
+        "fast": "COUNTER_FAST",
+        "charged": "DYNAMIC_PUNCH"
+      },
+      {
+        "species": "emboar",
+        "dex": 500,
+        "rating": 40.11,
+        "dps": 22.7,
+        "tdo": 221.4,
+        "fast": "LOW_KICK_FAST",
+        "charged": "FOCUS_BLAST"
+      },
+      {
+        "species": "hariyama",
+        "dex": 297,
+        "rating": 39.49,
+        "dps": 21.69,
+        "tdo": 238.4,
+        "fast": "FORCE_PALM_FAST",
+        "charged": "DYNAMIC_PUNCH"
+      },
+      {
+        "species": "sneasler",
+        "dex": 903,
+        "rating": 39.26,
+        "dps": 22.41,
+        "tdo": 211.1,
+        "fast": "POISON_JAB_FAST",
+        "charged": "CLOSE_COMBAT"
+      }
+    ],
+    "flying": [
+      {
+        "species": "salamence",
+        "dex": 373,
+        "rating": 52.87,
+        "dps": 28.79,
+        "tdo": 327.3,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "FLY"
+      },
+      {
+        "species": "toucannon",
+        "dex": 733,
+        "rating": 50.02,
+        "dps": 28.86,
+        "tdo": 260.5,
+        "fast": "PECK_FAST",
+        "charged": "BEAK_BLAST"
+      },
+      {
+        "species": "zapdos",
+        "dex": 145,
+        "rating": 48.21,
+        "dps": 25.79,
+        "tdo": 314.9,
+        "fast": "COUNTER_FAST",
+        "charged": "FLY",
+        "form": "ZAPDOS_GALARIAN"
+      },
+      {
+        "species": "honchkrow",
+        "dex": 430,
+        "rating": 48.1,
+        "dps": 28.95,
+        "tdo": 220.6,
+        "fast": "SNARL_FAST",
+        "charged": "BRAVE_BIRD"
+      },
+      {
+        "species": "articuno",
+        "dex": 144,
+        "rating": 48.06,
+        "dps": 25.54,
+        "tdo": 320.2,
+        "fast": "CONFUSION_FAST",
+        "charged": "FLY",
+        "form": "ARTICUNO_GALARIAN"
+      }
+    ],
+    "poison": [
+      {
+        "species": "gengar",
+        "dex": 94,
+        "rating": 40.37,
+        "dps": 24.38,
+        "tdo": 183.3,
+        "fast": "LICK_FAST",
+        "charged": "SLUDGE_BOMB"
+      },
+      {
+        "species": "overqwil",
+        "dex": 904,
+        "rating": 37.33,
+        "dps": 20.66,
+        "tdo": 220.2,
+        "fast": "POISON_JAB_FAST",
+        "charged": "SLUDGE_BOMB"
+      },
+      {
+        "species": "toxicroak",
+        "dex": 454,
+        "rating": 34.7,
+        "dps": 20.38,
+        "tdo": 171.3,
+        "fast": "POISON_JAB_FAST",
+        "charged": "SLUDGE_BOMB"
+      },
+      {
+        "species": "victreebel",
+        "dex": 71,
+        "rating": 34.06,
+        "dps": 20.06,
+        "tdo": 166.6,
+        "fast": "MAGICAL_LEAF_FAST",
+        "charged": "SLUDGE_BOMB"
+      },
+      {
+        "species": "muk",
+        "dex": 89,
+        "rating": 33.96,
+        "dps": 18.11,
+        "tdo": 224,
+        "fast": "POISON_JAB_FAST",
+        "charged": "GUNK_SHOT"
+      }
+    ],
+    "ground": [
+      {
+        "species": "landorus",
+        "dex": 645,
+        "rating": 54.37,
+        "dps": 29.7,
+        "tdo": 333.8,
+        "fast": "MUD_SHOT_FAST",
+        "charged": "SANDSEAR_STORM",
+        "form": "LANDORUS_THERIAN"
+      },
+      {
+        "species": "groudon",
+        "dex": 383,
+        "rating": 47.23,
+        "dps": 24.32,
+        "tdo": 346.2,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "PRECIPICE_BLADES"
+      },
+      {
+        "species": "garchomp",
+        "dex": 445,
+        "rating": 45.88,
+        "dps": 23.64,
+        "tdo": 335.7,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "EARTHQUAKE"
+      },
+      {
+        "species": "excadrill",
+        "dex": 530,
+        "rating": 44.18,
+        "dps": 24.96,
+        "tdo": 244.9,
+        "fast": "METAL_CLAW_FAST",
+        "charged": "EARTHQUAKE"
+      },
+      {
+        "species": "ursaluna",
+        "dex": 901,
+        "rating": 42.96,
+        "dps": 21.81,
+        "tdo": 328.5,
+        "fast": "TACKLE_FAST",
+        "charged": "HIGH_HORSEPOWER"
+      }
+    ],
+    "rock": [
+      {
+        "species": "tyrantrum",
+        "dex": 697,
+        "rating": 43.96,
+        "dps": 23.85,
+        "tdo": 275.3,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "METEOR_BEAM"
+      },
+      {
+        "species": "rhyperior",
+        "dex": 464,
+        "rating": 43.91,
+        "dps": 22.39,
+        "tdo": 331,
+        "fast": "MUD_SLAP_FAST",
+        "charged": "ROCK_WRECKER"
+      },
+      {
+        "species": "rampardos",
+        "dex": 409,
+        "rating": 43.85,
+        "dps": 26.18,
+        "tdo": 206.2,
+        "fast": "SMACK_DOWN_FAST",
+        "charged": "ROCK_SLIDE"
+      },
+      {
+        "species": "gigalith",
+        "dex": 526,
+        "rating": 41.73,
+        "dps": 22.35,
+        "tdo": 271.5,
+        "fast": "SMACK_DOWN_FAST",
+        "charged": "METEOR_BEAM"
+      },
+      {
+        "species": "aurorus",
+        "dex": 699,
+        "rating": 38.98,
+        "dps": 20.3,
+        "tdo": 275.9,
+        "fast": "POWDER_SNOW_FAST",
+        "charged": "METEOR_BEAM"
+      }
+    ],
+    "bug": [
+      {
+        "species": "escavalier",
+        "dex": 589,
+        "rating": 35.88,
+        "dps": 20.05,
+        "tdo": 205.6,
+        "fast": "BUG_BITE_FAST",
+        "charged": "MEGAHORN"
+      },
+      {
+        "species": "vikavolt",
+        "dex": 738,
+        "rating": 35.64,
+        "dps": 20.5,
+        "tdo": 187.1,
+        "fast": "BUG_BITE_FAST",
+        "charged": "X_SCISSOR"
+      },
+      {
+        "species": "scizor",
+        "dex": 212,
+        "rating": 33.81,
+        "dps": 19.2,
+        "tdo": 184.8,
+        "fast": "FURY_CUTTER_FAST",
+        "charged": "X_SCISSOR"
+      },
+      {
+        "species": "pinsir",
+        "dex": 127,
+        "rating": 33.48,
+        "dps": 19.24,
+        "tdo": 176.4,
+        "fast": "BUG_BITE_FAST",
+        "charged": "X_SCISSOR"
+      },
+      {
+        "species": "accelgor",
+        "dex": 617,
+        "rating": 33.03,
+        "dps": 19.92,
+        "tdo": 150.6,
+        "fast": "INFESTATION_FAST",
+        "charged": "BUG_BUZZ"
+      }
+    ],
+    "ghost": [
+      {
+        "species": "giratina",
+        "dex": 487,
+        "rating": 47.88,
+        "dps": 23.77,
+        "tdo": 391.4,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "SHADOW_FORCE",
+        "form": "GIRATINA_ORIGIN"
+      },
+      {
+        "species": "chandelure",
+        "dex": 609,
+        "rating": 43.94,
+        "dps": 25.53,
+        "tdo": 224,
+        "fast": "FIRE_SPIN_FAST",
+        "charged": "SHADOW_BALL"
+      },
+      {
+        "species": "gengar",
+        "dex": 94,
+        "rating": 42.33,
+        "dps": 25.56,
+        "tdo": 192.2,
+        "fast": "LICK_FAST",
+        "charged": "SHADOW_BALL"
+      },
+      {
+        "species": "annihilape",
+        "dex": 979,
+        "rating": 40.37,
+        "dps": 21.23,
+        "tdo": 277.7,
+        "fast": "COUNTER_FAST",
+        "charged": "SHADOW_BALL"
+      },
+      {
+        "species": "typhlosion",
+        "dex": 157,
+        "rating": 39.14,
+        "dps": 22.25,
+        "tdo": 213.1,
+        "fast": "HEX_FAST",
+        "charged": "SHADOW_BALL",
+        "form": "TYPHLOSION_HISUIAN"
+      }
+    ],
+    "steel": [
+      {
+        "species": "metagross",
+        "dex": 376,
+        "rating": 49.03,
+        "dps": 25.66,
+        "tdo": 342.1,
+        "fast": "FURY_CUTTER_FAST",
+        "charged": "METEOR_MASH"
+      },
+      {
+        "species": "dialga",
+        "dex": 483,
+        "rating": 38.56,
+        "dps": 20.37,
+        "tdo": 261.7,
+        "fast": "METAL_CLAW_FAST",
+        "charged": "IRON_HEAD"
+      },
+      {
+        "species": "excadrill",
+        "dex": 530,
+        "rating": 37.18,
+        "dps": 21.01,
+        "tdo": 206.1,
+        "fast": "METAL_CLAW_FAST",
+        "charged": "IRON_HEAD"
+      },
+      {
+        "species": "heatran",
+        "dex": 485,
+        "rating": 36.29,
+        "dps": 18.76,
+        "tdo": 262.5,
+        "fast": "FIRE_SPIN_FAST",
+        "charged": "IRON_HEAD"
+      },
+      {
+        "species": "magnezone",
+        "dex": 462,
+        "rating": 32.56,
+        "dps": 17.99,
+        "tdo": 192.9,
+        "fast": "VOLT_SWITCH_FAST",
+        "charged": "FLASH_CANNON"
+      }
+    ],
+    "fire": [
+      {
+        "species": "darmanitan",
+        "dex": 555,
+        "rating": 47.62,
+        "dps": 27.83,
+        "tdo": 238.6,
+        "fast": "FIRE_FANG_FAST",
+        "charged": "OVERHEAT"
+      },
+      {
+        "species": "emboar",
+        "dex": 500,
+        "rating": 46.1,
+        "dps": 26.09,
+        "tdo": 254.4,
+        "fast": "LOW_KICK_FAST",
+        "charged": "BLAST_BURN"
+      },
+      {
+        "species": "blaziken",
+        "dex": 257,
+        "rating": 44.55,
+        "dps": 26.08,
+        "tdo": 222.3,
+        "fast": "COUNTER_FAST",
+        "charged": "BLAST_BURN"
+      },
+      {
+        "species": "chandelure",
+        "dex": 609,
+        "rating": 44.06,
+        "dps": 25.6,
+        "tdo": 224.6,
+        "fast": "FIRE_SPIN_FAST",
+        "charged": "OVERHEAT"
+      },
+      {
+        "species": "moltres",
+        "dex": 146,
+        "rating": 43.68,
+        "dps": 23.74,
+        "tdo": 272.1,
+        "fast": "FIRE_SPIN_FAST",
+        "charged": "OVERHEAT"
+      }
+    ],
+    "water": [
+      {
+        "species": "kyogre",
+        "dex": 382,
+        "rating": 47.43,
+        "dps": 24.42,
+        "tdo": 347.6,
+        "fast": "WATERFALL_FAST",
+        "charged": "ORIGIN_PULSE"
+      },
+      {
+        "species": "palkia",
+        "dex": 484,
+        "rating": 46.48,
+        "dps": 24.49,
+        "tdo": 317.9,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "HYDRO_PUMP",
+        "form": "PALKIA_ORIGIN"
+      },
+      {
+        "species": "samurott",
+        "dex": 503,
+        "rating": 42.21,
+        "dps": 23.44,
+        "tdo": 246.3,
+        "fast": "FURY_CUTTER_FAST",
+        "charged": "HYDRO_CANNON"
+      },
+      {
+        "species": "greninja",
+        "dex": 658,
+        "rating": 42.14,
+        "dps": 24.65,
+        "tdo": 210.4,
+        "fast": "WATER_SHURIKEN_FAST",
+        "charged": "HYDRO_CANNON"
+      },
+      {
+        "species": "swampert",
+        "dex": 260,
+        "rating": 40.88,
+        "dps": 21.93,
+        "tdo": 265,
+        "fast": "MUD_SHOT_FAST",
+        "charged": "HYDRO_CANNON"
+      }
+    ],
+    "grass": [
+      {
+        "species": "sceptile",
+        "dex": 254,
+        "rating": 41.09,
+        "dps": 23.56,
+        "tdo": 218,
+        "fast": "FURY_CUTTER_FAST",
+        "charged": "FRENZY_PLANT"
+      },
+      {
+        "species": "exeggutor",
+        "dex": 103,
+        "rating": 41.07,
+        "dps": 22.97,
+        "tdo": 234.6,
+        "fast": "EXTRASENSORY_FAST",
+        "charged": "SOLAR_BEAM"
+      },
+      {
+        "species": "chesnaught",
+        "dex": 652,
+        "rating": 39.6,
+        "dps": 21.01,
+        "tdo": 265.1,
+        "fast": "VINE_WHIP_FAST",
+        "charged": "FRENZY_PLANT"
+      },
+      {
+        "species": "torterra",
+        "dex": 389,
+        "rating": 38.75,
+        "dps": 20.53,
+        "tdo": 260.7,
+        "fast": "MUD_SLAP_FAST",
+        "charged": "FRENZY_PLANT"
+      },
+      {
+        "species": "venusaur",
+        "dex": 3,
+        "rating": 38.48,
+        "dps": 20.99,
+        "tdo": 237.2,
+        "fast": "VINE_WHIP_FAST",
+        "charged": "FRENZY_PLANT"
+      }
+    ],
+    "electric": [
+      {
+        "species": "thundurus",
+        "dex": 642,
+        "rating": 54.98,
+        "dps": 31.42,
+        "tdo": 294.4,
+        "fast": "VOLT_SWITCH_FAST",
+        "charged": "WILDBOLT_STORM",
+        "form": "THUNDURUS_THERIAN"
+      },
+      {
+        "species": "raikou",
+        "dex": 243,
+        "rating": 41.98,
+        "dps": 22.36,
+        "tdo": 277.8,
+        "fast": "THUNDER_SHOCK_FAST",
+        "charged": "WILD_CHARGE"
+      },
+      {
+        "species": "electivire",
+        "dex": 466,
+        "rating": 41.89,
+        "dps": 23.88,
+        "tdo": 226.2,
+        "fast": "THUNDER_SHOCK_FAST",
+        "charged": "WILD_CHARGE"
+      },
+      {
+        "species": "zapdos",
+        "dex": 145,
+        "rating": 41.23,
+        "dps": 22.1,
+        "tdo": 267.6,
+        "fast": "THUNDER_SHOCK_FAST",
+        "charged": "ZAP_CANNON"
+      },
+      {
+        "species": "luxray",
+        "dex": 405,
+        "rating": 39.7,
+        "dps": 22.7,
+        "tdo": 212.3,
+        "fast": "SNARL_FAST",
+        "charged": "WILD_CHARGE"
+      }
+    ],
+    "psychic": [
+      {
+        "species": "mewtwo",
+        "dex": 150,
+        "rating": 54.84,
+        "dps": 29.6,
+        "tdo": 348.9,
+        "fast": "PSYCHO_CUT_FAST",
+        "charged": "PSYSTRIKE"
+      },
+      {
+        "species": "metagross",
+        "dex": 376,
+        "rating": 42.83,
+        "dps": 22.42,
+        "tdo": 298.8,
+        "fast": "FURY_CUTTER_FAST",
+        "charged": "PSYCHIC"
+      },
+      {
+        "species": "latios",
+        "dex": 381,
+        "rating": 42.74,
+        "dps": 22.95,
+        "tdo": 276.2,
+        "fast": "DRAGON_BREATH_FAST",
+        "charged": "PSYCHIC"
+      },
+      {
+        "species": "alakazam",
+        "dex": 65,
+        "rating": 41.4,
+        "dps": 24.67,
+        "tdo": 195.7,
+        "fast": "CONFUSION_FAST",
+        "charged": "PSYCHIC"
+      },
+      {
+        "species": "articuno",
+        "dex": 144,
+        "rating": 41,
+        "dps": 21.79,
+        "tdo": 273.2,
+        "fast": "CONFUSION_FAST",
+        "charged": "FUTURESIGHT",
+        "form": "ARTICUNO_GALARIAN"
+      }
+    ],
+    "ice": [
+      {
+        "species": "darmanitan",
+        "dex": 555,
+        "rating": 44.13,
+        "dps": 25.79,
+        "tdo": 221.1,
+        "fast": "ICE_FANG_FAST",
+        "charged": "AVALANCHE",
+        "form": "DARMANITAN_GALARIAN_STANDARD"
+      },
+      {
+        "species": "mamoswine",
+        "dex": 473,
+        "rating": 42.3,
+        "dps": 23.07,
+        "tdo": 260.9,
+        "fast": "MUD_SLAP_FAST",
+        "charged": "AVALANCHE"
+      },
+      {
+        "species": "weavile",
+        "dex": 461,
+        "rating": 39.59,
+        "dps": 22.66,
+        "tdo": 211.2,
+        "fast": "SNARL_FAST",
+        "charged": "AVALANCHE"
+      },
+      {
+        "species": "aurorus",
+        "dex": 699,
+        "rating": 34.14,
+        "dps": 17.78,
+        "tdo": 241.7,
+        "fast": "ROCK_THROW_FAST",
+        "charged": "WEATHER_BALL_ICE"
+      },
+      {
+        "species": "mr. rime",
+        "dex": 866,
+        "rating": 34.04,
+        "dps": 18.9,
+        "tdo": 198.9,
+        "fast": "CONFUSION_FAST",
+        "charged": "TRIPLE_AXEL"
+      }
+    ],
+    "dragon": [
+      {
+        "species": "palkia",
+        "dex": 484,
+        "rating": 49.64,
+        "dps": 26.15,
+        "tdo": 339.5,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "DRACO_METEOR",
+        "form": "PALKIA_ORIGIN"
+      },
+      {
+        "species": "salamence",
+        "dex": 373,
+        "rating": 48.67,
+        "dps": 26.51,
+        "tdo": 301.2,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "DRACO_METEOR"
+      },
+      {
+        "species": "dialga",
+        "dex": 483,
+        "rating": 47.59,
+        "dps": 25.14,
+        "tdo": 323,
+        "fast": "METAL_CLAW_FAST",
+        "charged": "DRACO_METEOR"
+      },
+      {
+        "species": "garchomp",
+        "dex": 445,
+        "rating": 47.12,
+        "dps": 24.27,
+        "tdo": 344.7,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "BREAKING_SWIPE"
+      },
+      {
+        "species": "dragonite",
+        "dex": 149,
+        "rating": 46.96,
+        "dps": 24.88,
+        "tdo": 315.5,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "DRACO_METEOR"
+      }
+    ],
+    "dark": [
+      {
+        "species": "tyranitar",
+        "dex": 248,
+        "rating": 43.58,
+        "dps": 22.57,
+        "tdo": 313.9,
+        "fast": "BITE_FAST",
+        "charged": "BRUTAL_SWING"
+      },
+      {
+        "species": "hydreigon",
+        "dex": 635,
+        "rating": 43.44,
+        "dps": 23.14,
+        "tdo": 287.4,
+        "fast": "BITE_FAST",
+        "charged": "BRUTAL_SWING"
+      },
+      {
+        "species": "absol",
+        "dex": 359,
+        "rating": 40.41,
+        "dps": 25.28,
+        "tdo": 165.1,
+        "fast": "SNARL_FAST",
+        "charged": "BRUTAL_SWING"
+      },
+      {
+        "species": "darkrai",
+        "dex": 491,
+        "rating": 40.22,
+        "dps": 22.33,
+        "tdo": 235.1,
+        "fast": "SNARL_FAST",
+        "charged": "DARK_PULSE"
+      },
+      {
+        "species": "weavile",
+        "dex": 461,
+        "rating": 37.64,
+        "dps": 21.54,
+        "tdo": 200.8,
+        "fast": "SNARL_FAST",
+        "charged": "FOUL_PLAY"
+      }
+    ],
+    "fairy": [
+      {
+        "species": "gardevoir",
+        "dex": 282,
+        "rating": 36.74,
+        "dps": 20.51,
+        "tdo": 211.2,
+        "fast": "CONFUSION_FAST",
+        "charged": "DAZZLING_GLEAM"
+      },
+      {
+        "species": "granbull",
+        "dex": 210,
+        "rating": 34.2,
+        "dps": 19.82,
+        "tdo": 175.6,
+        "fast": "SNARL_FAST",
+        "charged": "PLAY_ROUGH"
+      },
+      {
+        "species": "rapidash",
+        "dex": 78,
+        "rating": 31.83,
+        "dps": 18.58,
+        "tdo": 160,
+        "fast": "PSYCHO_CUT_FAST",
+        "charged": "PLAY_ROUGH",
+        "form": "RAPIDASH_GALARIAN"
+      },
+      {
+        "species": "ninetales",
+        "dex": 38,
+        "rating": 26.91,
+        "dps": 14.87,
+        "tdo": 159.5,
+        "fast": "CHARM_FAST",
+        "charged": "DAZZLING_GLEAM",
+        "form": "NINETALES_ALOLA"
+      },
+      {
+        "species": "weezing",
+        "dex": 110,
+        "rating": 26.66,
+        "dps": 14.98,
+        "tdo": 150.2,
+        "fast": "FAIRY_WIND_FAST",
+        "charged": "PLAY_ROUGH",
+        "form": "WEEZING_GALARIAN"
+      }
+    ]
+  },
   "chargerMoves": [
     {
       "name": "Bite",
@@ -219,6 +2274,11 @@
       "duration": 500
     },
     {
+      "name": "Metal Sound",
+      "type": "steel",
+      "duration": 500
+    },
+    {
       "name": "Mud Shot",
       "type": "ground",
       "duration": 500
@@ -236,6 +2296,16 @@
     {
       "name": "Psycho Cut",
       "type": "psychic",
+      "duration": 500
+    },
+    {
+      "name": "Psywave",
+      "type": "psychic",
+      "duration": 500
+    },
+    {
+      "name": "Sand Attack",
+      "type": "ground",
       "duration": 500
     },
     {

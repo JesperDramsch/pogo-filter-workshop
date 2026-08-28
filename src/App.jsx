@@ -117,18 +117,24 @@ export const DEFAULT_LUCKIES = [];
 // search — `mewtwo` covers Shadow Mewtwo and Mega Mewtwo Y both.
 //
 // Seed source: `src/data/meta-rankings.json` (regenerated daily by
-// scripts/fetch-meta-rankings.mjs from pogoapi.net stats + moves). Score
-// per (species, type) = base_attack × max charged-move power of that type;
-// top-8 per type, deduped union, sorted by best-score-across-types. Killing
-// the prior hand-curated tier-list constant: meta drifts every move
-// rebalance, so a daily-refreshed data feed beats periodic manual updates.
+// scripts/fetch-meta-rankings.mjs from the PokeMiners game master). Each
+// species is scored by simulating a raid against a generic tier-5 boss —
+// cycle DPS from its real fast/charged moveset, mixed with the total damage
+// it lives long enough to deal — and the top N of each type are unioned.
+// A data feed beats manual curation because the meta drifts every move
+// rebalance; a *simulated* feed beats the previous scoring because that one
+// multiplied base attack by charged-move power and looked at nothing else,
+// which put Komala and Octillery in the list next to Mewtwo.
 export const DEFAULT_TOP_ATTACKERS = META_RANKINGS.topAttackers;
 
 // Personal "top Max Battle attackers" — same idea but only relevant to
 // Dynamax/Gigantamax encounters. Seed source: same meta-rankings.json,
-// filtered through the Dynamax-eligibility seed in fetch-meta-rankings.mjs
-// (pogoapi has no Dynamax flag, so the eligibility set is hand-maintained;
-// ranking within it is data-driven). Forms fold into base species —
+// restricted to species the game master marks Dynamax-capable and ordered by
+// the same raid rating. Eligibility used to be a hand-maintained set, because
+// pogoapi carries no Dynamax flag; the game master does carry one, under
+// Niantic's internal name for the mechanic ("bread"), so the roster is now
+// derived too — and the hand-maintained one turned out to be wrong about
+// Zacian, Zamazenta, Urshifu and Eternatus. Forms fold into base species —
 // `charizard` covers Gigantamax Charizard.
 export const DEFAULT_TOP_MAX_ATTACKERS = META_RANKINGS.topMaxAttackers;
 
@@ -699,76 +705,24 @@ export const DEFAULT_CONFIG = {
 	// Shadows you'd never purify, even during take-over events. Acts as
 	// belt-and-suspenders alongside !legendär — the legendary entries here
 	// duplicate that protection so the list stays complete if the global
-	// flag is ever toggled off. Non-legendary entries cover S / A+ / A tier
-	// shadow raid attackers per the community / META.md tier lists, focusing
-	// on species without a relevant Mega form (where Shadow IS the canonical
-	// top form). Resolved via `resolveSpecies` so users can type in any
-	// locale; expanded family-wide (+species) by shadowSafe.
-	shadowKeeperSpecies: [
-		// S tier shadows
-		'dialga',
-		'palkia',
-		'heatran',
-		'groudon',
-		'rampardos',
-		'salamence',
-		'mewtwo',
-		// A+ tier shadows
-		'greninja',
-		'hydreigon',
-		'darkrai',
-		'toucannon',
-		'vikavolt',
-		'tyrantrum',
-		'conkeldurr',
-		'darmanitan',
-		'chandelure',
-		'excadrill',
-		'regigigas',
-		'gigalith',
-		'kyogre',
-		'mamoswine',
-		'electivire',
-		'magnezone',
-		'garchomp',
-		'rhyperior',
-		'metagross',
-		'tyranitar',
-		'blaziken',
-		'ho-oh',
-		'raikou',
-		'gardevoir',
-		'swampert',
-		'dragonite',
-		'moltres',
-		'gengar',
-		'machamp',
-		// A tier shadows
-		'landorus',
-		'kingler',
-		'delphox',
-		'chesnaught',
-		'giratina',
-		'emboar',
-		'honchkrow',
-		'latios',
-		'staraptor',
-		'weavile',
-		'crawdaunt',
-		'absol',
-		'hariyama',
-		'sceptile',
-		'entei',
-		'aerodactyl',
-		'zapdos',
-		// A tier non-Mega shadow attackers (Shadow is the top form for these)
-		'togekiss',
-		'roserade',
-		'toxicroak',
-		'glaceon',
-		'espeon',
-		'sylveon',
-	],
+	// flag is ever toggled off. Resolved via `resolveSpecies` so users can
+	// type in any locale; expanded family-wide (+species) by shadowSafe, and
+	// used as the fourth floor clause of the trash crypto guard.
+	//
+	// Seed source: `src/data/meta-rankings.json` (regenerated daily by
+	// scripts/fetch-meta-rankings.mjs from the PokeMiners game master). It is
+	// the top-N-per-type cut of every species that HAS a Shadow form, scored
+	// with the Shadow multipliers the game master itself publishes (×1.2 attack,
+	// ×0.8333333 defence) — so it answers "is Shadow the form worth keeping"
+	// rather than "is this species good", which is the question this list is
+	// actually asking. Killing the prior hand-curated tier-list constant: it
+	// had drifted, and not only by being out of date. It named Espeon, Sylveon,
+	// Glaceon, Togekiss and Roserade as shadow keepers, and none of the five
+	// has a Shadow form at all — neither the Eevee, Togepi nor Budew line
+	// carries a shadow entry anywhere in the game master, which the Rocket
+	// lineup snapshot independently agrees with. Five of its fifty-nine entries
+	// could never have matched a single Pokémon.
+	shadowKeeperSpecies: META_RANKINGS.shadowKeepers,
 
 	// Optional tag bookkeepers can use to manually flag a non-keeper shadow
 	// for Frustration removal during a take-over (e.g. a high-IV gem they
@@ -1644,6 +1598,18 @@ export function buildFilters(
 	const pvpMetaTier = cfg.pvpMode === 'intelligent' ? cfg.pvpMetaTier || 'loose' : pvpBaseTier;
 	const notP = IV_PVP_TIER[pvpBaseTier];
 
+	// Meta shadow attackers, rendered into the user's PoGo locale. Hoisted up
+	// here because two very different filters need the same list: the trash
+	// crypto floor below, and the shadowSafe / shadowFrustration pro-tools
+	// further down.
+	const keeperResolved = [
+		...new Set(
+			(cfg.shadowKeeperSpecies || [])
+				.map((sp) => speciesForOutput(sp, outputLocale))
+				.filter(Boolean),
+		),
+	];
+
 	// The curated "relevant now" list — species you actually battle with, seeded
 	// one tap at a time from the league packs. Rendered into the user's PoGo
 	// locale, same as shadowKeeperSpecies (`keeperResolved`).
@@ -1819,6 +1785,24 @@ export function buildFilters(
 				`!${kw.flag.shadow},@${kw.flag.frustration}`,
 				tFn('app.clause_why.shadow_purify_frustration'),
 			);
+		// Fourth floor clause: the meta shadow attackers themselves. The three
+		// above are all about the PURIFY decision — a shadow worth purifying is
+		// worth not releasing. That says nothing about a shadow whose whole
+		// value is staying a shadow, and those are exactly the ones this list
+		// names. Without it a keeper that is cheap-to-purify, has no low IV and
+		// has already been Charge-TM'd passes all three and gets released: a
+		// Charge-TM'd Shadow Metagross is the single most expensive Pokémon in
+		// the box to have thrown away, and it was the one shape the floor let
+		// through. One clause, not one per species — `!crypto,+a,+b,…` reads as
+		// "releasable only if it is not a keeper family", and OR binds tighter
+		// than `&` (same trick as legacyMovesClause).
+		if (keeperResolved.length > 0) {
+			push(
+				trashClauses,
+				`!${kw.flag.shadow},${keeperResolved.map((sp) => `+${sp}`).join(',')}`,
+				tFn('app.clause_why.shadow_purify_keeper'),
+			);
+		}
 	}
 	if (cfg.protectCostumes) push(trashClauses, `!${kw.flag.costume}`, tFn('app.clause_why.costumes'));
 	if (cfg.protectLuckies) push(trashClauses, `!${kw.flag.lucky}`, tFn('app.clause_why.luckies'));
@@ -3241,9 +3225,6 @@ export function buildFilters(
 	// Investment gate: `@frustration` (same reasoning as shadowCheap above)
 	// — only purify shadows still in default state. A Charge-TM'd shadow
 	// is an investment; purifying it loses the TM and the +20% boost.
-	const keeperResolved = (cfg.shadowKeeperSpecies || [])
-		.map((s) => speciesForOutput(s, outputLocale))
-		.filter(Boolean);
 	const shadowSafeClauses = [];
 	push(shadowSafeClauses, kw.flag.shadow, tFn('app.clause_why.shadow_safe_pool'));
 	push(shadowSafeClauses, `!${kw.flag.legendary}`, tFn('app.clause_why.legendaries'));
