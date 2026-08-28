@@ -20,9 +20,10 @@
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildFilters, mergeImportedConfig, DEFAULT_CONFIG } from "../src/App.jsx";
 import { pokemonNameFor } from "../src/data/species.js";
-import { makeTFn } from "./lib/fixture.mjs";
+import { buildResult } from "./lib/fixture.mjs";
+import { canonicalStringify } from "./lib/json.mjs";
+import { REFERENCE_LOCALES as LOCALES } from "./lib/meta-reference.mjs";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -33,9 +34,6 @@ const MD_OUT = resolve(REF_DIR, "META.md");
 
 const RAW_BASE =
   "https://raw.githubusercontent.com/JesperDramsch/pogo-filter-workshop/main";
-// The skill is German-first, so DE is what gets quoted. EN rides along because
-// a mis-localized string is obvious the moment you can see both.
-const LOCALES = ["de", "en"];
 const LEAGUE_TITLE = { great: "Great League (Superliga)", ultra: "Ultra League (Hyperliga)", master: "Master League (Meisterliga)" };
 
 function watchInfo() {
@@ -43,7 +41,11 @@ function watchInfo() {
   if (!existsSync(p)) return null;
   try {
     const w = JSON.parse(readFileSync(p, "utf8"));
-    const last = w.history?.[0] || null;
+    // PvP entries only. The watch grew a second, PvE stream (raid move power,
+    // duration and energy), and this section is captioned "Trainer-Battle stat
+    // change" — rendering a PvE entry under it would be a false statement about
+    // what moved. Entries predating the `stream` tag are all PvP.
+    const last = (w.history || []).find(h => (h.stream ?? "pvp") === "pvp") || null;
     return {
       checkedAt: w.fetchedAt || null,
       lastChangeAt: last?.at || null,
@@ -53,8 +55,12 @@ function watchInfo() {
   } catch { return null; }
 }
 
+// Via scripts/lib/fixture.mjs's buildResult, which is also what the fixture and
+// check-meta-reference call. M4 asserts the strings below are byte-identical to
+// the app's own output, so producer and checker must not spell the buildFilters
+// call out separately — they would drift the moment it grew a parameter.
 const built = Object.fromEntries(
-  LOCALES.map(loc => [loc, buildFilters([], [], mergeImportedConfig(DEFAULT_CONFIG), [], loc, makeTFn(loc))]),
+  LOCALES.map(loc => [loc, buildResult(loc, { hundos: [], luckies: [] })]),
 );
 
 function speciesRows(list) {
@@ -98,8 +104,7 @@ for (const [id, c] of Object.entries(PVP_RANKINGS.cups || {})) {
   };
 }
 
-const payload = {
-  generatedAt: new Date().toISOString(),
+const content = {
   // Copied verbatim, never regenerated: check-meta-reference asserts these match
   // so a snapshot sync that skips regeneration fails CI instead of silently
   // refreezing the reference.
@@ -115,17 +120,39 @@ const payload = {
   cups,
 };
 
+// Same preserve-when-unchanged rule the fetchers apply to `fetchedAt`, and for
+// the same reason. pvp-meta.json is in the sync workflow's `git diff --quiet`
+// path list, so a timestamp that moves on every run makes that guard permanently
+// false: the fetcher would correctly report "content unchanged", and the job
+// would still push a "sync ranking snapshot" commit containing nothing but this
+// line — every day, burying real meta movements in the log.
+function previousGeneratedAt() {
+  if (!existsSync(JSON_OUT)) return null;
+  try {
+    const { generatedAt, ...prevContent } = JSON.parse(readFileSync(JSON_OUT, "utf8"));
+    return canonicalStringify(prevContent) === canonicalStringify(content) ? generatedAt : null;
+  } catch { return null; }
+}
+
+const carried = previousGeneratedAt();
+if (carried) console.log("  ↺ reference unchanged — preserving previous generatedAt");
+const payload = { generatedAt: carried || new Date().toISOString(), ...content };
+
 if (!existsSync(REF_DIR)) mkdirSync(REF_DIR, { recursive: true });
 writeFileSync(JSON_OUT, JSON.stringify(payload, null, 2) + "\n", "utf8");
 
 // -------------------------------------------------------------------- META.md
 
 const md = [];
-const age = Math.round((Date.now() - Date.parse(PVP_RANKINGS.fetchedAt)) / 86400000);
 
 md.push("# Pokémon GO PvP Meta Reference — GENERATED, DO NOT HAND-EDIT");
 md.push("");
-md.push(`- **Snapshot taken:** ${PVP_RANKINGS.fetchedAt} (${age} day(s) ago at generation time)`);
+// Absolute date only. An "N days ago at generation time" figure was wrong for
+// every reader after the moment it was written, and — being clock-derived — it
+// rewrote this whole file on any day the snapshot had not moved, which is a
+// second churn source on top of `generatedAt`. The 14-day rule below tells the
+// reader to compare this date against today.
+md.push(`- **Snapshot taken:** ${PVP_RANKINGS.fetchedAt}`);
 md.push(`- **Source:** ${payload.source} — ${payload.sourceUrls.upstream}`);
 md.push(`- **Snapshot URL:** ${payload.sourceUrls.snapshot}`);
 md.push(`- **Depth:** top ${payload.topN} per league, deduped by base dex`);
@@ -201,11 +228,15 @@ function section(title, capLabel, data) {
   }
 }
 
-for (const key of ["great", "ultra", "master"]) {
+// Driven by the snapshot, like the JSON half above — not a hardcoded three.
+// A league key the snapshot grows produces a real filter string in pvp-meta.json
+// via buildFilters, so a fixed list here would drop it from the human-readable
+// half only, and M4's "filter strings actually present in META.md" check would
+// then fail CI on a purely upstream data change nobody in this repo made.
+for (const key of Object.keys(leagues)) {
   const l = leagues[key];
-  if (!l) continue;
   const cap = l.cpCap ? `${l.cpCap} CP` : "none — Master is uncapped, so a low-attack PvP spread is *worse* here than a hundo. No rank-1 IV clause is emitted.";
-  section(`${LEAGUE_TITLE[key]}`, cap, l);
+  section(LEAGUE_TITLE[key] ?? key, cap, l);
 }
 
 md.push("## Cups");

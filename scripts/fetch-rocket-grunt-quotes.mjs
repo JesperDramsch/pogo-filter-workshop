@@ -32,9 +32,10 @@
 //
 // Flags: --offline-ok   tolerate fetch failures if a previous artifact exists.
 
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
 import { HOLOHOLO_LOCALES, fetchLocaleBundle } from "./lib/holoholo-text.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -118,18 +119,6 @@ function buildNumbered(maps, prefix, indices, gendered) {
   });
 }
 
-function canonicalStringify(value) {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonicalStringify).join(",")}]`;
-  const keys = Object.keys(value).sort();
-  return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalStringify(value[k])}`).join(",")}}`;
-}
-
-function writeJson(path, data) {
-  if (!existsSync(dirname(path))) mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, JSON.stringify(data, null, 2) + "\n", "utf8");
-}
-
 // What actually counts as "the same snapshot" for the fetchedAt-preserving
 // comparison: everything except the timestamp and the bundle's total key count.
 // `sources.enKeys` moves whenever Niantic adds any string anywhere in the
@@ -141,15 +130,10 @@ function comparable(snapshot) {
   return { ...rest, sources: restSources };
 }
 
-function readPrevious() {
-  if (!existsSync(OUT_PATH)) return null;
-  try { return JSON.parse(readFileSync(OUT_PATH, "utf8")); } catch { return null; }
-}
-
 async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
-  const prev = readPrevious();
+  const prev = readPreviousJson(OUT_PATH);
 
   let maps;
   try {

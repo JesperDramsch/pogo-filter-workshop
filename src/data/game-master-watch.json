@@ -1,28 +1,10 @@
 {
-  "fetchedAt": "2026-08-28T13:49:54.179Z",
+  "fetchedAt": "2026-08-28T14:07:33.520Z",
   "sources": {
     "pvp": "pvpoke-gamemaster",
     "pve": "alexelgt/game_masters",
     "pveBatch": "2026-08-28T07:35:50.208Z"
   },
-  "trackedFields": [
-    "power",
-    "energy",
-    "energyGain",
-    "cooldown",
-    "turns",
-    "buffs",
-    "buffTarget",
-    "buffApplyChance"
-  ],
-  "trackedFieldsPve": [
-    "power",
-    "durationMs",
-    "energyDelta",
-    "pokemonType"
-  ],
-  "moveCount": 349,
-  "pveMoveCount": 403,
   "history": [],
   "moves": {
     "ACID": {

@@ -48,8 +48,16 @@ function flattenBossMap(byTier) {
 export const FIXTURE_CONFIG = mergeImportedConfig(DEFAULT_CONFIG);
 
 // Raw buildFilters output for one locale, before the stable/volatile split.
-export function buildResult(locale) {
-  return buildFilters(DEFAULT_HUNDOS, DEFAULT_LUCKIES, FIXTURE_CONFIG, [], locale, makeTFn(locale));
+//
+// The generated skill reference wants the same call with empty hundo/lucky
+// lists, so those are parameters rather than a second spelling of the call
+// elsewhere. Keeping every caller on this one function is what lets
+// check-meta-reference assert the generator's filter strings are byte-identical
+// to the app's: two hand-written copies of the argument list would drift the
+// moment buildFilters grows a parameter, and the failure would name a mismatch
+// neither file caused.
+export function buildResult(locale, { hundos = DEFAULT_HUNDOS, luckies = DEFAULT_LUCKIES } = {}) {
+  return buildFilters(hundos, luckies, FIXTURE_CONFIG, [], locale, makeTFn(locale));
 }
 
 // Exact-pinned fields: everything derived from config, species data and the

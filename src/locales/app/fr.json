@@ -200,6 +200,7 @@
   "app.filter.pvp_master_hint": "Top-30 picks méta pour la Master Ligue. Sans plafond PC — le choix d'espèce surpasse la perfection IV (un Zacian 3★ bat un Métalosse hundo). Aucun seuil IV appliqué ; une attaque basse est un handicap ici, pas un avantage de bait. Vérifie les IVs de ton roster en jeu.",
   "app.filter.pvp_cup_label": "{name} · {teaser}",
   "app.filter.pvp_cup_hint": "Famille méta top-30 pour {name}, dédupliquée par espèce de base. Inclut le plafond de {cap} PC de la coupe et le motif IV lâche rang-1 PvP (atk 0-1, déf 3-4, PV 3-4) — même forme que les filtres de ligue ci-dessus. La carte se masque quand aucune coupe à thème n'est en cours.",
+  "app.filter.pvp_cup_hint_uncapped": "Famille méta top-30 pour {name}, dédupliquée par espèce de base. Cette coupe n'a pas de plafond de PC, donc aucune clause de PC ni motif IV rang-1 n'est appliqué — sans plafond à respecter, une attaque faible est pire qu'un 100 %. La carte se masque quand aucune coupe à thème n'est en cours.",
   "app.filter.aux_rocket_empty": "Aucune composition Rocket dans le snapshot actuel. Lance `npm run fetch-rocket-lineups` pour rafraîchir.",
   "app.filter.rocket_phase_label": "phase {slot}",
   "app.filter.rocket_phase_hint": "Pokémon possibles en cette phase : {names}.",

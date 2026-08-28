@@ -3964,15 +3964,23 @@ export function buildFilters(
 	// active window.
 	const nowMs = Date.now();
 	const cupFilters = [];
+	// Deduped by cup id: the same cup legitimately appears in the `cups` array of
+	// more than one gblEvent (a season-spanning entry and the weekly rotation
+	// both name it), so two overlapping active events would push it twice —
+	// duplicate React keys, and a shared `copied` flag that lights up both cards
+	// when you copy either one.
+	const seenCups = new Set();
 	for (const event of PVP_RANKINGS.gblEvents || []) {
 		const startMs = Date.parse(event.start);
 		const endMs = Date.parse(event.end);
 		if (!(startMs <= nowMs && nowMs <= endMs)) continue;
 		for (const cupId of event.cups || []) {
+			if (seenCups.has(cupId)) continue;
 			const cup = PVP_RANKINGS.cups?.[cupId];
 			if (!cup) continue;
 			const filter = buildLeagueFilter(cup);
 			if (filter.skipped) continue;
+			seenCups.add(cupId);
 			cupFilters.push({
 				id: cup.id,
 				name: cup.name,
@@ -8329,7 +8337,17 @@ function PvpCollapsible({ fetchedAt, leagues, cupFilters, open, onToggle, copied
 									filterStr={cup.clause}
 									copied={copied[copyKey]}
 									onCopy={() => copyToClipboard(copyKey, cup.clause)}
-									hint={t('app.filter.pvp_cup_hint', { params: { name: cup.name, cap: cup.cpCap } })}
+									// An uncapped cup (Mega Master, cpCap null) gets its own string.
+									// The parameterized one interpolated the cap straight in, so it
+									// read "the cup's null CP cap" and went on to describe the
+									// rank-1 IV clauses — which buildLeagueFilter skips entirely
+									// when there is no cap. Same split the standing Master league
+									// already makes with pvp_master_hint.
+									hint={
+										cup.cpCap
+											? t('app.filter.pvp_cup_hint', { params: { name: cup.name, cap: cup.cpCap } })
+											: t('app.filter.pvp_cup_hint_uncapped', { params: { name: cup.name } })
+									}
 								/>
 							);
 						})}

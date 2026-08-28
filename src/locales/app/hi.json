@@ -200,6 +200,7 @@
   "app.filter.pvp_master_hint": "Master League के लिए top-30 meta picks। कोई CP cap नहीं — species choice IV perfection पर हावी है (3★ Zacian, hundo Metagross को हरा देता है)। कोई IV gate apply नहीं किया जाता; यहाँ कम attack handicap है, bait advantage नहीं। अपने roster की IVs in-game देखें।",
   "app.filter.pvp_cup_label": "{name} · {teaser}",
   "app.filter.pvp_cup_hint": "{name} के लिए top-30 मेटा परिवार, बेस प्रजाति के हिसाब से dedupe किया हुआ। इसमें cup का {cap} CP cap और loose PvP rank-1 IV pattern (atk 0-1, def 3-4, HP 3-4) शामिल है — ऊपर के league फिल्टरों जैसा ही ढाँचा। जब कोई थीम वाला cup नहीं चल रहा हो, कार्ड ख़ुद छिप जाता है।",
+  "app.filter.pvp_cup_hint_uncapped": "{name} के लिए top-30 मेटा परिवार, बेस प्रजाति के हिसाब से dedupe किया हुआ। इस cup में कोई CP cap नहीं है, इसलिए न CP क्लॉज़ लगता है और न rank-1 IV pattern — जब दबाने के लिए कोई cap ही नहीं, तो कम attack वाला स्प्रेड hundo से ख़राब होता है। जब कोई थीम वाला cup नहीं चल रहा हो, कार्ड ख़ुद छिप जाता है।",
   "app.filter.aux_rocket_empty": "Current snapshot में कोई रॉकेट lineups नहीं। Refresh करने के लिए `npm run fetch-rocket-lineups` चलाएँ।",
   "app.filter.rocket_phase_label": "phase {slot}",
   "app.filter.rocket_phase_hint": "इस phase के संभावित Pokémon: {names}.",

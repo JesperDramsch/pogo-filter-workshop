@@ -10,7 +10,8 @@
 //          `turns` and the buff fields: the turn-based Trainer-Battle numbers.
 //          PvPoke rebuilds daily and re-scores its rankings off exactly these,
 //          so this stream is also the leading indicator for the PvP rankings in
-//          src/data/pvp-rankings.json going stale.
+//          src/data/pvp-rankings.json going stale. It is the stream the
+//          generated skill reference renders.
 //   PvE  — the Niantic game master's own `moveSettings`. `power`, `durationMs`
 //          and `energyDelta`: the real-time raid and gym numbers, which decide
 //          the whole damage model in scripts/fetch-meta-rankings.mjs. PvPoke's
@@ -24,7 +25,10 @@
 // the option set. alexelgt/game_masters publishes the same Niantic dump every
 // one to three days, and scripts/lib/game-master.mjs now prefers it. So the PvE
 // block is both current and watchable, and this file downloads it rather than
-// HEAD-probing a corpse for an ETag.
+// HEAD-probing a corpse for an ETag. PokeMiners is still reachable as that
+// module's fallback mirror, and `sources.pve` records when it answered — which
+// is strictly more than the old probe told us, since a fallback means the
+// primary was down rather than merely that a stale ETag moved.
 //
 // The two streams are kept SEPARATE rather than merged, deliberately. They key
 // differently — PvPoke by `moveId` ("EARTHQUAKE"), the game master by template
@@ -32,7 +36,9 @@
 // namespaces for no gain. More to the point, they answer different questions:
 // the Season 27 rebalance changed 14 `combatMove` templates and not one PvE
 // `moveSettings` value, and a reader of the history should be able to see that
-// at a glance instead of inferring it from which field names appear.
+// at a glance instead of inferring it from which field names appear. Every
+// history entry carries a `stream` tag for that reason, and the skill reference
+// filters on it so a PvE change is never captioned as a Trainer-Battle one.
 //
 // This file is NOT imported by the app — no filter string depends on it. It
 // exists so a rebalance is visible in git days before it propagates into
@@ -43,9 +49,10 @@
 //
 // Flags: --offline-ok   tolerate fetch failures if cache exists.
 
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
 import { fetchGameMaster, warnIfStale, gameMasterProvenance } from "./lib/game-master.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -64,12 +71,22 @@ const TRACKED = ["power", "energy", "energyGain", "cooldown", "turns", "buffs", 
 // change to any of them moves the raid-attacker ranking; `pokemonType` is here
 // because a retyped move changes STAB and therefore the ranking too.
 // Deliberately NOT tracked: damageWindowStartMs / damageWindowEndMs (animation
-// timing, not damage), accuracyChance and criticalChance (both constant across
-// the whole PvE move set and unused by the model), and `vfxName` and friends.
+// timing, not damage), and accuracyChance / criticalChance, which are constant
+// across the whole PvE move set and unused by the model.
 const TRACKED_PVE = ["power", "durationMs", "energyDelta", "pokemonType"];
 
 // Keep the log reviewable; a rebalance is a handful of entries a few times a year.
 const MAX_HISTORY = 40;
+// Refuse-to-shrink floor, the same guard every sibling fetcher carries
+// (fetch-regional-forms `< 500`, fetch-rocket-grunt-quotes `< 1000`). The live
+// game master carries ~349 tracked PvP moves and ~403 PvE ones. A truncated
+// parse that still yields a non-empty result is the dangerous case: diffMoves
+// would emit a `removed` row for every absent move, and those rows are
+// unshifted onto `history` and sliced to MAX_HISTORY — wiping every real
+// rebalance ever recorded, then publishing the fabricated mass-removal as this
+// file's headline signal.
+const MIN_MOVES = 200;
+const MIN_PVE_MOVES = 250;
 
 const UA = { "User-Agent": "pogo-filter-workshop gm-watch/2.0" };
 
@@ -133,33 +150,33 @@ export function diffMoves(before, after, fields = TRACKED) {
   return changes;
 }
 
-function canonicalStringify(value) {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonicalStringify).join(",")}]`;
-  const keys = Object.keys(value).sort();
-  return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalStringify(value[k])}`).join(",")}}`;
-}
-
-function readPrevious() {
-  if (!existsSync(OUT_PATH)) return null;
-  try { return JSON.parse(readFileSync(OUT_PATH, "utf8")); } catch { return null; }
+// The same refuse-to-shrink shape for both streams: an absolute floor, plus a
+// halving guard against whatever the last good sync recorded.
+function assertNotShrunken(label, count, prevCount, floor) {
+  if (count < floor || (prevCount > 0 && count < prevCount / 2)) {
+    throw new Error(
+      `${label} carried ${count} moves (previous ${prevCount || "none"}, floor ${floor}) ` +
+      "— refusing to overwrite cache",
+    );
+  }
 }
 
 // Turns a diff into one history entry, and says what it found out loud. Shared
-// by both streams so a PvE rebalance is reported exactly like a PvP one.
-function recordChanges(label, changes, history, now) {
+// by both streams so a PvE rebalance is reported exactly like a PvP one. The
+// `stream` tag is what lets a consumer tell them apart — see the header.
+function recordChanges(stream, changes, history, now) {
   if (changes.length === 0) return history;
   const names = [...new Set(changes.map(c => c.move))];
-  console.log(`  ⚑ ${label}: ${changes.length} field change(s) across ${names.length} move(s): ` +
+  console.log(`  ⚑ ${stream}: ${changes.length} field change(s) across ${names.length} move(s): ` +
     names.slice(0, 8).join(", "));
-  return [{ at: now, stream: label, summary: `${names.length} move(s) changed`, changes }, ...history]
+  return [{ at: now, stream, summary: `${names.length} move(s) changed`, changes }, ...history]
     .slice(0, MAX_HISTORY);
 }
 
 async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
-  const prev = readPrevious();
+  const prev = readPreviousJson(OUT_PATH);
 
   let moves;
   try {
@@ -173,41 +190,40 @@ async function main() {
     }
     process.exit(1);
   }
-  if (Object.keys(moves).length === 0) {
-    throw new Error("game master carried no moves[] — refusing to overwrite cache");
-  }
+  assertNotShrunken("PvPoke game master", Object.keys(moves).length,
+    Object.keys(prev?.moves || {}).length, MIN_MOVES);
   console.log(`  ${Object.keys(moves).length} PvP moves tracked`);
 
   // The PvE stream. Never fatal on its own: the PvP signal does not depend on
   // it, and a failed fetch keeps the previous PvE snapshot rather than
   // publishing an empty one — which would read as "every move was removed" on
   // the next diff and then as "every move was added" on the one after.
+  //
+  // `sources.pve` is seeded from the cache for the same reason #58 seeded the
+  // PokeMiners probe from it: a mirror that 503s must not erase the record of
+  // which mirror last answered and when.
   let pveMoves = prev?.pveMoves || null;
-  let gmSource = { mirror: null, batchMs: null };
+  let pveSource = {
+    mirror: prev?.sources?.pve ?? null,
+    batch: prev?.sources?.pveBatch ?? null,
+  };
   let pveFresh = false;
   try {
     console.log("→ Niantic game master (PvE move mechanics)");
     const gm = await fetchGameMaster({ userAgent: UA["User-Agent"] });
-    gmSource = { mirror: gm.mirror, batchMs: gm.batchMs };
     const extracted = extractPveMoves(gm.templates);
-    if (Object.keys(extracted).length === 0) {
-      throw new Error("no moveSettings templates — refusing to overwrite the PvE cache");
-    }
-    // Same shrink guard every fetcher in this repo carries: a mirror that
-    // suddenly serves half the move set is a broken publish, not a rebalance.
-    const before = Object.keys(pveMoves || {}).length;
-    if (before > 0 && Object.keys(extracted).length < before * 0.9) {
-      throw new Error(
-        `moveSettings shrank ${before} → ${Object.keys(extracted).length} — refusing to overwrite the PvE cache`,
-      );
-    }
+    assertNotShrunken(gm.mirror, Object.keys(extracted).length,
+      Object.keys(pveMoves || {}).length, MIN_PVE_MOVES);
     pveMoves = extracted;
     pveFresh = true;
+    const prov = gameMasterProvenance({ mirror: gm.mirror, batchMs: gm.batchMs });
+    pveSource = { mirror: prov.mirror, batch: prov.batch };
     if (gm.failures.length > 0) {
       console.warn(`⚠  fell back to ${gm.mirror} after ${gm.failures.join("; ")}`);
     }
     console.log(`  ${Object.keys(pveMoves).length} PvE moves tracked from ${gm.mirror}`);
-    warnIfStale(gmSource, "A PvE rebalance would not show up here until the mirror moves.");
+    warnIfStale({ mirror: gm.mirror, batchMs: gm.batchMs },
+      "A PvE rebalance would not show up here until the mirror moves.");
   } catch (e) {
     console.warn(`  ⚠  PvE stream failed (${e.message}) — keeping the previous PvE snapshot`);
   }
@@ -223,18 +239,20 @@ async function main() {
     console.log("  ↺ no move stats changed on either stream");
   }
 
+  // No derived fields, per #58: `moveCount` and `trackedFields` restated a
+  // number the reader can count and a constant that lives in this script, and
+  // each was one more field a reader had to decide whether to trust. `sources`
+  // is not derived — it names which upstream answered, which nothing else
+  // records — but for the same reason it carries no age or `stale` flag: those
+  // come from the clock, and a committed field that flips on the day it crosses
+  // a threshold is a churn commit whose whole diff is `false → true`. The
+  // staleness warning goes to the console, where it does not get committed.
   const newContent = {
-    // Named per stream, so the snapshot says which upstream answered for which
-    // half of it — the same provenance shape meta-rankings.json carries.
     sources: {
       pvp: "pvpoke-gamemaster",
-      pve: gameMasterProvenance(gmSource).mirror,
-      pveBatch: gameMasterProvenance(gmSource).batch,
+      pve: pveSource.mirror,
+      pveBatch: pveSource.batch,
     },
-    trackedFields: TRACKED,
-    trackedFieldsPve: TRACKED_PVE,
-    moveCount: Object.keys(moves).length,
-    pveMoveCount: Object.keys(pveMoves || {}).length,
     history,
     moves,
     pveMoves: pveMoves || {},
@@ -249,8 +267,7 @@ async function main() {
     }
   }
 
-  if (!existsSync(dirname(OUT_PATH))) mkdirSync(dirname(OUT_PATH), { recursive: true });
-  writeFileSync(OUT_PATH, JSON.stringify({ fetchedAt, ...newContent }, null, 2) + "\n", "utf8");
+  writeJson(OUT_PATH, { fetchedAt, ...newContent });
   console.log(`✓ wrote ${OUT_PATH}`);
 }
 

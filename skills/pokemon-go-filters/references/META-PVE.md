@@ -375,22 +375,30 @@
 | Shadow Registeel | 379 | Steel tank |
 
 ### Must-keep Legacy/CD Moves
+
+> **This table is about MOVES, not about the PvP meta.** It records which species carry a
+> legacy or Community Day move you cannot currently re-roll — that is a property of the move,
+> and it does not go stale the way a tier list does. It deliberately makes no claim about
+> which leagues these species are good in. For that, read the generated `META.md`, which
+> derives from `src/data/pvp-rankings.json`; a league annotation written here from memory is
+> the exact defect `CLAUDE.md` forbids.
+
 | Pokemon | Dex | Move | Use |
 |---------|-----|------|-----|
 | Mewtwo | 150 | Psystrike + Shadow Ball | Double legacy = most valuable |
 | Metagross | 376 | Meteor Mash | #1 Steel |
-| Swampert | 260 | Hydro Cannon | All leagues PvP |
+| Swampert | 260 | Hydro Cannon | Community Day charged move |
 | Charizard | 6 | Blast Burn | Mega Fire |
 | Venusaur | 3 | Frenzy Plant | Mega Grass |
 | Salamence | 373 | Outrage | Dragon DPS |
-| Garchomp | 445 | Earth Power | ML PvP |
-| Corviknight | 823 | Air Cutter | GL/UL meta |
-| Annihilape | 979 | Rage Fist | GL/UL core |
-| Walrein | 365 | Icicle Spear | GL/UL spam |
-| Ho-Oh | 250 | Sacred Fire+ | ML viable |
-| Groudon | 383 | Precipice Blades | ML + raids |
+| Garchomp | 445 | Earth Power | Community Day charged move |
+| Corviknight | 823 | Air Cutter | Community Day charged move |
+| Annihilape | 979 | Rage Fist | Evolution-locked charged move |
+| Walrein | 365 | Icicle Spear | Community Day charged move |
+| Ho-Oh | 250 | Sacred Fire+ | Legacy raid-day charged move |
+| Groudon | 383 | Precipice Blades | Legacy raid-day charged move |
 | Rhyperior | 464 | Rock Wrecker | Rock DPS |
-| Empoleon | 395 | Hydro Cannon | GL/UL |
+| Empoleon | 395 | Hydro Cannon | Community Day charged move |
 | Feraligatr | 160 | Hydro Cannon | Water DPS |
 | Greninja | 658 | Hydro Cannon | Raid Water |
 | Gengar | 94 | Shadow Claw (fast) | Ghost DPS |
@@ -404,7 +412,7 @@
 # Shadow legends (never purify)
 150,243,244,245,249,250,381,380,144,145,146,377,378,379
 
-# Legacy move Pokemon (check @spezial)
+# Legacy/CD move holders — a MOVE list, not a PvP meta list (check @spezial)
 150,376,260,6,3,373,445,823,979,365,250,383,464,395,160,658,94,248
 ```
 
