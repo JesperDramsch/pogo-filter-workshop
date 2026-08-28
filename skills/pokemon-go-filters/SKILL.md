@@ -29,12 +29,16 @@ article, not from `META.md`'s prose recalled from an earlier conversation.
    Falling back on remembered tiers is not.
 
 This rule exists because the failure already happened. This skill shipped a hand-written tier
-list headed "April 2026 / GBL Season 26" whose entire Great League S-tier — Azumarill, Galarian
-Stunfisk, Medicham — had fallen out of the live top 30 by August 2026. It named none of the
-actual top five (Lickilicky, Tinkaton, Altaria, Empoleon, Mimikyu), and Mimikyu had only become
-GBL-legal at all in June 2026. Nothing flagged it; the list simply read as authoritative while
-being wrong. `META.md` is now generated from the same snapshot the pogo.filter.workshop app
-builds its filters from, so the two can no longer disagree.
+list headed "April 2026 / GBL Season 26". Four months later its entire Great League S-tier had
+fallen out of the live top 30, it named none of the then-current top five, and one of those
+five had not even been GBL-legal when the list was written. Nothing flagged any of it; the list
+simply read as authoritative while being wrong.
+
+Note that this paragraph deliberately names no species. It is prose, and it is not regenerated —
+so any list it contained would go stale exactly the way the list it describes did, inside the
+section telling you not to trust prose. **For who is actually meta right now, read
+`references/pvp-meta.json`.** `META.md` is generated from the same snapshot the
+pogo.filter.workshop app builds its filters from, so the two can no longer disagree.
 
 The same rule in one line: **PvP species lists are data, never prose.**
 

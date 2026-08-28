@@ -1,13 +1,15 @@
 # Pokémon GO PvP "Keep This" Analysis: Great and Ultra League, Late August 2026
 
-> **Editor's note.** Research doc written by Jesper, late August 2026. Committed verbatim as
-> the provenance record behind the repo's PvP data pipeline. See `../CLAUDE.md` for the rule it
-> justifies, and the **Corrections** block at the end of this file for claims that did not
-> survive verification against the raw feeds.
+> **Editor's note.** Research doc by Jesper, late August 2026, behind the repo's PvP data
+> pipeline. Their original draft was written before the feeds were byte-verified; on 2026-08-28
+> every automation claim in it was checked against the raw sources and **the text below was
+> corrected in place**, so what you read is what is actually true. The
+> [Verification log](#verification-log) at the end records what changed and how it was checked.
+> See `../CLAUDE.md` for the rule this doc justifies.
 
 ## TL;DR
-- The current ranking snapshot (PvPoke via Dittobase, updated 24 August 2026) puts Mimikyu and Lickilicky at the very top of both Great and Ultra League; the single biggest recent shift is that Mimikyu became GBL-legal only on 23 June 2026 with the new PvP battle system, so if you have a low-attack Mimikyu, keep it. The season is Forever Forward (Season 27, 2 June to 8 September 2026), and the late-August rotation (25 August to 1 September) is plain Great/Ultra/Master with no type-restricted cup.
-- For automation, the best single starting point is the PvPoke GitHub repo (MIT-licensed): poll the raw rankings JSON for 1500 and 2500, plus gamemaster.json. Back it with PokeMiners game_masters latest.json (for pre-announcement move/stat rebalances) and pogoapi.net's api_hashes.json for cheap change detection. Use timestamp/hash files rather than blind polling, because unauthenticated GitHub raw requests are capped at 60 requests per hour per IP.
+- The current ranking snapshot (PvPoke, verified 28 August 2026) puts **Lickilicky #1 in Great League** (score 93.7) and **Mimikyu #1 in Ultra League** (95.9), with the two swapping places between the leagues rather than topping both. The single biggest recent shift is that Mimikyu became GBL-legal only on 23 June 2026 with the new PvP battle system, so if you have a low-attack Mimikyu, keep it. The season is Forever Forward (Season 27, 2 June to 8 September 2026), and the late-August rotation (25 August to 1 September) is plain Great/Ultra/Master with no type-restricted cup.
+- For automation, the best single starting point is the PvPoke GitHub repo (MIT-licensed): poll the raw rankings JSON for 1500 and 2500, plus `gamemaster.min.json` — which you need regardless, because the rankings carry `speciesId` but **no dex number**, and the game master is where the two are joined. It is also the reliable source for current move stats. PokeMiners' `latest.json` would be the earliest possible rebalance signal, but its mirror is months stale (see source 2), so treat it as a probe rather than a feed, and detect changes on it with the HTTP `ETag` from a `HEAD` request — **not** the `timestamp.txt` its README advertises. Use change tokens rather than blind polling, because unauthenticated GitHub raw requests are capped at 60 requests per hour per IP.
 - Keep low-attack, high-bulk copies of meta staples that either need XL candy, depend on a legacy/unavailable move, or are pre-evolutions of not-yet-released or hard-to-build species. Mythicals and box legendaries are banned from Play! Pokémon tournaments but are legal in casual GBL, so the "keep" decision differs depending on whether you play tournaments.
 
 ## Key Findings
@@ -16,8 +18,9 @@
 - Season 27, "Forever Forward", runs 2 June to 8 September 2026 (Pokémon GO Wiki/Fandom; pokemongo.com news).
 - The rebuilt PvP battle system rolled out 23 June 2026. It moved battle resolution server-side and, critically, made Mimikyu eligible in GBL for the first time (pokemongo.com "Trainer Battle Update", 23 June 2026). Mimikyu is excluded from the Competitors Cup, the legacy-system format used for the 2026 World Championships, which ends 30 August 2026.
 - Late-August rotation: Great, Ultra and Master League run together from 25 August to 1 September 2026, with 4x Stardust from win rewards; all Pokémon eligible, no type cup (LeekDuck; buffhub 2026 PvP tier list; theclick.gg). The following week (1 to 8 September) is also Great/Ultra/Master. From 1 September, Master League: Mega Edition and Great/Ultra Mega Editions begin.
-- Ranking snapshot: PvPoke-derived, as surfaced by Dittobase "updated Aug 24, 2026". Great League top 16: Lickilicky #1 (93.7), Tinkaton #2, Altaria #3, Empoleon #4, Mimikyu #5, then Shadow Altaria, Shadow Empoleon, Shadow Quagsire, Quagsire, Jellicent, Forretress, Ninetales, Cramorant, Shadow Ninetales, Feraligatr, Shadow Forretress. Note: Pokémon GO Hub's database and buffhub instead show Mimikyu #1 in both Great and Ultra; the two differ because of how each treats Mimikyu's optimal IVs and scoring date. I flag this as an unresolved discrepancy between snapshots taken within the same week.
-- Ultra League: Mimikyu and Lickilicky lead; Corviknight is called the standout safe-swap (resists all but two types with Sand Attack/Air Cutter/Payback), per buffhub and ldshop.gg tier writeups dated 2026.
+- Ranking snapshot, read directly from PvPoke's `rankings-1500.json` on 28 August 2026. Great League top 12: Lickilicky #1 (93.7), Tinkaton, Altaria, Empoleon, Mimikyu, Shadow Altaria, Shadow Empoleon, Shadow Quagsire, Quagsire, Jellicent, Forretress, Ninetales.
+- The apparent conflict between snapshots — Dittobase showing Lickilicky #1, Pokémon GO Hub and buffhub showing Mimikyu #1 — **is not a conflict.** PvPoke has Lickilicky #1 in Great and Mimikyu #1 in Ultra; the two sources were reporting different leagues. There is no IV-treatment or scoring-date disagreement to resolve. A secondary effect worth knowing: any feed that dedupes by base dex (as this repo does) reorders the list relative to PvPoke's raw output, because entries like `altaria_shadow` fold into `altaria`.
+- Ultra League: Mimikyu #1 (95.9), Lickilicky #2 (93.8), Corviknight #3 (93.4). Corviknight is called the standout safe-swap (resists all but two types with Sand Attack/Air Cutter/Payback), per buffhub and ldshop.gg tier writeups dated 2026.
 
 ### Season 27 move rebalance (relevant to what to keep)
 From the GBL Season 27 rebalance (Pokémon GO Hub analysis by JRE47, 31 May 2026; changes live 2 June 2026 at 1:00 p.m. PDT per the Fandom Season 27 page):
@@ -60,7 +63,7 @@ XL candy turns these into multi-month projects, so keep good-IV copies as you fi
 - Analysts (GO Hub's XL-candy guide) previously flagged Trevenant as likely to outclass Cofagrigus before release; that has since borne out, but the same "hold the pre-evolution" logic applies to any newly datamined evolution.
 - The general PvP-analyst consensus in the 2026 tier writeups (ldshop.gg, buffhub) is to finish existing builds rather than chase new #1s, and to bank low-attack copies of anything sitting just below the CP cap.
 
-**Pre-evolutions to keep now:** if an evolution is not yet in the game, hold the best-IV pre-evolution. I could not verify a specific list of not-yet-released PvP-relevant evolutions from a current dated source, so I am not inventing one; check the PokeMiners game master for unreleased forms.
+**Pre-evolutions to keep now:** if an evolution is not yet in the game, hold the best-IV pre-evolution. I could not verify a specific list of not-yet-released PvP-relevant evolutions from a current dated source, so I am not inventing one. To find unreleased forms, check PvPoke's `gamemaster.min.json` — its `pokemon[]` carries a `released` flag per species — rather than the PokeMiners mirror, which is months behind and would miss exactly the recent additions you are looking for.
 
 ### Bucket C: Keep criteria per Pokémon
 
@@ -91,12 +94,14 @@ Ranked by reliability and ease of automation.
 - Great: `https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/rankings/all/overall/rankings-1500.json`
 - Ultra: `https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/rankings/all/overall/rankings-2500.json`
 - Master: `rankings-10000.json`; a 500-cap "Little" file also exists.
-- Cup/format rankings: `src/data/rankings/{cupId}/{category}/rankings-{cp}.json`, where cupId is `all` for open leagues or a cup id (published ids include spring, retro, jungle, fantasy, premier, championship, naic2026, catch, electric, little), and category is one of overall/leads/closers/switches/chargers/attackers/consistency. Not every (cup, cap) pair exists, so expect 404s.
+- Cup/format rankings: `src/data/rankings/{cupId}/{category}/rankings-{cp}.json`, where cupId is `all` for open leagues or a cup id, and category is one of overall/leads/closers/switches/chargers/attackers/consistency. **Enumerate cups from `gamemaster.min.json`'s `formats[]`, not its `cups[]`** — `formats[]` (15 entries) is the only place carrying the `{cup, cp, title}` triple the ranking path needs, while `cups[]` (30) has no CP field and includes the non-cups `all` and `custom`. Note that a cup can be published at several caps: `mega` exists at 1500, 2500 and 10000, so a cup map keyed on the bare cup id will collide. Most pairs resolve — `mega/1500`, `premier/10000` and `catch/1500` were all verified returning real content — but some 404 (`fantasy` does), so tolerate a miss per cup rather than failing the run.
 - Game master: `https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/gamemaster.json` (plus gamemaster.min.json).
 
-Format: JSON. Each entry carries speciesId, speciesName, rating, moveset, scores, matchups and counters (field names inferred from downstream consumers such as the lily dex API and pogo-pvp-mcp, so verify against the raw file once before hard-coding a parser). Update cadence: the README states a two-week development cycle plus ad-hoc data/ranking updates "for newly released Pokemon, moves, or mechanics", so data changes land whenever the game changes. No public REST API; you scrape static files from GitHub. Licence: MIT for the code.
+Format: JSON array, sorted by `score` descending. **Byte-verified 28 August 2026**: each entry carries `speciesId, speciesName, rating, score, scores, moves, moveset, matchups, counters, stats, editorNotes, editorScore` — 1145 entries at 1500, 843 at 2500. There is **no dex number**; join it from `gamemaster.min.json`'s `pokemon[]`, which is keyed by the same `speciesId` and covers 1742 entries including every shadow, mega, regional and alternate form. Sort by `score`, not `rating` — `rating` is a separate figure and is not the ranking order. Update cadence: the README states a two-week development cycle plus ad-hoc data/ranking updates "for newly released Pokemon, moves, or mechanics", so data changes land whenever the game changes. No public REST API; you scrape static files from GitHub. Licence: MIT for the code.
 
-**2. PokeMiners/game_masters (authoritative for raw game data and pre-announcement rebalances).** Raw: `https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/latest.json` and `.../latest/timestamp.txt`. The timestamp file exists specifically so you can detect a new game master before pulling the large JSON; the README says it "can be used to check if a new Game Master has been updated", with format "gm gm_version apk_version year-month-day hour-minute-second". Move and stat rebalances are datamined here, typically before Niantic's blog announces them. Format JSON/TXT. Terms (verbatim): "This repo is for educational use only. All content found within this repo is the property of The Pokemon Company and Niantic." No OSS licence; usage restriction only. Update cadence: event-driven, on each new game master push.
+**2. PokeMiners/game_masters — currently stale; probe it, do not depend on it.** Raw: `https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/latest.json` (18,724,770 bytes) and `.../latest/timestamp.txt`. In principle this is where move and stat rebalances are datamined before Niantic's blog announces them, which would make it the earliest machine-readable signal. **In practice, as of 28 August 2026 the mirror is roughly four months behind.** `timestamp.txt` returns the bare epoch-millis integer `1776386930700` — 17 April 2026 — and not the `gm gm_version apk_version year-month-day hour-minute-second` string the README documents. Worse, `latest.json` still carries the *pre*-Season-27 values for every move that rebalance touched: Earthquake power 110 (live: 120), Drill Run 80/45 (live: 70/40), Flash Cannon energy 70 (live: 65), Earth Power energy 55 (live: 50). A rebalance watch built on this feed would never fire.
+
+So: **`timestamp.txt` is not a usable change trigger.** `raw.githubusercontent.com` also serves no `Last-Modified` header on this file, which leaves the HTTP `ETag` from a `HEAD` request as the only cheap change token — and a `HEAD` costs nothing and downloads none of the 18 MB. Keep the probe, because the mirror waking up is worth knowing about, but take current move stats from PvPoke's game master (source 1), which was verified carrying all four live Season 27 values. Terms (verbatim): "This repo is for educational use only. All content found within this repo is the property of The Pokemon Company and Niantic." No OSS licence; usage restriction only.
 
 **3. pogoapi.net (convenient pre-parsed JSON REST).** Base `https://pogoapi.net/api/v1/{file}.json` (pokemon_stats.json, fast_moves.json, charged_moves.json, type_effectiveness.json, released_pokemon.json, pokemon_max_cp.json, etc.). Change detection via `https://pogoapi.net/api/v1/api_hashes.json`, which returns md5/sha1/sha256 per file so you only re-download changed endpoints. Unauthenticated JSON; the author explicitly recommends caching locally to reduce load. No stated numeric rate limit and no formal licence found; data derives from Niantic's game master.
 
@@ -108,59 +113,48 @@ Format: JSON. Each entry carries speciesId, speciesName, rating, moveset, scores
 
 **7. Play! Pokémon rules and ban list (pokemon.com):** the banned list and Tournament Handbook (last revised 21 May 2026) are HTML/PDF only and sit behind an Incapsula bot wall, so they are not cleanly machine-readable via automated fetch. There is no machine-readable Niantic feed for GBL season rules or cup ban lists; the pokemongo.com news blog is the canonical source and is HTML only. For structured season/cup data, ScrapedDuck/LeekDuck or the Fandom season wiki are the practical scrape targets.
 
-**8. RSS/webhooks for rebalance announcements:** Pokémon GO Hub publishes an RSS feed (`https://pokemongohub.net/feed/`) that carries the seasonal move-rebalance analyses. PokeMiners post datamines to Threads and Discord. There is no official Niantic webhook for move rebalances; the datamine (PokeMiners game master) is the earliest machine-readable signal, and the game master timestamp change is the event you would trigger on.
+**8. RSS/webhooks for rebalance announcements:** Pokémon GO Hub publishes an RSS feed (`https://pokemongohub.net/feed/`) that carries the seasonal move-rebalance analyses. PokeMiners post datamines to Threads and Discord. There is no official Niantic webhook for move rebalances. A datamine would in principle be the earliest machine-readable signal, but with the PokeMiners mirror months behind (source 2), the earliest *reliable* one is a change in PvPoke's game master `moves[]` — diff the Trainer-Battle stats (`power`, `energy`, `energyGain`, `cooldown`, `turns`, buffs) between fetches and trigger on a field actually moving, rather than on any timestamp.
 
-**GitHub polling note:** unauthenticated requests to api.github.com and raw.githubusercontent.com are capped at 60 requests per hour per IP. Per GitHub Docs: "The primary rate limit for unauthenticated requests is 60 requests per hour... associated with the originating IP address, not with the user or application." GitHub's May 2025 changelog extended this class of limit to raw.githubusercontent.com downloads. Use the PokeMiners timestamp.txt and pogoapi api_hashes.json to avoid re-downloading unchanged files, and cache locally.
+**GitHub polling note:** unauthenticated requests to api.github.com and raw.githubusercontent.com are capped at 60 requests per hour per IP. Per GitHub Docs: "The primary rate limit for unauthenticated requests is 60 requests per hour... associated with the originating IP address, not with the user or application." GitHub's May 2025 changelog extended this class of limit to raw.githubusercontent.com downloads. Avoid re-downloading unchanged files, and cache locally. For change tokens, use the HTTP **`ETag`** from a `HEAD` request (raw.githubusercontent sends no `Last-Modified`) and pogoapi's `api_hashes.json` — **not** PokeMiners' `timestamp.txt`, which as of August 2026 is stale and does not track its own repo (see source 2). In practice a full PvP sync is ~6-9 requests per day against a 60/hour cap, which is comfortable.
 
 ## Recommendations
 
 1. **Immediate keeps (do this now):** bank low-attack, high-bulk copies of Lickilicky/Lickitung, Mimikyu, Quagsire (and Shadow), Tinkaton, Altaria (and Shadow), Empoleon (and Shadow), Jellicent, Forretress, Cresselia, Registeel, Poliwrath, Lanturn, Galarian Stunfisk and Steelix. For Great League target roughly 0/15/15-shaped spreads, but use a PvP IV checker for the exact rank-1 per species rather than a blanket spread.
 2. **Legacy-move triage:** before transferring anything, check whether its viability depends on a move you cannot currently re-roll (Hydro Cannon, Zap Cannon, and similar). If it has the legacy move, keep it; if not, and the move is not event-available, its ceiling is lower and it is a lower-priority hold.
 3. **Tournament vs casual split:** if you play Play! Pokémon events, do not rely on mythicals/box legendaries; if you only play GBL, Cresselia and similar are fine and worth XL investment.
-4. **Build the automation in this order:** (a) PvPoke rankings-1500/2500 JSON as your primary "is this still meta" signal; (b) PokeMiners latest.json + timestamp.txt as your early warning for rebalances; (c) pogoapi api_hashes.json for cheap change detection; (d) ScrapedDuck events.json for knowing which cup/rotation is live. Poll a few times per day at most, keyed off timestamp/hash changes, to stay under GitHub's 60/hour cap.
-5. **Benchmarks that change the plan:** a new move rebalance appearing in the PokeMiners game master (re-run your keep list); a cup with type bans returning (re-check eligibility); the Mimikyu IV/scoring discrepancy resolving once more players build it; and the 1 September shift to Mega Editions, which changes Master League but not your Great/Ultra keeps.
+4. **Build the automation in this order:** (a) PvPoke `rankings-1500/2500/10000.json` as your primary "is this still meta" signal, joined to dex numbers through `gamemaster.min.json`; (b) that same game master's `moves[]` as your rebalance signal — it is current, where PokeMiners is not — with a one-request `HEAD` probe on PokeMiners so a mirror recovery is still visible; (c) pogoapi `api_hashes.json` for cheap change detection; (d) ScrapedDuck `events.json` for knowing which cup/rotation is live, matched against the game master's `formats[]`. Poll a few times per day at most, keyed off ETag/hash changes, to stay under GitHub's 60/hour cap.
+5. **Benchmarks that change the plan:** a move rebalance appearing in the game master (re-run your keep list); a cup with type bans returning (re-check eligibility); PokeMiners' mirror catching up, which would restore genuine pre-announcement lead time; and the 1 September shift to Mega Editions, which adds Mega Great/Ultra/Master cups on top of the standing leagues.
 
 ## Caveats
-- Ranking snapshots are dated: the Dittobase/PvPoke Great League order is from 24 August 2026; Pokémon GO Hub's database shows Mimikyu #1 in both capped leagues. I flagged this discrepancy rather than picking one; both are within the same week and reflect scoring/IV-treatment differences.
-- Several IV spreads and XL flags are drawn from sportskeeda and Pokémon GO Hub articles of varying dates; where I could not confirm a spread against a current dated source I said so rather than inventing numbers.
+
+What is still uncertain, after the 28 August verification pass:
+
+- Several IV spreads and XL flags are drawn from sportskeeda and Pokémon GO Hub articles of varying dates; where I could not confirm a spread against a current dated source I said so rather than inventing numbers. These were **not** re-verified — treat the Bucket C spreads as the weakest material in this doc.
 - The Galarian Stunfisk "~60% Great League win rate" is one analyst's simulation claim (JRE47, 31 May 2026) and I could not corroborate the exact figure; its GO Hub DB rank (71/1143) and rank-1 spread (0/13/14) are verified.
-- The PvPoke rankings JSON field names are inferred from downstream consumers, not byte-verified this session; confirm once against the raw file before shipping a parser.
 - The ScrapedDuck "every 12 hours" figure is contradicted by its very frequent Action run history; verify the workflow cron before hard-coding an interval.
-- Play! Pokémon and Niantic sources are not machine-readable; any automation of ban lists or season rules requires scraping HTML/PDF or relying on community mirrors.
-- German names are given only where verified on PokéWiki (Mimigma, Schlurplek, Altaria); others omitted deliberately.
+- Play! Pokémon and Niantic sources are not machine-readable; any automation of ban lists or season rules requires scraping HTML/PDF or relying on community mirrors. The Play! Pokémon banned list in Bucket A2 was not re-verified in the August pass.
+- German names are given only where verified on PokéWiki (Mimigma, Schlurplek, Altaria); others omitted deliberately. For any other name, use the repo's `src/locales/pokemon-names.json` rather than guessing.
+- pogoapi.net could not be reached during the August verification pass (blocked by an egress proxy), so its endpoints and `api_hashes.json` behaviour are as documented by the site, not independently confirmed.
 
 ---
 
-## Corrections
+## Verification log
 
-Verified against the raw feeds on 2026-08-28 while building the pipeline this doc specifies.
-The doc above is left unedited; these supersede it where they conflict.
+On 2026-08-28 every automation claim in this doc was checked against the raw feeds while the
+pipeline it specifies was being built. The prose above was **corrected in place** rather than
+left standing with errata, so the doc reads as true. This log records what changed, so the
+original judgement stays auditable.
 
-1. **PvPoke ranking entries carry no dex number.** The doc lists the fields as inferred from
-   downstream consumers and flags them for verification — correctly. The actual keys are
-   `speciesId, speciesName, rating, score, scores, moves, moveset, matchups, counters, stats,
-   editorNotes, editorScore`. There is no `dex` and no `dexNr`. The dex must be joined from
-   `gamemaster.min.json`'s `pokemon[]`, which is keyed by the same `speciesId`. Sorting is by
-   `score` descending, not `rating`.
+| # | Original claim | What verification found | Where it now says so |
+|---|---|---|---|
+| 1 | PvPoke ranking fields, inferred from downstream consumers, flagged "verify before shipping a parser" | Correct to flag. The fields are `speciesId, speciesName, rating, score, scores, moves, moveset, matchups, counters, stats, editorNotes, editorScore` — **no dex**, so the dex must be joined from `gamemaster.min.json`. Order is by `score`, not `rating`. | Source 1, TL;DR bullet 2 |
+| 2 | PokeMiners `timestamp.txt` detects a new game master before pulling the large JSON | The file returns bare epoch-millis `1776386930700` (2026-04-17), not the documented format, and the mirror is ~4 months stale — `latest.json` still holds the pre-Season-27 values for Earthquake, Drill Run, Flash Cannon and Earth Power. A watch on it would never fire. `ETag` via `HEAD` is the working token; current move stats come from PvPoke. | Source 2, TL;DR bullet 2, polling note, Recommendation 4 |
+| 3 | Dittobase and GO Hub disagree about Mimikyu; flagged as an unresolved discrepancy | Not a discrepancy. PvPoke has Lickilicky #1 in **Great** (93.7) and Mimikyu #1 in **Ultra** (95.9); the two sources were reporting different leagues. | TL;DR bullet 1, meta-state section |
+| 4 | Cup rankings: "not every (cup, cap) pair exists, so expect 404s" | True but not the main risk. Most pairs resolve (`mega/1500`, `premier/10000`, `catch/1500` all verified); `fantasy` 404s. The real trap is enumerating cups from `cups[]`, which carries no CP field — use `formats[]`, and key on `{cup}-{cp}` because `mega` is published at three caps. | Source 1 |
 
-2. **PokeMiners `latest/timestamp.txt` is not a usable change trigger.** It currently returns the
-   bare epoch-millis integer `1776386930700` — **17 April 2026**, four months stale — and not the
-   `gm gm_version apk_version year-month-day hour-minute-second` format the README describes.
-   `raw.githubusercontent.com` also serves no `Last-Modified` header. The reliable token is the
-   HTTP `ETag` on `latest.json`, obtained with a `HEAD` request; that avoids downloading the
-   18,724,770-byte body on the ~364 days a year it has not changed. This repo's
-   `scripts/fetch-game-master-watch.mjs` uses the ETag.
+Two things this doc got right that were worth confirming: PvPoke is genuinely the upstream every
+other community feed derives from, and the 60-requests-per-hour unauthenticated cap on
+raw.githubusercontent is real and does constrain the design.
 
-3. **The "unresolved Mimikyu discrepancy" is not a discrepancy.** PvPoke has **Lickilicky #1 in
-   Great League** (score 93.7) and **Mimikyu #1 in Ultra League** (score 95.9). The Dittobase and
-   GO Hub snapshots were reporting different leagues, not disagreeing about one. A secondary
-   effect: feeds that dedupe by base dex (as this repo does, and as lily-dex-api does) reorder the
-   list relative to PvPoke's raw output, because entries like `altaria_shadow` fold into `altaria`.
-
-4. **Cup rankings are reliably available**, contrary to the doc's caution being the whole story.
-   Probed `mega/overall/rankings-1500`, `premier/overall/rankings-10000` and
-   `catch/overall/rankings-1500` — all HTTP 200 with real content. `fantasy` does 404, so the
-   "expect 404s" warning stands, but as a per-cup exception rather than a general risk. Cups
-   should be enumerated from `gamemaster.min.json`'s `formats[]` (15 entries, each carrying the
-   `{cup, cp, title}` triple the ranking path needs) rather than its `cups[]` (30 entries, no CP
-   field, includes the non-cups `all` and `custom`).
+Not re-verified in this pass, and so unchanged above: the Bucket C IV spreads, the Play! Pokémon
+banned list, and the German name translations beyond the three already sourced to PokéWiki.

@@ -82,7 +82,13 @@ function extractMoves(gm) {
   return out;
 }
 
-const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+// Compared through canonicalStringify, not JSON.stringify: it sorts object keys,
+// so a field that upstream reorders cannot register as a rebalance. No tracked
+// field is object-valued today (buffs is an array, where order IS significant
+// and canonicalStringify preserves it), so this is insurance against a future
+// one rather than a live bug — but a false rebalance alert is exactly the kind
+// of churn this file exists to avoid.
+const same = (a, b) => canonicalStringify(a) === canonicalStringify(b);
 
 // Field-level diff so the commit message can say "Earthquake power 110 → 120"
 // rather than "12 moves changed".
