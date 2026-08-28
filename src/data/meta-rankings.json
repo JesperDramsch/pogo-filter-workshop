@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-08-28T12:06:39.435Z",
+  "fetchedAt": "2026-08-28T15:22:06.452Z",
   "gameMasterTimestamp": "1787902550208",
   "sources": {
     "mechanics": "alexelgt/game_masters",
@@ -214,6 +214,25 @@
     "mawile",
     "shiinotic"
   ],
+  "shadowKeeperClasses": {
+    "articuno": "legendary",
+    "zapdos": "legendary",
+    "moltres": "legendary",
+    "mewtwo": "legendary",
+    "raikou": "legendary",
+    "latios": "legendary",
+    "kyogre": "legendary",
+    "groudon": "legendary",
+    "dialga": "legendary",
+    "palkia": "legendary",
+    "heatran": "legendary",
+    "regigigas": "legendary",
+    "giratina": "legendary",
+    "darkrai": "mythical",
+    "thundurus": "legendary",
+    "reshiram": "legendary",
+    "landorus": "legendary"
+  },
   "topMaxAttackers": [
     "metagross",
     "zapdos",

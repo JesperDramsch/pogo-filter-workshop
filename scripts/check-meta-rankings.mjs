@@ -10,6 +10,7 @@
 //   M1 — battle constants come from battleSettings (PvE), not combatSettings
 //   M2 — move parsing: fast/charged split, unnamed ids, Frustration, Hidden Power
 //   M3 — species parsing: the release gate, form dedupe, Shadow and battle-only forms
+//   M3b — evolution FAMILIES (undirected) and the keeper class map built on them
 //   M4 — Dynamax eligibility from breadOverrides, and the PvPoke roster overlay
 //   M5 — the damage model behaves the way the ranking depends on it behaving
 //   M6 — the shipped snapshot is internally consistent and app-resolvable
@@ -23,6 +24,8 @@ import {
   cpMultiplierFor,
   cycleDps,
   evolutionDescendants,
+  evolutionFamilies,
+  keeperClasses,
   moveDamage,
   parseMaxEligibility,
   parseMoves,
@@ -163,6 +166,72 @@ console.log("\nM3 — species parsing");
   check("an evolution cycle terminates instead of hanging", cyclic.get(1) instanceof Set);
 }
 
+// evolutionDescendants walks downstream only. The keeper class map cannot use
+// it: `!+species` matches the whole family in every direction, so "is this
+// family entirely legendary" is a question about the connected component.
+console.log("\nM3b — evolution families and the keeper class map");
+{
+  const form = (dex, pokemonId, evolvesTo = [], pokemonClass = null) =>
+    ({ dex, pokemonId, evolvesTo, pokemonClass });
+  const gastlyLine = new Map([
+    [92, [form(92, "GASTLY", ["HAUNTER"])]],
+    [93, [form(93, "HAUNTER", ["GENGAR"])]],
+    [94, [form(94, "GENGAR")]],
+  ]);
+  const families = evolutionFamilies(gastlyLine);
+  check("a family reaches UPSTREAM, unlike the descendant closure",
+    [...families.get(94)].sort((a, b) => a - b).join(",") === "92,93,94");
+  check("every member sees the same family",
+    families.get(92) === families.get(94));
+  // Siblings that share an ancestor (the Eevee shape) are one family too.
+  const branching = evolutionFamilies(new Map([
+    [133, [form(133, "EEVEE", ["VAPOREON", "JOLTEON"])]],
+    [134, [form(134, "VAPOREON")]],
+    [135, [form(135, "JOLTEON")]],
+  ]));
+  check("branch siblings land in one family",
+    [...branching.get(134)].sort((a, b) => a - b).join(",") === "133,134,135");
+  const cyclic = evolutionFamilies(new Map([
+    [1, [form(1, "A", ["B"])]],
+    [2, [form(2, "B", ["A"])]],
+  ]));
+  check("a cycle terminates instead of hanging", cyclic.get(1)?.size === 2);
+
+  // The class map: only a family that is uniformly one class may be dropped
+  // from the crypto floor, because the blanket clause it defers to covers the
+  // class, not the family.
+  const LEG = "POKEMON_CLASS_LEGENDARY";
+  const MYTH = "POKEMON_CLASS_MYTHIC";
+  const UB = "POKEMON_CLASS_ULTRA_BEAST";
+  const forms = new Map([
+    [381, [form(381, "LATIOS", [], LEG)]],                      // solo legendary
+    [772, [form(772, "TYPE_NULL", ["SILVALLY"], LEG)]],         // legendary line
+    [773, [form(773, "SILVALLY", [], LEG)]],
+    [803, [form(803, "POIPOLE", ["NAGANADEL"], UB)]],
+    [804, [form(804, "NAGANADEL", [], UB)]],
+    [808, [form(808, "MELTAN", ["MELMETAL"], MYTH)]],
+    [809, [form(809, "MELMETAL", [], MYTH)]],
+    [376, [form(376, "METAGROSS")]],                            // classless
+    [700, [form(700, "MIXED_BASE", ["MIXED_EVO"])]],            // classless base…
+    [701, [form(701, "MIXED_EVO", [], LEG)]],                   // …legendary evo
+    [702, [form(702, "TWO_FORMS", [], LEG), form(702, "TWO_FORMS", [])]],
+  ]);
+  const fam = evolutionFamilies(forms);
+  const classes = keeperClasses([...forms.keys()], forms, fam);
+  check("a solo legendary is classed", classes[381] === "legendary");
+  check("a wholly-legendary line is classed on both members",
+    classes[772] === "legendary" && classes[773] === "legendary");
+  check("an Ultra Beast line is classed", classes[803] === "ultraBeast" && classes[804] === "ultraBeast");
+  check("a mythic line is classed", classes[808] === "mythical" && classes[809] === "mythical");
+  check("a classless species is omitted", !(376 in classes));
+  check("a family with one classless member is omitted on BOTH ends",
+    !(700 in classes) && !(701 in classes),
+    "!+species would protect the classless member the blanket clause misses");
+  check("a species whose own forms disagree is omitted", !(702 in classes));
+  check("only the three protection buckets are ever emitted",
+    Object.values(classes).every((b) => ["legendary", "mythical", "ultraBeast"].includes(b)));
+}
+
 console.log("\nM4 — Dynamax eligibility from the game master's own flags");
 {
   const ext = (dex, uniqueId, modes) => ({
@@ -299,6 +368,23 @@ console.log("\nM6 — the shipped snapshot");
     new Set(Object.values(perType).flat().map((e) => e.species)).size === topAttackers.length);
   check("the union of the shadow cuts is exactly shadowKeepers",
     new Set(Object.values(shadowPerType).flat().map((e) => e.species)).size === shadowKeepers.length);
+
+  // shadowKeeperClasses tells the trash crypto floor which keepers the blanket
+  // `!legendär` / `!mysteriös` / `!ultrabestie` clauses already cover, so it can
+  // skip their `!crypto,!+species` clause. A key that is not a keeper would be
+  // dead weight; a bogus bucket would silently stop trimming.
+  const keeperClassMap = META_RANKINGS.shadowKeeperClasses || {};
+  const keeperSet = new Set(shadowKeepers);
+  check("shadowKeeperClasses only keys actual keepers",
+    Object.keys(keeperClassMap).every((s) => keeperSet.has(s)),
+    Object.keys(keeperClassMap).filter((s) => !keeperSet.has(s)).join(", "));
+  check("every bucket is one the app knows how to spend",
+    Object.values(keeperClassMap).every((b) => ["legendary", "mythical", "ultraBeast"].includes(b)));
+  // A cut this deep always catches some legendaries; an empty map means the
+  // pokemonClass parse broke, and a full one means the family gate did.
+  check("the map is a non-empty, strict subset of the roster",
+    Object.keys(keeperClassMap).length > 0 && Object.keys(keeperClassMap).length < shadowKeepers.length,
+    `${Object.keys(keeperClassMap).length} of ${shadowKeepers.length}`);
 
   // Charger moves are looked up as `move.<lowercase name>`; a movementId here
   // would emit `@1metal_claw_fast`, which matches nothing in any locale.

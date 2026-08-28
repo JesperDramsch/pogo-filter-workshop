@@ -165,8 +165,10 @@ const TYPES = [
 //
 // shadowKeepers cuts at 7 by explicit choice. Each keeper costs a `!+species`
 // clause in shadowSafe, a `+species` term in shadowFrustration and one more in
-// the trash crypto floor, so the depth trades roster coverage against the
-// length of a string that gets typed into the game's search box. A shallower
+// the trash crypto floor — that last one only when no blanket class clause
+// already covers it, which is what shadowKeeperClasses below is for — so the
+// depth trades roster coverage against the length of a string that gets typed
+// into the game's search box. A shallower
 // cut of 5 dropped two picks the community treats as canonical — Shadow
 // Machamp sat 6th in Fighting and Shadow Swampert 7th in Water, both within a
 // few percent of the cut — because those are the two deepest Shadow pools.
@@ -603,6 +605,96 @@ function topPerType(entries, perType, descendants) {
 // Union the per-type cuts into one dex list, ordered by each species' best
 // rating across every type it made — so the head of the list is the roster's
 // heaviest hitters, which is the order the chip editor reads best in.
+// Undirected evolution families, as connected components over the same
+// evolutionBranch edges evolutionDescendants walks. Descendants alone are not
+// enough for the question shadowKeeperClasses asks: PoGo's `+species` search
+// matches the whole family in both directions (and across siblings that share
+// an ancestor), so a claim about what `!+X` covers has to be a claim about
+// X's component, not X's subtree.
+export function evolutionFamilies(formsByDex) {
+  const idToDex = new Map();
+  for (const [dex, forms] of formsByDex) {
+    for (const f of forms) if (!idToDex.has(f.pokemonId)) idToDex.set(f.pokemonId, dex);
+  }
+  const adj = new Map();
+  const link = (a, b) => {
+    if (!adj.has(a)) adj.set(a, new Set());
+    adj.get(a).add(b);
+  };
+  for (const dex of formsByDex.keys()) if (!adj.has(dex)) adj.set(dex, new Set());
+  for (const [dex, forms] of formsByDex) {
+    for (const f of forms) {
+      for (const id of f.evolvesTo) {
+        const d = idToDex.get(id);
+        if (d == null || d === dex) continue;
+        link(dex, d);
+        link(d, dex);
+      }
+    }
+  }
+  const families = new Map();
+  for (const start of adj.keys()) {
+    if (families.has(start)) continue;
+    const component = new Set([start]);
+    const queue = [start];
+    while (queue.length) {
+      for (const next of adj.get(queue.pop()) || []) {
+        if (component.has(next)) continue;
+        component.add(next);
+        queue.push(next);
+      }
+    }
+    for (const dex of component) families.set(dex, component);
+  }
+  return families;
+}
+
+// Game-master pokemonClass → the app's protection buckets. Only these three
+// classes exist; everything else is classless and carries no blanket
+// protection to inherit.
+const CLASS_BUCKETS = [
+  [/ULTRA_BEAST/, "ultraBeast"],
+  [/MYTHIC/, "mythical"],
+  [/LEGENDARY/, "legendary"],
+];
+function classBucket(pokemonClass) {
+  for (const [re, bucket] of CLASS_BUCKETS) if (re.test(pokemonClass || "")) return bucket;
+  return null;
+}
+
+// Which keepers the trash filter's blanket `!legendär` / `!mysteriös` /
+// `!ultrabestie` clauses already cover, so the crypto floor can skip emitting a
+// `!crypto,!+species` clause it would only duplicate. ~20 characters each, and
+// the floor is the longest thing in that filter.
+//
+// The bar is the WHOLE evolution family, not the keeper: `!+latios` protects
+// everything in Latios's family, and dropping it is only sound if the blanket
+// clause protects all of that too. A family with even one classless or
+// differently-classed member is left out of the map entirely, which means the
+// clause stays — silence here always costs characters, never protection.
+//
+// A family member the game master has not released (no modelScaleV2) is not in
+// formsByDex and so is not consulted. That is the right call: it cannot be in
+// anyone's storage either.
+export function keeperClasses(keeperDexes, formsByDex, families) {
+  const out = {};
+  for (const dex of keeperDexes) {
+    const family = families.get(dex) || new Set([dex]);
+    let bucket = null;
+    let uniform = true;
+    for (const member of family) {
+      for (const form of formsByDex.get(member) || []) {
+        const b = classBucket(form.pokemonClass);
+        if (b === null || (bucket !== null && b !== bucket)) { uniform = false; break; }
+        bucket = b;
+      }
+      if (!uniform) break;
+    }
+    if (uniform && bucket) out[dex] = bucket;
+  }
+  return out;
+}
+
 function unionByBestRating(byType) {
   const best = new Map();
   for (const list of Object.values(byType)) {
@@ -774,7 +866,15 @@ async function main() {
   const shadowByType = topPerType(shadowEntries, SHADOW_TOP_PER_TYPE, descendants);
 
   const topAttackers = unionByBestRating(byType).map(nameFor).filter(Boolean);
-  const shadowKeepers = unionByBestRating(shadowByType).map(nameFor).filter(Boolean);
+  const shadowKeeperDexes = unionByBestRating(shadowByType).filter(dex => nameFor(dex));
+  const shadowKeepers = shadowKeeperDexes.map(nameFor);
+  // Keyed by the same species names as shadowKeepers, so the app canonicalizes
+  // one list and looks the other up by the result. Keepers with no entry are
+  // classless (or their family is mixed) and always keep their floor clause.
+  const shadowKeeperClasses = Object.fromEntries(
+    Object.entries(keeperClasses(shadowKeeperDexes, formsByDex, evolutionFamilies(formsByDex)))
+      .map(([dex, bucket]) => [nameFor(Number(dex)), bucket]),
+  );
 
   // topMaxAttackers: the same top-N-per-type cut as topAttackers, taken over
   // only the Dynamax-capable species. Max moves are not in the game master as a
@@ -877,6 +977,7 @@ async function main() {
     maxChargerDurationMs: MAX_CHARGER_DURATION_MS,
     topAttackers,
     shadowKeepers,
+    shadowKeeperClasses,
     topMaxAttackers,
     gigantamaxSpecies,
     perType,
@@ -1022,7 +1123,8 @@ async function main() {
   writeJson(OUT_PATH, { fetchedAt, ...newContent });
   console.log(`✓ wrote ${OUT_PATH}`);
   console.log(`  top attackers:     ${topAttackers.length} species`);
-  console.log(`  shadow keepers:    ${shadowKeepers.length} species`);
+  console.log(`  shadow keepers:    ${shadowKeepers.length} species` +
+    ` (${Object.keys(shadowKeeperClasses).length} covered by a blanket class protection)`);
   console.log(`  top max attackers: ${topMaxAttackers.length} species (${gigantamaxSpecies.length} G-Max)`);
   console.log(`  charger moves:     ${chargerMoves.length} ≤${MAX_CHARGER_DURATION_MS}ms`);
   console.log(`  sample top-5:      ${topAttackers.slice(0, 5).join(", ")}`);
