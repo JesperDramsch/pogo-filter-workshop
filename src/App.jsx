@@ -7329,7 +7329,15 @@ function FriendCollectEditor({
 		<div className='space-y-3'>
 			<div className='flex items-center gap-2 flex-wrap'>
 				<span className='mono text-xs text-[#8090A0]'>{t('app.filter.friend_collect_mode_label')}</span>
-				<div className='flex rounded overflow-hidden border border-[#2D3A47]'>
+				{/* Segmented control — one goal at a time, so radio semantics. The
+				    selection was carried by the accent fill alone, and the three
+				    accents (amber / purple / green) are themselves colour-coded
+				    meaning, so nothing distinguished them non-visually. */}
+				<div
+					className='flex rounded overflow-hidden border border-[#2D3A47]'
+					role='radiogroup'
+					aria-label={t('app.filter.friend_collect_mode_label')}
+				>
 					{['lucky', 'hundo', 'both'].map((m) => {
 						// Accent language matches the chip badges: amber = lucky,
 						// purple = hundo (4★), green = both goals.
@@ -7342,6 +7350,8 @@ function FriendCollectEditor({
 							<button
 								key={m}
 								onClick={() => onModeChange(m)}
+								role='radio'
+								aria-checked={mode === m}
 								className={`mono text-xs px-3 py-1 transition ${
 									mode === m ? activeCls : 'bg-[#1F2933] text-[#8090A0] hover:text-[#E6EDF3]'
 								}`}
@@ -9326,13 +9336,19 @@ function ConfigPanel({
 				<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
 					{t('app.preset.section_title')}
 				</div>
-				<div className='flex flex-wrap gap-1.5'>
+				{/* Mutually exclusive: applying one preset overwrites the others, so
+				    radio semantics rather than aria-pressed. Selection was cyan fill
+				    alone, which said neither which preset was active nor that the four
+				    are one choice. */}
+				<div className='flex flex-wrap gap-1.5' role='radiogroup' aria-label={t('app.preset.section_title')}>
 					{Object.entries(PRESETS).map(([key, preset]) => {
 						const active = config.lastAppliedPreset === key;
 						return (
 							<button
 								key={key}
 								onClick={() => applyPreset(key)}
+								role='radio'
+								aria-checked={active}
 								title={t(preset.descriptionKey)}
 								className={`mono text-xs px-3 py-1.5 rounded transition ${
 									active

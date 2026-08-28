@@ -86,8 +86,20 @@ console.log("S1 — two-state toggles expose aria-pressed");
 console.log("\nS2 — mutually-exclusive groups use radio semantics");
 {
   const groups = (app.match(/role='radiogroup'/g) || []).length;
-  check(`${groups} radiogroup(s)`, groups >= 1);
-  check("radiogroups are named", (app.match(/role='radiogroup' aria-label=/g) || []).length === groups);
+  check(`${groups} radiogroup(s)`, groups >= 3);
+  // Named individually rather than counted, so dropping one is a failure and
+  // not a silently smaller number.
+  for (const [label, handler] of [
+    ["PvP mode", "set('pvpMode', m)"],
+    ["preset selector", "applyPreset(key)"],
+    ["friend-collect goal", "onModeChange(m)"],
+  ]) {
+    const i = app.indexOf(`onClick={() => ${handler}}`);
+    check(`${label} is a radio`, i !== -1 && app.slice(i, i + 200).includes("aria-checked"));
+  }
+  // Every radiogroup must be named, or AT announces "group" with no subject.
+  check("every radiogroup is named",
+    (app.match(/<[^>]*(?=[^>]*role='radiogroup')(?=[^>]*aria-label=)[^>]*>/g) || []).length === groups);
   check("radio children carry aria-checked",
     (app.match(/role='radio'/g) || []).length === (app.match(/aria-checked=/g) || []).length);
 }
