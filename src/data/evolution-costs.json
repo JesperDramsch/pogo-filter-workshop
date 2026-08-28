@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-04T13:56:34.931Z",
+  "fetchedAt": "2026-08-28T14:18:13.004Z",
   "candyHeavySingleJumpThreshold": 400,
   "candyHeavyCumulativeThreshold": 150,
   "candyHeavy": [
@@ -38,6 +38,7 @@
     "duskull",
     "eevee",
     "elekid",
+    "gimmighoul",
     "gligar",
     "goomy",
     "grubbin",

@@ -161,7 +161,7 @@ export const DEFAULT_TOP_ATTACKERS = META_RANKINGS.topAttackers;
 // Dynamax/Gigantamax encounters. Seed source: same meta-rankings.json,
 // restricted to species the game master marks Dynamax-capable and ordered by
 // the same raid rating. Eligibility used to be a hand-maintained set, because
-// pogoapi carries no Dynamax flag; the game master does carry one, under
+// no pre-parsed feed carried a Dynamax flag; the game master does carry one, under
 // Niantic's internal name for the mechanic ("bread"), so the roster is now
 // derived too — and the hand-maintained one turned out to be wrong about
 // Zacian, Zamazenta, Urshifu and Eternatus. Forms fold into base species —
@@ -199,7 +199,8 @@ const UNTRADEABLE_MYTHICAL_DEX = new Set([
 
 // Species that only move in a Special Trade (legendaries, mythicals, Ultra
 // Beasts) — they never belong in a regular-trade friend-collect pack. Derived
-// snapshot from pogoapi (rarity Legendary ∪ Mythic ∪ raid-exclusives),
+// snapshot from the game master's own `pokemonClass` (LEGENDARY ∪ MYTHIC ∪
+// ULTRA_BEAST — the classes the Special-Trade rule actually keys off),
 // regenerated daily by scripts/fetch-species-meta.mjs — no hand-maintained
 // list here. Note Meltan/Melmetal ARE in this set: tradeable (unlike other
 // mythicals, hence the `!mythical,808,809` wishlist guard keeps them), but
@@ -235,9 +236,10 @@ const BABY_DEX = new Set([
 	848, // Toxel
 ]);
 
-// Child dex → parent dex for every evolution step (species-meta feed, GM +
-// pogoapi union). Old snapshots without the field degrade gracefully: every
-// species counts as its own base and the packs behave as before.
+// Child dex → parent dex for every evolution step (species-meta feed, from the
+// game master's form-granular `evolutionBranch`). Old snapshots without the
+// field degrade gracefully: every species counts as its own base and the packs
+// behave as before.
 const EVO_PARENT_BY_DEX = SPECIES_META.evoParentByDex || {};
 // Inverse (parent → children), for the one walk the parent map can't do:
 // hopping DOWN from a baby that is itself the candidate.

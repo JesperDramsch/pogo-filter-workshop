@@ -359,7 +359,12 @@ function NavChip({ icon: Icon, label, onClick, tone, current = false, iconRight 
 // Sign-off used on every page (landing, chapters, workshop). Three compact
 // lines: the personal credit, the author's other projects, and the upstream
 // data sources the workshop snapshots from. Data credit is mandatory courtesy —
-// ScrapedDuck, LeekDuck, and PoGoAPI ask for attribution; lily-dex-api is MIT.
+// ScrapedDuck and LeekDuck ask for attribution; lily-dex-api and PvPoke are MIT.
+// The list tracks what is actually read today: crediting a source nothing reads
+// is as wrong as omitting one. PoGoAPI left in August 2026 with the last four
+// fetchers that read it (docs/upstream-sources.md); PokeMiners now points at
+// game_masters, the fallback mirror, rather than pogo_assets, whose Texts/
+// directory the grunt quotes moved off in the same month.
 const CREDIT_PROJECTS = [
   { label: "ML.recipes",             url: "https://ml.recipes"          },
   { label: "data-science-gui.de",    url: "https://data-science-gui.de" },
@@ -372,8 +377,10 @@ const DATA_CREDIT_PROJECTS = [
   { label: "ScrapedDuck",  url: "https://github.com/bigfoott/ScrapedDuck"      },
   { label: "LeekDuck",     url: "https://leekduck.com"                         },
   { label: "lily-dex-api", url: "https://github.com/mknepprath/lily-dex-api"   },
-  { label: "PoGoAPI",      url: "https://pogoapi.net"                          },
-  { label: "PokeMiners",   url: "https://github.com/PokeMiners/pogo_assets"    },
+  { label: "PvPoke",       url: "https://github.com/pvpoke/pvpoke"             },
+  { label: "holoholo-text",url: "https://github.com/sora10pls/holoholo-text"   },
+  { label: "alexelgt",     url: "https://github.com/alexelgt/game_masters"     },
+  { label: "PokeMiners",   url: "https://github.com/PokeMiners/game_masters"   },
 ];
 
 export function AppCredit() {

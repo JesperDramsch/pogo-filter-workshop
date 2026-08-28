@@ -44,6 +44,14 @@ the app *and* `scripts/generate-pvp-meta-reference.mjs` → the skill.
 so `fetchedAt` is preserved when nothing changed (otherwise every sync is a churn commit); and an
 empty or shrunken result refuses to overwrite the cache rather than publishing a hole.
 
+**Game-master access goes through `scripts/lib/game-master.mjs`.** Six fetchers read the
+same 19 MB Niantic dump. The mirror preference list (alexelgt primary, PokeMiners fallback —
+the latter has stalled before), the batch stamp, the staleness warning, the batch-keyed download
+cache and the shared species parsers live in that one file. Do not re-declare a mirror URL in a
+fetcher, and do not add a new species-fact upstream before checking whether the game master
+already publishes it — [`docs/upstream-sources.md`](docs/upstream-sources.md) is the inventory,
+and it records what nine months of a silently-stale upstream cost.
+
 **Fixtures vs property checks.** `src/__fixtures__/default-filter-output.json` pins *config-derived*
 output only — filters that move when someone changes logic on purpose. Data-derived families
 (raids, Rocket, PvP) are deliberately excluded and covered by property assertions in

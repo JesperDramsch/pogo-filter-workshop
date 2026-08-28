@@ -15,6 +15,14 @@
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  fetchGameMaster,
+  formSuffix,
+  gameMasterAgeDays,
+  pokemonTemplates,
+  typesOf,
+  warnIfStale,
+} from "./lib/game-master.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -29,10 +37,16 @@ const ENDPOINTS = {
   // ScrapedDuck event feed — covers raid-day / raid-hour / raid-battles /
   // raid-weekend events that lily-dex-api's `currentList` doesn't carry.
   events:     "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.min.json",
-  // pogoapi name → types map for resolving bosses parsed out of event titles
-  // (raid-day / raid-hour entries don't carry structured boss metadata).
-  pokemonTypes: "https://pogoapi.net/api/v1/pokemon_types.json",
 };
+
+// The name → types index used to resolve bosses parsed out of event titles
+// (raid-day / raid-hour entries don't carry structured boss metadata) is built
+// from the game master and this repo's own name dictionary. It read pogoapi's
+// pokemon_types.json until August 2026; that feed had not moved since November
+// 2025 and published no freshness signal, so a boss released after it stalled
+// could not be resolved out of an event title at all. See
+// scripts/lib/game-master.mjs and docs/upstream-sources.md.
+const NAMES_PATH = resolve(ROOT, "src/locales/pokemon-names.json");
 
 // Window for surfacing upcoming events: active now + the next 7 days. Anything
 // further out is noise (rotation slots routinely shift) and would force a
@@ -148,26 +162,44 @@ function deriveBoss(boss, allTypes, typeIdx) {
   };
 }
 
-// Build a lowercase-name → {id, types} index from pogoapi.net's pokemon_types
-// dataset. The "Normal" form wins when the same dex number has multiple form
-// rows (e.g. Entei has Normal + an "S" Shadow tag row); we want canonical
-// non-form types for our derivation.
-function buildNameIndex(pokemonTypes) {
+// Event titles are marketing copy: they use a typographic apostrophe where the
+// name dictionary uses a straight one, and vice versa. Fold both, so
+// "Farfetch’d Raid Hour" resolves against a dictionary entry spelled
+// "Farfetch'd".
+function nameKey(name) {
+  return String(name).toLowerCase().replace(/[‘’ʼ]/g, "'").trim();
+}
+
+// Build a lowercase-name → {id, types} index from the game master, named via
+// this repo's own dictionary. The species-level template (no form) or the
+// NORMAL form wins where a dex has several form templates — we want canonical
+// non-form types for the derivation, not Alolan Meowth's.
+export function buildNameIndex(templates, names) {
+  const byDex = new Map();
+  for (const template of pokemonTemplates(templates)) {
+    const types = typesOf(template.settings);
+    if (types.length === 0) continue;
+    const form = formSuffix(template);
+    // A later regional form must not displace a canonical one; a later
+    // canonical one may displace anything (bare and NORMAL agree on types).
+    const canonical = form === null || form === "NORMAL";
+    if (byDex.has(template.dex) && !canonical) continue;
+    byDex.set(template.dex, { template, types });
+  }
   const idx = new Map();
-  for (const row of pokemonTypes) {
-    const name = row.pokemon_name;
-    if (!name || !Array.isArray(row.type)) continue;
-    const key = name.toLowerCase();
-    const isNormal = !row.form || row.form === "Normal";
-    if (idx.has(key) && !isNormal) continue;
-    idx.set(key, {
-      // lily-dex-api ID convention: TAPU_LELE, MR_MIME, etc.
-      id: name.toUpperCase().replace(/[\s-]+/g, "_"),
+  for (const [dex, { template, types }] of byDex) {
+    const name = names[String(dex)]?.en;
+    if (!name) continue;
+    idx.set(nameKey(name), {
+      // The game's own species enum — TAPU_LELE, MR_MIME, HO_OH — which is the
+      // convention lily-dex-api's boss ids follow, so the dedupe key built
+      // from these matches the standing-tier ids exactly.
+      id: template.settings.pokemonId,
       // Keep types in TitleCase ("Fire"/"Ground") to match the type index
       // keys built from the upstream typesArr — `eff()` lookups fail silently
       // on case-mismatched strings and would emit empty resistor/SE arrays.
       // `lowerTypes()` inside `deriveBoss` handles the lowercase emit shape.
-      types: row.type,
+      types: types.map(t => t[0].toUpperCase() + t.slice(1)),
       displayName: name,
     });
   }
@@ -226,8 +258,7 @@ function buildEventEntry(event, nameIdx, allTypes, typeIdx, dedupeSet) {
   let anyUnresolved = false;
   let anyDeduped = false;
   for (const rawName of names) {
-    const key = rawName
-      .toLowerCase()
+    const key = nameKey(rawName)
       .replace(/^shadow\s+/i, "")
       .replace(/^mega\s+/i, "")
       .trim();
@@ -315,15 +346,15 @@ async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
 
-  let typesArr, raidBossRaw, maxBattlesRaw, eventsRaw, pokemonTypesRaw;
+  let typesArr, raidBossRaw, maxBattlesRaw, eventsRaw, gameMaster;
   try {
-    console.log("→ Fetching lily-dex-api + ScrapedDuck + pogoapi endpoints");
-    [typesArr, raidBossRaw, maxBattlesRaw, eventsRaw, pokemonTypesRaw] = await Promise.all([
+    console.log("→ Fetching lily-dex-api + ScrapedDuck + game master");
+    [typesArr, raidBossRaw, maxBattlesRaw, eventsRaw, gameMaster] = await Promise.all([
       fetchJson(ENDPOINTS.types),
       fetchJson(ENDPOINTS.raidboss),
       fetchJson(ENDPOINTS.maxbattles),
       fetchJson(ENDPOINTS.events),
-      fetchJson(ENDPOINTS.pokemonTypes),
+      fetchGameMaster({ userAgent: "pogo-filter-workshop raid-fetcher/1.0" }),
     ]);
   } catch (e) {
     console.error(`✗ Fetch failed: ${e.message}`);
@@ -351,7 +382,17 @@ async function main() {
   // Event raids — currently active + upcoming within the lookahead window.
   // Built after the standing-tier derivation so dedupe can prune events
   // whose bosses are already in the rotation.
-  const nameIdx = buildNameIndex(Array.isArray(pokemonTypesRaw) ? pokemonTypesRaw : []);
+  if (gameMaster.failures.length > 0) {
+    console.warn(`⚠  fell back to ${gameMaster.mirror} after ${gameMaster.failures.join("; ")}`);
+  }
+  warnIfStale(gameMaster, "A boss released since that batch cannot be resolved out of an event title.");
+  const nameIdx = buildNameIndex(
+    gameMaster.templates,
+    JSON.parse(readFileSync(NAMES_PATH, "utf8")),
+  );
+  if (nameIdx.size < 500) {
+    throw new Error(`species name index collapsed to ${nameIdx.size} entries — refusing to drop event bosses silently`);
+  }
   const dedupeSet = buildStandingDedupeSet(raids);
   const now = Date.now();
   const horizon = now + EVENT_LOOKAHEAD_MS;
@@ -403,9 +444,17 @@ async function main() {
   console.log(`  raids: ${totalRaids} bosses across ${Object.keys(raids).length} tiers`);
   console.log(`  maxBattles: ${totalMax} bosses across ${Object.keys(maxBattles).length} tiers`);
   console.log(`  eventRaids: ${eventRaids.length} surfaced · ${skippedDeduped} deduped against standing tiers · ${skippedUnresolved} unresolved`);
+  const gmAgeDays = gameMasterAgeDays(gameMaster.batchMs);
+  console.log(`  boss name index: ${nameIdx.size} species from ${gameMaster.mirror}` +
+    `${gmAgeDays != null ? ` (${gmAgeDays}d old)` : " (unstamped)"}`);
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+// Only run when executed directly — the offline checks import buildNameIndex
+// above without triggering a fetch.
+import { pathToFileURL } from "node:url";
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}

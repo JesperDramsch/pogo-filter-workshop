@@ -59,8 +59,9 @@ const GENDER_SLOT_DEX = new Map([
 // tracked purely so the app knows the species isn't finished, and the friend
 // wishlists keep asking for it until every slot is ticked.
 //
-// No upstream feed carries this (Sesokitz isn't even in pogoapi's types
-// dataset), so it is hand-maintained. The bar for entry is deliberately high:
+// No upstream carries this as a searchable distinction — Sesokitz's four
+// seasonal forms are all Normal/Grass in the game master, so no type predicate
+// can separate them — and so it is hand-maintained. The bar for entry is deliberately high:
 // forms that DO differ by type belong in regional-forms.json instead, where
 // they become real search guards — that is where Burmadame's cloaks and
 // Choreogel's styles now live.

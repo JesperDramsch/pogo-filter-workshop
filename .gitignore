@@ -5,3 +5,6 @@ dist
 .vscode
 .idea
 .claude/
+
+# Batch-stamped game-master download cache (scripts/lib/game-master.mjs)
+.cache

@@ -1,24 +1,41 @@
 #!/usr/bin/env node
-// Pulls species metadata from pogoapi.net and derives the pools the
-// friend-collect suggestion packs in App.jsx consume. Replaces the
-// hand-curated RARE_COLLECT_DEX constant — same rationale as
+// Derives the species pools the friend-collect suggestion packs in App.jsx
+// consume, from the Niantic game master plus PvPoke's release roster.
+// Replaces the hand-curated RARE_COLLECT_DEX constant — same rationale as
 // fetch-meta-rankings.mjs: derived lists stay current without code changes.
+//
+// Source note: rarity, generations, evolutions, stats and release status came
+// from pogoapi.net until August 2026. That service stopped publishing in
+// November 2025 and carries no freshness signal of its own — its
+// released_pokemon feed was missing seventeen live species by the time this
+// was measured, and nothing in the pipeline could have said so. Every fact it
+// supplied is now read first-hand:
+//
+//   pogoapi feed        → replacement
+//   pokemon_rarity      → game master `pokemonSettings.pokemonClass`
+//   pokemon_evolutions  → game master `evolutionBranch` (form-granular)
+//   pokemon_stats       → game master `pokemonSettings.stats`
+//   released_pokemon    → PvPoke game master `released` flag
+//   pokemon_generations → scripts/lib/generations.mjs (a dex-range constant)
+//
+// See scripts/lib/game-master.mjs and docs/upstream-sources.md.
 //
 //  - specialTradeDex: species that can only move in a Special Trade and
 //    therefore never belong in a regular-trade "collect for me" pack.
-//    Two-source union, so no single upstream quirk can leak a species:
-//      1. PokeMiners game master `pokemonSettings.pokemonClass` —
-//         POKEMON_CLASS_LEGENDARY / _MYTHIC / _ULTRA_BEAST, the game's
-//         own classes that the Special-Trade rule keys off. Authoritative
-//         (pogoapi's rarity feed follows main-series taxonomy, where
-//         Ultra Beasts are NOT legendaries — the first live run tripped
-//         the Nihilego assertion exactly because of that).
-//      2. pogoapi rarity: every non-"Standard" category (not just
-//         Legendary/Mythic, in case Ultra Beasts sit in their own bucket).
-//    The raid-exclusive roster was dropped as a source: a live run tripped
-//    the specialTradeDex ∩ starterDex guard, showing "raid-only" is not a
-//    special-trade signal (shadow/event raids feature regular species,
-//    starters included).
+//    Read from the game master's `pokemonSettings.pokemonClass` —
+//    POKEMON_CLASS_LEGENDARY / _MYTHIC / _ULTRA_BEAST, the game's own classes
+//    that the Special-Trade rule keys off.
+//    This used to union in pogoapi's rarity feed as a second opinion, which
+//    was a mistake dressed as caution: that feed follows main-series taxonomy,
+//    where Ultra Beasts are NOT legendaries, and the first live run tripped
+//    the Nihilego assertion below exactly because of it. Measured on the
+//    migration, the two sources agreed on all 111 species, so the union was
+//    contributing nothing but a stale upstream. The assertions below are the
+//    real guard, and they are what will catch a pokemonClass reshape.
+//    The raid-exclusive roster was dropped as a source earlier for a similar
+//    reason: a live run tripped the specialTradeDex ∩ starterDex guard,
+//    showing "raid-only" is not a special-trade signal (shadow/event raids
+//    feature regular species, starters included).
 //    Meltan/Melmetal stay IN this set: they're the one mythical line that
 //    is tradeable at all, but the trade is still a Special Trade (mythic
 //    class) — App.jsx's `!mythical,808,809` wishlist guard re-includes
@@ -32,6 +49,12 @@
 //    per generation we take the nine lowest dex ids and keep offsets
 //    0/3/6. Bases only — that's what friends actually catch; the evolved
 //    forms ride along implicitly once curated.
+//    The generation boundaries themselves are a constant now
+//    (scripts/lib/generations.mjs). That is a deliberate trade: pogoapi's
+//    pokemon_generations payload had changed shape often enough that the
+//    parser handled seven of them, and a boundary is fixed the day a
+//    generation ships — one edit per new generation buys the removal of an
+//    upstream nobody could tell had stalled.
 //
 //  - powerLineDex: "pseudo-legendary-style" lines — released 3-stage
 //    chains with ≥125 cumulative candy whose FINAL stage ranks in the
@@ -45,29 +68,25 @@
 //    game's own temporary-evolution data — so a newly released Mega joins
 //    the friend-collect "Mega evolutions" pack on the next daily sync with
 //    no code change (the whole point of deriving it instead of curating it).
-//    Game master ONLY, deliberately — unlike specialTradeDex there is no
-//    second source worth unioning: pogoapi's mega_pokemon feed lists Primal
-//    Kyogre/Groudon alongside the real megas and carries no field this
-//    script can key a Mega-vs-Primal split off, so a first live run tripped
-//    the Kyogre assertion below (gm 48 · pogoapi 47 · union 50). The game
-//    master is the one source that names the mechanic outright
-//    (TEMP_EVOLUTION_MEGA vs TEMP_EVOLUTION_PRIMAL), and it is also by far
-//    the fresher of the two — see scripts/lib/game-master.mjs for the mirror
-//    preference this reads through, and why it is no longer PokeMiners. A game-master outage empties megaDex and the size
-//    gate below reddens the sync — the intended intervention signal, same as
-//    every other assertion here. Emitted as the MEGA-CAPABLE species dex
-//    (Charizard, not Charmander) — App.jsx's collectible-base remap turns
+//    Game master ONLY, deliberately — there was never a second source worth
+//    unioning: pogoapi's mega_pokemon feed listed Primal Kyogre/Groudon
+//    alongside the real megas and carried no field this script could key a
+//    Mega-vs-Primal split off, so a first live run tripped the Kyogre
+//    assertion below (gm 48 · pogoapi 47 · union 50). The game master is the
+//    one source that names the mechanic outright (TEMP_EVOLUTION_MEGA vs
+//    TEMP_EVOLUTION_PRIMAL). A game-master outage empties megaDex and the
+//    size gate below reddens the sync — the intended intervention signal,
+//    same as every other assertion here. Emitted as the MEGA-CAPABLE species
+//    dex (Charizard, not Charmander) — App.jsx's collectible-base remap turns
 //    that into the species a friend actually catches.
 //
 //  - evoParentByDex: child dex → parent dex for every evolution step, so
 //    App.jsx can walk any species down to the base of its line (the
 //    friend-collect packs only suggest collectible bases — a lucky
 //    Skwovet must prune a meta-pack Greedent, not coexist with it).
-//    Two-source union: game-master `evolutionBranch` (authoritative,
-//    form-aware — Galarian Meowth → Perrserker lands as 863→52) wins,
-//    pogoapi's pokemon_evolutions fills anything the GM misses. Cross-dex
-//    pairs only — same-species form changes never appear because both
-//    sources key steps by species.
+//    Form-aware and cross-dex: Galarian Meowth → Perrserker lands as
+//    863→52, while same-species form changes never appear because a step
+//    is only emitted when parent and child dex differ.
 //
 // Flags: --offline-ok   tolerate fetch failures if cache exists.
 
@@ -75,125 +94,36 @@ import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { canonicalStringify, writeJson } from "./lib/json.mjs";
-import { fetchGameMaster, warnIfStale, gameMasterProvenance } from "./lib/game-master.mjs";
+import {
+  evoParentsFromSteps,
+  evolutionChainsFromSteps,
+  evolutionStepsFromGameMaster,
+  fetchGameMaster,
+  fetchPvpokeGameMaster,
+  gameMasterProvenance,
+  pokemonTemplates,
+  releasedDexFromPvpoke,
+  warnIfStale,
+} from "./lib/game-master.mjs";
+import { lowestDexPerGeneration } from "./lib/generations.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const DATA_DIR = resolve(ROOT, "src/data");
 const OUT_PATH = resolve(DATA_DIR, "species-meta.json");
 
-const ENDPOINTS = {
-  rarity:      "https://pogoapi.net/api/v1/pokemon_rarity.json",
-  generations: "https://pogoapi.net/api/v1/pokemon_generations.json",
-  evolutions:  "https://pogoapi.net/api/v1/pokemon_evolutions.json",
-  stats:       "https://pogoapi.net/api/v1/pokemon_stats.json",
-  released:    "https://pogoapi.net/api/v1/released_pokemon.json",
-};
-
-// The game master is fetched through the shared mirror preference list rather
-// than pinned to one repo — see scripts/lib/game-master.mjs. This script used
-// to read PokeMiners directly, which by 2026-08-28 was serving a 2026-04-17
-// batch: 133 days in which no new Mega reached megaDex, no new evolution
-// branch reached evoParentByDex, and no newly reclassified species reached
-// specialTradeDex, all silently. Big file (~19 MB) but this script only runs
-// in the daily sync workflow.
-
-// Group dex ids by generation from pogoapi's pokemon_generations.json,
-// whatever shape it arrives in — the first live run tripped the starter
-// assertion because the real payload didn't match the shape we guessed.
-// Handled shapes:
-//   A. array of entries:            [{ pokemon_id, generation_number }, ...]
-//      (incl. per-generation entries carrying a NESTED species list)
-//   B. object gen → entry list:     { "generation_1": [{ pokemon_id }, ...] }
-//   C. object gen → keyed-by-id:    { "generation_1": { "1": {...}, ... } }
-//   D. object gen → dex range:      { "generation_1": { min_dex, max_dex } }
-//   E. object id → generation:      { "1": "generation_1" | 1, ... }
-//   F. object NAME → generation:    { "bulbasaur": 1, ... } (needs nameToDex,
-//      built from the stats feed)
-//   G. object id → entry w/ gen:    { "1": { generation_number: 1 }, ... }
-// Exported for the offline shape tests in scripts/check-friend-collect.mjs.
-export function generationDexSets(generations, nameToDex = new Map()) {
-  const byGen = new Map();
-  const add = (gen, id) => {
-    if (!Number.isInteger(gen) || !Number.isInteger(id)) return;
-    if (!byGen.has(gen)) byGen.set(gen, new Set());
-    byGen.get(gen).add(id);
-  };
-  const genNum = (v) => {
-    if (v == null) return null;
-    const n = parseInt(String(v).replace(/\D+/g, ""), 10);
-    return Number.isNaN(n) ? null : n;
-  };
-  // Entry id: the real feed (2026-07-18 log capture) names the field `id`,
-  // not `pokemon_id` — accept both here. collectDexIds stays pokemon_id-only
-  // on purpose: bare `id` fields in the rarity/raid feeds could mean anything.
-  const entryId = (e) => parseInt(e?.pokemon_id ?? e?.id, 10);
-  if (Array.isArray(generations)) {
-    for (const e of generations || []) {
-      const gen = genNum(e?.generation_number ?? e?.generation ?? e?.gen);
-      if (gen == null) continue;
-      add(gen, entryId(e)); // A — flat entry
-      for (const id of collectDexIds(e)) add(gen, id); // A — nested species list
-      for (const sub of Object.values(e || {})) {
-        if (Array.isArray(sub)) for (const s of sub) add(gen, entryId(s)); // A — nested list with `id` fields
-      }
-    }
-    return byGen;
-  }
-  for (const [key, val] of Object.entries(generations || {})) {
-    if (val == null || typeof val !== "object") {
-      const scalarGen = genNum(val);
-      const keyId = parseInt(key, 10);
-      if (!Number.isNaN(keyId)) add(scalarGen, keyId); // E — key is the pokemon id
-      else if (nameToDex.has(normalizeName(key))) add(scalarGen, nameToDex.get(normalizeName(key))); // F
-      continue;
-    }
-    const entryGen = genNum(val.generation_number ?? val.generation ?? val.gen);
-    const keyId = parseInt(key, 10);
-    if (entryGen != null && !Number.isNaN(keyId) && !/\D/.test(key)) {
-      add(entryGen, keyId); // G — key is the pokemon id, gen sits in the entry
-      continue;
-    }
-    const gen = genNum(key);
-    if (gen == null) continue;
-    for (const id of collectDexIds(val)) add(gen, id); // B (and C with pokemon_id fields)
-    if (Array.isArray(val)) {
-      // B — the live feed's actual shape: { "Generation 1": [{ id, name }] }
-      for (const e of val) add(gen, entryId(e));
-    }
-    if (!Array.isArray(val)) {
-      for (const k of Object.keys(val)) add(gen, parseInt(k, 10)); // C — ids as keys
-      const lo = parseInt(val.min_dex ?? val.min ?? val.start ?? val.from, 10);
-      const hi = parseInt(val.max_dex ?? val.max ?? val.end ?? val.to, 10);
-      if (!Number.isNaN(lo) && !Number.isNaN(hi) && hi >= lo && hi - lo < 2000) {
-        for (let i = lo; i <= hi; i++) add(gen, i); // D
-      }
-    }
-  }
-  return byGen;
-}
-
 // The three starter BASE species per generation: each generation's regional
 // dex opens with its three starter lines as three consecutive trios — ONCE
-// special-trade species are skipped. That carve-out exists for exactly one
-// reason: Unova's dex opens with Victini (494, mythical) ahead of the
+// excluded species are skipped. That carve-out exists for exactly one reason:
+// Unova's dex opens with Victini (494, mythical) ahead of the
 // Snivy/Tepig/Oshawott trios, which a live run caught via the
-// specialTradeDex ∩ starterDex guard. Skipping the exclusions first, take
-// the nine lowest dex ids and keep offsets 0/3/6.
-export function starterDexFromGenerations(
-  generations,
-  perGeneration = 9,
-  nameToDex = new Map(),
-  excludeDex = new Set(),
-) {
+// specialTradeDex ∩ starterDex guard. Skipping the exclusions first, take the
+// nine lowest dex ids of each generation and keep offsets 0/3/6.
+// Exported for the offline test in scripts/check-friend-collect.mjs.
+export function starterDexFromGenerations(perGeneration = 9, excludeDex = new Set()) {
   const starters = new Set();
-  for (const ids of generationDexSets(generations, nameToDex).values()) {
-    [...ids]
-      .filter((id) => !excludeDex.has(id))
-      .sort((a, b) => a - b)
-      .slice(0, perGeneration)
-      .filter((_, idx) => idx % 3 === 0)
-      .forEach((id) => starters.add(id));
+  for (const ids of lowestDexPerGeneration(perGeneration, excludeDex).values()) {
+    ids.filter((_, idx) => idx % 3 === 0).forEach((id) => starters.add(id));
   }
   return starters;
 }
@@ -207,65 +137,19 @@ const SPECIAL_TRADE_CLASSES = /LEGENDARY|MYTHIC|ULTRA_BEAST/i;
 // for the offline parse test in scripts/check-friend-collect.mjs.
 export function specialTradeDexFromGameMaster(templates) {
   const ids = new Set();
-  // latest.json is a plain array today, but older/mirrored game masters wrap
-  // the list ({ template: [...] } / { templates: [...] } / { itemTemplate:
-  // [...] }) — normalize instead of throwing on a non-iterable payload.
-  const list = Array.isArray(templates)
-    ? templates
-    : templates?.template || templates?.templates || templates?.itemTemplate || [];
-  for (const entry of list) {
-    const node = entry?.data || entry;
-    const ps = node?.pokemonSettings;
-    if (!ps?.pokemonClass || !SPECIAL_TRADE_CLASSES.test(ps.pokemonClass)) continue;
-    const tid = node?.templateId || entry?.templateId || "";
-    const m = /^V(\d+)_POKEMON_/.exec(tid);
-    if (m) ids.add(parseInt(m[1], 10));
+  for (const { dex, settings } of pokemonTemplates(templates)) {
+    if (settings?.pokemonClass && SPECIAL_TRADE_CLASSES.test(settings.pokemonClass)) ids.add(dex);
   }
   return ids;
 }
 
 // Extract child-dex → parent-dex evolution pairs from the game master.
-// Every per-form template repeats its species' branches (BULBASAUR and
-// BULBASAUR_NORMAL both list IVYSAUR), so pairs dedupe naturally; branch
-// targets are pokemonId enum names, resolved to dex via the template ids
-// ("V0002_POKEMON_IVYSAUR"). Where two parents ever claim one child, the
-// lowest parent dex wins — deterministic output beats feed ordering.
-// Exported for the offline parse test in scripts/check-friend-collect.mjs.
+// Thin wrapper over the shared form-granular step parser: every per-form
+// template repeats its species' branches, and where two parents ever claim
+// one child the lowest parent dex wins. Exported for the offline parse test
+// in scripts/check-friend-collect.mjs.
 export function evoParentsFromGameMaster(templates) {
-  const list = Array.isArray(templates)
-    ? templates
-    : templates?.template || templates?.templates || templates?.itemTemplate || [];
-  // Pass 1: pokemonId enum name → dex, from every pokemonSettings template.
-  const dexByPokemonId = new Map();
-  for (const entry of list) {
-    const node = entry?.data || entry;
-    const ps = node?.pokemonSettings;
-    if (!ps?.pokemonId) continue;
-    const m = /^V(\d+)_POKEMON_/.exec(node?.templateId || entry?.templateId || "");
-    if (!m) continue;
-    const dex = parseInt(m[1], 10);
-    if (!dexByPokemonId.has(ps.pokemonId)) dexByPokemonId.set(ps.pokemonId, dex);
-  }
-  // Pass 2: evolutionBranch entries → child→parent pairs.
-  const parents = new Map();
-  for (const entry of list) {
-    const node = entry?.data || entry;
-    const ps = node?.pokemonSettings;
-    if (!Array.isArray(ps?.evolutionBranch)) continue;
-    const m = /^V(\d+)_POKEMON_/.exec(node?.templateId || entry?.templateId || "");
-    if (!m) continue;
-    const parentDex = parseInt(m[1], 10);
-    for (const branch of ps.evolutionBranch) {
-      // Mega/primal temp-evos carry `temporaryEvolution` instead of a target
-      // species — those aren't evolution steps in the line-walking sense.
-      if (!branch?.evolution) continue;
-      const childDex = dexByPokemonId.get(branch.evolution);
-      if (!childDex || childDex === parentDex) continue;
-      const prev = parents.get(childDex);
-      if (prev === undefined || parentDex < prev) parents.set(childDex, parentDex);
-    }
-  }
-  return parents;
+  return evoParentsFromSteps(evolutionStepsFromGameMaster(templates));
 }
 
 // Mega temporary evolutions. TEMP_EVOLUTION_MEGA covers plain megas and the
@@ -283,25 +167,33 @@ const MEGA_TEMP_EVO = /^TEMP_EVOLUTION_MEGA/;
 //   2. tempEvoOverrides[].tempEvoId — the stat block the mega form swaps in.
 // Exported for the offline parse test in scripts/check-friend-collect.mjs.
 export function megaDexFromGameMaster(templates) {
-  const list = Array.isArray(templates)
-    ? templates
-    : templates?.template || templates?.templates || templates?.itemTemplate || [];
   const ids = new Set();
-  for (const entry of list) {
-    const node = entry?.data || entry;
-    const ps = node?.pokemonSettings;
-    if (!ps) continue;
-    const m = /^V(\d+)_POKEMON_/.exec(node?.templateId || entry?.templateId || "");
-    if (!m) continue;
+  for (const { dex, settings } of pokemonTemplates(templates)) {
     const branchMega =
-      Array.isArray(ps.evolutionBranch) &&
-      ps.evolutionBranch.some((b) => MEGA_TEMP_EVO.test(b?.temporaryEvolution || ""));
+      Array.isArray(settings.evolutionBranch) &&
+      settings.evolutionBranch.some((b) => MEGA_TEMP_EVO.test(b?.temporaryEvolution || ""));
     const overrideMega =
-      Array.isArray(ps.tempEvoOverrides) &&
-      ps.tempEvoOverrides.some((o) => MEGA_TEMP_EVO.test(o?.tempEvoId || ""));
-    if (branchMega || overrideMega) ids.add(parseInt(m[1], 10));
+      Array.isArray(settings.tempEvoOverrides) &&
+      settings.tempEvoOverrides.some((o) => MEGA_TEMP_EVO.test(o?.tempEvoId || ""));
+    if (branchMega || overrideMega) ids.add(dex);
   }
   return ids;
+}
+
+// Best base stat product per dex, across every form template. "Best" rather
+// than "the base form's": the pool this feeds ranks lines by how strong their
+// final stage gets, and a regional form that outclasses the original (Hisuian
+// Typhlosion, Galarian Darmanitan) is exactly what makes that line worth the
+// grind. Exported for the offline test in scripts/check-friend-collect.mjs.
+export function statProductByDex(templates) {
+  const products = new Map();
+  for (const { dex, settings } of pokemonTemplates(templates)) {
+    const stats = settings?.stats;
+    if (!stats) continue;
+    const product = (stats.baseAttack || 0) * (stats.baseDefense || 0) * (stats.baseStamina || 0);
+    if (product > (products.get(dex) || 0)) products.set(dex, product);
+  }
+  return products;
 }
 
 // Tunables. The plan defaults — change here, not at consumer side.
@@ -316,46 +208,6 @@ const POWER_LINE_TOP = 20;           // strongest qualifying lines by final stat
 // TRADE_EVO_FAMILIES.
 const TRADE_EVO_BASE_DEX = new Set([63, 66, 74, 92, 524, 532, 588, 616, 708, 710]);
 
-async function fetchJson(url) {
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": "pogo-filter-workshop species-meta-fetcher/1.0",
-      Accept: "application/json",
-    },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
-  return res.json();
-}
-
-// Mirrors fetch-evolution-costs.mjs:normalizeName — lowercase, strip
-// punctuation, hyphenate — so name-keyed payloads match the stats feed's
-// pokemon_name entries in the name→dex lookup.
-function normalizeName(name) {
-  return String(name)
-    .toLowerCase()
-    .replace(/[.':]/g, "")
-    .replace(/[♂]/g, "-m")
-    .replace(/[♀]/g, "-f")
-    .replace(/\s+/g, "-");
-}
-
-// pogoapi payloads come in three shapes: array of entries, object keyed by
-// id, or object of category → entry-list. Pull every numeric pokemon_id out
-// of whatever we got.
-function collectDexIds(payload) {
-  const ids = new Set();
-  const visit = (node) => {
-    if (Array.isArray(node)) { node.forEach(visit); return; }
-    if (node && typeof node === "object") {
-      const id = parseInt(node.pokemon_id, 10);
-      if (!Number.isNaN(id)) ids.add(id);
-      for (const v of Object.values(node)) if (typeof v === "object") visit(v);
-    }
-  };
-  visit(payload);
-  return ids;
-}
-
 function assertOrDie(cond, label) {
   if (!cond) {
     console.error(`✗ sanity check failed: ${label}`);
@@ -367,16 +219,32 @@ async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
 
-  let rarity, generations, evolutions, stats, released;
+  let templates, gmSource = { mirror: null, batchMs: null }, pvpoke, released;
   try {
-    console.log("→ Fetching pogoapi.net endpoints");
-    [rarity, generations, evolutions, stats, released] = await Promise.all([
-      fetchJson(ENDPOINTS.rarity),
-      fetchJson(ENDPOINTS.generations),
-      fetchJson(ENDPOINTS.evolutions),
-      fetchJson(ENDPOINTS.stats),
-      fetchJson(ENDPOINTS.released),
-    ]);
+    console.log("→ Fetching game master (pokemonClass / megaDex / evolutionBranch / stats source) + PvPoke release roster");
+    // PvPoke is started first so it overlaps the big download.
+    const pvpokePromise = fetchPvpokeGameMaster({
+      userAgent: "pogo-filter-workshop species-meta-fetcher/1.0",
+    });
+    const gm = await fetchGameMaster({
+      userAgent: "pogo-filter-workshop species-meta-fetcher/1.0",
+    });
+    templates = gm.templates;
+    gmSource = { mirror: gm.mirror, batchMs: gm.batchMs };
+    if (gm.failures.length > 0) {
+      console.warn(`⚠  fell back to ${gm.mirror} after ${gm.failures.join("; ")}`);
+    }
+    console.log(`  game master: ${gm.mirror}, ${templates.length} templates`);
+    warnIfStale(gmSource, "Newly released Megas and evolution branches may be missing.");
+    pvpoke = await pvpokePromise;
+    // An unavailable or shrunken roster is a FETCH failure, not an empty
+    // result: powerLineDex gates on it, so publishing with an empty roster
+    // would quietly delete a whole suggestion pack. Raising it here routes it
+    // through --offline-ok like any other outage.
+    released = releasedDexFromPvpoke(pvpoke);
+    if (released.size <= 700) {
+      throw new Error(`PvPoke released roster is ${released.size} species (expected > 700)`);
+    }
   } catch (e) {
     console.error(`✗ Fetch failed: ${e.message}`);
     if (offlineOk && existsSync(OUT_PATH)) {
@@ -385,170 +253,65 @@ async function main() {
     }
     process.exit(1);
   }
-  // The game master may fail independently of the pogoapi batch — the union
-  // of whatever succeeds plus the assertions below is the gate. `gmSource`
-  // carries which mirror answered into the provenance block below; a total
-  // outage leaves it null and the megaDex size gate reddens the sync.
-  let gameMaster = null;
-  let gmSource = { mirror: null, batchMs: null };
-  try {
-    console.log("→ Fetching game master (pokemonClass / megaDex / evolutionBranch source)");
-    const gm = await fetchGameMaster({
-      userAgent: "pogo-filter-workshop species-meta-fetcher/1.0",
-    });
-    gameMaster = gm.templates;
-    gmSource = { mirror: gm.mirror, batchMs: gm.batchMs };
-    if (gm.failures.length > 0) {
-      console.warn(`⚠  fell back to ${gm.mirror} after ${gm.failures.join("; ")}`);
-    }
-    console.log(`  game master: ${gm.mirror}, ${gameMaster.length} templates`);
-    warnIfStale(gmSource, "Newly released Megas and evolution branches may be missing.");
-  } catch (e) {
-    console.warn(`⚠  game master fetch failed (${e.message}).`);
-  }
 
   // ── specialTradeDex ──
-  // Per-source sets kept separate so an assertion failure can name the
-  // source that leaked (see the overlap diagnostic below).
-  const gmSet = specialTradeDexFromGameMaster(gameMaster);
-  const raritySet = new Set();
-  for (const [category, entries] of Object.entries(rarity || {})) {
-    if (/standard/i.test(category)) continue;
-    for (const id of collectDexIds(entries)) raritySet.add(id);
-  }
-  const specialTrade = new Set([...gmSet, ...raritySet]);
+  const specialTrade = specialTradeDexFromGameMaster(templates);
 
   // ── megaDex ──
-  // Game master only — see the header note: it is the only source that
-  // separates Mega from Primal Reversion. Special-trade megas (Latias,
-  // Latios, Rayquaza, Diancie) stay in the snapshot; App.jsx's pack builder
-  // drops them, and the raw roster is the honest answer to "what can mega".
-  const megas = megaDexFromGameMaster(gameMaster);
-  console.log(`  megas: ${megas.size} from the game master`);
+  // Special-trade megas (Latias, Latios, Rayquaza, Diancie) stay in the
+  // snapshot; App.jsx's pack builder drops them, and the raw roster is the
+  // honest answer to "what can mega".
+  const megas = megaDexFromGameMaster(templates);
 
   // ── starterDex ──
-  // Name→dex lookup (from the stats feed) lets the parser resolve
-  // name-keyed generation payloads.
-  const nameToDex = new Map();
-  for (const row of stats || []) {
-    const id = parseInt(row.pokemon_id, 10);
-    if (Number.isNaN(id) || !row.pokemon_name) continue;
-    const key = normalizeName(row.pokemon_name);
-    if (!nameToDex.has(key)) nameToDex.set(key, id);
-  }
-  const generationSets = generationDexSets(generations, nameToDex);
-  const starters = starterDexFromGenerations(generations, STARTERS_PER_GENERATION, nameToDex, specialTrade);
-  // Diagnostic breadcrumb: if an assertion below trips, this line says whether
-  // the feed shape parsed at all — and on a zero-parse, a payload sample goes
-  // straight into the log so the next fix doesn't have to guess the shape.
-  console.log(
-    `  generations parsed: ${generationSets.size} · starters derived: ${[...starters].sort((a, b) => a - b).slice(0, 6).join(",")}…`,
-  );
-  if (generationSets.size === 0) {
-    // Structural sample only — never serialize the full payload into the log.
-    const sample = Array.isArray(generations)
-      ? generations.slice(0, 2)
-      : Object.fromEntries(Object.entries(generations || {}).slice(0, 1).map(([k, v]) => [k, Array.isArray(v) ? v.slice(0, 3) : v]));
-    console.warn(`⚠  unrecognized pokemon_generations shape — structural sample:`);
-    console.warn(`   ${JSON.stringify(sample)?.slice(0, 600)}`);
-  }
+  const starters = starterDexFromGenerations(STARTERS_PER_GENERATION, specialTrade);
 
   // ── powerLineDex ──
-  // released_pokemon.json is an object keyed by pokemon_id string.
-  const releasedSet = new Set();
-  for (const key of Object.keys(released || {})) {
-    const id = parseInt(key, 10);
-    if (!Number.isNaN(id)) releasedSet.add(id);
-  }
-
-  // Best stat product per dex across forms (stats is an array of form rows).
-  const statProduct = new Map();
-  for (const row of stats || []) {
-    const id = parseInt(row.pokemon_id, 10);
-    if (Number.isNaN(id)) continue;
-    const product = (row.base_attack || 0) * (row.base_defense || 0) * (row.base_stamina || 0);
-    if (product > (statProduct.get(id) || 0)) statProduct.set(id, product);
-  }
-
-  // Chain walk (same structure as fetch-evolution-costs.mjs), tracking depth,
-  // cumulative candy, and the strongest final stage per base.
-  const evosBySpecies = new Map();
-  const idByName = new Map();
-  const descendants = new Set();
-  for (const entry of evolutions || []) {
-    idByName.set(entry.pokemon_name, parseInt(entry.pokemon_id, 10));
-    if (!evosBySpecies.has(entry.pokemon_name)) evosBySpecies.set(entry.pokemon_name, []);
-    evosBySpecies.get(entry.pokemon_name).push(...(entry.evolutions || []));
-    for (const ev of entry.evolutions || []) {
-      descendants.add(ev.pokemon_name);
-      if (ev.pokemon_id != null) idByName.set(ev.pokemon_name, parseInt(ev.pokemon_id, 10));
-    }
-  }
-  const baseNames = [...evosBySpecies.keys()].filter((n) => !descendants.has(n));
-
-  function walkChain(name, accumCandy = 0, depth = 1, visited = new Set()) {
-    if (visited.has(name)) return { maxCum: accumCandy, maxDepth: depth, bestFinal: 0 };
-    visited.add(name);
-    const evos = evosBySpecies.get(name) || [];
-    const selfId = idByName.get(name);
-    if (evos.length === 0) {
-      return { maxCum: accumCandy, maxDepth: depth, bestFinal: statProduct.get(selfId) || 0 };
-    }
-    let maxCum = accumCandy;
-    let maxDepth = depth;
-    let bestFinal = 0;
-    for (const ev of evos) {
-      const sub = walkChain(ev.pokemon_name, accumCandy + (ev.candy_required || 0), depth + 1, visited);
-      if (sub.maxCum > maxCum) maxCum = sub.maxCum;
-      if (sub.maxDepth > maxDepth) maxDepth = sub.maxDepth;
-      if (sub.bestFinal > bestFinal) bestFinal = sub.bestFinal;
-    }
-    return { maxCum, maxDepth, bestFinal };
-  }
+  const statProduct = statProductByDex(templates);
+  const steps = evolutionStepsFromGameMaster(templates);
+  const chains = evolutionChainsFromSteps(steps);
 
   const qualifying = [];
-  for (const base of baseNames) {
-    const baseId = idByName.get(base);
-    if (!baseId || !releasedSet.has(baseId)) continue;
-    if (specialTrade.has(baseId)) continue;
-    if (starters.has(baseId)) continue;
-    if (TRADE_EVO_BASE_DEX.has(baseId)) continue;
-    const chain = walkChain(base);
-    if (chain.maxDepth < POWER_LINE_MIN_STAGES) continue;
-    if (chain.maxCum < POWER_LINE_CUMULATIVE_CANDY) continue;
-    if (!chain.bestFinal) continue;
-    qualifying.push({ baseId, bestFinal: chain.bestFinal });
+  for (const [baseDex, chain] of chains) {
+    if (!released.has(baseDex)) continue;
+    if (specialTrade.has(baseDex)) continue;
+    if (starters.has(baseDex)) continue;
+    if (TRADE_EVO_BASE_DEX.has(baseDex)) continue;
+    if (chain.maxStages < POWER_LINE_MIN_STAGES) continue;
+    if (chain.maxCumulativeCandy < POWER_LINE_CUMULATIVE_CANDY) continue;
+    let bestFinal = 0;
+    for (const finalDex of chain.finalDex) {
+      bestFinal = Math.max(bestFinal, statProduct.get(finalDex) || 0);
+    }
+    if (!bestFinal) continue;
+    qualifying.push({ baseDex, bestFinal });
   }
-  qualifying.sort((a, b) => b.bestFinal - a.bestFinal);
-  const powerLines = new Set(qualifying.slice(0, POWER_LINE_TOP).map((q) => q.baseId));
+  qualifying.sort((a, b) => b.bestFinal - a.bestFinal || a.baseDex - b.baseDex);
+  const powerLines = new Set(qualifying.slice(0, POWER_LINE_TOP).map((q) => q.baseDex));
 
   // ── evoParentByDex ──
-  // GM pairs are authoritative; pogoapi fills gaps (never overrides). The
-  // pogoapi walk reuses idByName built from the evolutions feed above.
-  const evoParents = evoParentsFromGameMaster(gameMaster);
-  for (const entry of evolutions || []) {
-    const parentDex = parseInt(entry.pokemon_id, 10);
-    if (Number.isNaN(parentDex)) continue;
-    for (const ev of entry.evolutions || []) {
-      const childDex = ev.pokemon_id != null ? parseInt(ev.pokemon_id, 10) : idByName.get(ev.pokemon_name);
-      if (!childDex || Number.isNaN(childDex) || childDex === parentDex) continue;
-      if (!evoParents.has(childDex)) evoParents.set(childDex, parentDex);
-    }
-  }
+  const evoParents = evoParentsFromSteps(steps);
   const evoParentByDex = {};
   for (const child of [...evoParents.keys()].sort((a, b) => a - b)) {
     evoParentByDex[String(child)] = evoParents.get(child);
   }
 
+  const provenance = gameMasterProvenance(gmSource);
+  console.log(`  ${steps.length} evolution steps · ${chains.size} base species` +
+    ` · PvPoke roster ${pvpoke?.timestamp || "?"} (${released.size} released)`);
+
   const newContent = {
     // Provenance, the way meta-rankings.json records it: which upstream
     // answered each half of this snapshot, and the game master's batch stamp.
-    // pogoapi carries no batch stamp of its own — see the audit note in
-    // README.md's "Data sources" — so it is named without one.
+    // Every species fact here now comes from a feed that stamps its batches —
+    // which is exactly what pogoapi.net, this file's previous source for five
+    // of them, never did. See docs/upstream-sources.md.
     sources: {
-      classes: "pogoapi.net + game master",
-      gameMaster: gameMasterProvenance(gmSource).mirror,
-      gameMasterBatch: gameMasterProvenance(gmSource).batch,
+      classes: "game master",
+      released: "pvpoke/pvpoke",
+      generations: "scripts/lib/generations.mjs (pinned dex ranges)",
+      gameMaster: provenance.mirror,
+      gameMasterBatch: provenance.batch,
     },
     startersPerGeneration: STARTERS_PER_GENERATION,
     powerLineCumulativeCandy: POWER_LINE_CUMULATIVE_CANDY,
@@ -562,16 +325,6 @@ async function main() {
 
   // Sanity gates — exit 1 turns the sync workflow red, which is the only
   // intervention signal the user wants.
-  // Overlap attribution first: if a starter ends up special-trade, name the
-  // ids AND the source that leaked them before the assertion kills the run.
-  const overlap = newContent.starterDex.filter((dex) => specialTrade.has(dex));
-  if (overlap.length > 0) {
-    console.warn(
-      `⚠  special∩starter overlap: ${overlap
-        .map((dex) => `${dex}(gm:${gmSet.has(dex) ? "y" : "n"} rarity:${raritySet.has(dex) ? "y" : "n"})`)
-        .join(", ")}`,
-    );
-  }
   assertOrDie(newContent.specialTradeDex.includes(150), "Mewtwo (150) ∈ specialTradeDex");
   assertOrDie(newContent.specialTradeDex.includes(151), "Mew (151) ∈ specialTradeDex");
   assertOrDie(newContent.specialTradeDex.includes(793), "Nihilego (793, Ultra Beast) ∈ specialTradeDex");
@@ -579,6 +332,10 @@ async function main() {
   assertOrDie(
     newContent.specialTradeDex.includes(808),
     "Meltan (808) ∈ specialTradeDex — tradeable, but only as a Special Trade",
+  );
+  assertOrDie(
+    newContent.specialTradeDex.length >= 100,
+    `specialTradeDex covers the legendary/mythic/UB roster (${newContent.specialTradeDex.length} ≥ 100)`,
   );
   for (const dex of [1, 4, 7, 495, 906]) {
     assertOrDie(newContent.starterDex.includes(dex), `starter ${dex} ∈ starterDex`);
@@ -588,6 +345,10 @@ async function main() {
     "Victini (494) ∉ starterDex — Unova's dex opens with a mythical, not the trios",
   );
   assertOrDie(newContent.powerLineDex.includes(147), "Dratini (147) ∈ powerLineDex");
+  assertOrDie(
+    newContent.powerLineDex.length === POWER_LINE_TOP,
+    `powerLineDex is the full top-${POWER_LINE_TOP} cut (got ${newContent.powerLineDex.length})`,
+  );
   for (const [dex, name] of [[3, "Venusaur"], [6, "Charizard"], [9, "Blastoise"], [15, "Beedrill"], [94, "Gengar"]]) {
     assertOrDie(newContent.megaDex.includes(dex), `${name} (${dex}) ∈ megaDex`);
   }
@@ -617,6 +378,7 @@ async function main() {
   assertOrDie(evoParentByDex["2"] === 1, "Ivysaur (2) → Bulbasaur (1) ∈ evoParentByDex");
   assertOrDie(evoParentByDex["25"] === 172, "Pikachu (25) → Pichu (172): baby stages are real parents");
   assertOrDie(evoParentByDex["820"] === 819, "Greedent (820) → Skwovet (819) ∈ evoParentByDex");
+  assertOrDie(evoParentByDex["863"] === 52, "Perrserker (863) → Meowth (52): cross-dex regional-form evolutions land");
   assertOrDie(evoParentByDex["1"] === undefined, "Bulbasaur (1) is a base — no parent entry");
   assertOrDie(Object.keys(evoParentByDex).length > 400, "evoParentByDex covers the dex (>400 steps)");
   // No cycles: every species must reach a base within the longest real line.
@@ -651,7 +413,7 @@ async function main() {
 }
 
 // Only run when executed directly — check-friend-collect.mjs imports the
-// game-master parser above without triggering a fetch.
+// parsers above without triggering a fetch.
 import { pathToFileURL } from "node:url";
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch(e => { console.error(e); process.exit(1); });

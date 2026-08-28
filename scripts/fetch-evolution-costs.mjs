@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Pulls evolution chains from pogoapi.net and partitions species into the
-// two pools the EvoSwap aux cards in App.jsx consume:
+// Reads the Niantic game master's evolutionBranch data and partitions species
+// into the two pools the EvoSwap aux cards in App.jsx consume:
 //
 //  - candyHeavy: species whose chain has any single ≥400-candy jump OR
 //    cumulative ≥150 candy from base to deepest descendant. Catches the
@@ -17,43 +17,50 @@
 //    those through the manual #EvoSwap tag on the third card.
 //
 //  - itemGated: species whose chain has any stage requiring an
-//    `item_required` (Sinnoh/Unova/Sun Stone, King's Rock, Metal Coat,
-//    Dragon Scale, Up-Grade, Apples) or `lure_required` (Magnetic/Mossy/
-//    Glacial/Rainy Lure Module). Time-of-day, buddy-walk, gender, and
-//    upside-down conditions are intentionally excluded — the user scoped
-//    EvoSwap to candy and items only.
+//    `evolutionItemRequirement` (Sinnoh/Unova/Sun Stone, King's Rock, Metal
+//    Coat, Dragon Scale, Up-Grade, Apples, Gimmighoul Coins) or a
+//    `lureItemRequirement` (Magnetic/Mossy/Glacial/Rainy Lure Module).
+//    Time-of-day, buddy-walk, gender, and upside-down conditions are
+//    intentionally excluded — the user scoped EvoSwap to candy and items only.
 //
 // Output: only the *base* species of each qualifying chain. The app's
 // PoGo `+species` operator is family-aware (matches every evolutionary
 // relative of the named species), so listing Magikarp covers Gyarados too.
 //
+// Source note: this read pogoapi.net's pokemon_evolutions.json until August
+// 2026. That feed had not moved since November 2025 and published no freshness
+// signal of its own, so it was quietly missing Gimmighoul's Coin requirement
+// among other things. The game master carries the same chains first-hand, at
+// form granularity, and stamps every batch — see scripts/lib/game-master.mjs
+// and docs/upstream-sources.md.
+//
+// Species names are emitted from src/locales/pokemon-names.json, keyed by dex
+// — the same dictionary resolveSpecies reads, so every name resolves by
+// construction.
+//
 // Flags: --offline-ok   tolerate fetch failures if cache exists.
 
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { canonicalStringify, writeJson } from "./lib/json.mjs";
+import {
+  evolutionChainsFromSteps,
+  evolutionStepsFromGameMaster,
+  fetchGameMaster,
+  gameMasterAgeDays,
+  warnIfStale,
+} from "./lib/game-master.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const DATA_DIR = resolve(ROOT, "src/data");
 const OUT_PATH = resolve(DATA_DIR, "evolution-costs.json");
-
-const ENDPOINT = "https://pogoapi.net/api/v1/pokemon_evolutions.json";
+const NAMES_PATH = resolve(ROOT, "src/locales/pokemon-names.json");
 
 // Tunables. The plan defaults — change here, not at consumer side.
 const CANDY_HEAVY_SINGLE_JUMP = 400;
 const CANDY_HEAVY_CUMULATIVE  = 150;
-
-async function fetchJson(url) {
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": "pogo-filter-workshop evolution-costs-fetcher/1.0",
-      Accept: "application/json",
-    },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
-  return res.json();
-}
 
 // Mirrors fetch-meta-rankings.mjs:normalizeName so the species-id format
 // matches what App.jsx's resolveSpecies / topAttackersList already expect.
@@ -68,26 +75,23 @@ function normalizeName(name) {
     .replace(/\s+/g, "-");
 }
 
-function canonicalStringify(value) {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonicalStringify).join(",")}]`;
-  const keys = Object.keys(value).sort();
-  return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalStringify(value[k])}`).join(",")}}`;
-}
-
-function writeJson(path, data) {
-  if (!existsSync(dirname(path))) mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, JSON.stringify(data, null, 2) + "\n", "utf8");
-}
-
 async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
 
-  let raw;
+  let templates, mirrorName, ageDays;
   try {
-    console.log("→ Fetching pogoapi.net pokemon_evolutions");
-    raw = await fetchJson(ENDPOINT);
+    console.log("→ Fetching game master (evolutionBranch source)");
+    const gm = await fetchGameMaster({
+      userAgent: "pogo-filter-workshop evolution-costs-fetcher/1.0",
+    });
+    templates = gm.templates;
+    mirrorName = gm.mirror;
+    ageDays = gameMasterAgeDays(gm.batchMs);
+    if (gm.failures.length > 0) {
+      console.warn(`⚠  fell back to ${gm.mirror} after ${gm.failures.join("; ")}`);
+    }
+    warnIfStale(gm, "A newly released evolution line may be missing from these pools.");
   } catch (e) {
     console.error(`✗ Fetch failed: ${e.message}`);
     if (offlineOk && existsSync(OUT_PATH)) {
@@ -97,61 +101,42 @@ async function main() {
     process.exit(1);
   }
 
-  // Pool *all* form variants under the same species name. Galarian Slowpoke's
-  // item-gated evolution to Slowking should mark "Slowpoke" as item-gated even
-  // though regular Slowpoke also has a non-item path — the +species clause
-  // catches the family regardless of which form the user has.
-  const evosBySpecies = new Map();
-  const allNames = new Set();
-  for (const entry of raw) {
-    allNames.add(entry.pokemon_name);
-    if (!evosBySpecies.has(entry.pokemon_name)) evosBySpecies.set(entry.pokemon_name, []);
-    evosBySpecies.get(entry.pokemon_name).push(...(entry.evolutions || []));
-  }
-
-  // Descendants — anything appearing as a target — can't be a base species.
-  const descendants = new Set();
-  for (const entry of raw) {
-    for (const ev of entry.evolutions || []) descendants.add(ev.pokemon_name);
-  }
-
-  const baseSpecies = [...allNames].filter(n => !descendants.has(n));
-
-  // Walk forward from `name`, tracking the deepest cumulative candy across
-  // every descendant path, the largest single jump, and whether any stage
-  // required an item or a lure. Visited-set guards against malformed cycles.
-  function walkChain(name, accumCandy = 0, visited = new Set()) {
-    if (visited.has(name)) return { maxCum: accumCandy, maxSingle: 0, item: false };
-    visited.add(name);
-    const evos = evosBySpecies.get(name) || [];
-    let maxCum = accumCandy;
-    let maxSingle = 0;
-    let item = false;
-    for (const ev of evos) {
-      const cost = ev.candy_required || 0;
-      if (cost > maxSingle) maxSingle = cost;
-      if (ev.item_required || ev.lure_required) item = true;
-      const sub = walkChain(ev.pokemon_name, accumCandy + cost, visited);
-      if (sub.maxCum > maxCum) maxCum = sub.maxCum;
-      if (sub.maxSingle > maxSingle) maxSingle = sub.maxSingle;
-      if (sub.item) item = true;
-    }
-    return { maxCum, maxSingle, item };
-  }
+  const steps = evolutionStepsFromGameMaster(templates);
+  const chains = evolutionChainsFromSteps(steps);
+  const names = JSON.parse(readFileSync(NAMES_PATH, "utf8"));
 
   const candyHeavy = [];
   const itemGated = [];
-  for (const base of baseSpecies) {
-    const chain = walkChain(base);
-    if (chain.maxSingle >= CANDY_HEAVY_SINGLE_JUMP || chain.maxCum >= CANDY_HEAVY_CUMULATIVE) {
-      candyHeavy.push(normalizeName(base));
+  const unnamed = [];
+  for (const [baseDex, chain] of chains) {
+    const name = names[String(baseDex)]?.en;
+    if (!name) { unnamed.push(baseDex); continue; }
+    const id = normalizeName(name);
+    if (chain.maxSingleCandy >= CANDY_HEAVY_SINGLE_JUMP ||
+        chain.maxCumulativeCandy >= CANDY_HEAVY_CUMULATIVE) {
+      candyHeavy.push(id);
     }
-    if (chain.item) {
-      itemGated.push(normalizeName(base));
-    }
+    if (chain.itemGated) itemGated.push(id);
   }
   candyHeavy.sort();
   itemGated.sort();
+  if (unnamed.length > 0) {
+    // A base species the name dictionary has never heard of means a new
+    // generation landed in the game master before fetch-translations ran.
+    // Report it — the pools are still valid, they are just short a line.
+    console.warn(`⚠  ${unnamed.length} base species have no name entry yet: ${unnamed.join(", ")}`);
+  }
+
+  // Sanity gates. An emptied or halved pool means the branch shape changed
+  // upstream; a red sync is the intended intervention signal.
+  const fail = (label) => { console.error(`✗ sanity check failed: ${label}`); process.exit(1); };
+  if (candyHeavy.length < 15) fail(`candyHeavy collapsed to ${candyHeavy.length} species (expected ≥ 15)`);
+  if (itemGated.length < 25) fail(`itemGated collapsed to ${itemGated.length} species (expected ≥ 25)`);
+  if (!candyHeavy.includes("magikarp")) fail("Magikarp ∈ candyHeavy (the 400-candy archetype)");
+  if (!candyHeavy.includes("sinistea")) fail("Sinistea ∈ candyHeavy — the Antique form's 400-candy jump must survive form dedupe");
+  if (!itemGated.includes("eevee")) fail("Eevee ∈ itemGated (Mossy/Glacial lure)");
+  if (!itemGated.includes("slowpoke")) fail("Slowpoke ∈ itemGated (King's Rock)");
+  if (candyHeavy.includes("bulbasaur")) fail("Bulbasaur ∉ candyHeavy — 125 cumulative is below the bar");
 
   const newContent = {
     candyHeavySingleJumpThreshold: CANDY_HEAVY_SINGLE_JUMP,
@@ -176,6 +161,7 @@ async function main() {
 
   writeJson(OUT_PATH, { fetchedAt, ...newContent });
   console.log(`✓ wrote ${OUT_PATH}`);
+  console.log(`  source: ${mirrorName}${ageDays != null ? ` (${ageDays}d old)` : " (unstamped)"} · ${steps.length} evolution steps · ${chains.size} base species`);
   console.log(`  candy-heavy: ${candyHeavy.length} base species`);
   console.log(`  item-gated:  ${itemGated.length} base species`);
   console.log(`  sample candy-heavy: ${candyHeavy.slice(0, 5).join(", ")}`);
