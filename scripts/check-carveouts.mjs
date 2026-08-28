@@ -15,6 +15,7 @@ import {
   buildFilters, evalFilter, mergeImportedConfig, DEFAULT_CONFIG,
   regionalProtectionsFor, ivToBar, starFromIVs,
 } from "../src/App.jsx";
+import { resolveSpecies } from "../src/data/species.js";
 
 const tFn = (k) => k;
 let failures = 0;
@@ -300,8 +301,15 @@ console.log("\nS2b — the keeper floor names the actual keeper roster");
   // The roster is a daily sync, so this asserts the projection, not the names —
   // except for Metagross, which is the case that motivated the clause and is
   // the top Steel shadow by a wide margin in any plausible meta.
-  check("Shadow Metagross is protected by name",
-    terms.includes("+meistagrif"), keeperClause.slice(0, 120));
+  //
+  // The species name is DERIVED, not typed. The first draft of this check
+  // hardcoded "+meistagrif" as the German for Metagross; Meistagrif is
+  // Conkeldurr (534). It passed anyway — Conkeldurr is also a keeper — so the
+  // check would have gone on passing with Metagross missing entirely. Same
+  // rule as the filter emitters: species names come from the dictionary.
+  const metagross = resolveSpecies("metagross", "de");
+  check(`Shadow Metagross is protected by name (+${metagross})`,
+    terms.includes(`+${metagross}`), keeperClause.slice(0, 120));
   // An empty roster must collapse the clause entirely rather than emit
   // `!crypto,` — a dangling separator the game cannot parse.
   const empty = buildFilters([], [], mergeImportedConfig({

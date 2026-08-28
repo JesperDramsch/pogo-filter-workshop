@@ -21,6 +21,8 @@
 //    12. Current version → ok
 //   envelope round-trip:
 //    13. build → stringify → parse → validate → prepare yields original state
+//   seeded-roster reconciliation:
+//    15. a saved roster tracks the feed without losing user edits
 //   end-to-end old-export migration:
 //    14. v1 envelope with stale config keys → prepareImport surfaces renamed
 //        keys correctly + drops legacy keys
@@ -29,6 +31,7 @@ import {
   mergeImportedConfig, DEFAULT_CONFIG,
   validateImportEnvelope, prepareImport,
   SCHEMA_CURRENT, regionalCatalogTokens,
+  reconcileSeededList,
 } from "../src/App.jsx";
 import { resolveSpecies } from "../src/data/species.js";
 
@@ -433,6 +436,118 @@ console.log("\nGender annotation maps: defaults, canonicalization and junk rejec
   const twice = mergeImportedConfig(canon);
   check("idempotent on re-merge",
     JSON.stringify(twice.luckyGenders) === JSON.stringify(canon.luckyGenders));
+}
+
+console.log("\n15 — seeded rosters reconcile instead of freezing");
+{
+  // The bug this exists to prevent: a first-run visitor's state is written to
+  // localStorage immediately, and from then on the saved array shadows the
+  // shipped default. Without reconciliation every returning user is frozen on
+  // the roster from their first visit and the daily sync reaches nobody.
+  const feed = ["a", "b", "c"];
+
+  const fresh = reconcileSeededList(undefined, feed, undefined);
+  check("never saved → take the feed whole", JSON.stringify(fresh.list) === JSON.stringify(feed));
+
+  // seen === saved === the old feed: a user who never touched the list.
+  const untouched = reconcileSeededList(["a", "b"], feed, ["a", "b"]);
+  check("untouched roster picks up new feed entries",
+    JSON.stringify(untouched.list) === JSON.stringify(["a", "b", "c"]));
+
+  // The four cases the `seen` fingerprint exists to separate.
+  const edited = reconcileSeededList(["a", "mine"], ["a", "b"], ["a", "gone"]);
+  check("a user's own addition survives", edited.list.includes("mine"));
+  check("a new feed entry is added", edited.list.includes("b"));
+  check("a species the user deleted stays deleted", !edited.list.includes("gone"));
+  const pruned = reconcileSeededList(["a", "gone"], ["a"], ["a", "gone"]);
+  check("a species that left the feed is pruned", !pruned.list.includes("gone"));
+  check("but only if it was seeded, never a user's own",
+    reconcileSeededList(["a", "mine"], ["a"], ["a"]).list.includes("mine"));
+
+  check("user order is preserved, new entries append",
+    JSON.stringify(reconcileSeededList(["c", "a"], ["a", "b", "c"], ["a", "c"]).list)
+      === JSON.stringify(["c", "a", "b"]));
+
+  // Grandfathering: a config predating the fingerprint must not dump the whole
+  // current feed on the user at the upgrade that introduces it.
+  const grandfathered = reconcileSeededList(["a"], feed, undefined);
+  check("no fingerprint → grandfathered, nothing added",
+    JSON.stringify(grandfathered.list) === JSON.stringify(["a"]));
+  check("and the fingerprint is recorded for next time",
+    JSON.stringify(grandfathered.seen) === JSON.stringify(feed));
+
+  check("idempotent — reconciling twice changes nothing",
+    JSON.stringify(reconcileSeededList(untouched.list, feed, untouched.seen).list)
+      === JSON.stringify(untouched.list));
+
+  // Through mergeImportedConfig: the keeper roster is the one that lives in the
+  // config blob, so it must reconcile there rather than be overwritten wholesale.
+  const feedKeepers = DEFAULT_CONFIG.shadowKeeperSpecies;
+  const stale = mergeImportedConfig({
+    shadowKeeperSpecies: [feedKeepers[0], "kindwurm"],
+    shadowKeeperSeen: [feedKeepers[0]],
+  });
+  check("merge keeps a hand-added keeper", stale.shadowKeeperSpecies.includes("kindwurm"));
+  check("merge adds keepers new since the fingerprint",
+    stale.shadowKeeperSpecies.length > 2);
+  // The fingerprint is stored canonicalized, like the roster beside it — every
+  // reader canonicalizes both sides before comparing, so the two never drift.
+  const canonFeed = feedKeepers.map((sp) => resolveSpecies(sp) || sp);
+  check("merge bumps the fingerprint to the current feed",
+    JSON.stringify(stale.shadowKeeperSeen) === JSON.stringify(canonFeed),
+    stale.shadowKeeperSeen.slice(0, 3).join(", "));
+  const deleted = mergeImportedConfig({
+    shadowKeeperSpecies: feedKeepers.slice(1),
+    shadowKeeperSeen: feedKeepers,
+  });
+  check("merge does not resurrect a keeper the user deleted",
+    !deleted.shadowKeeperSpecies.includes(feedKeepers[0]));
+  check("a config with no roster at all still gets the full seed",
+    mergeImportedConfig({}).shadowKeeperSpecies.length === feedKeepers.length);
+
+  // The upgrade path, and the one the unit tests above cannot see: every
+  // existing user has a curated roster and NO fingerprint, because the field
+  // ships with this change. mergeImportedConfig's canonicalize() maps a missing
+  // array to [], which as a fingerprint reads "has seen nothing" and dumps the
+  // whole feed over their list. Absent must grandfather instead.
+  const seeded = resolveSpecies("metagross");
+  const ownAddition = resolveSpecies("bagon");
+  const upgrading = mergeImportedConfig({ shadowKeeperSpecies: [seeded, ownAddition] });
+  check("an upgrading config is grandfathered, not flooded",
+    upgrading.shadowKeeperSpecies.length === 2,
+    `${upgrading.shadowKeeperSpecies.length} entries`);
+  check("and keeps exactly what the user had",
+    upgrading.shadowKeeperSpecies.includes(seeded)
+      && upgrading.shadowKeeperSpecies.includes(ownAddition),
+    upgrading.shadowKeeperSpecies.join(", "));
+  check("an explicitly emptied roster stays empty",
+    mergeImportedConfig({ shadowKeeperSpecies: [] }).shadowKeeperSpecies.length === 0);
+  // Grandfathering sets the fingerprint to the feed as it stands now, so the
+  // very next merge is a no-op and only species added AFTER the upgrade flow
+  // in. That is the point — the user is treated as having seen today's meta,
+  // not as owing it. (The "picks up new feed entries" case is covered against
+  // a synthetic feed above; mergeImportedConfig can only see the live one.)
+  const nextVisit = mergeImportedConfig(upgrading);
+  check("the merge after grandfathering is a no-op",
+    JSON.stringify(nextVisit.shadowKeeperSpecies) === JSON.stringify(upgrading.shadowKeeperSpecies));
+  check("and the fingerprint is now the live feed, so later additions flow",
+    nextVisit.shadowKeeperSeen.length === feedKeepers.length);
+
+  // And through the import path, where the fingerprints ride in the envelope's
+  // config: a months-old export must not drag its owner back to that meta.
+  const imported = prepareImport({
+    schema: "pogo-filter-workshop/v1",
+    data: {
+      topAttackers: ["mewtwo"],
+      config: { topAttackerSeen: ["mewtwo"] },
+    },
+  });
+  check("an imported roster reconciles against the current feed",
+    imported.topAttackers.length > 1 && imported.topAttackers[0] === "mewtu",
+    imported.topAttackers.slice(0, 3).join(", "));
+  check("import bumps the fingerprint too",
+    Array.isArray(imported.config.topAttackerSeen)
+      && imported.config.topAttackerSeen.length === DEFAULT_CONFIG.topAttackerSeen.length);
 }
 
 console.log(`\n${failures === 0 ? "✓ All migration tests passed." : `✗ ${failures} test(s) failed.`}`);
