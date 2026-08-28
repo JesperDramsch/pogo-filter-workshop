@@ -265,7 +265,7 @@
     "en": "Nidorina",
     "es": "Nidorina",
     "fr": "Nidorina",
-    "hi": "नीडोरिना",
+    "hi": "नीडोरीना",
     "ja": "ニドリーナ",
     "zh-TW": "尼多娜"
   },
@@ -769,7 +769,7 @@
     "en": "Seel",
     "es": "Seel",
     "fr": "Otaria",
-    "hi": "सीसील",
+    "hi": "सील",
     "ja": "パウワウ",
     "zh-TW": "小海獅"
   },
@@ -2398,7 +2398,7 @@
     "en": "Beautifly",
     "es": "Beautifly",
     "fr": "Charmillon",
-    "hi": "ब्यूटीफ़्लाई",
+    "hi": "ब्यूटीफ़्लाई",
     "ja": "アゲハント",
     "zh-TW": "狩獵鳳蝶"
   },
@@ -3064,7 +3064,7 @@
     "en": "Corphish",
     "es": "Corphish",
     "fr": "Écrapince",
-    "hi": "कॉर्फ़िश",
+    "hi": "कॉर्फ़िश",
     "ja": "ヘイガニ",
     "zh-TW": "龍蝦小兵"
   },
@@ -5323,7 +5323,7 @@
     "en": "Frillish",
     "es": "Frillish",
     "fr": "Viskuse",
-    "hi": "फ़्रिलिश",
+    "hi": "फ़्रिलिश",
     "ja": "プルリル",
     "zh-TW": "輕飄飄"
   },
@@ -6016,7 +6016,7 @@
     "en": "Flabébé",
     "es": "Flabébé",
     "fr": "Flabébé",
-    "hi": "फ़्लबेबे",
+    "hi": "फ़्लबेबे",
     "ja": "フラベベ",
     "zh-TW": "花蓓蓓"
   },
@@ -6025,7 +6025,7 @@
     "en": "Floette",
     "es": "Floette",
     "fr": "Floette",
-    "hi": "फ़्लोएट",
+    "hi": "फ़्लोएट",
     "ja": "フラエッテ",
     "zh-TW": "花葉蒂"
   },
@@ -6034,7 +6034,7 @@
     "en": "Florges",
     "es": "Florges",
     "fr": "Florges",
-    "hi": "फ़्लोर्जेस",
+    "hi": "फ़्लोर्जेस",
     "ja": "フラージェス",
     "zh-TW": "花潔夫人"
   },
@@ -6502,7 +6502,7 @@
     "en": "Dartrix",
     "es": "Dartrix",
     "fr": "Efflèche",
-    "hi": "डार्टि्रक्स",
+    "hi": "डार्ट्रिक्स",
     "ja": "フクスロー",
     "zh-TW": "投羽梟"
   },
@@ -7096,7 +7096,7 @@
     "en": "Cosmog",
     "es": "Cosmog",
     "fr": "Cosmog",
-    "hi": "कॉज़्मॉग",
+    "hi": "कॉज़्मॉग",
     "ja": "コスモッグ",
     "zh-TW": "科斯莫古"
   },
@@ -7105,7 +7105,7 @@
     "en": "Cosmoem",
     "es": "Cosmoem",
     "fr": "Cosmovum",
-    "hi": "कॉज़्मोएम",
+    "hi": "कॉज़्मोएम",
     "ja": "コスモウム",
     "zh-TW": "科斯莫姆"
   },
@@ -7195,7 +7195,7 @@
     "en": "Necrozma",
     "es": "Necrozma",
     "fr": "Necrozma",
-    "hi": "नैक्रॉज़्मा",
+    "hi": "नैक्रॉज़्मा",
     "ja": "ネクロズマ",
     "zh-TW": "奈克洛茲瑪"
   },
@@ -9323,15 +9323,6 @@
     "ja": "キョダイマックス ピカチュウ",
     "zh-TW": "超極巨化皮卡丘"
   },
-  "26_1": {
-    "de": "Mega-Raichu X",
-    "en": "Mega Raichu X",
-    "es": "Mega-Raichu X",
-    "fr": "Méga-Raichu X",
-    "hi": "मेगा राइचू X",
-    "ja": "メガライチュウＸ",
-    "zh-TW": "超級雷丘Ｘ"
-  },
   "26_2": {
     "de": "Mega-Raichu X",
     "en": "Mega Raichu X",
@@ -9863,15 +9854,6 @@
     "ja": "メガルカリオ",
     "zh-TW": "超級路卡利歐"
   },
-  "448_2": {
-    "de": "Mega-Lucario Z",
-    "en": "Mega Lucario Z",
-    "es": "Mega-Lucario Z",
-    "fr": "Méga-Lucario Z",
-    "hi": "मेगा लुकारियो Z",
-    "ja": "メガルカリオＺ",
-    "zh-TW": "超級路卡利歐Ｚ"
-  },
   "448_5": {
     "de": "Mega-Lucario Z",
     "en": "Mega Lucario Z",
@@ -9967,7 +9949,7 @@
     "en": "Mega Scrafty",
     "es": "Mega-Scrafty",
     "fr": "Méga-Baggaïd",
-    "hi": "मेगा स्क्राफ़्टी",
+    "hi": "मेगा स्क्राफ़्टी",
     "ja": "メガズルズキン",
     "zh-TW": "超級頭巾混混"
   },
@@ -10048,7 +10030,7 @@
     "en": "Mega Floette",
     "es": "Mega-Floette",
     "fr": "Méga-Floette",
-    "hi": "मेगा फ़्लोएट",
+    "hi": "मेगा फ़्लोएट",
     "ja": "メガフラエッテ",
     "zh-TW": "超級花葉蒂"
   },

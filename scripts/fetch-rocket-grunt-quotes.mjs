@@ -1,7 +1,22 @@
 #!/usr/bin/env node
-// Pulls in-game Team GO Rocket grunt quotes from PokeMiners' pogo_assets
-// repo (which mirrors Niantic's localized text exports) and writes a slim
-// per-locale snapshot to src/data/rocket-grunt-quotes.json.
+// Pulls in-game Team GO Rocket grunt quotes from Niantic's own localized text
+// export (sora10pls/holoholo-text) and writes a slim per-locale snapshot to
+// src/data/rocket-grunt-quotes.json.
+//
+// WHY IT MOVED OFF PokeMiners/pogo_assets. Not because the quotes were wrong in
+// six of the seven locales — they were byte-identical, because Rocket dialogue
+// has not changed since August 2025. It moved because that source is FROZEN:
+// `Texts/Latest APK/JSON` last changed 2025-08-24 and had zero commits in the
+// two months before this was written, while the repo kept committing images
+// daily, so nothing about it looks abandoned from the outside. It would have
+// gone on serving 2025 dialogue after the next change, silently.
+//
+// The Hindi bundle was the exception, and it was a live defect: 60 of the 70
+// grunt-quote keys differed, and every difference was PokeMiners dropping
+// Devanagari vowel signs — "बत" for "बहुत", "कं" for "कहूं",
+// "पोकटॉप" for "पोकेस्टॉप". Those broken strings were in the committed
+// snapshot and on screen for Hindi users. holoholo's Hindi is clean Unicode
+// with no private-use codepoints at all.
 //
 // Four quote categories — only the first uniquely identifies a lineup:
 //   * typed   — combat_grunt_quote_<type>__{female,male}_speaker. 18 types
@@ -12,55 +27,24 @@
 //   * balloon — combat_grunt_balloon_quote#<n>__{female,male}_speaker.
 //               Jessie/James event grunts.
 //
-// PokeMiners JSON shape: { "data": ["key1","val1","key2","val2",...] }
+// JSON shape: { "data": ["key1","val1","key2","val2",...] } — parsed by
+// scripts/lib/holoholo-text.mjs, which also owns the locale→path table.
 //
 // Flags: --offline-ok   tolerate fetch failures if a previous artifact exists.
 
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { HOLOHOLO_LOCALES, fetchLocaleBundle } from "./lib/holoholo-text.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const DATA_DIR = resolve(ROOT, "src/data");
 const OUT_PATH = resolve(DATA_DIR, "rocket-grunt-quotes.json");
 
-// App locale → PokeMiners filename suffix (lowercase English language name).
-const LOCALES = {
-  en: "english",
-  de: "german",
-  es: "spanish",
-  fr: "french",
-  "zh-TW": "chinesetraditional",
-  hi: "hindi",
-  ja: "japanese",
-};
-
-const POKEMINERS_BASE =
-  "https://raw.githubusercontent.com/PokeMiners/pogo_assets/master/Texts/Latest%20APK/JSON";
-
-async function fetchI18n(lang) {
-  const url = `${POKEMINERS_BASE}/i18n_${lang}.json`;
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": "pogo-filter-workshop grunt-quote-fetcher/1.0",
-      Accept: "application/json",
-    },
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
-  const json = await res.json();
-  if (!json || !Array.isArray(json.data)) {
-    throw new Error(`Unexpected shape for ${url} — expected { data: [...] }`);
-  }
-  if (json.data.length % 2 !== 0) {
-    throw new Error(`Odd-length data array in ${url} — expected key/value pairs`);
-  }
-  const map = {};
-  for (let i = 0; i < json.data.length; i += 2) {
-    map[json.data[i]] = json.data[i + 1];
-  }
-  return map;
-}
+// The seven locales the app supports; the locale→directory table itself lives
+// in scripts/lib/holoholo-text.mjs, shared with the translation fetcher.
+const LOCALES = Object.keys(HOLOHOLO_LOCALES);
 
 // Read both gendered variants. JA / zh-TW (and occasionally ES, HI) use
 // gendered speech patterns where female and male strings genuinely differ;
@@ -146,15 +130,35 @@ function writeJson(path, data) {
   writeFileSync(path, JSON.stringify(data, null, 2) + "\n", "utf8");
 }
 
+// What actually counts as "the same snapshot" for the fetchedAt-preserving
+// comparison: everything except the timestamp and the bundle's total key count.
+// `sources.enKeys` moves whenever Niantic adds any string anywhere in the
+// 42k-key bundle, and rewriting fetchedAt for a key this snapshot does not read
+// is exactly the churn this comparison exists to prevent.
+function comparable(snapshot) {
+  const { fetchedAt: _at, sources, ...rest } = snapshot || {};
+  const { enKeys: _n, ...restSources } = sources || {};
+  return { ...rest, sources: restSources };
+}
+
+function readPrevious() {
+  if (!existsSync(OUT_PATH)) return null;
+  try { return JSON.parse(readFileSync(OUT_PATH, "utf8")); } catch { return null; }
+}
+
 async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
+  const prev = readPrevious();
 
   let maps;
   try {
-    console.log(`→ Fetching PokeMiners i18n bundles for ${Object.keys(LOCALES).length} locales`);
+    console.log(`→ Fetching holoholo-text bundles for ${LOCALES.length} locales`);
     const entries = await Promise.all(
-      Object.entries(LOCALES).map(async ([locale, lang]) => [locale, await fetchI18n(lang)])
+      LOCALES.map(async (locale) => [
+        locale,
+        await fetchLocaleBundle(locale, { userAgent: "pogo-filter-workshop grunt-quote-fetcher/2.0" }),
+      ])
     );
     maps = Object.fromEntries(entries);
   } catch (e) {
@@ -167,8 +171,19 @@ async function main() {
   }
 
   const enMap = maps.en;
-  if (!enMap || Object.keys(enMap).length < 1000) {
-    throw new Error(`English bundle suspiciously small (${Object.keys(enMap || {}).length} keys) — refusing to overwrite cache`);
+  const enKeys = Object.keys(enMap || {}).length;
+  // Absolute floor first — a truncated or error-page body cannot reach this.
+  if (enKeys < 1000) {
+    throw new Error(`English bundle suspiciously small (${enKeys} keys) — refusing to overwrite cache`);
+  }
+  // Then the shrink guard every fetcher here carries, against the key count the
+  // last good sync recorded. Niantic retires strings, so a small drop is normal;
+  // losing a tenth of the bundle is a broken publish.
+  const prevKeys = prev?.sources?.enKeys;
+  if (Number.isFinite(prevKeys) && enKeys < prevKeys * 0.9) {
+    throw new Error(
+      `English bundle shrank ${prevKeys} → ${enKeys} keys — refusing to overwrite cache`,
+    );
   }
 
   const types = discoverTypes(enMap);
@@ -180,6 +195,11 @@ async function main() {
   const balloonIdx = discoverNumbered(enMap, "combat_grunt_balloon_quote", true);
 
   const newContent = {
+    // Provenance, so the snapshot names its upstream without a reader having to
+    // open this script. holoholo-text publishes no batch stamp of its own; the
+    // key count is the closest thing to one, and it is what the shrink guard
+    // above compares against on the next run.
+    sources: { text: "sora10pls/holoholo-text (Release)", enKeys },
     typed:   buildTyped(maps, types),
     generic: buildNumbered(maps, "combat_grunt_quote",         genericIdx, true),
     decoy:   buildNumbered(maps, "combat_grunt_decoy_quote",   decoyIdx,   false),
@@ -187,15 +207,9 @@ async function main() {
   };
 
   let fetchedAt = new Date().toISOString();
-  if (existsSync(OUT_PATH)) {
-    try {
-      const prev = JSON.parse(readFileSync(OUT_PATH, "utf8"));
-      const prevContent = { typed: prev.typed, generic: prev.generic, decoy: prev.decoy, balloon: prev.balloon };
-      if (canonicalStringify(prevContent) === canonicalStringify(newContent) && prev.fetchedAt) {
-        fetchedAt = prev.fetchedAt;
-        console.log("  ↺ content unchanged — preserving previous fetchedAt");
-      }
-    } catch { /* fall through to fresh write */ }
+  if (prev?.fetchedAt && canonicalStringify(comparable(prev)) === canonicalStringify(comparable(newContent))) {
+    fetchedAt = prev.fetchedAt;
+    console.log("  ↺ content unchanged — preserving previous fetchedAt");
   }
 
   writeJson(OUT_PATH, { fetchedAt, ...newContent });
