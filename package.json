@@ -14,6 +14,7 @@
   "fetch-meta-rankings": "node scripts/fetch-meta-rankings.mjs",
   "fetch-evolution-costs": "node scripts/fetch-evolution-costs.mjs",
   "fetch-species-meta": "node scripts/fetch-species-meta.mjs",
+  "fetch-game-master-watch": "node scripts/fetch-game-master-watch.mjs",
   "fetch-regional-forms": "node scripts/fetch-regional-forms.mjs",
   "generate-pwa-assets": "pwa-assets-generator",
   "prebuild": "node scripts/fetch-translations.mjs --offline-ok && node scripts/fetch-raid-bosses.mjs --offline-ok && node scripts/fetch-rocket-lineups.mjs --offline-ok && node scripts/fetch-rocket-grunt-quotes.mjs --offline-ok && node scripts/fetch-pvp-rankings.mjs --offline-ok && node scripts/fetch-meta-rankings.mjs --offline-ok && node scripts/fetch-evolution-costs.mjs --offline-ok && node scripts/fetch-species-meta.mjs --offline-ok && node scripts/fetch-events.mjs --offline-ok && node scripts/fetch-regional-forms.mjs --offline-ok",
