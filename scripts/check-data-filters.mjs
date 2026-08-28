@@ -14,15 +14,16 @@
 //   D3 — all 7 locales produce the same key set (no locale-specific gaps)
 //   D4 — non-English locales actually localize (no silent English fallback)
 //   D5 — empty filter families are reported, so upstream shape breaks surface
-//   D6 — the shadow keeper filters carry every keeper, in every locale
+//   D6 — the PvP snapshot itself is well formed and every dex resolves
+//   D7 — the shadow keeper filters carry every keeper, in every locale
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import META_RANKINGS from "../src/data/meta-rankings.json";
-import { resolveSpecies } from "../src/data/species.js";
 import { buildDataFilters, FIXTURE_CONFIG } from "./lib/fixture.mjs";
 import { LOCALES } from "../src/i18n/index.js";
+import { pokemonNameFor, resolveSpecies } from "../src/data/species.js";
 
 let failures = 0;
 function check(label, cond, detail = "") {
@@ -97,8 +98,24 @@ console.log("\nD2 — every boss / leader / cup in the data produces a clause");
   const leagues = Object.keys(PVP_RANKINGS.leagues || {});
   check(`pvp: ${leagues.length} league(s) in data → ${Object.keys(byLocale.en.pvpFilters).length} filter(s)`,
     leagues.length > 0 && Object.keys(byLocale.en.pvpFilters).length === leagues.length);
-  // Cups (PVP_RANKINGS.cups) drive a separate `cupFilters` output that
-  // buildDataFilters does not expose; not asserted here.
+
+  // Cups drive `cupFilters`, which buildDataFilters does not expose because it
+  // is gated on Date.now() — a cup card only renders inside its event window, so
+  // most weeks it is legitimately empty. Asserting on it would pass or fail
+  // depending on the day. Assert referential integrity on the DATA instead,
+  // which holds every day: a cup id that an event references but the snapshot
+  // does not define is a matcher inventing ids.
+  const cupIds = Object.keys(PVP_RANKINGS.cups || {});
+  const referenced = new Set();
+  for (const e of PVP_RANKINGS.gblEvents || []) for (const id of e.cups || []) referenced.add(id);
+  const dangling = [...referenced].filter((id) => !PVP_RANKINGS.cups?.[id]);
+  check(`pvp cups: ${cupIds.length} defined, ${referenced.size} referenced by events, 0 dangling`,
+    dangling.length === 0, dangling.join(", "));
+  for (const id of cupIds) {
+    const cup = PVP_RANKINGS.cups[id];
+    check(`pvp cup ${id}: has species and a cpCap of number-or-null`,
+      (cup.species?.length || 0) > 0 && (cup.cpCap === null || typeof cup.cpCap === "number"));
+  }
 }
 
 console.log("\nD3 — all 7 locales expose the same entries");
@@ -150,7 +167,47 @@ console.log("\nD5 — filter families that are entirely empty");
   }
 }
 
-console.log("\nD6 — shadow keeper filters project the whole keeper list");
+console.log("\nD6 — the PvP snapshot is well formed and every dex resolves");
+{
+  // D1 asserts no `undefined` reaches a clause. This is the same guarantee moved
+  // back to the data layer, where the diagnostic can name the offending dex
+  // instead of pointing at a 900-character filter string.
+  check("snapshot records a source", ["pvpoke", "lily-dex"].includes(PVP_RANKINGS.source),
+    String(PVP_RANKINGS.source));
+  check("fetchedAt parses", Number.isFinite(Date.parse(PVP_RANKINGS.fetchedAt)), PVP_RANKINGS.fetchedAt);
+
+  const pools = [
+    ...Object.entries(PVP_RANKINGS.leagues || {}),
+    ...Object.entries(PVP_RANKINGS.cups || {}),
+  ];
+  const malformed = [];
+  const unresolvable = [];
+  const duplicated = [];
+  for (const [label, pool] of pools) {
+    const seen = new Set();
+    for (const sp of pool.species || []) {
+      if (!Number.isInteger(sp.dex) || typeof sp.name !== "string" || sp.name === "") {
+        malformed.push(`${label}:${JSON.stringify(sp).slice(0, 40)}`);
+        continue;
+      }
+      if (seen.has(sp.dex)) duplicated.push(`${label}:${sp.dex}`);
+      seen.add(sp.dex);
+      // A parenthesised form name here would emit `+quagsire (shadow)` — a
+      // filter token with a space in it — via App.jsx's dex-dict fallback.
+      if (/[()]/.test(sp.name)) malformed.push(`${label}:${sp.name} (form suffix, not a base name)`);
+      for (const loc of localeNames) {
+        if (!pokemonNameFor(String(sp.dex), loc)) unresolvable.push(`${label}:${sp.dex}/${loc}`);
+      }
+    }
+  }
+  check(`every species entry is {dex:int, name:non-empty base name} (${pools.length} pools)`,
+    malformed.length === 0, malformed.slice(0, 5).join(", "));
+  check("no duplicate dex within a league or cup", duplicated.length === 0, duplicated.slice(0, 5).join(", "));
+  check(`every dex resolves in all ${localeNames.length} locales`,
+    unresolvable.length === 0, unresolvable.slice(0, 5).join(", "));
+}
+
+console.log("\nD7 — shadow keeper filters project the whole keeper list");
 {
   // shadowSafe and shadowFrustration are the two filters that name every
   // meta shadow attacker individually, so they are the ones that break when
