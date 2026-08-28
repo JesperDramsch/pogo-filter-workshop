@@ -700,8 +700,9 @@ console.log('\nScenario 8h: line-level pack coverage — an owned evolution reti
 		curated.friendCollectWishlist.startsWith('chikorita&') && curated.friendCollectTargets[0].owned === false,
 		curated.friendCollectWishlist);
 	// Un-searchable slots gate the widening exactly as they gate `!+family`:
-	// while a season is unticked the line keeps being asked for. Exact-species
-	// coverage is deliberately untouched.
+	// while a season is unticked the line keeps being asked for — and, since
+	// the slot gate moved into friendCollectGoalOwned, so does the EXACT
+	// species (see scenario 9b). One owned copy never stands in for four.
 	const raidCfg = { ...packCfg, topAttackers: ['kronjuwild'] };
 	const raids = (luckies, extra = {}) =>
 		buildFilters([], luckies, { ...raidCfg, ...extra }, [], 'en', t)
@@ -712,8 +713,12 @@ console.log('\nScenario 8h: line-level pack coverage — an owned evolution reti
 		raids(['kronjuwild'], { luckySlots: { kronjuwild: ['spring'] } })?.species.includes('sesokitz'));
 	check('all four seasons let the widening through',
 		!raids(['kronjuwild'], { luckySlots: { kronjuwild: ['spring', 'summer', 'autumn', 'winter'] } }));
-	check('exact-species coverage ignores the slot gate, as before',
-		!raids(['sesokitz'], { luckySlots: { sesokitz: ['spring'] } }));
+	check('exact-species coverage obeys the slot gate too',
+		raids(['sesokitz'], { luckySlots: { sesokitz: ['spring'] } })?.species.includes('sesokitz'));
+	check('…and retires once every season is ticked',
+		!raids(['sesokitz'], { luckySlots: { sesokitz: ['spring', 'summer', 'autumn', 'winter'] } }));
+	check('…while an unannotated lucky Sesokitz retires it as before',
+		!raids(['sesokitz']));
 	// …and the same rule through the pack path: an owned coin-flip base must not
 	// retire its own ask (Wurmple sits in event pools, so this is reachable).
 	const flip = (luckies) =>
@@ -859,12 +864,157 @@ console.log('\nScenario 9: config merge');
 				.friendCollectDropForms,
 		) === '{}',
 	);
+	const slotMaps = mergeImportedConfig({
+		friendCollectSpecies: ['Burmy', 'Dratini'],
+		// burmy has four slots — dropping two is a real restriction; dratini has
+		// none, so its entry is junk; wormadam is not curated.
+		friendCollectDropSlots: { Burmy: ['sandy', 'bogus', 'trash'], Dratini: ['plant'], Wormadam: ['plant'] },
+	});
+	check(
+		'dropSlots: catalog-validated, non-slot and non-curated species dropped',
+		JSON.stringify(slotMaps.friendCollectDropSlots) === JSON.stringify({ burmy: ['sandy', 'trash'] }),
+		JSON.stringify(slotMaps.friendCollectDropSlots),
+	);
+	check(
+		'dropping every slot is rejected as junk',
+		JSON.stringify(
+			mergeImportedConfig({
+				friendCollectSpecies: ['Burmy'],
+				friendCollectDropSlots: { Burmy: ['male', 'plant', 'sandy', 'trash'] },
+			}).friendCollectDropSlots,
+		) === '{}',
+	);
 	const legacyMaps = mergeImportedConfig({});
 	check(
-		'legacy configs back-fill all four maps empty',
-		[legacyMaps.friendCollectGenders, legacyMaps.friendCollectDropForms, legacyMaps.hundoForms, legacyMaps.luckyForms].every(
-			(m) => m && typeof m === 'object' && Object.keys(m).length === 0,
-		),
+		'legacy configs back-fill all five maps empty',
+		[
+			legacyMaps.friendCollectGenders,
+			legacyMaps.friendCollectDropForms,
+			legacyMaps.friendCollectDropSlots,
+			legacyMaps.hundoForms,
+			legacyMaps.luckyForms,
+		].every((m) => m && typeof m === 'object' && Object.keys(m).length === 0),
+	);
+}
+
+console.log('\nScenario 9b: un-searchable slots gate coverage the same way they gate the auto wishlist');
+{
+	// The reported gap: the have-list could already say "my lucky Burmy is the
+	// plant cloak", but the curated wishlist then counted the species as done
+	// and stopped asking friends for the other three cloaks — while the
+	// automatic lucky wishlist correctly withheld its `!+burmy` exclusion.
+	const slotCfg = {
+		...DEFAULT_CONFIG,
+		topAttackers: DEFAULT_TOP_ATTACKERS,
+		friendCollectSpecies: ['burmy', 'sesokitz'],
+		friendCollectMode: 'lucky',
+		luckySlots: { burmy: ['plant'], sesokitz: ['spring'] },
+	};
+	const owned = ['burmy', 'sesokitz'];
+	const r = buildFilters([], owned, slotCfg, [], 'en', t);
+	check(
+		'a partly-slotted lucky no longer covers the target',
+		r.friendCollectTargets.every((tg) => tg.owned === false),
+		JSON.stringify(r.friendCollectTargets.map((tg) => [tg.display, tg.owned])),
+	);
+	check(
+		'both targets stay in the curated string',
+		r.friendCollectWishlist.startsWith('burmy,deerling&'),
+		r.friendCollectWishlist,
+	);
+	check(
+		'the auto lucky wishlist still withholds its family exclusions (unchanged)',
+		!r.friendLuckyWishlist.includes('!+burmy') && !r.friendLuckyWishlist.includes('!+deerling'),
+		r.friendLuckyWishlist,
+	);
+	// Slots are un-searchable, so nothing about them may reach the string.
+	check(
+		'no slot term leaks into the filter',
+		!/plant|sandy|trash|spring|summer|autumn|winter/i.test(r.friendCollectWishlist),
+		r.friendCollectWishlist,
+	);
+	// Every slot ticked → covered again, exactly as before the change.
+	const full = buildFilters([], owned, {
+		...slotCfg,
+		luckySlots: { burmy: ['male', 'plant', 'sandy', 'trash'], sesokitz: ['spring', 'summer', 'autumn', 'winter'] },
+	}, [], 'en', t);
+	check(
+		'a complete slot set covers the target again',
+		full.friendCollectTargets.every((tg) => tg.owned === true) && full.friendCollectWishlist === '',
+		JSON.stringify(full.friendCollectTargets.map((tg) => [tg.display, tg.owned])),
+	);
+	// Dropping the slots you don't want narrows what has to be owned.
+	const dropped = buildFilters([], owned, {
+		...slotCfg,
+		friendCollectDropSlots: { burmy: ['male', 'sandy', 'trash'] },
+	}, [], 'en', t);
+	check(
+		'dropping every other cloak makes the owned plant cloak enough',
+		dropped.friendCollectTargets.find((tg) => tg.display === 'burmy')?.owned === true,
+		JSON.stringify(dropped.friendCollectTargets.map((tg) => [tg.display, tg.owned])),
+	);
+	// Opt-in rule: an unannotated have-entry still covers the whole species.
+	const unannotated = buildFilters([], owned, { ...slotCfg, luckySlots: {} }, [], 'en', t);
+	check(
+		'an unannotated lucky covers the species as before',
+		unannotated.friendCollectTargets.every((tg) => tg.owned === true),
+		JSON.stringify(unannotated.friendCollectTargets.map((tg) => [tg.display, tg.owned])),
+	);
+	// The chip needs to know which slots the ACTIVE goal already holds.
+	check(
+		'targets expose the active goal\'s owned slots for the chip badges',
+		JSON.stringify(r.friendCollectTargets.map((tg) => tg.slotsOwned)) === JSON.stringify([['plant'], ['spring']]),
+		JSON.stringify(r.friendCollectTargets.map((tg) => tg.slotsOwned)),
+	);
+	check(
+		'a species without slots reports none',
+		buildFilters([], [], { ...slotCfg, friendCollectSpecies: ['dratini'] }, [], 'en', t)
+			.friendCollectTargets[0].slotsOwned === null,
+	);
+	// 'both' mode: the chip's owned markers are the INTERSECTION of the two
+	// have-lists, because that is what coverage demands there. A slot the lucky
+	// list holds but the hundo list does not is not done, and marking it so
+	// would promise a hundo hunt was over before it started.
+	{
+		const bothCfg = {
+			...slotCfg,
+			friendCollectSpecies: ['burmy'],
+			friendCollectMode: 'both',
+			luckySlots: { burmy: ['plant', 'sandy'] },
+			hundoSlots: { burmy: ['plant'] },
+		};
+		const both = buildFilters(['burmy'], ['burmy'], bothCfg, [], 'en', t).friendCollectTargets[0];
+		check(
+			"'both' marks only the slots BOTH goals hold",
+			JSON.stringify(both.slotsOwned) === JSON.stringify(['plant']),
+			JSON.stringify(both.slotsOwned),
+		);
+		const luckyOnly = buildFilters(['burmy'], ['burmy'], { ...bothCfg, friendCollectMode: 'lucky' }, [], 'en', t)
+			.friendCollectTargets[0];
+		const hundoOnly = buildFilters(['burmy'], ['burmy'], { ...bothCfg, friendCollectMode: 'hundo' }, [], 'en', t)
+			.friendCollectTargets[0];
+		check(
+			'…while each single-goal focus reads its own have-list',
+			JSON.stringify(luckyOnly.slotsOwned) === JSON.stringify(['plant', 'sandy']) &&
+				JSON.stringify(hundoOnly.slotsOwned) === JSON.stringify(['plant']),
+			`${JSON.stringify(luckyOnly.slotsOwned)} / ${JSON.stringify(hundoOnly.slotsOwned)}`,
+		);
+		check(
+			'…and the target stays uncovered while either goal is short',
+			both.owned === false,
+		);
+	}
+	// Hundo focus reads the hundo slot map, not the lucky one.
+	const hundoFocus = buildFilters(owned, [], {
+		...slotCfg,
+		friendCollectMode: 'hundo',
+		luckySlots: {},
+		hundoSlots: { burmy: ['plant'], sesokitz: ['spring'] },
+	}, [], 'en', t);
+	check(
+		'hundo focus gates on hundoSlots',
+		hundoFocus.friendCollectTargets.every((tg) => tg.owned === false),
+		JSON.stringify(hundoFocus.friendCollectTargets.map((tg) => [tg.display, tg.owned])),
 	);
 }
 

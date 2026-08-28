@@ -16,6 +16,7 @@ import { readFileSync, readdirSync } from "node:fs";
 
 const FILES = [
   "src/App.jsx",
+  "src/refinements.jsx",
   "src/Landing.jsx",
   "src/SwipeOnboarding.jsx",
   ...readdirSync("src/explain").filter((f) => f.endsWith(".jsx")).map((f) => `src/explain/${f}`),
