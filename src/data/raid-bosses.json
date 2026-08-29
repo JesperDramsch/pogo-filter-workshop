@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-08-28T19:34:53.811Z",
+  "fetchedAt": "2026-08-29T13:20:39.315Z",
   "raids": {
     "mega": [
       {
@@ -116,100 +116,6 @@
         ]
       }
     ],
-    "lvl3": [
-      {
-        "id": "SNEASEL",
-        "names": {
-          "en": "Hisuian Sneasel",
-          "de": "Hisuian-Sniebel",
-          "fr": "Farfuret de Hisuian",
-          "it": "Sneasel di Hisuian",
-          "ja": "ニューラ",
-          "ko": "포푸니",
-          "es": "Sneasel de Galar"
-        },
-        "types": [
-          "fighting",
-          "poison"
-        ],
-        "resistorTypes": [
-          "flying",
-          "poison",
-          "ground",
-          "bug",
-          "ghost",
-          "psychic"
-        ],
-        "seMoveTypes": [
-          "psychic",
-          "flying",
-          "ground"
-        ]
-      },
-      {
-        "id": "LILLIGANT",
-        "names": {
-          "en": "Hisuian Lilligant",
-          "de": "Hisuian-Dressella",
-          "fr": "Fragilady de Hisuian",
-          "it": "Lilligant di Hisuian",
-          "ja": "ドレディア",
-          "ko": "드레디어",
-          "es": "Lilligant de Galar"
-        },
-        "types": [
-          "grass",
-          "fighting"
-        ],
-        "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
-          "ghost",
-          "fire",
-          "grass",
-          "psychic",
-          "dragon",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "flying",
-          "fairy",
-          "fire",
-          "ice",
-          "poison",
-          "psychic"
-        ]
-      },
-      {
-        "id": "PASSIMIAN",
-        "names": {
-          "en": "Passimian",
-          "de": "Quartermak",
-          "fr": "Quartermac",
-          "it": "Passimian",
-          "ja": "ナゲツケサル",
-          "ko": "내던숭이",
-          "es": "Passimian"
-        },
-        "types": [
-          "fighting"
-        ],
-        "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
-          "ghost",
-          "psychic",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "fairy",
-          "flying",
-          "psychic"
-        ]
-      }
-    ],
     "lvl1": [
       {
         "id": "PIKACHU",
@@ -236,30 +142,33 @@
         ]
       },
       {
-        "id": "IMPIDIMP",
+        "id": "HONEDGE",
         "names": {
-          "en": "Impidimp",
-          "de": "Bähmon",
-          "fr": "Grimalin",
-          "it": "Impidimp",
-          "ja": "ベロバー",
-          "ko": "메롱꿍",
-          "es": "Impidimp"
+          "en": "Honedge",
+          "de": "Gramokles",
+          "fr": "Monorpale",
+          "it": "Honedge",
+          "ja": "ヒトツキ",
+          "ko": "단칼빙",
+          "es": "Honedge"
         },
         "types": [
-          "dark",
-          "fairy"
+          "steel",
+          "ghost"
         ],
         "resistorTypes": [
-          "poison",
+          "normal",
           "steel",
           "fire",
-          "fairy"
+          "water",
+          "electric",
+          "dark"
         ],
         "seMoveTypes": [
-          "fairy",
-          "poison",
-          "steel"
+          "dark",
+          "fire",
+          "ghost",
+          "ground"
         ]
       }
     ],
