@@ -209,6 +209,46 @@ export function refinementAriaLabel(entry, key, tFn) {
 	return undefined;
 }
 
+// ── Wishlist picking: what you WANT, stored as what you DON'T ────────────────
+//
+// The wishlist surfaces STORE the dropped options — the complement of the ask —
+// because that is the shape the config and every emitter speak: an absent entry
+// means "every form", so a target that dropped nothing is indistinguishable
+// from one nobody ever touched, which is exactly right.
+//
+// The user CLICKS the form they want ("collect me the Kanto one"), the same way
+// they click the ♀/♂ lock sitting right above it on the very same chip. These
+// two helpers are the whole translation between the two directions, kept here
+// so no surface re-derives the inversion by hand: reading it backwards is a
+// silent, entirely plausible-looking bug — the chip lights up, the string is
+// well-formed, and it asks a friend for precisely the form you already have.
+//
+// Not shared with the buddy catch-targets on purpose: those render every form
+// lit at rest, so "all of them, minus the ones I struck out" is what the row
+// visibly says, and a drop-click is the honest affordance there.
+
+// Is `key` part of what the target currently asks for? An empty `dropped` means
+// no pick has been made, which asks for EVERY option — rendered as nothing lit
+// rather than everything lit, so a tint on this row only ever means "I picked
+// this one".
+export function optionPicked(dropped, key) {
+	return Array.isArray(dropped) && dropped.length > 0 && !dropped.includes(key);
+}
+
+// The next stored drop-list after a click on `key`, or null when the ask is
+// unrestricted again. The first click on an untouched row picks that option
+// alone; further clicks widen the ask; clicking a picked option takes it back
+// out. Un-picking the last one — and its mirror image, picking every option —
+// both land on "asks for everything", which the config expresses as absence.
+// No click is ever a no-op: the old drop-based row silently refused to drop
+// the last kept form, which read as a dead button.
+export function togglePickedOption(keys, dropped, key) {
+	const current = keys.filter((k) => optionPicked(dropped, k));
+	const picked = current.includes(key) ? current.filter((k) => k !== key) : [...current, key];
+	if (picked.length === 0 || picked.length === keys.length) return null;
+	return keys.filter((k) => !picked.includes(k));
+}
+
 // Is a set of ticked options complete for this axis? For the gender axis
 // "complete" means every gender that CLOSES the slot is owned — owning the ♂
 // Wadribie is worth recording but does not finish it.

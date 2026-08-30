@@ -18,6 +18,12 @@ import SPECIES_META from '../src/data/species-meta.json';
 import PVP_RANKINGS from '../src/data/pvp-rankings.json';
 import { POKEMON_NAMES_DICT, pokemonNameFor, resolveSpeciesInfo } from '../src/data/species.js';
 import {
+	invisibleSlotsFor,
+	optionPicked,
+	regionalFormsFor,
+	togglePickedOption,
+} from '../src/refinements.jsx';
+import {
 	evoParentsFromGameMaster,
 	megaDexFromGameMaster,
 	specialTradeDexFromGameMaster,
@@ -577,6 +583,68 @@ console.log('\nScenario 8e: click-only refinements — gender and drop-form guar
 		de.friendCollectWishlist.includes('!vulpix,!feuer'),
 		de.friendCollectWishlist,
 	);
+}
+
+console.log('\nScenario 8e2: wishlist form picking — a click names the form you WANT');
+{
+	// The chips store DROPPED options and the user clicks the option to ask
+	// for, so every one of these asserts the inversion in the direction the
+	// user experiences it. This regressed once in the direction that is
+	// hardest to notice: clicking "Kanto" dropped Kanto and lit up Alola, so
+	// the wishlist confidently asked a friend for the exact form being
+	// excluded. Both surfaces the chips drive — regional forms and the
+	// un-searchable slots — go through the same helper.
+	const forms = (sp) => (regionalFormsFor(sp) || []).map((f) => f.key);
+	const sandshrew = forms('sandshrew'); // ['base', 'alola']
+	check('catalog order is the chip order', JSON.stringify(sandshrew) === '["base","alola"]');
+	// A first click picks that form ALONE — the drop list is its complement.
+	const pickKanto = togglePickedOption(sandshrew, [], 'base');
+	check('clicking Kanto drops Alola, not Kanto', JSON.stringify(pickKanto) === '["alola"]', JSON.stringify(pickKanto));
+	check('…so Kanto reads as picked and Alola does not',
+		optionPicked(pickKanto, 'base') && !optionPicked(pickKanto, 'alola'));
+	// Untouched = every form asked for, and NOTHING lit: a tint on this row
+	// only ever means "I picked this one".
+	check('an untouched row lights nothing', sandshrew.every((k) => !optionPicked([], k)));
+	// Clicking the lit form takes it back out — the ask is unrestricted again.
+	// The old row refused this click outright (it would have dropped the last
+	// kept form), which is the dead button the user hit.
+	check('clicking the picked form again clears the restriction',
+		togglePickedOption(sandshrew, pickKanto, 'base') === null);
+	// Further clicks widen rather than replace; picking everything is the same
+	// ask as picking nothing, and stores as absence either way.
+	const zig = forms('zigzagoon'); // ['base', 'galar']
+	const pickGalar = togglePickedOption(zig, [], 'galar');
+	check('Galar Zigzagoon keeps its own chip lit',
+		JSON.stringify(pickGalar) === '["base"]' && optionPicked(pickGalar, 'galar'), JSON.stringify(pickGalar));
+	check('picking every form is stored as no restriction',
+		togglePickedOption(zig, pickGalar, 'base') === null);
+	const meowth = forms('meowth'); // ['base', 'alola', 'galar']
+	const twoOfThree = togglePickedOption(meowth, togglePickedOption(meowth, [], 'alola'), 'galar');
+	check('a second click widens the ask instead of replacing it',
+		JSON.stringify(twoOfThree) === '["base"]', JSON.stringify(twoOfThree));
+	// Un-searchable slots ride the same helper, keys straight off the catalog.
+	const cloaks = invisibleSlotsFor('burmy').slots;
+	check('slot picking works the same way',
+		JSON.stringify(togglePickedOption(cloaks, [], 'plant')) === '["male","sandy","trash"]');
+	// End to end: the picked form is what survives into the string. Kanto
+	// Sandshrew is pure Ground, Alolan is Ice — so asking for Kanto emits the
+	// guard that excludes ICE, and asking for Galar Zigzagoon (Dark) emits the
+	// one that demands it.
+	// Keyed by the STORAGE name (the config's own canonical locale), which is
+	// where a map keyed by the English display name would silently miss.
+	const sandKey = pokemonNameFor(27);
+	const zigKey = pokemonNameFor(263);
+	const picked = buildFilters([], [], {
+		...cfg,
+		friendCollectSpecies: [sandKey, zigKey],
+		friendCollectDropForms: {
+			[sandKey]: togglePickedOption(sandshrew, [], 'base'),
+			[zigKey]: togglePickedOption(zig, [], 'galar'),
+		},
+	}, [], 'en', t);
+	check('the string asks for the picked forms, not their complements',
+		picked.friendCollectWishlist.startsWith('sandshrew,zigzagoon&!sandshrew,!ice&!zigzagoon,dark&'),
+		picked.friendCollectWishlist);
 }
 
 console.log('\nScenario 8f: form-aware coverage — annotations opt in to finer pruning');
