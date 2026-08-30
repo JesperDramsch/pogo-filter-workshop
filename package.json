@@ -38,6 +38,7 @@
   "test:a11ydialogs": "vite-node scripts/check-a11y-dialogs.mjs",
   "test:a11ylive": "vite-node scripts/check-a11y-live.mjs",
   "test:a11ystate": "vite-node scripts/check-a11y-state.mjs",
+  "test:a11ytargets": "vite-node scripts/check-a11y-targets.mjs",
   "fixtures:update": "vite-node scripts/generate-fixtures.mjs",
   "preview": "vite preview",
   "deploy": "npm run build && gh-pages -d dist"

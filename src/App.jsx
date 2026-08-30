@@ -39,6 +39,7 @@ import {
 	formGuardHides,
 	formRegionLabel,
 	genderSlotsFor,
+	CHIP_REMOVE_TARGET,
 	invisibleSlotsFor,
 	optionPicked,
 	refinementAxisFor,
@@ -6795,7 +6796,7 @@ function HundosEditor({
 						<button
 							onClick={() => removeHundo(h)}
 							aria-label={t('app.a11y.remove_species', { params: { name: h } })}
-							className='opacity-40 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#E74C3C] transition'
+							className={`${CHIP_REMOVE_TARGET} opacity-40 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#E74C3C] transition`}
 						>
 							<X size={12} />
 						</button>
@@ -6987,7 +6988,7 @@ function SpeciesListEditor({
 						<button
 							onClick={() => removeItem(s)}
 							aria-label={t('app.a11y.remove_species', { params: { name: s } })}
-							className='opacity-40 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#E74C3C] transition'
+							className={`${CHIP_REMOVE_TARGET} opacity-40 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#E74C3C] transition`}
 						>
 							<X size={12} />
 						</button>
@@ -7136,7 +7137,7 @@ function CustomCollectiblesEditor({ list, onChange }) {
 							<button
 								onClick={() => remove(sp)}
 								aria-label={t('app.a11y.remove_species', { params: { name: sp } })}
-								className='opacity-50 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#FF6B5B] transition'
+								className={`${CHIP_REMOVE_TARGET} opacity-50 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#FF6B5B] transition`}
 							>
 								<X size={10} />
 							</button>
@@ -7758,7 +7759,7 @@ function FriendCollectEditor({
 							<button
 								onClick={() => remove(tg.species)}
 								aria-label={t('app.a11y.remove_species', { params: { name: tg.display } })}
-								className='opacity-50 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#FF6B5B] transition'
+								className={`${CHIP_REMOVE_TARGET} opacity-50 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#FF6B5B] transition`}
 							>
 								<X size={10} />
 							</button>
@@ -10802,7 +10803,7 @@ function RegionalMap({
 									<button
 										onClick={() => removeFromBazaar(name)}
 										aria-label={t('app.a11y.remove_species', { params: { name: name } })}
-										className='opacity-50 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#E74C3C] transition'
+										className={`${CHIP_REMOVE_TARGET} opacity-50 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#E74C3C] transition`}
 									>
 										<X size={10} />
 									</button>
@@ -11997,7 +11998,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 								<button
 									onClick={() => removeAt(i)}
 									aria-label={t('app.a11y.remove_species', { params: { name: capFirst(tg.species) } })}
-									className='ml-auto opacity-50 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#FF6B5B] transition text-[#E67E22]'
+									className={`${CHIP_REMOVE_TARGET} ml-auto opacity-50 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#FF6B5B] transition text-[#E67E22]`}
 								>
 									<X size={10} />
 								</button>
