@@ -40,9 +40,11 @@ import {
 	formRegionLabel,
 	genderSlotsFor,
 	invisibleSlotsFor,
+	optionPicked,
 	refinementAxisFor,
 	refinementComplete,
 	regionalFormsFor,
+	togglePickedOption,
 } from './refinements.jsx';
 import { useTranslation } from './i18n/I18nProvider.jsx';
 import { useAnnounce } from './Announcer.jsx';
@@ -7342,9 +7344,16 @@ function FriendCollectEditor({
 		if (genders[name] === g) onGendersChange(omitKey(genders, name));
 		else onGendersChange({ ...genders, [name]: g });
 	}
-	// Forms and un-searchable slots share one affordance: every option is
-	// collected by default, and a click drops one. The picker never lets the
-	// LAST kept option drop — a target that asks for nothing.
+	// Forms and un-searchable slots share one affordance, and it is the same one
+	// the ♀/♂ lock directly above them on the chip uses: click the option you
+	// WANT. Nothing lit asks for every option (the default); a click picks one,
+	// further clicks widen the ask, and clicking a lit option takes it back out.
+	//
+	// Storage stays the complement — the DROPPED options — which is what the
+	// config schema and every emitter speak; togglePickedOption owns that
+	// inversion. Getting it backwards is not a cosmetic slip: clicking "Kanto"
+	// used to drop Kanto and light up Alola, so the string went off and asked a
+	// friend for the exact form the user was trying to exclude.
 	//
 	// What a drop MEANS differs by axis, and only the axis descriptor knows
 	// which: a dropped regional form becomes a scoped De-Morgan guard in the
@@ -7357,18 +7366,11 @@ function FriendCollectEditor({
 		const [map] = dropStateFor(axis);
 		return Array.isArray(map[name]) ? map[name] : [];
 	}
-	function toggleDrop(name, axis, optionKey) {
+	function togglePick(name, axis, optionKey) {
 		const [map, onChange] = dropStateFor(axis);
 		if (!onChange) return;
-		const dropped = new Set(dropListFor(name, axis));
-		if (dropped.has(optionKey)) {
-			dropped.delete(optionKey);
-		} else {
-			if (axis.keys.filter((k) => !dropped.has(k)).length <= 1) return;
-			dropped.add(optionKey);
-		}
-		if (dropped.size > 0) onChange({ ...map, [name]: [...dropped] });
-		else onChange(omitKey(map, name));
+		const next = togglePickedOption(axis.keys, dropListFor(name, axis), optionKey);
+		onChange(next ? { ...map, [name]: next } : omitKey(map, name));
 	}
 	// Owned chips toggle their coverage override: forced targets re-enter the
 	// string (keep hunting the hundo although the lucky already landed).
@@ -7709,15 +7711,18 @@ function FriendCollectEditor({
 									+4★
 								</span>
 							)}
-							{/* Click-only refinements — buddy-target semantics, but the QUIET
-							    have-list badge styling (gray at rest, blue when deliberately
-							    set) so a big chip cloud stays calm: untouched chips show dim
-							    gray tags, and color only appears where the user made a pick.
-							    ♀/♂ locks the wanted gender (scoped `!species,<gender>` guard;
-							    Combee/Salandit gender-locked evolutions) and is offered for
-							    every species, since PoGo's gender keyword is universal. Below
-							    it sits the species' own refinement axis, drop-based: everything
-							    is asked for by default and a click leaves one option out. */}
+							{/* Click-only refinements, in the QUIET have-list badge styling (gray
+							    at rest, blue when deliberately set) so a big chip cloud stays
+							    calm: untouched chips show dim gray tags, and color only appears
+							    where the user made a pick. Both rows therefore read the same
+							    way — a click names what you WANT, a tint marks what you asked
+							    for — which is the whole point of them sitting one above the
+							    other on one chip. ♀/♂ locks the wanted gender (scoped
+							    `!species,<gender>` guard; Combee/Salandit gender-locked
+							    evolutions) and is offered for every species, since PoGo's
+							    gender keyword is universal. Below it sits the species' own
+							    refinement axis: pick the form(s) to ask for, nothing picked
+							    asks for all of them. */}
 							{onGendersChange && (
 								<RefinementBadges
 									entry={GENDER_LOCK_AXIS}
@@ -7736,12 +7741,10 @@ function FriendCollectEditor({
 											? 'app.filter.friend_collect_slots_help'
 											: 'app.filter.friend_collect_forms_help',
 									)}
-									stateFor={(key) => {
-										const dropped = dropListFor(tg.species, dropAxis);
-										if (dropped.includes(key)) return 'dropped';
-										return dropped.length > 0 ? 'on' : 'off';
-									}}
-									onToggle={(key) => toggleDrop(tg.species, dropAxis, key)}
+									stateFor={(key) =>
+										optionPicked(dropListFor(tg.species, dropAxis), key) ? 'on' : 'off'
+									}
+									onToggle={(key) => togglePick(tg.species, dropAxis, key)}
 									titleFor={
 										dropAxis.axis === AXIS_SLOT
 											? (key) =>
