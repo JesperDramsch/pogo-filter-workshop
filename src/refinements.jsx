@@ -267,6 +267,7 @@ export function refinementComplete(entry, ticked) {
 //   'dropped' — deliberately excluded from an otherwise all-in ask. Struck
 //               through and dimmer than 'off', so "I turned this one off"
 //               never reads the same as "I have not been here yet".
+
 // ── Tap targets, which are not the same thing as paint ───────────────────────
 //
 // The badges are deliberately tiny: a chip cloud with fifty species has to stay
@@ -278,14 +279,21 @@ export function refinementComplete(entry, ticked) {
 // last badge sat 6px from the ✕ that deletes the whole species.
 //
 // So the visual size stays and the target grows underneath it. `min-h`/`min-w`
-// clear WCAG 2.5.8's 24×24 CSS px on every pointer (which the old 20px-tall,
-// 15px-wide ♀/♂ badges did not), and the coarse-pointer branch takes both to
-// 44 — the touch figure Apple's HIG and WCAG 2.5.5 agree on — with roomier
-// padding and readable text on the devices that actually need it. The row
-// widens its gap to match, because separation is half of what makes a target
-// hittable: two 44px targets 2px apart are still one 90px smudge.
+// clear WCAG 2.5.8's 24×24 CSS px on every pointer — which the old 20px-tall,
+// 15px-wide ♀/♂ badges did not — and the coarse-pointer branch takes both to
+// 32, with roomier padding and readable text on the devices that need it.
 //
-// `[@media(pointer:coarse)]` rather than a stylesheet rule on purpose — as a
+// 32 and not the 44 of Apple's HIG and WCAG 2.5.5 (AAA): these badges live
+// INSIDE an inline chip beside the species name, and at 44 the row stops
+// fitting a phone — it wraps into a two-by-two block with the name stranded
+// alongside, trading a mis-tap for an unreadable chip. 32px is ~8.5mm, inside
+// the 7–10mm a fingertip wants, and keeps the chip on one line.
+//
+// The row widens its gap to match, because separation is the other half of a
+// hittable target: two 32px badges 2px apart are one unbroken 66px run, and a
+// press landing on the seam is still ambiguous however big each half is.
+//
+// `[@media(pointer:coarse)]:` rather than a stylesheet rule on purpose — as a
 // Tailwind arbitrary variant it lands in the utilities layer, so it beats the
 // `px-1` sitting next to it instead of losing a specificity race to it.
 //
@@ -294,13 +302,6 @@ export function refinementComplete(entry, ticked) {
 // through `${…}` produces markup referring to a rule that was never emitted —
 // silently, and only on the devices the variant targets. Repeating
 // `[@media(pointer:coarse)]:` is the price of the utility actually existing.
-//
-// 32px on touch rather than the 44 of Apple's HIG and WCAG 2.5.5: these badges
-// live INSIDE an inline chip beside the species name, and at 44 the row stops
-// fitting a phone — it wraps into a two-by-two block with the name stranded
-// beside it, which trades a mis-tap for an unreadable chip. 32px is ~8.5mm,
-// inside the 7–10mm a fingertip wants, is well clear of WCAG 2.5.8's 24px
-// floor, and keeps the chip on one line. The gap does the rest of the work.
 const TOUCH_TARGET =
 	'min-h-[24px] min-w-[24px] [@media(pointer:coarse)]:min-h-[32px] [@media(pointer:coarse)]:min-w-[32px]';
 
@@ -310,8 +311,8 @@ const TOUCH_TARGET =
 // once rather than each growing their own idea of a touch target.
 export const CHIP_REMOVE_TARGET = `inline-flex items-center justify-center ${TOUCH_TARGET}`;
 
-// Row spacing, which is the other half of a hittable target: two 44px badges
-// 2px apart are still one 90px smudge under a thumb.
+// Row spacing — the separation half of the rule above, kept beside the sizes it
+// has to stay in step with.
 export const BADGE_ROW_GAP = 'gap-0.5 [@media(pointer:coarse)]:gap-2';
 
 const BADGE_SIZE = {
