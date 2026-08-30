@@ -37,17 +37,31 @@ const MIN_ANY = 24;
 const MIN_COARSE = 32;
 const COARSE = "[@media(pointer:coarse)]:";
 
+// Pull `<n>` out of the `[<variant>:]<prop>-[<n>px]` utility in a class list.
+// Tokenised rather than matched with a RegExp built from COARSE: that string is
+// almost entirely regex metacharacters, so using it as a pattern needs escaping
+// — and a hand-written escape that misses one (backslashes, in the first
+// version of this file; CodeQL caught it) silently matches the wrong thing.
+// Splitting on whitespace and comparing literal prefixes has no such failure
+// mode, and says what a Tailwind class actually is.
+// Split on the quote characters too: `classes` arrives as the raw right-hand
+// side of a declaration, so the first token still carries the opening quote.
+function sizeOf(classes, prop, variant = "") {
+  const token = classes.split(/[\s'"`]+/).find((t) => t.startsWith(`${variant}${prop}-[`));
+  return token ? Number(/\[(\d+)px\]/.exec(token)?.[1]) : NaN;
+}
+
 console.log("T1 — the badge row states a minimum target size, and grows it on touch");
 {
   const target = chips.match(/const TOUCH_TARGET =\s*([\s\S]*?);\n/)?.[1] || "";
   check("TOUCH_TARGET exists", target.length > 0);
   for (const dim of ["min-h", "min-w"]) {
-    const base = target.match(new RegExp(`(?<!:)\\b${dim}-\\[(\\d+)px\\]`))?.[1];
-    check(`${dim} floor on every pointer is ≥ ${MIN_ANY}px`, Number(base) >= MIN_ANY, `got ${base}px`);
-    const coarse = target.match(
-      new RegExp(`${COARSE.replace(/[[\]()]/g, "\\$&")}${dim}-\\[(\\d+)px\\]`),
-    )?.[1];
-    check(`${dim} on a coarse pointer is ≥ ${MIN_COARSE}px`, Number(coarse) >= MIN_COARSE, `got ${coarse}px`);
+    // A bare `min-h-[…]` token cannot be confused with the variant one: the
+    // latter starts with `[`, so the prefix test separates them on its own.
+    const base = sizeOf(target, dim);
+    check(`${dim} floor on every pointer is ≥ ${MIN_ANY}px`, base >= MIN_ANY, `got ${base}px`);
+    const coarse = sizeOf(target, dim, COARSE);
+    check(`${dim} on a coarse pointer is ≥ ${MIN_COARSE}px`, coarse >= MIN_COARSE, `got ${coarse}px`);
   }
   // Separation is half of what makes a target hittable: two 32px badges 2px
   // apart are still one smudge. The row has to widen with the badges.
