@@ -267,9 +267,56 @@ export function refinementComplete(entry, ticked) {
 //   'dropped' — deliberately excluded from an otherwise all-in ask. Struck
 //               through and dimmer than 'off', so "I turned this one off"
 //               never reads the same as "I have not been here yet".
+// ── Tap targets, which are not the same thing as paint ───────────────────────
+//
+// The badges are deliberately tiny: a chip cloud with fifty species has to stay
+// calm, and 9px text in a 37×20 box does that. But the painted box was also the
+// whole hit target, and the row set them 2px apart — so a fingertip (~40px of
+// contact) covered two badges at once and the browser handed the press to
+// whichever one its centroid landed in. Under a mouse the row was flawless;
+// under a thumb "Einall" reliably toggled the Hisui badge beside it, and the
+// last badge sat 6px from the ✕ that deletes the whole species.
+//
+// So the visual size stays and the target grows underneath it. `min-h`/`min-w`
+// clear WCAG 2.5.8's 24×24 CSS px on every pointer (which the old 20px-tall,
+// 15px-wide ♀/♂ badges did not), and the coarse-pointer branch takes both to
+// 44 — the touch figure Apple's HIG and WCAG 2.5.5 agree on — with roomier
+// padding and readable text on the devices that actually need it. The row
+// widens its gap to match, because separation is half of what makes a target
+// hittable: two 44px targets 2px apart are still one 90px smudge.
+//
+// `[@media(pointer:coarse)]` rather than a stylesheet rule on purpose — as a
+// Tailwind arbitrary variant it lands in the utilities layer, so it beats the
+// `px-1` sitting next to it instead of losing a specificity race to it.
+//
+// Every class below is written out in full, and has to be: Tailwind generates
+// CSS by scanning these files for literal class names, so a prefix spliced in
+// through `${…}` produces markup referring to a rule that was never emitted —
+// silently, and only on the devices the variant targets. Repeating
+// `[@media(pointer:coarse)]:` is the price of the utility actually existing.
+//
+// 32px on touch rather than the 44 of Apple's HIG and WCAG 2.5.5: these badges
+// live INSIDE an inline chip beside the species name, and at 44 the row stops
+// fitting a phone — it wraps into a two-by-two block with the name stranded
+// beside it, which trades a mis-tap for an unreadable chip. 32px is ~8.5mm,
+// inside the 7–10mm a fingertip wants, is well clear of WCAG 2.5.8's 24px
+// floor, and keeps the chip on one line. The gap does the rest of the work.
+const TOUCH_TARGET =
+	'min-h-[24px] min-w-[24px] [@media(pointer:coarse)]:min-h-[32px] [@media(pointer:coarse)]:min-w-[32px]';
+
+// The same rule for the ✕ that removes a chip: a 10px icon in a button with no
+// padding is a 10×10 target, and it is the one control in these rows whose
+// mis-tap is destructive. Exported so the six chip lists in App.jsx state it
+// once rather than each growing their own idea of a touch target.
+export const CHIP_REMOVE_TARGET = `inline-flex items-center justify-center ${TOUCH_TARGET}`;
+
+// Row spacing, which is the other half of a hittable target: two 44px badges
+// 2px apart are still one 90px smudge under a thumb.
+export const BADGE_ROW_GAP = 'gap-0.5 [@media(pointer:coarse)]:gap-2';
+
 const BADGE_SIZE = {
-	xs: 'text-[9px] px-1 py-px',
-	sm: 'text-[10px] px-1.5 py-0.5',
+	xs: 'text-[9px] px-1 py-px [@media(pointer:coarse)]:text-[11px] [@media(pointer:coarse)]:px-2.5',
+	sm: 'text-[10px] px-1.5 py-0.5 [@media(pointer:coarse)]:text-[11px] [@media(pointer:coarse)]:px-2.5',
 };
 
 // One refinement row for one species chip. Pure presentation plus ARIA: it
@@ -297,7 +344,7 @@ export function RefinementBadges({
 	if (!entry || !onToggle) return null;
 	const dims = BADGE_SIZE[size] || BADGE_SIZE.xs;
 	return (
-		<span className='flex items-center gap-0.5 flex-wrap' title={title}>
+		<span className={`flex items-center flex-wrap ${BADGE_ROW_GAP}`} title={title}>
 			{entry.keys.map((key) => {
 				const state = stateFor(key);
 				const on = state === 'on';
@@ -309,7 +356,7 @@ export function RefinementBadges({
 						aria-pressed={on}
 						aria-label={refinementAriaLabel(entry, key, t)}
 						title={titleFor ? titleFor(key) : undefined}
-						className={`${dims} rounded border transition ${
+						className={`${dims} ${TOUCH_TARGET} inline-flex items-center justify-center rounded border transition ${
 							on
 								? ''
 								: state === 'dropped'
