@@ -126,8 +126,8 @@ console.log("\nBuddy targets: legacy string[] → structured Target[]");
     ],
   });
   const ts = out.buddies[0].targetSpecies;
-  check("legacy string → whole-species target (empty dropForms, gender any)",
-    JSON.stringify(ts[0]) === JSON.stringify({ species: "habitak", expand: false, dropForms: [], gender: "any" }),
+  check("legacy string → whole-species target (empty dropForms/dropSlots, gender any)",
+    JSON.stringify(ts[0]) === JSON.stringify({ species: "habitak", expand: false, dropForms: [], dropSlots: [], gender: "any" }),
     `got ${JSON.stringify(ts[0])}`);
   check("legacy type 'unlicht' migrates to keep only Alolan Mauzi",
     ts[1]?.species === "mauzi" && ts[1]?.expand === false
@@ -158,6 +158,39 @@ console.log("\nBuddy targets: migration is idempotent");
     JSON.stringify(twice.buddies[0].targetSpecies) === JSON.stringify(once.buddies[0].targetSpecies),
     `got ${JSON.stringify(twice.buddies[0].targetSpecies)}`);
   check("rawAppend preserved on re-merge", twice.buddies[0].rawAppend === "");
+}
+
+console.log("\nBuddy targets: dropSlots (un-searchable slots, mirror of the friend-collect map)");
+{
+  const out = mergeImportedConfig({
+    buddies: [{ id: "a", name: "Auri", tagPrefix: "Auri",
+      targetSpecies: [
+        { species: "burmy", dropSlots: ["male", "sandy"] },          // valid subset
+        { species: "sesokitz", dropSlots: ["spring", "banana"] },    // unknown key dropped
+        { species: "kinoso", dropSlots: ["overcast", "sunny"] },     // full drop → asks for nothing
+        { species: "mauzi", dropSlots: ["plant"] },                  // species has no slot axis
+        { species: "pikachu" },                                      // absent field
+      ] }],
+  });
+  const ts = out.buddies[0].targetSpecies;
+  const by = (sp) => ts.find(t => t.species === sp);
+  check("valid slot keys survive",
+    JSON.stringify(by("burmy")?.dropSlots) === JSON.stringify(["male", "sandy"]),
+    `got ${JSON.stringify(by("burmy")?.dropSlots)}`);
+  check("unknown slot key dropped, valid one kept",
+    JSON.stringify(by("sesokitz")?.dropSlots) === JSON.stringify(["spring"]),
+    `got ${JSON.stringify(by("sesokitz")?.dropSlots)}`);
+  // The picker refuses to drop the last kept slot, so a full drop can only come
+  // from a hand-edited import. Asking for nothing is junk, not a choice.
+  check("dropping every slot clears the restriction rather than emptying the ask",
+    by("kinoso")?.dropSlots.length === 0, `got ${JSON.stringify(by("kinoso")?.dropSlots)}`);
+  check("slot keys on a species with no slot axis drop entirely",
+    by("mauzi")?.dropSlots.length === 0, `got ${JSON.stringify(by("mauzi")?.dropSlots)}`);
+  check("absent dropSlots backfills to []",
+    Array.isArray(by("pikachu")?.dropSlots) && by("pikachu").dropSlots.length === 0);
+  const twice = mergeImportedConfig({ buddies: out.buddies });
+  check("dropSlots migration is idempotent",
+    JSON.stringify(twice.buddies[0].targetSpecies) === JSON.stringify(ts));
 }
 
 console.log("\nBuddy targets: duplicate species collapse to one (form selection is per-species)");

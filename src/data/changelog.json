@@ -1,4 +1,5 @@
 [
+	{ "id": "buddy_slot_parity", "date": "2026-08-31" },
 	{ "id": "chip_tap_targets", "date": "2026-08-30" },
 	{ "id": "friend_collect_form_picking", "date": "2026-08-30" },
 	{ "id": "meta_rankings_simulated", "date": "2026-08-28" },
