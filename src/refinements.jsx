@@ -276,6 +276,69 @@ export function refinementComplete(entry, ticked) {
 	return required.every((k) => owned.has(k));
 }
 
+// ── Coverage: does the copy I own satisfy the copy being asked for? ──────────
+//
+// Two surfaces ask this in opposite directions and used to answer it in
+// different places. "Have friends collect for me" asks whether a lucky/hundo
+// already on a have-list retires a wishlist target. "I collect for my buddies"
+// asks whether the hundo I own makes my 3★ spares of that species surplus, and
+// therefore safe to hand over. Both reduce to one question: does the copy I
+// OWN — as annotated on the have-list — match what is being ASKED for?
+//
+// The opt-in rule is what makes this safe to share, and it is the same on both
+// sides: an UNannotated have-entry covers the species exactly as it did before
+// annotations existed. Only a user who has clicked a badge ever gets the finer
+// answer, so absence of annotation can never take something away.
+
+// Kept option keys for a drop-restricted ask, against a catalog of keys.
+// null means unrestricted, which is three different things collapsed on
+// purpose: no catalog, nothing dropped, or junk that dropped every option and
+// would otherwise ask for nothing at all.
+export function keptOptions(catalog, dropped) {
+	const list = Array.isArray(catalog) ? catalog : [];
+	const drop = dropped instanceof Set ? dropped : new Set(Array.isArray(dropped) ? dropped : []);
+	if (list.length === 0 || drop.size === 0) return null;
+	const kept = list.filter((k) => !drop.has(k));
+	return kept.length > 0 && kept.length < list.length ? kept : null;
+}
+
+// Does the annotated copy of `canonSpecies` on ONE have-list satisfy `want`?
+//
+//   ann  — that list's three annotation maps: { forms, genders, slots }
+//   want — the ask's own restrictions: { gender, forms, slots }, each nullable
+//          (null = unrestricted, from keptOptions above)
+//
+// Says nothing about whether the species is owned at all: that stays with the
+// caller, which is the only side that knows WHICH list it is reading.
+//
+// The three gates AND together and none can override another:
+//
+//   gender — an annotated owner missing the locked gender cannot satisfy it
+//            (a ♂ Wadribie never becomes Honweisel).
+//   slots  — every slot still being asked for has to be ticked. One owned copy
+//            does not stand in for a species with four cloaks.
+//   forms  — the owned form has to be one of the forms still being asked for.
+export function annotationCovers(canonSpecies, ann, want) {
+	const w = want || {};
+	if (w.gender) {
+		const ownedGenders = ann?.genders?.[canonSpecies];
+		if (Array.isArray(ownedGenders) && ownedGenders.length > 0 && !ownedGenders.includes(w.gender))
+			return false;
+	}
+	const slotCatalog = invisibleSlotsFor(canonSpecies)?.slots;
+	if (slotCatalog) {
+		const ownedSlots = ann?.slots?.[canonSpecies];
+		if (Array.isArray(ownedSlots) && ownedSlots.length > 0) {
+			const wantedSlots = w.slots || slotCatalog;
+			if (!wantedSlots.every((k) => ownedSlots.includes(k))) return false;
+		}
+	}
+	if (!w.forms) return true;
+	const ownedForms = ann?.forms?.[canonSpecies];
+	if (!Array.isArray(ownedForms) || ownedForms.length === 0) return true;
+	return ownedForms.some((k) => w.forms.includes(k));
+}
+
 // ── The badge row ────────────────────────────────────────────────────────────
 
 // Per-option render state, decided by the call site:

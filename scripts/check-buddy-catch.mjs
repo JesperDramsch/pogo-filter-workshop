@@ -318,5 +318,85 @@ console.log("\nDropping every form catches nothing → species omitted");
     `got ${res.buddyCatchFilters.length}`);
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// The spare carve-out reads the have-list annotations
+//
+// When a buddy wants a species you already own a hundo of, the stars line
+// widens to `0*,1*,2*,<selector>` + `!4*`: your 3★ copies are surplus, so hand
+// them over. Species-level ownership is the wrong question for a species split
+// by form, gender or an un-searchable slot — this is the same
+// whole-species-counts-as-done bug the friend wishlist carried, on the surface
+// that GIVES POKÉMON AWAY. The gate is opt-in: an unannotated hundo behaves
+// exactly as it always did, so every scenario below has its control.
+//
+// Annotation maps are canonical-species-keyed (mergeConfig canonicalizes them),
+// which in this repo means the German name — sandan, not sandshrew.
+console.log("\nSpare carve-out: annotated hundos only cover what they actually are");
+{
+  const target = (over) => ({ species: "sandan", expand: false, dropForms: [], dropSlots: [], gender: "any", ...over });
+  const run = (targets, cfgExtra, hundos = ["sandan"]) => {
+    const buddy = { id: "s", name: "S", tagPrefix: "S", active: true, rawAppend: "", targetSpecies: targets };
+    const res = buildFilters(hundos, [], { ...DEFAULT_CONFIG, buddies: [buddy], ...cfgExtra }, [], LOCALE, tFn);
+    return res.buddyCatchFilters[0]?.filter || "";
+  };
+  // The carve-out is visible as the `!4*` guard, which only ever accompanies it.
+  const spared = (f) => segs(f).includes("!4*");
+
+  check("control: unannotated hundo still opens the carve-out",
+    spared(run([target({})], {})));
+  check("control: no hundo at all → plain stars line, no carve-out",
+    !spared(run([target({})], {}, [])));
+
+  // Forms. Owning the Kanto hundo must not offer up the Alolan spares.
+  check("hundo annotated Kanto + buddy wants Alola → no carve-out",
+    !spared(run([target({ dropForms: ["base"] })], { hundoForms: { sandan: ["base"] } })));
+  check("hundo annotated Kanto + buddy wants Kanto → carve-out fires",
+    spared(run([target({ dropForms: ["alola"] })], { hundoForms: { sandan: ["base"] } })));
+  check("hundo annotated Kanto + buddy wants either form → carve-out fires (overlap is enough)",
+    spared(run([target({})], { hundoForms: { sandan: ["base"] } })));
+
+  // Un-searchable slots. Burmy's four cloaks share one dex entry and one type,
+  // so nothing about them can be written as a search term — the carve-out is
+  // the only place a slot pick has any effect at all.
+  const burmy = (over) => ({ species: "burmy", expand: false, dropForms: [], dropSlots: [], gender: "any", ...over });
+  const runB = (over, cfgExtra) => run([burmy(over)], cfgExtra, ["burmy"]);
+  check("hundo Burmy with one cloak ticked + buddy wants the species → no carve-out",
+    !spared(runB({}, { hundoSlots: { burmy: ["plant"] } })));
+  check("…but if the buddy only wants that cloak → carve-out fires",
+    spared(runB({ dropSlots: ["male", "sandy", "trash"] }, { hundoSlots: { burmy: ["plant"] } })));
+  check("…and if they want a different one → no carve-out",
+    !spared(runB({ dropSlots: ["male", "plant", "trash"] }, { hundoSlots: { burmy: ["plant"] } })));
+  check("every cloak ticked → carve-out fires for the whole species",
+    spared(runB({}, { hundoSlots: { burmy: ["male", "plant", "sandy", "trash"] } })));
+
+  // Gender. A ♂ Wadribie is never the ♀ one a buddy asked for.
+  const combee = (over) => ({ species: "wadribie", expand: false, dropForms: [], dropSlots: [], gender: "any", ...over });
+  check("hundo annotated ♂ + buddy locked ♀ → no carve-out",
+    !spared(run([combee({ gender: "female" })], { hundoGenders: { wadribie: ["male"] } }, ["wadribie"])));
+  check("hundo annotated ♀ + buddy locked ♀ → carve-out fires",
+    spared(run([combee({ gender: "female" })], { hundoGenders: { wadribie: ["female"] } }, ["wadribie"])));
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// dropSlots is invisible to the string, by construction. If a slot key, a slot
+// label or a narrowed selector ever showed up here it would be a search term
+// PoGo cannot parse — the failure the whole AXIS_SLOT distinction exists to
+// prevent.
+console.log("\nDropped slots never reach the filter string");
+{
+  const buddy = { id: "n", name: "N", tagPrefix: "N", active: true, rawAppend: "",
+    targetSpecies: [{ species: "burmy", expand: false, dropForms: [], dropSlots: ["male", "sandy"], gender: "any" }] };
+  const withDrops = buildFilters([], [], { ...DEFAULT_CONFIG, buddies: [buddy] }, [], LOCALE, tFn);
+  const plain = { ...buddy, targetSpecies: [{ ...buddy.targetSpecies[0], dropSlots: [] }] };
+  const without = buildFilters([], [], { ...DEFAULT_CONFIG, buddies: [plain] }, [], LOCALE, tFn);
+  const f = withDrops.buddyCatchFilters[0]?.filter || "";
+  check("the filter is byte-identical with and without the slot drops",
+    f === (without.buddyCatchFilters[0]?.filter || ""), f);
+  check("the species is still asked for in full", segs(f).includes("burmy"));
+  for (const term of ["male", "sandy", "plant", "trash"])
+    check(`no '${term}' term in the string`, !f.includes(term), f);
+  check("no slot guard clause", !segs(f).some(s => s.startsWith("!burmy,")), f);
+}
+
 console.log(`\n${failures === 0 ? "✓ All buddy-catch tests passed." : `✗ ${failures} test(s) failed.`}`);
 process.exit(failures === 0 ? 0 : 1);

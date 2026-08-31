@@ -63,8 +63,8 @@ console.log("S1 — two-state toggles expose aria-pressed");
     const i = app.indexOf(`onClick={() => ${handler}}`);
     check(label, i !== -1 && app.slice(i, i + 300).includes("aria-pressed"));
   }
-  // The five species refinement rows (two have-lists, friend-collect gender +
-  // axis, buddy gender + forms) all render through RefinementBadges, so the
+  // The species refinement rows (two have-lists, friend-collect gender + axis,
+  // buddy gender + forms + slots) all render through RefinementBadges, so the
   // per-handler audit above is replaced by one check on the shared row plus a
   // check that every call site actually drives it.
   {
