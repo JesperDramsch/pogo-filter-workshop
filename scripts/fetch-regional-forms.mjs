@@ -76,6 +76,17 @@ function regionForForm(form) {
 // Bug: predicateFor then reports them indistinct and buildCatalog drops the
 // species with a loud warning, which is the correct outcome and self-healing
 // if Niantic ever splits the types.
+//
+// Basculin's three stripes are here for the same reason and with the same
+// outcome today — red, blue and white all publish POKEMON_TYPE_WATER and
+// nothing else. Listing them is what makes that a checked fact rather than a
+// comment: the day any stripe gains a second type — White-Striped is the one
+// Basculegion evolves from, and Basculegion is not in PoGo at all yet — this
+// file starts emitting a real predicate instead of a warning, and the stripes
+// become searchable on their own. Whoever sees that happen must also drop dex
+// 550 from INVISIBLE_FORM_SLOTS (src/refinements.jsx) and add the form_variant
+// labels the picker will need — scripts/check-lucky-logic.mjs fails until they
+// do, because one chip may only ever render one badge group.
 const NON_REGIONAL_AXES = {
   PLANT: { key: "cloak:plant", axis: "cloak", variant: "plant" },
   SANDY: { key: "cloak:sandy", axis: "cloak", variant: "sandy" },
@@ -84,6 +95,9 @@ const NON_REGIONAL_AXES = {
   POMPOM: { key: "style:pompom", axis: "style", variant: "pompom" },
   PAU: { key: "style:pau", axis: "style", variant: "pau" },
   SENSU: { key: "style:sensu", axis: "style", variant: "sensu" },
+  RED_STRIPED: { key: "stripe:red", axis: "stripe", variant: "redstriped" },
+  BLUE_STRIPED: { key: "stripe:blue", axis: "stripe", variant: "bluestriped" },
+  WHITE_STRIPED: { key: "stripe:white", axis: "stripe", variant: "whitestriped" },
 };
 
 // Render order: the base/origin form first, then the regional variants.
@@ -242,6 +256,11 @@ export function validate(species) {
     // Burmy's three cloaks are all pure Bug, so it must stay OUT of the
     // catalog — if this ever starts resolving, the types changed upstream.
     ["Burmy stays indistinct", () => species["412"] === undefined],
+    // Same for Basculin's three stripes, all pure Water. Both species are
+    // tracked as un-searchable slots in src/refinements.jsx instead; a species
+    // in this catalog AND in that one would render two badge groups on one
+    // chip, which is why the disjointness is asserted in check-lucky-logic.
+    ["Basculin stays indistinct", () => species["550"] === undefined],
   ];
   const failures = checks.filter(([, fn]) => !fn()).map(([name]) => name);
   if (failures.length) {
