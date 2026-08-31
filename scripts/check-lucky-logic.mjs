@@ -1,4 +1,4 @@
-import { buildFilters, DEFAULT_CONFIG, prepareImport, validateImportEnvelope, SCHEMA_CURRENT, babyStageDex, genderSlotsFor, regionalFormsFor, invisibleSlotsFor, formGuardHides, deerlingSeasonFor, currentSeasonWindow } from "../src/App.jsx";
+import { buildFilters, DEFAULT_CONFIG, prepareImport, validateImportEnvelope, SCHEMA_CURRENT, babyStageDex, genderSlotsFor, regionalFormsFor, invisibleSlotsFor, INVISIBLE_SLOT_DEX, formGuardHides, deerlingSeasonFor, currentSeasonWindow } from "../src/App.jsx";
 import {
   AXIS_FORM,
   AXIS_GENDER,
@@ -360,6 +360,13 @@ console.log("\nScenario 20: friend-collect coverage respects gender");
     fc(cfgWith(target)) === "");
 }
 
+// The disjointness and type-declaration checks below walk the catalog itself
+// (every resolver takes a dex as readily as a name), so a species added to
+// INVISIBLE_FORM_SLOTS is covered by them the moment it lands there — a
+// hand-copied list would leave the newest entry, the one most likely to be
+// wrong, as the only one nothing asserts.
+const SLOT_SPECIES = INVISIBLE_SLOT_DEX;
+
 console.log("\nScenario 21: un-searchable slots — catalog and disjointness");
 {
   check("Sesokitz carries the four seasons",
@@ -368,7 +375,15 @@ console.log("\nScenario 21: un-searchable slots — catalog and disjointness");
     JSON.stringify(invisibleSlotsFor("cherrim")?.slots) === '["overcast","sunny"]');
   check("Burmy is ONE four-slot group (gender × cloak interact)",
     JSON.stringify(invisibleSlotsFor("burmy")?.slots) === '["male","plant","sandy","trash"]');
+  check("Barschuft carries the three stripes",
+    JSON.stringify(invisibleSlotsFor("basculin")?.slots) === '["red","blue","white"]');
   check("an ordinary species has no slots", invisibleSlotsFor("charizard") === null);
+  // The stripes are separate form templates with separate stats, but every one
+  // of them is pure Water in the game master — so they can never become a
+  // search guard, exactly like Burmy's cloaks. fetch-regional-forms.mjs asserts
+  // the other half of this against the live dump.
+  check("Barschuft's stripes are NOT in the searchable form catalog",
+    regionalFormsFor("basculin") === null);
   // Burmadame's cloaks DO differ by type, so they belong in the searchable
   // form catalog and must NOT be tracked as invisible slots.
   check("Burmadame is type-searchable, not an invisible-slot species",
@@ -381,10 +396,10 @@ console.log("\nScenario 21: un-searchable slots — catalog and disjointness");
   check("Burmy itself has NO searchable forms (all three cloaks are pure Bug)",
     regionalFormsFor("burmy") === null);
   // The chip rule again: one refinement group per chip.
-  const both = ["deerling", "sawsbuck", "cherrim", "burmy", "maushold", "dudunsparce"]
+  const both = SLOT_SPECIES
     .filter((s) => invisibleSlotsFor(s) && (regionalFormsFor(s) || []).length > 0);
   check("invisible-slot catalog is disjoint from the form catalog", both.length === 0, JSON.stringify(both));
-  const g = ["deerling", "sawsbuck", "cherrim", "burmy", "maushold", "dudunsparce"]
+  const g = SLOT_SPECIES
     .filter((s) => invisibleSlotsFor(s) && genderSlotsFor(s));
   check("…and from the gender catalog", g.length === 0, JSON.stringify(g));
 
@@ -399,6 +414,7 @@ console.log("\nScenario 21: un-searchable slots — catalog and disjointness");
     ["burmy", AXIS_SLOT],
     ["deerling", AXIS_SLOT],
     ["cherrim", AXIS_SLOT],
+    ["basculin", AXIS_SLOT],
     ["charizard", null],
   ];
   const wrong = cases.filter(([sp, axis]) => (refinementAxisFor(sp)?.axis ?? null) !== axis);
@@ -572,8 +588,7 @@ console.log("\nScenario 25: formGuardHides — the type proof behind Scenario 24
       formGuardHides({ include: ["grass"], exclude: [] }, undefined) === true);
   // Every catalog entry has to carry the types the proof runs on, or the check
   // above silently degrades to "hidden" and the withholding goes back to blunt.
-  const missing = ["deerling", "sawsbuck", "cherrim", "burmy", "maushold", "dudunsparce"]
-    .filter((s) => !(invisibleSlotsFor(s)?.types?.length > 0));
+  const missing = SLOT_SPECIES.filter((s) => !(invisibleSlotsFor(s)?.types?.length > 0));
   check("every invisible-slot species declares its type combination", missing.length === 0,
     JSON.stringify(missing));
 }
