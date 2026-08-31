@@ -82,9 +82,26 @@ const INVISIBLE_FORM_SLOTS = {
 	// and all four Burmy slots are pure Bug, which is what lets Burmadame's
 	// cloak guards coexist with an unfinished Burmy.)
 	412: { axis: 'burmy', slots: ['male', 'plant', 'sandy', 'trash'], types: ['bug'] },
+	// Barschuft: three stripes, one type. The game master publishes
+	// BASCULIN_RED_STRIPED / _BLUE_STRIPED / _WHITE_STRIPED as separate form
+	// templates with separate stats blocks — and all three are POKEMON_TYPE_WATER
+	// with no second type, so no predicate can isolate one. The stripe axis is
+	// listed in fetch-regional-forms.mjs's NON_REGIONAL_AXES for exactly the
+	// reason Burmy's cloaks are: the sync then computes the predicates, finds
+	// them indistinct, and drops the species with a warning — so if Niantic ever
+	// splits the types (White-Striped is the Basculegion parent), the species
+	// moves into the searchable catalog on its own and the disjointness check in
+	// scripts/check-lucky-logic.mjs fails until this entry goes away.
+	550: { axis: 'basculin', slots: ['red', 'blue', 'white'], types: ['water'] },
 	925: { axis: 'maushold', slots: ['family3', 'family4'], types: ['normal'] }, // ~99:1 roll
 	982: { axis: 'dudunsparce', slots: ['twoseg', 'threeseg'], types: ['normal'] }, // ~99:1 roll
 };
+
+// Every dex carrying un-searchable slots. Exported so the offline checks in
+// scripts/check-lucky-logic.mjs walk the catalog itself — a hand-copied species
+// list there would quietly stop covering the newest entry, which is exactly the
+// entry most likely to be wrong.
+export const INVISIBLE_SLOT_DEX = Object.keys(INVISIBLE_FORM_SLOTS).map(Number);
 
 // Would the form guard `f` (an entry from regional-forms.json, applied inside a
 // `!+family,<terms>` clause) actually hide a species whose type combination is

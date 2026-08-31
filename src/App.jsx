@@ -40,6 +40,7 @@ import {
 	formRegionLabel,
 	genderSlotsFor,
 	CHIP_REMOVE_TARGET,
+	INVISIBLE_SLOT_DEX,
 	invisibleSlotsFor,
 	optionPicked,
 	refinementAxisFor,
@@ -916,7 +917,12 @@ const REGIONAL_GROUPS = {
 			'Nigiragi', // Tatsugiri — Curly/Droopy/Stretchy
 			'Schalellos',
 			'Gastrodon', // West/Ost forms not separately searchable
-			'Barschuft', // Basculin — red/blue stripe forms not separately searchable
+			// Basculin — red / blue / white stripes are all pure Water in the game
+			// master, so no type predicate separates them. Tracked as un-searchable
+			// slots (INVISIBLE_FORM_SLOTS, dex 550) so the wishlists keep asking
+			// until you own all three; the collector protection is what keeps the
+			// stripes you already have out of the trash pile meanwhile.
+			'Barschuft',
 			// Regional-by-form species we *can't* distinguish in PoGo's search syntax —
 			// even when home is in the region of one form, the bag holds all forms under
 			// the same name. Better to keep the whole species and trade duplicates to
@@ -940,7 +946,7 @@ const REGIONAL_GROUPS = {
 // Re-exported so scripts/check-lucky-logic.mjs (and anything else that already
 // treats App.jsx as the public surface) keeps importing them from here after
 // the move into refinements.jsx.
-export { formGuardHides, genderSlotsFor, invisibleSlotsFor, regionalFormsFor };
+export { formGuardHides, genderSlotsFor, invisibleSlotsFor, regionalFormsFor, INVISIBLE_SLOT_DEX };
 
 // Family expansion: when collectors include all members of a +family,
 // collapse to "+Family" instead of repeated entries (saves chars + protects whole line).
