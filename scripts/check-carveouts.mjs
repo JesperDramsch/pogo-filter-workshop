@@ -218,11 +218,16 @@ console.log("\nBuddy spare-dupe surfacing (you own a hundo of a species the budd
   check("2★ dratini still shows (normal catch)",
     shows(mon({ dex: 147, families: ["dratini"], types: ["dragon"], star: 2 })));
 
-  // No-spare case stays byte-identical: a buddy wanting only a non-hundo species
-  // gets the plain 0*,1*,2* clause and no !4* guard.
+  // No-spare case: a buddy wanting only a non-hundo species gets the plain,
+  // UN-WIDENED 0*,1*,2* clause — that line is the carve-out's only signal. The
+  // `!4*` guard rides along either way; it is redundant here (0-2★ cannot be a
+  // 4★) but a give-away filter should not look unguarded because of a have-list
+  // annotation somewhere else.
   const r2 = buildFilters([], [], mergeImportedConfig({ buddies: [{ id: "k", name: "Kai", tagPrefix: "#kai", active: true, targetSpecies: ["dratini"] }] }), [], "de", tFn);
   const fk = r2.buddyCatchFilters.find(b => b.buddyName === "Kai").filter;
-  check("no-hundo buddy: plain 0*,1*,2* clause, no !4*", clauses(fk).includes("0*,1*,2*") && !clauses(fk).includes("!4*"));
+  check("no-hundo buddy: plain 0*,1*,2* clause, not widened",
+    clauses(fk).includes("0*,1*,2*") && !clauses(fk).some(c => c.startsWith("0*,1*,2*,")));
+  check("no-hundo buddy: '!4*' guard still present", clauses(fk).includes("!4*"));
 }
 
 console.log("\nMap-marked bazaar species protected in TRASH (Choreogel regression)");

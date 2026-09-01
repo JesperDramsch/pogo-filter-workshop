@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-08-31T16:08:38.263Z",
+  "fetchedAt": "2026-09-01T07:44:49.586Z",
   "events": [
     {
       "id": "event-mega-ascension-2026-08-31t10-00-00",
@@ -178,6 +178,46 @@
         "Zorua"
       ],
       "unresolved": []
+    },
+    {
+      "id": "event-mega-squads-2026-09-08t10-00-00",
+      "title": "Mega Squads",
+      "category": "Event",
+      "start": "2026-09-08T10:00:00",
+      "end": "2026-09-14T20:00:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        13,
+        16,
+        228,
+        318,
+        821,
+        973
+      ],
+      "spawns": [
+        "Carvanha",
+        "Flamigo",
+        "Houndour",
+        "Pidgey",
+        "Rookidee",
+        "Weedle"
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "community-day-gible-community-day-classic-2026-09-12t14-00-00",
+      "title": "Gible Community Day Classic",
+      "category": "Community Day",
+      "start": "2026-09-12T14:00:00",
+      "end": "2026-09-12T17:00:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        443
+      ],
+      "spawns": [
+        "Gible"
+      ],
+      "unresolved": []
     }
   ],
   "eggPools": [
@@ -269,6 +309,33 @@
         "Tyrogue",
         "Wynaut",
         "Zigzagoon"
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "event-mega-squads-2026-09-08t10-00-00-eggs",
+      "title": "Mega Squads",
+      "category": "Event",
+      "start": "2026-09-08T10:00:00",
+      "end": "2026-09-14T20:00:00",
+      "isLocalTime": true,
+      "eggDex": [
+        551,
+        587,
+        661,
+        674,
+        821,
+        942,
+        973
+      ],
+      "eggs": [
+        "Emolga",
+        "Flamigo",
+        "Fletchling",
+        "Maschiff",
+        "Pancham",
+        "Rookidee",
+        "Sandile"
       ],
       "unresolved": []
     },
