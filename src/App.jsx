@@ -2259,6 +2259,20 @@ export function buildFilters(
 		if (cfg.protectXL) push(clauses, `!${kw.flag.xl}`, tFn('app.clause_why.xl_trade'));
 		if (cfg.protectXXS) push(clauses, `!${kw.flag.xxs}`, tFn('app.clause_why.xxs'));
 		if (cfg.protectLegacyMoves) push(clauses, legacyMovesClause(), tFn('app.clause_why.legacy_moves'));
+		// Guaranteed-lucky floor. Old untraded stock is the pool that makes a
+		// lucky trade a certainty, and this filter stages a REGULAR trade —
+		// handing one of those over burns it for nothing. trash, trade, gift and
+		// cheap-evolve all carry the floor; the buddy catch filter was the one
+		// hand-off surface without it, even though the `!traded` guard above
+		// means everything it surfaces is still lucky-eligible by construction.
+		// Plain `jahr{N}-`, without the `,traded` escape trash and cheap-evolve
+		// use: the traded half of that OR is already excluded here.
+		if (cfg.protectLuckyEligible && cfg.luckyEligibleYear && cfg.luckyEligibleYear > 0)
+			push(
+				clauses,
+				`${kw.numeric.year}${cfg.luckyEligibleYear}-`,
+				tFn('app.clause_why.lucky_eligible', { params: { year: cfg.luckyEligibleYear } }),
+			);
 	};
 	// Stars-to-trash line, with the spare-hundo carve-out: if the buddy wants a
 	// species you already own a hundo of, surface its 3★+ copies too (you don't
@@ -2269,10 +2283,17 @@ export function buildFilters(
 	const pushStarsOrSpare = (clauses, spareSelectors) => {
 		if (spareSelectors.length > 0) {
 			push(clauses, ['0*,1*,2*', ...spareSelectors].join(','), tFn('app.clause_why.buddy_catch_or_spare'));
-			push(clauses, '!4*', tFn('app.clause_why.never_gift_4star'));
 		} else {
 			push(clauses, '0*,1*,2*', tFn('app.clause_why.trashable_stars'));
 		}
+		// Unconditional. Without the carve-out the plain `0*,1*,2*` line already
+		// cannot match a 4★, so this guard is redundant there — but a safety
+		// clause that appears and disappears with an unrelated have-list
+		// annotation reads like a bug on the one filter that hands Pokémon AWAY,
+		// and four characters is a cheap price for never having to re-derive
+		// that. The carve-out's own signal is the widened stars line above, which
+		// is what check-buddy-catch asserts on.
+		push(clauses, '!4*', tFn('app.clause_why.never_gift_4star'));
 	};
 	// Does the hundo I already own actually cover what this buddy asked for?
 	//

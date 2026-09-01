@@ -94,6 +94,9 @@ const SEM_CFG = {
   protectBackgrounds: false, protectNundos: false, protectDoubleMoved: false,
   protectDynamax: false, protectXXL: false, protectXL: false, protectXXS: false,
   protectLegacyMoves: false,
+  // The guaranteed-lucky floor emits a `jahr{N}-` term, which litMatch has no
+  // notion of (the mocks carry no catch year) — off here, asserted structurally.
+  protectLuckyEligible: false,
 };
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -139,6 +142,41 @@ console.log("Combined catch filter — structure (5 mixed targets, Mauzi hundo o
   // Standard protection guards — they now cover the raw append too.
   check("standard guards present ('!#', '!favorit')",
     S.includes("!#") && f.includes(`!${kw.flag.favorite}`));
+  // Guaranteed-lucky floor: this filter stages a regular trade, so it must not
+  // surface the old untraded stock that would trade lucky for certain.
+  check(`guaranteed-lucky floor '${kw.numeric.year}21-' present`,
+    S.includes(`${kw.numeric.year}21-`), f);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// The two guards this filter used to emit only sometimes (or never). Both are
+// about handing Pokémon AWAY, so neither may depend on an unrelated toggle.
+console.log("\nGive-away guards hold with no hundo, no annotations, every toggle off");
+{
+  const buddy = { id: "j", name: "Julia", tagPrefix: "Julia", active: true, rawAppend: "",
+    targetSpecies: [{ species: "dratini", expand: false, dropForms: [], dropSlots: [], gender: "any" }] };
+  const run = (cfgExtra) => buildFilters([], [], { ...DEFAULT_CONFIG, buddies: [buddy], ...cfgExtra },
+    [], LOCALE, tFn).buddyCatchFilters[0]?.filter || "";
+
+  const bare = run({});
+  check("'!4*' present with no hundo to spare (carve-out closed)", segs(bare).includes("!4*"), bare);
+  check("…and the stars line is NOT widened", !segs(bare).some(x => x.startsWith("0*,1*,2*,")), bare);
+  check("'!#' present", segs(bare).includes("!#"), bare);
+  check(`'${kw.numeric.year}21-' present`, segs(bare).includes(`${kw.numeric.year}21-`), bare);
+
+  // Every optional protection off — the give-away guards are not toggles.
+  const allOff = Object.fromEntries(Object.entries(DEFAULT_CONFIG)
+    .filter(([k, v]) => typeof v === "boolean" && k.startsWith("protect")).map(([k]) => [k, false]));
+  const off = run(allOff);
+  check("'!4*' survives every protect* toggle off", segs(off).includes("!4*"), off);
+  check("'!#' survives every protect* toggle off", segs(off).includes("!#"), off);
+  // This one IS the toggle, so it correctly disappears with it.
+  check(`'${kw.numeric.year}21-' follows protectLuckyEligible`,
+    !segs(off).some(x => x.startsWith(kw.numeric.year)), off);
+  check("year floor tracks luckyEligibleYear",
+    segs(run({ luckyEligibleYear: 19 })).includes(`${kw.numeric.year}19-`));
+  check("luckyEligibleYear 0 emits no floor",
+    !segs(run({ luckyEligibleYear: 0 })).some(x => x.startsWith(kw.numeric.year)));
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -339,8 +377,11 @@ console.log("\nSpare carve-out: annotated hundos only cover what they actually a
     const res = buildFilters(hundos, [], { ...DEFAULT_CONFIG, buddies: [buddy], ...cfgExtra }, [], LOCALE, tFn);
     return res.buddyCatchFilters[0]?.filter || "";
   };
-  // The carve-out is visible as the `!4*` guard, which only ever accompanies it.
-  const spared = (f) => segs(f).includes("!4*");
+  // The carve-out's signal is the WIDENED stars line — `0*,1*,2*,<selector>`.
+  // It used to be read off the `!4*` guard beside it, but that guard is now
+  // unconditional (it costs four characters and stops the one give-away filter
+  // from looking unguarded), so it no longer distinguishes the two branches.
+  const spared = (f) => segs(f).some(x => x.startsWith("0*,1*,2*,"));
 
   check("control: unannotated hundo still opens the carve-out",
     spared(run([target({})], {})));
