@@ -27,6 +27,11 @@
 // paired with the ScrapedDuck GBL event windows that name it, so the app can
 // render an "active cup" card that hides itself outside the cup's run.
 //
+// That pairing is per battle SLOT, not per event: a GBL week runs three
+// concurrent slots and names all of them in one string. scripts/lib/gbl-slots.mjs
+// does the splitting and the matching, for both source paths, and its header
+// records what matching the flattened event instead cost.
+//
 // Flags: --offline-ok   tolerate fetch failures if cache exists.
 
 import { existsSync } from "node:fs";
@@ -34,6 +39,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
 import { loadNameDict, unresolvableDexEntries, NAME_LOCALES } from "./lib/species-dex.mjs";
+import { eventSlots, leaguesForSlots, matchEventFormats } from "./lib/gbl-slots.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -69,10 +75,6 @@ const STORED_CP_CAP = { great: 1500, ultra: 2500, master: null };
 // buildLeagueFilter skips the CP clause AND the rank-1 IV math: with no cap to
 // squeeze under, a low-attack spread is worse than a hundo, not better.
 const storedCap = (cp) => (typeof cp === "number" && cp < 10000 ? cp : null);
-// League tokens in a LeekDuck event slug, and the CP cap each implies.
-const LEAGUE_TOKEN_CP = { "great-league": 1500, "ultra-league": 2500, "master-league": 10000 };
-// Not cups: `all` is the open-league pseudo-cup, `custom` is the site's builder.
-const NON_CUPS = new Set(["all", "custom"]);
 
 async function fetchJson(url) {
   const res = await fetch(url, {
@@ -177,48 +179,6 @@ function topNByDex(rankings, n) {
   return out;
 }
 
-// Lowercase kebab token stream. The eventID is the higher-signal field — it is
-// LeekDuck's URL slug, so it is already stable kebab-case — but the display
-// name is folded in too because a slug can drop a qualifier.
-const tokenize = (...parts) =>
-  parts.join(" ").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-
-// How many consecutive slug tokens a single cup id is allowed to span. Cup ids
-// are one to three words ("mega", "copadiluvio", "championshipseries").
-const MAX_TOKEN_WINDOW = 4;
-
-// Every run of CONSECUTIVE tokens in the stream, joined. `copa-diluvio` yields
-// {copa, copadiluvio, diluvio}.
-//
-// Whole-token matching alone is not enough, because PvPoke's cup ids concatenate
-// words that LeekDuck's slug hyphenates: `copadiluvio` vs `copa-diluvio`, and
-// likewise `championshipseries`, `ligaultra`, `coupedusillage`. A token-equality
-// test never matches those, so the cup is never fetched and the user gets no cup
-// card for the entire event, silently.
-//
-// Joining only whole tokens is what keeps the old substring bug fixed: `fall` is
-// a single token, so `all` is not in its window set and cannot match it — which
-// is the false positive the whole-token rule was introduced to kill.
-function tokenWindows(stream) {
-  const parts = stream.split("-").filter(Boolean);
-  const out = new Set();
-  for (let i = 0; i < parts.length; i++) {
-    let joined = "";
-    for (let j = i; j < parts.length && j - i < MAX_TOKEN_WINDOW; j++) {
-      joined += parts[j];
-      out.add(joined);
-    }
-  }
-  return out;
-}
-
-const tokenSet = (...parts) => tokenWindows(tokenize(...parts));
-
-// Tokens are compared with separators stripped from BOTH sides, so the league
-// token `great-league` matches the window `greatleague`.
-const hasToken = (windows, token) =>
-  windows.has(String(token).toLowerCase().replace(/[^a-z0-9]/g, ""));
-
 // ---------------------------------------------------------------- PvPoke path
 
 async function fromPvpoke() {
@@ -246,49 +206,13 @@ async function fromPvpoke() {
   return { leagues, index, formats: gm?.formats || [] };
 }
 
-// Discover the cups a GBL event is actually running, from the game master's
-// formats[]. Keyed `${cup}-${cp}` because `mega` appears three times (1500 /
-// 2500 / 10000) and a bare cup id would collide.
-function matchFormatsToEvent(formats, windows) {
-  const capsNamed = new Set(
-    Object.keys(LEAGUE_TOKEN_CP).filter(t => hasToken(windows, t)).map(t => LEAGUE_TOKEN_CP[t]),
-  );
-  // How many caps each cup is published at, so the disambiguation below fires
-  // only where there is an actual ambiguity to resolve.
-  const capsPerCup = new Map();
-  for (const f of formats) {
-    if (!f || typeof f.cup !== "string" || typeof f.cp !== "number") continue;
-    if (!capsPerCup.has(f.cup)) capsPerCup.set(f.cup, new Set());
-    capsPerCup.get(f.cup).add(f.cp);
-  }
-  const matched = [];
-  for (const f of formats) {
-    if (!f || typeof f.cup !== "string" || typeof f.cp !== "number") continue;
-    if (NON_CUPS.has(f.cup)) continue;
-    if (!hasToken(windows, f.cup)) continue;
-    // A cup published at several caps ("Mega Great/Ultra/Master League") is
-    // disambiguated by the league the event names. If the event names none,
-    // every cap of that cup is running.
-    //
-    // Only cups that exist at MORE THAN ONE cap are ambiguous, and only those
-    // may be filtered this way. capsNamed can only ever hold {1500, 2500,
-    // 10000}, so applying it to every cup discarded any cup at a different cap
-    // whenever the slug also named a standing league — dropping e.g. Little Cup
-    // (cp 500) from a "Great League and Little Cup" week entirely.
-    const ambiguous = (capsPerCup.get(f.cup)?.size || 0) > 1;
-    if (ambiguous && capsNamed.size > 0 && !capsNamed.has(f.cp)) continue;
-    matched.push(f);
-  }
-  return matched;
-}
-
 // Shared by both source paths. The event record's shape and its ordering must
 // not depend on which upstream produced the cups: the fallback path never runs
 // in CI, so a divergence here would only ever surface on the day the primary
 // source breaks.
 //
-// `cupIdsFor(windows, event)` returns the cup ids this event is running.
-function buildGblEvents(sdEvents, cupIdsFor) {
+// `formatsFor(slots)` returns the formats this event's slots are running.
+function buildGblEvents(sdEvents, formatsFor) {
   const out = [];
   for (const e of (Array.isArray(sdEvents) ? sdEvents : [])) {
     if (e?.eventType !== "go-battle-league") continue;
@@ -301,16 +225,17 @@ function buildGblEvents(sdEvents, cupIdsFor) {
       console.warn(`  ⚠  GBL event with unparseable start dropped: ${e.eventID || e.name}`);
       continue;
     }
-    const windows = tokenSet(e.eventID || "", e.name || "");
+    const slots = eventSlots(e.eventID, e.name);
+    // Deduped: the same cup can be named by the slug segment AND by the display
+    // name slot it corresponds to, which are matched independently.
+    const cups = [...new Set(formatsFor(slots).map(f => `${f.cup}-${f.cp}`))];
     out.push({
       eventID: e.eventID,
       name: e.name,
       start: e.start,
       end: e.end,
-      cups: cupIdsFor(windows, e),
-      leagues: Object.keys(LEAGUE_TOKEN_CP)
-        .filter(t => hasToken(windows, t))
-        .map(t => t.replace("-league", "")),
+      cups,
+      leagues: leaguesForSlots(slots),
     });
   }
   return out.sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
@@ -318,29 +243,10 @@ function buildGblEvents(sdEvents, cupIdsFor) {
 
 async function buildCups(formats, index, sdEvents) {
   const wanted = new Map(); // `${cup}-${cp}` → format
-  const gblEvents = buildGblEvents(sdEvents, (windows, e) => {
-    const matched = matchFormatsToEvent(formats, windows);
-    // A runaway matcher is the failure mode worth catching, and this is the
-    // exact shape of it: a real GBL week runs at most ONE cup, across however
-    // many caps that cup is published at. Two distinct cups from one slug means
-    // the matcher is inventing them, so assert it rather than warning into a
-    // scheduled log nobody opens — a warn-only guard on a robot-run job is
-    // indistinguishable from no guard, and the run would still publish the
-    // bogus cups as live.
-    const cupsMatched = new Set(matched.map(f => f.cup));
-    if (cupsMatched.size > 1) {
-      throw new Error(
-        `"${e.name}" matched ${cupsMatched.size} distinct cups (${[...cupsMatched].join(", ")}) — ` +
-        "a GBL week runs at most one cup across its caps; the matcher is too loose",
-      );
-    }
-    const ids = [];
-    for (const f of matched) {
-      const id = `${f.cup}-${f.cp}`;
-      wanted.set(id, f);
-      ids.push(id);
-    }
-    return ids;
+  const gblEvents = buildGblEvents(sdEvents, (slots) => {
+    const matched = matchEventFormats(formats, slots);
+    for (const f of matched) wanted.set(`${f.cup}-${f.cp}`, f);
+    return matched;
   });
 
   const entries = [...wanted.entries()];
@@ -380,6 +286,10 @@ function fromLilyDex(raw) {
     leagues[key] = { cpCap: STORED_CP_CAP[key], species: list };
   }
   const cups = {};
+  // The same {cup, cp} shape the game master's formats[] has, so the event
+  // matcher is literally the same code on both paths. lily has no formats[] of
+  // its own; the cups it ships ARE the published set.
+  const formats = [];
   for (const cup of raw?.cups || []) {
     if (!cup || typeof cup.id !== "string") continue;
     const list = topNByDex(cup.rankings, TOP_N);
@@ -411,8 +321,9 @@ function fromLilyDex(raw) {
       cpCap: storedCap(cup.cp),
       species: list,
     };
+    formats.push({ cup: cup.id, cp: cup.cp });
   }
-  return { leagues, cups };
+  return { leagues, cups, formats };
 }
 
 // ---------------------------------------------------------------------- guards
@@ -529,19 +440,11 @@ async function main() {
       leagues = lily.leagues;
       cups = lily.cups;
       source = "lily-dex";
-      // Same event builder the PvPoke path uses — only the cup lookup differs.
-      // lily has no formats[], so match on each cup's BASE id and expand to the
-      // `${cup}-${cp}` ids stored above.
-      const idsByBaseCup = new Map();
-      for (const [id, c] of Object.entries(cups)) {
-        if (!idsByBaseCup.has(c.cup)) idsByBaseCup.set(c.cup, []);
-        idsByBaseCup.get(c.cup).push(id);
-      }
-      gblEvents = buildGblEvents(sdEvents, (windows) =>
-        [...idsByBaseCup.entries()]
-          .filter(([base]) => hasToken(windows, base))
-          .flatMap(([, ids]) => ids),
-      );
+      // Same event builder AND the same slot matcher the PvPoke path uses —
+      // only the format list differs. The fallback never runs in CI, so a
+      // second matcher here would only ever be found wrong on the day the
+      // primary source breaks, which is the one day it runs.
+      gblEvents = buildGblEvents(sdEvents, (slots) => matchEventFormats(lily.formats, slots));
     } catch (e2) {
       console.error(`✗ Fallback failed: ${e2.message}`);
       if (offlineOk && existsSync(OUT_PATH)) {
