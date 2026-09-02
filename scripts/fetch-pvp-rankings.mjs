@@ -33,7 +33,12 @@ import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
-import { loadNameDict, unresolvableDexEntries, NAME_LOCALES } from "./lib/species-dex.mjs";
+import {
+  loadNameDict,
+  unresolvableDexEntries,
+  formSuffixedDexEntries,
+  NAME_LOCALES,
+} from "./lib/species-dex.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -111,21 +116,43 @@ async function mapLimit(items, limit, fn) {
   return out;
 }
 
-const stripForm = (name) => String(name || "").replace(/\s*\([^)]*\)\s*$/, "").trim();
+// Strips EVERY trailing parenthesised group, not just the last one. The game
+// master stacks them: `giratina_altered_shadow` is "Giratina (Altered)
+// (Shadow)", and dropping one suffix leaves "Giratina (Altered)" — a name with
+// a space and parentheses in it, which App.jsx's dex-dict fallback emits as the
+// filter token `+giratina (altered)`. That matches nothing in PoGo, and
+// check-data-filters D6 rejects it, so the sync fails at its own validation step.
+const stripForms = (name) => String(name || "").replace(/(?:\s*\([^)]*\))+\s*$/, "").trim();
 
 // speciesId → {dex, speciesName}, plus dex → base (suffix-free) species name.
 // The base name matters: it is what App.jsx falls back to when the dex dict
 // misses, and a parenthesised form name there produces a broken filter token.
-function buildSpeciesIndex(gm) {
+export function buildSpeciesIndex(gm) {
   const bySpeciesId = new Map();
   const baseNameByDex = new Map();
+  // Which dex numbers got their name from a parenthesis-free row. Such a row is
+  // the species' own name as the upstream states it; a stripped one is derived,
+  // so the stated name always wins no matter which order the rows arrive in.
+  const bare = new Set();
   for (const p of gm?.pokemon || []) {
     if (typeof p?.dex !== "number" || typeof p?.speciesId !== "string") continue;
     bySpeciesId.set(p.speciesId, { dex: p.dex, speciesName: p.speciesName || "" });
-    // First parenthesis-free name wins; that is the base species.
-    if (!baseNameByDex.has(p.dex) && p.speciesName && !p.speciesName.includes("(")) {
+    if (!p.speciesName || bare.has(p.dex)) continue;
+    // First parenthesis-free name wins; that is the base species. First, not
+    // last, because a few dex numbers publish parenthesis-free FORM rows too
+    // ("Maushold_family_of_four", "Palafin_hero", "Koraidon_apex") and those
+    // follow the real base row.
+    if (!p.speciesName.includes("(")) {
+      bare.add(p.dex);
       baseNameByDex.set(p.dex, p.speciesName);
+      continue;
     }
+    // 29 dex numbers have NO parenthesis-free row at all — every Giratina,
+    // Landorus, Keldeo and Zacian entry is a named form — so keying on one left
+    // those species with no base name here and pushed the whole job onto the
+    // per-entry fallback in topNFromPvpoke. Strip the suffixes instead, so every
+    // dex the game master knows about gets a base name.
+    if (!baseNameByDex.has(p.dex)) baseNameByDex.set(p.dex, stripForms(p.speciesName));
   }
   return { bySpeciesId, baseNameByDex };
 }
@@ -135,7 +162,7 @@ function buildSpeciesIndex(gm) {
 // The folded-away forms are kept as metadata: which form is the RANKED one is a
 // real collection signal (a Shadow ranking above its base means build the
 // Shadow), even though it cannot change the emitted filter token.
-function topNFromPvpoke(rankings, index, n) {
+export function topNFromPvpoke(rankings, index, n) {
   if (!Array.isArray(rankings)) return { list: [], scanned: 0, missed: 0 };
   const byDex = new Map();
   const out = [];
@@ -151,7 +178,7 @@ function topNFromPvpoke(rankings, index, n) {
     if (existing) { existing.forms.push(speciesId); continue; }
     const record = {
       dex: meta.dex,
-      name: index.baseNameByDex.get(meta.dex) || stripForm(meta.speciesName) || `dex_${meta.dex}`,
+      name: index.baseNameByDex.get(meta.dex) || stripForms(meta.speciesName) || `dex_${meta.dex}`,
       speciesId,
       score: typeof entry.score === "number" ? entry.score : null,
       forms: [speciesId],
@@ -171,7 +198,7 @@ function topNByDex(rankings, n) {
     const dex = entry?.dexNr;
     if (typeof dex !== "number" || seen.has(dex)) continue;
     seen.add(dex);
-    out.push({ dex, name: stripForm(entry.speciesName) || `dex_${dex}` });
+    out.push({ dex, name: stripForms(entry.speciesName) || `dex_${dex}` });
     if (out.length >= n) break;
   }
   return out;
@@ -417,17 +444,18 @@ function fromLilyDex(raw) {
 
 // ---------------------------------------------------------------------- guards
 
-// Every emitted dex must resolve in the name dictionary App.jsx renders from,
-// in every locale. This is check-data-filters D6 pushed back to the data layer,
-// where the diagnostic can name the offending dex — so it must be the SAME test
-// D6 runs, not a weaker local copy, or the fetcher publishes what CI rejects.
+// Every emitted dex must resolve in the name dictionary App.jsx renders from, in
+// every locale, and every emitted name must be a BASE species name. This is
+// check-data-filters D6 pushed back to the data layer, where the diagnostic can
+// name the offending dex — so it must be the SAME test D6 runs, not a weaker
+// local copy, or the fetcher publishes what CI rejects.
 // Shared with D6 via scripts/lib/species-dex.mjs.
 //
 // An unreadable dictionary is fatal rather than skipped: skipping turned the one
 // guard standing between a bad join and a published snapshot into a no-op
 // exactly when something was already wrong. main() routes the throw through
 // --offline-ok, so the cached snapshot still covers a build.
-function assertDexResolvable(leagues, cups) {
+function assertSpeciesEntriesSound(leagues, cups) {
   const dict = loadNameDict(NAMES_PATH);
   const pools = [
     ...Object.entries(leagues).map(([key, l]) => [key, l.species]),
@@ -436,6 +464,14 @@ function assertDexResolvable(leagues, cups) {
   const bad = unresolvableDexEntries(pools, dict, NAME_LOCALES);
   if (bad.length > 0) {
     throw new Error(`dex numbers unresolvable in pokemon-names.json: ${bad.join(", ")}`);
+  }
+  // D6's other half. Left out of the producer, it let a form-suffixed name —
+  // "Giratina (Altered)", from the double-suffixed `giratina_altered_shadow` —
+  // reach the snapshot, and the sync only found out when its own validation step
+  // failed, on a cup week, with no diagnostic naming the species.
+  const suffixed = formSuffixedDexEntries(pools);
+  if (suffixed.length > 0) {
+    throw new Error(`species names carry a form suffix: ${suffixed.join(", ")}`);
   }
 }
 
@@ -559,7 +595,7 @@ async function main() {
   // deploy over a data-shape problem the cached snapshot already solved.
   try {
     assertLeaguesHealthy(prev, leagues);
-    assertDexResolvable(leagues, cups);
+    assertSpeciesEntriesSound(leagues, cups);
     assertNoCupCollapse(prev, cups, matchedCount);
   } catch (e) {
     console.error(`✗ ${e.message}`);
@@ -588,4 +624,9 @@ async function main() {
   console.log(`  ${Object.keys(cups).length} cups, ${cupTotal} species; ${gblEvents.length} GBL event windows`);
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+// Only run when executed directly — scripts/check-game-master.mjs imports
+// buildSpeciesIndex/topNFromPvpoke above without triggering the fetches.
+import { pathToFileURL } from "node:url";
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch(e => { console.error(e); process.exit(1); });
+}
