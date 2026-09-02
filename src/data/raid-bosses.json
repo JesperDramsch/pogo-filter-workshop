@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-01T12:43:31.465Z",
+  "fetchedAt": "2026-09-02T12:16:20.851Z",
   "raids": {
     "legendary_mega": [
       {
@@ -65,87 +65,31 @@
     ],
     "mega": [
       {
-        "id": "VICTREEBEL",
+        "id": "FALINKS",
         "names": {
-          "en": "Mega Victreebel",
-          "de": "Mega-Sarzenia",
-          "fr": "Méga-Empiflor",
-          "it": "MegaVictreebel",
-          "ja": "メガウツボット",
-          "ko": "메가우츠보트",
-          "es": "Mega-Victreebel"
+          "en": "Mega Falinks",
+          "de": "Mega-Legios",
+          "fr": "Méga-Hexadron",
+          "it": "MegaFalinks",
+          "ja": "メガタイレーツ",
+          "ko": "메가대여르",
+          "es": "Mega-Falinks"
         },
         "types": [
-          "grass",
-          "poison"
+          "fighting"
         ],
         "resistorTypes": [
           "flying",
           "poison",
           "bug",
           "ghost",
-          "steel",
-          "fire",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "fire",
-          "flying",
-          "ice",
-          "psychic"
-        ]
-      },
-      {
-        "id": "DRAGONITE",
-        "names": {
-          "en": "Mega Dragonite",
-          "de": "Mega-Dragoran",
-          "fr": "Méga-Dracolosse",
-          "it": "MegaDragonite",
-          "ja": "メガカイリュー",
-          "ko": "메가망나뇽",
-          "es": "Mega-Dragonite"
-        },
-        "types": [
-          "dragon",
-          "flying"
-        ],
-        "resistorTypes": [
-          "rock",
-          "steel",
-          "electric",
+          "psychic",
           "fairy"
         ],
         "seMoveTypes": [
-          "ice",
-          "dragon",
           "fairy",
-          "rock"
-        ]
-      },
-      {
-        "id": "MALAMAR",
-        "names": {
-          "en": "Mega Malamar",
-          "de": "Mega-Calamanero",
-          "fr": "Méga-Sepiatroce",
-          "it": "MegaMalamar",
-          "ja": "メガカラマネロ",
-          "ko": "메가칼라마네로",
-          "es": "Mega-Malamar"
-        },
-        "types": [
-          "dark",
+          "flying",
           "psychic"
-        ],
-        "resistorTypes": [
-          "steel",
-          "dark",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "bug",
-          "fairy"
         ]
       }
     ],
