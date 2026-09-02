@@ -1,6 +1,6 @@
 # Pokémon GO PvP Meta Reference — GENERATED, DO NOT HAND-EDIT
 
-- **Snapshot taken:** 2026-09-02T14:00:58.661Z
+- **Snapshot taken:** 2026-09-02T14:13:37.923Z
 - **Source:** pvpoke — https://github.com/pvpoke/pvpoke (MIT)
 - **Snapshot URL:** https://raw.githubusercontent.com/JesperDramsch/pogo-filter-workshop/main/src/data/pvp-rankings.json
 - **Depth:** top 30 per league, deduped by base dex
@@ -274,39 +274,39 @@ CP cap: none (uncapped)
 
 | # | German | English | Dex | Ranked form | Score |
 |---:|---|---|---:|---|---:|
-| 1 | kyogre | kyogre | 382 | `kyogre_primal` | 99.4 |
-| 2 | mewtu | mewtwo | 150 | `mewtwo_mega_x` | 95.5 |
-| 3 | garados | gyarados | 130 | `gyarados_mega` | 94.8 |
-| 4 | rayquaza | rayquaza | 384 | `rayquaza_mega` | 93.6 |
-| 5 | knakrack | garchomp | 445 | `garchomp_mega` | 93 |
-| 6 | dragoran | dragonite | 149 | `dragonite_mega` | 92.8 |
-| 7 | despotar | tyranitar | 248 | `tyranitar_mega` | 90.9 |
-| 8 | groudon | groudon | 383 | `groudon_primal` | 90.4 |
-| 9 | metagross | metagross | 376 | `metagross_mega` | 90.2 |
-| 10 | latias | latias | 380 | `latias_mega` | 86.8 |
-| 11 | latios | latios | 381 | `latios_mega` | 86.4 |
-| 12 | skaraborn | heracross | 214 | `heracross_mega` | 83.2 |
-| 13 | brutalanda | salamence | 373 | `salamence_mega` | 82.9 |
-| 14 | dialga | dialga | 483 | `dialga_origin` | 82.3 |
-| 15 | sumpex | swampert | 260 | `swampert_mega` | 81.1 |
-| 16 | lugia | lugia | 249 | — | 80.9 |
-| 17 | brigaron | chesnaught | 652 | `chesnaught_mega` | 80.5 |
-| 18 | palkia | palkia | 484 | `palkia_shadow` | 80.2 |
-| 19 | galagladi | gallade | 475 | `gallade_mega` | 79.5 |
-| 20 | scherox | scizor | 212 | `scizor_mega` | 79.4 |
-| 21 | xerneas | xerneas | 716 | — | 78.3 |
-| 22 | gengar | gengar | 94 | `gengar_mega` | 77.5 |
-| 23 | zacian | zacian | 888 | `zacian_crowned_sword` | 77.2 |
-| 24 | florges | florges | 671 | — | 76.9 |
-| 25 | zamazenta | zamazenta | 889 | `zamazenta_crowned_shield` | 75.9 |
-| 26 | glurak | charizard | 6 | `charizard_mega_y` | 75.4 |
-| 27 | stolloss | aggron | 306 | `aggron_mega` | 75.2 |
-| 28 | kyurem | kyurem | 646 | `kyurem_white` | 75.2 |
-| 29 | zekrom | zekrom | 644 | — | 74.8 |
-| 30 | reshiram | reshiram | 643 | — | 74.2 |
+| 1 | kyogre | kyogre | 382 | `kyogre_primal` | 99.5 |
+| 2 | mewtu | mewtwo | 150 | `mewtwo_mega_y` | 98 |
+| 3 | dragoran | dragonite | 149 | `dragonite_mega` | 93.9 |
+| 4 | garados | gyarados | 130 | `gyarados_mega` | 93.9 |
+| 5 | rayquaza | rayquaza | 384 | `rayquaza_mega` | 93.9 |
+| 6 | knakrack | garchomp | 445 | `garchomp_mega` | 92.5 |
+| 7 | groudon | groudon | 383 | `groudon_primal` | 90.9 |
+| 8 | despotar | tyranitar | 248 | `tyranitar_mega` | 90.6 |
+| 9 | metagross | metagross | 376 | `metagross_mega` | 90.4 |
+| 10 | latias | latias | 380 | `latias_mega` | 87.5 |
+| 11 | latios | latios | 381 | `latios_mega` | 86.3 |
+| 12 | skaraborn | heracross | 214 | `heracross_mega` | 83.9 |
+| 13 | brutalanda | salamence | 373 | `salamence_mega` | 83.4 |
+| 14 | dialga | dialga | 483 | `dialga_origin` | 82.8 |
+| 15 | sumpex | swampert | 260 | `swampert_mega` | 81.9 |
+| 16 | brigaron | chesnaught | 652 | `chesnaught_mega` | 81.7 |
+| 17 | lugia | lugia | 249 | — | 81.4 |
+| 18 | palkia | palkia | 484 | `palkia_shadow` | 80.7 |
+| 19 | scherox | scizor | 212 | `scizor_mega` | 80.1 |
+| 20 | xerneas | xerneas | 716 | — | 78.6 |
+| 21 | gengar | gengar | 94 | `gengar_mega` | 78.1 |
+| 22 | zacian | zacian | 888 | `zacian_crowned_sword` | 77.4 |
+| 23 | florges | florges | 671 | — | 77.3 |
+| 24 | zamazenta | zamazenta | 889 | `zamazenta_crowned_shield` | 76.3 |
+| 25 | glurak | charizard | 6 | `charizard_mega_y` | 75.8 |
+| 26 | stolloss | aggron | 306 | `aggron_mega` | 75.7 |
+| 27 | kyurem | kyurem | 646 | `kyurem_white` | 75.5 |
+| 28 | zekrom | zekrom | 644 | — | 75.2 |
+| 29 | galagladi | gallade | 475 | `gallade_mega` | 75 |
+| 30 | reshiram | reshiram | 643 | — | 74.4 |
 
 ```
-382,150,130,384,445,149,248,383,376,380,381,214,373,483,260,249,652,484,475,212,716,94,888,671,889,6,306,646,644,643
+382,150,149,130,384,445,383,248,376,380,381,214,373,483,260,652,249,484,212,716,94,888,671,889,6,306,646,644,475,643
 ```
 
 ### Little Cup `little-500`

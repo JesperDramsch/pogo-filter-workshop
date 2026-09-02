@@ -32,6 +32,29 @@ export function loadNameDict(path) {
   return JSON.parse(readFileSync(path, "utf8"));
 }
 
+// The other half of "is this pool entry usable?", shared for the same reason:
+// the fetcher writes the file, check-data-filters D6 rejects it, and a weaker
+// copy on the producer side means the sync job publishes what CI then fails on.
+//
+// A stored `name` must be the BASE species name. App.jsx falls back to
+// `s.name.toLowerCase()` when the dex dictionary misses, so a leftover form
+// suffix emits `+giratina (altered)` — a filter token with a space in it that
+// matches no Pokémon at all.
+//
+// pools: [[label, species[]], ...]. Returns human-readable diagnostics, empty
+// when every name is a base name.
+export function formSuffixedDexEntries(pools) {
+  const bad = [];
+  for (const [label, species] of pools) {
+    for (const s of species || []) {
+      if (typeof s?.name === "string" && /[()]/.test(s.name)) {
+        bad.push(`${label}:${s.name} (form suffix, not a base name)`);
+      }
+    }
+  }
+  return bad;
+}
+
 // pools: [[label, species[]], ...]. Returns human-readable diagnostics, empty
 // when everything resolves.
 export function unresolvableDexEntries(pools, dict, locales) {
