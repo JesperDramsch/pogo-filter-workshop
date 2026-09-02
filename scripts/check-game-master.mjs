@@ -13,6 +13,7 @@
 //   G2 — evolution steps at FORM granularity, and the chain aggregates
 //   G3 — the regional-form catalog off game-master form suffixes
 //   G4 — the raid-boss name index (ids, canonical form, apostrophe folding)
+//   G5 — the PvP species index's base names (PvPoke's gamemaster.min.json)
 //
 // The generation table that replaced pogoapi's pokemon_generations feed is
 // covered where its consumer is: scripts/check-friend-collect.mjs, Scenario 12.
@@ -32,6 +33,7 @@ import {
 } from "./lib/game-master.mjs";
 import { buildCatalog, validate } from "./fetch-regional-forms.mjs";
 import { buildNameIndex } from "./fetch-raid-bosses.mjs";
+import { buildSpeciesIndex, topNByDex, topNFromPvpoke } from "./fetch-pvp-rankings.mjs";
 import { createChecker } from "./lib/check.mjs";
 
 const { check, done } = createChecker();
@@ -234,6 +236,72 @@ console.log("\nG4: raid-boss name index");
   check("display names come from the dictionary", idx.get("ho-oh")?.displayName === "Ho-Oh");
   check("a species with no dictionary entry is skipped, not indexed as undefined",
     buildNameIndex(templates, {}).size === 0);
+}
+
+console.log("\nG5: PvP base names off PvPoke's gamemaster.min.json");
+{
+  // PvPoke's dump, not Niantic's, but the same class of parser and the same
+  // failure mode: it only runs inside the daily PvP sync, so a break here goes
+  // green on every PR and surfaces days later as a red cron job.
+  //
+  // The shape that broke it: `giratina_altered_shadow` is "Giratina (Altered)
+  // (Shadow)" — TWO stacked suffixes — and dex 487 has no parenthesis-free row
+  // at all, so nothing supplied a base name and a single-suffix strip left
+  // "Giratina (Altered)" in the snapshot. That is a filter token with a space
+  // in it, which check-data-filters D6 rejects, so the sync failed at its own
+  // validation step the first week a cup ranked the shadow above the base form.
+  const mon = (dex, speciesId, speciesName) => ({ dex, speciesId, speciesName });
+  const gm = { pokemon: [
+    mon(487, "giratina_altered", "Giratina (Altered)"),
+    mon(487, "giratina_altered_shadow", "Giratina (Altered) (Shadow)"),
+    mon(487, "giratina_origin", "Giratina (Origin)"),
+    // A few dex numbers publish parenthesis-free FORM rows carrying a raw id
+    // rather than a display name, after the real base row. First bare row wins,
+    // so the id must not clobber "Maushold".
+    mon(925, "maushold", "Maushold"),
+    mon(925, "maushold_family_of_four", "Maushold_family_of_four"),
+    // The stated name beats a derived one whichever order the rows arrive in.
+    mon(52, "meowth_alolan", "Meowth (Alolan)"),
+    mon(52, "meowth", "Meowth"),
+  ] };
+  const index = buildSpeciesIndex(gm);
+  check("a species whose every row is a named form still gets a base name",
+    index.baseNameByDex.get(487) === "Giratina", index.baseNameByDex.get(487));
+  check("stacked form suffixes are all stripped, not just the last",
+    !/[()]/.test(index.baseNameByDex.get(487) || "("));
+  check("a parenthesis-free form row does not displace the base row",
+    index.baseNameByDex.get(925) === "Maushold", index.baseNameByDex.get(925));
+  check("a later parenthesis-free row still beats an earlier stripped one",
+    index.baseNameByDex.get(52) === "Meowth", index.baseNameByDex.get(52));
+
+  // End to end: a ranking that lists the double-suffixed shadow FIRST is the
+  // case the live Devon Chrysalis Cup hit.
+  const { list: ranked } = topNFromPvpoke(
+    [{ speciesId: "giratina_altered_shadow", score: 90 }, { speciesId: "giratina_origin", score: 88 },
+     { speciesId: "meowth_alolan", score: 80 }],
+    index, 30,
+  );
+  check("forms fold onto one base entry", ranked.length === 2,
+    ranked.map((r) => `${r.dex}:${r.name}`).join(", "));
+  check("the shadow-first ranking still emits the base species name",
+    ranked[0]?.dex === 487 && ranked[0]?.name === "Giratina", ranked[0]?.name);
+  check("the ranked form is still recorded as metadata",
+    ranked[0]?.speciesId === "giratina_altered_shadow" &&
+    ranked[0]?.forms.join(",") === "giratina_altered_shadow,giratina_origin");
+  check("no emitted name carries a form suffix",
+    ranked.every((r) => !/[()]/.test(r.name)), ranked.map((r) => r.name).join(", "));
+
+  // The lily-dex fallback needs the same treatment and is the path the sync
+  // actually died on: its Retro Cup entry is "Giratina (Altered) (Shadow)" too,
+  // and that path never runs in CI, so nothing else covers it.
+  const lily = topNByDex([
+    { dexNr: 487, speciesName: "Giratina (Altered) (Shadow)" },
+    { dexNr: 487, speciesName: "Giratina (Origin)" },
+    { dexNr: 52, speciesName: "Meowth (Alolan)" },
+  ], 30);
+  check("the fallback path folds by dex and strips stacked suffixes too",
+    lily.map((r) => `${r.dex}:${r.name}`).join(", ") === "487:Giratina, 52:Meowth",
+    lily.map((r) => `${r.dex}:${r.name}`).join(", "));
 }
 
 done("All game-master checks passed.", (n) => `${n} game-master check(s) failed.`);

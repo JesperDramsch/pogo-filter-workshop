@@ -27,7 +27,7 @@ import { LOCALES } from "../src/i18n/index.js";
 // longer imports `pokemonNameFor` — it falls back to English, which is what made
 // the old per-locale assertion unable to fail.
 import { POKEMON_NAMES_DICT, SUPPORTED_NAME_LOCALES, resolveSpecies } from "../src/data/species.js";
-import { unresolvableDexEntries, NAME_LOCALES } from "./lib/species-dex.mjs";
+import { unresolvableDexEntries, formSuffixedDexEntries, NAME_LOCALES } from "./lib/species-dex.mjs";
 
 let failures = 0;
 function check(label, cond, detail = "") {
@@ -195,11 +195,12 @@ console.log("\nD6 — the PvP snapshot is well formed and every dex resolves");
       }
       if (seen.has(sp.dex)) duplicated.push(`${label}:${sp.dex}`);
       seen.add(sp.dex);
-      // A parenthesised form name here would emit `+quagsire (shadow)` — a
-      // filter token with a space in it — via App.jsx's dex-dict fallback.
-      if (/[()]/.test(sp.name)) malformed.push(`${label}:${sp.name} (form suffix, not a base name)`);
     }
   }
+  // A parenthesised form name would emit `+quagsire (shadow)` — a filter token
+  // with a space in it — via App.jsx's dex-dict fallback. Via the shared helper,
+  // so the fetcher's own guard runs the same test rather than a weaker copy.
+  malformed.push(...formSuffixedDexEntries(pools.map(([label, pool]) => [label, pool.species])));
   // Via the shared strict helper, NOT pokemonNameFor. pokemonNameFor falls back
   // to the English entry, so it returns the same truthy value for all seven
   // locales and a per-locale hole could never fail this check — it did 7× the
