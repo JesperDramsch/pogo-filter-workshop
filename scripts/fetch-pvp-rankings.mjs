@@ -190,7 +190,7 @@ export function topNFromPvpoke(rankings, index, n) {
 }
 
 // lily-dex fallback: its entries already carry dexNr, so no join is needed.
-function topNByDex(rankings, n) {
+export function topNByDex(rankings, n) {
   if (!Array.isArray(rankings)) return [];
   const seen = new Set();
   const out = [];

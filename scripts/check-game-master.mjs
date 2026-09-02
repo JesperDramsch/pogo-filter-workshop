@@ -33,7 +33,7 @@ import {
 } from "./lib/game-master.mjs";
 import { buildCatalog, validate } from "./fetch-regional-forms.mjs";
 import { buildNameIndex } from "./fetch-raid-bosses.mjs";
-import { buildSpeciesIndex, topNFromPvpoke } from "./fetch-pvp-rankings.mjs";
+import { buildSpeciesIndex, topNByDex, topNFromPvpoke } from "./fetch-pvp-rankings.mjs";
 import { createChecker } from "./lib/check.mjs";
 
 const { check, done } = createChecker();
@@ -290,6 +290,18 @@ console.log("\nG5: PvP base names off PvPoke's gamemaster.min.json");
     ranked[0]?.forms.join(",") === "giratina_altered_shadow,giratina_origin");
   check("no emitted name carries a form suffix",
     ranked.every((r) => !/[()]/.test(r.name)), ranked.map((r) => r.name).join(", "));
+
+  // The lily-dex fallback needs the same treatment and is the path the sync
+  // actually died on: its Retro Cup entry is "Giratina (Altered) (Shadow)" too,
+  // and that path never runs in CI, so nothing else covers it.
+  const lily = topNByDex([
+    { dexNr: 487, speciesName: "Giratina (Altered) (Shadow)" },
+    { dexNr: 487, speciesName: "Giratina (Origin)" },
+    { dexNr: 52, speciesName: "Meowth (Alolan)" },
+  ], 30);
+  check("the fallback path folds by dex and strips stacked suffixes too",
+    lily.map((r) => `${r.dex}:${r.name}`).join(", ") === "487:Giratina, 52:Meowth",
+    lily.map((r) => `${r.dex}:${r.name}`).join(", "));
 }
 
 done("All game-master checks passed.", (n) => `${n} game-master check(s) failed.`);
