@@ -16,6 +16,10 @@
 //   - leak-duck refreshes continuously; the user / a daily sync runs this on
 //     demand so the Events card reflects whatever is live.
 //
+// Ended events: leak-duck drops an event from its feed the moment it ends, so
+// the just-ended window in scripts/lib/event-window.mjs is filled from the
+// PREVIOUS snapshot, not from the feed — see `carryOver` there for the why.
+//
 // Spawn resolution: the feed gives English names with forms parenthesised
 // ("Squawkabilly (Blue)") or regional prefixes ("Alolan Vulpix"). We strip both
 // down to the base species and resolve to its dex number — dex search in PoGo
@@ -24,9 +28,11 @@
 // Flags:
 //   --offline-ok   tolerate fetch failures if src/data/events.json exists.
 
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
+import { outsideWindow, carryOver } from "./lib/event-window.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -40,12 +46,6 @@ const EVENTS_URL =
 // Single-species, weekly, 1-hour cards add noise without a real "sort my
 // collection" payoff — the user opted to exclude them.
 const SKIP_CATEGORIES = new Set(["Pokémon Spotlight Hour"]);
-
-// Surfacing window. Past edge keeps a just-ended event around for tidying;
-// future edge avoids cluttering the card with events weeks out (rotation
-// shifts and would force daily snapshot churn).
-const ENDED_RETENTION_MS = 2 * 24 * 60 * 60 * 1000;   // keep ≤2 days after end
-const UPCOMING_HORIZON_MS = 14 * 24 * 60 * 60 * 1000;  // show ≤14 days ahead
 
 async function fetchJson(url) {
   const res = await fetch(url, {
@@ -137,20 +137,6 @@ function resolveSpawns(spawns, nameIdx) {
   };
 }
 
-function writeJson(path, data) {
-  if (!existsSync(dirname(path))) mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, JSON.stringify(data, null, 2) + "\n", "utf8");
-}
-
-// Order-independent stringify for content comparison, so a future re-key on
-// either side doesn't trigger a spurious diff (mirrors fetch-raid-bosses.mjs).
-function canonicalStringify(value) {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonicalStringify).join(",")}]`;
-  const keys = Object.keys(value).sort();
-  return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalStringify(value[k])}`).join(",")}}`;
-}
-
 async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
@@ -176,8 +162,7 @@ async function main() {
   const nameIdx = buildNameIndex(namesDict);
 
   const now = Date.now();
-  const pastEdge = now - ENDED_RETENTION_MS;
-  const futureEdge = now + UPCOMING_HORIZON_MS;
+  const previous = readPreviousJson(OUT_PATH);
 
   const eventsOut = [];
   const eggPoolsOut = [];
@@ -198,7 +183,7 @@ async function main() {
       const startMs = Date.parse(event.start_time);
       const endMs = Date.parse(event.end_time);
       if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) continue;
-      if (endMs < pastEdge || startMs > futureEdge) continue;
+      if (outsideWindow(startMs, endMs, now)) continue;
 
       const { spawnDex: eggDex, spawns: eggNames, unresolved } = resolveSpawns(eggs, nameIdx);
       if (eggDex.length === 0) continue;
@@ -220,7 +205,7 @@ async function main() {
       });
     }
   }
-  eggPoolsOut.sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+  const eggPools = carryOver(eggPoolsOut, previous?.eggPools, now);
 
   for (const [category, list] of Object.entries(feed)) {
     if (SKIP_CATEGORIES.has(category)) { skippedCategory += (Array.isArray(list) ? list.length : 0); continue; }
@@ -232,8 +217,7 @@ async function main() {
       const startMs = Date.parse(event.start_time);
       const endMs = Date.parse(event.end_time);
       if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) continue;
-      if (endMs < pastEdge) { skippedWindow++; continue; }      // ended >2 days ago
-      if (startMs > futureEdge) { skippedWindow++; continue; }  // beyond 14-day horizon
+      if (outsideWindow(startMs, endMs, now)) { skippedWindow++; continue; }
 
       const { spawnDex, spawns: spawnNames, unresolved } = resolveSpawns(spawns, nameIdx);
       if (spawnDex.length === 0) {
@@ -259,6 +243,9 @@ async function main() {
     }
   }
 
+  // The guard is on what the FEED produced, before the carry-over: a feed that
+  // yields nothing is a broken upstream, and a snapshot made only of carried
+  // records would hide that behind a card that still looks populated.
   if (eventsOut.length === 0) {
     if (offlineOk && existsSync(OUT_PATH)) {
       console.warn("⚠  No wild-spawn events in window; --offline-ok keeps existing cache.");
@@ -267,32 +254,30 @@ async function main() {
     throw new Error("No wild-spawn events resolved — refusing to overwrite cache");
   }
 
-  // Chronological so the UI can render top-down without re-sorting.
-  eventsOut.sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+  // Just-ended events come from the previous snapshot (leak-duck has already
+  // dropped them); the result is chronological so the UI renders top-down.
+  const events = carryOver(eventsOut, previous?.events, now);
+  for (const id of events.carriedIds) console.log(`  ↩ carried over ended event ${id}`);
+  for (const id of eggPools.carriedIds) console.log(`  ↩ carried over ended egg pool ${id}`);
 
   // Preserve the previous fetchedAt when the resolved event set is unchanged so
   // the daily sync doesn't open a PR just because the timestamp moved. The UI's
   // "last sync · Xh ago" still reflects the last time the content actually moved.
-  const newContent = { events: eventsOut, eggPools: eggPoolsOut };
+  const newContent = { events: events.merged, eggPools: eggPools.merged };
   let fetchedAt = new Date().toISOString();
-  if (existsSync(OUT_PATH)) {
-    try {
-      const prev = JSON.parse(readFileSync(OUT_PATH, "utf8"));
-      if (
-        canonicalStringify({ events: prev.events, eggPools: prev.eggPools || [] }) ===
-          canonicalStringify(newContent) &&
-        prev.fetchedAt
-      ) {
-        fetchedAt = prev.fetchedAt;
-        console.log("  ↺ content unchanged — preserving previous fetchedAt");
-      }
-    } catch { /* ignore parse errors; fall through to fresh write */ }
+  if (
+    previous?.fetchedAt &&
+    canonicalStringify({ events: previous.events, eggPools: previous.eggPools || [] }) ===
+      canonicalStringify(newContent)
+  ) {
+    fetchedAt = previous.fetchedAt;
+    console.log("  ↺ content unchanged — preserving previous fetchedAt");
   }
 
   writeJson(OUT_PATH, { fetchedAt, ...newContent });
   console.log(`✓ wrote ${OUT_PATH}`);
-  console.log(`  events: ${eventsOut.length} surfaced · ${skippedNoSpawns} without spawns · ${skippedWindow} outside window · ${skippedCategory} skipped categories · ${totalUnresolved} unresolved spawn names`);
-  console.log(`  egg pools: ${eggPoolsOut.length} surfaced`);
+  console.log(`  events: ${eventsOut.length} surfaced · ${events.carriedIds.length} carried over · ${skippedNoSpawns} without spawns · ${skippedWindow} outside window · ${skippedCategory} skipped categories · ${totalUnresolved} unresolved spawn names`);
+  console.log(`  egg pools: ${eggPoolsOut.length} surfaced · ${eggPools.carriedIds.length} carried over`);
 }
 
 main().catch((e) => {

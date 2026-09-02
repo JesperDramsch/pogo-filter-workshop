@@ -14,6 +14,7 @@ matter — how anyone would notice if one of them stopped moving.
 | [sora10pls/holoholo-text](https://github.com/sora10pls/holoholo-text) | Niantic's own localized text export: UI strings, move and species names, Rocket grunt dialogue, seven locales | Tracks the client release |
 | [mknepprath/lily-dex-api](https://github.com/mknepprath/lily-dex-api) | Type chart, current raid-boss and Max-Battle rotation | Refreshes every 6h; the rotation itself is the signal |
 | [bigfoott/ScrapedDuck](https://github.com/bigfoott/ScrapedDuck) | Events (GBL windows, raid days/hours, spotlight hours), Rocket lineups | Event windows are dated; a stopped feed shows as an empty lookahead |
+| [zhenga8533/leak-duck](https://github.com/zhenga8533/leak-duck) | Event wild-spawn and egg pools for the tidy-up card | Event windows are dated, and the feed **drops an event the moment it ends** — the just-ended events on the card are carried forward from the previous snapshot by `scripts/lib/event-window.mjs`, never read from the feed |
 
 Two facts are deliberately **not** fetched at all:
 
