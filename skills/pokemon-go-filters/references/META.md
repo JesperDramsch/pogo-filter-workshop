@@ -17,7 +17,7 @@
 
 ## Move rebalance watch
 
-No move stat change observed since the watch began (last checked 2026-08-31).
+No move stat change observed since the watch began (last checked 2026-09-02).
 
 ## Great League (Superliga)
 
