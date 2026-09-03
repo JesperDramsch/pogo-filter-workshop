@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-02T12:16:20.851Z",
+  "fetchedAt": "2026-09-03T12:14:52.708Z",
   "raids": {
     "legendary_mega": [
       {
@@ -65,31 +65,29 @@
     ],
     "mega": [
       {
-        "id": "FALINKS",
+        "id": "SKARMORY",
         "names": {
-          "en": "Mega Falinks",
-          "de": "Mega-Legios",
-          "fr": "Méga-Hexadron",
-          "it": "MegaFalinks",
-          "ja": "メガタイレーツ",
-          "ko": "메가대여르",
-          "es": "Mega-Falinks"
+          "en": "Mega Skarmory",
+          "de": "Mega-Panzaeron",
+          "fr": "Méga-Airmure",
+          "it": "MegaSkarmory",
+          "ja": "メガエアームド",
+          "ko": "메가무장조",
+          "es": "Mega-Skarmory"
         },
         "types": [
-          "fighting"
+          "steel",
+          "flying"
         ],
         "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
-          "ghost",
-          "psychic",
-          "fairy"
+          "steel",
+          "fire",
+          "water",
+          "electric"
         ],
         "seMoveTypes": [
-          "fairy",
-          "flying",
-          "psychic"
+          "electric",
+          "fire"
         ]
       }
     ],
@@ -571,79 +569,6 @@
       "eventType": "raid-battles",
       "start": "2026-08-26T06:00:00.000",
       "end": "2026-09-08T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "REGIROCK",
-          "names": {
-            "en": "Regirock"
-          },
-          "types": [
-            "rock"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "ground",
-            "steel"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "ground",
-            "steel",
-            "water",
-            "grass"
-          ]
-        },
-        {
-          "id": "REGICE",
-          "names": {
-            "en": "Regice"
-          },
-          "types": [
-            "ice"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "ice"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "rock",
-            "steel",
-            "fire"
-          ]
-        },
-        {
-          "id": "REGISTEEL",
-          "names": {
-            "en": "Registeel"
-          },
-          "types": [
-            "steel"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "electric"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "ground",
-            "fire"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20260902",
-      "name": "Regirock, Regice, and Registeel Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-09-02T18:00:00.000",
-      "end": "2026-09-02T19:00:00.000",
       "isShadow": false,
       "isMega": false,
       "bosses": [
