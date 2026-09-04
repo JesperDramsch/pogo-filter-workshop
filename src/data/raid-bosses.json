@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-03T12:14:52.708Z",
+  "fetchedAt": "2026-09-04T12:15:06.363Z",
   "raids": {
     "legendary_mega": [
       {
@@ -65,238 +65,27 @@
     ],
     "mega": [
       {
-        "id": "SKARMORY",
+        "id": "RAICHU",
         "names": {
-          "en": "Mega Skarmory",
-          "de": "Mega-Panzaeron",
-          "fr": "Méga-Airmure",
-          "it": "MegaSkarmory",
-          "ja": "メガエアームド",
-          "ko": "메가무장조",
-          "es": "Mega-Skarmory"
+          "en": "Mega Raichu X",
+          "de": "Mega-Raichu X",
+          "fr": "Méga-Raichu X",
+          "it": "MegaRaichu X",
+          "ja": "メガライチュウＸ",
+          "ko": "메가라이츄X",
+          "es": "Mega-Raichu X"
         },
         "types": [
-          "steel",
-          "flying"
-        ],
-        "resistorTypes": [
-          "steel",
-          "fire",
-          "water",
           "electric"
         ],
-        "seMoveTypes": [
-          "electric",
-          "fire"
-        ]
-      }
-    ],
-    "lvl3": [
-      {
-        "id": "SNEASEL",
-        "names": {
-          "en": "Hisuian Sneasel",
-          "de": "Hisuian-Sniebel",
-          "fr": "Farfuret de Hisuian",
-          "it": "Sneasel di Hisuian",
-          "ja": "ニューラ",
-          "ko": "포푸니",
-          "es": "Sneasel de Galar"
-        },
-        "types": [
-          "fighting",
-          "poison"
-        ],
         "resistorTypes": [
-          "flying",
-          "poison",
           "ground",
-          "bug",
-          "ghost",
-          "psychic"
-        ],
-        "seMoveTypes": [
-          "psychic",
-          "flying",
-          "ground"
-        ]
-      },
-      {
-        "id": "LILLIGANT",
-        "names": {
-          "en": "Hisuian Lilligant",
-          "de": "Hisuian-Dressella",
-          "fr": "Fragilady de Hisuian",
-          "it": "Lilligant di Hisuian",
-          "ja": "ドレディア",
-          "ko": "드레디어",
-          "es": "Lilligant de Galar"
-        },
-        "types": [
           "grass",
-          "fighting"
-        ],
-        "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
-          "ghost",
-          "fire",
-          "grass",
-          "psychic",
-          "dragon",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "flying",
-          "fairy",
-          "fire",
-          "ice",
-          "poison",
-          "psychic"
-        ]
-      },
-      {
-        "id": "PASSIMIAN",
-        "names": {
-          "en": "Passimian",
-          "de": "Quartermak",
-          "fr": "Quartermac",
-          "it": "Passimian",
-          "ja": "ナゲツケサル",
-          "ko": "내던숭이",
-          "es": "Passimian"
-        },
-        "types": [
-          "fighting"
-        ],
-        "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
-          "ghost",
-          "psychic",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "fairy",
-          "flying",
-          "psychic"
-        ]
-      }
-    ],
-    "lvl1": [
-      {
-        "id": "DRATINI",
-        "names": {
-          "en": "Dratini",
-          "de": "Dratini",
-          "fr": "Minidraco",
-          "it": "Dratini",
-          "ja": "ミニリュウ",
-          "ko": "미뇽",
-          "es": "Dratini"
-        },
-        "types": [
+          "electric",
           "dragon"
         ],
-        "resistorTypes": [
-          "steel",
-          "fairy"
-        ],
         "seMoveTypes": [
-          "dragon",
-          "fairy",
-          "ice"
-        ]
-      },
-      {
-        "id": "HONEDGE",
-        "names": {
-          "en": "Honedge",
-          "de": "Gramokles",
-          "fr": "Monorpale",
-          "it": "Honedge",
-          "ja": "ヒトツキ",
-          "ko": "단칼빙",
-          "es": "Honedge"
-        },
-        "types": [
-          "steel",
-          "ghost"
-        ],
-        "resistorTypes": [
-          "normal",
-          "steel",
-          "fire",
-          "water",
-          "electric",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "fire",
-          "ghost",
           "ground"
-        ]
-      },
-      {
-        "id": "TYRUNT",
-        "names": {
-          "en": "Tyrunt",
-          "de": "Balgoras",
-          "fr": "Ptyranidur",
-          "it": "Tyrunt",
-          "ja": "チゴラス",
-          "ko": "티고라스",
-          "es": "Tyrunt"
-        },
-        "types": [
-          "rock",
-          "dragon"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "ground",
-          "steel",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "dragon",
-          "fairy",
-          "fighting",
-          "ground",
-          "ice",
-          "steel"
-        ]
-      },
-      {
-        "id": "AMAURA",
-        "names": {
-          "en": "Amaura",
-          "de": "Amarino",
-          "fr": "Amagara",
-          "it": "Amaura",
-          "ja": "アマルス",
-          "ko": "아마루스",
-          "es": "Amaura"
-        },
-        "types": [
-          "rock",
-          "ice"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "steel",
-          "water"
-        ],
-        "seMoveTypes": [
-          "fighting",
-          "steel",
-          "grass",
-          "ground",
-          "rock",
-          "water"
         ]
       }
     ],
@@ -669,6 +458,42 @@
             "rock",
             "fire",
             "psychic"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-houndoom-in-mega-raids-september-2026",
+      "name": "Mega Houndoom in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-09-11T06:00:00.000",
+      "end": "2026-09-15T22:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "HOUNDOOM",
+          "names": {
+            "en": "Houndoom"
+          },
+          "types": [
+            "dark",
+            "fire"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "rock",
+            "fire",
+            "water",
+            "dragon",
+            "dark",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "ground",
+            "rock",
+            "water"
           ]
         }
       ]
