@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-05T12:36:27.523Z",
+  "generatedAt": "2026-09-06T12:50:00.437Z",
   "fetchedAt": "2026-09-02T14:13:37.923Z",
   "topN": 30,
   "source": "pvpoke",
@@ -8,7 +8,7 @@
     "upstream": "https://github.com/pvpoke/pvpoke (MIT)"
   },
   "gameMasterWatch": {
-    "checkedAt": "2026-09-05T12:36:22.033Z",
+    "checkedAt": "2026-09-06T12:49:55.835Z",
     "lastChangeAt": null,
     "lastChangeSummary": null,
     "movesChanged": []
