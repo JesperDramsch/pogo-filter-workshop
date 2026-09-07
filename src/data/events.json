@@ -1,55 +1,6 @@
 {
-  "fetchedAt": "2026-09-02T15:58:40.752Z",
+  "fetchedAt": "2026-09-07T14:14:08.034Z",
   "events": [
-    {
-      "id": "event-pok-monxp-2026-worlds-2026-08-25t10-00-00",
-      "title": "PokémonXP & 2026 Worlds",
-      "category": "Event",
-      "start": "2026-08-25T10:00:00",
-      "end": "2026-08-30T20:00:00",
-      "isLocalTime": true,
-      "spawnDex": [
-        27,
-        56,
-        108,
-        158,
-        176,
-        194,
-        280,
-        322,
-        363,
-        374,
-        425,
-        590,
-        605,
-        633,
-        656,
-        725,
-        816,
-        921
-      ],
-      "spawns": [
-        "Beldum",
-        "Deino",
-        "Drifloon",
-        "Elgyem",
-        "Foongus",
-        "Froakie",
-        "Lickitung",
-        "Litten",
-        "Mankey",
-        "Numel",
-        "Pawmi",
-        "Ralts",
-        "Sandshrew",
-        "Sobble",
-        "Spheal",
-        "Togetic",
-        "Totodile",
-        "Wooper"
-      ],
-      "unresolved": []
-    },
     {
       "id": "event-mega-ascension-2026-08-31t10-00-00",
       "title": "Mega Ascension",
@@ -391,33 +342,6 @@
       "unresolved": []
     },
     {
-      "id": "event-mega-squads-2026-09-08t10-00-00-eggs",
-      "title": "Mega Squads",
-      "category": "Event",
-      "start": "2026-09-08T10:00:00",
-      "end": "2026-09-14T20:00:00",
-      "isLocalTime": true,
-      "eggDex": [
-        551,
-        587,
-        661,
-        674,
-        821,
-        942,
-        973
-      ],
-      "eggs": [
-        "Emolga",
-        "Flamigo",
-        "Fletchling",
-        "Maschiff",
-        "Pancham",
-        "Rookidee",
-        "Sandile"
-      ],
-      "unresolved": []
-    },
-    {
       "id": "season-twilight-trails-2026-09-08t10-00-00-eggs",
       "title": "Twilight Trails",
       "category": "Season",
@@ -469,6 +393,33 @@
         "Stunfisk",
         "Tyrogue",
         "Zigzagoon"
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "event-mega-squads-2026-09-08t10-00-00-eggs",
+      "title": "Mega Squads",
+      "category": "Event",
+      "start": "2026-09-08T10:00:00",
+      "end": "2026-09-14T20:00:00",
+      "isLocalTime": true,
+      "eggDex": [
+        551,
+        587,
+        661,
+        674,
+        821,
+        942,
+        973
+      ],
+      "eggs": [
+        "Emolga",
+        "Flamigo",
+        "Fletchling",
+        "Maschiff",
+        "Pancham",
+        "Rookidee",
+        "Sandile"
       ],
       "unresolved": []
     }
