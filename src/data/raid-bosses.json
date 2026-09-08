@@ -1,91 +1,327 @@
 {
-  "fetchedAt": "2026-09-04T12:15:06.363Z",
+  "fetchedAt": "2026-09-08T12:16:38.923Z",
   "raids": {
-    "legendary_mega": [
+    "mega": [
       {
-        "id": "LATIAS",
+        "id": "GYARADOS",
         "names": {
-          "en": "Mega Latias",
-          "de": "Mega-Latias",
-          "fr": "Méga-Latias",
-          "it": "MegaLatias",
-          "ja": "メガラティアス",
-          "ko": "메가라티아스",
-          "es": "Mega-Latias"
+          "en": "Mega Gyarados",
+          "de": "Mega-Garados",
+          "fr": "Méga-Léviator",
+          "it": "MegaGyarados",
+          "ja": "メガギャラドス",
+          "ko": "메가갸라도스",
+          "es": "Mega-Gyarados"
         },
         "types": [
-          "dragon",
-          "psychic"
+          "water",
+          "dark"
         ],
         "resistorTypes": [
-          "steel",
-          "psychic",
+          "fighting",
+          "water",
+          "grass",
+          "dragon",
           "dark",
           "fairy"
         ],
         "seMoveTypes": [
           "bug",
-          "dark",
+          "electric",
+          "fairy",
+          "fighting",
+          "grass"
+        ]
+      }
+    ],
+    "lvl5": [
+      {
+        "id": "REGIROCK",
+        "names": {
+          "en": "Regirock",
+          "de": "Regirock",
+          "fr": "Regirock",
+          "it": "Regirock",
+          "ja": "レジロック",
+          "ko": "레지락",
+          "es": "Regirock"
+        },
+        "types": [
+          "rock"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "ground",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "grass",
+          "ground",
+          "steel",
+          "water"
+        ]
+      },
+      {
+        "id": "REGICE",
+        "names": {
+          "en": "Regice",
+          "de": "Regice",
+          "fr": "Regice",
+          "it": "Regice",
+          "ja": "レジアイス",
+          "ko": "레지아이스",
+          "es": "Regice"
+        },
+        "types": [
+          "ice"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "ice"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "fire",
+          "rock",
+          "steel"
+        ]
+      },
+      {
+        "id": "REGISTEEL",
+        "names": {
+          "en": "Registeel",
+          "de": "Registeel",
+          "fr": "Registeel",
+          "it": "Registeel",
+          "ja": "レジスチル",
+          "ko": "레지스틸",
+          "es": "Registeel"
+        },
+        "types": [
+          "steel"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "electric"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "fire",
+          "ground"
+        ]
+      }
+    ],
+    "lvl3": [
+      {
+        "id": "SNEASEL",
+        "names": {
+          "en": "Hisuian Sneasel",
+          "de": "Hisuian-Sniebel",
+          "fr": "Farfuret de Hisuian",
+          "it": "Sneasel di Hisuian",
+          "ja": "ニューラ",
+          "ko": "포푸니",
+          "es": "Sneasel de Galar"
+        },
+        "types": [
+          "fighting",
+          "poison"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "ground",
+          "bug",
+          "ghost",
+          "psychic"
+        ],
+        "seMoveTypes": [
+          "psychic",
+          "flying",
+          "ground"
+        ]
+      },
+      {
+        "id": "LILLIGANT",
+        "names": {
+          "en": "Hisuian Lilligant",
+          "de": "Hisuian-Dressella",
+          "fr": "Fragilady de Hisuian",
+          "it": "Lilligant di Hisuian",
+          "ja": "ドレディア",
+          "ko": "드레디어",
+          "es": "Lilligant de Galar"
+        },
+        "types": [
+          "grass",
+          "fighting"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "fire",
+          "grass",
+          "psychic",
+          "dragon",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "fairy",
+          "fire",
+          "ice",
+          "poison",
+          "psychic"
+        ]
+      },
+      {
+        "id": "PASSIMIAN",
+        "names": {
+          "en": "Passimian",
+          "de": "Quartermak",
+          "fr": "Quartermac",
+          "it": "Passimian",
+          "ja": "ナゲツケサル",
+          "ko": "내던숭이",
+          "es": "Passimian"
+        },
+        "types": [
+          "fighting"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "psychic",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "fairy",
+          "flying",
+          "psychic"
+        ]
+      }
+    ],
+    "lvl1": [
+      {
+        "id": "DRATINI",
+        "names": {
+          "en": "Dratini",
+          "de": "Dratini",
+          "fr": "Minidraco",
+          "it": "Dratini",
+          "ja": "ミニリュウ",
+          "ko": "미뇽",
+          "es": "Dratini"
+        },
+        "types": [
+          "dragon"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fairy"
+        ],
+        "seMoveTypes": [
           "dragon",
           "fairy",
-          "ghost",
           "ice"
         ]
       },
       {
-        "id": "LATIOS",
+        "id": "HONEDGE",
         "names": {
-          "en": "Mega Latios",
-          "de": "Mega-Latios",
-          "fr": "Méga-Latios",
-          "it": "MegaLatios",
-          "ja": "メガラティオス",
-          "ko": "메가라티오스",
-          "es": "Mega-Latios"
+          "en": "Honedge",
+          "de": "Gramokles",
+          "fr": "Monorpale",
+          "it": "Honedge",
+          "ja": "ヒトツキ",
+          "ko": "단칼빙",
+          "es": "Honedge"
         },
         "types": [
-          "dragon",
-          "psychic"
+          "steel",
+          "ghost"
         ],
         "resistorTypes": [
+          "normal",
           "steel",
-          "psychic",
+          "fire",
+          "water",
+          "electric",
+          "dark"
+        ],
+        "seMoveTypes": [
           "dark",
+          "fire",
+          "ghost",
+          "ground"
+        ]
+      },
+      {
+        "id": "TYRUNT",
+        "names": {
+          "en": "Tyrunt",
+          "de": "Balgoras",
+          "fr": "Ptyranidur",
+          "it": "Tyrunt",
+          "ja": "チゴラス",
+          "ko": "티고라스",
+          "es": "Tyrunt"
+        },
+        "types": [
+          "rock",
+          "dragon"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "ground",
+          "steel",
           "fairy"
         ],
         "seMoveTypes": [
-          "bug",
-          "dark",
           "dragon",
           "fairy",
-          "ghost",
-          "ice"
+          "fighting",
+          "ground",
+          "ice",
+          "steel"
         ]
-      }
-    ],
-    "mega": [
+      },
       {
-        "id": "RAICHU",
+        "id": "AMAURA",
         "names": {
-          "en": "Mega Raichu X",
-          "de": "Mega-Raichu X",
-          "fr": "Méga-Raichu X",
-          "it": "MegaRaichu X",
-          "ja": "メガライチュウＸ",
-          "ko": "메가라이츄X",
-          "es": "Mega-Raichu X"
+          "en": "Amaura",
+          "de": "Amarino",
+          "fr": "Amagara",
+          "it": "Amaura",
+          "ja": "アマルス",
+          "ko": "아마루스",
+          "es": "Amaura"
         },
         "types": [
-          "electric"
+          "rock",
+          "ice"
         ],
         "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
-          "dragon"
+          "fighting",
+          "steel",
+          "water"
         ],
         "seMoveTypes": [
-          "ground"
+          "fighting",
+          "steel",
+          "grass",
+          "ground",
+          "rock",
+          "water"
         ]
       }
     ],
@@ -321,110 +557,6 @@
   },
   "maxBattles": {},
   "eventRaids": [
-    {
-      "eventID": "mega-gyarados-in-mega-raids-august-2026",
-      "name": "Mega Gyarados in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-08-26T06:00:00.000",
-      "end": "2026-09-08T22:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "GYARADOS",
-          "names": {
-            "en": "Gyarados"
-          },
-          "types": [
-            "water",
-            "flying"
-          ],
-          "resistorTypes": [
-            "steel",
-            "water",
-            "electric",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "rock",
-            "electric"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "regirock-regice-registeel-in-5-star-raid-battles-august-2026",
-      "name": "Regirock, Regice, and Registeel in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-08-26T06:00:00.000",
-      "end": "2026-09-08T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "REGIROCK",
-          "names": {
-            "en": "Regirock"
-          },
-          "types": [
-            "rock"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "ground",
-            "steel"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "ground",
-            "steel",
-            "water",
-            "grass"
-          ]
-        },
-        {
-          "id": "REGICE",
-          "names": {
-            "en": "Regice"
-          },
-          "types": [
-            "ice"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "ice"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "rock",
-            "steel",
-            "fire"
-          ]
-        },
-        {
-          "id": "REGISTEEL",
-          "names": {
-            "en": "Registeel"
-          },
-          "types": [
-            "steel"
-          ],
-          "resistorTypes": [
-            "steel",
-            "fire",
-            "water",
-            "electric"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "ground",
-            "fire"
-          ]
-        }
-      ]
-    },
     {
       "eventID": "mega-beedrill-in-mega-raids-september-2026",
       "name": "Mega Beedrill in Mega Raids",
