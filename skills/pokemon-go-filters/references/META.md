@@ -17,7 +17,9 @@
 
 ## Move rebalance watch
 
-No move stat change observed since the watch began (last checked 2026-09-06).
+Last observed Trainer-Battle stat change: **2026-09-09** — 28 move(s) changed (AIR_CUTTER, BITE, BLAZE_KICK, BODY_SLAM, BRINE, BUBBLE_BEAM, BULLDOZE, CHARGE_BEAM, DARK_PULSE, DOUBLE_IRON_BASH, DRAINING_KISS, FELL_STINGER_PLUS).
+
+Rankings lag a rebalance by days, so treat the tables below with caution if that date is recent.
 
 ## Great League (Superliga)
 

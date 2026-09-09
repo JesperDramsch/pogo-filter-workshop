@@ -1,11 +1,317 @@
 {
-  "fetchedAt": "2026-09-06T12:49:55.835Z",
+  "fetchedAt": "2026-09-09T13:39:32.814Z",
   "sources": {
     "pvp": "pvpoke-gamemaster",
     "pve": "alexelgt/game_masters",
-    "pveBatch": "2026-09-05T01:43:47.411Z"
+    "pveBatch": "2026-09-09T01:36:59.036Z"
   },
-  "history": [],
+  "history": [
+    {
+      "at": "2026-09-09T13:39:32.814Z",
+      "stream": "pve",
+      "summary": "2 move(s) changed",
+      "changes": [
+        {
+          "move": "V0288_MOVE_PSYCHO_BOOST",
+          "field": "power",
+          "from": 70,
+          "to": 130
+        },
+        {
+          "move": "V0288_MOVE_PSYCHO_BOOST",
+          "field": "energyDelta",
+          "from": -50,
+          "to": -33
+        },
+        {
+          "move": "VM_MOVE_TEMP_EVOLUTION_MEGA_V0015_POKEMON_BEEDRILL",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-09T13:39:32.814Z",
+      "stream": "pvp",
+      "summary": "28 move(s) changed",
+      "changes": [
+        {
+          "move": "AIR_CUTTER",
+          "field": "power",
+          "from": 45,
+          "to": 60
+        },
+        {
+          "move": "AIR_CUTTER",
+          "field": "energy",
+          "from": 35,
+          "to": 40
+        },
+        {
+          "move": "AIR_CUTTER",
+          "field": "buffApplyChance",
+          "from": ".3",
+          "to": ".125"
+        },
+        {
+          "move": "BITE",
+          "field": "power",
+          "from": 4,
+          "to": 2
+        },
+        {
+          "move": "BITE",
+          "field": "energyGain",
+          "from": 2,
+          "to": 4
+        },
+        {
+          "move": "BLAZE_KICK",
+          "field": "energy",
+          "from": 40,
+          "to": 35
+        },
+        {
+          "move": "BODY_SLAM",
+          "field": "power",
+          "from": 55,
+          "to": 65
+        },
+        {
+          "move": "BODY_SLAM",
+          "field": "energy",
+          "from": 35,
+          "to": 40
+        },
+        {
+          "move": "BRINE",
+          "field": "power",
+          "from": 60,
+          "to": 100
+        },
+        {
+          "move": "BRINE",
+          "field": "energy",
+          "from": 50,
+          "to": 60
+        },
+        {
+          "move": "BUBBLE_BEAM",
+          "field": "power",
+          "from": 25,
+          "to": 50
+        },
+        {
+          "move": "BUBBLE_BEAM",
+          "field": "energy",
+          "from": 40,
+          "to": 50
+        },
+        {
+          "move": "BULLDOZE",
+          "field": "power",
+          "from": 45,
+          "to": 80
+        },
+        {
+          "move": "BULLDOZE",
+          "field": "energy",
+          "from": 45,
+          "to": 55
+        },
+        {
+          "move": "BULLDOZE",
+          "field": "buffApplyChance",
+          "from": ".5",
+          "to": "1"
+        },
+        {
+          "move": "CHARGE_BEAM",
+          "field": "power",
+          "from": 5,
+          "to": 6
+        },
+        {
+          "move": "DARK_PULSE",
+          "field": "energy",
+          "from": 50,
+          "to": 45
+        },
+        {
+          "move": "DOUBLE_IRON_BASH",
+          "field": "power",
+          "from": 55,
+          "to": 70
+        },
+        {
+          "move": "DRAINING_KISS",
+          "field": "power",
+          "from": 60,
+          "to": 80
+        },
+        {
+          "move": "DRAINING_KISS",
+          "field": "buffs",
+          "from": null,
+          "to": [
+            0,
+            1
+          ]
+        },
+        {
+          "move": "DRAINING_KISS",
+          "field": "buffTarget",
+          "from": null,
+          "to": "self"
+        },
+        {
+          "move": "DRAINING_KISS",
+          "field": "buffApplyChance",
+          "from": null,
+          "to": "1"
+        },
+        {
+          "move": "FELL_STINGER_PLUS",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        },
+        {
+          "move": "HIGH_HORSEPOWER",
+          "field": "energy",
+          "from": 60,
+          "to": 55
+        },
+        {
+          "move": "INFESTATION",
+          "field": "power",
+          "from": 6,
+          "to": 10
+        },
+        {
+          "move": "IRON_HEAD",
+          "field": "power",
+          "from": 70,
+          "to": 85
+        },
+        {
+          "move": "LOW_KICK",
+          "field": "power",
+          "from": 5,
+          "to": 6
+        },
+        {
+          "move": "LUNGE",
+          "field": "power",
+          "from": 60,
+          "to": 70
+        },
+        {
+          "move": "MAGNET_BOMB",
+          "field": "energy",
+          "from": 45,
+          "to": 40
+        },
+        {
+          "move": "MIRROR_COAT",
+          "field": "power",
+          "from": 60,
+          "to": 75
+        },
+        {
+          "move": "MIRROR_COAT",
+          "field": "energy",
+          "from": 55,
+          "to": 45
+        },
+        {
+          "move": "MOONBLAST",
+          "field": "power",
+          "from": 110,
+          "to": 90
+        },
+        {
+          "move": "MOONBLAST",
+          "field": "energy",
+          "from": 60,
+          "to": 50
+        },
+        {
+          "move": "POISON_FANG",
+          "field": "power",
+          "from": 45,
+          "to": 50
+        },
+        {
+          "move": "PSYCHO_BOOST",
+          "field": "power",
+          "from": 70,
+          "to": 85
+        },
+        {
+          "move": "RAGE_FIST",
+          "field": "power",
+          "from": 50,
+          "to": 55
+        },
+        {
+          "move": "RAGE_FIST",
+          "field": "energy",
+          "from": 35,
+          "to": 40
+        },
+        {
+          "move": "SAND_TOMB",
+          "field": "power",
+          "from": 40,
+          "to": 55
+        },
+        {
+          "move": "SAND_TOMB",
+          "field": "energy",
+          "from": 40,
+          "to": 45
+        },
+        {
+          "move": "SCRATCH",
+          "field": "power",
+          "from": 4,
+          "to": 3
+        },
+        {
+          "move": "SCRATCH",
+          "field": "energyGain",
+          "from": 2,
+          "to": 4
+        },
+        {
+          "move": "SHADOW_BALL",
+          "field": "power",
+          "from": 100,
+          "to": 90
+        },
+        {
+          "move": "SHADOW_FORCE",
+          "field": "energy",
+          "from": 90,
+          "to": 65
+        },
+        {
+          "move": "TAKE_DOWN",
+          "field": "power",
+          "from": 5,
+          "to": 14
+        },
+        {
+          "move": "TAKE_DOWN",
+          "field": "energyGain",
+          "from": 8,
+          "to": 9
+        }
+      ]
+    }
+  ],
   "moves": {
     "ACID": {
       "power": 6,
@@ -68,8 +374,8 @@
       "buffApplyChance": ".125"
     },
     "AIR_CUTTER": {
-      "power": 45,
-      "energy": 35,
+      "power": 60,
+      "energy": 40,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1,
@@ -78,7 +384,7 @@
         0
       ],
       "buffTarget": "self",
-      "buffApplyChance": ".3"
+      "buffApplyChance": ".125"
     },
     "AIR_SLASH": {
       "power": 9,
@@ -209,9 +515,9 @@
       "turns": 1
     },
     "BITE": {
-      "power": 4,
+      "power": 2,
       "energy": 0,
-      "energyGain": 2,
+      "energyGain": 4,
       "cooldown": 500,
       "turns": 1
     },
@@ -224,7 +530,7 @@
     },
     "BLAZE_KICK": {
       "power": 60,
-      "energy": 40,
+      "energy": 35,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1
@@ -250,8 +556,8 @@
       "turns": 1
     },
     "BODY_SLAM": {
-      "power": 55,
-      "energy": 35,
+      "power": 65,
+      "energy": 40,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1
@@ -323,8 +629,8 @@
       "buffApplyChance": "1"
     },
     "BRINE": {
-      "power": 60,
-      "energy": 50,
+      "power": 100,
+      "energy": 60,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1
@@ -344,8 +650,8 @@
       "turns": 3
     },
     "BUBBLE_BEAM": {
-      "power": 25,
-      "energy": 40,
+      "power": 50,
+      "energy": 50,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1,
@@ -377,8 +683,8 @@
       "buffApplyChance": ".3"
     },
     "BULLDOZE": {
-      "power": 45,
-      "energy": 45,
+      "power": 80,
+      "energy": 55,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1,
@@ -387,7 +693,7 @@
         -1
       ],
       "buffTarget": "opponent",
-      "buffApplyChance": ".5"
+      "buffApplyChance": "1"
     },
     "BULLET_PUNCH": {
       "power": 7,
@@ -404,7 +710,7 @@
       "turns": 3
     },
     "CHARGE_BEAM": {
-      "power": 5,
+      "power": 6,
       "energy": 0,
       "energyGain": 11,
       "cooldown": 1500,
@@ -539,7 +845,7 @@
     },
     "DARK_PULSE": {
       "power": 80,
-      "energy": 50,
+      "energy": 45,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1
@@ -587,7 +893,7 @@
       "turns": 1
     },
     "DOUBLE_IRON_BASH": {
-      "power": 55,
+      "power": 70,
       "energy": 35,
       "energyGain": 0,
       "cooldown": 500,
@@ -662,11 +968,17 @@
       "turns": 3
     },
     "DRAINING_KISS": {
-      "power": 60,
+      "power": 80,
       "energy": 55,
       "energyGain": 0,
       "cooldown": 500,
-      "turns": 1
+      "turns": 1,
+      "buffs": [
+        0,
+        1
+      ],
+      "buffTarget": "self",
+      "buffApplyChance": "1"
     },
     "DRAIN_PUNCH": {
       "power": 40,
@@ -812,6 +1124,19 @@
     },
     "FELL_STINGER": {
       "power": 20,
+      "energy": 35,
+      "energyGain": 0,
+      "cooldown": 500,
+      "turns": 1,
+      "buffs": [
+        1,
+        0
+      ],
+      "buffTarget": "self",
+      "buffApplyChance": "1"
+    },
+    "FELL_STINGER_PLUS": {
+      "power": 40,
       "energy": 35,
       "energyGain": 0,
       "cooldown": 500,
@@ -1266,7 +1591,7 @@
     },
     "HIGH_HORSEPOWER": {
       "power": 100,
-      "energy": 60,
+      "energy": 55,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1
@@ -1402,14 +1727,14 @@
       "turns": 5
     },
     "INFESTATION": {
-      "power": 6,
+      "power": 10,
       "energy": 0,
       "energyGain": 12,
       "cooldown": 1500,
       "turns": 3
     },
     "IRON_HEAD": {
-      "power": 70,
+      "power": 85,
       "energy": 50,
       "energyGain": 0,
       "cooldown": 500,
@@ -1517,7 +1842,7 @@
       "turns": 1
     },
     "LOW_KICK": {
-      "power": 5,
+      "power": 6,
       "energy": 0,
       "energyGain": 8,
       "cooldown": 1000,
@@ -1531,7 +1856,7 @@
       "turns": 1
     },
     "LUNGE": {
-      "power": 60,
+      "power": 70,
       "energy": 45,
       "energyGain": 0,
       "cooldown": 500,
@@ -1572,7 +1897,7 @@
     },
     "MAGNET_BOMB": {
       "power": 70,
-      "energy": 45,
+      "energy": 40,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1
@@ -1639,8 +1964,8 @@
       "buffApplyChance": "1"
     },
     "MIRROR_COAT": {
-      "power": 60,
-      "energy": 55,
+      "power": 75,
+      "energy": 45,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1
@@ -1672,8 +1997,8 @@
       "buffApplyChance": "0.5"
     },
     "MOONBLAST": {
-      "power": 110,
-      "energy": 60,
+      "power": 90,
+      "energy": 50,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1,
@@ -1919,7 +2244,7 @@
       "turns": 1
     },
     "POISON_FANG": {
-      "power": 45,
+      "power": 50,
       "energy": 40,
       "energyGain": 0,
       "cooldown": 500,
@@ -2048,7 +2373,7 @@
       "buffApplyChance": "1"
     },
     "PSYCHO_BOOST": {
-      "power": 70,
+      "power": 85,
       "energy": 35,
       "energyGain": 0,
       "cooldown": 500,
@@ -2103,8 +2428,8 @@
       "turns": 2
     },
     "RAGE_FIST": {
-      "power": 50,
-      "energy": 35,
+      "power": 55,
+      "energy": 40,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1,
@@ -2252,8 +2577,8 @@
       "turns": 1
     },
     "SAND_TOMB": {
-      "power": 40,
-      "energy": 40,
+      "power": 55,
+      "energy": 45,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1,
@@ -2291,9 +2616,9 @@
       "buffApplyChance": "0.1"
     },
     "SCRATCH": {
-      "power": 4,
+      "power": 3,
       "energy": 0,
-      "energyGain": 2,
+      "energyGain": 4,
       "cooldown": 500,
       "turns": 1
     },
@@ -2332,7 +2657,7 @@
       "buffApplyChance": ".4"
     },
     "SHADOW_BALL": {
-      "power": 100,
+      "power": 90,
       "energy": 50,
       "energyGain": 0,
       "cooldown": 500,
@@ -2360,7 +2685,7 @@
     },
     "SHADOW_FORCE": {
       "power": 120,
-      "energy": 90,
+      "energy": 65,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1
@@ -2639,9 +2964,9 @@
       "turns": 1
     },
     "TAKE_DOWN": {
-      "power": 5,
+      "power": 14,
       "energy": 0,
-      "energyGain": 8,
+      "energyGain": 9,
       "cooldown": 1500,
       "turns": 3
     },
@@ -4140,9 +4465,9 @@
       "pokemonType": "POKEMON_TYPE_NORMAL"
     },
     "V0288_MOVE_PSYCHO_BOOST": {
-      "power": 70,
+      "power": 130,
       "durationMs": 4000,
-      "energyDelta": -50,
+      "energyDelta": -33,
       "pokemonType": "POKEMON_TYPE_PSYCHIC"
     },
     "V0289_MOVE_ORIGIN_PULSE": {
@@ -5000,6 +5325,12 @@
     "V0595_MOVE_GULP_MISSILE_GORGING": {
       "durationMs": 2500,
       "pokemonType": "POKEMON_TYPE_NORMAL"
+    },
+    "VM_MOVE_TEMP_EVOLUTION_MEGA_V0015_POKEMON_BEEDRILL": {
+      "power": 140,
+      "durationMs": 2000,
+      "energyDelta": -100,
+      "pokemonType": "POKEMON_TYPE_BUG"
     },
     "VM_MOVE_TEMP_EVOLUTION_MEGA_V0071_POKEMON_VICTREEBEL": {
       "power": 160,
