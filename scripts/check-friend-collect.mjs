@@ -9,10 +9,16 @@ import {
 	collectibleBaseDex,
 	DEFAULT_CONFIG,
 	DEFAULT_TOP_ATTACKERS,
+	buildOwnedLine,
+	friendCollectWantsFor,
+	lineCoverageOwner,
 	lineHasStages,
+	lineOwnerCovers,
 	lineSlotCovered,
 	lineSlotOwner,
+	lineSlotOwnerIn,
 	mergeImportedConfig,
+	ownedLinePartition,
 	upwardReach,
 } from '../src/App.jsx';
 import EVENTS from '../src/data/events.json';
@@ -951,6 +957,52 @@ console.log('\nScenario 8c: have-list line scopes — family / upward / exact');
 		JSON.stringify([merged.luckyScope, merged.hundoScope]));
 	check('DEFAULT_CONFIG carries empty scope maps',
 		JSON.stringify(DEFAULT_CONFIG.luckyScope) === '{}' && JSON.stringify(DEFAULT_CONFIG.hundoScope) === '{}');
+
+	// The partition is built once per have-list and the owner-naming core reads
+	// it; the boolean wrappers are the same answer on a plain Set.
+	const part = ownedLinePartition(S(15, 14, 131), scopeOf({ 14: 'upward' }));
+	check('partition splits family / explicit and roots only the family copies',
+		JSON.stringify([...part.familyOwned]) === '[15,131]' && JSON.stringify(part.explicit) === '[[14,"upward"]]' &&
+			part.roots.has(13) && part.roots.has(131) && part.roots.size === 2);
+	check('lineSlotOwnerIn agrees with the wrappers',
+		[[13, 15], [14, 14], [15, 14], [131, 131], [172, null]].every(
+			([d, owner]) => lineSlotOwnerIn(d, part) === owner &&
+				(lineSlotOwner(d, S(15, 14, 131), scopeOf({ 14: 'upward' })) === owner) &&
+				(lineSlotCovered(d, S(15, 14, 131), null, scopeOf({ 14: 'upward' })) === (owner !== null))));
+
+	// Coverage reads the OWNER's annotations, not the target's: a Kanto-only
+	// lucky Vulpix fills a Vulnona ask that still wants Kanto, and never one
+	// narrowed to Alola. (Copilot's finding on the first cut of this PR.)
+	const ninetales = { ...cfg, friendCollectSpecies: ['vulnona'], friendCollectMode: 'lucky' };
+	const kantoVulpix = { luckyForms: { vulpix: ['base'] } };
+	const anyForm = buildFilters([], ['vulpix'], { ...ninetales, ...kantoVulpix }, [], 'en', t);
+	check('Kanto-only lucky Vulpix covers an unrestricted Vulnona ask',
+		anyForm.friendCollectTargets[0].owned === true && anyForm.friendCollectTargets[0].lineLucky === 'vulpix');
+	const alolaOnly = buildFilters([], ['vulpix'],
+		{ ...ninetales, ...kantoVulpix, friendCollectDropForms: { vulnona: ['base'] } }, [], 'en', t);
+	check('…but not a Vulnona ask narrowed to Alola',
+		alolaOnly.friendCollectTargets[0].owned === false && alolaOnly.friendCollectWishlist.startsWith('ninetales&'),
+		alolaOnly.friendCollectWishlist);
+	const kantoOnly = buildFilters([], ['vulpix'],
+		{ ...ninetales, ...kantoVulpix, friendCollectDropForms: { vulnona: ['alola'] } }, [], 'en', t);
+	check('…and does cover one narrowed to Kanto', kantoOnly.friendCollectTargets[0].owned === true);
+	const unannotated = buildFilters([], ['vulpix'],
+		{ ...ninetales, friendCollectDropForms: { vulnona: ['base'] } }, [], 'en', t);
+	check('an unannotated owner still covers every form (opt-in rule unchanged)',
+		unannotated.friendCollectTargets[0].owned === true);
+	// The packs read the same gate: a Kanto-only lucky Vulnona retires the
+	// Vulpix ask (no form restriction on a pack entry) — line-level as before.
+	check('lineOwnerCovers is the shared gate', lineOwnerCovers(37, { forms: { vulpix: ['base'] } }, { forms: ['alola'] }) === false &&
+		lineOwnerCovers(37, { forms: { vulpix: ['base'] } }, { forms: ['base', 'alola'] }) === true &&
+		lineOwnerCovers(null, {}, {}) === false);
+	// The notice reads the have-lists through the same helpers as the filter.
+	const haveLine = buildOwnedLine(['vulpix', 'bibor'], {}, { bibor: 'exact' });
+	check('buildOwnedLine + lineCoverageOwner mirror the filter',
+		lineCoverageOwner(38, haveLine) === 37 && lineCoverageOwner(13, haveLine) === null && lineCoverageOwner(15, haveLine) === 15);
+	check('friendCollectWantsFor derives gender / forms / slots from the config',
+		JSON.stringify(friendCollectWantsFor({ friendCollectGenders: { wadribie: 'female' }, friendCollectDropForms: { vulnona: ['base'] } }, 'vulnona')) ===
+			JSON.stringify({ gender: null, forms: ['alola'], slots: null }) &&
+			friendCollectWantsFor({ friendCollectGenders: { wadribie: 'female' } }, 'wadribie').gender === 'female');
 }
 
 console.log('\nScenario 9: config merge');
