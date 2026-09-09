@@ -1,11 +1,11 @@
 {
-  "fetchedAt": "2026-09-06T12:19:30.940Z",
-  "gameMasterTimestamp": "1788572627411",
+  "fetchedAt": "2026-09-09T13:08:29.669Z",
+  "gameMasterTimestamp": "1788917819036",
   "sources": {
     "mechanics": "alexelgt/game_masters",
-    "mechanicsBatch": "2026-09-05T01:43:47.411Z",
+    "mechanicsBatch": "2026-09-09T01:36:59.036Z",
     "roster": "pvpoke/pvpoke",
-    "rosterBatch": "2026-09-01 18:36:39"
+    "rosterBatch": "2026-09-09 01:44:57"
   },
   "model": {
     "attackerLevel": 40,
@@ -26,6 +26,7 @@
   "topAttackers": [
     "eternatus",
     "regigigas",
+    "deoxys",
     "regieleki",
     "blacephalon",
     "regidrago",
@@ -75,9 +76,11 @@
     "tapu koko",
     "zarude",
     "necrozma",
+    "ursaluna",
     "rillaboom",
     "tyrantrum",
     "excadrill",
+    "darkrai",
     "melmetal",
     "nihilego",
     "tyranitar",
@@ -91,7 +94,6 @@
     "tapu bulu",
     "porygon-z",
     "mamoswine",
-    "ursaluna",
     "primarina",
     "samurott",
     "jirachi",
@@ -101,7 +103,6 @@
     "meowscarada",
     "kingambit",
     "xerneas",
-    "darkrai",
     "absol",
     "gengar",
     "weavile",
@@ -148,12 +149,14 @@
     "heatran",
     "chandelure",
     "hydreigon",
+    "darkrai",
     "rampardos",
     "rhyperior",
     "mamoswine",
     "latios",
     "conkeldurr",
     "tyrantrum",
+    "gallade",
     "raikou",
     "porygon-z",
     "gengar",
@@ -168,7 +171,6 @@
     "absol",
     "swampert",
     "annihilape",
-    "darkrai",
     "chesnaught",
     "luxray",
     "hariyama",
@@ -179,11 +181,9 @@
     "ursaring",
     "torterra",
     "slaking",
-    "sneasler",
     "aurorus",
     "venusaur",
     "tangrowth",
-    "gallade",
     "cacturne",
     "vikavolt",
     "gardevoir",
@@ -193,9 +193,8 @@
     "arcanine",
     "banette",
     "exploud",
-    "toxicroak",
-    "houndoom",
     "snorlax",
+    "toxicroak",
     "victreebel",
     "muk",
     "scizor",
@@ -252,6 +251,7 @@
     "entei",
     "lugia",
     "gengar",
+    "gallade",
     "alakazam",
     "raikou",
     "espeon",
@@ -280,7 +280,6 @@
     "hatterene",
     "centiskorch",
     "flygon",
-    "gallade",
     "vaporeon",
     "raichu",
     "sylveon",
@@ -583,6 +582,15 @@
         "charged": "EARTHQUAKE"
       },
       {
+        "species": "ursaluna",
+        "dex": 901,
+        "rating": 35.88,
+        "dps": 17.56,
+        "tdo": 305.7,
+        "fast": "SCRATCH_FAST",
+        "charged": "HIGH_HORSEPOWER"
+      },
+      {
         "species": "excadrill",
         "dex": 530,
         "rating": 35.64,
@@ -598,15 +606,6 @@
         "dps": 18.05,
         "tdo": 236.2,
         "fast": "MUD_SLAP_FAST",
-        "charged": "HIGH_HORSEPOWER"
-      },
-      {
-        "species": "ursaluna",
-        "dex": 901,
-        "rating": 34.33,
-        "dps": 16.81,
-        "tdo": 292.6,
-        "fast": "TACKLE_FAST",
         "charged": "HIGH_HORSEPOWER"
       }
     ],
@@ -1065,6 +1064,15 @@
     ],
     "psychic": [
       {
+        "species": "deoxys",
+        "dex": 386,
+        "rating": 49.85,
+        "dps": 31.5,
+        "tdo": 197.6,
+        "fast": "ZEN_HEADBUTT_FAST",
+        "charged": "PSYCHO_BOOST"
+      },
+      {
         "species": "mewtwo",
         "dex": 150,
         "rating": 43.8,
@@ -1109,15 +1117,6 @@
         "dps": 17.96,
         "tdo": 255.1,
         "fast": "DRAGON_BREATH_FAST",
-        "charged": "PSYCHIC"
-      },
-      {
-        "species": "metagross",
-        "dex": 376,
-        "rating": 34.28,
-        "dps": 17.23,
-        "tdo": 269.9,
-        "fast": "FURY_CUTTER_FAST",
         "charged": "PSYCHIC"
       }
     ],
@@ -1240,6 +1239,15 @@
     ],
     "dark": [
       {
+        "species": "darkrai",
+        "dex": 491,
+        "rating": 35.57,
+        "dps": 18.98,
+        "tdo": 234.3,
+        "fast": "SUCKER_PUNCH_FAST",
+        "charged": "FOUL_PLAY"
+      },
+      {
         "species": "tyranitar",
         "dex": 248,
         "rating": 35.38,
@@ -1275,15 +1283,6 @@
         "tdo": 264.8,
         "fast": "METAL_CLAW_FAST",
         "charged": "FOUL_PLAY"
-      },
-      {
-        "species": "darkrai",
-        "dex": 491,
-        "rating": 32.04,
-        "dps": 17.09,
-        "tdo": 211.1,
-        "fast": "SNARL_FAST",
-        "charged": "DARK_PULSE"
       },
       {
         "species": "absol",
@@ -1412,10 +1411,10 @@
       {
         "species": "snorlax",
         "dex": 143,
-        "rating": 32.77,
-        "dps": 16.31,
-        "tdo": 265.6,
-        "fast": "LICK_FAST",
+        "rating": 33.64,
+        "dps": 16.75,
+        "tdo": 272.7,
+        "fast": "PSYWAVE_FAST",
         "charged": "HYPER_BEAM"
       }
     ],
@@ -1437,6 +1436,15 @@
         "tdo": 253.4,
         "fast": "FORCE_PALM_FAST",
         "charged": "FOCUS_BLAST"
+      },
+      {
+        "species": "gallade",
+        "dex": 475,
+        "rating": 40.79,
+        "dps": 22.77,
+        "tdo": 234.5,
+        "fast": "PSYCHO_CUT_FAST",
+        "charged": "SACRED_SWORD"
       },
       {
         "species": "emboar",
@@ -1474,15 +1482,6 @@
         "fast": "COUNTER_FAST",
         "charged": "CLOSE_COMBAT",
         "form": "ZAPDOS_GALARIAN"
-      },
-      {
-        "species": "sneasler",
-        "dex": 903,
-        "rating": 36.87,
-        "dps": 21.08,
-        "tdo": 197.2,
-        "fast": "POISON_JAB_FAST",
-        "charged": "CLOSE_COMBAT"
       }
     ],
     "flying": [
@@ -2427,6 +2426,15 @@
         "charged": "BRUTAL_SWING"
       },
       {
+        "species": "darkrai",
+        "dex": 491,
+        "rating": 41.6,
+        "dps": 23.09,
+        "tdo": 243.2,
+        "fast": "SNARL_FAST",
+        "charged": "FOUL_PLAY"
+      },
+      {
         "species": "absol",
         "dex": 359,
         "rating": 38.5,
@@ -2434,15 +2442,6 @@
         "tdo": 153,
         "fast": "SNARL_FAST",
         "charged": "BRUTAL_SWING"
-      },
-      {
-        "species": "darkrai",
-        "dex": 491,
-        "rating": 38.01,
-        "dps": 21.1,
-        "tdo": 222.2,
-        "fast": "SNARL_FAST",
-        "charged": "DARK_PULSE"
       },
       {
         "species": "weavile",
@@ -2454,6 +2453,15 @@
         "charged": "FOUL_PLAY"
       },
       {
+        "species": "greninja",
+        "dex": 658,
+        "rating": 34.96,
+        "dps": 20.69,
+        "tdo": 168.8,
+        "fast": "WATER_SHURIKEN_FAST",
+        "charged": "BRUTAL_SWING"
+      },
+      {
         "species": "honchkrow",
         "dex": 430,
         "rating": 34.16,
@@ -2461,15 +2469,6 @@
         "tdo": 153.5,
         "fast": "SNARL_FAST",
         "charged": "DARK_PULSE"
-      },
-      {
-        "species": "houndoom",
-        "dex": 229,
-        "rating": 33.17,
-        "dps": 19.63,
-        "tdo": 160.1,
-        "fast": "SNARL_FAST",
-        "charged": "FOUL_PLAY"
       }
     ],
     "fairy": [
