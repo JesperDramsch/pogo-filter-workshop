@@ -41,6 +41,7 @@ import {
 	formRegionLabel,
 	genderSlotsFor,
 	CHIP_REMOVE_TARGET,
+	CHIP_BADGE_TARGET,
 	INVISIBLE_SLOT_DEX,
 	invisibleSlotsFor,
 	keptOptions,
@@ -369,14 +370,64 @@ function selfAndDescendants(dex) {
 	return out;
 }
 
+// What one owned copy stands for once its have-list scope says "not the
+// whole line". The have-list scopes (cfg.luckyScope / cfg.hundoScope, see
+// DEFAULT_CONFIG) are per owned species:
+//
+//   'family'  (default, absent key) the line is done — the lucky Bibor came
+//             out of a lucky Hornliu, so nothing in the line is still wanted.
+//             Decided by the LINE rules in lineSlotCovered below.
+//   'upward'  this copy and what it can still become — the physically true
+//             coverage, since luckiness and IVs survive evolution and nothing
+//             de-evolves. A lucky Kokuna fills Kokuna and Bibor, not Hornliu.
+//   'exact'   this copy only — a lucky Bibor from a trade says nothing about
+//             the Hornliu still wanted for the line.
+//
+// 'upward' from a coin-flip base (SPLIT_FAMILIES) reaches only the base
+// itself: one Waumpel becomes exactly one branch, and which one is unknown
+// until it evolves. Exported for the offline checks.
+export function upwardReach(dex) {
+	const fam = SPLIT_FAMILY_BY_DEX.get(dex);
+	if (fam && fam.baseDex === dex) return [dex];
+	return selfAndDescendants(dex);
+}
+
+// Normalize one stored scope value; anything but the two explicit scopes is
+// the default. Shared by the merge path and every reader.
+export function haveScopeOf(scopeMap, species) {
+	const v = scopeMap?.[species];
+	return v === 'upward' || v === 'exact' ? v : 'family';
+}
+
+// Does this species have anything to scope — a parent or a child in the
+// evolution graph? A single-stage species (Lapras, Kangama) has no line, so
+// every scope means the same thing and the badge stays off its chip.
+// Exported for the offline checks.
+export function lineHasStages(dex) {
+	return (
+		EVO_PARENT_BY_DEX[String(dex)] !== undefined ||
+		(EVO_CHILDREN_BY_DEX.get(String(dex)) || []).length > 0
+	);
+}
+
+// Does the owned copy `owner` (with scope `scope`) fill the slot for `dex`
+// under an EXPLICIT scope? Family-scoped owners answer via the line rules in
+// lineSlotCovered instead, so this returns false for them.
+function explicitScopeReaches(owner, scope, dex) {
+	if (scope === 'exact') return owner === dex;
+	if (scope === 'upward') return upwardReach(owner).includes(dex);
+	return false;
+}
+
 // Is the collection slot an evolution line stands for already filled by the
 // have-list (passed as a dex Set)? This is the LINE-level question the friend-
-// collect PACKS ask, one level coarser than "do I own this exact species": a
-// pack entry is a proxy for its whole line (that is what the collectible-base
-// remap makes it), so a lucky Meganie fills the slot the pack's Endivie ask
-// exists to fill, and the ask is spent. It is the same identity the fallback
-// wishlists' `!+family` exclusions already use — PoGo's `+` IS the candy family
-// — with the same two carve-outs those exclusions widen for:
+// collect PACKS and the curated chips ask, one level coarser than "do I own
+// this exact species": a pack entry is a proxy for its whole line (that is
+// what the collectible-base remap makes it), so a lucky Meganie fills the slot
+// the pack's Endivie ask exists to fill, and the ask is spent. It is the same
+// identity the fallback wishlists' `!+family` exclusions already use — PoGo's
+// `+` IS the candy family — with the same two carve-outs those exclusions
+// widen for:
 //
 //   babies      a lucky Magmar is not a lucky Magby: babies only hatch from
 //               eggs and nothing de-evolves, so a baby ask is filled by an
@@ -392,40 +443,66 @@ function selfAndDescendants(dex) {
 //               shortcut, or a lucky Waumpel would fill its own slot and
 //               retire an ask the line has not finished.
 //
-// `ownedRoots` is the have-list's line roots, hoisted out of the loop by
-// callers that ask this for hundreds of candidates; it is derived on the spot
-// when omitted. Exported for the offline checks in
+// `scopeOf` (dex → 'family' | 'upward' | 'exact', see upwardReach) narrows
+// what each owned copy stands for. Explicitly scoped copies are literal: they
+// fill exactly the dex they name, split rules or not (an 'exact' Waumpel DOES
+// fill the Waumpel slot — the user said this copy is just a Waumpel), and
+// they take no part in the line rules, so an 'exact' Bibor leaves Hornliu on
+// the ask. Omitted, every copy is family-scoped and the answer is the one this
+// function has always given.
+//
+// `ownedRoots` is the FAMILY-scoped have-list's line roots, hoisted out of
+// the loop by callers that ask this for hundreds of candidates; it is derived
+// on the spot when omitted. Exported for the offline checks in
 // scripts/check-friend-collect.mjs.
-export function lineSlotCovered(dex, ownedDex, ownedRoots = null) {
+export function lineSlotCovered(dex, ownedDex, ownedRoots = null, scopeOf = null) {
+	let familyOwned = ownedDex;
+	if (scopeOf) {
+		familyOwned = new Set();
+		for (const d of ownedDex) {
+			const scope = scopeOf(d);
+			if (scope === 'family') familyOwned.add(d);
+			else if (explicitScopeReaches(d, scope, dex)) return true;
+		}
+	}
 	const fam = SPLIT_FAMILY_BY_DEX.get(dex);
 	if (fam) {
 		const branch = fam.branches.find((b) => b.includes(dex));
-		if (branch) return branch.some((d) => ownedDex.has(d));
-		return fam.branches.every((b) => b.some((d) => ownedDex.has(d)));
+		if (branch) return branch.some((d) => familyOwned.has(d));
+		return fam.branches.every((b) => b.some((d) => familyOwned.has(d)));
 	}
-	if (ownedDex.has(dex)) return true;
+	if (familyOwned.has(dex)) return true;
 	if (BABY_DEX.has(dex)) return false;
-	const roots = ownedRoots || new Set([...ownedDex].map(lineRootDex));
+	const roots = ownedRoots || new Set([...familyOwned].map(lineRootDex));
 	return roots.has(lineRootDex(dex));
 }
 
 // The same answer with the culprit named: WHICH have-list member fills the slot
 // (the species itself when it is owned outright). Feeds the have-badges on the
-// curated collect chips — the have-lists render as `+name`, so a lucky anywhere
-// in the line is worth showing on the chip even though it deliberately does not
-// prune an explicit pick. Rules live in lineSlotCovered above; this only picks
-// the member out, and scans the have-list to do it, so it is the display path
-// only — the packs ask the boolean. Exported for the offline checks.
-export function lineSlotOwner(dex, ownedDex) {
-	if (!lineSlotCovered(dex, ownedDex)) return null;
+// curated collect chips — the have-lists render as `+name`, so the lucky that
+// fills a target's slot is worth naming on the chip. Rules live in
+// lineSlotCovered above; this only picks the member out, and scans the
+// have-list to do it, so it is the display path only — the packs ask the
+// boolean. Exported for the offline checks.
+export function lineSlotOwner(dex, ownedDex, scopeOf = null) {
+	if (!lineSlotCovered(dex, ownedDex, null, scopeOf)) return null;
 	if (ownedDex.has(dex)) return dex;
+	let familyOwned = ownedDex;
+	if (scopeOf) {
+		familyOwned = new Set();
+		for (const d of ownedDex) {
+			const scope = scopeOf(d);
+			if (scope === 'family') familyOwned.add(d);
+			else if (explicitScopeReaches(d, scope, dex)) return d;
+		}
+	}
 	const fam = SPLIT_FAMILY_BY_DEX.get(dex);
 	if (fam) {
 		const pool = fam.branches.find((b) => b.includes(dex)) || fam.branches.flat();
-		return pool.find((d) => ownedDex.has(d)) ?? null;
+		return pool.find((d) => familyOwned.has(d)) ?? null;
 	}
 	const root = lineRootDex(dex);
-	for (const d of ownedDex) if (lineRootDex(d) === root) return d;
+	for (const d of familyOwned) if (lineRootDex(d) === root) return d;
 	return null;
 }
 
@@ -647,6 +724,20 @@ export const DEFAULT_CONFIG = {
 	// excluding the whole family the moment one copy lands.
 	hundoSlots: {},
 	luckySlots: {},
+	// Line-scope annotations for the have-lists ({ species: 'upward' | 'exact' }),
+	// the fourth axis beside forms/genders/slots. What one owned copy stands
+	// for when a wishlist, a pack or a curated chip asks "is this line done?":
+	//   absent   'family' — the line is done (the lucky Bibor was a lucky
+	//            Hornliu once). Today's behaviour everywhere.
+	//   'upward' this copy and what it can still evolve into (a lucky Kokuna
+	//            covers Kokuna and Bibor, not Hornliu).
+	//   'exact'  this copy only (a traded lucky Bibor leaves Hornliu wanted).
+	// Only the two explicit values are stored; the default is absence, so an
+	// untouched config changes nothing. Same stale-key rule as the other maps.
+	// Consumed by lineSlotCovered (packs + curated chips) and the fallback
+	// wishlists' owned-line exclusions (exclusionPlanFor).
+	hundoScope: {},
+	luckyScope: {},
 	// Sesokitz / Kronjuwild spawn in the season matching your hemisphere. The
 	// app infers it from your home pin plus the live in-game Season window and
 	// highlights the slot you can actually fill right now. Purely a UI hint —
@@ -1370,6 +1461,15 @@ export function mergeImportedConfig(raw, notices = []) {
 	merged.luckyGenders = canonMapKeys(merged.luckyGenders, validGenderKeys);
 	merged.hundoSlots = canonMapKeys(merged.hundoSlots, validSlotKeys);
 	merged.luckySlots = canonMapKeys(merged.luckySlots, validSlotKeys);
+	// Line-scope values: only the two explicit scopes are worth storing — the
+	// default is absence — and only for species that have a line to scope.
+	const validScope = (species, rawVal) => {
+		if (rawVal !== 'upward' && rawVal !== 'exact') return undefined;
+		const dex = resolveSpeciesInfo(species)?.dex;
+		return dex && lineHasStages(dex) ? rawVal : undefined;
+	};
+	merged.hundoScope = canonMapKeys(merged.hundoScope, validScope);
+	merged.luckyScope = canonMapKeys(merged.luckyScope, validScope);
 	if (typeof merged.seasonAuto !== 'boolean') merged.seasonAuto = true;
 	if (!['spring', 'summer', 'autumn', 'winter'].includes(merged.seasonOverride))
 		merged.seasonOverride = null;
@@ -2684,6 +2784,23 @@ export function buildFilters(
 	// answer "is the baby stage / the other branch already covered?".
 	const ownedDexSet = (names) =>
 		new Set((names || []).map((n) => resolveSpeciesInfo(n)?.dex).filter(Boolean));
+	// dex → line scope for one have-list (cfg.luckyScope / cfg.hundoScope, keyed
+	// by the have-list entry). Two entries resolving to one dex — a locale
+	// duplicate — keep the wider scope, so a stray narrow twin cannot silently
+	// re-open a line the other entry closed.
+	const SCOPE_WIDTH = { exact: 0, upward: 1, family: 2 };
+	const ownedScopeByDex = (names, scopeMap) => {
+		const out = new Map();
+		for (const n of names || []) {
+			const dex = resolveSpeciesInfo(n)?.dex;
+			if (!dex) continue;
+			const scope = haveScopeOf(scopeMap, canonKey(n));
+			const prev = out.get(dex);
+			if (!prev || SCOPE_WIDTH[scope] > SCOPE_WIDTH[prev]) out.set(dex, scope);
+		}
+		return out;
+	};
+	const scopeLookup = (scopeByDex) => (dex) => scopeByDex.get(dex) || 'family';
 
 	// Shared trade-eligibility guards appended to every friend wishlist.
 	const pushFriendTradeGuards = (clauses) => {
@@ -2745,10 +2862,22 @@ export function buildFilters(
 	// via cfg.protectBabies). Those locales take the enumeration path instead —
 	// the same safe fallback Toxel uses.
 	const babyKeyword = kw.flag.baby && !/\s/.test(kw.flag.baby) ? kw.flag.baby : null;
-	const exclusionPlanFor = (dex, ownedDex) => {
+	//
+	// An explicit have-list scope (see upwardReach) short-circuits all of it:
+	// 'exact' excludes the one species, 'upward' the species and what it can
+	// still become — both as bare member selectors, since `+` is the family
+	// and the family is precisely what the user said this copy does NOT
+	// settle. `familyOwned` is the have-list minus its explicitly scoped
+	// copies: only family-scoped copies may collapse a split line to `!+base`
+	// (two 'exact' branch finals are two exclusions, not a finished line),
+	// whereas the baby check reads the whole have-list — a baby owned under
+	// any scope is a baby owned.
+	const exclusionPlanFor = (dex, ownedDex, familyOwned = ownedDex, scope = 'family') => {
+		if (scope === 'exact') return { kind: 'members', members: [dex], scoped: true };
+		if (scope === 'upward') return { kind: 'members', members: upwardReach(dex), scoped: true };
 		const fam = SPLIT_FAMILY_BY_DEX.get(dex);
 		if (fam) {
-			if (fam.branches.every((b) => b.some((d) => ownedDex.has(d))))
+			if (fam.branches.every((b) => b.some((d) => familyOwned.has(d))))
 				return { kind: 'family', collapseTo: fam.baseDex };
 			const branch = fam.branches.find((b) => b.includes(dex));
 			// Only the coin-flip base is owned: one specimen fills ONE branch at
@@ -2834,9 +2963,28 @@ export function buildFilters(
 		return roots;
 	};
 
-	const pushOwnedExclusions = (clauses, names, scopedMap, genderAnn, slotAnn, whyKeys) => {
+	const pushOwnedExclusions = (clauses, names, scopedMap, genderAnn, slotAnn, scopeMap, whyKeys) => {
 		const genderExtras = genderScopedExclusions(genderAnn);
 		const ownedDex = ownedDexSet(names);
+		const scopeByDex = ownedScopeByDex(names, scopeMap);
+		const familyOwned = new Set([...ownedDex].filter((d) => scopeLookup(scopeByDex)(d) === 'family'));
+		// Form-scoped member exclusion for an explicitly scoped copy: the owned
+		// forms carry over by key (a Kanto Vulpix becomes a Kanto Vulnona, and
+		// both catalogs key it 'base'), so `!vulnona,!eis` hides only the Kanto
+		// Vulnona and the friend keeps being asked for the Alolan one. Falls
+		// back to the bare selector — exactly the species' own rule in
+		// formScopedExclusions — when the member has no catalog, every form is
+		// owned, or an owned form has no searchable drop terms.
+		const memberFormsFor = (memberDex, ownedForms) => {
+			if (!ownedForms) return null;
+			const catalog = regionalFormsFor(pokemonNameFor(String(memberDex))) || [];
+			if (catalog.length === 0) return null;
+			const keys = new Set(ownedForms.map((f) => f.key));
+			const owned = catalog.filter((f) => keys.has(f.key));
+			if (owned.length === 0 || owned.length >= catalog.length) return null;
+			if (owned.some((f) => !formDropTerms(f))) return null;
+			return owned;
+		};
 		const emitted = new Set();
 		const once = (clause, why) => {
 			if (emitted.has(clause)) return;
@@ -2861,15 +3009,31 @@ export function buildFilters(
 			// withhold the exclusion instead and keep the species on the ask. The
 			// form-scoped branch below re-earns its clauses one guard at a time.
 			const slotBlocked = slotIncompleteByRoot.has(lineRootDex(dex));
-			const plan = exclusionPlanFor(dex, ownedDex);
+			const plan = exclusionPlanFor(dex, ownedDex, familyOwned, scopeLookup(scopeByDex)(dex));
 			if (plan.kind === 'none') continue;
 			if (plan.kind === 'members') {
 				if (slotBlocked) continue;
-				const whyKey = SPLIT_FAMILY_BY_DEX.has(dex) ? whyKeys.branch : whyKeys.baby;
+				const whyKey = plan.scoped
+					? whyKeys.scope
+					: SPLIT_FAMILY_BY_DEX.has(dex)
+						? whyKeys.branch
+						: whyKeys.baby;
+				const ownedForms = plan.scoped ? scopedMap.get(sp) : null;
 				for (const d of plan.members) {
 					const name = pokemonNameFor(String(d), outputLocale);
 					if (!name) continue;
-					once(`!${name.toLowerCase()}`, tFn(whyKey, { params: { species: capFirst(name) } }));
+					const forms = memberFormsFor(d, ownedForms);
+					if (!forms) {
+						once(`!${name.toLowerCase()}`, tFn(whyKey, { params: { species: capFirst(name) } }));
+						continue;
+					}
+					for (const f of forms)
+						once(
+							`!${name.toLowerCase()},${formDropTerms(f)}`,
+							tFn(whyKeys.scopeForm, {
+								params: { species: capFirst(name), region: formRegionLabel(f, tFn) },
+							}),
+						);
 				}
 				continue;
 			}
@@ -2904,13 +3068,15 @@ export function buildFilters(
 	// Lucky wishlist — exclude every family the user already has a lucky in
 	// (form-scoped where the lucky is annotated to specific regional forms).
 	const friendLuckyClauses = [];
-	pushOwnedExclusions(friendLuckyClauses, luckies, luckyScopedExclusions, cfg.luckyGenders, cfg.luckySlots, {
+	pushOwnedExclusions(friendLuckyClauses, luckies, luckyScopedExclusions, cfg.luckyGenders, cfg.luckySlots, cfg.luckyScope, {
 		plain: 'app.clause_why.friend_have_lucky',
 		form: 'app.clause_why.friend_have_lucky_form',
 		baby: 'app.clause_why.friend_have_lucky_baby',
 		babyForm: 'app.clause_why.friend_have_lucky_baby_form',
 		branch: 'app.clause_why.friend_have_lucky_branch',
 		gender: 'app.clause_why.friend_have_lucky_gender',
+		scope: 'app.clause_why.friend_have_lucky_scope',
+		scopeForm: 'app.clause_why.friend_have_lucky_scope_form',
 	});
 	pushFriendTradeGuards(friendLuckyClauses);
 	const friendLuckyWishlist = friendLuckyClauses.map((c) => c.clause).join('&');
@@ -2932,13 +3098,15 @@ export function buildFilters(
 	// (form-scoped where annotated, same as the lucky wishlist above).
 	// No 4* clause: IVs re-roll on trade, so any untraded specimen is fair game.
 	const friendHundoClauses = [];
-	pushOwnedExclusions(friendHundoClauses, hundos, hundoScopedExclusions, cfg.hundoGenders, cfg.hundoSlots, {
+	pushOwnedExclusions(friendHundoClauses, hundos, hundoScopedExclusions, cfg.hundoGenders, cfg.hundoSlots, cfg.hundoScope, {
 		plain: 'app.clause_why.friend_have_hundo',
 		form: 'app.clause_why.friend_have_hundo_form',
 		baby: 'app.clause_why.friend_have_hundo_baby',
 		babyForm: 'app.clause_why.friend_have_hundo_baby_form',
 		branch: 'app.clause_why.friend_have_hundo_branch',
 		gender: 'app.clause_why.friend_have_hundo_gender',
+		scope: 'app.clause_why.friend_have_hundo_scope',
+		scopeForm: 'app.clause_why.friend_have_hundo_scope_form',
 	});
 	pushFriendTradeGuards(friendHundoClauses);
 	const friendHundoWishlist = friendHundoClauses.map((c) => c.clause).join('&');
@@ -2956,16 +3124,17 @@ export function buildFilters(
 	// Pikachu line — friends should collect exactly what was picked, and egg
 	// babies must never fan out into their evolved families. The
 	// have-collection is NOT encoded as `!+owned` guards: that's the fallback
-	// wishlists' job, it makes the string scale with the collection instead
-	// of the selection (hundreds of luckies ≈ thousands of chars, toward
-	// PoGo's ~5000 cap), and family-wide subtraction would silently override
-	// an explicit pick — lucky/hundo dex entries are per-species, so a lucky
-	// Raichu must NOT cancel a curated Pikachu. Exact-species ownership is
-	// pruned app-side instead (the dimmed ✓ chip and the drop from the
-	// positives below), so the string still shrinks as new luckies / hundos
-	// land in the have-lists. cfg.friendCollectForced overrides that pruning
-	// per species: a forced target stays in the string although the focus
-	// counts it as owned (the lucky landed, the hundo hunt continues).
+	// wishlists' job, and it would make the string scale with the collection
+	// instead of the selection (hundreds of luckies ≈ thousands of chars,
+	// toward PoGo's ~5000 cap). Ownership is pruned app-side instead (the
+	// dimmed ✓ chip and the drop from the positives below), so the string
+	// still shrinks as new luckies / hundos land in the have-lists. The
+	// pruning is LINE-level, the same question the packs ask (see ownedLine
+	// below): a lucky Bibor retires a curated Hornliu, unless the Bibor's
+	// have-list scope says that copy did not finish the line.
+	// cfg.friendCollectForced overrides that pruning per species: a forced
+	// target stays in the string although the focus counts it as owned (the
+	// lucky landed, the hundo hunt continues).
 	// Focus: 'lucky' | 'hundo' | 'both'. 'both' means the user wants each
 	// species as a lucky AND as a hundo — a target only counts as covered
 	// (and drops from the string / prunes the packs) once BOTH goals are met.
@@ -3054,62 +3223,69 @@ export function buildFilters(
 		if (friendCollectMode === 'hundo') return h;
 		return l && h;
 	};
-	// Curated targets: EXACT-species ownership, per the no-family-subtraction
-	// rule above — an explicit pick is an explicit pick, and a lucky Raichu must
-	// not cancel a curated Pikachu.
-	const friendCollectCovered = (canonName, want = null) =>
-		friendCollectCoveredBy(canonName, want, luckySet.has(canonName), friendCollectHundoSet.has(canonName));
-	// Suggested packs: LINE-level ownership instead (lineSlotCovered). A pack
-	// entry is nobody's explicit pick — it is a proxy for its evolution line,
-	// which is exactly what the collectible-base remap below makes it. The only
-	// reason the pack asks a friend for an Endivie is the lucky Meganie at the
+	// LINE-level ownership (lineSlotCovered), for the curated chips and the
+	// suggested packs alike. A pack entry is a proxy for its evolution line —
+	// that is what the collectible-base remap below makes it — and the only
+	// reason a pack asks a friend for an Endivie is the lucky Meganie at the
 	// end of that line, so once that Meganie is in the have-list the ask is
-	// spent and the pack must stop offering it — the same line identity the
-	// fallback wishlists' `!+family` exclusions have always used. Babies and
-	// coin-flip branches keep their own slots (see lineSlotCovered), and a line
-	// with an un-searchable slot still unticked keeps being asked for: the
-	// widening stops at the roots incompleteSlotsByRoot names, while EXACT-species
-	// coverage there stays as it was.
-	// Both have-lists are walked once here, not once per pack candidate — the
-	// packs ask this question for hundreds of species on every rebuild.
-	const ownedLine = (names, slotAnn) => {
+	// spent. The curated list used to keep an EXACT-species rule on top of that
+	// ("a lucky Raichu must not cancel a curated Pikachu"), which meant a pack
+	// entry switched rules the moment it was added: the pack flagged Hornliu
+	// as covered by the lucky Bibor, the chip then insisted it was not. One
+	// rule now feeds both surfaces, and the exception moved to where the fact
+	// lives — the have-list scope on the Bibor itself ('exact' or 'upward',
+	// see upwardReach) says whether that copy finished the line. The per-target
+	// override (cfg.friendCollectForced) stays as the second way to keep an
+	// explicit pick in the string.
+	// Babies and coin-flip branches keep their own slots (see lineSlotCovered),
+	// and a line with an un-searchable slot still unticked keeps being asked
+	// for: the widening stops at the roots incompleteSlotsByRoot names, while
+	// EXACT-species coverage there stays as it was.
+	// Both have-lists are walked once here, not once per candidate — the packs
+	// ask this question for hundreds of species on every rebuild. `roots` are
+	// the FAMILY-scoped copies' line roots only, which is what lineSlotCovered
+	// expects when a scope lookup rides along.
+	const ownedLine = (names, slotAnn, scopeMap) => {
 		const dexSet = ownedDexSet(names);
+		const scopeOf = scopeLookup(ownedScopeByDex(names, scopeMap));
 		return {
 			dexSet,
-			roots: new Set([...dexSet].map(lineRootDex)),
+			scopeOf,
+			roots: new Set([...dexSet].filter((d) => scopeOf(d) === 'family').map(lineRootDex)),
 			slotGaps: incompleteSlotsByRoot(slotAnn),
 		};
 	};
-	const friendCollectLuckyLine = ownedLine(luckies, cfg.luckySlots);
-	const friendCollectHundoLine = ownedLine(hundos, cfg.hundoSlots);
-	const friendCollectLineOwned = (dex, { dexSet, roots, slotGaps }) => {
+	const friendCollectLuckyLine = ownedLine(luckies, cfg.luckySlots, cfg.luckyScope);
+	const friendCollectHundoLine = ownedLine(hundos, cfg.hundoSlots, cfg.hundoScope);
+	const friendCollectLineOwned = (dex, { dexSet, scopeOf, roots, slotGaps }) => {
 		if (!dex) return false;
 		// A coin-flip line is never settled by one specimen — its own base
 		// included — so the split rules decide before exact ownership does.
-		if (SPLIT_FAMILY_BY_DEX.has(dex)) return lineSlotCovered(dex, dexSet, roots);
+		if (SPLIT_FAMILY_BY_DEX.has(dex)) return lineSlotCovered(dex, dexSet, roots, scopeOf);
 		if (dexSet.has(dex)) return true;
 		if (slotGaps.has(lineRootDex(dex))) return false;
-		return lineSlotCovered(dex, dexSet, roots);
+		return lineSlotCovered(dex, dexSet, roots, scopeOf);
 	};
 	// Display-only mirror for the curated chips: the have-list member that fills
-	// a target's line, when it isn't the target species itself. Same gates as the
-	// packs (babies, coin-flip branches, un-searchable slots), so one rule feeds
-	// both surfaces — this one just names the mon instead of pruning the ask.
-	const friendCollectLineOwner = (dex, { dexSet, slotGaps }) => {
+	// a target's line, when it isn't the target species itself. Same gates as
+	// the boolean (babies, coin-flip branches, un-searchable slots, scopes), so
+	// one rule feeds both — this one just names the mon instead of pruning.
+	const friendCollectLineOwner = (dex, { dexSet, scopeOf, slotGaps }) => {
 		if (!dex || dexSet.has(dex)) return null;
 		if (slotGaps.has(lineRootDex(dex))) return null;
-		const owner = lineSlotOwner(dex, dexSet);
+		const owner = lineSlotOwner(dex, dexSet, scopeOf);
 		return owner ? pokemonNameFor(String(owner), outputLocale) : null;
 	};
-	const friendCollectPackCovered = (canonName) => {
+	const friendCollectCovered = (canonName, want = null) => {
 		const dex = resolveSpeciesInfo(canonName)?.dex;
 		return friendCollectCoveredBy(
 			canonName,
-			null,
+			want,
 			friendCollectLineOwned(dex, friendCollectLuckyLine),
 			friendCollectLineOwned(dex, friendCollectHundoLine),
 		);
 	};
+	const friendCollectPackCovered = (canonName) => friendCollectCovered(canonName);
 	// Coverage overrides: a curated species the user explicitly re-activated
 	// even though the focus counts it as owned — the lucky Furfrou is in, but
 	// the hundo hunt on it continues. Overrides keep the target in the string;
@@ -3125,9 +3301,8 @@ export function buildFilters(
 			ownedLucky: friendCollectGoalOwned(key, luckySet.has(key), luckyAnn, want),
 			ownedHundo: friendCollectGoalOwned(key, friendCollectHundoSet.has(key), hundoAnn, want),
 			owned: friendCollectCovered(key, want),
-			// Family have-badges: a lucky/hundo elsewhere in this target's line.
-			// Purely informational — an explicit pick still needs the exact
-			// species before it drops out of the string.
+			// Family have-badges: the lucky/hundo elsewhere in this target's line
+			// that fills its slot — named so the dimmed chip says WHY it is done.
 			lineLucky: friendCollectLineOwner(resolveSpeciesInfo(key)?.dex, friendCollectLuckyLine),
 			lineHundo: friendCollectLineOwner(resolveSpeciesInfo(key)?.dex, friendCollectHundoLine),
 			forced: friendCollectForcedSet.has(key),
@@ -5414,13 +5589,30 @@ export default function App() {
 		};
 		const thisAnn = goal === 'hundo' ? config.hundoGenders : config.luckyGenders;
 		const otherAnn = goal === 'hundo' ? config.luckyGenders : config.hundoGenders;
+		// Line-level, like buildFilters' friendCollectCovered: a freshly added
+		// lucky Bibor retires a curated Hornliu. The new entry has no scope yet
+		// (badges are click-only), so it counts for its whole line; the OTHER
+		// have-list is read with its scopes, as the filter reads it.
+		const otherScope = goal === 'hundo' ? config.luckyScope : config.hundoScope;
+		const otherDex = new Set([...otherSet].map((n) => resolveSpeciesInfo(n)?.dex).filter(Boolean));
+		const otherScopeOf = (d) => haveScopeOf(otherScope, pokemonNameFor(String(d)));
 		const notices = [];
+		const seen = new Set();
 		for (const sp of added) {
-			if (!curated.has(sp)) continue;
-			if (!genderSatisfied(thisAnn, sp)) continue;
-			const nowFullyCovered =
-				mode === 'both' ? otherSet.has(sp) && genderSatisfied(otherAnn, sp) : true;
-			notices.push({ species: sp, goal, nowFullyCovered });
+			const dex = resolveSpeciesInfo(sp)?.dex;
+			if (!dex) continue;
+			for (const target of curated) {
+				const tdex = resolveSpeciesInfo(target)?.dex;
+				if (!tdex || seen.has(target)) continue;
+				if (!lineSlotCovered(tdex, new Set([dex]))) continue;
+				if (!genderSatisfied(thisAnn, target)) continue;
+				seen.add(target);
+				const nowFullyCovered =
+					mode === 'both'
+						? lineSlotCovered(tdex, otherDex, null, otherScopeOf) && genderSatisfied(otherAnn, target)
+						: true;
+				notices.push({ species: target, via: target === sp ? null : sp, goal, nowFullyCovered });
+			}
 		}
 		return notices;
 	}
@@ -5474,6 +5666,7 @@ export default function App() {
 			if (prev.hundoForms?.[h]) next.hundoForms = omitKey(prev.hundoForms, h);
 			if (prev.hundoGenders?.[h]) next.hundoGenders = omitKey(prev.hundoGenders, h);
 			if (prev.hundoSlots?.[h]) next.hundoSlots = omitKey(prev.hundoSlots, h);
+			if (prev.hundoScope?.[h]) next.hundoScope = omitKey(prev.hundoScope, h);
 			return next;
 		});
 	}
@@ -5506,6 +5699,7 @@ export default function App() {
 			if (prev.luckyForms?.[s]) next.luckyForms = omitKey(prev.luckyForms, s);
 			if (prev.luckyGenders?.[s]) next.luckyGenders = omitKey(prev.luckyGenders, s);
 			if (prev.luckySlots?.[s]) next.luckySlots = omitKey(prev.luckySlots, s);
+			if (prev.luckyScope?.[s]) next.luckyScope = omitKey(prev.luckyScope, s);
 			return next;
 		});
 	}
@@ -5854,6 +6048,8 @@ export default function App() {
 											onGendersAnnChange={(next) => setConfig({ ...config, hundoGenders: next })}
 											slotsAnn={config.hundoSlots || {}}
 											onSlotsAnnChange={(next) => setConfig({ ...config, hundoSlots: next })}
+											scopeAnn={config.hundoScope || {}}
+											onScopeAnnChange={(next) => setConfig({ ...config, hundoScope: next })}
 											activeSlot={activeSeason}
 										/>
 										<hr className='my-8 border-[#1F2933]' />
@@ -5871,6 +6067,8 @@ export default function App() {
 											onGendersAnnChange={(next) => setConfig({ ...config, luckyGenders: next })}
 											slotsAnn={config.luckySlots || {}}
 											onSlotsAnnChange={(next) => setConfig({ ...config, luckySlots: next })}
+											scopeAnn={config.luckyScope || {}}
+											onScopeAnnChange={(next) => setConfig({ ...config, luckyScope: next })}
 											activeSlot={activeSeason}
 										/>
 										<SeasonNote
@@ -6679,8 +6877,92 @@ function BuddyCatchSection({ buddyCatchFilters, copied, onCopy }) {
 //   slot   → hundoSlots   / luckySlots   — un-searchable slots. These can never
 //            become a guard; ticking every one of them is what finally lets a
 //            wishlist exclude the family, which is the whole mechanism.
-// The catalogs are disjoint, so a chip always renders exactly one row.
+// The catalogs are disjoint, so a chip always renders at most one axis row.
+//
+// A fourth, line-level control sits before the row on every species that has
+// a line at all:
+//   scope  → hundoScope   / luckyScope   — what this copy stands for when a
+//            wishlist, a pack or a curated chip asks "is this line done?":
+//            the whole family (default), this copy and what it can still
+//            become ('upward'), or this copy alone ('exact'). See upwardReach.
 function HaveRefinementBadges({
+	species,
+	formsAnn,
+	onFormsAnnChange,
+	gendersAnn,
+	onGendersAnnChange,
+	slotsAnn,
+	onSlotsAnnChange,
+	scopeAnn,
+	onScopeAnnChange,
+	accent,
+	activeSlot,
+	t,
+}) {
+	return (
+		<>
+			<HaveScopeBadge
+				species={species}
+				scopeAnn={scopeAnn}
+				onScopeAnnChange={onScopeAnnChange}
+				accent={accent}
+				t={t}
+			/>
+			<HaveAxisBadges
+				species={species}
+				formsAnn={formsAnn}
+				onFormsAnnChange={onFormsAnnChange}
+				gendersAnn={gendersAnn}
+				onGendersAnnChange={onGendersAnnChange}
+				slotsAnn={slotsAnn}
+				onSlotsAnnChange={onSlotsAnnChange}
+				activeSlot={activeSlot}
+				t={t}
+			/>
+		</>
+	);
+}
+
+// The line-scope toggle. Cycles family → upward → exact → family on click, the
+// way the buddy targets' exact / +family toggle does, and renders only for
+// species with a line to scope (a Lapras has nothing above or below it). The
+// default is stored as absence and reads quiet — grey, like an unset axis —
+// so an untouched chip looks exactly as it did; the two explicit scopes light
+// up in the list's accent.
+const HAVE_SCOPES = ['family', 'upward', 'exact'];
+function HaveScopeBadge({ species, scopeAnn, onScopeAnnChange, accent = '#5EAFC5', t }) {
+	if (!onScopeAnnChange) return null;
+	const dex = resolveSpeciesInfo(species)?.dex;
+	if (!dex || !lineHasStages(dex)) return null;
+	const scope = haveScopeOf(scopeAnn, species);
+	const next = HAVE_SCOPES[(HAVE_SCOPES.indexOf(scope) + 1) % HAVE_SCOPES.length];
+	const cycle = () => {
+		if (next === 'family') onScopeAnnChange(omitKey(scopeAnn, species));
+		else onScopeAnnChange({ ...(scopeAnn || {}), [species]: next });
+	};
+	const explicit = scope !== 'family';
+	return (
+		<button
+			onClick={cycle}
+			title={t('app.have_scope.help')}
+			aria-label={t('app.have_scope.aria', {
+				params: {
+					species: capFirst(species),
+					scope: t(`app.have_scope.${scope}_long`),
+					next: t(`app.have_scope.${next}_long`),
+				},
+			})}
+			className={`${CHIP_BADGE_TARGET} text-[9px] px-1 py-px [@media(pointer:coarse)]:text-[11px] [@media(pointer:coarse)]:px-2.5 ${
+				explicit ? '' : 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
+			}`}
+			style={explicit ? { background: `${accent}40`, borderColor: `${accent}80`, color: accent } : undefined}
+		>
+			{t(`app.have_scope.${scope}`)}
+		</button>
+	);
+}
+
+function HaveAxisBadges({
 	species,
 	formsAnn,
 	onFormsAnnChange,
@@ -6803,6 +7085,8 @@ function HundosEditor({
 	onGendersAnnChange,
 	slotsAnn,
 	onSlotsAnnChange,
+	scopeAnn,
+	onScopeAnnChange,
 	activeSlot,
 }) {
 	const { t } = useTranslation();
@@ -6845,6 +7129,9 @@ function HundosEditor({
 							onGendersAnnChange={onGendersAnnChange}
 							slotsAnn={slotsAnn}
 							onSlotsAnnChange={onSlotsAnnChange}
+							scopeAnn={scopeAnn}
+							onScopeAnnChange={onScopeAnnChange}
+							accent='#5EAFC5'
 							activeSlot={activeSlot}
 							t={t}
 						/>
@@ -6993,6 +7280,8 @@ function SpeciesListEditor({
 	onGendersAnnChange,
 	slotsAnn,
 	onSlotsAnnChange,
+	scopeAnn,
+	onScopeAnnChange,
 	activeSlot,
 	packs = [],
 	onAddPack,
@@ -7037,6 +7326,9 @@ function SpeciesListEditor({
 							onGendersAnnChange={onGendersAnnChange}
 							slotsAnn={slotsAnn}
 							onSlotsAnnChange={onSlotsAnnChange}
+							scopeAnn={scopeAnn}
+							onScopeAnnChange={onScopeAnnChange}
+							accent={accent}
 							activeSlot={activeSlot}
 							t={t}
 						/>
@@ -10971,6 +11263,11 @@ function FriendCollectCoveredNotice({ notices, onClose }) {
 								{n.goal === 'hundo' ? '4★' : '✦'}
 							</span>
 							{capFirst(n.species)}
+							{n.via && (
+								<span className='text-[#8090A0]'>
+									{t('app.friend_covered.via', { params: { species: capFirst(n.via) } })}
+								</span>
+							)}
 							{!n.nowFullyCovered && (
 								<span className='text-[#8090A0]'>{t('app.friend_covered.partial_tag')}</span>
 							)}
