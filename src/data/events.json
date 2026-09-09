@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-08T12:51:27.916Z",
+  "fetchedAt": "2026-09-09T12:57:24.358Z",
   "events": [
     {
       "id": "event-mega-ascension-2026-08-31t10-00-00",
@@ -348,6 +348,33 @@
       "unresolved": []
     },
     {
+      "id": "event-mega-squads-2026-09-08t10-00-00-eggs",
+      "title": "Mega Squads",
+      "category": "Event",
+      "start": "2026-09-08T10:00:00",
+      "end": "2026-09-14T20:00:00",
+      "isLocalTime": true,
+      "eggDex": [
+        551,
+        587,
+        661,
+        674,
+        821,
+        942,
+        973
+      ],
+      "eggs": [
+        "Emolga",
+        "Flamigo",
+        "Fletchling",
+        "Maschiff",
+        "Pancham",
+        "Rookidee",
+        "Sandile"
+      ],
+      "unresolved": []
+    },
+    {
       "id": "season-twilight-trails-2026-09-08t10-00-00-eggs",
       "title": "Twilight Trails",
       "category": "Season",
@@ -399,33 +426,6 @@
         "Stunfisk",
         "Tyrogue",
         "Zigzagoon"
-      ],
-      "unresolved": []
-    },
-    {
-      "id": "event-mega-squads-2026-09-08t10-00-00-eggs",
-      "title": "Mega Squads",
-      "category": "Event",
-      "start": "2026-09-08T10:00:00",
-      "end": "2026-09-14T20:00:00",
-      "isLocalTime": true,
-      "eggDex": [
-        551,
-        587,
-        661,
-        674,
-        821,
-        942,
-        973
-      ],
-      "eggs": [
-        "Emolga",
-        "Flamigo",
-        "Fletchling",
-        "Maschiff",
-        "Pancham",
-        "Rookidee",
-        "Sandile"
       ],
       "unresolved": []
     }
