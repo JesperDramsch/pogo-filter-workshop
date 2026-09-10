@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-09T12:28:32.693Z",
+  "fetchedAt": "2026-09-10T12:21:55.151Z",
   "raids": {
     "mega": [
       {
@@ -33,186 +33,100 @@
           "psychic",
           "rock"
         ]
-      },
-      {
-        "id": "GYARADOS",
-        "names": {
-          "en": "Mega Gyarados",
-          "de": "Mega-Garados",
-          "fr": "Méga-Léviator",
-          "it": "MegaGyarados",
-          "ja": "メガギャラドス",
-          "ko": "메가갸라도스",
-          "es": "Mega-Gyarados"
-        },
-        "types": [
-          "water",
-          "dark"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "water",
-          "grass",
-          "dragon",
-          "dark",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "bug",
-          "electric",
-          "fairy",
-          "fighting",
-          "grass"
-        ]
       }
     ],
     "lvl5": [
       {
-        "id": "REGIROCK",
+        "id": "ZACIAN",
         "names": {
-          "en": "Regirock",
-          "de": "Regirock",
-          "fr": "Regirock",
-          "it": "Regirock",
-          "ja": "レジロック",
-          "ko": "레지락",
-          "es": "Regirock"
+          "en": "Zacian (Hero of Many Battles)",
+          "de": "Zacian (Heldenhafter Krieger)",
+          "fr": "Zacian (Héros Aguerri)",
+          "it": "Zacian (Eroe di Mille Lotte)",
+          "ja": "ザシアン (れきせんのゆうしゃ)",
+          "ko": "자시안 (역전의 용사)",
+          "es": "Zacian (Guerrero Avezado)"
         },
         "types": [
-          "rock"
+          "fairy"
         ],
         "resistorTypes": [
-          "fighting",
+          "poison",
+          "steel",
+          "fire"
+        ],
+        "seMoveTypes": [
+          "poison",
+          "steel"
+        ]
+      }
+    ],
+    "lvl3": [
+      {
+        "id": "DUGTRIO",
+        "names": {
+          "en": "Alolan Dugtrio",
+          "de": "Alola-Digdri",
+          "fr": "Triopikeur d'Alola",
+          "it": "Dugtrio di Alola",
+          "ja": "アローラ ダグトリオ",
+          "ko": "알로라 닥트리오",
+          "es": "Dugtrio de Alola"
+        },
+        "types": [
           "ground",
           "steel"
         ],
+        "resistorTypes": [
+          "flying",
+          "bug",
+          "water",
+          "grass"
+        ],
         "seMoveTypes": [
           "fighting",
-          "grass",
+          "fire",
           "ground",
-          "steel",
           "water"
         ]
       },
       {
-        "id": "REGICE",
+        "id": "LAPRAS",
         "names": {
-          "en": "Regice",
-          "de": "Regice",
-          "fr": "Regice",
-          "it": "Regice",
-          "ja": "レジアイス",
-          "ko": "레지아이스",
-          "es": "Regice"
+          "en": "Lapras",
+          "de": "Lapras",
+          "fr": "Lokhlass",
+          "it": "Lapras",
+          "ja": "ラプラス",
+          "ko": "라프라스",
+          "es": "Lapras"
         },
         "types": [
+          "water",
           "ice"
         ],
         "resistorTypes": [
           "steel",
-          "fire",
           "water",
           "ice"
         ],
         "seMoveTypes": [
+          "electric",
           "fighting",
-          "fire",
-          "rock",
-          "steel"
+          "grass",
+          "rock"
         ]
       },
       {
-        "id": "REGISTEEL",
+        "id": "FALINKS",
         "names": {
-          "en": "Registeel",
-          "de": "Registeel",
-          "fr": "Registeel",
-          "it": "Registeel",
-          "ja": "レジスチル",
-          "ko": "레지스틸",
-          "es": "Registeel"
-        },
-        "types": [
-          "steel"
-        ],
-        "resistorTypes": [
-          "steel",
-          "fire",
-          "water",
-          "electric"
-        ],
-        "seMoveTypes": [
-          "fighting",
-          "fire",
-          "ground"
-        ]
-      }
-    ],
-    "shadow_lvl5": [
-      {
-        "id": "GIRATINA",
-        "names": {
-          "en": "Giratina (Altered Forme)",
-          "de": "Giratina (Wandelform)",
-          "fr": "Giratina (Forme Alternative)",
-          "it": "Giratina (Forma Alterata)",
-          "ja": "ギラティナ (アナザーフォルム)",
-          "ko": "기라티나 (어나더폼)",
-          "es": "Giratina (Forma Modificada)"
-        },
-        "types": [
-          "ghost",
-          "dragon"
-        ],
-        "resistorTypes": [
-          "normal",
-          "steel",
-          "dark",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "dragon",
-          "fairy",
-          "ghost",
-          "ice"
-        ]
-      }
-    ],
-    "shadow_lvl3": [
-      {
-        "id": "SNORLAX",
-        "names": {
-          "en": "Snorlax",
-          "de": "Relaxo",
-          "fr": "Ronflex",
-          "it": "Snorlax",
-          "ja": "カビゴン",
-          "ko": "잠만보",
-          "es": "Snorlax"
-        },
-        "types": [
-          "normal"
-        ],
-        "resistorTypes": [
-          "rock",
-          "ghost",
-          "steel"
-        ],
-        "seMoveTypes": [
-          "fighting"
-        ]
-      },
-      {
-        "id": "HITMONTOP",
-        "names": {
-          "en": "Hitmontop",
-          "de": "Kapoera",
-          "fr": "Kapoera",
-          "it": "Hitmontop",
-          "ja": "カポエラー",
-          "ko": "카포에라",
-          "es": "Hitmontop"
+          "en": "Falinks",
+          "de": "Legios",
+          "fr": "Hexadron",
+          "it": "Falinks",
+          "ja": "タイレーツ",
+          "ko": "대여르",
+          "es": "Falinks"
         },
         "types": [
           "fighting"
@@ -229,6 +143,195 @@
           "fairy",
           "flying",
           "psychic"
+        ]
+      }
+    ],
+    "lvl1": [
+      {
+        "id": "RATTATA",
+        "names": {
+          "en": "Alolan Rattata",
+          "de": "Alola-Rattfratz",
+          "fr": "Rattata d'Alola",
+          "it": "Rattata di Alola",
+          "ja": "アローラ コラッタ",
+          "ko": "알로라 꼬렛",
+          "es": "Rattata de Alola"
+        },
+        "types": [
+          "dark",
+          "normal"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "rock",
+          "steel",
+          "dark",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "bug",
+          "fairy"
+        ]
+      },
+      {
+        "id": "DUNSPARCE",
+        "names": {
+          "en": "Dunsparce",
+          "de": "Dummisel",
+          "fr": "Insolourdo",
+          "it": "Dunsparce",
+          "ja": "ノコッチ",
+          "ko": "노고치",
+          "es": "Dunsparce"
+        },
+        "types": [
+          "normal"
+        ],
+        "resistorTypes": [
+          "rock",
+          "ghost",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "fighting"
+        ]
+      },
+      {
+        "id": "SCRAGGY",
+        "names": {
+          "en": "Scraggy",
+          "de": "Zurrokex",
+          "fr": "Baggiguane",
+          "it": "Scraggy",
+          "ja": "ズルッグ",
+          "ko": "곤율랭",
+          "es": "Scraggy"
+        },
+        "types": [
+          "dark",
+          "fighting"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "flying",
+          "poison",
+          "bug",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "fairy",
+          "fighting",
+          "flying"
+        ]
+      },
+      {
+        "id": "FIDOUGH",
+        "names": {
+          "en": "Fidough",
+          "de": "Hefel",
+          "fr": "Pâtachiot",
+          "it": "Fidough",
+          "ja": "パピモッチ",
+          "ko": "쫀도기",
+          "es": "Fidough"
+        },
+        "types": [
+          "fairy"
+        ],
+        "resistorTypes": [
+          "poison",
+          "steel",
+          "fire"
+        ],
+        "seMoveTypes": [
+          "poison",
+          "steel"
+        ]
+      }
+    ],
+    "shadow_lvl5": [
+      {
+        "id": "THUNDURUS",
+        "names": {
+          "en": "Thundurus (Incarnate Forme)",
+          "de": "Voltolos (Inkarnationsform)",
+          "fr": "Fulguris (Forme Avatar)",
+          "it": "Thundurus (Forma Incarnazione)",
+          "ja": "ボルトロス (けしんフォルム)",
+          "ko": "볼트로스 (화신폼)",
+          "es": "Thundurus (Forma Avatar)"
+        },
+        "types": [
+          "electric",
+          "flying"
+        ],
+        "resistorTypes": [
+          "ground",
+          "rock",
+          "steel",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ice",
+          "rock"
+        ]
+      }
+    ],
+    "shadow_lvl3": [
+      {
+        "id": "SANDSLASH",
+        "names": {
+          "en": "Alolan Sandslash",
+          "de": "Alola-Sandamer",
+          "fr": "Sablaireau d'Alola",
+          "it": "Sandslash di Alola",
+          "ja": "アローラ サンドパン",
+          "ko": "알로라 고지",
+          "es": "Sandslash de Alola"
+        },
+        "types": [
+          "ice",
+          "steel"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fire",
+          "water",
+          "electric"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "fire",
+          "ground"
+        ]
+      },
+      {
+        "id": "QUAGSIRE",
+        "names": {
+          "en": "Quagsire",
+          "de": "Morlord",
+          "fr": "Maraiste",
+          "it": "Quagsire",
+          "ja": "ヌオー",
+          "ko": "누오",
+          "es": "Quagsire"
+        },
+        "types": [
+          "water",
+          "ground"
+        ],
+        "resistorTypes": [
+          "flying",
+          "bug",
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "grass"
         ]
       },
       {
@@ -265,115 +368,112 @@
     ],
     "shadow_lvl1": [
       {
-        "id": "SLOWPOKE",
+        "id": "MACHOP",
         "names": {
-          "en": "Slowpoke",
-          "de": "Flegmon",
-          "fr": "Ramoloss",
-          "it": "Slowpoke",
-          "ja": "ヤドン",
-          "ko": "야돈",
-          "es": "Slowpoke"
+          "en": "Machop",
+          "de": "Machollo",
+          "fr": "Machoc",
+          "it": "Machop",
+          "ja": "ワンリキー",
+          "ko": "알통몬",
+          "es": "Machop"
         },
         "types": [
-          "water",
-          "psychic"
-        ],
-        "resistorTypes": [
-          "steel",
-          "water",
-          "grass",
-          "psychic",
-          "dragon",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "bug",
-          "dark",
-          "electric",
-          "ghost",
-          "grass"
-        ]
-      },
-      {
-        "id": "AIPOM",
-        "names": {
-          "en": "Aipom",
-          "de": "Griffel",
-          "fr": "Capumain",
-          "it": "Aipom",
-          "ja": "エイパム",
-          "ko": "에이팜",
-          "es": "Aipom"
-        },
-        "types": [
-          "normal"
-        ],
-        "resistorTypes": [
-          "rock",
-          "ghost",
-          "steel"
-        ],
-        "seMoveTypes": [
-          "fighting"
-        ]
-      },
-      {
-        "id": "CROAGUNK",
-        "names": {
-          "en": "Croagunk",
-          "de": "Glibunkel",
-          "fr": "Cradopaud",
-          "it": "Croagunk",
-          "ja": "グレッグル",
-          "ko": "삐딱구리",
-          "es": "Croagunk"
-        },
-        "types": [
-          "poison",
           "fighting"
         ],
         "resistorTypes": [
           "flying",
           "poison",
-          "ground",
           "bug",
           "ghost",
-          "psychic"
-        ],
-        "seMoveTypes": [
           "psychic",
-          "flying",
-          "ground"
-        ]
-      },
-      {
-        "id": "GRUBBIN",
-        "names": {
-          "en": "Grubbin",
-          "de": "Mabula",
-          "fr": "Larvibule",
-          "it": "Grubbin",
-          "ja": "アゴジムシ",
-          "ko": "턱지충이",
-          "es": "Grubbin"
-        },
-        "types": [
-          "bug"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "flying",
-          "poison",
-          "ghost",
-          "steel",
-          "fire",
           "fairy"
         ],
         "seMoveTypes": [
+          "fairy",
+          "flying",
+          "psychic"
+        ]
+      },
+      {
+        "id": "BELLSPROUT",
+        "names": {
+          "en": "Bellsprout",
+          "de": "Knofensa",
+          "fr": "Chétiflor",
+          "it": "Bellsprout",
+          "ja": "マダツボミ",
+          "ko": "모다피",
+          "es": "Bellsprout"
+        },
+        "types": [
+          "grass",
+          "poison"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "steel",
+          "fire",
+          "dragon"
+        ],
+        "seMoveTypes": [
           "fire",
           "flying",
-          "rock"
+          "ice",
+          "psychic"
+        ]
+      },
+      {
+        "id": "TORCHIC",
+        "names": {
+          "en": "Torchic",
+          "de": "Flemmli",
+          "fr": "Poussifeu",
+          "it": "Torchic",
+          "ja": "アチャモ",
+          "ko": "아차모",
+          "es": "Torchic"
+        },
+        "types": [
+          "fire"
+        ],
+        "resistorTypes": [
+          "rock",
+          "fire",
+          "water",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground",
+          "rock",
+          "water"
+        ]
+      },
+      {
+        "id": "BAGON",
+        "names": {
+          "en": "Bagon",
+          "de": "Kindwurm",
+          "fr": "Draby",
+          "it": "Bagon",
+          "ja": "タツベイ",
+          "ko": "아공이",
+          "es": "Bagon"
+        },
+        "types": [
+          "dragon"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "dragon",
+          "fairy",
+          "ice"
         ]
       }
     ]
