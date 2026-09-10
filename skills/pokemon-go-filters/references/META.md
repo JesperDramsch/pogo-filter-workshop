@@ -1,6 +1,6 @@
 # Pokémon GO PvP Meta Reference — GENERATED, DO NOT HAND-EDIT
 
-- **Snapshot taken:** 2026-09-02T14:13:37.923Z
+- **Snapshot taken:** 2026-09-09T13:01:55.672Z
 - **Source:** pvpoke — https://github.com/pvpoke/pvpoke (MIT)
 - **Snapshot URL:** https://raw.githubusercontent.com/JesperDramsch/pogo-filter-workshop/main/src/data/pvp-rankings.json
 - **Depth:** top 30 per league, deduped by base dex
@@ -17,7 +17,9 @@
 
 ## Move rebalance watch
 
-No move stat change observed since the watch began (last checked 2026-09-02).
+Last observed Trainer-Battle stat change: **2026-09-09** — 28 move(s) changed (AIR_CUTTER, BITE, BLAZE_KICK, BODY_SLAM, BRINE, BUBBLE_BEAM, BULLDOZE, CHARGE_BEAM, DARK_PULSE, DOUBLE_IRON_BASH, DRAINING_KISS, FELL_STINGER_PLUS).
+
+Rankings lag a rebalance by days, so treat the tables below with caution if that date is recent.
 
 ## Great League (Superliga)
 
@@ -25,51 +27,51 @@ CP cap: 1500 CP
 
 | # | German | English | Dex | Ranked form | Score |
 |---:|---|---|---:|---|---:|
-| 1 | schlurplek | lickilicky | 463 | — | 93.7 |
-| 2 | granforgita | tinkaton | 959 | — | 92.6 |
-| 3 | altaria | altaria | 334 | — | 92.2 |
-| 4 | impoleon | empoleon | 395 | — | 92.2 |
-| 5 | mimigma | mimikyu | 778 | — | 92.2 |
-| 6 | morlord | quagsire | 195 | `quagsire_shadow` | 91.8 |
-| 7 | apoquallyp | jellicent | 593 | — | 91.6 |
-| 8 | forstellka | forretress | 205 | — | 91.5 |
-| 9 | vulnona | ninetales | 38 | — | 91.4 |
-| 10 | urgl | cramorant | 845 | — | 91.1 |
-| 11 | impergator | feraligatr | 160 | — | 91 |
-| 12 | corasonn | corsola | 222 | `corsola_galarian` | 90.9 |
-| 13 | papungha | jumpluff | 189 | — | 90.9 |
-| 14 | suelord | clodsire | 980 | — | 90.8 |
-| 15 | krarmor | corviknight | 823 | — | 90.7 |
-| 16 | ibitak | fearow | 22 | — | 90.7 |
-| 17 | seedraking | kingdra | 230 | — | 90.6 |
-| 18 | azumarill | azumarill | 184 | — | 90.5 |
-| 19 | schlingking | guzzlord | 799 | — | 90.5 |
-| 20 | wiesenior | furret | 162 | — | 90.3 |
-| 21 | lapras | lapras | 131 | — | 90.3 |
-| 22 | dragonir | dragonair | 148 | `dragonair_shadow` | 90.2 |
-| 23 | zobiris | sableye | 302 | `sableye_shadow` | 90.2 |
-| 24 | branawarz | seismitoad | 537 | — | 90.2 |
-| 25 | nachtara | umbreon | 197 | — | 90.2 |
-| 26 | meditalis | medicham | 308 | — | 90.1 |
-| 27 | fiaro | talonflame | 663 | — | 90.1 |
-| 28 | fragrunz | oinkologne | 916 | `oinkologne_female` | 89.9 |
-| 29 | viscargot | sliggoo | 705 | — | 89.9 |
-| 30 | seejong | sealeo | 364 | — | 89.8 |
+| 1 | granforgita | tinkaton | 959 | — | 93 |
+| 2 | vulnona | ninetales | 38 | `ninetales_shadow` | 92.1 |
+| 3 | corasonn | corsola | 222 | `corsola_galarian` | 91.4 |
+| 4 | krarmor | corviknight | 823 | — | 91.4 |
+| 5 | urgl | cramorant | 845 | — | 91.3 |
+| 6 | morlord | quagsire | 195 | `quagsire_shadow` | 91.3 |
+| 7 | altaria | altaria | 334 | — | 91.1 |
+| 8 | melmetal | melmetal | 809 | — | 91.1 |
+| 9 | impoleon | empoleon | 395 | — | 90.9 |
+| 10 | mantax | mantine | 226 | — | 90.9 |
+| 11 | relaxo | snorlax | 143 | — | 90.9 |
+| 12 | florges | florges | 671 | — | 90.8 |
+| 13 | gaunux | thievul | 828 | — | 90.8 |
+| 14 | mimigma | mimikyu | 778 | — | 90.7 |
+| 15 | impergator | feraligatr | 160 | — | 90.6 |
+| 16 | apoquallyp | jellicent | 593 | — | 90.6 |
+| 17 | aranestro | araquanid | 752 | — | 90.5 |
+| 18 | wiesenior | furret | 162 | — | 90.4 |
+| 19 | azumarill | azumarill | 184 | — | 90.3 |
+| 20 | suelord | clodsire | 980 | — | 90.3 |
+| 21 | ibitak | fearow | 22 | — | 90.3 |
+| 22 | muntier | vigoroth | 288 | — | 90.3 |
+| 23 | deoxys | deoxys | 386 | `deoxys_defense` | 90.2 |
+| 24 | knogga | marowak | 105 | — | 90.2 |
+| 25 | epitaff | annihilape | 979 | — | 90.1 |
+| 26 | calamanero | malamar | 687 | — | 90.1 |
+| 27 | zobiris | sableye | 302 | `sableye_shadow` | 90.1 |
+| 28 | lektrobal | electrode | 101 | `electrode_hisuian` | 90 |
+| 29 | lapras | lapras | 131 | — | 89.9 |
+| 30 | nachtara | umbreon | 197 | — | 89.9 |
 
 Dex numbers:
 
 ```
-463,959,334,395,778,195,593,205,38,845,160,222,189,980,823,22,230,184,799,162,131,148,302,537,197,308,663,916,705,364
+959,38,222,823,845,195,334,809,395,226,143,671,828,778,160,593,752,162,184,980,22,288,386,105,979,687,302,101,131,197
 ```
 
 Ready-made filter — copy verbatim, this is the app's own output:
 
 ```text title="de"
-+schlurplek,+granforgita,+altaria,+impoleon,+mimigma,+morlord,+apoquallyp,+forstellka,+vulnona,+urgl,+impergator,+corasonn,+papungha,+suelord,+krarmor,+ibitak,+seedraking,+azumarill,+schlingking,+wiesenior,+lapras,+dragonir,+zobiris,+branawarz,+nachtara,+meditalis,+fiaro,+fragrunz,+viscargot,+seejong&wp-1500&0-1angriffs-wert&3-4verteidigungs-wert&3-4kp
++granforgita,+vulnona,+corasonn,+krarmor,+urgl,+morlord,+altaria,+melmetal,+impoleon,+mantax,+relaxo,+florges,+gaunux,+mimigma,+impergator,+apoquallyp,+aranestro,+wiesenior,+azumarill,+suelord,+ibitak,+muntier,+deoxys,+knogga,+epitaff,+calamanero,+zobiris,+lektrobal,+lapras,+nachtara&wp-1500&0-1angriffs-wert&3-4verteidigungs-wert&3-4kp
 ```
 
 ```text title="en"
-+lickilicky,+tinkaton,+altaria,+empoleon,+mimikyu,+quagsire,+jellicent,+forretress,+ninetales,+cramorant,+feraligatr,+corsola,+jumpluff,+clodsire,+corviknight,+fearow,+kingdra,+azumarill,+guzzlord,+furret,+lapras,+dragonair,+sableye,+seismitoad,+umbreon,+medicham,+talonflame,+oinkologne,+sliggoo,+sealeo&cp-1500&0-1attack&3-4defense&3-4hp
++tinkaton,+ninetales,+corsola,+corviknight,+cramorant,+quagsire,+altaria,+melmetal,+empoleon,+mantine,+snorlax,+florges,+thievul,+mimikyu,+feraligatr,+jellicent,+araquanid,+furret,+azumarill,+clodsire,+fearow,+vigoroth,+deoxys,+marowak,+annihilape,+malamar,+sableye,+electrode,+lapras,+umbreon&cp-1500&0-1attack&3-4defense&3-4hp
 ```
 
 ## Ultra League (Hyperliga)
@@ -78,51 +80,51 @@ CP cap: 2500 CP
 
 | # | German | English | Dex | Ranked form | Score |
 |---:|---|---|---:|---|---:|
-| 1 | mimigma | mimikyu | 778 | — | 95.9 |
-| 2 | schlurplek | lickilicky | 463 | — | 93.8 |
-| 3 | krarmor | corviknight | 823 | — | 93.4 |
-| 4 | granforgita | tinkaton | 959 | — | 93.2 |
-| 5 | florges | florges | 671 | — | 93 |
-| 6 | viridium | virizion | 640 | — | 92.8 |
-| 7 | impoleon | empoleon | 395 | `empoleon_shadow` | 92.7 |
-| 8 | lavados | moltres | 146 | `moltres_galarian` | 92.2 |
-| 9 | epitaff | annihilape | 979 | — | 91.8 |
-| 10 | apoquallyp | jellicent | 593 | — | 91.8 |
-| 11 | rasaff | primeape | 57 | — | 91.8 |
-| 12 | forstellka | forretress | 205 | — | 91.7 |
-| 13 | zygarde | zygarde | 718 | `zygarde_complete` | 91.7 |
-| 14 | impergator | feraligatr | 160 | `feraligatr_shadow` | 91.1 |
-| 15 | vulnona | ninetales | 38 | `ninetales_alolan` | 91.1 |
-| 16 | seedraking | kingdra | 230 | — | 91 |
-| 17 | registeel | registeel | 379 | — | 90.8 |
-| 18 | turtok | blastoise | 9 | — | 90.7 |
-| 19 | zwirrfinst | dusknoir | 477 | — | 90.7 |
-| 20 | lapras | lapras | 131 | — | 90.7 |
-| 21 | calamanero | malamar | 687 | — | 90.7 |
-| 22 | urgl | cramorant | 845 | — | 90.6 |
-| 23 | regidrago | regidrago | 895 | — | 90.5 |
-| 24 | fiaro | talonflame | 663 | — | 90.5 |
-| 25 | walraisa | walrein | 365 | — | 90.5 |
-| 26 | heerashai | dondozo | 977 | — | 90.4 |
-| 27 | giratina | giratina | 487 | `giratina_altered` | 90.4 |
-| 28 | wampitz | bellibolt | 939 | — | 90.1 |
-| 29 | milotic | milotic | 350 | — | 89.9 |
-| 30 | stahlos | steelix | 208 | — | 89.9 |
+| 1 | granforgita | tinkaton | 959 | — | 94.4 |
+| 2 | krarmor | corviknight | 823 | — | 94 |
+| 3 | relaxo | snorlax | 143 | `snorlax_shadow` | 93.7 |
+| 4 | melmetal | melmetal | 809 | — | 92.7 |
+| 5 | viridium | virizion | 640 | — | 92.3 |
+| 6 | zygarde | zygarde | 718 | `zygarde_complete` | 92.2 |
+| 7 | impoleon | empoleon | 395 | — | 92.1 |
+| 8 | mimigma | mimikyu | 778 | — | 92.1 |
+| 9 | florges | florges | 671 | — | 92 |
+| 10 | lavados | moltres | 146 | `moltres_galarian` | 91.9 |
+| 11 | impergator | feraligatr | 160 | `feraligatr_shadow` | 91.7 |
+| 12 | apoquallyp | jellicent | 593 | — | 91.2 |
+| 13 | giratina | giratina | 487 | `giratina_altered` | 91 |
+| 14 | urgl | cramorant | 845 | — | 90.9 |
+| 15 | schlingking | guzzlord | 799 | — | 90.9 |
+| 16 | skelokrok | skeledirge | 911 | — | 90.7 |
+| 17 | gortrom | rillaboom | 812 | — | 90.6 |
+| 18 | lapras | lapras | 131 | — | 90.5 |
+| 19 | zwirrfinst | dusknoir | 477 | — | 90.3 |
+| 20 | vulnona | ninetales | 38 | `ninetales_alolan` | 90.3 |
+| 21 | heerashai | dondozo | 977 | — | 90.2 |
+| 22 | registeel | registeel | 379 | — | 90.2 |
+| 23 | turtok | blastoise | 9 | — | 90 |
+| 24 | forstellka | forretress | 205 | — | 89.9 |
+| 25 | regidrago | regidrago | 895 | — | 89.8 |
+| 26 | cresselia | cresselia | 488 | — | 89.4 |
+| 27 | sleimok | muk | 89 | `muk_alolan` | 89.4 |
+| 28 | pixi | clefable | 36 | — | 89.2 |
+| 29 | fiaro | talonflame | 663 | — | 89.2 |
+| 30 | walraisa | walrein | 365 | — | 89.1 |
 
 Dex numbers:
 
 ```
-778,463,823,959,671,640,395,146,979,593,57,205,718,160,38,230,379,9,477,131,687,845,895,663,365,977,487,939,350,208
+959,823,143,809,640,718,395,778,671,146,160,593,487,845,799,911,812,131,477,38,977,379,9,205,895,488,89,36,663,365
 ```
 
 Ready-made filter — copy verbatim, this is the app's own output:
 
 ```text title="de"
-+mimigma,+schlurplek,+krarmor,+granforgita,+florges,+viridium,+impoleon,+lavados,+epitaff,+apoquallyp,+rasaff,+forstellka,+zygarde,+impergator,+vulnona,+seedraking,+registeel,+turtok,+zwirrfinst,+lapras,+calamanero,+urgl,+regidrago,+fiaro,+walraisa,+heerashai,+giratina,+wampitz,+milotic,+stahlos&wp-2500&0-1angriffs-wert&3-4verteidigungs-wert&3-4kp
++granforgita,+krarmor,+relaxo,+melmetal,+viridium,+zygarde,+impoleon,+mimigma,+florges,+lavados,+impergator,+apoquallyp,+giratina,+urgl,+schlingking,+skelokrok,+gortrom,+lapras,+zwirrfinst,+vulnona,+heerashai,+registeel,+turtok,+forstellka,+regidrago,+cresselia,+sleimok,+pixi,+fiaro,+walraisa&wp-2500&0-1angriffs-wert&3-4verteidigungs-wert&3-4kp
 ```
 
 ```text title="en"
-+mimikyu,+lickilicky,+corviknight,+tinkaton,+florges,+virizion,+empoleon,+moltres,+annihilape,+jellicent,+primeape,+forretress,+zygarde,+feraligatr,+ninetales,+kingdra,+registeel,+blastoise,+dusknoir,+lapras,+malamar,+cramorant,+regidrago,+talonflame,+walrein,+dondozo,+giratina,+bellibolt,+milotic,+steelix&cp-2500&0-1attack&3-4defense&3-4hp
++tinkaton,+corviknight,+snorlax,+melmetal,+virizion,+zygarde,+empoleon,+mimikyu,+florges,+moltres,+feraligatr,+jellicent,+giratina,+cramorant,+guzzlord,+skeledirge,+rillaboom,+lapras,+dusknoir,+ninetales,+dondozo,+registeel,+blastoise,+forretress,+regidrago,+cresselia,+muk,+clefable,+talonflame,+walrein&cp-2500&0-1attack&3-4defense&3-4hp
 ```
 
 ## Master League (Meisterliga)
@@ -131,51 +133,51 @@ CP cap: none — Master is uncapped, so a low-attack PvP spread is *worse* here 
 
 | # | German | English | Dex | Ranked form | Score |
 |---:|---|---|---:|---|---:|
-| 1 | zacian | zacian | 888 | `zacian_crowned_sword` | 99 |
-| 2 | palkia | palkia | 484 | `palkia_origin` | 98.9 |
-| 3 | metagross | metagross | 376 | — | 97.9 |
-| 4 | kyurem | kyurem | 646 | `kyurem_white` | 94.8 |
-| 5 | lunala | lunala | 792 | — | 94.8 |
-| 6 | xerneas | xerneas | 716 | — | 94.8 |
-| 7 | dialga | dialga | 483 | `dialga_origin` | 94 |
-| 8 | reshiram | reshiram | 643 | — | 94 |
-| 9 | zamazenta | zamazenta | 889 | `zamazenta_crowned_shield` | 93.9 |
-| 10 | kyogre | kyogre | 382 | — | 93 |
-| 11 | zekrom | zekrom | 644 | — | 92.8 |
-| 12 | marshadow | marshadow | 802 | — | 92.6 |
-| 13 | endynalos | eternatus | 890 | — | 91.4 |
-| 14 | lugia | lugia | 249 | — | 91 |
-| 15 | knakrack | garchomp | 445 | `garchomp_shadow` | 89.7 |
-| 16 | necrozma | necrozma | 800 | `necrozma_dawn_wings` | 89.6 |
-| 17 | yveltal | yveltal | 717 | — | 89.6 |
-| 18 | ho-oh | ho-oh | 250 | — | 88.7 |
-| 19 | zygarde | zygarde | 718 | `zygarde_complete` | 88.6 |
-| 20 | meloetta | meloetta | 648 | `meloetta_aria` | 88.5 |
-| 21 | latios | latios | 381 | — | 88 |
-| 22 | garados | gyarados | 130 | `gyarados_shadow` | 87.6 |
-| 23 | groudon | groudon | 383 | — | 87.4 |
-| 24 | monetigo | gholdengo | 1000 | — | 87 |
-| 25 | mewtu | mewtwo | 150 | `mewtwo_shadow` | 87 |
-| 26 | florges | florges | 671 | — | 86.8 |
-| 27 | solgaleo | solgaleo | 791 | — | 86.8 |
-| 28 | melmetal | melmetal | 809 | — | 86.6 |
-| 29 | keldeo | keldeo | 647 | `keldeo_resolute` | 86.3 |
-| 30 | latias | latias | 380 | `latias_shadow` | 86.3 |
+| 1 | palkia | palkia | 484 | `palkia_origin` | 98.7 |
+| 2 | zacian | zacian | 888 | `zacian_crowned_sword` | 97.8 |
+| 3 | zygarde | zygarde | 718 | `zygarde_complete` | 94.4 |
+| 4 | metagross | metagross | 376 | — | 94.3 |
+| 5 | kyurem | kyurem | 646 | `kyurem_white` | 94.2 |
+| 6 | xerneas | xerneas | 716 | — | 94.2 |
+| 7 | kyogre | kyogre | 382 | — | 94 |
+| 8 | dialga | dialga | 483 | `dialga_origin` | 93.9 |
+| 9 | reshiram | reshiram | 643 | — | 93.9 |
+| 10 | ursaluna | ursaluna | 901 | — | 93 |
+| 11 | endynalos | eternatus | 890 | — | 92.8 |
+| 12 | lugia | lugia | 249 | — | 92.4 |
+| 13 | lunala | lunala | 792 | — | 92.3 |
+| 14 | zamazenta | zamazenta | 889 | `zamazenta_crowned_shield` | 92.3 |
+| 15 | necrozma | necrozma | 800 | `necrozma_dawn_wings` | 91.7 |
+| 16 | marshadow | marshadow | 802 | — | 90.6 |
+| 17 | zekrom | zekrom | 644 | — | 90.5 |
+| 18 | ho-oh | ho-oh | 250 | — | 89.5 |
+| 19 | knakrack | garchomp | 445 | `garchomp_shadow` | 88.8 |
+| 20 | groudon | groudon | 383 | — | 88.8 |
+| 21 | melmetal | melmetal | 809 | — | 88.5 |
+| 22 | keldeo | keldeo | 647 | `keldeo_resolute` | 88.4 |
+| 23 | garados | gyarados | 130 | `gyarados_shadow` | 87.6 |
+| 24 | gortrom | rillaboom | 812 | — | 86.2 |
+| 25 | latios | latios | 381 | `latios_shadow` | 86.1 |
+| 26 | yveltal | yveltal | 717 | — | 85.9 |
+| 27 | giratina | giratina | 487 | `giratina_altered_shadow` | 85.8 |
+| 28 | florges | florges | 671 | — | 85.7 |
+| 29 | demeteros | landorus | 645 | `landorus_therian` | 85.7 |
+| 30 | solgaleo | solgaleo | 791 | — | 85.7 |
 
 Dex numbers:
 
 ```
-888,484,376,646,792,716,483,643,889,382,644,802,890,249,445,800,717,250,718,648,381,130,383,1000,150,671,791,809,647,380
+484,888,718,376,646,716,382,483,643,901,890,249,792,889,800,802,644,250,445,383,809,647,130,812,381,717,487,671,645,791
 ```
 
 Ready-made filter — copy verbatim, this is the app's own output:
 
 ```text title="de"
-+zacian,+palkia,+metagross,+kyurem,+lunala,+xerneas,+dialga,+reshiram,+zamazenta,+kyogre,+zekrom,+marshadow,+endynalos,+lugia,+knakrack,+necrozma,+yveltal,+ho-oh,+zygarde,+meloetta,+latios,+garados,+groudon,+monetigo,+mewtu,+florges,+solgaleo,+melmetal,+keldeo,+latias
++palkia,+zacian,+zygarde,+metagross,+kyurem,+xerneas,+kyogre,+dialga,+reshiram,+ursaluna,+endynalos,+lugia,+lunala,+zamazenta,+necrozma,+marshadow,+zekrom,+ho-oh,+knakrack,+groudon,+melmetal,+keldeo,+garados,+gortrom,+latios,+yveltal,+giratina,+florges,+demeteros,+solgaleo
 ```
 
 ```text title="en"
-+zacian,+palkia,+metagross,+kyurem,+lunala,+xerneas,+dialga,+reshiram,+zamazenta,+kyogre,+zekrom,+marshadow,+eternatus,+lugia,+garchomp,+necrozma,+yveltal,+ho-oh,+zygarde,+meloetta,+latios,+gyarados,+groudon,+gholdengo,+mewtwo,+florges,+solgaleo,+melmetal,+keldeo,+latias
++palkia,+zacian,+zygarde,+metagross,+kyurem,+xerneas,+kyogre,+dialga,+reshiram,+ursaluna,+eternatus,+lugia,+lunala,+zamazenta,+necrozma,+marshadow,+zekrom,+ho-oh,+garchomp,+groudon,+melmetal,+keldeo,+gyarados,+rillaboom,+latios,+yveltal,+giratina,+florges,+landorus,+solgaleo
 ```
 
 ## Cups
@@ -188,39 +190,39 @@ CP cap: 1500 CP
 
 | # | German | English | Dex | Ranked form | Score |
 |---:|---|---|---:|---|---:|
-| 1 | schlurplek | lickilicky | 463 | — | 93.6 |
-| 2 | granforgita | tinkaton | 959 | — | 92.7 |
-| 3 | altaria | altaria | 334 | — | 92.1 |
-| 4 | impoleon | empoleon | 395 | — | 92.1 |
-| 5 | mimigma | mimikyu | 778 | — | 92.1 |
-| 6 | zobiris | sableye | 302 | `sableye_mega` | 92 |
-| 7 | morlord | quagsire | 195 | `quagsire_shadow` | 91.9 |
-| 8 | forstellka | forretress | 205 | — | 91.4 |
-| 9 | apoquallyp | jellicent | 593 | — | 91.4 |
-| 10 | vulnona | ninetales | 38 | — | 91.3 |
-| 11 | papungha | jumpluff | 189 | — | 91 |
-| 12 | impergator | feraligatr | 160 | — | 90.9 |
-| 13 | suelord | clodsire | 980 | — | 90.7 |
-| 14 | ibitak | fearow | 22 | — | 90.7 |
-| 15 | krarmor | corviknight | 823 | — | 90.6 |
-| 16 | urgl | cramorant | 845 | — | 90.6 |
-| 17 | schlingking | guzzlord | 799 | — | 90.6 |
-| 18 | seedraking | kingdra | 230 | `kingdra_shadow` | 90.6 |
-| 19 | azumarill | azumarill | 184 | — | 90.5 |
-| 20 | corasonn | corsola | 222 | `corsola_galarian` | 90.5 |
-| 21 | dragonir | dragonair | 148 | `dragonair_shadow` | 90.2 |
-| 22 | wiesenior | furret | 162 | — | 90.1 |
-| 23 | lapras | lapras | 131 | — | 90.1 |
-| 24 | branawarz | seismitoad | 537 | — | 90.1 |
-| 25 | nachtara | umbreon | 197 | — | 90.1 |
-| 26 | meditalis | medicham | 308 | — | 90 |
-| 27 | viscargot | sliggoo | 705 | — | 90 |
-| 28 | fiaro | talonflame | 663 | — | 90 |
-| 29 | calamanero | malamar | 687 | `malamar_mega` | 89.8 |
-| 30 | fragrunz | oinkologne | 916 | `oinkologne_female` | 89.7 |
+| 1 | granforgita | tinkaton | 959 | — | 93.1 |
+| 2 | vulnona | ninetales | 38 | `ninetales_shadow` | 92.1 |
+| 3 | zobiris | sableye | 302 | `sableye_mega` | 91.9 |
+| 4 | morlord | quagsire | 195 | `quagsire_shadow` | 91.2 |
+| 5 | altaria | altaria | 334 | — | 91.1 |
+| 6 | corasonn | corsola | 222 | `corsola_galarian` | 91.1 |
+| 7 | florges | florges | 671 | — | 91.1 |
+| 8 | krarmor | corviknight | 823 | — | 91 |
+| 9 | urgl | cramorant | 845 | — | 91 |
+| 10 | mantax | mantine | 226 | — | 90.8 |
+| 11 | melmetal | melmetal | 809 | — | 90.8 |
+| 12 | impoleon | empoleon | 395 | — | 90.7 |
+| 13 | gaunux | thievul | 828 | — | 90.7 |
+| 14 | mimigma | mimikyu | 778 | — | 90.6 |
+| 15 | impergator | feraligatr | 160 | — | 90.5 |
+| 16 | relaxo | snorlax | 143 | — | 90.5 |
+| 17 | ibitak | fearow | 22 | — | 90.4 |
+| 18 | aranestro | araquanid | 752 | — | 90.2 |
+| 19 | azumarill | azumarill | 184 | — | 90.2 |
+| 20 | wiesenior | furret | 162 | — | 90.2 |
+| 21 | apoquallyp | jellicent | 593 | — | 90.2 |
+| 22 | calamanero | malamar | 687 | `malamar_mega` | 90.2 |
+| 23 | knogga | marowak | 105 | — | 90.2 |
+| 24 | suelord | clodsire | 980 | — | 90.1 |
+| 25 | muntier | vigoroth | 288 | — | 90.1 |
+| 26 | epitaff | annihilape | 979 | `annihilape_shadow` | 89.8 |
+| 27 | deoxys | deoxys | 386 | `deoxys_defense` | 89.7 |
+| 28 | heerashai | dondozo | 977 | — | 89.7 |
+| 29 | lektrobal | electrode | 101 | `electrode_hisuian` | 89.7 |
+| 30 | lapras | lapras | 131 | — | 89.6 |
 
 ```
-463,959,334,395,778,302,195,205,593,38,189,160,980,22,823,845,799,230,184,222,148,162,131,537,197,308,705,663,687,916
+959,38,302,195,334,222,671,823,845,226,809,395,828,778,160,143,22,752,184,162,593,687,105,980,288,979,386,977,101,131
 ```
 
 ### Mega Ultra League `mega-2500`
@@ -231,39 +233,39 @@ CP cap: 2500 CP
 
 | # | German | English | Dex | Ranked form | Score |
 |---:|---|---|---:|---|---:|
-| 1 | mimigma | mimikyu | 778 | — | 95.9 |
-| 2 | schlurplek | lickilicky | 463 | — | 93.7 |
-| 3 | krarmor | corviknight | 823 | — | 93.3 |
-| 4 | granforgita | tinkaton | 959 | — | 93.3 |
-| 5 | florges | florges | 671 | — | 93 |
-| 6 | impoleon | empoleon | 395 | `empoleon_shadow` | 92.6 |
-| 7 | viridium | virizion | 640 | — | 92.6 |
-| 8 | lavados | moltres | 146 | `moltres_galarian` | 92.2 |
-| 9 | forstellka | forretress | 205 | — | 91.7 |
-| 10 | apoquallyp | jellicent | 593 | — | 91.7 |
-| 11 | zygarde | zygarde | 718 | `zygarde_complete` | 91.5 |
-| 12 | vulnona | ninetales | 38 | `ninetales_alolan` | 91.2 |
-| 13 | seedraking | kingdra | 230 | — | 90.8 |
-| 14 | zwirrfinst | dusknoir | 477 | — | 90.7 |
-| 15 | calamanero | malamar | 687 | `malamar_mega` | 90.7 |
-| 16 | registeel | registeel | 379 | — | 90.7 |
-| 17 | lapras | lapras | 131 | — | 90.6 |
-| 18 | turtok | blastoise | 9 | — | 90.5 |
-| 19 | urgl | cramorant | 845 | — | 90.5 |
-| 20 | impergator | feraligatr | 160 | `feraligatr_shadow` | 90.5 |
-| 21 | fiaro | talonflame | 663 | — | 90.5 |
-| 22 | heerashai | dondozo | 977 | — | 90.4 |
-| 23 | regidrago | regidrago | 895 | — | 90.4 |
-| 24 | walraisa | walrein | 365 | — | 90.4 |
-| 25 | giratina | giratina | 487 | `giratina_altered` | 90.3 |
-| 26 | wampitz | bellibolt | 939 | — | 90.1 |
-| 27 | epitaff | annihilape | 979 | — | 89.9 |
-| 28 | stahlos | steelix | 208 | — | 89.8 |
-| 29 | cresselia | cresselia | 488 | — | 89.7 |
-| 30 | oghnatoll | runerigus | 867 | — | 89.5 |
+| 1 | granforgita | tinkaton | 959 | — | 95.1 |
+| 2 | krarmor | corviknight | 823 | — | 93.9 |
+| 3 | florges | florges | 671 | — | 92.2 |
+| 4 | impoleon | empoleon | 395 | — | 92.1 |
+| 5 | melmetal | melmetal | 809 | — | 92.1 |
+| 6 | mimigma | mimikyu | 778 | — | 92.1 |
+| 7 | relaxo | snorlax | 143 | `snorlax_shadow` | 92.1 |
+| 8 | lavados | moltres | 146 | `moltres_galarian` | 91.9 |
+| 9 | viridium | virizion | 640 | — | 91.9 |
+| 10 | zygarde | zygarde | 718 | `zygarde_complete` | 91.8 |
+| 11 | impergator | feraligatr | 160 | — | 91.5 |
+| 12 | apoquallyp | jellicent | 593 | — | 90.9 |
+| 13 | giratina | giratina | 487 | `giratina_altered` | 90.8 |
+| 14 | schlingking | guzzlord | 799 | — | 90.8 |
+| 15 | skelokrok | skeledirge | 911 | — | 90.7 |
+| 16 | urgl | cramorant | 845 | — | 90.6 |
+| 17 | vulnona | ninetales | 38 | `ninetales_alolan` | 90.5 |
+| 18 | gortrom | rillaboom | 812 | — | 90.5 |
+| 19 | lapras | lapras | 131 | — | 90.4 |
+| 20 | registeel | registeel | 379 | — | 90.3 |
+| 21 | zwirrfinst | dusknoir | 477 | — | 90.2 |
+| 22 | sleimok | muk | 89 | `muk_alolan` | 90.1 |
+| 23 | pixi | clefable | 36 | — | 90 |
+| 24 | heerashai | dondozo | 977 | — | 90 |
+| 25 | forstellka | forretress | 205 | — | 89.8 |
+| 26 | regidrago | regidrago | 895 | — | 89.8 |
+| 27 | turtok | blastoise | 9 | — | 89.4 |
+| 28 | cresselia | cresselia | 488 | — | 89.4 |
+| 29 | fiaro | talonflame | 663 | — | 89.2 |
+| 30 | oghnatoll | runerigus | 867 | — | 89 |
 
 ```
-778,463,823,959,671,395,640,146,205,593,718,38,230,477,687,379,131,9,845,160,663,977,895,365,487,939,979,208,488,867
+959,823,671,395,809,778,143,146,640,718,160,593,487,799,911,845,38,812,131,379,477,89,36,977,205,895,9,488,663,867
 ```
 
 ### Mega Master League `mega-10000`
@@ -274,39 +276,82 @@ CP cap: none (uncapped)
 
 | # | German | English | Dex | Ranked form | Score |
 |---:|---|---|---:|---|---:|
-| 1 | kyogre | kyogre | 382 | `kyogre_primal` | 99.5 |
-| 2 | mewtu | mewtwo | 150 | `mewtwo_mega_y` | 98 |
-| 3 | dragoran | dragonite | 149 | `dragonite_mega` | 93.9 |
-| 4 | garados | gyarados | 130 | `gyarados_mega` | 93.9 |
-| 5 | rayquaza | rayquaza | 384 | `rayquaza_mega` | 93.9 |
-| 6 | knakrack | garchomp | 445 | `garchomp_mega` | 92.5 |
-| 7 | groudon | groudon | 383 | `groudon_primal` | 90.9 |
-| 8 | despotar | tyranitar | 248 | `tyranitar_mega` | 90.6 |
-| 9 | metagross | metagross | 376 | `metagross_mega` | 90.4 |
-| 10 | latias | latias | 380 | `latias_mega` | 87.5 |
-| 11 | latios | latios | 381 | `latios_mega` | 86.3 |
-| 12 | skaraborn | heracross | 214 | `heracross_mega` | 83.9 |
-| 13 | brutalanda | salamence | 373 | `salamence_mega` | 83.4 |
-| 14 | dialga | dialga | 483 | `dialga_origin` | 82.8 |
-| 15 | sumpex | swampert | 260 | `swampert_mega` | 81.9 |
-| 16 | brigaron | chesnaught | 652 | `chesnaught_mega` | 81.7 |
-| 17 | lugia | lugia | 249 | — | 81.4 |
-| 18 | palkia | palkia | 484 | `palkia_shadow` | 80.7 |
-| 19 | scherox | scizor | 212 | `scizor_mega` | 80.1 |
-| 20 | xerneas | xerneas | 716 | — | 78.6 |
-| 21 | gengar | gengar | 94 | `gengar_mega` | 78.1 |
-| 22 | zacian | zacian | 888 | `zacian_crowned_sword` | 77.4 |
-| 23 | florges | florges | 671 | — | 77.3 |
-| 24 | zamazenta | zamazenta | 889 | `zamazenta_crowned_shield` | 76.3 |
-| 25 | glurak | charizard | 6 | `charizard_mega_y` | 75.8 |
-| 26 | stolloss | aggron | 306 | `aggron_mega` | 75.7 |
-| 27 | kyurem | kyurem | 646 | `kyurem_white` | 75.5 |
-| 28 | zekrom | zekrom | 644 | — | 75.2 |
-| 29 | galagladi | gallade | 475 | `gallade_mega` | 75 |
-| 30 | reshiram | reshiram | 643 | — | 74.4 |
+| 1 | kyogre | kyogre | 382 | `kyogre_primal` | 99.3 |
+| 2 | mewtu | mewtwo | 150 | `mewtwo_mega_y` | 96.8 |
+| 3 | garados | gyarados | 130 | `gyarados_mega` | 96 |
+| 4 | dragoran | dragonite | 149 | `dragonite_mega` | 94.3 |
+| 5 | rayquaza | rayquaza | 384 | `rayquaza_mega` | 94 |
+| 6 | knakrack | garchomp | 445 | `garchomp_mega` | 93.1 |
+| 7 | despotar | tyranitar | 248 | `tyranitar_mega` | 91.2 |
+| 8 | groudon | groudon | 383 | `groudon_primal` | 91.1 |
+| 9 | metagross | metagross | 376 | `metagross_mega` | 90.9 |
+| 10 | brigaron | chesnaught | 652 | `chesnaught_mega` | 87 |
+| 11 | latios | latios | 381 | `latios_mega` | 86.5 |
+| 12 | latias | latias | 380 | `latias_mega` | 86 |
+| 13 | fennexis | delphox | 655 | `delphox_mega` | 84.4 |
+| 14 | skaraborn | heracross | 214 | `heracross_mega` | 84 |
+| 15 | brutalanda | salamence | 373 | `salamence_mega` | 83.7 |
+| 16 | dialga | dialga | 483 | `dialga_origin` | 83.2 |
+| 17 | sumpex | swampert | 260 | `swampert_mega` | 83.1 |
+| 18 | stolloss | aggron | 306 | `aggron_mega` | 82.3 |
+| 19 | palkia | palkia | 484 | `palkia_shadow` | 80.4 |
+| 20 | scherox | scizor | 212 | `scizor_mega` | 79.3 |
+| 21 | xerneas | xerneas | 716 | — | 78 |
+| 22 | galagladi | gallade | 475 | `gallade_mega` | 77 |
+| 23 | zygarde | zygarde | 718 | `zygarde_complete` | 76.9 |
+| 24 | glurak | charizard | 6 | `charizard_mega_y` | 76.7 |
+| 25 | keldeo | keldeo | 647 | `keldeo_resolute` | 76.3 |
+| 26 | melmetal | melmetal | 809 | — | 76.2 |
+| 27 | ursaluna | ursaluna | 901 | `ursaluna_shadow` | 76.2 |
+| 28 | lugia | lugia | 249 | — | 76 |
+| 29 | gengar | gengar | 94 | `gengar_mega` | 75.5 |
+| 30 | kyurem | kyurem | 646 | `kyurem_white` | 75.2 |
 
 ```
-382,150,149,130,384,445,383,248,376,380,381,214,373,483,260,652,249,484,212,716,94,888,671,889,6,306,646,644,475,643
+382,150,130,149,384,445,248,383,376,652,381,380,655,214,373,483,260,306,484,212,716,475,718,6,647,809,901,249,94,646
+```
+
+### Willpower Cup `willpower-1500`
+
+Window: 2026-09-15 → 2026-09-22 (Great League, Ultra League: Mega Edition, and Willpower Cup: Great League Edition | Twilight Trails)
+
+CP cap: 1500 CP
+
+| # | German | English | Dex | Ranked form | Score |
+|---:|---|---|---:|---|---:|
+| 1 | sleimok | muk | 89 | `muk_alolan` | 97.8 |
+| 2 | grypheldis | mandibuzz | 630 | — | 97.3 |
+| 3 | morpeko | morpeko | 877 | `morpeko_full_belly` | 95 |
+| 4 | kramurx | murkrow | 198 | `murkrow_shadow` | 94.6 |
+| 5 | zobiris | sableye | 302 | — | 94.6 |
+| 6 | piondragi | drapion | 452 | — | 94.4 |
+| 7 | quajutsu | greninja | 658 | `greninja_shadow` | 93.9 |
+| 8 | epitaff | annihilape | 979 | `annihilape_shadow` | 92.8 |
+| 9 | jiutesto | throh | 538 | — | 91.8 |
+| 10 | schlingking | guzzlord | 799 | — | 91.6 |
+| 11 | olangaar | grimmsnarl | 861 | — | 91.2 |
+| 12 | pamomamo | pawmot | 923 | — | 91 |
+| 13 | lepumentas | claydol | 344 | — | 90.9 |
+| 14 | calamanero | malamar | 687 | — | 90.2 |
+| 15 | admurai | samurott | 503 | `samurott_hisuian` | 90 |
+| 16 | trikephalo | hydreigon | 635 | `hydreigon_shadow` | 89.9 |
+| 17 | nachtara | umbreon | 197 | — | 89.7 |
+| 18 | lavados | moltres | 146 | `moltres_galarian` | 89.5 |
+| 19 | gladiantri | pawniard | 624 | — | 88.9 |
+| 20 | resladero | hawlucha | 701 | — | 88.7 |
+| 21 | gladimperio | kingambit | 983 | — | 88.6 |
+| 22 | mediras | hakamo-o | 783 | — | 88.1 |
+| 23 | metang | metang | 375 | `metang_shadow` | 88.1 |
+| 24 | flaminkno | flamigo | 973 | — | 87.7 |
+| 25 | grandiras | kommo-o | 784 | — | 87.5 |
+| 26 | pelzebub | morgrem | 860 | — | 87.5 |
+| 27 | lohgock | blaziken | 257 | — | 87.2 |
+| 28 | baldorfish | qwilfish | 211 | `qwilfish_hisuian` | 87.2 |
+| 29 | snobilikat | persian | 53 | `persian_alolan` | 86.9 |
+| 30 | duodino | zweilous | 634 | `zweilous_shadow` | 86.9 |
+
+```
+89,630,877,198,302,452,658,979,538,799,861,923,344,687,503,635,197,146,624,701,983,783,375,973,784,860,257,211,53,634
 ```
 
 ### Little Cup `little-500`
