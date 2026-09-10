@@ -12,6 +12,7 @@ import {
 	buildOwnedLine,
 	friendCollectWantsFor,
 	lineCoverageOwner,
+	haveScopeCycle,
 	haveScopeDefault,
 	haveScopeOf,
 	lineHasStages,
@@ -966,6 +967,9 @@ console.log('\nScenario 8c: have-list line scopes — family / upward / exact');
 	// family by hand is the way to say "I will evolve it".
 	check('haveScopeDefault: babies exact, everything else family',
 		haveScopeDefault(172) === 'exact' && haveScopeDefault(25) === 'family' && haveScopeDefault(13) === 'family');
+	check('the badge cycles through upward from either default',
+		JSON.stringify(haveScopeCycle('family')) === '["family","upward","exact"]' &&
+			JSON.stringify(haveScopeCycle('exact')) === '["exact","upward","family"]');
 	check('haveScopeOf falls back to the species default',
 		haveScopeOf({}, 'pichu', 172) === 'exact' && haveScopeOf({ pichu: 'family' }, 'pichu', 172) === 'family' &&
 			haveScopeOf({}, 'bibor', 15) === 'family' && haveScopeOf({ bibor: 'bogus' }, 'bibor', 15) === 'family');

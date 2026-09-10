@@ -404,6 +404,15 @@ export function haveScopeDefault(dex) {
 
 const HAVE_SCOPES = ['family', 'upward', 'exact'];
 
+// The order the badge cycles through, starting from the species' default:
+// family → upward → exact for most lines, exact → upward → family for a
+// baby. Both step through 'upward' in the middle, so one tap from either
+// default is always the narrower-or-wider neighbour, never the far end.
+// Exported for the checks.
+export function haveScopeCycle(dflt) {
+	return dflt === 'exact' ? ['exact', 'upward', 'family'] : ['family', 'upward', 'exact'];
+}
+
 // Resolve one have-list copy's scope: the stored value when it is one of the
 // three, else the species' default. Only a value that differs from the default
 // is ever stored (see mergeImportedConfig), so absence always means default.
@@ -7004,10 +7013,9 @@ function HaveScopeBadge({ species, scopeAnn, onScopeAnnChange, accent = '#5EAFC5
 	const key = canonSpeciesKey(species);
 	const dflt = haveScopeDefault(dex);
 	const scope = haveScopeOf(scopeAnn, key, dex);
-	// Cycle from the species' default: family → upward → exact for most lines,
-	// exact → upward → family for a baby. Landing back on the default clears
-	// the key, so absence keeps meaning default.
-	const order = [...HAVE_SCOPES.slice(HAVE_SCOPES.indexOf(dflt)), ...HAVE_SCOPES.slice(0, HAVE_SCOPES.indexOf(dflt))];
+	// Cycle from the species' default (haveScopeCycle). Landing back on the
+	// default clears the key, so absence keeps meaning default.
+	const order = haveScopeCycle(dflt);
 	const next = order[(order.indexOf(scope) + 1) % order.length];
 	const cycle = () => {
 		if (next === dflt) onScopeAnnChange(omitKey(omitKey(scopeAnn, species), key));
