@@ -9,9 +9,17 @@ import {
 	collectibleBaseDex,
 	DEFAULT_CONFIG,
 	DEFAULT_TOP_ATTACKERS,
+	buildOwnedLine,
+	friendCollectWantsFor,
+	lineCoverageOwner,
+	lineHasStages,
+	lineOwnerCovers,
 	lineSlotCovered,
 	lineSlotOwner,
+	lineSlotOwnerIn,
 	mergeImportedConfig,
+	ownedLinePartition,
+	upwardReach,
 } from '../src/App.jsx';
 import EVENTS from '../src/data/events.json';
 import SPECIES_META from '../src/data/species-meta.json';
@@ -51,23 +59,27 @@ const cfg = {
 const luckies = ['dragoran', 'lapras'];
 const hundos = ['glurak'];
 
-console.log('Scenario 1: lucky focus — exact-owned drops, singular selection-driven string');
+console.log('Scenario 1: lucky focus — line-owned drops, singular selection-driven string');
 {
+	// Ownership is LINE-level, the same question the packs ask: the lucky
+	// Dragoran retires the curated Dratini (the line is done), the lucky Lapras
+	// retires itself, and Larvitar stays. See Scenario 10 for the have-list
+	// scopes that narrow what one owned copy stands for.
 	const r = buildFilters(hundos, luckies, cfg, [], 'en', t);
 	check("mode defaults to 'lucky'", r.friendCollectMode === 'lucky');
 	check(
-		'targets carry exact-owned flags',
-		JSON.stringify(r.friendCollectTargets.map((x) => [x.display, x.owned])) ===
+		'targets carry line-owned flags',
+		JSON.stringify(r.friendCollectTargets.map((x) => [x.display, x.owned, x.ownedLucky, x.lineLucky])) ===
 			JSON.stringify([
-				['dratini', false],
-				['lapras', true],
-				['larvitar', false],
+				['dratini', true, false, 'dragonite'],
+				['lapras', true, true, null],
+				['larvitar', false, false, null],
 			]),
 		JSON.stringify(r.friendCollectTargets),
 	);
 	check(
-		'string = exact-species selection + trade guards, nothing else',
-		r.friendCollectWishlist === 'dratini,larvitar&!traded&!shadow&!mythical,808,809&!shiny&!costume&!background&!purified',
+		'string = unowned selection + trade guards, nothing else',
+		r.friendCollectWishlist === 'larvitar&!traded&!shadow&!mythical,808,809&!shiny&!costume&!background&!purified',
 		r.friendCollectWishlist,
 	);
 	// Targets are bare exact-species terms: `+dratini` would ask the friend for
@@ -409,7 +421,7 @@ console.log('\nScenario 8: output locale rendering');
 	const r = buildFilters(hundos, luckies, cfg, [], 'de', t);
 	check(
 		'DE output renders German names and keywords',
-		r.friendCollectWishlist.startsWith('dratini,larvitar&') && r.friendCollectWishlist.includes('!getauscht'),
+		r.friendCollectWishlist.startsWith('larvitar&') && r.friendCollectWishlist.includes('!getauscht'),
 		r.friendCollectWishlist,
 	);
 	check(
@@ -421,30 +433,32 @@ console.log('\nScenario 8: output locale rendering');
 
 console.log("\nScenario 8b: 'both' focus — covered only when lucky AND hundo are owned");
 {
-	// dragoran: lucky + hundo → fully covered, drops. glurak: hundo only →
-	// stays in the string. dratini: neither → stays.
+	// dragoran: lucky + hundo → fully covered, drops — and so does dratini,
+	// whose line the Dragoran finishes on both goals. glurak: hundo only →
+	// stays in the string. larvitar: neither → stays.
 	const r = buildFilters(
 		['dragoran', 'glurak'],
 		['dragoran'],
-		{ ...cfg, friendCollectSpecies: ['dragoran', 'glurak', 'dratini'], friendCollectMode: 'both' },
+		{ ...cfg, friendCollectSpecies: ['dragoran', 'glurak', 'dratini', 'larvitar'], friendCollectMode: 'both' },
 		[],
 		'en',
 		t,
 	);
 	check("mode resolves to 'both'", r.friendCollectMode === 'both');
 	check(
-		'per-goal flags are exact',
+		'per-goal exact flags stay exact, coverage is line-level',
 		JSON.stringify(r.friendCollectTargets.map((x) => [x.display, x.ownedLucky, x.ownedHundo, x.owned])) ===
 			JSON.stringify([
 				['dragonite', true, true, true],
 				['charizard', false, true, false],
-				['dratini', false, false, false],
+				['dratini', false, false, true],
+				['larvitar', false, false, false],
 			]),
 		JSON.stringify(r.friendCollectTargets),
 	);
 	check(
-		'only the fully-covered target drops from the string',
-		r.friendCollectWishlist.startsWith('charizard,dratini&'),
+		'only the fully-covered targets drop from the string',
+		r.friendCollectWishlist.startsWith('charizard,larvitar&'),
 		r.friendCollectWishlist,
 	);
 	check(
@@ -762,12 +776,19 @@ console.log('\nScenario 8h: line-level pack coverage — an owned evolution reti
 	check('a mid-stage lucky Lorblatt does too', !starters(['lorblatt']).species.includes('endivie'));
 	check('an unrelated lucky leaves it alone', starters(['glurak']).species.includes('endivie'));
 	check('…while pruning its own line (glumanda)', !starters(['glurak']).species.includes('glumanda'));
-	// Curated targets stay species-exact — the widening is a PACK rule only, so
-	// an explicit pick survives an owned evolution (Scenario 1's dratini rule).
+	// Curated targets follow the SAME rule — this is the Hornliu regression: a
+	// pack flagged the entry as covered, then the curated chip it turned into
+	// insisted it was not. The per-target override keeps an explicit pick in
+	// the string when the user wants it there anyway.
 	const curated = buildFilters([], ['meganie'], { ...cfg, friendCollectSpecies: ['endivie'] }, [], 'en', t);
-	check('curated endivie survives a lucky Meganie',
-		curated.friendCollectWishlist.startsWith('chikorita&') && curated.friendCollectTargets[0].owned === false,
+	check('curated endivie is retired by a lucky Meganie',
+		curated.friendCollectWishlist === '' && curated.friendCollectTargets[0].owned === true,
 		curated.friendCollectWishlist);
+	const forced = buildFilters([], ['meganie'],
+		{ ...cfg, friendCollectSpecies: ['endivie'], friendCollectForced: ['endivie'] }, [], 'en', t);
+	check('…unless the target is forced back into the string',
+		forced.friendCollectWishlist.startsWith('chikorita&') && forced.friendCollectTargets[0].forced === true,
+		forced.friendCollectWishlist);
 	// Un-searchable slots gate the widening exactly as they gate `!+family`:
 	// while a season is unticked the line keeps being asked for — and, since
 	// the slot gate moved into friendCollectGoalOwned, so does the EXACT
@@ -824,8 +845,8 @@ console.log('\nScenario 8i: family have-badges on curated chips — informationa
 		[[152, dexSet(154)], [172, dexSet(25)], [266, dexSet(269)], [265, dexSet(267, 269)]].every(
 			([d, owned]) => lineSlotCovered(d, owned) === (lineSlotOwner(d, owned) !== null)));
 
-	// On the targets: a lucky/hundo elsewhere in the line rides along as a badge
-	// while the target itself stays fully active in the string.
+	// On the targets: the lucky/hundo elsewhere in the line that fills a
+	// target's slot is named on the chip, and the target counts as owned.
 	const lineCfg = { ...cfg, friendCollectSpecies: ['endivie', 'meganie', 'glumanda'], friendCollectMode: 'lucky' };
 	const r = buildFilters(['lorblatt'], ['lorblatt'], lineCfg, [], 'en', t);
 	check('curated chips carry the line owner, in the output locale',
@@ -836,9 +857,10 @@ console.log('\nScenario 8i: family have-badges on curated chips — informationa
 				['charmander', null, null],
 			]),
 		JSON.stringify(r.friendCollectTargets.map((x) => [x.display, x.lineLucky, x.lineHundo])));
-	check('…and none of them counts as owned', r.friendCollectTargets.every((x) => !x.owned && !x.ownedLucky));
-	check('the string is untouched — an explicit pick survives its family',
-		r.friendCollectWishlist.startsWith('chikorita,meganium,charmander&'), r.friendCollectWishlist);
+	check('…the line-mates count as owned, the exact flag stays honest',
+		r.friendCollectTargets.slice(0, 2).every((x) => x.owned && !x.ownedLucky) && !r.friendCollectTargets[2].owned);
+	check('only the unrelated pick stays in the string',
+		r.friendCollectWishlist.startsWith('charmander&'), r.friendCollectWishlist);
 	// The exact owner keeps the solid badge alone — no doubled-up family badge.
 	const exact = buildFilters([], ['endivie'], lineCfg, [], 'en', t);
 	check('an exactly-owned target badges exact, not family',
@@ -855,6 +877,132 @@ console.log('\nScenario 8i: family have-badges on curated chips — informationa
 	const slotGap = buildFilters([], ['kronjuwild'], { ...cfg, friendCollectSpecies: ['sesokitz'], luckySlots: { kronjuwild: ['spring'] } }, [], 'en', t);
 	check('…and withholds the badge once a slot is ticked but incomplete',
 		slotGap.friendCollectTargets[0].lineLucky === null);
+}
+
+console.log('\nScenario 8c: have-list line scopes — family / upward / exact');
+{
+	// The Hornliu case (13 → Kokuna 14 → Bibor 15). The have-list scope on the
+	// OWNED copy says what it stands for; every consumer reads the same map.
+	const S = (...d) => new Set(d);
+	const scopeOf = (m) => (d) => m[d] || 'family';
+	check('upwardReach is self + descendants', JSON.stringify(upwardReach(14)) === '[14,15]');
+	check('…and just the base on a coin flip (Wurmple 265)', JSON.stringify(upwardReach(265)) === '[265]');
+	check('…while a branch member climbs its own branch', JSON.stringify(upwardReach(266)) === '[266,267]');
+	check('lineHasStages: Weedle yes, Lapras no, Beedrill yes',
+		lineHasStages(13) && !lineHasStages(131) && lineHasStages(15));
+
+	// lineSlotCovered under the three scopes.
+	check('family Bibor fills Hornliu', lineSlotCovered(13, S(15), null, scopeOf({})));
+	check('exact Bibor does not', !lineSlotCovered(13, S(15), null, scopeOf({ 15: 'exact' })));
+	check('…but still fills Bibor', lineSlotCovered(15, S(15), null, scopeOf({ 15: 'exact' })));
+	check('upward Kokuna fills Bibor', lineSlotCovered(15, S(14), null, scopeOf({ 14: 'upward' })));
+	check('…and Kokuna', lineSlotCovered(14, S(14), null, scopeOf({ 14: 'upward' })));
+	check('…but not Hornliu', !lineSlotCovered(13, S(14), null, scopeOf({ 14: 'upward' })));
+	check('no scope lookup = every copy family-scoped (unchanged)', lineSlotCovered(13, S(15)));
+	check('an explicit scope is literal on a coin flip: exact Wurmple fills Wurmple',
+		lineSlotCovered(265, S(265), null, scopeOf({ 265: 'exact' })) && !lineSlotCovered(265, S(265), null, scopeOf({})));
+	check('…and does not count toward "every branch owned"',
+		!lineSlotCovered(265, S(267, 269), null, scopeOf({ 267: 'exact' })) &&
+			lineSlotCovered(265, S(267, 269), null, scopeOf({})));
+	check('upward from the coin-flip base settles no branch',
+		!lineSlotCovered(266, S(265), null, scopeOf({ 265: 'upward' })));
+	check('babies stay their own slot under every scope',
+		!lineSlotCovered(172, S(25), null, scopeOf({ 25: 'upward' })) && !lineSlotCovered(172, S(25), null, scopeOf({ 25: 'exact' })));
+	check('lineSlotOwner names the explicit copy, or nobody',
+		lineSlotOwner(15, S(14), scopeOf({ 14: 'upward' })) === 14 &&
+			lineSlotOwner(13, S(15), scopeOf({ 15: 'exact' })) === null &&
+			lineSlotOwner(13, S(15), scopeOf({})) === 15);
+
+	// Through buildFilters: curated chips, the curated string, the fallback
+	// lucky wishlist and the packs all move together.
+	const line = { ...cfg, friendCollectSpecies: ['hornliu', 'kokuna', 'bibor'], friendCollectMode: 'lucky' };
+	const flags = (r) => r.friendCollectTargets.map((x) => `${x.display}${x.owned ? '✓' : ''}`).join(' ');
+	const fam = buildFilters([], ['bibor'], line, [], 'en', t);
+	check('family (default): lucky Bibor retires the whole line',
+		flags(fam) === 'weedle✓ kakuna✓ beedrill✓' && fam.friendCollectWishlist === '', flags(fam));
+	check('…fallback wishlist excludes +beedrill', fam.friendLuckyWishlist.startsWith('!+beedrill&'), fam.friendLuckyWishlist);
+	const exact = buildFilters([], ['bibor'], { ...line, luckyScope: { bibor: 'exact' } }, [], 'en', t);
+	check('exact: only Bibor is retired', flags(exact) === 'weedle kakuna beedrill✓', flags(exact));
+	check('…the curated string keeps the other two', exact.friendCollectWishlist.startsWith('weedle,kakuna&'), exact.friendCollectWishlist);
+	check('…fallback wishlist excludes the bare species, no +', exact.friendLuckyWishlist.startsWith('!beedrill&'), exact.friendLuckyWishlist);
+	check('…no family badge for Weedle (the Bibor does not fill it)',
+		exact.friendCollectTargets[0].lineLucky === null);
+	const up = buildFilters([], ['kokuna'], { ...line, luckyScope: { kokuna: 'upward' } }, [], 'en', t);
+	check('upward: Kokuna retires Kokuna and Bibor, not Hornliu', flags(up) === 'weedle kakuna✓ beedrill✓', flags(up));
+	check('…Bibor badges the Kokuna as its owner', up.friendCollectTargets[2].lineLucky === 'kakuna');
+	check('…fallback wishlist excludes both members bare', up.friendLuckyWishlist.startsWith('!kakuna&!beedrill&'), up.friendLuckyWishlist);
+	check('…explanations name the scope rule',
+		up.friendLuckyClauses.filter((c) => c.why === 'app.clause_why.friend_have_lucky_scope').length === 2);
+	// Packs: the live Hornliu case. Whatever the event feed holds today, the
+	// evergreen packs never offer a line-covered base and do offer it again
+	// under an exact scope on its final stage.
+	const packHas = (r, name) => r.friendCollectSuggestions.some((s) => s.species.includes(name) && !(s.owned || [])[s.species.indexOf(name)]);
+	const noCur = { ...cfg, friendCollectSpecies: [] };
+	const packFam = buildFilters([], ['meganie'], noCur, [], 'en', t);
+	const packExact = buildFilters([], ['meganie'], { ...noCur, luckyScope: { meganie: 'exact' } }, [], 'en', t);
+	check('packs: family Meganie retires endivie, exact Meganie offers it again',
+		!packHas(packFam, 'endivie') && packHas(packExact, 'endivie'));
+	// Regional forms ride along by key on an explicit scope: a Kanto Vulpix,
+	// 'upward', hides only Kanto Vulpix and Kanto Ninetales.
+	const vulpix = buildFilters([], ['vulpix'], { ...noCur, luckyScope: { vulpix: 'upward' }, luckyForms: { vulpix: ['base'] } }, [], 'en', t);
+	check('form-scoped upward exclusion per member',
+		vulpix.friendLuckyWishlist.startsWith('!vulpix,!fire&!ninetales,!fire&'), vulpix.friendLuckyWishlist);
+	// The hundo map is the same machinery.
+	const hundoExact = buildFilters(['bibor'], [], { ...line, friendCollectMode: 'hundo', hundoScope: { bibor: 'exact' } }, [], 'en', t);
+	check('hundoScope drives the hundo focus the same way', flags(hundoExact) === 'weedle kakuna beedrill✓', flags(hundoExact));
+	// Merge: only the two explicit values, only for species with a line, keys canonicalized.
+	const merged = mergeImportedConfig({ luckyScope: { Beedrill: 'exact', lapras: 'exact', kokuna: 'family', hornliu: 'bogus' }, hundoScope: 'junk' });
+	check('merge keeps explicit scopes on line species only, canonicalized',
+		JSON.stringify(merged.luckyScope) === '{"bibor":"exact"}' && JSON.stringify(merged.hundoScope) === '{}',
+		JSON.stringify([merged.luckyScope, merged.hundoScope]));
+	check('DEFAULT_CONFIG carries empty scope maps',
+		JSON.stringify(DEFAULT_CONFIG.luckyScope) === '{}' && JSON.stringify(DEFAULT_CONFIG.hundoScope) === '{}');
+
+	// The partition is built once per have-list and the owner-naming core reads
+	// it; the boolean wrappers are the same answer on a plain Set.
+	const part = ownedLinePartition(S(15, 14, 131), scopeOf({ 14: 'upward' }));
+	check('partition splits family / explicit and roots only the family copies',
+		JSON.stringify([...part.familyOwned]) === '[15,131]' && JSON.stringify(part.explicit) === '[[14,"upward"]]' &&
+			part.roots.has(13) && part.roots.has(131) && part.roots.size === 2);
+	check('lineSlotOwnerIn agrees with the wrappers',
+		[[13, 15], [14, 14], [15, 14], [131, 131], [172, null]].every(
+			([d, owner]) => lineSlotOwnerIn(d, part) === owner &&
+				(lineSlotOwner(d, S(15, 14, 131), scopeOf({ 14: 'upward' })) === owner) &&
+				(lineSlotCovered(d, S(15, 14, 131), null, scopeOf({ 14: 'upward' })) === (owner !== null))));
+
+	// Coverage reads the OWNER's annotations, not the target's: a Kanto-only
+	// lucky Vulpix fills a Vulnona ask that still wants Kanto, and never one
+	// narrowed to Alola. (Copilot's finding on the first cut of this PR.)
+	const ninetales = { ...cfg, friendCollectSpecies: ['vulnona'], friendCollectMode: 'lucky' };
+	const kantoVulpix = { luckyForms: { vulpix: ['base'] } };
+	const anyForm = buildFilters([], ['vulpix'], { ...ninetales, ...kantoVulpix }, [], 'en', t);
+	check('Kanto-only lucky Vulpix covers an unrestricted Vulnona ask',
+		anyForm.friendCollectTargets[0].owned === true && anyForm.friendCollectTargets[0].lineLucky === 'vulpix');
+	const alolaOnly = buildFilters([], ['vulpix'],
+		{ ...ninetales, ...kantoVulpix, friendCollectDropForms: { vulnona: ['base'] } }, [], 'en', t);
+	check('…but not a Vulnona ask narrowed to Alola',
+		alolaOnly.friendCollectTargets[0].owned === false && alolaOnly.friendCollectWishlist.startsWith('ninetales&'),
+		alolaOnly.friendCollectWishlist);
+	const kantoOnly = buildFilters([], ['vulpix'],
+		{ ...ninetales, ...kantoVulpix, friendCollectDropForms: { vulnona: ['alola'] } }, [], 'en', t);
+	check('…and does cover one narrowed to Kanto', kantoOnly.friendCollectTargets[0].owned === true);
+	const unannotated = buildFilters([], ['vulpix'],
+		{ ...ninetales, friendCollectDropForms: { vulnona: ['base'] } }, [], 'en', t);
+	check('an unannotated owner still covers every form (opt-in rule unchanged)',
+		unannotated.friendCollectTargets[0].owned === true);
+	// The packs read the same gate: a Kanto-only lucky Vulnona retires the
+	// Vulpix ask (no form restriction on a pack entry) — line-level as before.
+	check('lineOwnerCovers is the shared gate', lineOwnerCovers(37, { forms: { vulpix: ['base'] } }, { forms: ['alola'] }) === false &&
+		lineOwnerCovers(37, { forms: { vulpix: ['base'] } }, { forms: ['base', 'alola'] }) === true &&
+		lineOwnerCovers(null, {}, {}) === false);
+	// The notice reads the have-lists through the same helpers as the filter.
+	const haveLine = buildOwnedLine(['vulpix', 'bibor'], {}, { bibor: 'exact' });
+	check('buildOwnedLine + lineCoverageOwner mirror the filter',
+		lineCoverageOwner(38, haveLine) === 37 && lineCoverageOwner(13, haveLine) === null && lineCoverageOwner(15, haveLine) === 15);
+	check('friendCollectWantsFor derives gender / forms / slots from the config',
+		JSON.stringify(friendCollectWantsFor({ friendCollectGenders: { wadribie: 'female' }, friendCollectDropForms: { vulnona: ['base'] } }, 'vulnona')) ===
+			JSON.stringify({ gender: null, forms: ['alola'], slots: null }) &&
+			friendCollectWantsFor({ friendCollectGenders: { wadribie: 'female' } }, 'wadribie').gender === 'female');
 }
 
 console.log('\nScenario 9: config merge');
