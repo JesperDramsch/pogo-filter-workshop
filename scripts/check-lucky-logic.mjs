@@ -206,9 +206,15 @@ console.log("\nScenario 14: baby stages survive the family exclusion");
   // the one thing the user still needs. `,eggsonly` punches it back through.
   check("owned adult widens with eggsonly", plan([], ["magmar"]) === "!+magmar,eggsonly", plan([], ["magmar"]));
   check("owning the baby too drops the widening",
-    plan([], ["magmar", "magby"]) === "!+magby&!+magmar", plan([], ["magmar", "magby"]));
-  check("owning ONLY the baby needs no widening (evolving up is free)",
-    plan([], ["magby"]) === "!+magby", plan([], ["magby"]));
+    plan([], ["magmar", "magby"]) === "!magby&!+magmar", plan([], ["magmar", "magby"]));
+  // A baby defaults to the 'exact' have-list scope (haveScopeDefault): the
+  // lucky Magby is kept AS a Magby, so it excludes itself alone and Magmar
+  // stays on the ask. Setting the baby to 'family' by hand restores `!+magby`.
+  check("owning ONLY the baby excludes the baby alone",
+    plan([], ["magby"]) === "!magby", plan([], ["magby"]));
+  check("…unless the baby is scoped to its family by hand",
+    buildFilters([], ["magby"], { ...DEFAULT_CONFIG, luckyScope: { magby: "family" } }, [], "en", t)
+      .friendLuckyWishlist.split("&")[0] === "!+magby");
   check("a line with no baby is byte-identical to before",
     plan([], ["bulbasaur"]) === "!+bulbasaur", plan([], ["bulbasaur"]));
   check("the hundo wishlist gets the same treatment",

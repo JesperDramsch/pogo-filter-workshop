@@ -374,14 +374,15 @@ function selfAndDescendants(dex) {
 // whole line". The have-list scopes (cfg.luckyScope / cfg.hundoScope, see
 // DEFAULT_CONFIG) are per owned species:
 //
-//   'family'  (default, absent key) the line is done — the lucky Bibor came
-//             out of a lucky Hornliu, so nothing in the line is still wanted.
-//             Decided by the LINE rules in lineSlotCovered below.
+//   'family'  (the default, absent key) the line is done — the lucky Bibor
+//             came out of a lucky Hornliu, so nothing in the line is still
+//             wanted. Decided by the LINE rules in lineSlotOwnerIn below.
 //   'upward'  this copy and what it can still become — the physically true
 //             coverage, since luckiness and IVs survive evolution and nothing
 //             de-evolves. A lucky Kokuna fills Kokuna and Bibor, not Hornliu.
 //   'exact'   this copy only — a lucky Bibor from a trade says nothing about
-//             the Hornliu still wanted for the line.
+//             the Hornliu still wanted for the line. The default for BABIES
+//             (haveScopeDefault): a lucky Pichu is kept as a Pichu.
 //
 // 'upward' from a coin-flip base (SPLIT_FAMILIES) reaches only the base
 // itself: one Waumpel becomes exactly one branch, and which one is unknown
@@ -392,11 +393,24 @@ export function upwardReach(dex) {
 	return selfAndDescendants(dex);
 }
 
-// Normalize one stored scope value; anything but the two explicit scopes is
-// the default. Shared by the merge path and every reader.
-export function haveScopeOf(scopeMap, species) {
+// The scope a have-list copy has when nothing is stored for it. Babies default
+// to 'exact': a lucky Pichu is kept AS a Pichu — evolving it would spend the
+// one copy that fills the baby slot, which only eggs refill — so it says
+// nothing about the Pikachu and Raichu still wanted. Everything else defaults
+// to 'family' (you evolved it, the line is done). Exported for the checks.
+export function haveScopeDefault(dex) {
+	return BABY_DEX.has(dex) ? 'exact' : 'family';
+}
+
+const HAVE_SCOPES = ['family', 'upward', 'exact'];
+
+// Resolve one have-list copy's scope: the stored value when it is one of the
+// three, else the species' default. Only a value that differs from the default
+// is ever stored (see mergeImportedConfig), so absence always means default.
+// Shared by the merge path and every reader.
+export function haveScopeOf(scopeMap, species, dex) {
 	const v = scopeMap?.[species];
-	return v === 'upward' || v === 'exact' ? v : 'family';
+	return HAVE_SCOPES.includes(v) ? v : haveScopeDefault(dex);
 }
 
 // Does this species have anything to scope — a parent or a child in the
@@ -440,7 +454,7 @@ function ownedScopeByDexOf(names, scopeMap) {
 	for (const n of names || []) {
 		const dex = resolveSpeciesInfo(n)?.dex;
 		if (!dex) continue;
-		const scope = haveScopeOf(scopeMap, canonSpeciesKey(n));
+		const scope = haveScopeOf(scopeMap, canonSpeciesKey(n), dex);
 		const prev = out.get(dex);
 		if (!prev || SCOPE_WIDTH[scope] > SCOPE_WIDTH[prev]) out.set(dex, scope);
 	}
@@ -847,16 +861,19 @@ export const DEFAULT_CONFIG = {
 	// excluding the whole family the moment one copy lands.
 	hundoSlots: {},
 	luckySlots: {},
-	// Line-scope annotations for the have-lists ({ species: 'upward' | 'exact' }),
-	// the fourth axis beside forms/genders/slots. What one owned copy stands
-	// for when a wishlist, a pack or a curated chip asks "is this line done?":
-	//   absent   'family' — the line is done (the lucky Bibor was a lucky
-	//            Hornliu once). Today's behaviour everywhere.
+	// Line-scope annotations for the have-lists
+	// ({ species: 'family' | 'upward' | 'exact' }), the fourth axis beside
+	// forms/genders/slots. What one owned copy stands for when a wishlist, a
+	// pack or a curated chip asks "is this line done?":
+	//   'family' the line is done (the lucky Bibor was a lucky Hornliu once).
+	//            The default for every non-baby line.
 	//   'upward' this copy and what it can still evolve into (a lucky Kokuna
 	//            covers Kokuna and Bibor, not Hornliu).
 	//   'exact'  this copy only (a traded lucky Bibor leaves Hornliu wanted).
-	// Only the two explicit values are stored; the default is absence, so an
-	// untouched config changes nothing. Same stale-key rule as the other maps.
+	//            The default for babies: a lucky Pichu is kept as a Pichu.
+	// Only a value that differs from the species' default (haveScopeDefault) is
+	// stored; absence is the default, so an untouched config changes nothing.
+	// Same stale-key rule as the other maps.
 	// Consumed by lineSlotCovered (packs + curated chips) and the fallback
 	// wishlists' owned-line exclusions (exclusionPlanFor).
 	hundoScope: {},
@@ -1584,12 +1601,15 @@ export function mergeImportedConfig(raw, notices = []) {
 	merged.luckyGenders = canonMapKeys(merged.luckyGenders, validGenderKeys);
 	merged.hundoSlots = canonMapKeys(merged.hundoSlots, validSlotKeys);
 	merged.luckySlots = canonMapKeys(merged.luckySlots, validSlotKeys);
-	// Line-scope values: only the two explicit scopes are worth storing — the
-	// default is absence — and only for species that have a line to scope.
+	// Line-scope values: only a scope that differs from the species' default is
+	// worth storing — absence IS the default, 'family' for most lines and
+	// 'exact' for babies (haveScopeDefault) — and only for species that have a
+	// line to scope.
 	const validScope = (species, rawVal) => {
-		if (rawVal !== 'upward' && rawVal !== 'exact') return undefined;
+		if (!['family', 'upward', 'exact'].includes(rawVal)) return undefined;
 		const dex = resolveSpeciesInfo(species)?.dex;
-		return dex && lineHasStages(dex) ? rawVal : undefined;
+		if (!dex || !lineHasStages(dex)) return undefined;
+		return rawVal === haveScopeDefault(dex) ? undefined : rawVal;
 	};
 	merged.hundoScope = canonMapKeys(merged.hundoScope, validScope);
 	merged.luckyScope = canonMapKeys(merged.luckyScope, validScope);
@@ -6974,7 +6994,6 @@ function HaveRefinementBadges({
 // default is stored as absence and reads quiet — grey, like an unset axis —
 // so an untouched chip looks exactly as it did; the two explicit scopes light
 // up in the list's accent.
-const HAVE_SCOPES = ['family', 'upward', 'exact'];
 function HaveScopeBadge({ species, scopeAnn, onScopeAnnChange, accent = '#5EAFC5', t }) {
 	if (!onScopeAnnChange) return null;
 	const dex = resolveSpeciesInfo(species)?.dex;
@@ -6983,13 +7002,18 @@ function HaveScopeBadge({ species, scopeAnn, onScopeAnnChange, accent = '#5EAFC5
 	// hundo entry keeps its typed spelling — so resolve before reading or
 	// writing, or an imported "Beedrill" would never find its own scope.
 	const key = canonSpeciesKey(species);
-	const scope = haveScopeOf(scopeAnn, key);
-	const next = HAVE_SCOPES[(HAVE_SCOPES.indexOf(scope) + 1) % HAVE_SCOPES.length];
+	const dflt = haveScopeDefault(dex);
+	const scope = haveScopeOf(scopeAnn, key, dex);
+	// Cycle from the species' default: family → upward → exact for most lines,
+	// exact → upward → family for a baby. Landing back on the default clears
+	// the key, so absence keeps meaning default.
+	const order = [...HAVE_SCOPES.slice(HAVE_SCOPES.indexOf(dflt)), ...HAVE_SCOPES.slice(0, HAVE_SCOPES.indexOf(dflt))];
+	const next = order[(order.indexOf(scope) + 1) % order.length];
 	const cycle = () => {
-		if (next === 'family') onScopeAnnChange(omitKey(omitKey(scopeAnn, species), key));
+		if (next === dflt) onScopeAnnChange(omitKey(omitKey(scopeAnn, species), key));
 		else onScopeAnnChange({ ...omitKey(scopeAnn, species), [key]: next });
 	};
-	const explicit = scope !== 'family';
+	const explicit = scope !== dflt;
 	return (
 		<button
 			onClick={cycle}
