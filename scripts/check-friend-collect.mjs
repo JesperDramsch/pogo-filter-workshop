@@ -12,6 +12,9 @@ import {
 	buildOwnedLine,
 	friendCollectWantsFor,
 	lineCoverageOwner,
+	haveScopeCycle,
+	haveScopeDefault,
+	haveScopeOf,
 	lineHasStages,
 	lineOwnerCovers,
 	lineSlotCovered,
@@ -957,6 +960,32 @@ console.log('\nScenario 8c: have-list line scopes — family / upward / exact');
 		JSON.stringify([merged.luckyScope, merged.hundoScope]));
 	check('DEFAULT_CONFIG carries empty scope maps',
 		JSON.stringify(DEFAULT_CONFIG.luckyScope) === '{}' && JSON.stringify(DEFAULT_CONFIG.hundoScope) === '{}');
+
+	// Babies default to 'exact': a lucky Pichu is kept as a Pichu, so it fills
+	// the Pichu slot alone and Pikachu / Raichu stay wanted — on the curated
+	// list, in the fallback wishlist and in the packs. Scoping the baby to its
+	// family by hand is the way to say "I will evolve it".
+	check('haveScopeDefault: babies exact, everything else family',
+		haveScopeDefault(172) === 'exact' && haveScopeDefault(25) === 'family' && haveScopeDefault(13) === 'family');
+	check('the badge cycles through upward from either default',
+		JSON.stringify(haveScopeCycle('family')) === '["family","upward","exact"]' &&
+			JSON.stringify(haveScopeCycle('exact')) === '["exact","upward","family"]');
+	check('haveScopeOf falls back to the species default',
+		haveScopeOf({}, 'pichu', 172) === 'exact' && haveScopeOf({ pichu: 'family' }, 'pichu', 172) === 'family' &&
+			haveScopeOf({}, 'bibor', 15) === 'family' && haveScopeOf({ bibor: 'bogus' }, 'bibor', 15) === 'family');
+	const babyLine = { ...cfg, friendCollectSpecies: ['pichu', 'pikachu', 'raichu'], friendCollectMode: 'lucky' };
+	const luckyPichu = buildFilters([], ['pichu'], babyLine, [], 'en', t);
+	check('lucky Pichu retires only Pichu', flags(luckyPichu) === 'pichu✓ pikachu raichu', flags(luckyPichu));
+	check('…fallback wishlist excludes the baby alone', luckyPichu.friendLuckyWishlist.startsWith('!pichu&'), luckyPichu.friendLuckyWishlist);
+	const evolvedPichu = buildFilters([], ['pichu'], { ...babyLine, luckyScope: { pichu: 'family' } }, [], 'en', t);
+	check('a baby scoped to its family covers the line', flags(evolvedPichu) === 'pichu✓ pikachu✓ raichu✓', flags(evolvedPichu));
+	check('…and the fallback wishlist widens to +pichu', evolvedPichu.friendLuckyWishlist.startsWith('!+pichu&'));
+	const upPichu = buildFilters([], ['pichu'], { ...babyLine, luckyScope: { pichu: 'upward' } }, [], 'en', t);
+	check('upward from a baby reaches its evolutions too', flags(upPichu) === 'pichu✓ pikachu✓ raichu✓' && upPichu.friendLuckyWishlist.startsWith('!pichu&!pikachu&!raichu&'), upPichu.friendLuckyWishlist);
+	check('the baby target itself still needs an exact copy', flags(buildFilters([], ['pikachu'], babyLine, [], 'en', t)) === 'pichu pikachu✓ raichu✓');
+	const babyMerge = mergeImportedConfig({ luckyScope: { pichu: 'exact', magby: 'family', bibor: 'family', kokuna: 'upward' } });
+	check('merge stores only scopes that differ from the species default',
+		JSON.stringify(babyMerge.luckyScope) === '{"magby":"family","kokuna":"upward"}', JSON.stringify(babyMerge.luckyScope));
 
 	// The partition is built once per have-list and the owner-naming core reads
 	// it; the boolean wrappers are the same answer on a plain Set.
