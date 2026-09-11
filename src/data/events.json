@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-09T12:57:24.358Z",
+  "fetchedAt": "2026-09-11T12:48:43.481Z",
   "events": [
     {
       "id": "event-mega-ascension-2026-08-31t10-00-00",
@@ -191,10 +191,12 @@
         16,
         228,
         318,
+        509,
         587,
         661,
         714,
         821,
+        827,
         973
       ],
       "spawns": [
@@ -203,8 +205,10 @@
         "Flamigo",
         "Fletchling",
         "Houndour",
+        "Nickit",
         "Noibat",
         "Pidgey",
+        "Purrloin",
         "Rookidee",
         "Weedle"
       ],
