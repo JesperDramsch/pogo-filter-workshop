@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-09T13:01:55.672Z",
+  "fetchedAt": "2026-09-11T12:53:45.892Z",
   "topN": 30,
   "source": "pvpoke",
   "leagues": {
@@ -1403,16 +1403,6 @@
           ]
         },
         {
-          "dex": 89,
-          "name": "Muk",
-          "speciesId": "muk_alolan",
-          "score": 90.1,
-          "forms": [
-            "muk_alolan",
-            "muk_alolan_shadow"
-          ]
-        },
-        {
           "dex": 36,
           "name": "Clefable",
           "speciesId": "clefable",
@@ -1428,6 +1418,16 @@
           "score": 90,
           "forms": [
             "dondozo"
+          ]
+        },
+        {
+          "dex": 89,
+          "name": "Muk",
+          "speciesId": "muk_alolan",
+          "score": 90,
+          "forms": [
+            "muk_alolan",
+            "muk_alolan_shadow"
           ]
         },
         {
@@ -1634,7 +1634,7 @@
           "dex": 655,
           "name": "Delphox",
           "speciesId": "delphox_mega",
-          "score": 84.4,
+          "score": 84.5,
           "forms": [
             "delphox_mega",
             "delphox_shadow",
@@ -1801,7 +1801,7 @@
           "dex": 94,
           "name": "Gengar",
           "speciesId": "gengar_mega",
-          "score": 75.5,
+          "score": 75.6,
           "forms": [
             "gengar_mega"
           ]

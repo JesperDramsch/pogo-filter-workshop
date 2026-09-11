@@ -1,6 +1,6 @@
 # Pokémon GO PvP Meta Reference — GENERATED, DO NOT HAND-EDIT
 
-- **Snapshot taken:** 2026-09-09T13:01:55.672Z
+- **Snapshot taken:** 2026-09-11T12:53:45.892Z
 - **Source:** pvpoke — https://github.com/pvpoke/pvpoke (MIT)
 - **Snapshot URL:** https://raw.githubusercontent.com/JesperDramsch/pogo-filter-workshop/main/src/data/pvp-rankings.json
 - **Depth:** top 30 per league, deduped by base dex
@@ -254,9 +254,9 @@ CP cap: 2500 CP
 | 19 | lapras | lapras | 131 | — | 90.4 |
 | 20 | registeel | registeel | 379 | — | 90.3 |
 | 21 | zwirrfinst | dusknoir | 477 | — | 90.2 |
-| 22 | sleimok | muk | 89 | `muk_alolan` | 90.1 |
-| 23 | pixi | clefable | 36 | — | 90 |
-| 24 | heerashai | dondozo | 977 | — | 90 |
+| 22 | pixi | clefable | 36 | — | 90 |
+| 23 | heerashai | dondozo | 977 | — | 90 |
+| 24 | sleimok | muk | 89 | `muk_alolan` | 90 |
 | 25 | forstellka | forretress | 205 | — | 89.8 |
 | 26 | regidrago | regidrago | 895 | — | 89.8 |
 | 27 | turtok | blastoise | 9 | — | 89.4 |
@@ -265,7 +265,7 @@ CP cap: 2500 CP
 | 30 | oghnatoll | runerigus | 867 | — | 89 |
 
 ```
-959,823,671,395,809,778,143,146,640,718,160,593,487,799,911,845,38,812,131,379,477,89,36,977,205,895,9,488,663,867
+959,823,671,395,809,778,143,146,640,718,160,593,487,799,911,845,38,812,131,379,477,36,977,89,205,895,9,488,663,867
 ```
 
 ### Mega Master League `mega-10000`
@@ -288,7 +288,7 @@ CP cap: none (uncapped)
 | 10 | brigaron | chesnaught | 652 | `chesnaught_mega` | 87 |
 | 11 | latios | latios | 381 | `latios_mega` | 86.5 |
 | 12 | latias | latias | 380 | `latias_mega` | 86 |
-| 13 | fennexis | delphox | 655 | `delphox_mega` | 84.4 |
+| 13 | fennexis | delphox | 655 | `delphox_mega` | 84.5 |
 | 14 | skaraborn | heracross | 214 | `heracross_mega` | 84 |
 | 15 | brutalanda | salamence | 373 | `salamence_mega` | 83.7 |
 | 16 | dialga | dialga | 483 | `dialga_origin` | 83.2 |
@@ -304,7 +304,7 @@ CP cap: none (uncapped)
 | 26 | melmetal | melmetal | 809 | — | 76.2 |
 | 27 | ursaluna | ursaluna | 901 | `ursaluna_shadow` | 76.2 |
 | 28 | lugia | lugia | 249 | — | 76 |
-| 29 | gengar | gengar | 94 | `gengar_mega` | 75.5 |
+| 29 | gengar | gengar | 94 | `gengar_mega` | 75.6 |
 | 30 | kyurem | kyurem | 646 | `kyurem_white` | 75.2 |
 
 ```
