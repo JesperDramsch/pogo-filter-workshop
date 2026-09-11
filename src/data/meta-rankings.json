@@ -1,11 +1,11 @@
 {
-  "fetchedAt": "2026-09-09T13:08:29.669Z",
+  "fetchedAt": "2026-09-11T13:00:17.989Z",
   "gameMasterTimestamp": "1788917819036",
   "sources": {
     "mechanics": "alexelgt/game_masters",
     "mechanicsBatch": "2026-09-09T01:36:59.036Z",
     "roster": "pvpoke/pvpoke",
-    "rosterBatch": "2026-09-09 01:44:57"
+    "rosterBatch": "2026-09-10 22:49:06"
   },
   "model": {
     "attackerLevel": 40,
