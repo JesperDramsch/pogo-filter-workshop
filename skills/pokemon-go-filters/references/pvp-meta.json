@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-11T12:53:49.557Z",
+  "generatedAt": "2026-09-11T13:28:54.736Z",
   "fetchedAt": "2026-09-11T12:53:45.892Z",
   "topN": 30,
   "source": "pvpoke",
@@ -8,38 +8,11 @@
     "upstream": "https://github.com/pvpoke/pvpoke (MIT)"
   },
   "gameMasterWatch": {
-    "checkedAt": "2026-09-09T13:39:32.814Z",
-    "lastChangeAt": "2026-09-09T13:39:32.814Z",
-    "lastChangeSummary": "28 move(s) changed",
+    "checkedAt": "2026-09-11T13:28:49.674Z",
+    "lastChangeAt": "2026-09-11T13:28:49.674Z",
+    "lastChangeSummary": "1 move(s) changed",
     "movesChanged": [
-      "AIR_CUTTER",
-      "BITE",
-      "BLAZE_KICK",
-      "BODY_SLAM",
-      "BRINE",
-      "BUBBLE_BEAM",
-      "BULLDOZE",
-      "CHARGE_BEAM",
-      "DARK_PULSE",
-      "DOUBLE_IRON_BASH",
-      "DRAINING_KISS",
-      "FELL_STINGER_PLUS",
-      "HIGH_HORSEPOWER",
-      "INFESTATION",
-      "IRON_HEAD",
-      "LOW_KICK",
-      "LUNGE",
-      "MAGNET_BOMB",
-      "MIRROR_COAT",
-      "MOONBLAST",
-      "POISON_FANG",
-      "PSYCHO_BOOST",
-      "RAGE_FIST",
-      "SAND_TOMB",
-      "SCRATCH",
-      "SHADOW_BALL",
-      "SHADOW_FORCE",
-      "TAKE_DOWN"
+      "DARK_PULSE_PLUS"
     ]
   },
   "leagues": {

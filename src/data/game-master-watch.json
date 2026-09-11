@@ -1,11 +1,24 @@
 {
-  "fetchedAt": "2026-09-09T13:39:32.814Z",
+  "fetchedAt": "2026-09-11T13:28:49.674Z",
   "sources": {
     "pvp": "pvpoke-gamemaster",
     "pve": "alexelgt/game_masters",
     "pveBatch": "2026-09-09T01:36:59.036Z"
   },
   "history": [
+    {
+      "at": "2026-09-11T13:28:49.674Z",
+      "stream": "pvp",
+      "summary": "1 move(s) changed",
+      "changes": [
+        {
+          "move": "DARK_PULSE_PLUS",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        }
+      ]
+    },
     {
       "at": "2026-09-09T13:39:32.814Z",
       "stream": "pve",
@@ -846,6 +859,13 @@
     "DARK_PULSE": {
       "power": 80,
       "energy": 45,
+      "energyGain": 0,
+      "cooldown": 500,
+      "turns": 1
+    },
+    "DARK_PULSE_PLUS": {
+      "power": 60,
+      "energy": 40,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1
