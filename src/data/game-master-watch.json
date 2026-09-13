@@ -1,11 +1,24 @@
 {
-  "fetchedAt": "2026-09-11T13:28:49.674Z",
+  "fetchedAt": "2026-09-13T13:46:32.837Z",
   "sources": {
     "pvp": "pvpoke-gamemaster",
     "pve": "alexelgt/game_masters",
-    "pveBatch": "2026-09-09T01:36:59.036Z"
+    "pveBatch": "2026-09-12T07:30:29.277Z"
   },
   "history": [
+    {
+      "at": "2026-09-13T13:46:32.837Z",
+      "stream": "pve",
+      "summary": "1 move(s) changed",
+      "changes": [
+        {
+          "move": "VM_MOVE_TEMP_EVOLUTION_MEGA_V0229_POKEMON_HOUNDOOM",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        }
+      ]
+    },
     {
       "at": "2026-09-11T13:28:49.674Z",
       "stream": "pvp",
@@ -5375,6 +5388,12 @@
       "durationMs": 2500,
       "energyDelta": -100,
       "pokemonType": "POKEMON_TYPE_FLYING"
+    },
+    "VM_MOVE_TEMP_EVOLUTION_MEGA_V0229_POKEMON_HOUNDOOM": {
+      "power": 150,
+      "durationMs": 3000,
+      "energyDelta": -100,
+      "pokemonType": "POKEMON_TYPE_DARK"
     },
     "VM_MOVE_TEMP_EVOLUTION_MEGA_V0652_POKEMON_CHESNAUGHT": {
       "power": 150,
