@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-10T12:21:55.151Z",
+  "fetchedAt": "2026-09-13T12:50:12.982Z",
   "raids": {
     "mega": [
       {
@@ -32,6 +32,37 @@
           "flying",
           "psychic",
           "rock"
+        ]
+      },
+      {
+        "id": "HOUNDOOM",
+        "names": {
+          "en": "Mega Houndoom",
+          "de": "Mega-Hundemon",
+          "fr": "Méga-Démolosse",
+          "it": "MegaHoundoom",
+          "ja": "メガヘルガー",
+          "ko": "메가헬가",
+          "es": "Mega-Houndoom"
+        },
+        "types": [
+          "dark",
+          "fire"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "rock",
+          "fire",
+          "water",
+          "dragon",
+          "dark",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "ground",
+          "rock",
+          "water"
         ]
       }
     ],
@@ -481,42 +512,6 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "mega-houndoom-in-mega-raids-september-2026",
-      "name": "Mega Houndoom in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-09-11T06:00:00.000",
-      "end": "2026-09-15T22:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "HOUNDOOM",
-          "names": {
-            "en": "Houndoom"
-          },
-          "types": [
-            "dark",
-            "fire"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "rock",
-            "fire",
-            "water",
-            "dragon",
-            "dark",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "ground",
-            "rock",
-            "water"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "mega-venusaur-in-mega-raids-september-2026",
       "name": "Mega Venusaur in Mega Raids",
       "eventType": "raid-battles",
@@ -547,6 +542,38 @@
             "flying",
             "fire",
             "psychic",
+            "ice"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "staraptor-super-mega-raid-day-2026",
+      "name": "Staraptor Super Mega Raid Day",
+      "eventType": "raid-day",
+      "start": "2026-09-19T14:00:00.000",
+      "end": "2026-09-19T17:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "STARAPTOR",
+          "names": {
+            "en": "Staraptor"
+          },
+          "types": [
+            "normal",
+            "flying"
+          ],
+          "resistorTypes": [
+            "rock",
+            "ghost",
+            "steel",
+            "electric"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "electric",
             "ice"
           ]
         }
