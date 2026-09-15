@@ -1,6 +1,6 @@
 # Pokémon GO PvP Meta Reference — GENERATED, DO NOT HAND-EDIT
 
-- **Snapshot taken:** 2026-09-11T12:53:45.892Z
+- **Snapshot taken:** 2026-09-15T13:42:16.078Z
 - **Source:** pvpoke — https://github.com/pvpoke/pvpoke (MIT)
 - **Snapshot URL:** https://raw.githubusercontent.com/JesperDramsch/pogo-filter-workshop/main/src/data/pvp-rankings.json
 - **Depth:** top 30 per league, deduped by base dex
@@ -27,51 +27,51 @@ CP cap: 1500 CP
 
 | # | German | English | Dex | Ranked form | Score |
 |---:|---|---|---:|---|---:|
-| 1 | granforgita | tinkaton | 959 | — | 93 |
-| 2 | vulnona | ninetales | 38 | `ninetales_shadow` | 92.1 |
-| 3 | corasonn | corsola | 222 | `corsola_galarian` | 91.4 |
-| 4 | krarmor | corviknight | 823 | — | 91.4 |
-| 5 | urgl | cramorant | 845 | — | 91.3 |
-| 6 | morlord | quagsire | 195 | `quagsire_shadow` | 91.3 |
-| 7 | altaria | altaria | 334 | — | 91.1 |
-| 8 | melmetal | melmetal | 809 | — | 91.1 |
-| 9 | impoleon | empoleon | 395 | — | 90.9 |
-| 10 | mantax | mantine | 226 | — | 90.9 |
-| 11 | relaxo | snorlax | 143 | — | 90.9 |
-| 12 | florges | florges | 671 | — | 90.8 |
-| 13 | gaunux | thievul | 828 | — | 90.8 |
-| 14 | mimigma | mimikyu | 778 | — | 90.7 |
-| 15 | impergator | feraligatr | 160 | — | 90.6 |
-| 16 | apoquallyp | jellicent | 593 | — | 90.6 |
-| 17 | aranestro | araquanid | 752 | — | 90.5 |
-| 18 | wiesenior | furret | 162 | — | 90.4 |
-| 19 | azumarill | azumarill | 184 | — | 90.3 |
-| 20 | suelord | clodsire | 980 | — | 90.3 |
-| 21 | ibitak | fearow | 22 | — | 90.3 |
-| 22 | muntier | vigoroth | 288 | — | 90.3 |
-| 23 | deoxys | deoxys | 386 | `deoxys_defense` | 90.2 |
-| 24 | knogga | marowak | 105 | — | 90.2 |
+| 1 | melmetal | melmetal | 809 | — | 94.5 |
+| 2 | altaria | altaria | 334 | — | 93 |
+| 3 | vulnona | ninetales | 38 | `ninetales_shadow` | 93 |
+| 4 | urgl | cramorant | 845 | — | 92.4 |
+| 5 | granforgita | tinkaton | 959 | — | 92.2 |
+| 6 | mimigma | mimikyu | 778 | — | 92.1 |
+| 7 | krarmor | corviknight | 823 | — | 92 |
+| 8 | corasonn | corsola | 222 | `corsola_galarian` | 91.8 |
+| 9 | florges | florges | 671 | — | 91.4 |
+| 10 | morlord | quagsire | 195 | `quagsire_shadow` | 91.4 |
+| 11 | gaunux | thievul | 828 | — | 90.9 |
+| 12 | aranestro | araquanid | 752 | — | 90.8 |
+| 13 | suelord | clodsire | 980 | — | 90.8 |
+| 14 | zobiris | sableye | 302 | `sableye_shadow` | 90.7 |
+| 15 | knogga | marowak | 105 | — | 90.6 |
+| 16 | flunschlik | stunfisk | 618 | — | 90.6 |
+| 17 | muntier | vigoroth | 288 | — | 90.6 |
+| 18 | apoquallyp | jellicent | 593 | — | 90.5 |
+| 19 | impoleon | empoleon | 395 | — | 90.4 |
+| 20 | ibitak | fearow | 22 | — | 90.4 |
+| 21 | mantax | mantine | 226 | — | 90.3 |
+| 22 | relaxo | snorlax | 143 | — | 90.3 |
+| 23 | nachtara | umbreon | 197 | — | 90.3 |
+| 24 | impergator | feraligatr | 160 | — | 90.2 |
 | 25 | epitaff | annihilape | 979 | — | 90.1 |
-| 26 | calamanero | malamar | 687 | — | 90.1 |
-| 27 | zobiris | sableye | 302 | `sableye_shadow` | 90.1 |
-| 28 | lektrobal | electrode | 101 | `electrode_hisuian` | 90 |
-| 29 | lapras | lapras | 131 | — | 89.9 |
-| 30 | nachtara | umbreon | 197 | — | 89.9 |
+| 26 | azumarill | azumarill | 184 | — | 90.1 |
+| 27 | deoxys | deoxys | 386 | `deoxys_defense` | 90.1 |
+| 28 | lektrobal | electrode | 101 | `electrode_hisuian` | 90.1 |
+| 29 | gortrom | rillaboom | 812 | — | 90.1 |
+| 30 | lapras | lapras | 131 | — | 90 |
 
 Dex numbers:
 
 ```
-959,38,222,823,845,195,334,809,395,226,143,671,828,778,160,593,752,162,184,980,22,288,386,105,979,687,302,101,131,197
+809,334,38,845,959,778,823,222,671,195,828,752,980,302,105,618,288,593,395,22,226,143,197,160,979,184,386,101,812,131
 ```
 
 Ready-made filter — copy verbatim, this is the app's own output:
 
 ```text title="de"
-+granforgita,+vulnona,+corasonn,+krarmor,+urgl,+morlord,+altaria,+melmetal,+impoleon,+mantax,+relaxo,+florges,+gaunux,+mimigma,+impergator,+apoquallyp,+aranestro,+wiesenior,+azumarill,+suelord,+ibitak,+muntier,+deoxys,+knogga,+epitaff,+calamanero,+zobiris,+lektrobal,+lapras,+nachtara&wp-1500&0-1angriffs-wert&3-4verteidigungs-wert&3-4kp
++melmetal,+altaria,+vulnona,+urgl,+granforgita,+mimigma,+krarmor,+corasonn,+florges,+morlord,+gaunux,+aranestro,+suelord,+zobiris,+knogga,+flunschlik,+muntier,+apoquallyp,+impoleon,+ibitak,+mantax,+relaxo,+nachtara,+impergator,+epitaff,+azumarill,+deoxys,+lektrobal,+gortrom,+lapras&wp-1500&0-1angriffs-wert&3-4verteidigungs-wert&3-4kp
 ```
 
 ```text title="en"
-+tinkaton,+ninetales,+corsola,+corviknight,+cramorant,+quagsire,+altaria,+melmetal,+empoleon,+mantine,+snorlax,+florges,+thievul,+mimikyu,+feraligatr,+jellicent,+araquanid,+furret,+azumarill,+clodsire,+fearow,+vigoroth,+deoxys,+marowak,+annihilape,+malamar,+sableye,+electrode,+lapras,+umbreon&cp-1500&0-1attack&3-4defense&3-4hp
++melmetal,+altaria,+ninetales,+cramorant,+tinkaton,+mimikyu,+corviknight,+corsola,+florges,+quagsire,+thievul,+araquanid,+clodsire,+sableye,+marowak,+stunfisk,+vigoroth,+jellicent,+empoleon,+fearow,+mantine,+snorlax,+umbreon,+feraligatr,+annihilape,+azumarill,+deoxys,+electrode,+rillaboom,+lapras&cp-1500&0-1attack&3-4defense&3-4hp
 ```
 
 ## Ultra League (Hyperliga)
@@ -190,39 +190,39 @@ CP cap: 1500 CP
 
 | # | German | English | Dex | Ranked form | Score |
 |---:|---|---|---:|---|---:|
-| 1 | granforgita | tinkaton | 959 | — | 93.1 |
-| 2 | vulnona | ninetales | 38 | `ninetales_shadow` | 92.1 |
-| 3 | zobiris | sableye | 302 | `sableye_mega` | 91.9 |
-| 4 | morlord | quagsire | 195 | `quagsire_shadow` | 91.2 |
-| 5 | altaria | altaria | 334 | — | 91.1 |
-| 6 | corasonn | corsola | 222 | `corsola_galarian` | 91.1 |
-| 7 | florges | florges | 671 | — | 91.1 |
-| 8 | krarmor | corviknight | 823 | — | 91 |
-| 9 | urgl | cramorant | 845 | — | 91 |
-| 10 | mantax | mantine | 226 | — | 90.8 |
-| 11 | melmetal | melmetal | 809 | — | 90.8 |
-| 12 | impoleon | empoleon | 395 | — | 90.7 |
+| 1 | melmetal | melmetal | 809 | — | 94.2 |
+| 2 | zobiris | sableye | 302 | `sableye_mega` | 94 |
+| 3 | vulnona | ninetales | 38 | `ninetales_shadow` | 93 |
+| 4 | altaria | altaria | 334 | — | 92.9 |
+| 5 | granforgita | tinkaton | 959 | — | 92.3 |
+| 6 | mimigma | mimikyu | 778 | — | 92 |
+| 7 | urgl | cramorant | 845 | — | 91.9 |
+| 8 | krarmor | corviknight | 823 | — | 91.7 |
+| 9 | florges | florges | 671 | — | 91.7 |
+| 10 | corasonn | corsola | 222 | `corsola_galarian` | 91.5 |
+| 11 | morlord | quagsire | 195 | `quagsire_shadow` | 91.2 |
+| 12 | aranestro | araquanid | 752 | — | 90.7 |
 | 13 | gaunux | thievul | 828 | — | 90.7 |
-| 14 | mimigma | mimikyu | 778 | — | 90.6 |
-| 15 | impergator | feraligatr | 160 | — | 90.5 |
-| 16 | relaxo | snorlax | 143 | — | 90.5 |
-| 17 | ibitak | fearow | 22 | — | 90.4 |
-| 18 | aranestro | araquanid | 752 | — | 90.2 |
-| 19 | azumarill | azumarill | 184 | — | 90.2 |
-| 20 | wiesenior | furret | 162 | — | 90.2 |
-| 21 | apoquallyp | jellicent | 593 | — | 90.2 |
-| 22 | calamanero | malamar | 687 | `malamar_mega` | 90.2 |
-| 23 | knogga | marowak | 105 | — | 90.2 |
-| 24 | suelord | clodsire | 980 | — | 90.1 |
-| 25 | muntier | vigoroth | 288 | — | 90.1 |
-| 26 | epitaff | annihilape | 979 | `annihilape_shadow` | 89.8 |
-| 27 | deoxys | deoxys | 386 | `deoxys_defense` | 89.7 |
-| 28 | heerashai | dondozo | 977 | — | 89.7 |
-| 29 | lektrobal | electrode | 101 | `electrode_hisuian` | 89.7 |
-| 30 | lapras | lapras | 131 | — | 89.6 |
+| 14 | suelord | clodsire | 980 | — | 90.6 |
+| 15 | ibitak | fearow | 22 | — | 90.4 |
+| 16 | knogga | marowak | 105 | — | 90.4 |
+| 17 | muntier | vigoroth | 288 | — | 90.3 |
+| 18 | impoleon | empoleon | 395 | — | 90.2 |
+| 19 | nachtara | umbreon | 197 | — | 90.2 |
+| 20 | apoquallyp | jellicent | 593 | — | 90.1 |
+| 21 | mantax | mantine | 226 | — | 90.1 |
+| 22 | flunschlik | stunfisk | 618 | — | 90.1 |
+| 23 | azumarill | azumarill | 184 | — | 90 |
+| 24 | impergator | feraligatr | 160 | — | 90 |
+| 25 | gortrom | rillaboom | 812 | — | 90 |
+| 26 | lektrobal | electrode | 101 | `electrode_hisuian` | 89.9 |
+| 27 | calamanero | malamar | 687 | `malamar_mega` | 89.9 |
+| 28 | relaxo | snorlax | 143 | — | 89.9 |
+| 29 | akkup | charjabug | 737 | — | 89.8 |
+| 30 | lapras | lapras | 131 | — | 89.8 |
 
 ```
-959,38,302,195,334,222,671,823,845,226,809,395,828,778,160,143,22,752,184,162,593,687,105,980,288,979,386,977,101,131
+809,302,38,334,959,778,845,823,671,222,195,752,828,980,22,105,288,395,197,593,226,618,184,160,812,101,687,143,737,131
 ```
 
 ### Mega Ultra League `mega-2500`
