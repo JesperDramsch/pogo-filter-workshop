@@ -578,6 +578,115 @@
           ]
         }
       ]
+    },
+    {
+      "eventID": "mega-malamar-in-mega-raids-september-2026",
+      "name": "Mega Malamar in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-09-23T06:00:00.000",
+      "end": "2026-09-29T22:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "MALAMAR",
+          "names": {
+            "en": "Malamar"
+          },
+          "types": [
+            "dark",
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "dark",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "fairy"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "xurkitree-pheromosa-buzzwole-in-5-star-raid-battles-september-2026",
+      "name": "Xurkitree, Pheromosa, and Buzzwole in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-09-23T06:00:00.000",
+      "end": "2026-09-29T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "BUZZWOLE",
+          "names": {
+            "en": "Buzzwole"
+          },
+          "types": [
+            "bug",
+            "fighting"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
+            "fire",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "fire",
+            "psychic",
+            "fairy"
+          ]
+        },
+        {
+          "id": "PHEROMOSA",
+          "names": {
+            "en": "Pheromosa"
+          },
+          "types": [
+            "bug",
+            "fighting"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
+            "fire",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "fire",
+            "psychic",
+            "fairy"
+          ]
+        },
+        {
+          "id": "XURKITREE",
+          "names": {
+            "en": "Xurkitree"
+          },
+          "types": [
+            "electric"
+          ],
+          "resistorTypes": [
+            "ground",
+            "grass",
+            "electric",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "ground"
+          ]
+        }
+      ]
     }
   ]
 }
