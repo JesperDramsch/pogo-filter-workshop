@@ -1,6 +1,6 @@
 # Pokémon GO PvP Meta Reference — GENERATED, DO NOT HAND-EDIT
 
-- **Snapshot taken:** 2026-09-15T13:42:16.078Z
+- **Snapshot taken:** 2026-09-16T13:35:32.700Z
 - **Source:** pvpoke — https://github.com/pvpoke/pvpoke (MIT)
 - **Snapshot URL:** https://raw.githubusercontent.com/JesperDramsch/pogo-filter-workshop/main/src/data/pvp-rankings.json
 - **Depth:** top 30 per league, deduped by base dex
@@ -182,49 +182,6 @@ Ready-made filter — copy verbatim, this is the app's own output:
 
 ## Cups
 
-### Mega Great League `mega-1500`
-
-Window: 2026-11-03 → 2026-11-10 (Great League: Mega Edition, Ultra League: Mega Edition, and Master League: Mega Edition | Twilight Trails)
-
-CP cap: 1500 CP
-
-| # | German | English | Dex | Ranked form | Score |
-|---:|---|---|---:|---|---:|
-| 1 | melmetal | melmetal | 809 | — | 94.2 |
-| 2 | zobiris | sableye | 302 | `sableye_mega` | 94 |
-| 3 | vulnona | ninetales | 38 | `ninetales_shadow` | 93 |
-| 4 | altaria | altaria | 334 | — | 92.9 |
-| 5 | granforgita | tinkaton | 959 | — | 92.3 |
-| 6 | mimigma | mimikyu | 778 | — | 92 |
-| 7 | urgl | cramorant | 845 | — | 91.9 |
-| 8 | krarmor | corviknight | 823 | — | 91.7 |
-| 9 | florges | florges | 671 | — | 91.7 |
-| 10 | corasonn | corsola | 222 | `corsola_galarian` | 91.5 |
-| 11 | morlord | quagsire | 195 | `quagsire_shadow` | 91.2 |
-| 12 | aranestro | araquanid | 752 | — | 90.7 |
-| 13 | gaunux | thievul | 828 | — | 90.7 |
-| 14 | suelord | clodsire | 980 | — | 90.6 |
-| 15 | ibitak | fearow | 22 | — | 90.4 |
-| 16 | knogga | marowak | 105 | — | 90.4 |
-| 17 | muntier | vigoroth | 288 | — | 90.3 |
-| 18 | impoleon | empoleon | 395 | — | 90.2 |
-| 19 | nachtara | umbreon | 197 | — | 90.2 |
-| 20 | apoquallyp | jellicent | 593 | — | 90.1 |
-| 21 | mantax | mantine | 226 | — | 90.1 |
-| 22 | flunschlik | stunfisk | 618 | — | 90.1 |
-| 23 | azumarill | azumarill | 184 | — | 90 |
-| 24 | impergator | feraligatr | 160 | — | 90 |
-| 25 | gortrom | rillaboom | 812 | — | 90 |
-| 26 | lektrobal | electrode | 101 | `electrode_hisuian` | 89.9 |
-| 27 | calamanero | malamar | 687 | `malamar_mega` | 89.9 |
-| 28 | relaxo | snorlax | 143 | — | 89.9 |
-| 29 | akkup | charjabug | 737 | — | 89.8 |
-| 30 | lapras | lapras | 131 | — | 89.8 |
-
-```
-809,302,38,334,959,778,845,823,671,222,195,752,828,980,22,105,288,395,197,593,226,618,184,160,812,101,687,143,737,131
-```
-
 ### Mega Ultra League `mega-2500`
 
 Window: 2026-11-10 → 2026-11-17 (Great League, Ultra League: Mega Edition, and 2026 GO LAIC Cup | Twilight Trails)
@@ -266,6 +223,49 @@ CP cap: 2500 CP
 
 ```
 959,823,671,395,809,778,143,146,640,718,160,593,487,799,911,845,38,812,131,379,477,36,977,89,205,895,9,488,663,867
+```
+
+### Willpower Cup `willpower-1500`
+
+Window: 2026-09-15 → 2026-09-22 (Great League, Ultra League: Mega Edition, and Willpower Cup: Great League Edition | Twilight Trails)
+
+CP cap: 1500 CP
+
+| # | German | English | Dex | Ranked form | Score |
+|---:|---|---|---:|---|---:|
+| 1 | sleimok | muk | 89 | `muk_alolan` | 97.8 |
+| 2 | grypheldis | mandibuzz | 630 | — | 97.3 |
+| 3 | morpeko | morpeko | 877 | `morpeko_full_belly` | 95 |
+| 4 | kramurx | murkrow | 198 | `murkrow_shadow` | 94.6 |
+| 5 | zobiris | sableye | 302 | — | 94.6 |
+| 6 | piondragi | drapion | 452 | — | 94.4 |
+| 7 | quajutsu | greninja | 658 | `greninja_shadow` | 93.9 |
+| 8 | epitaff | annihilape | 979 | `annihilape_shadow` | 92.8 |
+| 9 | jiutesto | throh | 538 | — | 91.8 |
+| 10 | schlingking | guzzlord | 799 | — | 91.6 |
+| 11 | olangaar | grimmsnarl | 861 | — | 91.2 |
+| 12 | pamomamo | pawmot | 923 | — | 91 |
+| 13 | lepumentas | claydol | 344 | — | 90.9 |
+| 14 | calamanero | malamar | 687 | — | 90.2 |
+| 15 | admurai | samurott | 503 | `samurott_hisuian` | 90 |
+| 16 | trikephalo | hydreigon | 635 | `hydreigon_shadow` | 89.9 |
+| 17 | nachtara | umbreon | 197 | — | 89.7 |
+| 18 | lavados | moltres | 146 | `moltres_galarian` | 89.5 |
+| 19 | gladiantri | pawniard | 624 | — | 88.9 |
+| 20 | resladero | hawlucha | 701 | — | 88.7 |
+| 21 | gladimperio | kingambit | 983 | — | 88.6 |
+| 22 | mediras | hakamo-o | 783 | — | 88.1 |
+| 23 | metang | metang | 375 | `metang_shadow` | 88.1 |
+| 24 | flaminkno | flamigo | 973 | — | 87.7 |
+| 25 | grandiras | kommo-o | 784 | — | 87.5 |
+| 26 | pelzebub | morgrem | 860 | — | 87.5 |
+| 27 | lohgock | blaziken | 257 | — | 87.2 |
+| 28 | baldorfish | qwilfish | 211 | `qwilfish_hisuian` | 87.2 |
+| 29 | snobilikat | persian | 53 | `persian_alolan` | 86.9 |
+| 30 | duodino | zweilous | 634 | `zweilous_shadow` | 86.9 |
+
+```
+89,630,877,198,302,452,658,979,538,799,861,923,344,687,503,635,197,146,624,701,983,783,375,973,784,860,257,211,53,634
 ```
 
 ### Mega Master League `mega-10000`
@@ -311,47 +311,90 @@ CP cap: none (uncapped)
 382,150,130,149,384,445,248,383,376,652,381,380,655,214,373,483,260,306,484,212,716,475,718,6,647,809,901,249,94,646
 ```
 
-### Willpower Cup `willpower-1500`
+### Retro Cup `retro-1500`
 
-Window: 2026-09-15 → 2026-09-22 (Great League, Ultra League: Mega Edition, and Willpower Cup: Great League Edition | Twilight Trails)
+Window: 2026-09-22 → 2026-09-29 (Ultra League, Master League: Mega Edition, and Retro Cup: Great League Edition | Twilight Trails)
 
 CP cap: 1500 CP
 
 | # | German | English | Dex | Ranked form | Score |
 |---:|---|---|---:|---|---:|
-| 1 | sleimok | muk | 89 | `muk_alolan` | 97.8 |
-| 2 | grypheldis | mandibuzz | 630 | — | 97.3 |
-| 3 | morpeko | morpeko | 877 | `morpeko_full_belly` | 95 |
-| 4 | kramurx | murkrow | 198 | `murkrow_shadow` | 94.6 |
-| 5 | zobiris | sableye | 302 | — | 94.6 |
-| 6 | piondragi | drapion | 452 | — | 94.4 |
-| 7 | quajutsu | greninja | 658 | `greninja_shadow` | 93.9 |
-| 8 | epitaff | annihilape | 979 | `annihilape_shadow` | 92.8 |
-| 9 | jiutesto | throh | 538 | — | 91.8 |
-| 10 | schlingking | guzzlord | 799 | — | 91.6 |
-| 11 | olangaar | grimmsnarl | 861 | — | 91.2 |
-| 12 | pamomamo | pawmot | 923 | — | 91 |
-| 13 | lepumentas | claydol | 344 | — | 90.9 |
-| 14 | calamanero | malamar | 687 | — | 90.2 |
-| 15 | admurai | samurott | 503 | `samurott_hisuian` | 90 |
-| 16 | trikephalo | hydreigon | 635 | `hydreigon_shadow` | 89.9 |
-| 17 | nachtara | umbreon | 197 | — | 89.7 |
-| 18 | lavados | moltres | 146 | `moltres_galarian` | 89.5 |
-| 19 | gladiantri | pawniard | 624 | — | 88.9 |
-| 20 | resladero | hawlucha | 701 | — | 88.7 |
-| 21 | gladimperio | kingambit | 983 | — | 88.6 |
-| 22 | mediras | hakamo-o | 783 | — | 88.1 |
-| 23 | metang | metang | 375 | `metang_shadow` | 88.1 |
-| 24 | flaminkno | flamigo | 973 | — | 87.7 |
-| 25 | grandiras | kommo-o | 784 | — | 87.5 |
-| 26 | pelzebub | morgrem | 860 | — | 87.5 |
-| 27 | lohgock | blaziken | 257 | — | 87.2 |
-| 28 | baldorfish | qwilfish | 211 | `qwilfish_hisuian` | 87.2 |
-| 29 | snobilikat | persian | 53 | `persian_alolan` | 86.9 |
-| 30 | duodino | zweilous | 634 | `zweilous_shadow` | 86.9 |
+| 1 | corasonn | corsola | 222 | `corsola_galarian` | 98.6 |
+| 2 | relaxo | snorlax | 143 | — | 97.1 |
+| 3 | regidrago | regidrago | 895 | — | 96.4 |
+| 4 | zwirrklop | dusclops | 356 | — | 95.4 |
+| 5 | kommandutan | oranguru | 765 | — | 95.1 |
+| 6 | cresselia | cresselia | 488 | — | 95 |
+| 7 | lapras | lapras | 131 | — | 94.7 |
+| 8 | seedraking | kingdra | 230 | — | 94.5 |
+| 9 | draschel | shelgon | 372 | — | 94.5 |
+| 10 | urgl | cramorant | 845 | — | 94.4 |
+| 11 | wielie | cradily | 346 | — | 94 |
+| 12 | giratina | giratina | 487 | `giratina_altered_shadow` | 94 |
+| 13 | castellith | crustle | 558 | — | 93.8 |
+| 14 | papungha | jumpluff | 189 | — | 93.8 |
+| 15 | zwirrfinst | dusknoir | 477 | `dusknoir_shadow` | 93.4 |
+| 16 | groink | grumpig | 326 | — | 93.4 |
+| 17 | aranestro | araquanid | 752 | — | 93.1 |
+| 18 | dragonir | dragonair | 148 | `dragonair_shadow` | 93 |
+| 19 | wiesenior | furret | 162 | — | 93 |
+| 20 | viscargot | sliggoo | 705 | — | 93 |
+| 21 | amagarga | aurorus | 699 | — | 92.7 |
+| 22 | apoquallyp | jellicent | 593 | — | 92.1 |
+| 23 | rexblisar | abomasnow | 460 | `abomasnow_shadow` | 91.8 |
+| 24 | viscogon | goodra | 706 | — | 91.6 |
+| 25 | fragrunz | oinkologne | 916 | `oinkologne_female` | 91.6 |
+| 26 | suelord | clodsire | 980 | — | 91.3 |
+| 27 | dummisel | dunsparce | 206 | — | 91.2 |
+| 28 | walraisa | walrein | 365 | — | 91.2 |
+| 29 | spinsidias | spidops | 918 | — | 91.1 |
+| 30 | deoxys | deoxys | 386 | `deoxys_defense` | 91 |
 
 ```
-89,630,877,198,302,452,658,979,538,799,861,923,344,687,503,635,197,146,624,701,983,783,375,973,784,860,257,211,53,634
+222,143,895,356,765,488,131,230,372,845,346,487,558,189,477,326,752,148,162,705,699,593,460,706,916,980,206,365,918,386
+```
+
+### Mega Great League `mega-1500`
+
+Window: 2026-11-03 → 2026-11-10 (Great League: Mega Edition, Ultra League: Mega Edition, and Master League: Mega Edition | Twilight Trails)
+
+CP cap: 1500 CP
+
+| # | German | English | Dex | Ranked form | Score |
+|---:|---|---|---:|---|---:|
+| 1 | melmetal | melmetal | 809 | — | 94.2 |
+| 2 | zobiris | sableye | 302 | `sableye_mega` | 94 |
+| 3 | vulnona | ninetales | 38 | `ninetales_shadow` | 93 |
+| 4 | altaria | altaria | 334 | — | 92.9 |
+| 5 | granforgita | tinkaton | 959 | — | 92.3 |
+| 6 | mimigma | mimikyu | 778 | — | 92 |
+| 7 | urgl | cramorant | 845 | — | 91.9 |
+| 8 | krarmor | corviknight | 823 | — | 91.7 |
+| 9 | florges | florges | 671 | — | 91.7 |
+| 10 | corasonn | corsola | 222 | `corsola_galarian` | 91.5 |
+| 11 | morlord | quagsire | 195 | `quagsire_shadow` | 91.2 |
+| 12 | aranestro | araquanid | 752 | — | 90.7 |
+| 13 | gaunux | thievul | 828 | — | 90.7 |
+| 14 | suelord | clodsire | 980 | — | 90.6 |
+| 15 | ibitak | fearow | 22 | — | 90.4 |
+| 16 | knogga | marowak | 105 | — | 90.4 |
+| 17 | muntier | vigoroth | 288 | — | 90.3 |
+| 18 | impoleon | empoleon | 395 | — | 90.2 |
+| 19 | nachtara | umbreon | 197 | — | 90.2 |
+| 20 | apoquallyp | jellicent | 593 | — | 90.1 |
+| 21 | mantax | mantine | 226 | — | 90.1 |
+| 22 | flunschlik | stunfisk | 618 | — | 90.1 |
+| 23 | azumarill | azumarill | 184 | — | 90 |
+| 24 | impergator | feraligatr | 160 | — | 90 |
+| 25 | gortrom | rillaboom | 812 | — | 90 |
+| 26 | lektrobal | electrode | 101 | `electrode_hisuian` | 89.9 |
+| 27 | calamanero | malamar | 687 | `malamar_mega` | 89.9 |
+| 28 | relaxo | snorlax | 143 | — | 89.9 |
+| 29 | akkup | charjabug | 737 | — | 89.8 |
+| 30 | lapras | lapras | 131 | — | 89.8 |
+
+```
+809,302,38,334,959,778,845,823,671,222,195,752,828,980,22,105,288,395,197,593,226,618,184,160,812,101,687,143,737,131
 ```
 
 ### Little Cup `little-500`
