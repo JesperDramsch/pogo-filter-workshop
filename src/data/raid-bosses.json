@@ -1,163 +1,50 @@
 {
-  "fetchedAt": "2026-09-13T12:50:12.982Z",
+  "fetchedAt": "2026-09-17T12:45:41.388Z",
   "raids": {
     "mega": [
       {
-        "id": "BEEDRILL",
+        "id": "VENUSAUR",
         "names": {
-          "en": "Mega Beedrill",
-          "de": "Mega-Bibor",
-          "fr": "Méga-Dardargnan",
-          "it": "MegaBeedrill",
-          "ja": "メガスピアー",
-          "ko": "메가독침붕",
-          "es": "Mega-Beedrill"
+          "en": "Mega Venusaur",
+          "de": "Mega-Bisaflor",
+          "fr": "Méga-Florizarre",
+          "it": "MegaVenusaur",
+          "ja": "メガフシギバナ",
+          "ko": "메가이상해꽃",
+          "es": "Mega-Venusaur"
         },
         "types": [
-          "bug",
+          "grass",
           "poison"
         ],
         "resistorTypes": [
-          "fighting",
           "flying",
           "poison",
-          "ground",
-          "rock",
+          "bug",
           "ghost",
           "steel",
-          "fire"
+          "fire",
+          "dragon"
         ],
         "seMoveTypes": [
           "fire",
           "flying",
-          "psychic",
-          "rock"
-        ]
-      },
-      {
-        "id": "HOUNDOOM",
-        "names": {
-          "en": "Mega Houndoom",
-          "de": "Mega-Hundemon",
-          "fr": "Méga-Démolosse",
-          "it": "MegaHoundoom",
-          "ja": "メガヘルガー",
-          "ko": "메가헬가",
-          "es": "Mega-Houndoom"
-        },
-        "types": [
-          "dark",
-          "fire"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "rock",
-          "fire",
-          "water",
-          "dragon",
-          "dark",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "fighting",
-          "ground",
-          "rock",
-          "water"
+          "ice",
+          "psychic"
         ]
       }
     ],
     "lvl5": [
       {
-        "id": "ZACIAN",
+        "id": "ZAMAZENTA",
         "names": {
-          "en": "Zacian (Hero of Many Battles)",
-          "de": "Zacian (Heldenhafter Krieger)",
-          "fr": "Zacian (Héros Aguerri)",
-          "it": "Zacian (Eroe di Mille Lotte)",
-          "ja": "ザシアン (れきせんのゆうしゃ)",
-          "ko": "자시안 (역전의 용사)",
-          "es": "Zacian (Guerrero Avezado)"
-        },
-        "types": [
-          "fairy"
-        ],
-        "resistorTypes": [
-          "poison",
-          "steel",
-          "fire"
-        ],
-        "seMoveTypes": [
-          "poison",
-          "steel"
-        ]
-      }
-    ],
-    "lvl3": [
-      {
-        "id": "DUGTRIO",
-        "names": {
-          "en": "Alolan Dugtrio",
-          "de": "Alola-Digdri",
-          "fr": "Triopikeur d'Alola",
-          "it": "Dugtrio di Alola",
-          "ja": "アローラ ダグトリオ",
-          "ko": "알로라 닥트리오",
-          "es": "Dugtrio de Alola"
-        },
-        "types": [
-          "ground",
-          "steel"
-        ],
-        "resistorTypes": [
-          "flying",
-          "bug",
-          "water",
-          "grass"
-        ],
-        "seMoveTypes": [
-          "fighting",
-          "fire",
-          "ground",
-          "water"
-        ]
-      },
-      {
-        "id": "LAPRAS",
-        "names": {
-          "en": "Lapras",
-          "de": "Lapras",
-          "fr": "Lokhlass",
-          "it": "Lapras",
-          "ja": "ラプラス",
-          "ko": "라프라스",
-          "es": "Lapras"
-        },
-        "types": [
-          "water",
-          "ice"
-        ],
-        "resistorTypes": [
-          "steel",
-          "water",
-          "ice"
-        ],
-        "seMoveTypes": [
-          "electric",
-          "fighting",
-          "grass",
-          "rock"
-        ]
-      },
-      {
-        "id": "FALINKS",
-        "names": {
-          "en": "Falinks",
-          "de": "Legios",
-          "fr": "Hexadron",
-          "it": "Falinks",
-          "ja": "タイレーツ",
-          "ko": "대여르",
-          "es": "Falinks"
+          "en": "Zamazenta (Hero of Many Battles)",
+          "de": "Zamazenta (Heldenhafter Krieger)",
+          "fr": "Zamazenta (Héros Aguerri)",
+          "it": "Zamazenta (Eroe di Mille Lotte)",
+          "ja": "ザマゼンタ (れきせんのゆうしゃ)",
+          "ko": "자마젠타 (역전의 용사)",
+          "es": "Zamazenta (Guerrero Avezado)"
         },
         "types": [
           "fighting"
@@ -174,111 +61,6 @@
           "fairy",
           "flying",
           "psychic"
-        ]
-      }
-    ],
-    "lvl1": [
-      {
-        "id": "RATTATA",
-        "names": {
-          "en": "Alolan Rattata",
-          "de": "Alola-Rattfratz",
-          "fr": "Rattata d'Alola",
-          "it": "Rattata di Alola",
-          "ja": "アローラ コラッタ",
-          "ko": "알로라 꼬렛",
-          "es": "Rattata de Alola"
-        },
-        "types": [
-          "dark",
-          "normal"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "rock",
-          "steel",
-          "dark",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "fighting",
-          "bug",
-          "fairy"
-        ]
-      },
-      {
-        "id": "DUNSPARCE",
-        "names": {
-          "en": "Dunsparce",
-          "de": "Dummisel",
-          "fr": "Insolourdo",
-          "it": "Dunsparce",
-          "ja": "ノコッチ",
-          "ko": "노고치",
-          "es": "Dunsparce"
-        },
-        "types": [
-          "normal"
-        ],
-        "resistorTypes": [
-          "rock",
-          "ghost",
-          "steel"
-        ],
-        "seMoveTypes": [
-          "fighting"
-        ]
-      },
-      {
-        "id": "SCRAGGY",
-        "names": {
-          "en": "Scraggy",
-          "de": "Zurrokex",
-          "fr": "Baggiguane",
-          "it": "Scraggy",
-          "ja": "ズルッグ",
-          "ko": "곤율랭",
-          "es": "Scraggy"
-        },
-        "types": [
-          "dark",
-          "fighting"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "flying",
-          "poison",
-          "bug",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "fairy",
-          "fighting",
-          "flying"
-        ]
-      },
-      {
-        "id": "FIDOUGH",
-        "names": {
-          "en": "Fidough",
-          "de": "Hefel",
-          "fr": "Pâtachiot",
-          "it": "Fidough",
-          "ja": "パピモッチ",
-          "ko": "쫀도기",
-          "es": "Fidough"
-        },
-        "types": [
-          "fairy"
-        ],
-        "resistorTypes": [
-          "poison",
-          "steel",
-          "fire"
-        ],
-        "seMoveTypes": [
-          "poison",
-          "steel"
         ]
       }
     ],
@@ -512,42 +294,6 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "mega-venusaur-in-mega-raids-september-2026",
-      "name": "Mega Venusaur in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-09-16T06:00:00.000",
-      "end": "2026-09-22T22:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "VENUSAUR",
-          "names": {
-            "en": "Venusaur"
-          },
-          "types": [
-            "grass",
-            "poison"
-          ],
-          "resistorTypes": [
-            "flying",
-            "poison",
-            "bug",
-            "ghost",
-            "steel",
-            "fire",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "fire",
-            "psychic",
-            "ice"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "staraptor-super-mega-raid-day-2026",
       "name": "Staraptor Super Mega Raid Day",
       "eventType": "raid-day",
@@ -684,6 +430,85 @@
           ],
           "seMoveTypes": [
             "ground"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20260923",
+      "name": "Xurkitree, Pheromosa, and Buzzwole Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-09-23T18:00:00.000",
+      "end": "2026-09-23T19:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "XURKITREE",
+          "names": {
+            "en": "Xurkitree"
+          },
+          "types": [
+            "electric"
+          ],
+          "resistorTypes": [
+            "ground",
+            "grass",
+            "electric",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "ground"
+          ]
+        },
+        {
+          "id": "PHEROMOSA",
+          "names": {
+            "en": "Pheromosa"
+          },
+          "types": [
+            "bug",
+            "fighting"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
+            "fire",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "fire",
+            "psychic",
+            "fairy"
+          ]
+        },
+        {
+          "id": "BUZZWOLE",
+          "names": {
+            "en": "Buzzwole"
+          },
+          "types": [
+            "bug",
+            "fighting"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
+            "fire",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "fire",
+            "psychic",
+            "fairy"
           ]
         }
       ]
