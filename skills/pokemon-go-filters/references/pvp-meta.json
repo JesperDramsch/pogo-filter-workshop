@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-17T13:37:39.937Z",
+  "generatedAt": "2026-09-17T14:15:21.841Z",
   "fetchedAt": "2026-09-17T13:37:34.603Z",
   "topN": 30,
   "source": "pvpoke",
@@ -8,11 +8,11 @@
     "upstream": "https://github.com/pvpoke/pvpoke (MIT)"
   },
   "gameMasterWatch": {
-    "checkedAt": "2026-09-15T14:17:43.238Z",
-    "lastChangeAt": "2026-09-11T13:28:49.674Z",
+    "checkedAt": "2026-09-17T14:15:17.368Z",
+    "lastChangeAt": "2026-09-17T14:15:17.368Z",
     "lastChangeSummary": "1 move(s) changed",
     "movesChanged": [
-      "DARK_PULSE_PLUS"
+      "BRAVE_BIRD_PLUS"
     ]
   },
   "leagues": {

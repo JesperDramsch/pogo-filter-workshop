@@ -17,7 +17,7 @@
 
 ## Move rebalance watch
 
-Last observed Trainer-Battle stat change: **2026-09-11** — 1 move(s) changed (DARK_PULSE_PLUS).
+Last observed Trainer-Battle stat change: **2026-09-17** — 1 move(s) changed (BRAVE_BIRD_PLUS).
 
 Rankings lag a rebalance by days, so treat the tables below with caution if that date is recent.
 

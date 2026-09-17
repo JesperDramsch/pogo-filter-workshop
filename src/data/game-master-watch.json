@@ -1,11 +1,24 @@
 {
-  "fetchedAt": "2026-09-15T14:17:43.238Z",
+  "fetchedAt": "2026-09-17T14:15:17.368Z",
   "sources": {
     "pvp": "pvpoke-gamemaster",
     "pve": "alexelgt/game_masters",
     "pveBatch": "2026-09-15T00:01:14.577Z"
   },
   "history": [
+    {
+      "at": "2026-09-17T14:15:17.368Z",
+      "stream": "pvp",
+      "summary": "1 move(s) changed",
+      "changes": [
+        {
+          "move": "BRAVE_BIRD_PLUS",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        }
+      ]
+    },
     {
       "at": "2026-09-13T13:46:32.837Z",
       "stream": "pve",
@@ -605,6 +618,19 @@
     "BRAVE_BIRD": {
       "power": 130,
       "energy": 55,
+      "energyGain": 0,
+      "cooldown": 500,
+      "turns": 1,
+      "buffs": [
+        0,
+        -3
+      ],
+      "buffTarget": "self",
+      "buffApplyChance": "1"
+    },
+    "BRAVE_BIRD_PLUS": {
+      "power": 70,
+      "energy": 40,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1,
