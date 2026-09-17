@@ -1,6 +1,6 @@
 # Pokémon GO PvP Meta Reference — GENERATED, DO NOT HAND-EDIT
 
-- **Snapshot taken:** 2026-09-16T13:35:32.700Z
+- **Snapshot taken:** 2026-09-17T13:37:34.603Z
 - **Source:** pvpoke — https://github.com/pvpoke/pvpoke (MIT)
 - **Snapshot URL:** https://raw.githubusercontent.com/JesperDramsch/pogo-filter-workshop/main/src/data/pvp-rankings.json
 - **Depth:** top 30 per league, deduped by base dex
@@ -200,17 +200,17 @@ CP cap: 2500 CP
 | 8 | lavados | moltres | 146 | `moltres_galarian` | 91.9 |
 | 9 | viridium | virizion | 640 | — | 91.9 |
 | 10 | zygarde | zygarde | 718 | `zygarde_complete` | 91.8 |
-| 11 | impergator | feraligatr | 160 | — | 91.5 |
+| 11 | impergator | feraligatr | 160 | `feraligatr_shadow` | 91.6 |
 | 12 | apoquallyp | jellicent | 593 | — | 90.9 |
 | 13 | giratina | giratina | 487 | `giratina_altered` | 90.8 |
 | 14 | schlingking | guzzlord | 799 | — | 90.8 |
-| 15 | skelokrok | skeledirge | 911 | — | 90.7 |
-| 16 | urgl | cramorant | 845 | — | 90.6 |
+| 15 | urgl | cramorant | 845 | — | 90.7 |
+| 16 | skelokrok | skeledirge | 911 | — | 90.7 |
 | 17 | vulnona | ninetales | 38 | `ninetales_alolan` | 90.5 |
 | 18 | gortrom | rillaboom | 812 | — | 90.5 |
 | 19 | lapras | lapras | 131 | — | 90.4 |
-| 20 | registeel | registeel | 379 | — | 90.3 |
-| 21 | zwirrfinst | dusknoir | 477 | — | 90.2 |
+| 20 | zwirrfinst | dusknoir | 477 | — | 90.2 |
+| 21 | registeel | registeel | 379 | — | 90.2 |
 | 22 | pixi | clefable | 36 | — | 90 |
 | 23 | heerashai | dondozo | 977 | — | 90 |
 | 24 | sleimok | muk | 89 | `muk_alolan` | 90 |
@@ -222,7 +222,7 @@ CP cap: 2500 CP
 | 30 | oghnatoll | runerigus | 867 | — | 89 |
 
 ```
-959,823,671,395,809,778,143,146,640,718,160,593,487,799,911,845,38,812,131,379,477,36,977,89,205,895,9,488,663,867
+959,823,671,395,809,778,143,146,640,718,160,593,487,799,845,911,38,812,131,477,379,36,977,89,205,895,9,488,663,867
 ```
 
 ### Willpower Cup `willpower-1500`
@@ -283,32 +283,32 @@ CP cap: none (uncapped)
 | 5 | rayquaza | rayquaza | 384 | `rayquaza_mega` | 94 |
 | 6 | knakrack | garchomp | 445 | `garchomp_mega` | 93.1 |
 | 7 | despotar | tyranitar | 248 | `tyranitar_mega` | 91.2 |
-| 8 | groudon | groudon | 383 | `groudon_primal` | 91.1 |
-| 9 | metagross | metagross | 376 | `metagross_mega` | 90.9 |
-| 10 | brigaron | chesnaught | 652 | `chesnaught_mega` | 87 |
+| 8 | groudon | groudon | 383 | `groudon_primal` | 91 |
+| 9 | metagross | metagross | 376 | `metagross_mega` | 91 |
+| 10 | brigaron | chesnaught | 652 | `chesnaught_mega` | 86.9 |
 | 11 | latios | latios | 381 | `latios_mega` | 86.5 |
 | 12 | latias | latias | 380 | `latias_mega` | 86 |
 | 13 | fennexis | delphox | 655 | `delphox_mega` | 84.5 |
 | 14 | skaraborn | heracross | 214 | `heracross_mega` | 84 |
 | 15 | brutalanda | salamence | 373 | `salamence_mega` | 83.7 |
-| 16 | dialga | dialga | 483 | `dialga_origin` | 83.2 |
-| 17 | sumpex | swampert | 260 | `swampert_mega` | 83.1 |
-| 18 | stolloss | aggron | 306 | `aggron_mega` | 82.3 |
+| 16 | sumpex | swampert | 260 | `swampert_mega` | 83.2 |
+| 17 | dialga | dialga | 483 | `dialga_origin` | 83.1 |
+| 18 | stolloss | aggron | 306 | `aggron_mega` | 82.2 |
 | 19 | palkia | palkia | 484 | `palkia_shadow` | 80.4 |
-| 20 | scherox | scizor | 212 | `scizor_mega` | 79.3 |
-| 21 | xerneas | xerneas | 716 | — | 78 |
-| 22 | galagladi | gallade | 475 | `gallade_mega` | 77 |
-| 23 | zygarde | zygarde | 718 | `zygarde_complete` | 76.9 |
-| 24 | glurak | charizard | 6 | `charizard_mega_y` | 76.7 |
-| 25 | keldeo | keldeo | 647 | `keldeo_resolute` | 76.3 |
-| 26 | melmetal | melmetal | 809 | — | 76.2 |
-| 27 | ursaluna | ursaluna | 901 | `ursaluna_shadow` | 76.2 |
-| 28 | lugia | lugia | 249 | — | 76 |
-| 29 | gengar | gengar | 94 | `gengar_mega` | 75.6 |
-| 30 | kyurem | kyurem | 646 | `kyurem_white` | 75.2 |
+| 20 | scherox | scizor | 212 | `scizor_mega` | 79.2 |
+| 21 | xerneas | xerneas | 716 | — | 77.9 |
+| 22 | zygarde | zygarde | 718 | `zygarde_complete` | 76.9 |
+| 23 | glurak | charizard | 6 | `charizard_mega_y` | 76.7 |
+| 24 | keldeo | keldeo | 647 | `keldeo_resolute` | 76.2 |
+| 25 | melmetal | melmetal | 809 | — | 76.2 |
+| 26 | ursaluna | ursaluna | 901 | `ursaluna_shadow` | 76.2 |
+| 27 | lugia | lugia | 249 | — | 76 |
+| 28 | gengar | gengar | 94 | `gengar_mega` | 75.6 |
+| 29 | kyurem | kyurem | 646 | `kyurem_white` | 75.3 |
+| 30 | zacian | zacian | 888 | `zacian_crowned_sword` | 74.8 |
 
 ```
-382,150,130,149,384,445,248,383,376,652,381,380,655,214,373,483,260,306,484,212,716,475,718,6,647,809,901,249,94,646
+382,150,130,149,384,445,248,383,376,652,381,380,655,214,373,260,483,306,484,212,716,718,6,647,809,901,249,94,646,888
 ```
 
 ### Retro Cup `retro-1500`
@@ -373,8 +373,8 @@ CP cap: 1500 CP
 | 9 | florges | florges | 671 | — | 91.7 |
 | 10 | corasonn | corsola | 222 | `corsola_galarian` | 91.5 |
 | 11 | morlord | quagsire | 195 | `quagsire_shadow` | 91.2 |
-| 12 | aranestro | araquanid | 752 | — | 90.7 |
-| 13 | gaunux | thievul | 828 | — | 90.7 |
+| 12 | gaunux | thievul | 828 | — | 90.7 |
+| 13 | aranestro | araquanid | 752 | — | 90.6 |
 | 14 | suelord | clodsire | 980 | — | 90.6 |
 | 15 | ibitak | fearow | 22 | — | 90.4 |
 | 16 | knogga | marowak | 105 | — | 90.4 |
@@ -394,7 +394,7 @@ CP cap: 1500 CP
 | 30 | lapras | lapras | 131 | — | 89.8 |
 
 ```
-809,302,38,334,959,778,845,823,671,222,195,752,828,980,22,105,288,395,197,593,226,618,184,160,812,101,687,143,737,131
+809,302,38,334,959,778,845,823,671,222,195,828,752,980,22,105,288,395,197,593,226,618,184,160,812,101,687,143,737,131
 ```
 
 ### Little Cup `little-500`

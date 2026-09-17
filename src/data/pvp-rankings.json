@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-16T13:35:32.700Z",
+  "fetchedAt": "2026-09-17T13:37:34.603Z",
   "topN": 30,
   "source": "pvpoke",
   "leagues": {
@@ -997,11 +997,11 @@
         {
           "dex": 160,
           "name": "Feraligatr",
-          "speciesId": "feraligatr",
-          "score": 91.5,
+          "speciesId": "feraligatr_shadow",
+          "score": 91.6,
           "forms": [
-            "feraligatr",
-            "feraligatr_shadow"
+            "feraligatr_shadow",
+            "feraligatr"
           ]
         },
         {
@@ -1034,21 +1034,21 @@
           ]
         },
         {
+          "dex": 845,
+          "name": "Cramorant",
+          "speciesId": "cramorant",
+          "score": 90.7,
+          "forms": [
+            "cramorant"
+          ]
+        },
+        {
           "dex": 911,
           "name": "Skeledirge",
           "speciesId": "skeledirge",
           "score": 90.7,
           "forms": [
             "skeledirge"
-          ]
-        },
-        {
-          "dex": 845,
-          "name": "Cramorant",
-          "speciesId": "cramorant",
-          "score": 90.6,
-          "forms": [
-            "cramorant"
           ]
         },
         {
@@ -1083,16 +1083,6 @@
           ]
         },
         {
-          "dex": 379,
-          "name": "Registeel",
-          "speciesId": "registeel",
-          "score": 90.3,
-          "forms": [
-            "registeel",
-            "registeel_shadow"
-          ]
-        },
-        {
           "dex": 477,
           "name": "Dusknoir",
           "speciesId": "dusknoir",
@@ -1100,6 +1090,16 @@
           "forms": [
             "dusknoir",
             "dusknoir_shadow"
+          ]
+        },
+        {
+          "dex": 379,
+          "name": "Registeel",
+          "speciesId": "registeel",
+          "score": 90.2,
+          "forms": [
+            "registeel",
+            "registeel_shadow"
           ]
         },
         {
@@ -1571,7 +1571,7 @@
           "dex": 383,
           "name": "Groudon",
           "speciesId": "groudon_primal",
-          "score": 91.1,
+          "score": 91,
           "forms": [
             "groudon_primal",
             "groudon",
@@ -1582,7 +1582,7 @@
           "dex": 376,
           "name": "Metagross",
           "speciesId": "metagross_mega",
-          "score": 90.9,
+          "score": 91,
           "forms": [
             "metagross_mega",
             "metagross",
@@ -1593,7 +1593,7 @@
           "dex": 652,
           "name": "Chesnaught",
           "speciesId": "chesnaught_mega",
-          "score": 87,
+          "score": 86.9,
           "forms": [
             "chesnaught_mega",
             "chesnaught_shadow",
@@ -1655,21 +1655,10 @@
           ]
         },
         {
-          "dex": 483,
-          "name": "Dialga",
-          "speciesId": "dialga_origin",
-          "score": 83.2,
-          "forms": [
-            "dialga_origin",
-            "dialga",
-            "dialga_shadow"
-          ]
-        },
-        {
           "dex": 260,
           "name": "Swampert",
           "speciesId": "swampert_mega",
-          "score": 83.1,
+          "score": 83.2,
           "forms": [
             "swampert_mega",
             "swampert_shadow",
@@ -1677,10 +1666,21 @@
           ]
         },
         {
+          "dex": 483,
+          "name": "Dialga",
+          "speciesId": "dialga_origin",
+          "score": 83.1,
+          "forms": [
+            "dialga_origin",
+            "dialga",
+            "dialga_shadow"
+          ]
+        },
+        {
           "dex": 306,
           "name": "Aggron",
           "speciesId": "aggron_mega",
-          "score": 82.3,
+          "score": 82.2,
           "forms": [
             "aggron_mega",
             "aggron",
@@ -1702,7 +1702,7 @@
           "dex": 212,
           "name": "Scizor",
           "speciesId": "scizor_mega",
-          "score": 79.3,
+          "score": 79.2,
           "forms": [
             "scizor_mega",
             "scizor_shadow",
@@ -1713,20 +1713,9 @@
           "dex": 716,
           "name": "Xerneas",
           "speciesId": "xerneas",
-          "score": 78,
+          "score": 77.9,
           "forms": [
             "xerneas"
-          ]
-        },
-        {
-          "dex": 475,
-          "name": "Gallade",
-          "speciesId": "gallade_mega",
-          "score": 77,
-          "forms": [
-            "gallade_mega",
-            "gallade_shadow",
-            "gallade"
           ]
         },
         {
@@ -1754,7 +1743,7 @@
           "dex": 647,
           "name": "Keldeo",
           "speciesId": "keldeo_resolute",
-          "score": 76.3,
+          "score": 76.2,
           "forms": [
             "keldeo_resolute",
             "keldeo_ordinary"
@@ -1802,11 +1791,21 @@
           "dex": 646,
           "name": "Kyurem",
           "speciesId": "kyurem_white",
-          "score": 75.2,
+          "score": 75.3,
           "forms": [
             "kyurem_white",
-            "kyurem_black",
-            "kyurem"
+            "kyurem",
+            "kyurem_black"
+          ]
+        },
+        {
+          "dex": 888,
+          "name": "Zacian",
+          "speciesId": "zacian_crowned_sword",
+          "score": 74.8,
+          "forms": [
+            "zacian_crowned_sword",
+            "zacian_hero"
           ]
         }
       ]
@@ -2224,22 +2223,22 @@
           ]
         },
         {
-          "dex": 752,
-          "name": "Araquanid",
-          "speciesId": "araquanid",
-          "score": 90.7,
-          "forms": [
-            "araquanid",
-            "araquanid_shadow"
-          ]
-        },
-        {
           "dex": 828,
           "name": "Thievul",
           "speciesId": "thievul",
           "score": 90.7,
           "forms": [
             "thievul"
+          ]
+        },
+        {
+          "dex": 752,
+          "name": "Araquanid",
+          "speciesId": "araquanid",
+          "score": 90.6,
+          "forms": [
+            "araquanid",
+            "araquanid_shadow"
           ]
         },
         {
