@@ -1,11 +1,24 @@
 {
-  "fetchedAt": "2026-09-17T14:15:17.368Z",
+  "fetchedAt": "2026-09-18T13:33:21.589Z",
   "sources": {
     "pvp": "pvpoke-gamemaster",
     "pve": "alexelgt/game_masters",
-    "pveBatch": "2026-09-15T00:01:14.577Z"
+    "pveBatch": "2026-09-17T16:24:56.605Z"
   },
   "history": [
+    {
+      "at": "2026-09-18T13:33:21.589Z",
+      "stream": "pve",
+      "summary": "1 move(s) changed",
+      "changes": [
+        {
+          "move": "VM_MOVE_TEMP_EVOLUTION_MEGA_V0398_POKEMON_STARAPTOR",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        }
+      ]
+    },
     {
       "at": "2026-09-17T14:15:17.368Z",
       "stream": "pvp",
@@ -5420,6 +5433,12 @@
       "durationMs": 3000,
       "energyDelta": -100,
       "pokemonType": "POKEMON_TYPE_DARK"
+    },
+    "VM_MOVE_TEMP_EVOLUTION_MEGA_V0398_POKEMON_STARAPTOR": {
+      "power": 150,
+      "durationMs": 2000,
+      "energyDelta": -100,
+      "pokemonType": "POKEMON_TYPE_FLYING"
     },
     "VM_MOVE_TEMP_EVOLUTION_MEGA_V0652_POKEMON_CHESNAUGHT": {
       "power": 150,
