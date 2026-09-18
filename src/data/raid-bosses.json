@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-17T12:45:41.388Z",
+  "fetchedAt": "2026-09-18T12:21:24.552Z",
   "raids": {
     "mega": [
       {
@@ -61,6 +61,164 @@
           "fairy",
           "flying",
           "psychic"
+        ]
+      }
+    ],
+    "lvl3": [
+      {
+        "id": "CHARIZARD",
+        "names": {
+          "en": "Charizard",
+          "de": "Glurak",
+          "fr": "Dracaufeu",
+          "it": "Charizard",
+          "ja": "リザードン",
+          "ko": "리자몽",
+          "es": "Charizard"
+        },
+        "types": [
+          "fire",
+          "flying"
+        ],
+        "resistorTypes": [
+          "rock",
+          "fire",
+          "water",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "rock",
+          "electric",
+          "water"
+        ]
+      },
+      {
+        "id": "MEOWSCARADA",
+        "names": {
+          "en": "Meowscarada",
+          "de": "Maskagato",
+          "fr": "Miascarade",
+          "it": "Meowscarada",
+          "ja": "マスカーニャ",
+          "ko": "마스카나",
+          "es": "Meowscarada"
+        },
+        "types": [
+          "grass",
+          "dark"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "flying",
+          "poison",
+          "bug",
+          "steel",
+          "fire",
+          "grass",
+          "dragon",
+          "dark",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "bug",
+          "fairy",
+          "fighting",
+          "fire",
+          "flying",
+          "ice",
+          "poison"
+        ]
+      },
+      {
+        "id": "SKELEDIRGE",
+        "names": {
+          "en": "Skeledirge",
+          "de": "Skelokrok",
+          "fr": "Flâmigator",
+          "it": "Skeledirge",
+          "ja": "ラウドボーン",
+          "ko": "라우드본",
+          "es": "Skeledirge"
+        },
+        "types": [
+          "fire",
+          "ghost"
+        ],
+        "resistorTypes": [
+          "normal",
+          "rock",
+          "fire",
+          "water",
+          "dragon",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "ghost",
+          "ground",
+          "rock",
+          "water"
+        ]
+      },
+      {
+        "id": "QUAQUAVAL",
+        "names": {
+          "en": "Quaquaval",
+          "de": "Bailonda",
+          "fr": "Palmaval",
+          "it": "Quaquaval",
+          "ja": "ウェーニバル",
+          "ko": "웨이니발",
+          "es": "Quaquaval"
+        },
+        "types": [
+          "water",
+          "fighting"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "water",
+          "grass",
+          "psychic",
+          "dragon",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "electric",
+          "fairy",
+          "flying",
+          "grass",
+          "psychic"
+        ]
+      }
+    ],
+    "lvl1": [
+      {
+        "id": "PIKACHU",
+        "names": {
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground"
         ]
       }
     ],
