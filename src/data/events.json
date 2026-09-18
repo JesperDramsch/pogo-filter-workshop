@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-15T13:31:16.233Z",
+  "fetchedAt": "2026-09-18T12:57:01.146Z",
   "events": [
     {
       "id": "event-mega-squads-2026-09-08t10-00-00",
@@ -115,6 +115,62 @@
         "Lechonk",
         "Skwovet",
         "Smoliv"
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "event-harvest-festival-taken-over-2026-10-02t00-00-00",
+      "title": "Harvest Festival: Taken Over",
+      "category": "Event",
+      "start": "2026-10-02T00:00:00",
+      "end": "2026-10-05T20:00:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        109,
+        126,
+        218,
+        322
+      ],
+      "spawns": [
+        "Koffing",
+        "Magmar",
+        "Numel",
+        "Slugma"
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "event-patterns-of-the-wild-2026-10-02t10-00-00",
+      "title": "Patterns of the Wild",
+      "category": "Event",
+      "start": "2026-10-02T10:00:00",
+      "end": "2026-10-02T20:00:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        10,
+        25,
+        43,
+        44,
+        69,
+        165,
+        166,
+        187,
+        188,
+        191,
+        265
+      ],
+      "spawns": [
+        "Bellsprout",
+        "Caterpie",
+        "Gloom",
+        "Hoppip",
+        "Ledian",
+        "Ledyba",
+        "Oddish",
+        "Pikachu",
+        "Skiploom",
+        "Sunkern",
+        "Wurmple"
       ],
       "unresolved": []
     }
