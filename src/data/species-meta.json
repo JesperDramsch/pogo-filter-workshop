@@ -1,11 +1,11 @@
 {
-  "fetchedAt": "2026-09-15T13:41:21.398Z",
+  "fetchedAt": "2026-09-18T13:01:27.651Z",
   "sources": {
     "classes": "game master",
     "released": "pvpoke/pvpoke",
     "generations": "scripts/lib/generations.mjs (pinned dex ranges)",
     "gameMaster": "alexelgt/game_masters",
-    "gameMasterBatch": "2026-09-15T00:01:14.577Z"
+    "gameMasterBatch": "2026-09-17T16:24:56.605Z"
   },
   "startersPerGeneration": 9,
   "powerLineCumulativeCandy": 125,
