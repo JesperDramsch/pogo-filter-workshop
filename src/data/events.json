@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-18T12:57:01.146Z",
+  "fetchedAt": "2026-09-20T13:02:15.664Z",
   "events": [
     {
       "id": "event-mega-squads-2026-09-08t10-00-00",
@@ -33,21 +33,6 @@
         "Purrloin",
         "Rookidee",
         "Weedle"
-      ],
-      "unresolved": []
-    },
-    {
-      "id": "community-day-gible-community-day-classic-2026-09-12t14-00-00",
-      "title": "Gible Community Day Classic",
-      "category": "Community Day",
-      "start": "2026-09-12T14:00:00",
-      "end": "2026-09-12T17:00:00",
-      "isLocalTime": true,
-      "spawnDex": [
-        443
-      ],
-      "spawns": [
-        "Gible"
       ],
       "unresolved": []
     },
