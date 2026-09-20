@@ -452,38 +452,6 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "staraptor-super-mega-raid-day-2026",
-      "name": "Staraptor Super Mega Raid Day",
-      "eventType": "raid-day",
-      "start": "2026-09-19T14:00:00.000",
-      "end": "2026-09-19T17:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "STARAPTOR",
-          "names": {
-            "en": "Staraptor"
-          },
-          "types": [
-            "normal",
-            "flying"
-          ],
-          "resistorTypes": [
-            "rock",
-            "ghost",
-            "steel",
-            "electric"
-          ],
-          "seMoveTypes": [
-            "rock",
-            "electric",
-            "ice"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "mega-malamar-in-mega-raids-september-2026",
       "name": "Mega Malamar in Mega Raids",
       "eventType": "raid-battles",
