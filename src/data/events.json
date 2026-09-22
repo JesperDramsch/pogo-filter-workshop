@@ -1,41 +1,6 @@
 {
-  "fetchedAt": "2026-09-21T15:05:17.706Z",
+  "fetchedAt": "2026-09-22T13:23:39.101Z",
   "events": [
-    {
-      "id": "event-mega-squads-2026-09-08t10-00-00",
-      "title": "Mega Squads",
-      "category": "Event",
-      "start": "2026-09-08T10:00:00",
-      "end": "2026-09-14T20:00:00",
-      "isLocalTime": true,
-      "spawnDex": [
-        13,
-        16,
-        228,
-        318,
-        509,
-        587,
-        661,
-        714,
-        821,
-        827,
-        973
-      ],
-      "spawns": [
-        "Carvanha",
-        "Emolga",
-        "Flamigo",
-        "Fletchling",
-        "Houndour",
-        "Nickit",
-        "Noibat",
-        "Pidgey",
-        "Purrloin",
-        "Rookidee",
-        "Weedle"
-      ],
-      "unresolved": []
-    },
     {
       "id": "event-pok-mon-horizons-the-series-celebration-event-2026-2026-09-16t10-00-00",
       "title": "Pokémon Horizons: The Series Celebration Event 2026",
@@ -264,33 +229,6 @@
         "Stunfisk",
         "Tyrogue",
         "Zigzagoon"
-      ],
-      "unresolved": []
-    },
-    {
-      "id": "event-mega-squads-2026-09-08t10-00-00-eggs",
-      "title": "Mega Squads",
-      "category": "Event",
-      "start": "2026-09-08T10:00:00",
-      "end": "2026-09-14T20:00:00",
-      "isLocalTime": true,
-      "eggDex": [
-        551,
-        587,
-        661,
-        674,
-        821,
-        942,
-        973
-      ],
-      "eggs": [
-        "Emolga",
-        "Flamigo",
-        "Fletchling",
-        "Maschiff",
-        "Pancham",
-        "Rookidee",
-        "Sandile"
       ],
       "unresolved": []
     }
