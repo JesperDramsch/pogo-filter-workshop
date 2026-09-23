@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-17T13:37:34.603Z",
+  "fetchedAt": "2026-09-23T13:44:01.159Z",
   "topN": 30,
   "source": "pvpoke",
   "leagues": {
@@ -894,594 +894,6 @@
     }
   },
   "cups": {
-    "mega-2500": {
-      "id": "mega-2500",
-      "cup": "mega",
-      "meta": "megaultra",
-      "name": "Mega Ultra League",
-      "cpCap": 2500,
-      "species": [
-        {
-          "dex": 959,
-          "name": "Tinkaton",
-          "speciesId": "tinkaton",
-          "score": 95.1,
-          "forms": [
-            "tinkaton"
-          ]
-        },
-        {
-          "dex": 823,
-          "name": "Corviknight",
-          "speciesId": "corviknight",
-          "score": 93.9,
-          "forms": [
-            "corviknight",
-            "corviknight_shadow"
-          ]
-        },
-        {
-          "dex": 671,
-          "name": "Florges",
-          "speciesId": "florges",
-          "score": 92.2,
-          "forms": [
-            "florges"
-          ]
-        },
-        {
-          "dex": 395,
-          "name": "Empoleon",
-          "speciesId": "empoleon",
-          "score": 92.1,
-          "forms": [
-            "empoleon",
-            "empoleon_shadow"
-          ]
-        },
-        {
-          "dex": 809,
-          "name": "Melmetal",
-          "speciesId": "melmetal",
-          "score": 92.1,
-          "forms": [
-            "melmetal"
-          ]
-        },
-        {
-          "dex": 778,
-          "name": "Mimikyu",
-          "speciesId": "mimikyu",
-          "score": 92.1,
-          "forms": [
-            "mimikyu"
-          ]
-        },
-        {
-          "dex": 143,
-          "name": "Snorlax",
-          "speciesId": "snorlax_shadow",
-          "score": 92.1,
-          "forms": [
-            "snorlax_shadow",
-            "snorlax"
-          ]
-        },
-        {
-          "dex": 146,
-          "name": "Moltres",
-          "speciesId": "moltres_galarian",
-          "score": 91.9,
-          "forms": [
-            "moltres_galarian"
-          ]
-        },
-        {
-          "dex": 640,
-          "name": "Virizion",
-          "speciesId": "virizion",
-          "score": 91.9,
-          "forms": [
-            "virizion"
-          ]
-        },
-        {
-          "dex": 718,
-          "name": "Zygarde",
-          "speciesId": "zygarde_complete",
-          "score": 91.8,
-          "forms": [
-            "zygarde_complete"
-          ]
-        },
-        {
-          "dex": 160,
-          "name": "Feraligatr",
-          "speciesId": "feraligatr_shadow",
-          "score": 91.6,
-          "forms": [
-            "feraligatr_shadow",
-            "feraligatr"
-          ]
-        },
-        {
-          "dex": 593,
-          "name": "Jellicent",
-          "speciesId": "jellicent",
-          "score": 90.9,
-          "forms": [
-            "jellicent"
-          ]
-        },
-        {
-          "dex": 487,
-          "name": "Giratina",
-          "speciesId": "giratina_altered",
-          "score": 90.8,
-          "forms": [
-            "giratina_altered",
-            "giratina_altered_shadow",
-            "giratina_origin"
-          ]
-        },
-        {
-          "dex": 799,
-          "name": "Guzzlord",
-          "speciesId": "guzzlord",
-          "score": 90.8,
-          "forms": [
-            "guzzlord"
-          ]
-        },
-        {
-          "dex": 845,
-          "name": "Cramorant",
-          "speciesId": "cramorant",
-          "score": 90.7,
-          "forms": [
-            "cramorant"
-          ]
-        },
-        {
-          "dex": 911,
-          "name": "Skeledirge",
-          "speciesId": "skeledirge",
-          "score": 90.7,
-          "forms": [
-            "skeledirge"
-          ]
-        },
-        {
-          "dex": 38,
-          "name": "Ninetales",
-          "speciesId": "ninetales_alolan",
-          "score": 90.5,
-          "forms": [
-            "ninetales_alolan",
-            "ninetales_alolan_shadow",
-            "ninetales",
-            "ninetales_shadow"
-          ]
-        },
-        {
-          "dex": 812,
-          "name": "Rillaboom",
-          "speciesId": "rillaboom",
-          "score": 90.5,
-          "forms": [
-            "rillaboom"
-          ]
-        },
-        {
-          "dex": 131,
-          "name": "Lapras",
-          "speciesId": "lapras",
-          "score": 90.4,
-          "forms": [
-            "lapras",
-            "lapras_shadow"
-          ]
-        },
-        {
-          "dex": 477,
-          "name": "Dusknoir",
-          "speciesId": "dusknoir",
-          "score": 90.2,
-          "forms": [
-            "dusknoir",
-            "dusknoir_shadow"
-          ]
-        },
-        {
-          "dex": 379,
-          "name": "Registeel",
-          "speciesId": "registeel",
-          "score": 90.2,
-          "forms": [
-            "registeel",
-            "registeel_shadow"
-          ]
-        },
-        {
-          "dex": 36,
-          "name": "Clefable",
-          "speciesId": "clefable",
-          "score": 90,
-          "forms": [
-            "clefable"
-          ]
-        },
-        {
-          "dex": 977,
-          "name": "Dondozo",
-          "speciesId": "dondozo",
-          "score": 90,
-          "forms": [
-            "dondozo"
-          ]
-        },
-        {
-          "dex": 89,
-          "name": "Muk",
-          "speciesId": "muk_alolan",
-          "score": 90,
-          "forms": [
-            "muk_alolan",
-            "muk_alolan_shadow"
-          ]
-        },
-        {
-          "dex": 205,
-          "name": "Forretress",
-          "speciesId": "forretress",
-          "score": 89.8,
-          "forms": [
-            "forretress",
-            "forretress_shadow"
-          ]
-        },
-        {
-          "dex": 895,
-          "name": "Regidrago",
-          "speciesId": "regidrago",
-          "score": 89.8,
-          "forms": [
-            "regidrago"
-          ]
-        },
-        {
-          "dex": 9,
-          "name": "Blastoise",
-          "speciesId": "blastoise",
-          "score": 89.4,
-          "forms": [
-            "blastoise",
-            "blastoise_shadow"
-          ]
-        },
-        {
-          "dex": 488,
-          "name": "Cresselia",
-          "speciesId": "cresselia",
-          "score": 89.4,
-          "forms": [
-            "cresselia",
-            "cresselia_shadow"
-          ]
-        },
-        {
-          "dex": 663,
-          "name": "Talonflame",
-          "speciesId": "talonflame",
-          "score": 89.2,
-          "forms": [
-            "talonflame",
-            "talonflame_shadow"
-          ]
-        },
-        {
-          "dex": 867,
-          "name": "Runerigus",
-          "speciesId": "runerigus",
-          "score": 89,
-          "forms": [
-            "runerigus"
-          ]
-        }
-      ]
-    },
-    "willpower-1500": {
-      "id": "willpower-1500",
-      "cup": "willpower",
-      "meta": "willpower",
-      "name": "Willpower Cup",
-      "cpCap": 1500,
-      "species": [
-        {
-          "dex": 89,
-          "name": "Muk",
-          "speciesId": "muk_alolan",
-          "score": 97.8,
-          "forms": [
-            "muk_alolan",
-            "muk_alolan_shadow"
-          ]
-        },
-        {
-          "dex": 630,
-          "name": "Mandibuzz",
-          "speciesId": "mandibuzz",
-          "score": 97.3,
-          "forms": [
-            "mandibuzz"
-          ]
-        },
-        {
-          "dex": 877,
-          "name": "Morpeko",
-          "speciesId": "morpeko_full_belly",
-          "score": 95,
-          "forms": [
-            "morpeko_full_belly"
-          ]
-        },
-        {
-          "dex": 198,
-          "name": "Murkrow",
-          "speciesId": "murkrow_shadow",
-          "score": 94.6,
-          "forms": [
-            "murkrow_shadow",
-            "murkrow"
-          ]
-        },
-        {
-          "dex": 302,
-          "name": "Sableye",
-          "speciesId": "sableye",
-          "score": 94.6,
-          "forms": [
-            "sableye",
-            "sableye_shadow"
-          ]
-        },
-        {
-          "dex": 452,
-          "name": "Drapion",
-          "speciesId": "drapion",
-          "score": 94.4,
-          "forms": [
-            "drapion",
-            "drapion_shadow"
-          ]
-        },
-        {
-          "dex": 658,
-          "name": "Greninja",
-          "speciesId": "greninja_shadow",
-          "score": 93.9,
-          "forms": [
-            "greninja_shadow",
-            "greninja"
-          ]
-        },
-        {
-          "dex": 979,
-          "name": "Annihilape",
-          "speciesId": "annihilape_shadow",
-          "score": 92.8,
-          "forms": [
-            "annihilape_shadow",
-            "annihilape"
-          ]
-        },
-        {
-          "dex": 538,
-          "name": "Throh",
-          "speciesId": "throh",
-          "score": 91.8,
-          "forms": [
-            "throh",
-            "throh_shadow"
-          ]
-        },
-        {
-          "dex": 799,
-          "name": "Guzzlord",
-          "speciesId": "guzzlord",
-          "score": 91.6,
-          "forms": [
-            "guzzlord"
-          ]
-        },
-        {
-          "dex": 861,
-          "name": "Grimmsnarl",
-          "speciesId": "grimmsnarl",
-          "score": 91.2,
-          "forms": [
-            "grimmsnarl"
-          ]
-        },
-        {
-          "dex": 923,
-          "name": "Pawmot",
-          "speciesId": "pawmot",
-          "score": 91,
-          "forms": [
-            "pawmot"
-          ]
-        },
-        {
-          "dex": 344,
-          "name": "Claydol",
-          "speciesId": "claydol",
-          "score": 90.9,
-          "forms": [
-            "claydol",
-            "claydol_shadow"
-          ]
-        },
-        {
-          "dex": 687,
-          "name": "Malamar",
-          "speciesId": "malamar",
-          "score": 90.2,
-          "forms": [
-            "malamar",
-            "malamar_shadow"
-          ]
-        },
-        {
-          "dex": 503,
-          "name": "Samurott",
-          "speciesId": "samurott_hisuian",
-          "score": 90,
-          "forms": [
-            "samurott_hisuian"
-          ]
-        },
-        {
-          "dex": 635,
-          "name": "Hydreigon",
-          "speciesId": "hydreigon_shadow",
-          "score": 89.9,
-          "forms": [
-            "hydreigon_shadow",
-            "hydreigon"
-          ]
-        },
-        {
-          "dex": 197,
-          "name": "Umbreon",
-          "speciesId": "umbreon",
-          "score": 89.7,
-          "forms": [
-            "umbreon"
-          ]
-        },
-        {
-          "dex": 146,
-          "name": "Moltres",
-          "speciesId": "moltres_galarian",
-          "score": 89.5,
-          "forms": [
-            "moltres_galarian"
-          ]
-        },
-        {
-          "dex": 624,
-          "name": "Pawniard",
-          "speciesId": "pawniard",
-          "score": 88.9,
-          "forms": [
-            "pawniard"
-          ]
-        },
-        {
-          "dex": 701,
-          "name": "Hawlucha",
-          "speciesId": "hawlucha",
-          "score": 88.7,
-          "forms": [
-            "hawlucha"
-          ]
-        },
-        {
-          "dex": 983,
-          "name": "Kingambit",
-          "speciesId": "kingambit",
-          "score": 88.6,
-          "forms": [
-            "kingambit"
-          ]
-        },
-        {
-          "dex": 783,
-          "name": "Hakamo-o",
-          "speciesId": "hakamo_o",
-          "score": 88.1,
-          "forms": [
-            "hakamo_o"
-          ]
-        },
-        {
-          "dex": 375,
-          "name": "Metang",
-          "speciesId": "metang_shadow",
-          "score": 88.1,
-          "forms": [
-            "metang_shadow",
-            "metang"
-          ]
-        },
-        {
-          "dex": 973,
-          "name": "Flamigo",
-          "speciesId": "flamigo",
-          "score": 87.7,
-          "forms": [
-            "flamigo"
-          ]
-        },
-        {
-          "dex": 784,
-          "name": "Kommo-o",
-          "speciesId": "kommo_o",
-          "score": 87.5,
-          "forms": [
-            "kommo_o"
-          ]
-        },
-        {
-          "dex": 860,
-          "name": "Morgrem",
-          "speciesId": "morgrem",
-          "score": 87.5,
-          "forms": [
-            "morgrem"
-          ]
-        },
-        {
-          "dex": 257,
-          "name": "Blaziken",
-          "speciesId": "blaziken",
-          "score": 87.2,
-          "forms": [
-            "blaziken",
-            "blaziken_shadow"
-          ]
-        },
-        {
-          "dex": 211,
-          "name": "Qwilfish",
-          "speciesId": "qwilfish_hisuian",
-          "score": 87.2,
-          "forms": [
-            "qwilfish_hisuian"
-          ]
-        },
-        {
-          "dex": 53,
-          "name": "Persian",
-          "speciesId": "persian_alolan",
-          "score": 86.9,
-          "forms": [
-            "persian_alolan"
-          ]
-        },
-        {
-          "dex": 634,
-          "name": "Zweilous",
-          "speciesId": "zweilous_shadow",
-          "score": 86.9,
-          "forms": [
-            "zweilous_shadow",
-            "zweilous"
-          ]
-        }
-      ]
-    },
     "mega-10000": {
       "id": "mega-10000",
       "cup": "mega",
@@ -2408,6 +1820,302 @@
         }
       ]
     },
+    "mega-2500": {
+      "id": "mega-2500",
+      "cup": "mega",
+      "meta": "megaultra",
+      "name": "Mega Ultra League",
+      "cpCap": 2500,
+      "species": [
+        {
+          "dex": 959,
+          "name": "Tinkaton",
+          "speciesId": "tinkaton",
+          "score": 95.1,
+          "forms": [
+            "tinkaton"
+          ]
+        },
+        {
+          "dex": 823,
+          "name": "Corviknight",
+          "speciesId": "corviknight",
+          "score": 93.9,
+          "forms": [
+            "corviknight",
+            "corviknight_shadow"
+          ]
+        },
+        {
+          "dex": 671,
+          "name": "Florges",
+          "speciesId": "florges",
+          "score": 92.2,
+          "forms": [
+            "florges"
+          ]
+        },
+        {
+          "dex": 395,
+          "name": "Empoleon",
+          "speciesId": "empoleon",
+          "score": 92.1,
+          "forms": [
+            "empoleon",
+            "empoleon_shadow"
+          ]
+        },
+        {
+          "dex": 809,
+          "name": "Melmetal",
+          "speciesId": "melmetal",
+          "score": 92.1,
+          "forms": [
+            "melmetal"
+          ]
+        },
+        {
+          "dex": 778,
+          "name": "Mimikyu",
+          "speciesId": "mimikyu",
+          "score": 92.1,
+          "forms": [
+            "mimikyu"
+          ]
+        },
+        {
+          "dex": 143,
+          "name": "Snorlax",
+          "speciesId": "snorlax_shadow",
+          "score": 92.1,
+          "forms": [
+            "snorlax_shadow",
+            "snorlax"
+          ]
+        },
+        {
+          "dex": 146,
+          "name": "Moltres",
+          "speciesId": "moltres_galarian",
+          "score": 91.9,
+          "forms": [
+            "moltres_galarian"
+          ]
+        },
+        {
+          "dex": 640,
+          "name": "Virizion",
+          "speciesId": "virizion",
+          "score": 91.9,
+          "forms": [
+            "virizion"
+          ]
+        },
+        {
+          "dex": 718,
+          "name": "Zygarde",
+          "speciesId": "zygarde_complete",
+          "score": 91.8,
+          "forms": [
+            "zygarde_complete"
+          ]
+        },
+        {
+          "dex": 160,
+          "name": "Feraligatr",
+          "speciesId": "feraligatr_shadow",
+          "score": 91.6,
+          "forms": [
+            "feraligatr_shadow",
+            "feraligatr"
+          ]
+        },
+        {
+          "dex": 593,
+          "name": "Jellicent",
+          "speciesId": "jellicent",
+          "score": 90.9,
+          "forms": [
+            "jellicent"
+          ]
+        },
+        {
+          "dex": 487,
+          "name": "Giratina",
+          "speciesId": "giratina_altered",
+          "score": 90.8,
+          "forms": [
+            "giratina_altered",
+            "giratina_altered_shadow",
+            "giratina_origin"
+          ]
+        },
+        {
+          "dex": 799,
+          "name": "Guzzlord",
+          "speciesId": "guzzlord",
+          "score": 90.8,
+          "forms": [
+            "guzzlord"
+          ]
+        },
+        {
+          "dex": 845,
+          "name": "Cramorant",
+          "speciesId": "cramorant",
+          "score": 90.7,
+          "forms": [
+            "cramorant"
+          ]
+        },
+        {
+          "dex": 911,
+          "name": "Skeledirge",
+          "speciesId": "skeledirge",
+          "score": 90.7,
+          "forms": [
+            "skeledirge"
+          ]
+        },
+        {
+          "dex": 38,
+          "name": "Ninetales",
+          "speciesId": "ninetales_alolan",
+          "score": 90.5,
+          "forms": [
+            "ninetales_alolan",
+            "ninetales_alolan_shadow",
+            "ninetales",
+            "ninetales_shadow"
+          ]
+        },
+        {
+          "dex": 812,
+          "name": "Rillaboom",
+          "speciesId": "rillaboom",
+          "score": 90.5,
+          "forms": [
+            "rillaboom"
+          ]
+        },
+        {
+          "dex": 131,
+          "name": "Lapras",
+          "speciesId": "lapras",
+          "score": 90.4,
+          "forms": [
+            "lapras",
+            "lapras_shadow"
+          ]
+        },
+        {
+          "dex": 477,
+          "name": "Dusknoir",
+          "speciesId": "dusknoir",
+          "score": 90.2,
+          "forms": [
+            "dusknoir",
+            "dusknoir_shadow"
+          ]
+        },
+        {
+          "dex": 379,
+          "name": "Registeel",
+          "speciesId": "registeel",
+          "score": 90.2,
+          "forms": [
+            "registeel",
+            "registeel_shadow"
+          ]
+        },
+        {
+          "dex": 36,
+          "name": "Clefable",
+          "speciesId": "clefable",
+          "score": 90,
+          "forms": [
+            "clefable"
+          ]
+        },
+        {
+          "dex": 977,
+          "name": "Dondozo",
+          "speciesId": "dondozo",
+          "score": 90,
+          "forms": [
+            "dondozo"
+          ]
+        },
+        {
+          "dex": 89,
+          "name": "Muk",
+          "speciesId": "muk_alolan",
+          "score": 90,
+          "forms": [
+            "muk_alolan",
+            "muk_alolan_shadow"
+          ]
+        },
+        {
+          "dex": 205,
+          "name": "Forretress",
+          "speciesId": "forretress",
+          "score": 89.8,
+          "forms": [
+            "forretress",
+            "forretress_shadow"
+          ]
+        },
+        {
+          "dex": 895,
+          "name": "Regidrago",
+          "speciesId": "regidrago",
+          "score": 89.8,
+          "forms": [
+            "regidrago"
+          ]
+        },
+        {
+          "dex": 9,
+          "name": "Blastoise",
+          "speciesId": "blastoise",
+          "score": 89.4,
+          "forms": [
+            "blastoise",
+            "blastoise_shadow"
+          ]
+        },
+        {
+          "dex": 488,
+          "name": "Cresselia",
+          "speciesId": "cresselia",
+          "score": 89.4,
+          "forms": [
+            "cresselia",
+            "cresselia_shadow"
+          ]
+        },
+        {
+          "dex": 663,
+          "name": "Talonflame",
+          "speciesId": "talonflame",
+          "score": 89.2,
+          "forms": [
+            "talonflame",
+            "talonflame_shadow"
+          ]
+        },
+        {
+          "dex": 867,
+          "name": "Runerigus",
+          "speciesId": "runerigus",
+          "score": 89,
+          "forms": [
+            "runerigus"
+          ]
+        }
+      ]
+    },
     "little-500": {
       "id": "little-500",
       "cup": "little",
@@ -2998,20 +2706,6 @@
     }
   },
   "gblEvents": [
-    {
-      "eventID": "gbl-twilight-trails_great-league_ultra-league-mega-edition_willpower-cup-great-league-edition",
-      "name": "Great League, Ultra League: Mega Edition, and Willpower Cup: Great League Edition | Twilight Trails",
-      "start": "2026-09-15T20:00:00.000Z",
-      "end": "2026-09-22T20:00:00.000Z",
-      "cups": [
-        "mega-2500",
-        "willpower-1500"
-      ],
-      "leagues": [
-        "great",
-        "ultra"
-      ]
-    },
     {
       "eventID": "gbl-twilight-trails_ultra-league_master-league-mega-edition_retro-cup-great-league-edition",
       "name": "Ultra League, Master League: Mega Edition, and Retro Cup: Great League Edition | Twilight Trails",
