@@ -5690,13 +5690,24 @@ export default function App() {
 	}
 
 	function addHundo() {
+		const res = addHundoText(newHundo);
+		if (!res) return;
+		if (res.covered.length > 0) setFriendCollectCoveredNotice(res.covered);
+		setNewHundo(res.unresolved.join(', '));
+	}
+	// Add a free-text species list to the hundos. Returns the tokens that did
+	// not resolve plus the friend-collect coverage notices (null when the text
+	// was empty), so each caller decides what stays in its own input and which
+	// notices to show — the per-list editor and the quick-add bar, which may
+	// add to both lists in one go.
+	function addHundoText(text) {
 		// Accept comma/space/semicolon-separated lists. Each token can be:
 		// - a dex number (e.g. "1", "201", "0666")
 		// - an English name (e.g. "Bulbasaur", "venusaur")
 		// - a German name (e.g. "bisasam", "Bisaflor")
 		// Resolves each to canonical lowercase German via resolveSpecies().
-		const tokens = splitSpeciesInput(newHundo);
-		if (tokens.length === 0) return;
+		const tokens = splitSpeciesInput(text);
+		if (tokens.length === 0) return null;
 		const set = new Set(hundos);
 		const unresolved = [];
 		const added = [];
@@ -5717,14 +5728,9 @@ export default function App() {
 			.map((sp) => ({ species: sp, groups: regionalProtectionsFor(sp, config) }))
 			.filter((x) => x.groups.length > 0);
 		if (regionalAdds.length > 0) setHundoRegionalNotice(regionalAdds);
-		const covered = detectFriendCollectCovered(added, 'hundo');
-		if (covered.length > 0) setFriendCollectCoveredNotice(covered);
-		if (unresolved.length > 0) {
-			// Keep unresolved tokens in the input so the user sees what didn't match
-			setNewHundo(unresolved.join(', '));
-		} else {
-			setNewHundo('');
-		}
+		// Unresolved tokens go back to the caller's input so the user sees what
+		// didn't match.
+		return { added, unresolved, covered: detectFriendCollectCovered(added, 'hundo') };
 	}
 	function removeHundo(h) {
 		setHundos(hundos.filter((x) => x !== h));
@@ -5745,11 +5751,17 @@ export default function App() {
 		});
 	}
 	function addLucky() {
-		// Same parser as addHundo: comma/space/semicolon-split, multi-locale
-		// species resolution, dupes silently ignored, unresolved tokens kept
-		// in the input so the user can fix typos.
-		const tokens = splitSpeciesInput(newLucky);
-		if (tokens.length === 0) return;
+		const res = addLuckyText(newLucky);
+		if (!res) return;
+		if (res.covered.length > 0) setFriendCollectCoveredNotice(res.covered);
+		setNewLucky(res.unresolved.join(', '));
+	}
+	function addLuckyText(text) {
+		// Same parser as addHundoText: comma/space/semicolon-split, multi-locale
+		// species resolution, dupes silently ignored, unresolved tokens returned
+		// so the input can keep them for the user to fix typos.
+		const tokens = splitSpeciesInput(text);
+		if (tokens.length === 0) return null;
 		const set = new Set(luckies);
 		const unresolved = [];
 		const added = [];
@@ -5761,9 +5773,23 @@ export default function App() {
 			} else unresolved.push(tok);
 		}
 		setLuckies([...set].sort());
-		const covered = detectFriendCollectCovered(added, 'lucky');
+		return { added, unresolved, covered: detectFriendCollectCovered(added, 'lucky') };
+	}
+	// The quick-add bar above both have-lists: one field that feeds the hundos,
+	// the luckies, or both (a lucky hundo), so adding to a long list never means
+	// scrolling past it to that list's own input. Both lists resolve the same
+	// text identically, so either result's `unresolved` stands for both.
+	function quickAddHave(text, target) {
+		const h = target === 'lucky' ? null : addHundoText(text);
+		const l = target === 'hundo' ? null : addLuckyText(text);
+		const res = h || l;
+		if (!res) return null;
+		const covered = [...(h?.covered || []), ...(l?.covered || [])];
 		if (covered.length > 0) setFriendCollectCoveredNotice(covered);
-		setNewLucky(unresolved.length > 0 ? unresolved.join(', ') : '');
+		return {
+			added: [...new Set([...(h?.added || []), ...(l?.added || [])])].sort(),
+			unresolved: res.unresolved,
+		};
 	}
 	function removeLucky(s) {
 		setLuckies(luckies.filter((x) => x !== s));
@@ -6110,6 +6136,7 @@ export default function App() {
 										<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4'>
 											{t('app.step.have.section_completions')}
 										</h3>
+										<QuickHaveAdd onAdd={quickAddHave} />
 										<HundosEditor
 											hundos={hundos}
 											setHundos={setHundos}
@@ -7150,6 +7177,93 @@ function SeasonNote({ hemisphere, season, window, auto, onAuto, onOverride, over
 					</button>
 				))}
 			</div>
+		</div>
+	);
+}
+
+// One field at the top of the have step that adds to the hundos, the luckies
+// or both. The per-list inputs sit below their chips, so with a few hundred
+// entries they are a long scroll away; this one never moves. Same free-text
+// parser and suggestions as the list inputs; unrecognised tokens stay in the
+// field, and the outcome is shown and announced because the chips it changed
+// are usually off-screen.
+const QUICK_ADD_TARGETS = [
+	{ id: 'hundo', accent: '#5EAFC5' },
+	{ id: 'lucky', accent: '#F5B82E' },
+	{ id: 'both', accent: '#E6EDF3' },
+];
+function QuickHaveAdd({ onAdd }) {
+	const { t } = useTranslation();
+	const announce = useAnnounce();
+	const [text, setText] = useState('');
+	const [target, setTarget] = useState('hundo');
+	const [result, setResult] = useState(null);
+	const canAdd = splitSpeciesInput(text).length > 0;
+
+	function submit() {
+		const res = onAdd(text, target);
+		if (!res) return;
+		setText(res.unresolved.join(', '));
+		const list = t(`app.quick_add.target.${target}`);
+		const parts = [
+			res.added.length > 0
+				? t('app.quick_add.added', { params: { count: res.added.length, list, names: res.added.join(', ') } })
+				: t('app.quick_add.nothing_new', { params: { list } }),
+		];
+		if (res.unresolved.length > 0)
+			parts.push(t('app.quick_add.unresolved', { params: { count: res.unresolved.length } }));
+		const message = parts.join(' · ');
+		setResult({ message, ok: res.added.length > 0 });
+		announce(message);
+	}
+
+	return (
+		<div className='mb-8 border border-[#1F2933] rounded p-3 bg-[#0B0F14] space-y-2.5'>
+			<div className='flex flex-wrap items-center justify-between gap-2'>
+				<span className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
+					{t('app.quick_add.title')}
+				</span>
+				<div role='group' aria-label={t('app.quick_add.target_label')} className='flex gap-1'>
+					{QUICK_ADD_TARGETS.map((opt) => (
+						<button
+							key={opt.id}
+							onClick={() => setTarget(opt.id)}
+							aria-pressed={target === opt.id}
+							style={target === opt.id ? { color: opt.accent, borderColor: opt.accent } : undefined}
+							className={`mono text-xs px-2 py-0.5 rounded border transition ${
+								target === opt.id
+									? 'bg-[#1F2933]'
+									: 'bg-transparent border-[#2D3A47] text-[#8090A0] hover:text-[#E6EDF3]'
+							}`}
+						>
+							{t(`app.quick_add.target.${opt.id}`)}
+						</button>
+					))}
+				</div>
+			</div>
+			<div className='flex gap-2'>
+				<SpeciesInput
+					value={text}
+					onChange={(v) => {
+						setText(v);
+						setResult(null);
+					}}
+					onSubmit={submit}
+					aria-label={t('app.quick_add.input_label')}
+					placeholder={t('app.hundos.input_placeholder')}
+					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
+				/>
+				<button
+					onClick={submit}
+					disabled={!canAdd}
+					className='mono text-sm bg-[#E74C3C] hover:bg-[#FF5A4A] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded transition flex items-center gap-1.5'
+				>
+					<Plus size={14} /> {t('app.hundos.add_button')}
+				</button>
+			</div>
+			{result && (
+				<p className={`mono text-xs ${result.ok ? 'text-[#27AE60]' : 'text-[#8B98A5]'}`}>{result.message}</p>
+			)}
 		</div>
 	);
 }
