@@ -19,6 +19,7 @@ const FILES = [
   "src/refinements.jsx",
   "src/Landing.jsx",
   "src/SwipeOnboarding.jsx",
+  "src/SpeciesInput.jsx",
   ...readdirSync("src/explain").filter((f) => f.endsWith(".jsx")).map((f) => `src/explain/${f}`),
 ];
 

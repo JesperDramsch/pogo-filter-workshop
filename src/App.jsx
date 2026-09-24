@@ -15,7 +15,8 @@ import {
 	Download,
 	Upload,
 } from 'lucide-react';
-import { POKEMON_NAMES_DICT, resolveSpecies, resolveSpeciesInfo, pokemonNameFor } from './data/species.js';
+import { POKEMON_NAMES_DICT, resolveSpecies, resolveSpeciesInfo, pokemonNameFor, splitSpeciesInput } from './data/species.js';
+import SpeciesInput from './SpeciesInput.jsx';
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from './i18n/pogo-keywords.js';
 import RAID_BOSSES from './data/raid-bosses.json';
 import EVENTS from './data/events.json';
@@ -5694,7 +5695,7 @@ export default function App() {
 		// - an English name (e.g. "Bulbasaur", "venusaur")
 		// - a German name (e.g. "bisasam", "Bisaflor")
 		// Resolves each to canonical lowercase German via resolveSpecies().
-		const tokens = newHundo.split(/[,;\s]+/).filter(Boolean);
+		const tokens = splitSpeciesInput(newHundo);
 		if (tokens.length === 0) return;
 		const set = new Set(hundos);
 		const unresolved = [];
@@ -5747,7 +5748,7 @@ export default function App() {
 		// Same parser as addHundo: comma/space/semicolon-split, multi-locale
 		// species resolution, dupes silently ignored, unresolved tokens kept
 		// in the input so the user can fix typos.
-		const tokens = newLucky.split(/[,;\s]+/).filter(Boolean);
+		const tokens = splitSpeciesInput(newLucky);
 		if (tokens.length === 0) return;
 		const set = new Set(luckies);
 		const unresolved = [];
@@ -5781,7 +5782,7 @@ export default function App() {
 		// Same parser as addHundo: comma/space/semicolon-split, multi-locale
 		// species resolution, dupes silently ignored, unresolved tokens kept
 		// in the input so the user can fix typos.
-		const tokens = newTopAttacker.split(/[,;\s]+/).filter(Boolean);
+		const tokens = splitSpeciesInput(newTopAttacker);
 		if (tokens.length === 0) return;
 		const set = new Set(topAttackers);
 		const unresolved = [];
@@ -5797,7 +5798,7 @@ export default function App() {
 		setTopAttackers(topAttackers.filter((x) => x !== s));
 	}
 	function addTopMaxAttacker() {
-		const tokens = newTopMaxAttacker.split(/[,;\s]+/).filter(Boolean);
+		const tokens = splitSpeciesInput(newTopMaxAttacker);
 		if (tokens.length === 0) return;
 		const set = new Set(topMaxAttackers);
 		const unresolved = [];
@@ -5816,7 +5817,7 @@ export default function App() {
 	// shadowKeeperSpecies). Mirrors addHundo/addTopAttacker but writes back
 	// through setConfig so the value persists alongside other config.
 	function addToConfigList(fieldKey, raw, setRaw) {
-		const tokens = raw.split(/[,;\s]+/).filter(Boolean);
+		const tokens = splitSpeciesInput(raw);
 		if (tokens.length === 0) return;
 		const next = new Set(config[fieldKey] || []);
 		const unresolved = [];
@@ -7174,9 +7175,7 @@ function HundosEditor({
 	// Live preview of what's about to be added: parse the input, resolve each token,
 	// show a green chip for each resolved one + a red marker for unresolved tokens.
 	const previewTokens = useMemo(() => {
-		return newHundo
-			.split(/[,;\s]+/)
-			.filter(Boolean)
+		return splitSpeciesInput(newHundo)
 			.map((tok) => {
 				const info = resolveSpeciesInfo(tok);
 				return { input: tok, info };
@@ -7231,11 +7230,10 @@ function HundosEditor({
 			</div>
 
 			<div className='flex gap-2'>
-				<input
-					type='text'
+				<SpeciesInput
 					value={newHundo}
-					onChange={(e) => setNewHundo(e.target.value)}
-					onKeyDown={(e) => e.key === 'Enter' && addHundo()}
+					onChange={setNewHundo}
+					onSubmit={addHundo}
 					aria-label={t('app.a11y.species_input')}
 					placeholder={t('app.hundos.input_placeholder')}
 					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
@@ -7369,9 +7367,7 @@ function SpeciesListEditor({
 }) {
 	const { t } = useTranslation();
 	const previewTokens = useMemo(() => {
-		return newItem
-			.split(/[,;\s]+/)
-			.filter(Boolean)
+		return splitSpeciesInput(newItem)
 			.map((tok) => ({
 				input: tok,
 				info: resolveSpeciesInfo(tok),
@@ -7428,11 +7424,10 @@ function SpeciesListEditor({
 			</div>
 
 			<div className='flex gap-2'>
-				<input
-					type='text'
+				<SpeciesInput
 					value={newItem}
-					onChange={(e) => setNewItem(e.target.value)}
-					onKeyDown={(e) => e.key === 'Enter' && addItem()}
+					onChange={setNewItem}
+					onSubmit={addItem}
 					aria-label={t('app.a11y.species_input')}
 					placeholder={t(`${titleKey}.input_placeholder`)}
 					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
@@ -7517,9 +7512,7 @@ function CustomCollectiblesEditor({ list, onChange }) {
 
 	// Live preview using same resolver as hundo input
 	const previewTokens = useMemo(() => {
-		return input
-			.split(/[,;\s]+/)
-			.filter(Boolean)
+		return splitSpeciesInput(input)
 			.map((tok) => ({
 				input: tok,
 				info: resolveSpeciesInfo(tok),
@@ -7531,7 +7524,7 @@ function CustomCollectiblesEditor({ list, onChange }) {
 	const unresolved = previewTokens.filter((p) => !p.info);
 
 	function addAll() {
-		const tokens = input.split(/[,;\s]+/).filter(Boolean);
+		const tokens = splitSpeciesInput(input);
 		if (tokens.length === 0) return;
 		const set = new Set(list);
 		const remaining = [];
@@ -7575,11 +7568,10 @@ function CustomCollectiblesEditor({ list, onChange }) {
 			)}
 
 			<div className='flex gap-2'>
-				<input
-					type='text'
+				<SpeciesInput
 					value={input}
-					onChange={(e) => setInput(e.target.value)}
-					onKeyDown={(e) => e.key === 'Enter' && addAll()}
+					onChange={setInput}
+					onSubmit={addAll}
 					placeholder={t('app.collectibles.input_placeholder')}
 					aria-label={t('app.a11y.species_input')}
 					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
@@ -7722,9 +7714,7 @@ function FriendCollectEditor({
 	const [packDeselected, setPackDeselected] = useState({});
 
 	const previewTokens = useMemo(() => {
-		return input
-			.split(/[,;\s]+/)
-			.filter(Boolean)
+		return splitSpeciesInput(input)
 			.map((tok) => ({
 				input: tok,
 				info: resolveSpeciesInfo(tok),
@@ -7736,7 +7726,7 @@ function FriendCollectEditor({
 	const unresolved = previewTokens.filter((p) => !p.info);
 
 	function addAll() {
-		const tokens = input.split(/[,;\s]+/).filter(Boolean);
+		const tokens = splitSpeciesInput(input);
 		if (tokens.length === 0) return;
 		const set = new Set(list);
 		const remaining = [];
@@ -8200,11 +8190,10 @@ function FriendCollectEditor({
 			)}
 
 			<div className='flex gap-2'>
-				<input
-					type='text'
+				<SpeciesInput
 					value={input}
-					onChange={(e) => setInput(e.target.value)}
-					onKeyDown={(e) => e.key === 'Enter' && addAll()}
+					onChange={setInput}
+					onSubmit={addAll}
 					placeholder={t('app.filter.friend_collect_input_placeholder')}
 					aria-label={t('app.a11y.species_input')}
 					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
@@ -9696,7 +9685,7 @@ function PvpMetaPanel({ config, set, expert, packs, newItem, setNewItem }) {
 		set('pvpMetaSpecies', [...new Set([...items, ...pack.species])].sort());
 	}
 	function addTyped() {
-		const tokens = newItem.split(/[,;\s]+/).filter(Boolean);
+		const tokens = splitSpeciesInput(newItem);
 		if (tokens.length === 0) return;
 		const next = new Set(items);
 		const unresolved = [];
@@ -12267,9 +12256,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 	const [open, setOpen] = useState(targets.length === 0);
 
 	const previewTokens = useMemo(() => {
-		return input
-			.split(/[,;\s]+/)
-			.filter(Boolean)
+		return splitSpeciesInput(input)
 			.map((tok) => ({
 				input: tok,
 				info: resolveSpeciesInfo(tok),
@@ -12285,7 +12272,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 
 	const keyOf = (tg) => tg.species;
 	function addAll() {
-		const tokens = input.split(/[,;\s]+/).filter(Boolean);
+		const tokens = splitSpeciesInput(input);
 		if (tokens.length === 0) return;
 		const map = new Map(targets.map((tg) => [tg.species, tg]));
 		const remaining = [];
@@ -12482,11 +12469,10 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 			)}
 
 			<div className='flex gap-2'>
-				<input
-					type='text'
+				<SpeciesInput
 					value={input}
-					onChange={(e) => setInput(e.target.value)}
-					onKeyDown={(e) => e.key === 'Enter' && addAll()}
+					onChange={setInput}
+					onSubmit={addAll}
 					placeholder={t('app.buddy_targets.input_placeholder')}
 					aria-label={t('app.a11y.species_input')}
 					className='mono text-xs flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
