@@ -1,145 +1,132 @@
 {
-  "fetchedAt": "2026-09-18T12:21:24.552Z",
+  "fetchedAt": "2026-09-24T12:52:57.618Z",
   "raids": {
-    "mega": [
+    "ultra_beast": [
       {
-        "id": "VENUSAUR",
+        "id": "BUZZWOLE",
         "names": {
-          "en": "Mega Venusaur",
-          "de": "Mega-Bisaflor",
-          "fr": "Méga-Florizarre",
-          "it": "MegaVenusaur",
-          "ja": "メガフシギバナ",
-          "ko": "메가이상해꽃",
-          "es": "Mega-Venusaur"
+          "en": "Buzzwole",
+          "de": "Masskito",
+          "fr": "Mouscoto",
+          "it": "Buzzwole",
+          "ja": "マッシブーン",
+          "ko": "매시붕",
+          "es": "Buzzwole"
         },
         "types": [
-          "grass",
-          "poison"
-        ],
-        "resistorTypes": [
-          "flying",
-          "poison",
           "bug",
-          "ghost",
-          "steel",
-          "fire",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "fire",
-          "flying",
-          "ice",
-          "psychic"
-        ]
-      }
-    ],
-    "lvl5": [
-      {
-        "id": "ZAMAZENTA",
-        "names": {
-          "en": "Zamazenta (Hero of Many Battles)",
-          "de": "Zamazenta (Heldenhafter Krieger)",
-          "fr": "Zamazenta (Héros Aguerri)",
-          "it": "Zamazenta (Eroe di Mille Lotte)",
-          "ja": "ザマゼンタ (れきせんのゆうしゃ)",
-          "ko": "자마젠타 (역전의 용사)",
-          "es": "Zamazenta (Guerrero Avezado)"
-        },
-        "types": [
           "fighting"
-        ],
-        "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
-          "ghost",
-          "psychic",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "fairy",
-          "flying",
-          "psychic"
-        ]
-      }
-    ],
-    "lvl3": [
-      {
-        "id": "CHARIZARD",
-        "names": {
-          "en": "Charizard",
-          "de": "Glurak",
-          "fr": "Dracaufeu",
-          "it": "Charizard",
-          "ja": "リザードン",
-          "ko": "리자몽",
-          "es": "Charizard"
-        },
-        "types": [
-          "fire",
-          "flying"
-        ],
-        "resistorTypes": [
-          "rock",
-          "fire",
-          "water",
-          "electric",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "rock",
-          "electric",
-          "water"
-        ]
-      },
-      {
-        "id": "MEOWSCARADA",
-        "names": {
-          "en": "Meowscarada",
-          "de": "Maskagato",
-          "fr": "Miascarade",
-          "it": "Meowscarada",
-          "ja": "マスカーニャ",
-          "ko": "마스카나",
-          "es": "Meowscarada"
-        },
-        "types": [
-          "grass",
-          "dark"
         ],
         "resistorTypes": [
           "fighting",
           "flying",
           "poison",
           "bug",
-          "steel",
+          "ghost",
           "fire",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "fairy",
+          "fire",
+          "psychic"
+        ]
+      },
+      {
+        "id": "PHEROMOSA",
+        "names": {
+          "en": "Pheromosa",
+          "de": "Schabelle",
+          "fr": "Cancrelove",
+          "it": "Pheromosa",
+          "ja": "フェローチェ",
+          "ko": "페로코체",
+          "es": "Pheromosa"
+        },
+        "types": [
+          "bug",
+          "fighting"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "fire",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "flying",
+          "fairy",
+          "fire",
+          "psychic"
+        ]
+      },
+      {
+        "id": "XURKITREE",
+        "names": {
+          "en": "Xurkitree",
+          "de": "Voltriant",
+          "fr": "Câblifère",
+          "it": "Xurkitree",
+          "ja": "デンジュモク",
+          "ko": "전수목",
+          "es": "Xurkitree"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
           "grass",
-          "dragon",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "ground"
+        ]
+      }
+    ],
+    "mega": [
+      {
+        "id": "MALAMAR",
+        "names": {
+          "en": "Mega Malamar",
+          "de": "Mega-Calamanero",
+          "fr": "Méga-Sepiatroce",
+          "it": "MegaMalamar",
+          "ja": "メガカラマネロ",
+          "ko": "메가칼라마네로",
+          "es": "Mega-Malamar"
+        },
+        "types": [
+          "dark",
+          "psychic"
+        ],
+        "resistorTypes": [
+          "steel",
           "dark",
           "fairy"
         ],
         "seMoveTypes": [
           "bug",
-          "fairy",
-          "fighting",
-          "fire",
-          "flying",
-          "ice",
-          "poison"
+          "fairy"
         ]
-      },
+      }
+    ],
+    "lvl3": [
       {
-        "id": "SKELEDIRGE",
+        "id": "TYPHLOSION",
         "names": {
-          "en": "Skeledirge",
-          "de": "Skelokrok",
-          "fr": "Flâmigator",
-          "it": "Skeledirge",
-          "ja": "ラウドボーン",
-          "ko": "라우드본",
-          "es": "Skeledirge"
+          "en": "Hisuian Typhlosion",
+          "de": "Hisuian-Tornupto",
+          "fr": "Typhlosion de Hisuian",
+          "it": "Typhlosion di Hisuian",
+          "ja": "バクフーン",
+          "ko": "블레이범",
+          "es": "Typhlosion de Galar"
         },
         "types": [
           "fire",
@@ -162,18 +149,49 @@
         ]
       },
       {
-        "id": "QUAQUAVAL",
+        "id": "SAMUROTT",
         "names": {
-          "en": "Quaquaval",
-          "de": "Bailonda",
-          "fr": "Palmaval",
-          "it": "Quaquaval",
-          "ja": "ウェーニバル",
-          "ko": "웨이니발",
-          "es": "Quaquaval"
+          "en": "Hisuian Samurott",
+          "de": "Hisuian-Admurai",
+          "fr": "Clamiral de Hisuian",
+          "it": "Samurott di Hisuian",
+          "ja": "ダイケンキ",
+          "ko": "대검귀",
+          "es": "Samurott de Galar"
         },
         "types": [
           "water",
+          "dark"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "water",
+          "grass",
+          "dragon",
+          "dark",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "bug",
+          "electric",
+          "fairy",
+          "fighting",
+          "grass"
+        ]
+      },
+      {
+        "id": "DECIDUEYE",
+        "names": {
+          "en": "Hisuian Decidueye",
+          "de": "Hisuian-Silvarro",
+          "fr": "Archéduc de Hisuian",
+          "it": "Decidueye di Hisuian",
+          "ja": "ジュナイパー",
+          "ko": "모크나이퍼",
+          "es": "Decidueye de Galar"
+        },
+        "types": [
+          "grass",
           "fighting"
         ],
         "resistorTypes": [
@@ -181,44 +199,127 @@
           "poison",
           "bug",
           "ghost",
-          "water",
+          "fire",
           "grass",
           "psychic",
           "dragon",
           "fairy"
         ],
         "seMoveTypes": [
-          "electric",
-          "fairy",
           "flying",
-          "grass",
+          "fairy",
+          "fire",
+          "ice",
+          "poison",
           "psychic"
         ]
       }
     ],
     "lvl1": [
       {
-        "id": "PIKACHU",
+        "id": "DRATINI",
         "names": {
-          "en": "Pikachu",
-          "de": "Pikachu",
-          "fr": "Pikachu",
-          "it": "Pikachu",
-          "ja": "ピカチュウ",
-          "ko": "피카츄",
-          "es": "Pikachu"
+          "en": "Dratini",
+          "de": "Dratini",
+          "fr": "Minidraco",
+          "it": "Dratini",
+          "ja": "ミニリュウ",
+          "ko": "미뇽",
+          "es": "Dratini"
         },
         "types": [
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
           "dragon"
         ],
+        "resistorTypes": [
+          "steel",
+          "fairy"
+        ],
         "seMoveTypes": [
+          "dragon",
+          "fairy",
+          "ice"
+        ]
+      },
+      {
+        "id": "LARVITAR",
+        "names": {
+          "en": "Larvitar",
+          "de": "Larvitar",
+          "fr": "Embrylex",
+          "it": "Larvitar",
+          "ja": "ヨーギラス",
+          "ko": "애버라스",
+          "es": "Larvitar"
+        },
+        "types": [
+          "rock",
           "ground"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "ground",
+          "grass"
+        ],
+        "seMoveTypes": [
+          "grass",
+          "water",
+          "fighting",
+          "ground",
+          "ice",
+          "steel"
+        ]
+      },
+      {
+        "id": "BAGON",
+        "names": {
+          "en": "Bagon",
+          "de": "Kindwurm",
+          "fr": "Draby",
+          "it": "Bagon",
+          "ja": "タツベイ",
+          "ko": "아공이",
+          "es": "Bagon"
+        },
+        "types": [
+          "dragon"
+        ],
+        "resistorTypes": [
+          "steel",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "dragon",
+          "fairy",
+          "ice"
+        ]
+      },
+      {
+        "id": "DEINO",
+        "names": {
+          "en": "Deino",
+          "de": "Kapuno",
+          "fr": "Solochi",
+          "it": "Deino",
+          "ja": "モノズ",
+          "ko": "모노두",
+          "es": "Deino"
+        },
+        "types": [
+          "dark",
+          "dragon"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "steel",
+          "dark",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "fairy",
+          "bug",
+          "dragon",
+          "fighting",
+          "ice"
         ]
       }
     ],
@@ -452,194 +553,6 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "mega-malamar-in-mega-raids-september-2026",
-      "name": "Mega Malamar in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-09-23T06:00:00.000",
-      "end": "2026-09-29T22:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "MALAMAR",
-          "names": {
-            "en": "Malamar"
-          },
-          "types": [
-            "dark",
-            "psychic"
-          ],
-          "resistorTypes": [
-            "steel",
-            "dark",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "bug",
-            "fairy"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "xurkitree-pheromosa-buzzwole-in-5-star-raid-battles-september-2026",
-      "name": "Xurkitree, Pheromosa, and Buzzwole in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-09-23T06:00:00.000",
-      "end": "2026-09-29T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "BUZZWOLE",
-          "names": {
-            "en": "Buzzwole"
-          },
-          "types": [
-            "bug",
-            "fighting"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "flying",
-            "poison",
-            "bug",
-            "ghost",
-            "fire",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "fire",
-            "psychic",
-            "fairy"
-          ]
-        },
-        {
-          "id": "PHEROMOSA",
-          "names": {
-            "en": "Pheromosa"
-          },
-          "types": [
-            "bug",
-            "fighting"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "flying",
-            "poison",
-            "bug",
-            "ghost",
-            "fire",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "fire",
-            "psychic",
-            "fairy"
-          ]
-        },
-        {
-          "id": "XURKITREE",
-          "names": {
-            "en": "Xurkitree"
-          },
-          "types": [
-            "electric"
-          ],
-          "resistorTypes": [
-            "ground",
-            "grass",
-            "electric",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "ground"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20260923",
-      "name": "Xurkitree, Pheromosa, and Buzzwole Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-09-23T18:00:00.000",
-      "end": "2026-09-23T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "XURKITREE",
-          "names": {
-            "en": "Xurkitree"
-          },
-          "types": [
-            "electric"
-          ],
-          "resistorTypes": [
-            "ground",
-            "grass",
-            "electric",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "ground"
-          ]
-        },
-        {
-          "id": "PHEROMOSA",
-          "names": {
-            "en": "Pheromosa"
-          },
-          "types": [
-            "bug",
-            "fighting"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "flying",
-            "poison",
-            "bug",
-            "ghost",
-            "fire",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "fire",
-            "psychic",
-            "fairy"
-          ]
-        },
-        {
-          "id": "BUZZWOLE",
-          "names": {
-            "en": "Buzzwole"
-          },
-          "types": [
-            "bug",
-            "fighting"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "flying",
-            "poison",
-            "bug",
-            "ghost",
-            "fire",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "fire",
-            "psychic",
-            "fairy"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "mega-victreebel-in-mega-raids-september-2026",
       "name": "Mega Victreebel in Mega Raids",
       "eventType": "raid-battles",
@@ -681,6 +594,35 @@
       "eventType": "raid-battles",
       "start": "2026-09-30T06:00:00.000",
       "end": "2026-10-06T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "XERNEAS",
+          "names": {
+            "en": "Xerneas"
+          },
+          "types": [
+            "fairy"
+          ],
+          "resistorTypes": [
+            "poison",
+            "steel",
+            "fire"
+          ],
+          "seMoveTypes": [
+            "poison",
+            "steel"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20260930",
+      "name": "Xerneas Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-09-30T18:00:00.000",
+      "end": "2026-09-30T19:00:00.000",
       "isShadow": false,
       "isMega": false,
       "bosses": [
