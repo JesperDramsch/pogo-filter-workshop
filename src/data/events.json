@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-27T13:56:25.616Z",
+  "fetchedAt": "2026-09-29T14:50:07.052Z",
   "events": [
     {
       "id": "event-pok-mon-horizons-the-series-celebration-event-2026-2026-09-16t10-00-00",
@@ -96,6 +96,9 @@
       "end": "2026-10-05T20:00:00",
       "isLocalTime": true,
       "spawnDex": [
+        143,
+        285,
+        590,
         819,
         840,
         915,
@@ -103,9 +106,12 @@
       ],
       "spawns": [
         "Applin",
+        "Foongus",
         "Lechonk",
+        "Shroomish",
         "Skwovet",
-        "Smoliv"
+        "Smoliv",
+        "Snorlax"
       ],
       "unresolved": []
     },
@@ -177,6 +183,41 @@
       ],
       "spawns": [
         "Zorua"
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "event-fall-marathon-buddy-trek-2026-10-13t10-00-00",
+      "title": "Fall Marathon: Buddy Trek",
+      "category": "Event",
+      "start": "2026-10-13T10:00:00",
+      "end": "2026-10-19T20:00:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        58,
+        77,
+        84,
+        187,
+        227,
+        290,
+        309,
+        522,
+        557,
+        694,
+        946
+      ],
+      "spawns": [
+        "Blitzle",
+        "Bramblin",
+        "Doduo",
+        "Dwebble",
+        "Electrike",
+        "Growlithe",
+        "Helioptile",
+        "Hoppip",
+        "Nincada",
+        "Ponyta",
+        "Skarmory"
       ],
       "unresolved": []
     }
