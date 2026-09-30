@@ -645,6 +645,69 @@
           ]
         }
       ]
+    },
+    {
+      "eventID": "mega-blastoise-in-mega-raids-october-2026",
+      "name": "Mega Blastoise in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-10-07T06:00:00.000",
+      "end": "2026-10-13T22:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "BLASTOISE",
+          "names": {
+            "en": "Blastoise"
+          },
+          "types": [
+            "water"
+          ],
+          "resistorTypes": [
+            "water",
+            "grass",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "grass",
+            "electric"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "yveltal-in-5-star-raid-battles-october-2026",
+      "name": "Yveltal in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-10-07T06:00:00.000",
+      "end": "2026-10-13T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "YVELTAL",
+          "names": {
+            "en": "Yveltal"
+          },
+          "types": [
+            "dark",
+            "flying"
+          ],
+          "resistorTypes": [
+            "rock",
+            "steel",
+            "electric",
+            "dark",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "electric",
+            "ice",
+            "fairy"
+          ]
+        }
+      ]
     }
   ]
 }
