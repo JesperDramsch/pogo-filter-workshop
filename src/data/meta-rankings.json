@@ -1,9 +1,9 @@
 {
-  "fetchedAt": "2026-09-30T15:17:11.626Z",
-  "gameMasterTimestamp": "1790661633037",
+  "fetchedAt": "2026-10-01T15:39:42.146Z",
+  "gameMasterTimestamp": "1790753454239",
   "sources": {
     "mechanics": "alexelgt/game_masters",
-    "mechanicsBatch": "2026-09-29T06:00:33.037Z",
+    "mechanicsBatch": "2026-09-30T07:30:54.239Z",
     "roster": "pvpoke/pvpoke",
     "rosterBatch": "2026-09-28 01:57:22"
   },
@@ -124,6 +124,7 @@
     "reshiram",
     "salamence",
     "landorus",
+    "zekrom",
     "toucannon",
     "palkia",
     "blaziken",
@@ -185,11 +186,11 @@
     "venusaur",
     "tangrowth",
     "cacturne",
-    "vikavolt",
     "gardevoir",
     "overqwil",
     "golurk",
     "unfezant",
+    "vikavolt",
     "arcanine",
     "banette",
     "exploud",
@@ -207,7 +208,7 @@
     "scolipede",
     "walrein",
     "rapidash",
-    "galvantula",
+    "golisopod",
     "weezing",
     "ninetales",
     "mawile",
@@ -230,6 +231,7 @@
     "darkrai": "mythical",
     "thundurus": "legendary",
     "reshiram": "legendary",
+    "zekrom": "legendary",
     "landorus": "legendary"
   },
   "topMaxAttackers": [
@@ -1805,13 +1807,13 @@
         "charged": "MEGAHORN"
       },
       {
-        "species": "galvantula",
-        "dex": 596,
-        "rating": 28.06,
-        "dps": 17.21,
-        "tdo": 121.6,
-        "fast": "FURY_CUTTER_FAST",
-        "charged": "BUG_BUZZ"
+        "species": "golisopod",
+        "dex": 768,
+        "rating": 29.62,
+        "dps": 15.74,
+        "tdo": 197.4,
+        "fast": "WATERFALL_FAST",
+        "charged": "X_SCISSOR"
       }
     ],
     "ghost": [
@@ -2154,6 +2156,15 @@
         "form": "THUNDURUS_THERIAN"
       },
       {
+        "species": "zekrom",
+        "dex": 644,
+        "rating": 49.13,
+        "dps": 25.95,
+        "tdo": 333.5,
+        "fast": "CHARGE_BEAM_FAST",
+        "charged": "FUSION_BOLT"
+      },
+      {
         "species": "raikou",
         "dex": 243,
         "rating": 40.58,
@@ -2197,15 +2208,6 @@
         "tdo": 223.2,
         "fast": "VOLT_SWITCH_FAST",
         "charged": "WILD_CHARGE"
-      },
-      {
-        "species": "vikavolt",
-        "dex": 738,
-        "rating": 35.56,
-        "dps": 20.5,
-        "tdo": 185.7,
-        "fast": "BUG_BITE_FAST",
-        "charged": "DISCHARGE"
       }
     ],
     "psychic": [
