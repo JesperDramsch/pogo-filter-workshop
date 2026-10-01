@@ -1,194 +1,99 @@
 {
-  "fetchedAt": "2026-09-24T12:52:57.618Z",
+  "fetchedAt": "2026-10-01T14:45:05.052Z",
   "raids": {
-    "ultra_beast": [
+    "mega": [
       {
-        "id": "BUZZWOLE",
+        "id": "VICTREEBEL",
         "names": {
-          "en": "Buzzwole",
-          "de": "Masskito",
-          "fr": "Mouscoto",
-          "it": "Buzzwole",
-          "ja": "マッシブーン",
-          "ko": "매시붕",
-          "es": "Buzzwole"
+          "en": "Mega Victreebel",
+          "de": "Mega-Sarzenia",
+          "fr": "Méga-Empiflor",
+          "it": "MegaVictreebel",
+          "ja": "メガウツボット",
+          "ko": "메가우츠보트",
+          "es": "Mega-Victreebel"
         },
         "types": [
-          "bug",
-          "fighting"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "flying",
-          "poison",
-          "bug",
-          "ghost",
-          "fire",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "flying",
-          "fairy",
-          "fire",
-          "psychic"
-        ]
-      },
-      {
-        "id": "PHEROMOSA",
-        "names": {
-          "en": "Pheromosa",
-          "de": "Schabelle",
-          "fr": "Cancrelove",
-          "it": "Pheromosa",
-          "ja": "フェローチェ",
-          "ko": "페로코체",
-          "es": "Pheromosa"
-        },
-        "types": [
-          "bug",
-          "fighting"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "flying",
-          "poison",
-          "bug",
-          "ghost",
-          "fire",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "flying",
-          "fairy",
-          "fire",
-          "psychic"
-        ]
-      },
-      {
-        "id": "XURKITREE",
-        "names": {
-          "en": "Xurkitree",
-          "de": "Voltriant",
-          "fr": "Câblifère",
-          "it": "Xurkitree",
-          "ja": "デンジュモク",
-          "ko": "전수목",
-          "es": "Xurkitree"
-        },
-        "types": [
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
           "grass",
-          "electric",
+          "poison"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
+          "ghost",
+          "steel",
+          "fire",
           "dragon"
         ],
         "seMoveTypes": [
-          "ground"
+          "fire",
+          "flying",
+          "ice",
+          "psychic"
         ]
       }
     ],
-    "mega": [
+    "lvl5": [
       {
-        "id": "MALAMAR",
+        "id": "XERNEAS",
         "names": {
-          "en": "Mega Malamar",
-          "de": "Mega-Calamanero",
-          "fr": "Méga-Sepiatroce",
-          "it": "MegaMalamar",
-          "ja": "メガカラマネロ",
-          "ko": "메가칼라마네로",
-          "es": "Mega-Malamar"
+          "en": "Xerneas",
+          "de": "Xerneas",
+          "fr": "Xerneas",
+          "it": "Xerneas",
+          "ja": "ゼルネアス",
+          "ko": "제르네아스",
+          "es": "Xerneas"
         },
         "types": [
-          "dark",
-          "psychic"
+          "fairy"
         ],
         "resistorTypes": [
+          "poison",
           "steel",
-          "dark",
-          "fairy"
+          "fire"
         ],
         "seMoveTypes": [
-          "bug",
-          "fairy"
+          "poison",
+          "steel"
         ]
       }
     ],
     "lvl3": [
       {
-        "id": "TYPHLOSION",
+        "id": "MILTANK",
         "names": {
-          "en": "Hisuian Typhlosion",
-          "de": "Hisuian-Tornupto",
-          "fr": "Typhlosion de Hisuian",
-          "it": "Typhlosion di Hisuian",
-          "ja": "バクフーン",
-          "ko": "블레이범",
-          "es": "Typhlosion de Galar"
+          "en": "Miltank",
+          "de": "Miltank",
+          "fr": "Écrémeuh",
+          "it": "Miltank",
+          "ja": "ミルタンク",
+          "ko": "밀탱크",
+          "es": "Miltank"
         },
         "types": [
-          "fire",
-          "ghost"
+          "normal"
         ],
         "resistorTypes": [
-          "normal",
           "rock",
-          "fire",
-          "water",
-          "dragon",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
           "ghost",
-          "ground",
-          "rock",
-          "water"
-        ]
-      },
-      {
-        "id": "SAMUROTT",
-        "names": {
-          "en": "Hisuian Samurott",
-          "de": "Hisuian-Admurai",
-          "fr": "Clamiral de Hisuian",
-          "it": "Samurott di Hisuian",
-          "ja": "ダイケンキ",
-          "ko": "대검귀",
-          "es": "Samurott de Galar"
-        },
-        "types": [
-          "water",
-          "dark"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "water",
-          "grass",
-          "dragon",
-          "dark",
-          "fairy"
+          "steel"
         ],
         "seMoveTypes": [
-          "bug",
-          "electric",
-          "fairy",
-          "fighting",
-          "grass"
+          "fighting"
         ]
       },
       {
-        "id": "DECIDUEYE",
+        "id": "LILLIGANT",
         "names": {
-          "en": "Hisuian Decidueye",
-          "de": "Hisuian-Silvarro",
-          "fr": "Archéduc de Hisuian",
-          "it": "Decidueye di Hisuian",
-          "ja": "ジュナイパー",
-          "ko": "모크나이퍼",
-          "es": "Decidueye de Galar"
+          "en": "Hisuian Lilligant",
+          "de": "Hisuian-Dressella",
+          "fr": "Fragilady de Hisuian",
+          "it": "Lilligant di Hisuian",
+          "ja": "ドレディア",
+          "ko": "드레디어",
+          "es": "Lilligant de Galar"
         },
         "types": [
           "grass",
@@ -213,113 +118,150 @@
           "poison",
           "psychic"
         ]
+      },
+      {
+        "id": "DONDOZO",
+        "names": {
+          "en": "Dondozo",
+          "de": "Heerashai",
+          "fr": "Oyacata",
+          "it": "Dondozo",
+          "ja": "ヘイラッシャ",
+          "ko": "어써러셔",
+          "es": "Dondozo"
+        },
+        "types": [
+          "water"
+        ],
+        "resistorTypes": [
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "electric",
+          "grass"
+        ]
       }
     ],
     "lvl1": [
       {
-        "id": "DRATINI",
+        "id": "FARFETCHD",
         "names": {
-          "en": "Dratini",
-          "de": "Dratini",
-          "fr": "Minidraco",
-          "it": "Dratini",
-          "ja": "ミニリュウ",
-          "ko": "미뇽",
-          "es": "Dratini"
+          "en": "Galarian Farfetch'd",
+          "de": "Galar-Porenta",
+          "fr": "Canarticho de Galar",
+          "it": "Farfetch’d di Galar",
+          "ja": "ガラル カモネギ",
+          "ko": "가라르 파오리",
+          "es": "Farfetch'd de Galar"
         },
         "types": [
-          "dragon"
+          "fighting"
         ],
         "resistorTypes": [
-          "steel",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "dragon",
-          "fairy",
-          "ice"
-        ]
-      },
-      {
-        "id": "LARVITAR",
-        "names": {
-          "en": "Larvitar",
-          "de": "Larvitar",
-          "fr": "Embrylex",
-          "it": "Larvitar",
-          "ja": "ヨーギラス",
-          "ko": "애버라스",
-          "es": "Larvitar"
-        },
-        "types": [
-          "rock",
-          "ground"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "ground",
-          "grass"
-        ],
-        "seMoveTypes": [
-          "grass",
-          "water",
-          "fighting",
-          "ground",
-          "ice",
-          "steel"
-        ]
-      },
-      {
-        "id": "BAGON",
-        "names": {
-          "en": "Bagon",
-          "de": "Kindwurm",
-          "fr": "Draby",
-          "it": "Bagon",
-          "ja": "タツベイ",
-          "ko": "아공이",
-          "es": "Bagon"
-        },
-        "types": [
-          "dragon"
-        ],
-        "resistorTypes": [
-          "steel",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "dragon",
-          "fairy",
-          "ice"
-        ]
-      },
-      {
-        "id": "DEINO",
-        "names": {
-          "en": "Deino",
-          "de": "Kapuno",
-          "fr": "Solochi",
-          "it": "Deino",
-          "ja": "モノズ",
-          "ko": "모노두",
-          "es": "Deino"
-        },
-        "types": [
-          "dark",
-          "dragon"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "steel",
-          "dark",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "fairy",
+          "flying",
+          "poison",
           "bug",
-          "dragon",
+          "ghost",
+          "psychic",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "fairy",
+          "flying",
+          "psychic"
+        ]
+      },
+      {
+        "id": "ZIGZAGOON",
+        "names": {
+          "en": "Galarian Zigzagoon",
+          "de": "Galar-Zigzachs",
+          "fr": "Zigzaton de Galar",
+          "it": "Zigzagoon di Galar",
+          "ja": "ガラル ジグザグマ",
+          "ko": "가라르 지그제구리",
+          "es": "Zigzagoon de Galar"
+        },
+        "types": [
+          "dark",
+          "normal"
+        ],
+        "resistorTypes": [
           "fighting",
+          "rock",
+          "steel",
+          "dark",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "bug",
+          "fairy"
+        ]
+      },
+      {
+        "id": "COMBEE",
+        "names": {
+          "en": "Combee",
+          "de": "Wadribie",
+          "fr": "Apitrini",
+          "it": "Combee",
+          "ja": "ミツハニー",
+          "ko": "세꿀버리",
+          "es": "Combee"
+        },
+        "types": [
+          "bug",
+          "flying"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "rock",
+          "ghost",
+          "steel",
+          "fire",
+          "electric",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "rock",
+          "electric",
+          "fire",
+          "flying",
           "ice"
+        ]
+      },
+      {
+        "id": "HONEDGE",
+        "names": {
+          "en": "Honedge",
+          "de": "Gramokles",
+          "fr": "Monorpale",
+          "it": "Honedge",
+          "ja": "ヒトツキ",
+          "ko": "단칼빙",
+          "es": "Honedge"
+        },
+        "types": [
+          "steel",
+          "ghost"
+        ],
+        "resistorTypes": [
+          "normal",
+          "steel",
+          "fire",
+          "water",
+          "electric",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "fire",
+          "ghost",
+          "ground"
         ]
       }
     ],
@@ -553,100 +495,6 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "mega-victreebel-in-mega-raids-september-2026",
-      "name": "Mega Victreebel in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-09-30T06:00:00.000",
-      "end": "2026-10-06T22:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "VICTREEBEL",
-          "names": {
-            "en": "Victreebel"
-          },
-          "types": [
-            "grass",
-            "poison"
-          ],
-          "resistorTypes": [
-            "flying",
-            "poison",
-            "bug",
-            "ghost",
-            "steel",
-            "fire",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "fire",
-            "psychic",
-            "ice"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "xerneas-in-5-star-raid-battles-september-2026",
-      "name": "Xerneas in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-09-30T06:00:00.000",
-      "end": "2026-10-06T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "XERNEAS",
-          "names": {
-            "en": "Xerneas"
-          },
-          "types": [
-            "fairy"
-          ],
-          "resistorTypes": [
-            "poison",
-            "steel",
-            "fire"
-          ],
-          "seMoveTypes": [
-            "poison",
-            "steel"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20260930",
-      "name": "Xerneas Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-09-30T18:00:00.000",
-      "end": "2026-09-30T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "XERNEAS",
-          "names": {
-            "en": "Xerneas"
-          },
-          "types": [
-            "fairy"
-          ],
-          "resistorTypes": [
-            "poison",
-            "steel",
-            "fire"
-          ],
-          "seMoveTypes": [
-            "poison",
-            "steel"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "mega-blastoise-in-mega-raids-october-2026",
       "name": "Mega Blastoise in Mega Raids",
       "eventType": "raid-battles",
@@ -681,6 +529,40 @@
       "eventType": "raid-battles",
       "start": "2026-10-07T06:00:00.000",
       "end": "2026-10-13T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "YVELTAL",
+          "names": {
+            "en": "Yveltal"
+          },
+          "types": [
+            "dark",
+            "flying"
+          ],
+          "resistorTypes": [
+            "rock",
+            "steel",
+            "electric",
+            "dark",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "electric",
+            "ice",
+            "fairy"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20261007",
+      "name": "Yveltal Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-10-07T18:00:00.000",
+      "end": "2026-10-07T19:00:00.000",
       "isShadow": false,
       "isMega": false,
       "bosses": [
