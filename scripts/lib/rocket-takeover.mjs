@@ -112,7 +112,16 @@ function decodeEntities(s) {
     .replace(/&quot;/g, '"')
     .replace(/&#039;|&apos;/g, "'")
     .replace(/&eacute;/g, "é")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
     .replace(/&amp;/g, "&");
+}
+
+// Decoded, whitespace-collapsed text; throws on anything that decodes to markup.
+function plainText(raw) {
+  const text = decodeEntities(raw).replace(/\s+/g, " ").trim();
+  if (/[<>]/.test(text)) throw new Error(`LeekDuck text contains markup: ${JSON.stringify(text)}`);
+  return text;
 }
 
 function attr(tag, name) {
@@ -130,9 +139,11 @@ function attr(tag, name) {
 export function parseLeekDuckLineups(html) {
   const chunks = String(html).split(/<div class="rocket-profile"/).slice(1);
   const lineups = chunks.map((chunk, i) => {
-    const nameMatch = chunk.match(/<div class="name">([\s\S]*?)<\/div>/);
-    if (!nameMatch) throw new Error(`LeekDuck profile #${i + 1}: no .name`);
-    const name = decodeEntities(nameMatch[1].replace(/<[^>]+>/g, "")).replace(/\s+/g, " ").trim();
+    // .name is plain text. Markup inside it (raw or entity-encoded) is a layout
+    // change or a hostile page, never something to strip and carry on with.
+    const nameMatch = chunk.match(/<div class="name">([^<]*)<\/div>/);
+    if (!nameMatch) throw new Error(`LeekDuck profile #${i + 1}: no plain-text .name`);
+    const name = plainText(nameMatch[1]);
     const typeMatch = chunk.match(/<span class="type">\s*<img[^>]*\ssrc="([^"]+)"/);
     const type = typeMatch ? typeMatch[1].split("/").pop().replace(/\.png$/i, "").toLowerCase() : "";
 
@@ -141,7 +152,7 @@ export function parseLeekDuckLineups(html) {
         const types = [attr(tag, "data-type1"), attr(tag, "data-type2")]
           .filter((t) => t && t !== "None")
           .map((t) => t.toLowerCase());
-        return { name: attr(tag, "data-pokemon") || "", types };
+        return { name: plainText(attr(tag, "data-pokemon") || ""), types };
       }),
     );
     if (slots.length !== 3) throw new Error(`LeekDuck profile "${name}": ${slots.length} slots, expected 3`);

@@ -11,7 +11,7 @@
 //   T1 — takeover detection: title, bonus line, description; plain events are not takeovers
 //   T2 — the live window, widened for local-time events, and both feed shapes
 //   T3 — read gating: once per UTC day, never once settled, fresh for a new takeover
-//   T4 — LeekDuck parsing matches ScrapedDuck's shape; layout drift throws
+//   T4 — LeekDuck parsing matches ScrapedDuck's shape; layout drift and markup in names throw
 
 import {
   isTakeoverEvent,
@@ -113,5 +113,12 @@ check("a profile with two slots throws",
   throws(() => parseLeekDuckLineups(profile("Cliff", null, [slot("", mon("Cubone", "ground")), slot("", mon("Snorlax", "normal"))]))));
 check("a Pokémon without types throws",
   throws(() => parseLeekDuckLineups(profile("Cliff", null, [slot("", mon("Cubone", "None")), slot("", mon("Snorlax", "normal")), slot("", mon("Tyranitar", "rock", "Dark"))]))));
+
+check("a name that decodes to markup throws",
+  throws(() => parseLeekDuckLineups(profile("&lt;script&gt;x", null, [slot("", mon("Cubone", "ground")), slot("", mon("Snorlax", "normal")), slot("", mon("Tyranitar", "rock", "Dark"))]))));
+check("a name containing a tag throws (never stripped)",
+  throws(() => parseLeekDuckLineups(profile("<b>Cliff</b>", null, [slot("", mon("Cubone", "ground")), slot("", mon("Snorlax", "normal")), slot("", mon("Tyranitar", "rock", "Dark"))]))));
+check("a Pokémon name that decodes to markup throws",
+  throws(() => parseLeekDuckLineups(profile("Cliff", null, [slot("", mon("&lt;img&gt;", "ground")), slot("", mon("Snorlax", "normal")), slot("", mon("Tyranitar", "rock", "Dark"))]))));
 
 done("All rocket takeover checks passed.", (n) => `${n} rocket takeover check(s) failed.`);
