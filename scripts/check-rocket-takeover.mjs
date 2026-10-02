@@ -4,19 +4,24 @@
 //
 // This only runs inside the daily Rocket sync against live pages nothing in CI
 // sees, so every case is pinned here. The fixtures are the 2026-10-02 shapes:
-// "Harvest Festival: Taken Over" in leak-duck's feed and in this repo's own
-// events snapshot, and one LeekDuck .rocket-profile block per trainer kind.
+// "Harvest Festival: Taken Over" in leak-duck's feed and in ScrapedDuck's,
+// and one LeekDuck .rocket-profile block per trainer kind.
 //
 // Covers:
 //   T1 — takeover detection: title, bonus line, description; plain events are not takeovers
-//   T2 — the live window, widened for local-time events, and both feed shapes
-//   T3 — read gating: once per UTC day, never once settled, fresh for a new takeover
-//   T4 — LeekDuck parsing matches ScrapedDuck's shape; layout drift and markup in names throw
+//   T2 — the live window, widened for local-time events; both feeds, one shared id
+//   T3 — read gating: once per UTC day, never once settled, fresh for a new takeover,
+//        old-id state still recognised
+//   T4 — LeekDuck parsing matches ScrapedDuck's shape; layout drift and markup in names
+//        throw; a parse missing any ScrapedDuck trainer is refused
 
 import {
   isTakeoverEvent,
   findActiveTakeover,
   shouldReadLeekDuck,
+  takeoverId,
+  sameTakeover,
+  missingTrainers,
   parseLeekDuckLineups,
 } from "./lib/rocket-takeover.mjs";
 import { createChecker } from "./lib/check.mjs";
@@ -59,17 +64,23 @@ check("live from UTC+14 midnight (01 Oct 10:00 UTC)", !!findActiveTakeover(FEED,
 check("not live the day before that", findActiveTakeover(FEED, at("2026-10-01T09:00:00Z")) === null);
 check("still live in UTC-12 after the local end", !!findActiveTakeover(FEED, at("2026-10-06T07:00:00Z")));
 check("over a day after the end", findActiveTakeover(FEED, at("2026-10-07T00:00:00Z")) === null);
-check("id is the article URL (stable across syncs)",
-  findActiveTakeover(FEED, at("2026-10-02T08:13:00Z"))?.id === HFTO.article_url);
-const SNAPSHOT = { events: [{ id: "event-harvest-festival-taken-over-2026-10-02t00-00-00", title: HFTO.title,
-  start: HFTO.start_time, end: HFTO.end_time, isLocalTime: true }] };
-check("the repo's own events.json shape works as the fallback",
-  findActiveTakeover(SNAPSHOT, at("2026-10-02T08:13:00Z"))?.title === HFTO.title);
+const ID = takeoverId(HFTO.title, HFTO.start_time);
+check("id is title + start, not a feed-specific id",
+  findActiveTakeover(FEED, at("2026-10-02T08:13:00Z"))?.id === ID && ID === "harvest-festival-taken-over@2026-10-02T00:00");
+// ScrapedDuck's events.min.json: flat array, titles only, ms-precision naive stamps.
+const SD_FEED = [
+  { eventID: "harvest-festival-2026", name: HARVEST.title, start: "2026-09-29T10:00:00.000", end: "2026-10-05T20:00:00.000" },
+  { eventID: "harvest-festival-taken-over-2026", name: HFTO.title, start: "2026-10-02T00:00:00.000", end: "2026-10-05T20:00:00.000" },
+];
+check("ScrapedDuck's event feed works as the fallback, with the same id",
+  findActiveTakeover(SD_FEED, at("2026-10-02T08:13:00Z"))?.id === ID);
+check("a takeover with no spawn pool is still found (the filtered events.json would miss it)",
+  !!findActiveTakeover({ Event: [{ ...HFTO, details: { bonuses: HFTO.details.bonuses } }] }, at("2026-10-02T08:13:00Z")));
 check("missing / malformed source → null",
   findActiveTakeover(null, Date.now()) === null && findActiveTakeover({ Event: "x" }, Date.now()) === null);
 
 console.log("\nT3 — read gating");
-const TO = { id: HFTO.article_url };
+const TO = { id: ID, title: HFTO.title, start: HFTO.start_time };
 check("no takeover → no read", !shouldReadLeekDuck(null, undefined, "2026-10-02"));
 check("first sight of a takeover → read", shouldReadLeekDuck(TO, undefined, "2026-10-02"));
 check("already tried today → no read",
@@ -78,6 +89,9 @@ check("tried yesterday, unsettled → read",
   shouldReadLeekDuck(TO, { id: TO.id, attempts: ["2026-10-02"], settled: false }, "2026-10-03"));
 check("settled → never again for this takeover",
   !shouldReadLeekDuck(TO, { id: TO.id, attempts: ["2026-10-02"], settled: true }, "2026-10-04"));
+check("state recorded under another id scheme is matched by title + start",
+  sameTakeover(TO, { id: HFTO.article_url, title: HFTO.title, start: "2026-10-02T00:00:00.000" }) &&
+  !shouldReadLeekDuck(TO, { id: HFTO.article_url, title: HFTO.title, start: HFTO.start_time, attempts: ["2026-10-02"], settled: true }, "2026-10-03"));
 check("state from an older takeover does not block a new one",
   shouldReadLeekDuck({ id: "next" }, { id: TO.id, attempts: ["2026-10-02"], settled: true }, "2026-10-02"));
 
@@ -108,6 +122,11 @@ check("&nbsp; in a grunt name becomes a plain space (ScrapedDuck's naming)",
 check("typed grunt type comes from the type icon", parsed[1].type === "fire");
 check("generic grunt has an empty type", parsed[2].type === "");
 const throws = (fn) => { try { fn(); return false; } catch { return true; } };
+const roster = (...names) => names.map((name) => ({ name }));
+check("complete roster → nothing missing",
+  missingTrainers(roster("Giovanni", "Cliff", "Extra"), roster("Giovanni", "Cliff")).length === 0);
+check("one trainer short → refused, and named",
+  JSON.stringify(missingTrainers(roster("Giovanni"), roster("Giovanni", "Cliff"))) === '["Cliff"]');
 check("a page without profiles throws", throws(() => parseLeekDuckLineups("<html></html>")));
 check("a profile with two slots throws",
   throws(() => parseLeekDuckLineups(profile("Cliff", null, [slot("", mon("Cubone", "ground")), slot("", mon("Snorlax", "normal"))]))));

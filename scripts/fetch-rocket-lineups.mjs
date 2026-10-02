@@ -42,6 +42,8 @@ import {
   LEEKDUCK_ROCKET_URL,
   findActiveTakeover,
   shouldReadLeekDuck,
+  sameTakeover,
+  missingTrainers,
   parseLeekDuckLineups,
 } from "./lib/rocket-takeover.mjs";
 
@@ -49,7 +51,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const DATA_DIR = resolve(ROOT, "src/data");
 const OUT_PATH = resolve(DATA_DIR, "rocket-lineups.json");
-const EVENTS_CACHE_PATH = resolve(DATA_DIR, "events.json");
 
 const ENDPOINTS = {
   rocket: "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/rocketLineups.min.json",
@@ -57,6 +58,8 @@ const ENDPOINTS = {
   // Only read for takeover detection: leak-duck's feed carries each event's
   // bonus list, which is the steadier takeover signal (see rocket-takeover.mjs).
   events: "https://raw.githubusercontent.com/zhenga8533/leak-duck/refs/heads/data/events.json",
+  // Fallback for takeover detection (titles only).
+  eventsFallback: "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.min.json",
 };
 
 const GENERIC_TOP_N = 3;
@@ -305,13 +308,19 @@ function digest(trainers) {
 }
 
 // The live takeover, if any. leak-duck's feed first (it has the bonus lines);
-// this repo's own events snapshot (titles only) when the feed is unreachable.
+// ScrapedDuck's event feed (titles only) when leak-duck is unreachable. Not
+// src/data/events.json: it keeps only events with a wild-spawn pool.
 async function detectTakeover(now) {
   try {
     return findActiveTakeover(await fetchJson(ENDPOINTS.events), now);
   } catch (e) {
-    console.warn(`  ⚠ events feed unavailable (${e.message}); falling back to ${EVENTS_CACHE_PATH}`);
-    return findActiveTakeover(readPreviousJson(EVENTS_CACHE_PATH), now);
+    console.warn(`  ⚠ leak-duck events feed unavailable (${e.message}); falling back to ScrapedDuck's`);
+    try {
+      return findActiveTakeover(await fetchJson(ENDPOINTS.eventsFallback), now);
+    } catch (e2) {
+      console.error(`✗ no event feed reachable (${e2.message}); takeover check skipped`);
+      return null;
+    }
   }
 }
 
@@ -371,7 +380,7 @@ async function main() {
   if (allowLeekDuck) {
     const takeover = await detectTakeover(now);
     if (takeover) {
-      const prevState = prev?.takeover?.id === takeover.id ? prev.takeover : null;
+      const prevState = sameTakeover(takeover, prev?.takeover) ? prev.takeover : null;
       takeoverState = { ...takeover, attempts: prevState?.attempts || [], settled: !!prevState?.settled };
       console.log(`→ Takeover live: "${takeover.title}" (${takeover.start} → ${takeover.end})`);
       if (shouldReadLeekDuck(takeover, prevState, today)) {
@@ -379,8 +388,9 @@ async function main() {
         try {
           console.log(`→ Reading ${LEEKDUCK_ROCKET_URL} (takeover check ${takeoverState.attempts.length})`);
           const leekDuckTrainers = derive(parseLeekDuckLineups(await fetchText(LEEKDUCK_ROCKET_URL)));
-          if (leekDuckTrainers.length < Math.ceil(scrapedDuckTrainers.length * 0.8)) {
-            throw new Error(`LeekDuck parse yielded ${leekDuckTrainers.length} trainers vs ScrapedDuck's ${scrapedDuckTrainers.length} — refusing`);
+          const missing = missingTrainers(leekDuckTrainers, scrapedDuckTrainers);
+          if (missing.length > 0) {
+            throw new Error(`LeekDuck parse is missing ${missing.length} of ScrapedDuck's trainers (${missing.join(", ")}) — refusing`);
           }
           if (digest(leekDuckTrainers) !== scrapedDuckDigest) {
             trainers = leekDuckTrainers;
