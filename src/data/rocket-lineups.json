@@ -1,5 +1,17 @@
 {
-  "fetchedAt": "2026-06-27T10:23:32.687Z",
+  "fetchedAt": "2026-10-02T09:51:06.812Z",
+  "source": "leekduck",
+  "scrapedDuckPin": "893be583256b19db",
+  "takeover": {
+    "id": "harvest-festival-taken-over@2026-10-02T00:00",
+    "title": "Harvest Festival: Taken Over",
+    "start": "2026-10-02T00:00:00",
+    "end": "2026-10-05T20:00:00",
+    "attempts": [
+      "2026-10-02"
+    ],
+    "settled": true
+  },
   "trainers": [
     {
       "name": "Giovanni",
@@ -71,23 +83,25 @@
           "slot": 3,
           "pokemons": [
             {
-              "name": "Reshiram",
+              "name": "Zekrom",
               "types": [
                 "dragon",
-                "fire"
+                "electric"
               ]
             }
           ],
           "resistorTypes": [
-            "rock",
-            "fire",
-            "water",
+            "ground",
+            "steel",
+            "grass",
+            "electric",
             "fairy"
           ],
           "seMoveTypes": [
             "ground",
-            "rock",
-            "dragon"
+            "ice",
+            "dragon",
+            "fairy"
           ]
         }
       ]
@@ -100,20 +114,21 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Axew",
+              "name": "Cubone",
               "types": [
-                "dragon"
+                "ground"
               ]
             }
           ],
           "resistorTypes": [
-            "steel",
-            "fairy"
+            "flying",
+            "bug",
+            "grass"
           ],
           "seMoveTypes": [
-            "ice",
-            "dragon",
-            "fairy"
+            "water",
+            "grass",
+            "ice"
           ]
         },
         {
@@ -211,26 +226,23 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Tyrunt",
+              "name": "Alolan Grimer",
               "types": [
-                "rock",
-                "dragon"
+                "poison",
+                "dark"
               ]
             }
           ],
           "resistorTypes": [
             "fighting",
+            "poison",
             "ground",
+            "rock",
             "steel",
-            "fairy"
+            "dark"
           ],
           "seMoveTypes": [
-            "fighting",
-            "ground",
-            "steel",
-            "ice",
-            "dragon",
-            "fairy"
+            "ground"
           ]
         },
         {
@@ -332,25 +344,24 @@
           "slot": 1,
           "pokemons": [
             {
-              "name": "Amaura",
+              "name": "Pancham",
               "types": [
-                "rock",
-                "ice"
+                "fighting"
               ]
             }
           ],
           "resistorTypes": [
-            "fighting",
-            "steel",
-            "water"
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
+            "psychic",
+            "fairy"
           ],
           "seMoveTypes": [
-            "fighting",
-            "ground",
-            "rock",
-            "steel",
-            "water",
-            "grass"
+            "flying",
+            "psychic",
+            "fairy"
           ]
         },
         {
@@ -726,12 +737,6 @@
               "types": [
                 "water"
               ]
-            },
-            {
-              "name": "Feebas",
-              "types": [
-                "water"
-              ]
             }
           ]
         },
@@ -775,7 +780,7 @@
         "electric",
         "grass"
       ],
-      "lineupSize": 5
+      "lineupSize": 4
     },
     {
       "name": "Electric-type Female Grunt",
@@ -887,7 +892,7 @@
               ]
             },
             {
-              "name": "Treecko",
+              "name": "Fomantis",
               "types": [
                 "grass"
               ]
@@ -1084,7 +1089,7 @@
               ]
             },
             {
-              "name": "Machop",
+              "name": "Makuhita",
               "types": [
                 "fighting"
               ]
@@ -1553,9 +1558,10 @@
               ]
             },
             {
-              "name": "Grubbin",
+              "name": "Wimpod",
               "types": [
-                "bug"
+                "bug",
+                "water"
               ]
             }
           ]
@@ -1737,10 +1743,10 @@
               ]
             },
             {
-              "name": "Gastly",
+              "name": "Sandygast",
               "types": [
                 "ghost",
-                "poison"
+                "ground"
               ]
             },
             {
@@ -1804,10 +1810,7 @@
       "resistorTypes": [
         "normal",
         "fighting",
-        "poison",
-        "rock",
-        "steel",
-        "fire",
+        "bug",
         "water",
         "ice",
         "dark"
@@ -1841,7 +1844,7 @@
               ]
             },
             {
-              "name": "Dratini",
+              "name": "Axew",
               "types": [
                 "dragon"
               ]
