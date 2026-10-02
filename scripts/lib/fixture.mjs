@@ -56,8 +56,11 @@ export const FIXTURE_CONFIG = mergeImportedConfig(DEFAULT_CONFIG);
 // to the app's: two hand-written copies of the argument list would drift the
 // moment buildFilters grows a parameter, and the failure would name a mismatch
 // neither file caused.
-export function buildResult(locale, { hundos = DEFAULT_HUNDOS, luckies = DEFAULT_LUCKIES } = {}) {
-  return buildFilters(hundos, luckies, FIXTURE_CONFIG, [], locale, makeTFn(locale));
+//
+// `uiLocale` defaults to the output locale; expert mode lets the two differ, and
+// output that must follow the OUTPUT locale (names) is only testable when they do.
+export function buildResult(locale, { hundos = DEFAULT_HUNDOS, luckies = DEFAULT_LUCKIES, uiLocale = locale } = {}) {
+  return buildFilters(hundos, luckies, FIXTURE_CONFIG, [], locale, makeTFn(uiLocale));
 }
 
 // Exact-pinned fields: everything derived from config, species data and the

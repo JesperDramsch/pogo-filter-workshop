@@ -16,17 +16,18 @@
 //   D5 — empty filter families are reported, so upstream shape breaks surface
 //   D6 — the PvP snapshot itself is well formed and every dex resolves
 //   D7 — the shadow keeper filters carry every keeper, in every locale
+//   D8 — every Rocket lineup Pokémon resolves to a real name in every locale
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import META_RANKINGS from "../src/data/meta-rankings.json";
-import { buildDataFilters, FIXTURE_CONFIG } from "./lib/fixture.mjs";
+import { buildDataFilters, buildResult, FIXTURE_CONFIG } from "./lib/fixture.mjs";
 import { LOCALES } from "../src/i18n/index.js";
 // `resolveSpecies` is D7's; the dictionary and locale list are D6's. D6 no
 // longer imports `pokemonNameFor` — it falls back to English, which is what made
 // the old per-locale assertion unable to fail.
-import { POKEMON_NAMES_DICT, SUPPORTED_NAME_LOCALES, resolveSpecies } from "../src/data/species.js";
+import { POKEMON_NAMES_DICT, SUPPORTED_NAME_LOCALES, resolveSpecies, resolveRegionalSpecies } from "../src/data/species.js";
 import { unresolvableDexEntries, formSuffixedDexEntries, NAME_LOCALES } from "./lib/species-dex.mjs";
 
 let failures = 0;
@@ -270,6 +271,64 @@ console.log("\nD7 — shadow keeper filters project the whole keeper list");
     FIXTURE_CONFIG.protectShadows === true,
     FIXTURE_CONFIG.protectShadows === true ? ""
       : "protectShadows default flipped — the keeper floor now lands in `trash`, which IS exact-pinned");
+}
+
+console.log("\nD8 — every Rocket lineup Pokémon resolves in every locale");
+{
+  // The lineup hint names each Pokémon in the output locale. ScrapedDuck spells
+  // regional forms "Alolan Vulpix", which no name dictionary carries, so those
+  // rendered in English everywhere. Assert on the dictionary entry itself, not
+  // on pokemonNameFor — that falls back to English and could never fail (D6).
+  const sourceNames = [];
+  for (const t of ROCKET_LINEUPS.trainers || [])
+    for (const p of t.phases || []) for (const pk of p.pokemons || []) sourceNames.push(pk.name);
+  const names = new Set(sourceNames);
+  check(`rocket lineups name ${names.size} distinct Pokémon`, names.size > 0,
+    "an empty name list would make every check below vacuous");
+  const regionLabel = (loc, region) => LOCALES[loc]?.messages[`app.buddy_targets.form_region.${region}`];
+  for (const loc of SUPPORTED_NAME_LOCALES) {
+    const bad = [];
+    for (const name of names) {
+      const hit = resolveRegionalSpecies(name, loc);
+      if (!hit) bad.push(`${name} (unresolvable)`);
+      else if (!POKEMON_NAMES_DICT[hit.dexKey]?.[loc]) bad.push(`${name} (no ${loc} name)`);
+      else if (hit.region && !regionLabel(loc, hit.region))
+        bad.push(`${name} (no ${loc} label for region ${hit.region})`);
+    }
+    check(`${loc}: all ${names.size} lineup names localize`, bad.length === 0, bad.slice(0, 5).join(", "));
+  }
+
+  // The dictionary passing proves nothing about what buildFilters renders, so
+  // also run the real builder and compare its phase Pokémon names, as a
+  // multiset, against the names the dictionary says each locale should show.
+  // Each output locale is built twice: under its own UI locale and under a
+  // different one. The region label belongs to the name, so it must follow the
+  // OUTPUT locale; an English UI with Japanese output must not say "(Alola)".
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const expectedFor = (loc) => sourceNames.map((n) => {
+    const hit = resolveRegionalSpecies(n, loc);
+    if (!hit) return n;
+    const base = cap(POKEMON_NAMES_DICT[hit.dexKey][loc].toLowerCase());
+    return hit.region ? `${base} (${regionLabel(loc, hit.region)})` : base;
+  }).sort();
+  const renderedFor = (result) =>
+    ["rocketLeaders", "rocketTypedGrunts", "rocketGenericGrunts"]
+      .flatMap((fam) => result[fam] || [])
+      .flatMap((t) => t.phases || [])
+      .flatMap((p) => (p.pokemons || []).map((pk) => pk.name))
+      .sort();
+  for (const loc of SUPPORTED_NAME_LOCALES) {
+    const expected = expectedFor(loc);
+    for (const ui of [loc, loc === "en" ? "ja" : "en"]) {
+      const rendered = renderedFor(buildResult(loc, { uiLocale: ui }));
+      const diff = rendered.filter((n, i) => n !== expected[i]);
+      check(`${loc} output / ${ui} UI: buildFilters renders all ${expected.length} lineup names in ${loc}`,
+        rendered.length === expected.length && diff.length === 0,
+        rendered.length !== expected.length
+          ? `rendered ${rendered.length}, expected ${expected.length}`
+          : diff.slice(0, 5).join(", "));
+    }
+  }
 }
 
 console.log(`\n${failures === 0 ? "✓ All data-filter property checks passed." : `✗ ${failures} failure(s).`}`);
