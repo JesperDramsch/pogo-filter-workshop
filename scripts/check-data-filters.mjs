@@ -16,6 +16,7 @@
 //   D5 — empty filter families are reported, so upstream shape breaks surface
 //   D6 — the PvP snapshot itself is well formed and every dex resolves
 //   D7 — the shadow keeper filters carry every keeper, in every locale
+//   D8 — every Rocket lineup Pokémon resolves to a real name in every locale
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
@@ -26,7 +27,7 @@ import { LOCALES } from "../src/i18n/index.js";
 // `resolveSpecies` is D7's; the dictionary and locale list are D6's. D6 no
 // longer imports `pokemonNameFor` — it falls back to English, which is what made
 // the old per-locale assertion unable to fail.
-import { POKEMON_NAMES_DICT, SUPPORTED_NAME_LOCALES, resolveSpecies } from "../src/data/species.js";
+import { POKEMON_NAMES_DICT, SUPPORTED_NAME_LOCALES, resolveSpecies, resolveRegionalSpecies } from "../src/data/species.js";
 import { unresolvableDexEntries, formSuffixedDexEntries, NAME_LOCALES } from "./lib/species-dex.mjs";
 
 let failures = 0;
@@ -270,6 +271,30 @@ console.log("\nD7 — shadow keeper filters project the whole keeper list");
     FIXTURE_CONFIG.protectShadows === true,
     FIXTURE_CONFIG.protectShadows === true ? ""
       : "protectShadows default flipped — the keeper floor now lands in `trash`, which IS exact-pinned");
+}
+
+console.log("\nD8 — every Rocket lineup Pokémon resolves in every locale");
+{
+  // The lineup hint names each Pokémon in the output locale. ScrapedDuck spells
+  // regional forms "Alolan Vulpix", which no name dictionary carries, so those
+  // rendered in English everywhere. Assert on the dictionary entry itself, not
+  // on pokemonNameFor — that falls back to English and could never fail (D6).
+  const names = new Set();
+  for (const t of ROCKET_LINEUPS.trainers || [])
+    for (const p of t.phases || []) for (const pk of p.pokemons || []) names.add(pk.name);
+  check(`rocket lineups name ${names.size} distinct Pokémon`, names.size > 0,
+    "an empty name list would make every check below vacuous");
+  for (const loc of SUPPORTED_NAME_LOCALES) {
+    const bad = [];
+    for (const name of names) {
+      const hit = resolveRegionalSpecies(name, loc);
+      if (!hit) bad.push(`${name} (unresolvable)`);
+      else if (!POKEMON_NAMES_DICT[hit.dexKey]?.[loc]) bad.push(`${name} (no ${loc} name)`);
+      else if (hit.region && !LOCALES[loc]?.messages[`app.buddy_targets.form_region.${hit.region}`])
+        bad.push(`${name} (no ${loc} label for region ${hit.region})`);
+    }
+    check(`${loc}: all ${names.size} lineup names localize`, bad.length === 0, bad.slice(0, 5).join(", "));
+  }
 }
 
 console.log(`\n${failures === 0 ? "✓ All data-filter property checks passed." : `✗ ${failures} failure(s).`}`);

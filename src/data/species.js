@@ -119,6 +119,27 @@ export function resolveSpecies(input, outputLocale = DEFAULT_OUTPUT_LOCALE) {
   return pokemonNameFor(found.dexKey, outputLocale);
 }
 
+// English regional adjective → region key, the same keys regional-forms.json
+// and the `app.buddy_targets.form_region.*` labels use. Upstream feeds
+// (ScrapedDuck's Rocket lineups) spell regional forms "Alolan Vulpix", which no
+// locale's name dictionary carries.
+export const REGIONAL_PREFIXES = { alolan: "alola", galarian: "galar", hisuian: "hisui", paldean: "paldea" };
+
+// Like resolveSpecies, but also accepts an English regional prefix. Returns
+// { name, dexKey, region } — `name` is the lowercase base species in
+// `outputLocale`, `region` a region key or null — or null when unresolvable.
+// Callers compose the display (the region label is a UI string, not a name).
+export function resolveRegionalSpecies(input, outputLocale = DEFAULT_OUTPUT_LOCALE) {
+  const found = findDexKey(input, outputLocale);
+  if (found) return { name: pokemonNameFor(found.dexKey, outputLocale), dexKey: found.dexKey, region: null };
+  const m = String(input || "").trim().match(/^(\S+)\s+(.+)$/);
+  const region = m && REGIONAL_PREFIXES[m[1].toLowerCase()];
+  if (!region) return null;
+  const base = findDexKey(m[2], outputLocale);
+  if (!base) return null;
+  return { name: pokemonNameFor(base.dexKey, outputLocale), dexKey: base.dexKey, region };
+}
+
 // Returns full info — useful for UI chip previews showing input → output mapping.
 // Shape: { dex, dexKey, names: { en, de, ... }, inputLocale }
 //   dex      — integer base dex number
