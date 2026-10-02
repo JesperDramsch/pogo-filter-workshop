@@ -60,6 +60,7 @@ import {
 	togglePickedOption,
 } from './refinements.jsx';
 import { useTranslation } from './i18n/I18nProvider.jsx';
+import { LOCALES } from './i18n/index.js';
 import { useAnnounce } from './Announcer.jsx';
 import Landing from './Landing.jsx';
 import General from './explain/General.jsx';
@@ -4103,12 +4104,18 @@ export function buildFilters(
 	// display (resolveSpecies returns lowercase per the filter convention).
 	// Regional forms arrive as "Alolan Vulpix"; they render as the localized
 	// base name plus the region label, "Vulpix (Alola)", the parenthetical
-	// style formRegionLabel uses.
+	// style formRegionLabel uses. The label is part of the NAME, so it comes
+	// from the output locale's bundle, not tFn (the UI locale) — otherwise an
+	// English UI with Japanese output renders "ロコン (Alola)".
+	const outputRegionLabel = (region) => {
+		const key = `app.buddy_targets.form_region.${region}`;
+		return LOCALES[outputLocale]?.messages[key] ?? LOCALES.en.messages[key] ?? region;
+	};
 	const localizePokemonName = (name) => {
 		const hit = resolveRegionalSpecies(name, outputLocale);
 		if (!hit?.name) return name;
 		const base = hit.name.charAt(0).toUpperCase() + hit.name.slice(1);
-		return hit.region ? `${base} (${tFn(`app.buddy_targets.form_region.${hit.region}`)})` : base;
+		return hit.region ? `${base} (${outputRegionLabel(hit.region)})` : base;
 	};
 	const localizePokemons = (list) => (list || []).map((pk) => ({ ...pk, name: localizePokemonName(pk.name) }));
 	const localizePhases = (phases) => (phases || []).map((p) => ({ ...p, pokemons: localizePokemons(p.pokemons) }));
