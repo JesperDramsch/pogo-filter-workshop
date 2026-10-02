@@ -21,20 +21,42 @@
 //                      "how many of the lineup's Pokémon take SE damage"
 //                      and surface the top 3.
 //
-// Flags: --offline-ok   tolerate fetch failures if a previous artifact exists.
+// During a Team GO Rocket takeover the fetcher also reads LeekDuck's lineup
+// page directly, at most once per UTC day, until it shows a lineup ScrapedDuck
+// does not. See scripts/lib/rocket-takeover.mjs for why and how sparingly.
+// A LeekDuck-sourced snapshot is pinned against the ScrapedDuck content it
+// replaced (`scrapedDuckPin`), so a still-frozen ScrapedDuck cannot roll it
+// back after the takeover ends; the pin lifts the moment ScrapedDuck changes.
+//
+// Flags: --offline-ok    tolerate fetch failures if a previous artifact exists.
+//        --no-leekduck   never read LeekDuck directly (prebuild uses this, so
+//                        a deploy build never adds a request; the pin still
+//                        holds).
 
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
+import { existsSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
+import {
+  LEEKDUCK_ROCKET_URL,
+  findActiveTakeover,
+  shouldReadLeekDuck,
+  parseLeekDuckLineups,
+} from "./lib/rocket-takeover.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const DATA_DIR = resolve(ROOT, "src/data");
 const OUT_PATH = resolve(DATA_DIR, "rocket-lineups.json");
+const EVENTS_CACHE_PATH = resolve(DATA_DIR, "events.json");
 
 const ENDPOINTS = {
   rocket: "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/rocketLineups.min.json",
   types:  "https://mknepprath.github.io/lily-dex-api/types.json",
+  // Only read for takeover detection: leak-duck's feed carries each event's
+  // bonus list, which is the steadier takeover signal (see rocket-takeover.mjs).
+  events: "https://raw.githubusercontent.com/zhenga8533/leak-duck/refs/heads/data/events.json",
 };
 
 const GENERIC_TOP_N = 3;
@@ -267,21 +289,36 @@ function deriveTrainer(entry, allTypeNames, typeIdx) {
   return null;
 }
 
-function canonicalStringify(value) {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonicalStringify).join(",")}]`;
-  const keys = Object.keys(value).sort();
-  return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalStringify(value[k])}`).join(",")}}`;
+async function fetchText(url) {
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "pogo-filter-workshop rocket-fetcher/1.0 (takeover check, once per day)",
+      Accept: "text/html",
+    },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
+  return res.text();
 }
 
-function writeJson(path, data) {
-  if (!existsSync(dirname(path))) mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, JSON.stringify(data, null, 2) + "\n", "utf8");
+function digest(trainers) {
+  return createHash("sha256").update(canonicalStringify(trainers)).digest("hex").slice(0, 16);
+}
+
+// The live takeover, if any. leak-duck's feed first (it has the bonus lines);
+// this repo's own events snapshot (titles only) when the feed is unreachable.
+async function detectTakeover(now) {
+  try {
+    return findActiveTakeover(await fetchJson(ENDPOINTS.events), now);
+  } catch (e) {
+    console.warn(`  ⚠ events feed unavailable (${e.message}); falling back to ${EVENTS_CACHE_PATH}`);
+    return findActiveTakeover(readPreviousJson(EVENTS_CACHE_PATH), now);
+  }
 }
 
 async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
+  const allowLeekDuck = !args.has("--no-leekduck");
 
   let typesArr, rocketRaw;
   try {
@@ -308,26 +345,81 @@ async function main() {
 
   const typeIdx = indexTypes(typesArr);
   const allTypeNames = Object.keys(typeIdx);
+  const derive = (raw) => raw.map(e => deriveTrainer(e, allTypeNames, typeIdx)).filter(Boolean);
 
-  const trainers = rocketRaw.map(e => deriveTrainer(e, allTypeNames, typeIdx)).filter(Boolean);
+  const scrapedDuckTrainers = derive(rocketRaw);
+  const scrapedDuckDigest = digest(scrapedDuckTrainers);
+  const prev = readPreviousJson(OUT_PATH);
 
-  const newContent = { trainers };
-  let fetchedAt = new Date().toISOString();
-  if (existsSync(OUT_PATH)) {
-    try {
-      const prev = JSON.parse(readFileSync(OUT_PATH, "utf8"));
-      const prevContent = { trainers: prev.trainers };
-      if (canonicalStringify(prevContent) === canonicalStringify(newContent) && prev.fetchedAt) {
-        fetchedAt = prev.fetchedAt;
-        console.log("  ↺ content unchanged — preserving previous fetchedAt");
-      }
-    } catch { /* ignore parse errors; fall through to fresh write */ }
+  // Default: ScrapedDuck. A previous LeekDuck snapshot survives as long as
+  // ScrapedDuck still serves exactly what it served when LeekDuck replaced it.
+  let trainers = scrapedDuckTrainers;
+  let source = "scrapedduck";
+  let scrapedDuckPin;
+  if (prev?.source === "leekduck" && prev.scrapedDuckPin === scrapedDuckDigest && Array.isArray(prev.trainers)) {
+    trainers = prev.trainers;
+    source = "leekduck";
+    scrapedDuckPin = prev.scrapedDuckPin;
+    console.log("  📌 ScrapedDuck unchanged since the LeekDuck takeover read — keeping the LeekDuck lineup");
   }
 
-  writeJson(OUT_PATH, { fetchedAt, ...newContent });
+  // Takeover state is only carried while that takeover is live.
+  const now = Date.now();
+  const today = new Date(now).toISOString().slice(0, 10);
+  let takeoverState;
+  let leekDuckFailed = false;
+  if (allowLeekDuck) {
+    const takeover = await detectTakeover(now);
+    if (takeover) {
+      const prevState = prev?.takeover?.id === takeover.id ? prev.takeover : null;
+      takeoverState = { ...takeover, attempts: prevState?.attempts || [], settled: !!prevState?.settled };
+      console.log(`→ Takeover live: "${takeover.title}" (${takeover.start} → ${takeover.end})`);
+      if (shouldReadLeekDuck(takeover, prevState, today)) {
+        takeoverState.attempts = [...takeoverState.attempts, today];
+        try {
+          console.log(`→ Reading ${LEEKDUCK_ROCKET_URL} (takeover check ${takeoverState.attempts.length})`);
+          const leekDuckTrainers = derive(parseLeekDuckLineups(await fetchText(LEEKDUCK_ROCKET_URL)));
+          if (leekDuckTrainers.length < Math.ceil(scrapedDuckTrainers.length * 0.8)) {
+            throw new Error(`LeekDuck parse yielded ${leekDuckTrainers.length} trainers vs ScrapedDuck's ${scrapedDuckTrainers.length} — refusing`);
+          }
+          if (digest(leekDuckTrainers) !== scrapedDuckDigest) {
+            trainers = leekDuckTrainers;
+            source = "leekduck";
+            scrapedDuckPin = scrapedDuckDigest;
+            takeoverState.settled = true;
+            console.log("  ✓ LeekDuck differs from ScrapedDuck — using LeekDuck; no further reads this takeover");
+          } else {
+            console.log("  ↺ LeekDuck matches ScrapedDuck — will check again tomorrow");
+          }
+        } catch (e) {
+          leekDuckFailed = true;
+          console.error(`✗ LeekDuck takeover read failed: ${e.message}`);
+        }
+      } else {
+        console.log(takeoverState.settled
+          ? "  ✓ already settled for this takeover — not reading LeekDuck"
+          : "  ↺ already checked LeekDuck today");
+      }
+    }
+  } else if (prev?.takeover) {
+    takeoverState = prev.takeover; // prebuild must not drop the sync's state
+  }
+
+  const newContent = { trainers };
+  let fetchedAt = new Date(now).toISOString();
+  if (prev && prev.fetchedAt && canonicalStringify({ trainers: prev.trainers }) === canonicalStringify(newContent)) {
+    fetchedAt = prev.fetchedAt;
+    console.log("  ↺ content unchanged — preserving previous fetchedAt");
+  }
+
+  writeJson(OUT_PATH, { fetchedAt, source, scrapedDuckPin, takeover: takeoverState, ...newContent });
   const counts = trainers.reduce((acc, t) => { acc[t.kind] = (acc[t.kind] || 0) + 1; return acc; }, {});
-  console.log(`✓ wrote ${OUT_PATH}`);
+  console.log(`✓ wrote ${OUT_PATH} (source: ${source})`);
   console.log(`  trainers: ${trainers.length} total — ${counts.leader || 0} leaders, ${counts.typed_grunt || 0} typed grunts, ${counts.generic_grunt || 0} generic`);
+
+  // A failed takeover read is exactly the silent staleness this exists to
+  // catch, so the sync job goes red. A build (--offline-ok) carries on.
+  if (leekDuckFailed && !offlineOk) process.exitCode = 1;
 }
 
 main().catch(e => { console.error(e); process.exit(1); });
