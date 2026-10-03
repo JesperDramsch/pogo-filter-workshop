@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-02T09:51:06.812Z",
+  "fetchedAt": "2026-10-03T13:23:35.510Z",
   "source": "scrapedduck",
   "takeover": {
     "id": "harvest-festival-taken-over@2026-10-02T00:00",
@@ -736,6 +736,12 @@
               "types": [
                 "water"
               ]
+            },
+            {
+              "name": "Feebas",
+              "types": [
+                "water"
+              ]
             }
           ]
         },
@@ -779,7 +785,7 @@
         "electric",
         "grass"
       ],
-      "lineupSize": 4
+      "lineupSize": 5
     },
     {
       "name": "Electric-type Female Grunt",
