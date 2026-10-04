@@ -1,6 +1,6 @@
 # Pokémon GO PvP Meta Reference — GENERATED, DO NOT HAND-EDIT
 
-- **Snapshot taken:** 2026-10-02T14:49:20.706Z
+- **Snapshot taken:** 2026-10-04T14:10:33.434Z
 - **Source:** pvpoke — https://github.com/pvpoke/pvpoke (MIT)
 - **Snapshot URL:** https://raw.githubusercontent.com/JesperDramsch/pogo-filter-workshop/main/src/data/pvp-rankings.json
 - **Depth:** top 30 per league, deduped by base dex
@@ -319,39 +319,39 @@ CP cap: 500 CP
 
 | # | German | English | Dex | Ranked form | Score |
 |---:|---|---|---:|---|---:|
-| 1 | bronzel | bronzor | 436 | — | 98.3 |
-| 2 | isso | wynaut | 360 | — | 89.3 |
-| 3 | jurob | seel | 86 | — | 87.7 |
-| 4 | zigzachs | zigzagoon | 263 | `zigzagoon_galarian` | 87.7 |
-| 5 | skallyk | vullaby | 629 | — | 87.6 |
-| 6 | piccolente | ducklett | 580 | — | 87.4 |
-| 7 | skorgla | gligar | 207 | — | 87.1 |
-| 8 | schlurp | lickitung | 108 | — | 86.5 |
-| 9 | kapuno | deino | 633 | — | 84.7 |
-| 10 | felino | wooper | 194 | `wooper_shadow` | 84.3 |
-| 11 | schmerbe | barboach | 339 | `barboach_shadow` | 83.8 |
-| 12 | skunkapuh | stunky | 434 | `stunky_shadow` | 82.8 |
-| 13 | vulpix | vulpix | 37 | `vulpix_alolan` | 82.8 |
-| 14 | tragosso | cubone | 104 | `cubone_shadow` | 82.1 |
-| 15 | gladiantri | pawniard | 624 | — | 81.6 |
-| 16 | evoli | eevee | 133 | — | 81.5 |
-| 17 | ledyba | ledyba | 165 | `ledyba_shadow` | 80.6 |
-| 18 | wailmer | wailmer | 320 | — | 80.1 |
-| 19 | felilou | purrloin | 509 | `purrloin_shadow` | 79.9 |
-| 20 | dratini | dratini | 147 | `dratini_shadow` | 79.4 |
-| 21 | golbit | golett | 622 | `golett_shadow` | 79.4 |
-| 22 | gruff | greavard | 971 | — | 79.4 |
-| 23 | driftlon | drifloon | 425 | `drifloon_shadow` | 79 |
-| 24 | riolu | riolu | 447 | — | 78.9 |
-| 25 | schnuthelm | shelmet | 616 | — | 78.9 |
-| 26 | fluffeluff | igglybuff | 174 | — | 78.5 |
-| 27 | amarino | amaura | 698 | — | 78.3 |
-| 28 | frospino | frigibax | 996 | — | 78 |
-| 29 | dartiri | fletchling | 661 | — | 77.9 |
-| 30 | rattfratz | rattata | 19 | `rattata_shadow` | 77.6 |
+| 1 | isso | wynaut | 360 | — | 97.9 |
+| 2 | hoothoot | hoothoot | 163 | — | 97.2 |
+| 3 | bronzel | bronzor | 436 | — | 97.1 |
+| 4 | togepi | togepi | 175 | — | 91.6 |
+| 5 | bithora | binacle | 688 | — | 90.3 |
+| 6 | piccolente | ducklett | 580 | — | 90.1 |
+| 7 | araqua | dewpider | 751 | — | 89.9 |
+| 8 | mauzi | meowth | 52 | `meowth_galarian` | 89.1 |
+| 9 | ledyba | ledyba | 165 | — | 88.9 |
+| 10 | dartiri | fletchling | 661 | — | 88.8 |
+| 11 | zigzachs | zigzagoon | 263 | `zigzagoon_galarian` | 88.6 |
+| 12 | wablu | swablu | 333 | — | 88.4 |
+| 13 | kleptifux | nickit | 827 | — | 88.3 |
+| 14 | gladiantri | pawniard | 624 | — | 88 |
+| 15 | schnuthelm | shelmet | 616 | `shelmet_shadow` | 87.9 |
+| 16 | felilou | purrloin | 509 | `purrloin_shadow` | 87.8 |
+| 17 | pionskora | skorupi | 451 | `skorupi_shadow` | 87.3 |
+| 18 | wolly | wooloo | 831 | — | 86.9 |
+| 19 | dratini | dratini | 147 | `dratini_shadow` | 86.8 |
+| 20 | jurob | seel | 86 | — | 86.5 |
+| 21 | bähmon | impidimp | 859 | — | 86.2 |
+| 22 | sandan | sandshrew | 27 | `sandshrew_alolan_shadow` | 86 |
+| 23 | teddiursa | teddiursa | 216 | `teddiursa_shadow` | 86 |
+| 24 | vulpix | vulpix | 37 | — | 85.9 |
+| 25 | zwirrlicht | duskull | 355 | — | 85.4 |
+| 26 | griffel | aipom | 190 | `aipom_shadow` | 84.7 |
+| 27 | kramurx | murkrow | 198 | — | 84.7 |
+| 28 | driftlon | drifloon | 425 | — | 84.3 |
+| 29 | skorgla | gligar | 207 | `gligar_shadow` | 84 |
+| 30 | amarino | amaura | 698 | `amaura_shadow` | 83.9 |
 
 ```
-436,360,86,263,629,580,207,108,633,194,339,434,37,104,624,133,165,320,509,147,622,971,425,447,616,174,698,996,661,19
+360,163,436,175,688,580,751,52,165,661,263,333,827,624,616,509,451,831,147,86,859,27,216,37,355,190,198,425,207,698
 ```
 
 ### Catch Cup `catch-1500`
