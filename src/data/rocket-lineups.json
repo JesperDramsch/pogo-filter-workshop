@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-03T13:23:35.510Z",
+  "fetchedAt": "2026-10-04T14:05:09.179Z",
   "source": "scrapedduck",
   "takeover": {
     "id": "harvest-festival-taken-over@2026-10-02T00:00",
@@ -826,9 +826,10 @@
               ]
             },
             {
-              "name": "Voltorb",
+              "name": "Magnemite",
               "types": [
-                "electric"
+                "electric",
+                "steel"
               ]
             },
             {
@@ -869,12 +870,10 @@
         "fighting",
         "poison",
         "ground",
-        "rock",
         "ghost",
         "steel",
         "electric",
-        "dragon",
-        "fairy"
+        "dragon"
       ],
       "seMoveTypes": [
         "ground"
