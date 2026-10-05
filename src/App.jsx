@@ -4094,7 +4094,8 @@ export function buildFilters(
 	//   typed_grunt   → 1 aggregated clause across the whole lineup
 	//   generic_grunt → offensive-only clause (top-3 SE move types) plus a
 	//                   lineup hint, since the lineup is too varied for a
-	//                   universal resistor.
+	//                   universal resistor. Themed lineups (`themeTypes`, e.g.
+	//                   the Grass/Fire/Water starter trio) get the typed shape.
 
 	// ScrapedDuck stores Pokémon names in EN ("Persian", "Kangaskhan"); the
 	// teaser/hint render layer surfaces these directly. Resolve to the user's
@@ -4237,6 +4238,39 @@ export function buildFilters(
 		if (!v) return typeKey;
 		return v.charAt(0).toUpperCase() + v.slice(1);
 	};
+	// A themed generic grunt (fetcher sets `themeTypes` when every phase offers
+	// the same primary types, e.g. the Grass/Fire/Water starter trio) is named
+	// after its theme through the typed-grunt keys: "Pflanze/Feuer/Wasser-Rüpel ♂".
+	const localizedThemedGruntName = (trainer) => {
+		const typeNames = trainer.themeTypes.map((t) => kw.type[t]);
+		if (typeNames.some((n) => !n)) return trainer.name;
+		const types = typeNames.map((n) => n.charAt(0).toUpperCase() + n.slice(1)).join('/');
+		const key = /female/i.test(trainer.name) ? 'app.filter.rocket_grunt_female' : 'app.filter.rocket_grunt_male';
+		return tFn(key, { params: { type: types }, fallback: trainer.name });
+	};
+	// Themed lineups get the typed-grunt filter shape: resistor allowlist, SE
+	// moves (pre-filtered by the fetcher to types no theme type resists) and
+	// a whole-lineup weakness guard. Null when the data is missing a piece, so
+	// the caller falls back to the generic top-coverage filter.
+	const buildThemedGruntFilter = (trainer) => {
+		const resistorList = (trainer.resistorTypes || []).map((t) => kw.type[t]).filter(Boolean);
+		const seMoveList = (trainer.seMoveTypes || []).map((t) => kw.type[t]).filter(Boolean);
+		if (resistorList.length === 0 || seMoveList.length === 0) return null;
+		const clauses = [];
+		push(clauses, withAllowlist(resistorList.join(',')), tFn('app.clause_why.rocket_resistor_types'));
+		push(clauses, fastMoveClause(seMoveList), tFn('app.clause_why.rocket_theme_se_fast'));
+		push(clauses, chargeMoveClause(seMoveList), tFn('app.clause_why.rocket_theme_se_charge'));
+		const second = buildSecondMoveAndAppraise();
+		if (second) push(clauses, second.clause, second.why);
+		const allLineup = (trainer.phases || []).flatMap((p) => p.pokemons || []);
+		const wGuard = weaknessGuard(unionTypesOf(allLineup));
+		if (wGuard) push(clauses, wGuard, tFn('app.clause_why.rocket_not_weak_to_lineup'));
+		return {
+			clause: clauses.map((c) => c.clause).join('&'),
+			clauses,
+			lenient: buildLenientCounters(seMoveList, unionTypesOf(allLineup)),
+		};
+	};
 	const buildGenericGrunt = (trainer) => {
 		const seMoveList = (trainer.topOffensiveTypes || []).map((t) => kw.type[t]).filter(Boolean);
 		const localizedPhases = localizePhases(trainer.phases);
@@ -4252,6 +4286,19 @@ export function buildFilters(
 		// recognize the encounter regardless of which line was rolled.
 		const gender = gruntGender(trainer.name);
 		const quotes = (ROCKET_GRUNT_QUOTES.generic || []).map((e) => resolveQuote(e, gender)).filter(Boolean);
+		const themed = trainer.themeTypes?.length ? buildThemedGruntFilter(trainer) : null;
+		if (themed) {
+			return {
+				name: trainer.name,
+				displayName: localizedThemedGruntName(trainer),
+				themeTypes: trainer.themeTypes,
+				phases: localizedPhases,
+				topHits: localizedTopHits,
+				quotes,
+				...themed,
+				skipped: false,
+			};
+		}
 		if (seMoveList.length === 0) {
 			return {
 				name: trainer.name,
@@ -9200,11 +9247,12 @@ function RocketCollapsible({
 							{genericGrunts.map((g) => {
 								if (g.skipped) return null;
 								const copyKey = `rocket_generic_${g.name}`;
+								const themed = !!g.themeTypes;
 								return (
 									<TrainerAccordion
 										key={copyKey}
-										name={g.name}
-										teaser={genericGruntTeaser(g, t)}
+										name={g.displayName || g.name}
+										teaser={themed ? typedGruntTeaser(g, t) : genericGruntTeaser(g, t)}
 										accent='#16A085'
 									>
 										{(g.quotes || []).length > 0 && <GruntQuoteList quotes={g.quotes} t={t} />}
@@ -9214,8 +9262,22 @@ function RocketCollapsible({
 											filterStr={g.clause}
 											copied={copied[copyKey]}
 											onCopy={() => copyToClipboard(copyKey, g.clause)}
-											hint={`${topHitsHint(g.topHits, t)} — ${lineupHint(g.phases, t)}`}
+											hint={
+												themed
+													? lineupHint(g.phases, t)
+													: `${topHitsHint(g.topHits, t)} — ${lineupHint(g.phases, t)}`
+											}
 										/>
+										{themed && lenientCounters && g.lenient?.clause && (
+											<FilterBox
+												label={t('app.filter.rocket_grunt_filter_label_lenient')}
+												accent='#E08E0B'
+												filterStr={g.lenient.clause}
+												copied={copied[`${copyKey}_lenient`]}
+												onCopy={() => copyToClipboard(`${copyKey}_lenient`, g.lenient.clause)}
+												hint={t('app.filter.rocket_lenient_hint')}
+											/>
+										)}
 									</TrainerAccordion>
 								);
 							})}

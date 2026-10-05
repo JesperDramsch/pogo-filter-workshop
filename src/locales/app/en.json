@@ -273,6 +273,8 @@
   "app.clause_why.rocket_resistor_types": "defender type resists the Rocket lineup's STAB",
   "app.clause_why.rocket_se_fast": "fast move type hits at least one possible lineup Pokémon SE",
   "app.clause_why.rocket_se_charge": "at least one charge move type hits at least one possible lineup Pokémon SE",
+  "app.clause_why.rocket_theme_se_fast": "fast move type hits at least one lineup Pokémon SE and is not resisted by any of the lineup's theme types",
+  "app.clause_why.rocket_theme_se_charge": "at least one charge move type hits a lineup Pokémon SE and is not resisted by any of the lineup's theme types",
   "app.clause_why.rocket_top_offensive_fast": "fast move in the top SE coverage across the lineup (best-effort — lineups vary)",
   "app.clause_why.rocket_top_offensive_charge": "at least one charge move in the top SE coverage across the lineup",
   "app.clause_why.pvp_meta_pool": "top-30 meta family for the league",

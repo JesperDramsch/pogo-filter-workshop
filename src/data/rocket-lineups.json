@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-04T14:05:09.179Z",
+  "fetchedAt": "2026-10-05T08:54:13.810Z",
   "source": "scrapedduck",
   "takeover": {
     "id": "harvest-festival-taken-over@2026-10-02T00:00",
@@ -2306,6 +2306,23 @@
         "water"
       ],
       "commonStabThreshold": 3,
+      "themeTypes": [
+        "grass",
+        "fire",
+        "water"
+      ],
+      "resistorTypes": [
+        "flying",
+        "poison",
+        "ghost",
+        "electric",
+        "dragon"
+      ],
+      "seMoveTypes": [
+        "flying",
+        "psychic",
+        "rock"
+      ],
       "lineupSize": 9
     },
     {

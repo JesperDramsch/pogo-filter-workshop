@@ -273,6 +273,8 @@
   "app.clause_why.rocket_resistor_types": "tipo del defensor resiste el STAB de la alineación Rocket",
   "app.clause_why.rocket_se_fast": "el tipo del ataque rápido pega SE a al menos un Pokémon posible de la alineación",
   "app.clause_why.rocket_se_charge": "al menos un tipo de ataque cargado pega SE a al menos un Pokémon posible de la alineación",
+  "app.clause_why.rocket_theme_se_fast": "el tipo del movimiento rápido es supereficaz contra al menos un Pokémon de la alineación y ningún tipo temático de la alineación lo resiste",
+  "app.clause_why.rocket_theme_se_charge": "al menos un movimiento cargado es supereficaz contra un Pokémon de la alineación y ningún tipo temático de la alineación lo resiste",
   "app.clause_why.rocket_top_offensive_fast": "ataque rápido en la cobertura SE top de la alineación (mejor esfuerzo — las alineaciones varían)",
   "app.clause_why.rocket_top_offensive_charge": "al menos un ataque cargado en la cobertura SE top de la alineación",
   "app.clause_why.pvp_meta_pool": "familia top-30 meta de la liga",

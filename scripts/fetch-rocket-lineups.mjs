@@ -19,7 +19,11 @@
 //   * generic_grunt  — Male/Female/Decoy. Lineups too varied for a clean
 //                      universal resistor. We rank candidate move types by
 //                      "how many of the lineup's Pokémon take SE damage"
-//                      and surface the top 3.
+//                      and surface the top 3. Exception: a *themed* lineup
+//                      (every phase offers the same set of primary types,
+//                      e.g. Grass/Fire/Water starter lines) gets
+//                      `themeTypes` plus typed-grunt-style resistors and SE
+//                      move types. See themeTypesOf.
 //
 // During a Team GO Rocket takeover the fetcher also reads LeekDuck's lineup
 // page directly, at most once per UTC day, until it shows a lineup ScrapedDuck
@@ -257,12 +261,48 @@ function deriveTypedGrunt(entry, allTypeNames, typeIdx) {
   };
 }
 
+// A generic grunt's lineup is "themed" when every phase offers the same set
+// of primary types and that set has at least two members — the shape of a
+// starter-trio lineup (Bulbasaur/Charmander/Squirtle → … → Venusaur/
+// Charizard/Blastoise is Grass/Fire/Water in all three phases). Derived from
+// the lineup, never from species names, so a rotation to another trio (or
+// away from trios) is picked up by the next sync. Returns the theme types
+// in lineup order, or null.
+function themeTypesOf(slots) {
+  if (slots.length === 0 || slots.some(s => s.length < 2)) return null;
+  const primaries = slots.map(slot => slot.map(p => (p.types?.[0] || "").toLowerCase()));
+  if (primaries.some(list => list.some(t => !t))) return null;
+  const key = list => [...new Set(list)].sort().join(",");
+  const first = key(primaries[0]);
+  if (!primaries.every(list => key(list) === first)) return null;
+  const theme = [...new Set(primaries[0])];
+  return theme.length >= 2 ? theme : null;
+}
+
+// SE move types for a themed lineup: hits at least one lineup Pokémon SE and
+// is not resisted by any theme type. Without the resistance gate the starter
+// trio would rank electric first (SE on the Squirtle line, halved by the
+// Bulbasaur line) and fire (halved by two of the three lines).
+function seMoveTypesForTheme(themeTypes, pokemons, allTypeNames, typeIdx) {
+  return seVsAnyPokemon(pokemons, allTypeNames, typeIdx)
+    .filter(cand => themeTypes.every(t => eff(cand, t, typeIdx) >= 1))
+    .sort();
+}
+
 function deriveGenericGrunt(entry, allTypeNames, typeIdx) {
   const slots = phasesOf(entry);
   const pokemons = slots.flat().map(pokemonSummary);
   const { types: top, hitMap } = topOffensiveTypes(pokemons, allTypeNames, typeIdx);
   const commonStabThreshold = Math.max(2, Math.ceil(pokemons.length / 3));
   const commonStabTypes = commonStabsOf(pokemons, commonStabThreshold);
+  const themeTypes = themeTypesOf(slots);
+  const theme = themeTypes
+    ? {
+        themeTypes,
+        resistorTypes: resistorsFor(unionTypesOf(slots.flat()), allTypeNames, typeIdx),
+        seMoveTypes: seMoveTypesForTheme(themeTypes, pokemons, allTypeNames, typeIdx),
+      }
+    : {};
   return {
     name: entry.name,
     kind: "generic_grunt",
@@ -271,6 +311,7 @@ function deriveGenericGrunt(entry, allTypeNames, typeIdx) {
     topHits: top.map(t => ({ type: t, hits: hitMap[t], total: pokemons.length })),
     commonStabTypes,
     commonStabThreshold,
+    ...theme,
     lineupSize: pokemons.length,
   };
 }
