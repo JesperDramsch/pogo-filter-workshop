@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-01T14:45:05.052Z",
+  "fetchedAt": "2026-10-05T16:21:25.968Z",
   "raids": {
     "mega": [
       {
@@ -146,121 +146,26 @@
     ],
     "lvl1": [
       {
-        "id": "FARFETCHD",
+        "id": "PIKACHU",
         "names": {
-          "en": "Galarian Farfetch'd",
-          "de": "Galar-Porenta",
-          "fr": "Canarticho de Galar",
-          "it": "Farfetch’d di Galar",
-          "ja": "ガラル カモネギ",
-          "ko": "가라르 파오리",
-          "es": "Farfetch'd de Galar"
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
         },
         "types": [
-          "fighting"
+          "electric"
         ],
         "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
-          "ghost",
-          "psychic",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "fairy",
-          "flying",
-          "psychic"
-        ]
-      },
-      {
-        "id": "ZIGZAGOON",
-        "names": {
-          "en": "Galarian Zigzagoon",
-          "de": "Galar-Zigzachs",
-          "fr": "Zigzaton de Galar",
-          "it": "Zigzagoon di Galar",
-          "ja": "ガラル ジグザグマ",
-          "ko": "가라르 지그제구리",
-          "es": "Zigzagoon de Galar"
-        },
-        "types": [
-          "dark",
-          "normal"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "rock",
-          "steel",
-          "dark",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "fighting",
-          "bug",
-          "fairy"
-        ]
-      },
-      {
-        "id": "COMBEE",
-        "names": {
-          "en": "Combee",
-          "de": "Wadribie",
-          "fr": "Apitrini",
-          "it": "Combee",
-          "ja": "ミツハニー",
-          "ko": "세꿀버리",
-          "es": "Combee"
-        },
-        "types": [
-          "bug",
-          "flying"
-        ],
-        "resistorTypes": [
-          "flying",
-          "poison",
-          "rock",
-          "ghost",
-          "steel",
-          "fire",
+          "ground",
+          "grass",
           "electric",
-          "fairy"
+          "dragon"
         ],
         "seMoveTypes": [
-          "rock",
-          "electric",
-          "fire",
-          "flying",
-          "ice"
-        ]
-      },
-      {
-        "id": "HONEDGE",
-        "names": {
-          "en": "Honedge",
-          "de": "Gramokles",
-          "fr": "Monorpale",
-          "it": "Honedge",
-          "ja": "ヒトツキ",
-          "ko": "단칼빙",
-          "es": "Honedge"
-        },
-        "types": [
-          "steel",
-          "ghost"
-        ],
-        "resistorTypes": [
-          "normal",
-          "steel",
-          "fire",
-          "water",
-          "electric",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "fire",
-          "ghost",
           "ground"
         ]
       }
