@@ -341,23 +341,42 @@ console.log("\nD9 — themed generic grunts carry their theme into name and filt
   // then check every locale names the card after the theme and filters with
   // the typed shape (resistor allowlist + SE moves) instead of top coverage.
   const generic = (ROCKET_LINEUPS.trainers || []).filter((t) => t.kind === "generic_grunt");
-  const themed = generic.filter((t) => t.themeTypes?.length);
+  // Expected theme from the phases alone, independent of `themeTypes`, so a
+  // fetcher that drops the field fails here instead of skipping every check.
+  const expectedTheme = (t) => {
+    const phases = t.phases || [];
+    if (phases.length === 0 || phases.some((ph) => (ph.pokemons || []).length < 2)) return null;
+    const keys = phases.map((ph) => [...new Set(ph.pokemons.map((pk) => pk.types?.[0]))].sort().join(","));
+    if (keys.some((k) => k !== keys[0]) || keys[0].split(",").length < 2) return null;
+    return keys[0];
+  };
+  const expected = generic.map((t) => ({ t, theme: expectedTheme(t) }));
+  const themed = expected.filter((e) => e.theme);
   console.log(`  (${themed.length} of ${generic.length} generic grunt(s) themed in the current snapshot)`);
-  for (const t of themed) {
-    const theme = [...t.themeTypes].sort().join(",");
-    const phaseThemes = t.phases.map((ph) => [...new Set(ph.pokemons.map((pk) => pk.types[0]))].sort().join(","));
-    check(`${t.name}: every phase offers exactly the theme types (${theme})`,
-      phaseThemes.every((pt) => pt === theme), phaseThemes.join(" | "));
-    check(`${t.name}: data carries resistor and SE move types`,
-      (t.resistorTypes || []).length > 0 && (t.seMoveTypes || []).length > 0);
+  for (const { t, theme } of expected) {
+    const actual = t.themeTypes?.length ? [...t.themeTypes].sort().join(",") : null;
+    check(`${t.name}: themeTypes matches the phases (${theme ?? "unthemed"})`,
+      actual === theme, `data says ${actual ?? "unthemed"}`);
+  }
+  const builtByLocale = Object.fromEntries(localeNames.map((loc) => [loc, buildResult(loc).rocketGenericGrunts || []]));
+  for (const { t, theme } of expected) {
+    if (theme) {
+      check(`${t.name}: data carries resistor and SE move types`,
+        (t.resistorTypes || []).length > 0 && (t.seMoveTypes || []).length > 0);
+    }
     for (const loc of localeNames) {
+      const built = builtByLocale[loc].find((g) => g.name === t.name);
+      if (!theme) {
+        check(`${loc}: ${t.name} keeps the generic top-coverage shape`,
+          !!built && !built.themeTypes && !built.displayName);
+        continue;
+      }
       const kw = pogoKeywords(loc);
-      const built = (buildResult(loc).rocketGenericGrunts || []).find((g) => g.name === t.name);
       check(`${loc}: ${t.name} renders as themed with a non-empty clause`,
         !!built && !built.skipped && built.clause.length > 0 && Array.isArray(built.themeTypes),
         built ? "" : "missing from buildFilters output");
       const name = (built?.displayName || "").toLowerCase();
-      const missing = t.themeTypes.filter((ty) => !name.includes(kw.type[ty]));
+      const missing = theme.split(",").filter((ty) => !name.includes(kw.type[ty]));
       check(`${loc}: ${t.name} is named after its theme ("${built?.displayName}")`,
         !!built?.displayName && missing.length === 0,
         missing.length ? `missing ${missing.join(", ")}` : "");
