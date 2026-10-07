@@ -29,8 +29,10 @@ Two facts are deliberately **not** fetched at all:
 Access to the game master goes through `scripts/lib/game-master.mjs`, which owns
 the mirror preference list, the batch stamp, the staleness warning and
 provenance helpers, the shared species parsers, and a download cache keyed on the
-batch id — six fetchers read the same 19 MB file, and `npm run prebuild` runs five
-of them back to back.
+batch id — seven fetchers read the same 19 MB file, and `npm run prebuild` runs six
+of them back to back. The Rocket fetcher is the newest: it reads per-form base
+stats to flag lineup tanks (base Defence × Stamina in the top eighth of all
+species), and reuses the previous snapshot's figures when every mirror fails.
 
 ## Retired: pogoapi.net (August 2026)
 

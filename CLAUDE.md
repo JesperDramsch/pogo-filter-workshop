@@ -44,7 +44,7 @@ the app *and* `scripts/generate-pvp-meta-reference.mjs` → the skill.
 so `fetchedAt` is preserved when nothing changed (otherwise every sync is a churn commit); and an
 empty or shrunken result refuses to overwrite the cache rather than publishing a hole.
 
-**Game-master access goes through `scripts/lib/game-master.mjs`.** Six fetchers read the
+**Game-master access goes through `scripts/lib/game-master.mjs`.** Seven fetchers read the
 same 19 MB Niantic dump. The mirror preference list (alexelgt primary, PokeMiners fallback —
 the latter has stalled before), the batch stamp, the staleness warning, the batch-keyed download
 cache and the shared species parsers live in that one file. Do not re-declare a mirror URL in a

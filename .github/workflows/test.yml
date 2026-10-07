@@ -31,6 +31,7 @@ jobs:
       - run: npm run test:gblslots
       - run: npm run test:eventwindow
       - run: npm run test:rockettakeover
+      - run: npm run test:rocketcover
       - run: npm run test:a11ynames
       - run: npm run test:a11ykbd
       - run: npm run test:a11ydialogs

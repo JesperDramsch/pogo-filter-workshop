@@ -6,24 +6,25 @@
 // Three trainer kinds:
 //   * leader         — Giovanni / Cliff / Sierra / Arlo. Per-phase counters
 //                      so the user can swap Pokémon between phases.
-//   * typed_grunt    — 18 type-themed grunts. Resistor selection still
-//                      considers the full union of lineup types (so a
-//                      ground secondary like Swinub knocks steel out of
-//                      the defender list). SE move selection anchors to
-//                      the type chart counters of the grunt's primary
-//                      type and only adds bonus types that hit ≥half of
-//                      the lineup AND aren't resisted by the primary —
-//                      otherwise a single off-type secondary (e.g.
-//                      Swinub's ground on an ice grunt) used to leak
-//                      water/grass/etc into the SE list.
+//   * typed_grunt    — 18 type-themed grunts. Resistor selection considers
+//                      the full union of lineup types (so a ground secondary
+//                      like Swinub knocks steel out of the defender list).
 //   * generic_grunt  — Male/Female/Decoy. Lineups too varied for a clean
-//                      universal resistor. We rank candidate move types by
-//                      "how many of the lineup's Pokémon take SE damage"
-//                      and surface the top 3. Exception: a *themed* lineup
-//                      (every phase offers the same set of primary types,
-//                      e.g. Grass/Fire/Water starter lines) gets
-//                      `themeTypes` plus typed-grunt-style resistors and SE
-//                      move types. See themeTypesOf.
+//                      universal resistor. A *themed* lineup (every phase
+//                      offers the same set of primary types, e.g. the
+//                      Grass/Fire/Water starter lines) gets `themeTypes` plus
+//                      typed-grunt-style resistors. See themeTypesOf.
+//
+// Every grunt, typed or generic, then gets a `counterPlan` and its `tanks`
+// (scripts/lib/rocket-cover.mjs). The plan is an exhaustive set cover of the
+// distinct lineup by move type: one window when a single move type is
+// super-effective against everyone, else the best split into two windows (a
+// two-counter team brings two picks), else the best two plus the species
+// nothing reaches. Tanks are lineup species whose base Defence × Stamina is in
+// the top eighth of all species, read from the game master through
+// scripts/lib/game-master.mjs; each gets its own hard-hitter filter in the app.
+// The per-species bulk figures and the cutoff are stored at the top level
+// (`bulk`) so a game-master outage can reuse them instead of dropping tanks.
 //
 // During a Team GO Rocket takeover the fetcher also reads LeekDuck's lineup
 // page directly, at most once per UTC day, until it shows a lineup ScrapedDuck
@@ -43,6 +44,20 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
 import {
+  indexTypes,
+  eff,
+  effVsPokemon,
+  counterPlan,
+  bulkTable,
+  bulkOf,
+  enNameIndex,
+  tanksOf,
+  distinctSpecies,
+  TANK_TOP_FRACTION,
+} from "./lib/rocket-cover.mjs";
+import { fetchGameMaster, pokemonTemplates, formSuffix, warnIfStale } from "./lib/game-master.mjs";
+import { loadNameDict } from "./lib/species-dex.mjs";
+import {
   LEEKDUCK_ROCKET_URL,
   findActiveTakeover,
   shouldReadLeekDuck,
@@ -55,6 +70,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const DATA_DIR = resolve(ROOT, "src/data");
 const OUT_PATH = resolve(DATA_DIR, "rocket-lineups.json");
+const NAMES_PATH = resolve(ROOT, "src/locales/pokemon-names.json");
 
 const ENDPOINTS = {
   rocket: "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/rocketLineups.min.json",
@@ -66,8 +82,6 @@ const ENDPOINTS = {
   eventsFallback: "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.min.json",
 };
 
-const GENERIC_TOP_N = 3;
-
 async function fetchJson(url) {
   const res = await fetch(url, {
     headers: {
@@ -77,39 +91,6 @@ async function fetchJson(url) {
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
   return res.json();
-}
-
-// lily-dex's matchup table matches PoGo's (Gen VI+) — verified across all 18
-// types against the canonical chart, so no PoGo-specific override layer is
-// applied. If a future audit finds a divergence, patch typeIdx after this fn.
-function indexTypes(typesArr) {
-  const idx = {};
-  for (const entry of typesArr) {
-    // ScrapedDuck uses lowercase type names ("fire"); lily-dex-api uses
-    // TitleCase ("Fire"). Normalize both sides to lowercase.
-    const key = entry.type.toLowerCase();
-    idx[key] = {
-      doubleFrom: new Set((entry.doubleDamageFrom || []).map(s => s.toLowerCase())),
-      halfFrom:   new Set((entry.halfDamageFrom   || []).map(s => s.toLowerCase())),
-      noFrom:     new Set((entry.noDamageFrom     || []).map(s => s.toLowerCase())),
-    };
-  }
-  return idx;
-}
-
-function eff(att, def, typeIdx) {
-  const d = typeIdx[def];
-  if (!d) return 1;
-  if (d.noFrom.has(att))     return 0;
-  if (d.halfFrom.has(att))   return 0.5;
-  if (d.doubleFrom.has(att)) return 2;
-  return 1;
-}
-
-// Combined effectiveness of attacker type Y against a Pokémon with possibly
-// multiple types (PoGo: multiplicative).
-function effVsPokemon(att, pokemonTypes, typeIdx) {
-  return pokemonTypes.reduce((acc, t) => acc * eff(att, t, typeIdx), 1);
 }
 
 // Effectiveness of a typed STAB attack from attacker (single type) against
@@ -151,53 +132,6 @@ function seVsAnyPokemon(pokemons, allTypeNames, typeIdx) {
     }
   }
   return out;
-}
-
-// SE move types for a typed grunt. Anchored to the type chart (always
-// includes types SE vs the primary type) plus "bonus coverage" types
-// that hit at least half the lineup SE AND aren't resisted by the
-// primary type. The resistance gate stops a single off-type secondary
-// (Swinub's ground on an ice grunt) from re-introducing types whose
-// STAB is halved by the headline matchup.
-function seMoveTypesForTypedGrunt(primaryType, pokemons, allTypeNames, typeIdx) {
-  const canonical = new Set(
-    allTypeNames.filter(cand => eff(cand, primaryType, typeIdx) > 1)
-  );
-  const threshold = Math.ceil(pokemons.length / 2);
-  const out = new Set(canonical);
-  for (const cand of allTypeNames) {
-    if (out.has(cand)) continue;
-    if (eff(cand, primaryType, typeIdx) < 1) continue;
-    let hits = 0;
-    for (const p of pokemons) {
-      if (effVsPokemon(cand, (p.types || []).map(t => t.toLowerCase()), typeIdx) > 1) {
-        hits++;
-      }
-    }
-    if (hits >= threshold) out.add(cand);
-  }
-  return [...out].sort();
-}
-
-// Top-N attacker types by "hits SE" count across a heterogeneous lineup.
-// Used for generic grunts whose phase composition is too varied for a
-// clean union-resistor. Ties broken alphabetically.
-function topOffensiveTypes(pokemons, allTypeNames, typeIdx, topN = GENERIC_TOP_N) {
-  if (pokemons.length === 0) return { types: [], hitMap: {} };
-  const counts = allTypeNames.map(cand => {
-    let hits = 0;
-    for (const p of pokemons) {
-      if (effVsPokemon(cand, (p.types || []).map(t => t.toLowerCase()), typeIdx) > 1) {
-        hits++;
-      }
-    }
-    return { type: cand, hits };
-  })
-    .filter(x => x.hits > 0)
-    .sort((a, b) => b.hits - a.hits || a.type.localeCompare(b.type));
-  const hitMap = {};
-  for (const c of counts) hitMap[c.type] = c.hits;
-  return { types: counts.slice(0, topN).map(c => c.type), hitMap };
 }
 
 function unionTypesOf(pokemons) {
@@ -256,7 +190,6 @@ function deriveTypedGrunt(entry, allTypeNames, typeIdx) {
     type: entry.type,
     phases: slots.map((slot, i) => ({ slot: i + 1, pokemons: slot.map(pokemonSummary) })),
     resistorTypes: resistorsFor(unionTypes, allTypeNames, typeIdx),
-    seMoveTypes: seMoveTypesForTypedGrunt(entry.type.toLowerCase(), pokemons, allTypeNames, typeIdx),
     lineupSize: pokemons.length,
   };
 }
@@ -279,20 +212,9 @@ function themeTypesOf(slots) {
   return theme.length >= 2 ? theme : null;
 }
 
-// SE move types for a themed lineup: hits at least one lineup Pokémon SE and
-// is not resisted by any theme type. Without the resistance gate the starter
-// trio would rank electric first (SE on the Squirtle line, halved by the
-// Bulbasaur line) and fire (halved by two of the three lines).
-function seMoveTypesForTheme(themeTypes, pokemons, allTypeNames, typeIdx) {
-  return seVsAnyPokemon(pokemons, allTypeNames, typeIdx)
-    .filter(cand => themeTypes.every(t => eff(cand, t, typeIdx) >= 1))
-    .sort();
-}
-
 function deriveGenericGrunt(entry, allTypeNames, typeIdx) {
   const slots = phasesOf(entry);
   const pokemons = slots.flat().map(pokemonSummary);
-  const { types: top, hitMap } = topOffensiveTypes(pokemons, allTypeNames, typeIdx);
   const commonStabThreshold = Math.max(2, Math.ceil(pokemons.length / 3));
   const commonStabTypes = commonStabsOf(pokemons, commonStabThreshold);
   const themeTypes = themeTypesOf(slots);
@@ -300,15 +222,12 @@ function deriveGenericGrunt(entry, allTypeNames, typeIdx) {
     ? {
         themeTypes,
         resistorTypes: resistorsFor(unionTypesOf(slots.flat()), allTypeNames, typeIdx),
-        seMoveTypes: seMoveTypesForTheme(themeTypes, pokemons, allTypeNames, typeIdx),
       }
     : {};
   return {
     name: entry.name,
     kind: "generic_grunt",
     phases: slots.map((slot, i) => ({ slot: i + 1, pokemons: slot.map(pokemonSummary) })),
-    topOffensiveTypes: top,
-    topHits: top.map(t => ({ type: t, hits: hitMap[t], total: pokemons.length })),
     commonStabTypes,
     commonStabThreshold,
     ...theme,
@@ -331,6 +250,53 @@ function deriveTrainer(entry, allTypeNames, typeIdx) {
     case "generic_grunt": return deriveGenericGrunt(entry, allTypeNames, typeIdx);
   }
   return null;
+}
+
+const isGrunt = (t) => t.kind === "typed_grunt" || t.kind === "generic_grunt";
+const lineupOf = (t) => (t.phases || []).flatMap(p => p.pokemons || []);
+
+// Base Defence × Stamina for every grunt lineup species, plus the top-eighth
+// cutoff over all species. A game-master outage reuses the previous
+// snapshot's figures (species it never measured stay null, so never tanks)
+// rather than publishing a snapshot with every tank filter silently gone.
+async function lineupBulk(trainers, prev) {
+  const names = [...new Set(trainers.filter(isGrunt).flatMap(t => distinctSpecies(lineupOf(t)).map(s => s.name)))].sort();
+  try {
+    console.log("→ Fetching the game master for lineup bulk (tank flags)");
+    const gm = await fetchGameMaster({ userAgent: "pogo-filter-workshop rocket-fetcher/1.0" });
+    warnIfStale(gm, "Rocket tank flags may miss newly added species.");
+    const forms = pokemonTemplates(gm.templates).map(t => ({ dex: t.dex, suffix: formSuffix(t), stats: t.settings?.stats }));
+    const table = bulkTable(forms);
+    if (table.cutoff == null) throw new Error("game master carried no species stats");
+    const enIdx = enNameIndex(loadNameDict(NAMES_PATH));
+    const species = {};
+    for (const n of names) species[n] = bulkOf(n, table, enIdx);
+    const unresolved = names.filter(n => species[n] == null);
+    if (unresolved.length > 0) {
+      console.warn(`  ⚠ no base stats for ${unresolved.join(", ")} — never flagged as tanks`);
+    }
+    return { metric: "baseDefense*baseStamina", topFraction: TANK_TOP_FRACTION, cutoff: table.cutoff, species };
+  } catch (e) {
+    if (prev?.bulk?.cutoff == null) throw e;
+    console.warn(`  ⚠ game master unavailable (${e.message}); reusing the previous snapshot's bulk figures`);
+    const species = {};
+    for (const n of names) species[n] = prev.bulk.species?.[n] ?? null;
+    return { ...prev.bulk, species };
+  }
+}
+
+// counterPlan + tanks on every grunt. Runs on the FINAL trainer list (after
+// the LeekDuck pin decision), so it never feeds the pin digest.
+function annotateGrunts(trainers, bulk, allTypeNames, typeIdx) {
+  return trainers.map(t => {
+    if (!isGrunt(t)) return t;
+    const lineup = lineupOf(t);
+    return {
+      ...t,
+      counterPlan: counterPlan(lineup, allTypeNames, typeIdx),
+      tanks: tanksOf(lineup, bulk.species, bulk.cutoff, allTypeNames, typeIdx),
+    };
+  });
 }
 
 async function fetchText(url) {
@@ -456,9 +422,22 @@ async function main() {
     takeoverState = prev.takeover; // prebuild must not drop the sync's state
   }
 
-  const newContent = { trainers };
+  let bulk;
+  try {
+    bulk = await lineupBulk(trainers, prev);
+  } catch (e) {
+    console.error(`✗ Game master fetch failed and no previous bulk figures exist: ${e.message}`);
+    if (offlineOk && existsSync(OUT_PATH)) {
+      console.warn(`⚠  --offline-ok and cached ${OUT_PATH} exists; build will use cache.`);
+      return;
+    }
+    process.exit(1);
+  }
+  trainers = annotateGrunts(trainers, bulk, allTypeNames, typeIdx);
+
+  const newContent = { bulk, trainers };
   let fetchedAt = new Date(now).toISOString();
-  if (prev && prev.fetchedAt && canonicalStringify({ trainers: prev.trainers }) === canonicalStringify(newContent)) {
+  if (prev && prev.fetchedAt && canonicalStringify({ bulk: prev.bulk, trainers: prev.trainers }) === canonicalStringify(newContent)) {
     fetchedAt = prev.fetchedAt;
     console.log("  ↺ content unchanged — preserving previous fetchedAt");
   }
@@ -467,6 +446,12 @@ async function main() {
   const counts = trainers.reduce((acc, t) => { acc[t.kind] = (acc[t.kind] || 0) + 1; return acc; }, {});
   console.log(`✓ wrote ${OUT_PATH} (source: ${source})`);
   console.log(`  trainers: ${trainers.length} total — ${counts.leader || 0} leaders, ${counts.typed_grunt || 0} typed grunts, ${counts.generic_grunt || 0} generic`);
+  for (const t of trainers.filter(isGrunt)) {
+    const plan = t.counterPlan.windows.map(w => w.types.join("/")).join(" + ");
+    const miss = t.counterPlan.uncovered.length ? `, uncovered: ${t.counterPlan.uncovered.join(", ")}` : "";
+    const tanks = t.tanks.length ? `, tanks: ${t.tanks.map(k => k.name).join(", ")}` : "";
+    console.log(`    ${t.name}: ${plan}${miss}${tanks}`);
+  }
 
   // A failed takeover read is exactly the silent staleness this exists to
   // catch, so the sync job goes red. A build (--offline-ok) carries on.
