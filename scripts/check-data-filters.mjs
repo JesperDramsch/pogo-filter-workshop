@@ -333,14 +333,16 @@ console.log("\nD8 — every Rocket lineup Pokémon resolves in every locale");
   }
 }
 
-console.log("\nD9 — generic grunts: themed lineups get the typed shape, the rest one filter per phase");
+console.log("\nD9 — generic grunts: themed lineups get the typed shape, the rest counter groups");
 {
   // `themeTypes` (fetcher) marks a generic grunt whose every phase offers the
   // same primary types, e.g. the Grass/Fire/Water starter trio. Re-derive that
   // from the phases so a fetcher regression cannot mark an unthemed lineup,
   // then check every locale names the card after the theme and filters with
-  // the typed shape (resistor allowlist + SE moves). Unthemed lineups get the
-  // leader shape: per-phase counters in the data, one clause per phase.
+  // the typed shape (resistor allowlist + SE moves). Unthemed lineups get
+  // counter groups (genericCountersOf): every phase covered by one, each
+  // rendered as a clause. The group logic itself is pinned in
+  // check-rocket-counters.mjs against fixed lineups.
   const generic = (ROCKET_LINEUPS.trainers || []).filter((t) => t.kind === "generic_grunt");
   // Expected theme from the phases alone, independent of `themeTypes`, so a
   // fetcher that drops the field fails here instead of skipping every check.
@@ -365,17 +367,19 @@ console.log("\nD9 — generic grunts: themed lineups get the typed shape, the re
       check(`${t.name}: data carries resistor and SE move types`,
         (t.resistorTypes || []).length > 0 && (t.seMoveTypes || []).length > 0);
     } else {
-      check(`${t.name}: every phase carries resistor and SE move types`,
-        (t.phases || []).every((p) => Array.isArray(p.resistorTypes) && Array.isArray(p.seMoveTypes)));
+      const covered = new Set((t.counters || []).filter((c) => !c.recurring).flatMap((c) => c.phases));
+      check(`${t.name}: counter groups cover every phase (${[...covered].sort().join(", ")})`,
+        (t.phases || []).every((p) => covered.has(p.slot)) &&
+          (t.counters || []).every((c) => c.resistorTypes.length > 0 && c.seMoveTypes.length > 0));
     }
     for (const loc of localeNames) {
       const built = builtByLocale[loc].find((g) => g.name === t.name);
       if (!theme) {
-        const phases = built?.phases || [];
-        const live = phases.filter((p) => !p.skipped && p.clause.length > 0);
-        check(`${loc}: ${t.name} renders one filter per phase (${live.length}/${(t.phases || []).length})`,
+        const counters = built?.counters || [];
+        const live = counters.filter((c) => !c.skipped && c.clause.length > 0);
+        check(`${loc}: ${t.name} renders a clause per counter group (${live.length}/${(t.counters || []).length})`,
           !!built && built.phased && !built.themeTypes && !built.displayName &&
-            phases.length === (t.phases || []).length && live.length > 0,
+            live.length === (t.counters || []).length && live.length > 0,
           built ? "" : "missing from buildFilters output");
         continue;
       }

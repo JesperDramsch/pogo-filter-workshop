@@ -125,10 +125,10 @@ export function buildDataFilters(locale) {
     rocketTypedGrunts: Object.fromEntries(
       (result.rocketTypedGrunts || []).map(g => [g.name, g.clause])
     ),
-    // A phased generic grunt maps phase slot → clause, like a leader.
+    // A phased generic grunt maps counter key → clause, like a leader's phases.
     rocketGenericGrunts: Object.fromEntries(
       (result.rocketGenericGrunts || []).map(g => [g.name, g.phased
-        ? Object.fromEntries(g.phases.map(p => [String(p.slot), p.clause || ""]))
+        ? Object.fromEntries(g.counters.map(c => [c.key, c.clause || ""]))
         : g.clause])
     ),
     pvpFilters: Object.fromEntries(

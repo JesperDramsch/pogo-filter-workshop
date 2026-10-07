@@ -4301,20 +4301,27 @@ export function buildFilters(
 				skipped: false,
 			};
 		}
-		// The fetcher attaches per-phase counters to unthemed lineups. Same
-		// builder as the leaders: you see the grunt's first Pokémon before you
-		// pick a team, and you can swap between phases.
-		if ((trainer.phases || []).some((p) => p.resistorTypes)) {
-			const phases = trainer.phases.map(buildLeaderPhase);
+		// The fetcher attaches counter groups to unthemed lineups (see
+		// genericCountersOf in scripts/lib/rocket-derive.mjs): one per phase,
+		// one per typing that recurs across phases, identical ones merged.
+		// Each builds like a leader phase; `slot` is the display label.
+		if (trainer.counters?.length) {
+			const counters = trainer.counters.map((c) => ({
+				...buildLeaderPhase({ ...c, slot: c.phases.join(' + ') }),
+				key: `${c.recurring ? 'recurring' : 'phase'}_${c.phases.join('_')}`,
+				recurring: !!c.recurring,
+				alsoPhases: c.alsoPhases || [],
+			}));
 			return {
 				name: trainer.name,
 				phased: true,
-				phases,
+				phases: localizedPhases,
+				counters,
 				topHits: localizedTopHits,
 				quotes,
 				clause: '',
 				clauses: [],
-				skipped: phases.every((p) => p.skipped),
+				skipped: counters.every((c) => c.skipped),
 			};
 		}
 		if (seMoveList.length === 0) {
@@ -9116,33 +9123,41 @@ function GruntQuoteList({ quotes, t }) {
 }
 
 // One filter box per phase (plus its lenient fallback), for leaders and for
-// generic grunts whose lineup only resolves phase by phase.
+// generic grunts whose lineup only resolves phase by phase. Generic grunt
+// counters can also be `recurring` (a typing seen in several phases, labelled
+// by its Pokémon) or carry `alsoPhases` (a recurring typing merged in).
 function RocketPhaseFilters({ phases, keyPrefix, accent, lenientCounters, copied, copyToClipboard, t }) {
 	return phases.map((phase) => {
 		if (phase.skipped) return null;
-		const copyKey = `${keyPrefix}_${phase.slot}`;
+		const copyKey = `${keyPrefix}_${phase.key || phase.slot}`;
 		const lenientKey = `${copyKey}_lenient`;
+		const names = phase.pokemons.map((p) => p.name).join(t('app.filter.rocket_lineup_or'));
+		const label = phase.recurring
+			? t('app.filter.rocket_recurring_label', { params: { names, slots: phase.slot } })
+			: t('app.filter.rocket_phase_label', { params: { slot: phase.slot } });
+		const hint = phase.recurring
+			? t('app.filter.rocket_recurring_hint', { params: { slots: phase.slot } })
+			: t('app.filter.rocket_phase_hint', { params: { names } }) +
+				(phase.alsoPhases?.length
+					? ` ${t('app.filter.rocket_phase_also_hint', { params: { slots: phase.alsoPhases.join(' + ') } })}`
+					: '');
 		return (
 			<Fragment key={copyKey}>
 				<FilterBox
-					label={t('app.filter.rocket_phase_label', {
-						params: { slot: phase.slot },
-					})}
+					label={label}
 					accent={accent}
 					filterStr={phase.clause}
 					copied={copied[copyKey]}
 					onCopy={() => copyToClipboard(copyKey, phase.clause)}
-					hint={t('app.filter.rocket_phase_hint', {
-						params: {
-							names: phase.pokemons.map((p) => p.name).join(t('app.filter.rocket_lineup_or')),
-						},
-					})}
+					hint={hint}
 				/>
 				{lenientCounters && phase.lenient?.clause && (
 					<FilterBox
-						label={t('app.filter.rocket_phase_label_lenient', {
-							params: { slot: phase.slot },
-						})}
+						label={
+							phase.recurring
+								? t('app.filter.rocket_recurring_label_lenient', { params: { names } })
+								: t('app.filter.rocket_phase_label_lenient', { params: { slot: phase.slot } })
+						}
 						accent='#E08E0B'
 						filterStr={phase.lenient.clause}
 						copied={copied[lenientKey]}
@@ -9175,7 +9190,7 @@ function RocketCollapsible({
 		typedGrunts.filter((g) => !g.skipped).length +
 		genericGrunts
 			.filter((g) => !g.skipped)
-			.reduce((a, g) => a + (g.phased ? g.phases.filter((p) => !p.skipped).length : 1), 0);
+			.reduce((a, g) => a + (g.phased ? g.counters.filter((c) => !c.skipped).length : 1), 0);
 	const age = formatSyncAge(fetchedAt, t);
 	const headerLabel = t('app.collapsible.aux_rocket');
 	const countLabel = t('app.collapsible.aux_rocket_count', { params: { count: totalFilters } });
@@ -9285,9 +9300,7 @@ function RocketCollapsible({
 										key={copyKey}
 										name={g.displayName || g.name}
 										teaser={
-											g.phased
-												? leaderTeaser(g, t)
-												: themed
+											g.phased || themed
 													? typedGruntTeaser(g, t)
 													: genericGruntTeaser(g, t)
 										}
@@ -9296,7 +9309,7 @@ function RocketCollapsible({
 										{(g.quotes || []).length > 0 && <GruntQuoteList quotes={g.quotes} t={t} />}
 										{g.phased ? (
 											<RocketPhaseFilters
-												phases={g.phases}
+												phases={g.counters}
 												keyPrefix={copyKey}
 												accent='#16A085'
 												lenientCounters={lenientCounters}

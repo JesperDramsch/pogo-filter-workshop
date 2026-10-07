@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-07T13:46:31.964Z",
+  "fetchedAt": "2026-10-07T14:21:41.128Z",
   "source": "scrapedduck",
   "trainers": [
     {
@@ -2335,6 +2335,103 @@
                 "ice"
               ]
             }
+          ]
+        },
+        {
+          "slot": 2,
+          "pokemons": [
+            {
+              "name": "Poliwrath",
+              "types": [
+                "water",
+                "fighting"
+              ]
+            },
+            {
+              "name": "Gardevoir",
+              "types": [
+                "psychic",
+                "fairy"
+              ]
+            },
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Gyarados",
+              "types": [
+                "water",
+                "flying"
+              ]
+            },
+            {
+              "name": "Dragonite",
+              "types": [
+                "dragon",
+                "flying"
+              ]
+            },
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ]
+        }
+      ],
+      "counters": [
+        {
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "recurring": true,
+          "pokemons": [
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "rock",
+            "ghost",
+            "steel"
+          ],
+          "seMoveTypes": [
+            "fighting"
+          ]
+        },
+        {
+          "phases": [
+            1
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            },
+            {
+              "name": "Lapras",
+              "types": [
+                "water",
+                "ice"
+              ]
+            }
           ],
           "resistorTypes": [
             "ghost",
@@ -2350,7 +2447,10 @@
           ]
         },
         {
-          "slot": 2,
+          "phases": [
+            2
+          ],
+          "recurring": false,
           "pokemons": [
             {
               "name": "Poliwrath",
@@ -2383,19 +2483,18 @@
             "fairy"
           ],
           "seMoveTypes": [
-            "fighting",
             "flying",
             "poison",
-            "ghost",
-            "steel",
             "grass",
             "electric",
-            "psychic",
             "fairy"
           ]
         },
         {
-          "slot": 3,
+          "phases": [
+            3
+          ],
+          "recurring": false,
           "pokemons": [
             {
               "name": "Gyarados",
@@ -2426,7 +2525,6 @@
             "fairy"
           ],
           "seMoveTypes": [
-            "fighting",
             "rock",
             "electric",
             "ice",
@@ -2478,21 +2576,6 @@
                 "poison"
               ]
             }
-          ],
-          "resistorTypes": [
-            "flying",
-            "poison",
-            "bug",
-            "ghost",
-            "steel",
-            "fire",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "fire",
-            "psychic",
-            "ice"
           ]
         },
         {
@@ -2511,6 +2594,54 @@
                 "poison"
               ]
             }
+          ]
+        },
+        {
+          "slot": 3,
+          "pokemons": [
+            {
+              "name": "Raticate",
+              "types": [
+                "normal"
+              ]
+            },
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ]
+        }
+      ],
+      "counters": [
+        {
+          "phases": [
+            1,
+            2
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Bellsprout",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            },
+            {
+              "name": "Weepinbell",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            },
+            {
+              "name": "Raticate",
+              "types": [
+                "normal"
+              ]
+            }
           ],
           "resistorTypes": [
             "flying",
@@ -2522,7 +2653,6 @@
             "dragon"
           ],
           "seMoveTypes": [
-            "fighting",
             "flying",
             "fire",
             "psychic",
@@ -2530,7 +2660,13 @@
           ]
         },
         {
-          "slot": 3,
+          "phases": [
+            3
+          ],
+          "alsoPhases": [
+            2
+          ],
+          "recurring": false,
           "pokemons": [
             {
               "name": "Raticate",

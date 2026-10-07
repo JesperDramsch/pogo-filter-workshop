@@ -17,14 +17,18 @@
 //                      Swinub's ground on an ice grunt) used to leak
 //                      water/grass/etc into the SE list.
 //   * generic_grunt  — Male/Female/Decoy. Lineups too varied for a clean
-//                      universal resistor, so an unthemed lineup gets the
-//                      leader treatment: per-phase resistors and SE move
-//                      types, one filter per phase. A *themed* lineup
-//                      (every phase offers the same set of primary types,
-//                      e.g. Grass/Fire/Water starter lines) instead gets
-//                      `themeTypes` plus typed-grunt-style resistors and SE
-//                      move types. See themeTypesOf. Both also carry the
-//                      top-3 "hits SE" ranking for the card teaser.
+//                      universal resistor, so an unthemed lineup gets
+//                      `counters`: one group per phase, one per typing that
+//                      recurs across phases (Snorlax), identical groups
+//                      merged, move types limited to ones nobody in the
+//                      group resists. A *themed* lineup (every phase offers
+//                      the same set of primary types, e.g. Grass/Fire/Water
+//                      starter lines) instead gets `themeTypes` plus
+//                      typed-grunt-style resistors and SE move types. Both
+//                      also carry the top-3 "hits SE" ranking.
+//
+// The derivation lives in scripts/lib/rocket-derive.mjs (pure, pinned by
+// scripts/check-rocket-counters.mjs); this file does the I/O.
 //
 // During a Team GO Rocket takeover the fetcher also reads LeekDuck's lineup
 // page directly, at most once per UTC day, until it shows a lineup ScrapedDuck
@@ -51,6 +55,7 @@ import {
   missingTrainers,
   parseLeekDuckLineups,
 } from "./lib/rocket-takeover.mjs";
+import { indexTypes, deriveTrainer } from "./lib/rocket-derive.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -67,8 +72,6 @@ const ENDPOINTS = {
   eventsFallback: "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/events.min.json",
 };
 
-const GENERIC_TOP_N = 3;
-
 async function fetchJson(url) {
   const res = await fetch(url, {
     headers: {
@@ -78,268 +81,6 @@ async function fetchJson(url) {
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
   return res.json();
-}
-
-// lily-dex's matchup table matches PoGo's (Gen VI+) — verified across all 18
-// types against the canonical chart, so no PoGo-specific override layer is
-// applied. If a future audit finds a divergence, patch typeIdx after this fn.
-function indexTypes(typesArr) {
-  const idx = {};
-  for (const entry of typesArr) {
-    // ScrapedDuck uses lowercase type names ("fire"); lily-dex-api uses
-    // TitleCase ("Fire"). Normalize both sides to lowercase.
-    const key = entry.type.toLowerCase();
-    idx[key] = {
-      doubleFrom: new Set((entry.doubleDamageFrom || []).map(s => s.toLowerCase())),
-      halfFrom:   new Set((entry.halfDamageFrom   || []).map(s => s.toLowerCase())),
-      noFrom:     new Set((entry.noDamageFrom     || []).map(s => s.toLowerCase())),
-    };
-  }
-  return idx;
-}
-
-function eff(att, def, typeIdx) {
-  const d = typeIdx[def];
-  if (!d) return 1;
-  if (d.noFrom.has(att))     return 0;
-  if (d.halfFrom.has(att))   return 0.5;
-  if (d.doubleFrom.has(att)) return 2;
-  return 1;
-}
-
-// Combined effectiveness of attacker type Y against a Pokémon with possibly
-// multiple types (PoGo: multiplicative).
-function effVsPokemon(att, pokemonTypes, typeIdx) {
-  return pokemonTypes.reduce((acc, t) => acc * eff(att, t, typeIdx), 1);
-}
-
-// Effectiveness of a typed STAB attack from attacker (single type) against
-// defender (single type). Used to compute resistors when the boss-side is
-// represented as a union of types from a multi-Pokémon set.
-function defenderTakesFromBossTypes(defenderType, bossTypes, typeIdx) {
-  // For each boss STAB type, what does the defender take?
-  return bossTypes.map(bt => eff(bt, defenderType, typeIdx));
-}
-
-// Resistors for a boss represented as a union of types (drawn from one or
-// more Pokémon's typings). Same rule as the raid-counter logic.
-function resistorsFor(bossTypes, allTypeNames, typeIdx) {
-  if (bossTypes.length === 0) return [];
-  const out = [];
-  for (const cand of allTypeNames) {
-    const effs = defenderTakesFromBossTypes(cand, bossTypes, typeIdx);
-    const maxEff = Math.max(...effs);
-    if (maxEff > 1) continue;
-    if (!effs.some(e => e < 1)) continue;
-    out.push(cand);
-  }
-  return out;
-}
-
-// SE move types: per-Pokémon iteration. A type Y is "useful SE" iff it hits
-// AT LEAST ONE Pokémon in the lineup super-effectively. Union-of-types
-// would undercount because a dual-type Pokémon's resistance to one of its
-// types can cancel out the SE on the other in the product.
-function seVsAnyPokemon(pokemons, allTypeNames, typeIdx) {
-  if (pokemons.length === 0) return [];
-  const out = [];
-  for (const cand of allTypeNames) {
-    for (const p of pokemons) {
-      if (effVsPokemon(cand, (p.types || []).map(t => t.toLowerCase()), typeIdx) > 1) {
-        out.push(cand);
-        break;
-      }
-    }
-  }
-  return out;
-}
-
-// SE move types for a typed grunt. Anchored to the type chart (always
-// includes types SE vs the primary type) plus "bonus coverage" types
-// that hit at least half the lineup SE AND aren't resisted by the
-// primary type. The resistance gate stops a single off-type secondary
-// (Swinub's ground on an ice grunt) from re-introducing types whose
-// STAB is halved by the headline matchup.
-function seMoveTypesForTypedGrunt(primaryType, pokemons, allTypeNames, typeIdx) {
-  const canonical = new Set(
-    allTypeNames.filter(cand => eff(cand, primaryType, typeIdx) > 1)
-  );
-  const threshold = Math.ceil(pokemons.length / 2);
-  const out = new Set(canonical);
-  for (const cand of allTypeNames) {
-    if (out.has(cand)) continue;
-    if (eff(cand, primaryType, typeIdx) < 1) continue;
-    let hits = 0;
-    for (const p of pokemons) {
-      if (effVsPokemon(cand, (p.types || []).map(t => t.toLowerCase()), typeIdx) > 1) {
-        hits++;
-      }
-    }
-    if (hits >= threshold) out.add(cand);
-  }
-  return [...out].sort();
-}
-
-// Top-N attacker types by "hits SE" count across a heterogeneous lineup.
-// Used for generic grunts whose phase composition is too varied for a
-// clean union-resistor. Ties broken alphabetically.
-function topOffensiveTypes(pokemons, allTypeNames, typeIdx, topN = GENERIC_TOP_N) {
-  if (pokemons.length === 0) return { types: [], hitMap: {} };
-  const counts = allTypeNames.map(cand => {
-    let hits = 0;
-    for (const p of pokemons) {
-      if (effVsPokemon(cand, (p.types || []).map(t => t.toLowerCase()), typeIdx) > 1) {
-        hits++;
-      }
-    }
-    return { type: cand, hits };
-  })
-    .filter(x => x.hits > 0)
-    .sort((a, b) => b.hits - a.hits || a.type.localeCompare(b.type));
-  const hitMap = {};
-  for (const c of counts) hitMap[c.type] = c.hits;
-  return { types: counts.slice(0, topN).map(c => c.type), hitMap };
-}
-
-function unionTypesOf(pokemons) {
-  const set = new Set();
-  for (const p of pokemons) {
-    for (const t of (p.types || [])) set.add(t.toLowerCase());
-  }
-  return [...set];
-}
-
-// Types that appear on enough of the lineup's Pokémon to be worth a partial
-// weakness guard for generic grunts. Counts per Pokémon entry (so a species
-// appearing in multiple phases votes multiple times — that's the actual
-// encounter exposure). Returned alphabetically for stable JSON diffs.
-function commonStabsOf(pokemons, threshold) {
-  const counts = {};
-  for (const p of pokemons) {
-    for (const t of (p.types || [])) {
-      const k = t.toLowerCase();
-      counts[k] = (counts[k] || 0) + 1;
-    }
-  }
-  return Object.keys(counts).filter(t => counts[t] >= threshold).sort();
-}
-
-function pokemonSummary(p) {
-  return { name: p.name, types: (p.types || []).map(t => t.toLowerCase()) };
-}
-
-// Phases come from ScrapedDuck under camelCase keys.
-function phasesOf(entry) {
-  return [entry.firstPokemon || [], entry.secondPokemon || [], entry.thirdPokemon || []];
-}
-
-// Per-phase counters: resistors against the union of the phase's types and
-// move types SE against at least one of its Pokémon. Leaders and unthemed
-// generic grunts both use this, since in both the phase is the unit you swap
-// your team around.
-function phaseCountersOf(slots, allTypeNames, typeIdx) {
-  return slots.map((slot, i) => {
-    const pokemons = slot.map(pokemonSummary);
-    return {
-      slot: i + 1,
-      pokemons,
-      resistorTypes: resistorsFor(unionTypesOf(slot), allTypeNames, typeIdx),
-      seMoveTypes: seVsAnyPokemon(pokemons, allTypeNames, typeIdx),
-    };
-  });
-}
-
-function deriveLeader(entry, allTypeNames, typeIdx) {
-  return { name: entry.name, kind: "leader", phases: phaseCountersOf(phasesOf(entry), allTypeNames, typeIdx) };
-}
-
-function deriveTypedGrunt(entry, allTypeNames, typeIdx) {
-  const slots = phasesOf(entry);
-  const pokemons = slots.flat().map(pokemonSummary);
-  const unionTypes = unionTypesOf(slots.flat());
-  return {
-    name: entry.name,
-    kind: "typed_grunt",
-    type: entry.type,
-    phases: slots.map((slot, i) => ({ slot: i + 1, pokemons: slot.map(pokemonSummary) })),
-    resistorTypes: resistorsFor(unionTypes, allTypeNames, typeIdx),
-    seMoveTypes: seMoveTypesForTypedGrunt(entry.type.toLowerCase(), pokemons, allTypeNames, typeIdx),
-    lineupSize: pokemons.length,
-  };
-}
-
-// A generic grunt's lineup is "themed" when every phase offers the same set
-// of primary types and that set has at least two members — the shape of a
-// starter-trio lineup (Bulbasaur/Charmander/Squirtle → … → Venusaur/
-// Charizard/Blastoise is Grass/Fire/Water in all three phases). Derived from
-// the lineup, never from species names, so a rotation to another trio (or
-// away from trios) is picked up by the next sync. Returns the theme types
-// in lineup order, or null.
-function themeTypesOf(slots) {
-  if (slots.length === 0 || slots.some(s => s.length < 2)) return null;
-  const primaries = slots.map(slot => slot.map(p => (p.types?.[0] || "").toLowerCase()));
-  if (primaries.some(list => list.some(t => !t))) return null;
-  const key = list => [...new Set(list)].sort().join(",");
-  const first = key(primaries[0]);
-  if (!primaries.every(list => key(list) === first)) return null;
-  const theme = [...new Set(primaries[0])];
-  return theme.length >= 2 ? theme : null;
-}
-
-// SE move types for a themed lineup: hits at least one lineup Pokémon SE and
-// is not resisted by any theme type. Without the resistance gate the starter
-// trio would rank electric first (SE on the Squirtle line, halved by the
-// Bulbasaur line) and fire (halved by two of the three lines).
-function seMoveTypesForTheme(themeTypes, pokemons, allTypeNames, typeIdx) {
-  return seVsAnyPokemon(pokemons, allTypeNames, typeIdx)
-    .filter(cand => themeTypes.every(t => eff(cand, t, typeIdx) >= 1))
-    .sort();
-}
-
-function deriveGenericGrunt(entry, allTypeNames, typeIdx) {
-  const slots = phasesOf(entry);
-  const pokemons = slots.flat().map(pokemonSummary);
-  const { types: top, hitMap } = topOffensiveTypes(pokemons, allTypeNames, typeIdx);
-  const commonStabThreshold = Math.max(2, Math.ceil(pokemons.length / 3));
-  const commonStabTypes = commonStabsOf(pokemons, commonStabThreshold);
-  const themeTypes = themeTypesOf(slots);
-  const theme = themeTypes
-    ? {
-        themeTypes,
-        resistorTypes: resistorsFor(unionTypesOf(slots.flat()), allTypeNames, typeIdx),
-        seMoveTypes: seMoveTypesForTheme(themeTypes, pokemons, allTypeNames, typeIdx),
-      }
-    : {};
-  return {
-    name: entry.name,
-    kind: "generic_grunt",
-    phases: themeTypes
-      ? slots.map((slot, i) => ({ slot: i + 1, pokemons: slot.map(pokemonSummary) }))
-      : phaseCountersOf(slots, allTypeNames, typeIdx),
-    topOffensiveTypes: top,
-    topHits: top.map(t => ({ type: t, hits: hitMap[t], total: pokemons.length })),
-    commonStabTypes,
-    commonStabThreshold,
-    ...theme,
-    lineupSize: pokemons.length,
-  };
-}
-
-const LEADER_NAMES = new Set(["Giovanni", "Cliff", "Sierra", "Arlo"]);
-
-function classify(entry) {
-  if (LEADER_NAMES.has(entry.name)) return "leader";
-  if (entry.type) return "typed_grunt";
-  return "generic_grunt";
-}
-
-function deriveTrainer(entry, allTypeNames, typeIdx) {
-  switch (classify(entry)) {
-    case "leader":        return deriveLeader(entry, allTypeNames, typeIdx);
-    case "typed_grunt":   return deriveTypedGrunt(entry, allTypeNames, typeIdx);
-    case "generic_grunt": return deriveGenericGrunt(entry, allTypeNames, typeIdx);
-  }
-  return null;
 }
 
 async function fetchText(url) {
