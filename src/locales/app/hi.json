@@ -165,7 +165,7 @@
   "app.collapsible.aux_event_raids_heading": "event raids",
   "app.collapsible.aux_rocket_leaders": "लीडर · हर फ़ेज़ के counters",
   "app.collapsible.aux_rocket_typed_grunts": "टाइप-थीम वाले grunts",
-  "app.collapsible.aux_rocket_generic_grunts": "सामान्य grunts · top SE coverage",
+  "app.collapsible.aux_rocket_generic_grunts": "सामान्य grunts",
   "app.filter.shadow_cheap_label": "सस्ता purify",
   "app.filter.shadow_cheap_hint": "Default state (अभी भी Frustration है) वाले common 1km-walk शैडो। शाइनी, favorites, tagged, और कोई भी ऐसा शैडो छोड़ देता है जिसकी Frustration आपने पहले Charge TM से बदली है — वो असली TM investments हैं।",
   "app.filter.shadow_safe_label": "safe purify",

@@ -17,13 +17,14 @@
 //                      Swinub's ground on an ice grunt) used to leak
 //                      water/grass/etc into the SE list.
 //   * generic_grunt  — Male/Female/Decoy. Lineups too varied for a clean
-//                      universal resistor. We rank candidate move types by
-//                      "how many of the lineup's Pokémon take SE damage"
-//                      and surface the top 3. Exception: a *themed* lineup
+//                      universal resistor, so an unthemed lineup gets the
+//                      leader treatment: per-phase resistors and SE move
+//                      types, one filter per phase. A *themed* lineup
 //                      (every phase offers the same set of primary types,
-//                      e.g. Grass/Fire/Water starter lines) gets
+//                      e.g. Grass/Fire/Water starter lines) instead gets
 //                      `themeTypes` plus typed-grunt-style resistors and SE
-//                      move types. See themeTypesOf.
+//                      move types. See themeTypesOf. Both also carry the
+//                      top-3 "hits SE" ranking for the card teaser.
 //
 // During a Team GO Rocket takeover the fetcher also reads LeekDuck's lineup
 // page directly, at most once per UTC day, until it shows a lineup ScrapedDuck
@@ -232,18 +233,24 @@ function phasesOf(entry) {
   return [entry.firstPokemon || [], entry.secondPokemon || [], entry.thirdPokemon || []];
 }
 
-function deriveLeader(entry, allTypeNames, typeIdx) {
-  const phases = phasesOf(entry).map((slot, i) => {
+// Per-phase counters: resistors against the union of the phase's types and
+// move types SE against at least one of its Pokémon. Leaders and unthemed
+// generic grunts both use this, since in both the phase is the unit you swap
+// your team around.
+function phaseCountersOf(slots, allTypeNames, typeIdx) {
+  return slots.map((slot, i) => {
     const pokemons = slot.map(pokemonSummary);
-    const unionTypes = unionTypesOf(slot);
     return {
       slot: i + 1,
       pokemons,
-      resistorTypes: resistorsFor(unionTypes, allTypeNames, typeIdx),
+      resistorTypes: resistorsFor(unionTypesOf(slot), allTypeNames, typeIdx),
       seMoveTypes: seVsAnyPokemon(pokemons, allTypeNames, typeIdx),
     };
   });
-  return { name: entry.name, kind: "leader", phases };
+}
+
+function deriveLeader(entry, allTypeNames, typeIdx) {
+  return { name: entry.name, kind: "leader", phases: phaseCountersOf(phasesOf(entry), allTypeNames, typeIdx) };
 }
 
 function deriveTypedGrunt(entry, allTypeNames, typeIdx) {
@@ -306,7 +313,9 @@ function deriveGenericGrunt(entry, allTypeNames, typeIdx) {
   return {
     name: entry.name,
     kind: "generic_grunt",
-    phases: slots.map((slot, i) => ({ slot: i + 1, pokemons: slot.map(pokemonSummary) })),
+    phases: themeTypes
+      ? slots.map((slot, i) => ({ slot: i + 1, pokemons: slot.map(pokemonSummary) }))
+      : phaseCountersOf(slots, allTypeNames, typeIdx),
     topOffensiveTypes: top,
     topHits: top.map(t => ({ type: t, hits: hitMap[t], total: pokemons.length })),
     commonStabTypes,

@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-05T08:54:13.810Z",
+  "fetchedAt": "2026-10-07T13:46:31.964Z",
   "source": "scrapedduck",
   "trainers": [
     {
@@ -2335,6 +2335,18 @@
                 "ice"
               ]
             }
+          ],
+          "resistorTypes": [
+            "ghost",
+            "steel",
+            "water",
+            "ice"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "rock",
+            "grass",
+            "electric"
           ]
         },
         {
@@ -2360,6 +2372,26 @@
                 "normal"
               ]
             }
+          ],
+          "resistorTypes": [
+            "flying",
+            "bug",
+            "ghost",
+            "water",
+            "grass",
+            "psychic",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "flying",
+            "poison",
+            "ghost",
+            "steel",
+            "grass",
+            "electric",
+            "psychic",
+            "fairy"
           ]
         },
         {
@@ -2385,6 +2417,21 @@
                 "normal"
               ]
             }
+          ],
+          "resistorTypes": [
+            "ghost",
+            "steel",
+            "water",
+            "electric",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "rock",
+            "electric",
+            "ice",
+            "dragon",
+            "fairy"
           ]
         }
       ],
@@ -2431,6 +2478,21 @@
                 "poison"
               ]
             }
+          ],
+          "resistorTypes": [
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
+            "steel",
+            "fire",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "fire",
+            "psychic",
+            "ice"
           ]
         },
         {
@@ -2449,6 +2511,22 @@
                 "poison"
               ]
             }
+          ],
+          "resistorTypes": [
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
+            "steel",
+            "fire",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "flying",
+            "fire",
+            "psychic",
+            "ice"
           ]
         },
         {
@@ -2466,6 +2544,14 @@
                 "normal"
               ]
             }
+          ],
+          "resistorTypes": [
+            "rock",
+            "ghost",
+            "steel"
+          ],
+          "seMoveTypes": [
+            "fighting"
           ]
         }
       ],

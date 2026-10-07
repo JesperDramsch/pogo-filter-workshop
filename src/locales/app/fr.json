@@ -165,7 +165,7 @@
   "app.collapsible.aux_event_raids_heading": "event raids",
   "app.collapsible.aux_rocket_leaders": "boss · counters par phase",
   "app.collapsible.aux_rocket_typed_grunts": "sbires à thème de type",
-  "app.collapsible.aux_rocket_generic_grunts": "sbires génériques · top couverture SE",
+  "app.collapsible.aux_rocket_generic_grunts": "sbires génériques",
   "app.filter.shadow_cheap_label": "purifier pas cher",
   "app.filter.shadow_cheap_hint": "Obscurs courants à 1km en état par défaut (Frustration encore présente). Exclut les chromatiques, favoris, étiquetés, plus tout obscur dont tu as déjà retiré Frustration via CT Chargée — ce sont de vrais investissements de CT.",
   "app.filter.shadow_safe_label": "purifier sûr",

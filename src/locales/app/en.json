@@ -165,7 +165,7 @@
   "app.collapsible.aux_event_raids_heading": "event raids",
   "app.collapsible.aux_rocket_leaders": "leaders · per-phase counters",
   "app.collapsible.aux_rocket_typed_grunts": "type-themed grunts",
-  "app.collapsible.aux_rocket_generic_grunts": "generic grunts · top SE coverage",
+  "app.collapsible.aux_rocket_generic_grunts": "generic grunts",
   "app.filter.shadow_cheap_label": "cheap purify",
   "app.filter.shadow_cheap_hint": "Common 1km-walk shadows still in default state (Frustration). Excludes shinies, favorites, tagged, plus any shadow you've Charge-TM'd off Frustration — those are real TM investments.",
   "app.filter.shadow_safe_label": "safe purify",

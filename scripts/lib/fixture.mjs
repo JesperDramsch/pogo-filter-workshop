@@ -125,8 +125,11 @@ export function buildDataFilters(locale) {
     rocketTypedGrunts: Object.fromEntries(
       (result.rocketTypedGrunts || []).map(g => [g.name, g.clause])
     ),
+    // A phased generic grunt maps phase slot → clause, like a leader.
     rocketGenericGrunts: Object.fromEntries(
-      (result.rocketGenericGrunts || []).map(g => [g.name, g.clause])
+      (result.rocketGenericGrunts || []).map(g => [g.name, g.phased
+        ? Object.fromEntries(g.phases.map(p => [String(p.slot), p.clause || ""]))
+        : g.clause])
     ),
     pvpFilters: Object.fromEntries(
       Object.entries(result.pvpFilters || {}).map(([k, v]) => [k, v.clause || ""])

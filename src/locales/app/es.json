@@ -165,7 +165,7 @@
   "app.collapsible.aux_event_raids_heading": "event raids",
   "app.collapsible.aux_rocket_leaders": "líderes · counters por fase",
   "app.collapsible.aux_rocket_typed_grunts": "reclutas tipo-temáticos",
-  "app.collapsible.aux_rocket_generic_grunts": "reclutas genéricos · top cobertura SE",
+  "app.collapsible.aux_rocket_generic_grunts": "reclutas genéricos",
   "app.filter.shadow_cheap_label": "purificar barato",
   "app.filter.shadow_cheap_hint": "Oscuros comunes de paseo de 1km en estado por defecto (aún con Frustración). Excluye variocolor, favoritos, etiquetados, más cualquier oscuro al que ya hayas quitado Frustración con MT Cargada — esos son inversiones reales de MT.",
   "app.filter.shadow_safe_label": "purificar seguro",

@@ -333,13 +333,14 @@ console.log("\nD8 — every Rocket lineup Pokémon resolves in every locale");
   }
 }
 
-console.log("\nD9 — themed generic grunts carry their theme into name and filter");
+console.log("\nD9 — generic grunts: themed lineups get the typed shape, the rest one filter per phase");
 {
   // `themeTypes` (fetcher) marks a generic grunt whose every phase offers the
   // same primary types, e.g. the Grass/Fire/Water starter trio. Re-derive that
   // from the phases so a fetcher regression cannot mark an unthemed lineup,
   // then check every locale names the card after the theme and filters with
-  // the typed shape (resistor allowlist + SE moves) instead of top coverage.
+  // the typed shape (resistor allowlist + SE moves). Unthemed lineups get the
+  // leader shape: per-phase counters in the data, one clause per phase.
   const generic = (ROCKET_LINEUPS.trainers || []).filter((t) => t.kind === "generic_grunt");
   // Expected theme from the phases alone, independent of `themeTypes`, so a
   // fetcher that drops the field fails here instead of skipping every check.
@@ -363,12 +364,19 @@ console.log("\nD9 — themed generic grunts carry their theme into name and filt
     if (theme) {
       check(`${t.name}: data carries resistor and SE move types`,
         (t.resistorTypes || []).length > 0 && (t.seMoveTypes || []).length > 0);
+    } else {
+      check(`${t.name}: every phase carries resistor and SE move types`,
+        (t.phases || []).every((p) => Array.isArray(p.resistorTypes) && Array.isArray(p.seMoveTypes)));
     }
     for (const loc of localeNames) {
       const built = builtByLocale[loc].find((g) => g.name === t.name);
       if (!theme) {
-        check(`${loc}: ${t.name} keeps the generic top-coverage shape`,
-          !!built && !built.themeTypes && !built.displayName);
+        const phases = built?.phases || [];
+        const live = phases.filter((p) => !p.skipped && p.clause.length > 0);
+        check(`${loc}: ${t.name} renders one filter per phase (${live.length}/${(t.phases || []).length})`,
+          !!built && built.phased && !built.themeTypes && !built.displayName &&
+            phases.length === (t.phases || []).length && live.length > 0,
+          built ? "" : "missing from buildFilters output");
         continue;
       }
       const kw = pogoKeywords(loc);
