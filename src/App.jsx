@@ -4311,6 +4311,7 @@ export function buildFilters(
 				key: `${c.recurring ? 'recurring' : 'phase'}_${c.phases.join('_')}`,
 				recurring: !!c.recurring,
 				alsoPhases: c.alsoPhases || [],
+				alsoPokemons: localizePokemons(c.alsoPokemons),
 			}));
 			return {
 				name: trainer.name,
@@ -9125,7 +9126,8 @@ function GruntQuoteList({ quotes, t }) {
 // One filter box per phase (plus its lenient fallback), for leaders and for
 // generic grunts whose lineup only resolves phase by phase. Generic grunt
 // counters can also be `recurring` (a typing seen in several phases, labelled
-// by its Pokémon) or carry `alsoPhases` (a recurring typing merged in).
+// by its Pokémon) or carry `alsoPhases` / `alsoPokemons` (a recurring typing
+// folded in, e.g. phase 1 that also handles Snorlax in phases 2 and 3).
 function RocketPhaseFilters({ phases, keyPrefix, accent, lenientCounters, copied, copyToClipboard, t }) {
 	return phases.map((phase) => {
 		if (phase.skipped) return null;
@@ -9139,7 +9141,12 @@ function RocketPhaseFilters({ phases, keyPrefix, accent, lenientCounters, copied
 			? t('app.filter.rocket_recurring_hint', { params: { slots: phase.slot } })
 			: t('app.filter.rocket_phase_hint', { params: { names } }) +
 				(phase.alsoPhases?.length
-					? ` ${t('app.filter.rocket_phase_also_hint', { params: { slots: phase.alsoPhases.join(' + ') } })}`
+					? ` ${t('app.filter.rocket_phase_also_hint', {
+							params: {
+								names: phase.alsoPokemons.map((p) => p.name).join(t('app.filter.rocket_lineup_or')),
+								slots: phase.alsoPhases.join(' + '),
+							},
+						})}`
 					: '');
 		return (
 			<Fragment key={copyKey}>

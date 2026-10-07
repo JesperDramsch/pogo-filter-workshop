@@ -1179,7 +1179,7 @@
   "app.filter.rocket_recurring_label": "{names} · phases {slots}",
   "app.filter.rocket_recurring_label_lenient": "{names} · broad",
   "app.filter.rocket_recurring_hint": "Can turn up in phases {slots}, so it is worth a dedicated slot on your team.",
-  "app.filter.rocket_phase_also_hint": "Also covers this typing in phase {slots}.",
+  "app.filter.rocket_phase_also_hint": "Also counters {names} in phase {slots}.",
   "app.filter.rocket_lenient_hint": "Wider pool: any super-effective move (any slot) or CP ≥ 3500, still not weak to the lineup. Use when the strict filter shows too few of your Pokémon.",
   "app.protect.rocket_lenient_counters.label": "Show broad fallback Rocket counters",
   "app.protect.rocket_lenient_counters.help": "Adds a second, wider counter box per leader phase and typed grunt: any super-effective move (any slot) or CP ≥ 3500, still guarded against the lineup's weaknesses. On by default; turn off to declutter.",

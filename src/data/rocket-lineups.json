@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-07T14:21:41.128Z",
+  "fetchedAt": "2026-10-07T14:37:52.804Z",
   "source": "scrapedduck",
   "trainers": [
     {
@@ -2391,30 +2391,6 @@
       "counters": [
         {
           "phases": [
-            1,
-            2,
-            3
-          ],
-          "recurring": true,
-          "pokemons": [
-            {
-              "name": "Snorlax",
-              "types": [
-                "normal"
-              ]
-            }
-          ],
-          "resistorTypes": [
-            "rock",
-            "ghost",
-            "steel"
-          ],
-          "seMoveTypes": [
-            "fighting"
-          ]
-        },
-        {
-          "phases": [
             1
           ],
           "recurring": false,
@@ -2440,10 +2416,19 @@
             "ice"
           ],
           "seMoveTypes": [
-            "fighting",
-            "rock",
-            "grass",
-            "electric"
+            "fighting"
+          ],
+          "alsoPhases": [
+            2,
+            3
+          ],
+          "alsoPokemons": [
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
           ]
         },
         {
@@ -2663,9 +2648,6 @@
           "phases": [
             3
           ],
-          "alsoPhases": [
-            2
-          ],
           "recurring": false,
           "pokemons": [
             {
@@ -2688,6 +2670,17 @@
           ],
           "seMoveTypes": [
             "fighting"
+          ],
+          "alsoPhases": [
+            2
+          ],
+          "alsoPokemons": [
+            {
+              "name": "Raticate",
+              "types": [
+                "normal"
+              ]
+            }
           ]
         }
       ],

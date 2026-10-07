@@ -1179,7 +1179,7 @@
   "app.filter.rocket_recurring_label": "{names} · 階段 {slots}",
   "app.filter.rocket_recurring_label_lenient": "{names} · 寬鬆",
   "app.filter.rocket_recurring_hint": "可能在階段 {slots} 出現，值得在隊伍中留一個專門的位置。",
-  "app.filter.rocket_phase_also_hint": "也適用於階段 {slots} 的同屬性寶可夢。",
+  "app.filter.rocket_phase_also_hint": "也能剋制階段 {slots} 的{names}。",
   "app.filter.rocket_lenient_hint": "更大的池：任一招式槽帶效果絕佳招式，或 CP ≥ 3500，且不弱於陣容。當嚴格篩選器顯示的寶可夢太少時使用。",
   "app.protect.rocket_lenient_counters.label": "顯示火箭隊的寬鬆備援剋制",
   "app.protect.rocket_lenient_counters.help": "為每個首領階段與屬性嘍囉新增第二個更寬鬆的剋制框：任一招式槽帶效果絕佳招式，或 CP ≥ 3500，仍可防範陣容的弱點。預設開啟；想精簡時可關閉。",

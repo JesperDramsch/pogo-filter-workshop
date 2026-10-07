@@ -71,17 +71,21 @@ for (const entry of [FEMALE, DECOY]) {
   check(`${entry.name}: phases 1–3 each covered by a phase group`, [1, 2, 3].every((s) => covered.has(s)));
 }
 
-console.log("\nC2 — a recurring typing gets its own group");
+console.log("\nC2 — a recurring typing folds into a phase sharing a move type");
 {
   const t = derive(FEMALE);
-  const snorlax = t.counters.find((c) => c.recurring && names(c) === "Snorlax");
-  check("Female: Snorlax group spans phases 1, 2, 3", snorlax?.phases.join(",") === "1,2,3");
-  check("Female: Snorlax group carries fighting", !!snorlax?.seMoveTypes.includes("fighting"));
-  check("Female: recurring group is listed first", t.counters[0] === snorlax);
-  const withFlyers = t.counters.find((c) => !c.recurring && c.phases.includes(3));
+  check("Female: three filters, one per team slot", t.counters.length === 3,
+    t.counters.map((c) => c.phases.join("+")).join(" | "));
+  check("Female: no recurring-only filter left", t.counters.every((c) => !c.recurring));
+  const first = t.counters.find((c) => c.phases.join(",") === "1");
+  check("Female phase 1: narrowed to fighting (SE on Snorlax and Lapras)", first?.seMoveTypes.join(",") === "fighting",
+    first?.seMoveTypes.join(", "));
+  check("Female phase 1: also covers Snorlax in phases 2 + 3",
+    first?.alsoPhases?.join(",") === "2,3" && first?.alsoPokemons?.map((p) => p.name).join(",") === "Snorlax");
+  const withFlyers = t.counters.find((c) => c.phases.includes(3));
   check("Female phase 3: fighting dropped (Gyarados and Dragonite resist it)",
     !!withFlyers && !withFlyers.seMoveTypes.includes("fighting"), withFlyers?.seMoveTypes.join(", "));
-  const withGardevoir = t.counters.find((c) => !c.recurring && c.phases.includes(2));
+  const withGardevoir = t.counters.find((c) => c.phases.includes(2));
   check("Female phase 2: fighting dropped (Gardevoir resists it)",
     !!withGardevoir && !withGardevoir.seMoveTypes.includes("fighting"), withGardevoir?.seMoveTypes.join(", "));
 }
@@ -93,6 +97,8 @@ console.log("\nC3 — identical groups merge");
   check("Decoy: two groups, phase 1+2 and phase 3 (also 2)",
     summary.join(" | ") === "1+2 | 3 also 2", summary.join(" | "));
   check("Decoy: no group is left recurring-only", t.counters.every((c) => !c.recurring));
+  check("Decoy phase 3: also covers Raticate in phase 2",
+    t.counters[1]?.alsoPokemons?.map((p) => p.name).join(",") === "Raticate");
   check("Decoy phase 3 carries fighting", !!t.counters[1]?.seMoveTypes.includes("fighting"));
 }
 

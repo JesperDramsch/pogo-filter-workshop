@@ -1179,7 +1179,7 @@
   "app.filter.rocket_recurring_label": "{names} · phases {slots}",
   "app.filter.rocket_recurring_label_lenient": "{names} · large",
   "app.filter.rocket_recurring_hint": "Peut apparaître aux phases {slots} : il mérite une place dédiée dans votre équipe.",
-  "app.filter.rocket_phase_also_hint": "Couvre aussi ce type en phase {slots}.",
+  "app.filter.rocket_phase_also_hint": "Contre aussi {names} en phase {slots}.",
   "app.filter.rocket_lenient_hint": "Pool plus large : n'importe quelle attaque super efficace (n'importe quel emplacement) ou PC ≥ 3500, toujours pas faible à la composition. À utiliser quand le filtre strict montre trop peu de vos Pokémon.",
   "app.protect.rocket_lenient_counters.label": "Afficher des counters de secours larges pour la Team GO Rocket",
   "app.protect.rocket_lenient_counters.help": "Ajoute une deuxième boîte de counters plus large par phase de leader et sbire à thème : n'importe quelle attaque super efficace (n'importe quel emplacement) ou PC ≥ 3500, toujours protégé contre les faiblesses de la composition. Activé par défaut ; désactivez pour alléger l'affichage.",

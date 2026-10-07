@@ -233,23 +233,30 @@ function seMoveTypesForTheme(themeTypes, pokemons, allTypeNames, typeIdx) {
 const typingKey = p => [...p.types].sort().join("/");
 const countersKey = c => `${[...c.resistorTypes].sort().join(",")}|${[...c.seMoveTypes].sort().join(",")}`;
 
-// Counter filters for an unthemed generic grunt. Three rules, all from types:
+// Counter filters for an unthemed generic grunt, aiming at one filter per
+// team slot. Four rules, all from types:
 //   1. Per phase: resistors against the phase's types and unwalled SE moves.
 //   2. A typing that can show up in two or more phases (Snorlax in all three
-//      of one lineup) also gets its own filter: you will likely face it more
-//      than once, so it is worth a dedicated slot on the team.
+//      of one lineup) is worth countering wherever it appears.
 //   3. Filters that come out identical merge. A phase whose Pokémon are a
 //      subset of another phase's often lands here (Bellsprout alone, then
 //      Raticate or Weepinbell), as does a recurring typing that fills a phase
-//      on its own. Merging is sound: the move lists are equal and the App's
-//      weakness guard takes the union of every covered Pokémon's types.
-// A merged filter that covers any phase is labelled by its phases; a
-// recurring typing merged into it lists its other phases in `alsoPhases`.
+//      on its own. Sound: the move lists are equal and the App's weakness
+//      guard takes the union of every covered Pokémon's types.
+//   4. A recurring typing still on its own folds into a phase it appears in
+//      that shares a move type with it (most shared types, then earliest
+//      phase), and that phase keeps only the shared types. Snorlax/Lapras
+//      share fighting, so phase 1 becomes "fighting, and it also handles
+//      Snorlax in phases 2 and 3": three filters for a team of three. With
+//      no shared type the recurring typing keeps its own filter.
+// A filter is labelled by its phases; a recurring typing merged into it is
+// listed in `alsoPhases` / `alsoPokemons` (its Pokémon in those phases).
 function genericCountersOf(slots, allTypeNames, typeIdx) {
-  const entries = slots.map((slot, i) => ({ phases: [i + 1], pokemons: slot.map(pokemonSummary), recurring: false }));
+  const summaries = slots.map(slot => slot.map(pokemonSummary));
+  const entries = summaries.map((pokemons, i) => ({ phases: [i + 1], pokemons, recurring: false }));
   const byTyping = new Map();
-  slots.forEach((slot, i) => {
-    for (const p of slot.map(pokemonSummary)) {
+  summaries.forEach((pokemons, i) => {
+    for (const p of pokemons) {
       const key = typingKey(p);
       if (!byTyping.has(key)) byTyping.set(key, { phases: new Set(), pokemons: new Map() });
       byTyping.get(key).phases.add(i + 1);
@@ -270,22 +277,51 @@ function genericCountersOf(slots, allTypeNames, typeIdx) {
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(counter);
   }
-  return [...groups.values()].map(group => {
+  // The recurring Pokémon that actually appear in `phases`.
+  const appearingIn = (pokemons, phases) => {
+    const names = new Set(phases.flatMap(s => summaries[s - 1].map(p => p.name)));
+    return pokemons.filter(p => names.has(p.name));
+  };
+  const counters = [...groups.values()].map(group => {
     const phaseSlots = new Set(group.filter(c => !c.recurring).flatMap(c => c.phases));
     const recurringSlots = new Set(group.filter(c => c.recurring).flatMap(c => c.phases));
     const pokemons = new Map();
     for (const c of group) for (const p of c.pokemons) pokemons.set(p.name, p);
     const isRecurring = phaseSlots.size === 0;
-    const alsoPhases = [...recurringSlots].filter(s => !phaseSlots.has(s)).sort();
+    const alsoPhases = isRecurring ? [] : [...recurringSlots].filter(s => !phaseSlots.has(s)).sort();
     return {
       phases: [...(isRecurring ? recurringSlots : phaseSlots)].sort(),
-      ...(!isRecurring && alsoPhases.length > 0 ? { alsoPhases } : {}),
+      alsoPhases,
+      alsoPokemons: appearingIn(group.filter(c => c.recurring).flatMap(c => c.pokemons), alsoPhases),
       recurring: isRecurring,
       pokemons: [...pokemons.values()],
       resistorTypes: group[0].resistorTypes,
       seMoveTypes: group[0].seMoveTypes,
     };
-  }).sort((a, b) => (b.recurring - a.recurring) || (a.phases[0] - b.phases[0]));
+  });
+  const phaseCounters = counters.filter(c => !c.recurring);
+  const out = [...phaseCounters];
+  for (const r of counters.filter(c => c.recurring)) {
+    const target = phaseCounters
+      .filter(c => c.phases.some(s => r.phases.includes(s)))
+      .map(c => ({ c, shared: c.seMoveTypes.filter(m => r.seMoveTypes.includes(m)) }))
+      .filter(x => x.shared.length > 0)
+      .sort((x, y) => (y.shared.length - x.shared.length) || (x.c.phases[0] - y.c.phases[0]))[0];
+    if (!target) { out.push(r); continue; }
+    const { c, shared } = target;
+    c.seMoveTypes = shared;
+    const extra = r.phases.filter(s => !c.phases.includes(s) && !c.alsoPhases.includes(s));
+    c.alsoPhases = [...c.alsoPhases, ...extra].sort();
+    const also = new Map(c.alsoPokemons.map(p => [p.name, p]));
+    for (const p of appearingIn(r.pokemons, extra)) also.set(p.name, p);
+    c.alsoPokemons = [...also.values()];
+    const all = new Map(c.pokemons.map(p => [p.name, p]));
+    for (const p of r.pokemons) all.set(p.name, p);
+    c.pokemons = [...all.values()];
+  }
+  return out
+    .map(({ alsoPhases, alsoPokemons, ...c }) => (alsoPhases.length > 0 ? { ...c, alsoPhases, alsoPokemons } : c))
+    .sort((a, b) => (b.recurring - a.recurring) || (a.phases[0] - b.phases[0]));
 }
 
 function deriveGenericGrunt(entry, allTypeNames, typeIdx) {
