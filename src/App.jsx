@@ -4344,7 +4344,7 @@ export function buildFilters(
 				resistorList: null,
 				guardTypes: trainer.commonStabTypes || [],
 				guardWhy: tFn('app.clause_why.rocket_not_weak_to_common_stab'),
-				lenientGuardTypes: null,
+				lenientGuardTypes: trainer.commonStabTypes || [],
 			}),
 		};
 	};

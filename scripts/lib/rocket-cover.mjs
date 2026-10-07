@@ -61,7 +61,7 @@ export function seTypesAgainst(pokemonTypes, allTypeNames, typeIdx) {
 }
 
 // Only the move types at the highest multiplier against these types: Ice
-// alone on Dragonite (4×), Fighting/Ground/Steel on Aurorus (4×), all three
+// alone on Dragonite (4×), Fighting/Steel on Aurorus (4×; Ground is only 2×), all three
 // 2× types on Wobbuffet. Empty when nothing is super-effective.
 export function bestTypesAgainst(pokemonTypes, allTypeNames, typeIdx) {
   const types = (pokemonTypes || []).map(t => t.toLowerCase());
