@@ -1,16 +1,6 @@
 {
   "fetchedAt": "2026-10-05T08:54:13.810Z",
   "source": "scrapedduck",
-  "takeover": {
-    "id": "harvest-festival-taken-over@2026-10-02T00:00",
-    "title": "Harvest Festival: Taken Over",
-    "start": "2026-10-02T00:00:00",
-    "end": "2026-10-05T20:00:00",
-    "attempts": [
-      "2026-10-02"
-    ],
-    "settled": true
-  },
   "trainers": [
     {
       "name": "Giovanni",

@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-08-28T14:19:13.832Z",
+  "fetchedAt": "2026-10-05T18:22:10.468Z",
   "species": {
     "19": {
       "name": "Rattata",
@@ -1087,6 +1087,48 @@
           "region": "hisui",
           "include": [
             "psychic"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "705": {
+      "name": "Sliggoo",
+      "forms": [
+        {
+          "key": "base",
+          "region": "kalos",
+          "include": [],
+          "exclude": [
+            "steel"
+          ]
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "steel"
+          ],
+          "exclude": []
+        }
+      ]
+    },
+    "706": {
+      "name": "Goodra",
+      "forms": [
+        {
+          "key": "base",
+          "region": "kalos",
+          "include": [],
+          "exclude": [
+            "steel"
+          ]
+        },
+        {
+          "key": "hisui",
+          "region": "hisui",
+          "include": [
+            "steel"
           ],
           "exclude": []
         }
