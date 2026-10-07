@@ -273,6 +273,8 @@
   "app.clause_why.rocket_resistor_types": "le type du défenseur résiste au STAB de la composition Rocket",
   "app.clause_why.rocket_se_fast": "le type d'attaque rapide touche au moins un Pokémon possible de la composition SE",
   "app.clause_why.rocket_se_charge": "au moins un type d'attaque chargée touche au moins un Pokémon possible de la composition SE",
+  "app.clause_why.rocket_theme_se_fast": "le type de l'attaque immédiate est super efficace contre au moins un Pokémon de la composition et aucun type thématique de la composition n'y résiste",
+  "app.clause_why.rocket_theme_se_charge": "au moins une attaque chargée est super efficace contre un Pokémon de la composition et aucun type thématique de la composition n'y résiste",
   "app.clause_why.rocket_top_offensive_fast": "attaque rapide dans la couverture SE top sur la composition (best-effort — les compositions varient)",
   "app.clause_why.rocket_top_offensive_charge": "au moins une attaque chargée dans la couverture SE top sur la composition",
   "app.clause_why.pvp_meta_pool": "famille top-30 méta pour la ligue",

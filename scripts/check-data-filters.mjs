@@ -17,6 +17,7 @@
 //   D6 — the PvP snapshot itself is well formed and every dex resolves
 //   D7 — the shadow keeper filters carry every keeper, in every locale
 //   D8 — every Rocket lineup Pokémon resolves to a real name in every locale
+//   D9 — a themed generic grunt is named after its theme and filtered like one
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
@@ -24,6 +25,7 @@ import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import META_RANKINGS from "../src/data/meta-rankings.json";
 import { buildDataFilters, buildResult, FIXTURE_CONFIG } from "./lib/fixture.mjs";
 import { LOCALES } from "../src/i18n/index.js";
+import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
 // `resolveSpecies` is D7's; the dictionary and locale list are D6's. D6 no
 // longer imports `pokemonNameFor` — it falls back to English, which is what made
 // the old per-locale assertion unable to fail.
@@ -327,6 +329,57 @@ console.log("\nD8 — every Rocket lineup Pokémon resolves in every locale");
         rendered.length !== expected.length
           ? `rendered ${rendered.length}, expected ${expected.length}`
           : diff.slice(0, 5).join(", "));
+    }
+  }
+}
+
+console.log("\nD9 — themed generic grunts carry their theme into name and filter");
+{
+  // `themeTypes` (fetcher) marks a generic grunt whose every phase offers the
+  // same primary types, e.g. the Grass/Fire/Water starter trio. Re-derive that
+  // from the phases so a fetcher regression cannot mark an unthemed lineup,
+  // then check every locale names the card after the theme and filters with
+  // the typed shape (resistor allowlist + SE moves) instead of top coverage.
+  const generic = (ROCKET_LINEUPS.trainers || []).filter((t) => t.kind === "generic_grunt");
+  // Expected theme from the phases alone, independent of `themeTypes`, so a
+  // fetcher that drops the field fails here instead of skipping every check.
+  const expectedTheme = (t) => {
+    const phases = t.phases || [];
+    if (phases.length === 0 || phases.some((ph) => (ph.pokemons || []).length < 2)) return null;
+    const keys = phases.map((ph) => [...new Set(ph.pokemons.map((pk) => pk.types?.[0]))].sort().join(","));
+    if (keys.some((k) => k !== keys[0]) || keys[0].split(",").length < 2) return null;
+    return keys[0];
+  };
+  const expected = generic.map((t) => ({ t, theme: expectedTheme(t) }));
+  const themed = expected.filter((e) => e.theme);
+  console.log(`  (${themed.length} of ${generic.length} generic grunt(s) themed in the current snapshot)`);
+  for (const { t, theme } of expected) {
+    const actual = t.themeTypes?.length ? [...t.themeTypes].sort().join(",") : null;
+    check(`${t.name}: themeTypes matches the phases (${theme ?? "unthemed"})`,
+      actual === theme, `data says ${actual ?? "unthemed"}`);
+  }
+  const builtByLocale = Object.fromEntries(localeNames.map((loc) => [loc, buildResult(loc).rocketGenericGrunts || []]));
+  for (const { t, theme } of expected) {
+    if (theme) {
+      check(`${t.name}: data carries resistor and SE move types`,
+        (t.resistorTypes || []).length > 0 && (t.seMoveTypes || []).length > 0);
+    }
+    for (const loc of localeNames) {
+      const built = builtByLocale[loc].find((g) => g.name === t.name);
+      if (!theme) {
+        check(`${loc}: ${t.name} keeps the generic top-coverage shape`,
+          !!built && !built.themeTypes && !built.displayName);
+        continue;
+      }
+      const kw = pogoKeywords(loc);
+      check(`${loc}: ${t.name} renders as themed with a non-empty clause`,
+        !!built && !built.skipped && built.clause.length > 0 && Array.isArray(built.themeTypes),
+        built ? "" : "missing from buildFilters output");
+      const name = (built?.displayName || "").toLowerCase();
+      const missing = theme.split(",").filter((ty) => !name.includes(kw.type[ty]));
+      check(`${loc}: ${t.name} is named after its theme ("${built?.displayName}")`,
+        !!built?.displayName && missing.length === 0,
+        missing.length ? `missing ${missing.join(", ")}` : "");
     }
   }
 }

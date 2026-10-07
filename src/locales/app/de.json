@@ -273,6 +273,8 @@
   "app.clause_why.rocket_resistor_types": "Verteidiger-Typ resistiert STAB des Rocket-Lineups",
   "app.clause_why.rocket_se_fast": "Sofort-Move-Typ trifft mindestens ein mögliches Lineup-Pokémon SE",
   "app.clause_why.rocket_se_charge": "mindestens ein Lade-Move-Typ trifft mindestens ein mögliches Lineup-Pokémon SE",
+  "app.clause_why.rocket_theme_se_fast": "Sofort-Move-Typ trifft mindestens ein Lineup-Pokémon SE und wird von keinem Thementyp des Lineups resistiert",
+  "app.clause_why.rocket_theme_se_charge": "mindestens ein Lade-Move-Typ trifft ein Lineup-Pokémon SE und wird von keinem Thementyp des Lineups resistiert",
   "app.clause_why.rocket_top_offensive_fast": "Sofort-Move in der top SE-Abdeckung über das Lineup (best-effort — Lineups variieren)",
   "app.clause_why.rocket_top_offensive_charge": "mindestens ein Lade-Move in der top SE-Abdeckung über das Lineup",
   "app.clause_why.pvp_meta_pool": "Top-30 Meta-Familie für die Liga",

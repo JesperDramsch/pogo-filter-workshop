@@ -273,6 +273,8 @@
   "app.clause_why.rocket_resistor_types": "防御側のタイプがロケット団編成のSTABを軽減",
   "app.clause_why.rocket_se_fast": "通常技のタイプが編成の少なくとも1匹の可能性のあるポケモンに効果抜群",
   "app.clause_why.rocket_se_charge": "少なくとも1つのスペシャル技タイプが編成の少なくとも1匹の可能性のあるポケモンに効果抜群",
+  "app.clause_why.rocket_theme_se_fast": "通常技のタイプが編成の少なくとも1匹に効果抜群で、編成のテーマタイプのどれにも半減されない",
+  "app.clause_why.rocket_theme_se_charge": "少なくとも1つのゲージ技のタイプが編成の1匹に効果抜群で、編成のテーマタイプのどれにも半減されない",
   "app.clause_why.rocket_top_offensive_fast": "編成全体でトップSEカバレッジの通常技(ベストエフォート — 編成は変動)",
   "app.clause_why.rocket_top_offensive_charge": "編成全体でトップSEカバレッジに少なくとも1つのスペシャル技",
   "app.clause_why.pvp_meta_pool": "そのリーグのトップ30メタファミリー",

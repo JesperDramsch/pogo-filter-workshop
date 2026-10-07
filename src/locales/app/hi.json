@@ -273,6 +273,8 @@
   "app.clause_why.rocket_resistor_types": "defender type रॉकेट lineup के STAB को resist करता है",
   "app.clause_why.rocket_se_fast": "fast move type कम से कम एक संभावित lineup Pokémon को SE हिट करता है",
   "app.clause_why.rocket_se_charge": "कम से कम एक charge move type कम से कम एक संभावित lineup Pokémon को SE हिट करता है",
+  "app.clause_why.rocket_theme_se_fast": "fast move type कम से कम एक lineup Pokémon पर SE है और lineup के किसी theme type से resist नहीं होता",
+  "app.clause_why.rocket_theme_se_charge": "कम से कम एक charge move type किसी lineup Pokémon पर SE है और lineup के किसी theme type से resist नहीं होता",
   "app.clause_why.rocket_top_offensive_fast": "lineup पर top SE coverage में fast move (best-effort — lineups vary करते हैं)",
   "app.clause_why.rocket_top_offensive_charge": "lineup पर top SE coverage में कम से कम एक charge move",
   "app.clause_why.pvp_meta_pool": "league के लिए top-30 meta family",

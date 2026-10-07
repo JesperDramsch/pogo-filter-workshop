@@ -273,6 +273,8 @@
   "app.clause_why.rocket_resistor_types": "防守方屬性抗火箭隊陣容的 STAB",
   "app.clause_why.rocket_se_fast": "一般招式屬性對陣容中至少一隻可能寶可夢造成 SE",
   "app.clause_why.rocket_se_charge": "至少一個特殊招式屬性對陣容中至少一隻可能寶可夢造成 SE",
+  "app.clause_why.rocket_theme_se_fast": "一般招式屬性對陣容中至少一隻寶可夢效果絕佳，且不被陣容的任何主題屬性抵抗",
+  "app.clause_why.rocket_theme_se_charge": "至少一個特殊招式屬性對陣容中一隻寶可夢效果絕佳，且不被陣容的任何主題屬性抵抗",
   "app.clause_why.rocket_top_offensive_fast": "陣容上最佳 SE 覆蓋的一般招式(盡力而為 — 陣容會變動)",
   "app.clause_why.rocket_top_offensive_charge": "陣容上最佳 SE 覆蓋至少一個特殊招式",
   "app.clause_why.pvp_meta_pool": "聯盟前 30 meta 家族",
