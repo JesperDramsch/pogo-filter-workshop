@@ -495,6 +495,70 @@
           ]
         }
       ]
+    },
+    {
+      "eventID": "dialga-in-5-star-raid-battles-october-2026",
+      "name": "Dialga in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-10-14T06:00:00.000",
+      "end": "2026-10-20T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "DIALGA",
+          "names": {
+            "en": "Dialga"
+          },
+          "types": [
+            "steel",
+            "dragon"
+          ],
+          "resistorTypes": [
+            "steel",
+            "fire",
+            "water",
+            "electric"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "ground"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-dragonite-in-mega-raids-october-2026",
+      "name": "Mega Dragonite in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-10-14T06:00:00.000",
+      "end": "2026-10-20T22:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "DRAGONITE",
+          "names": {
+            "en": "Dragonite"
+          },
+          "types": [
+            "dragon",
+            "flying"
+          ],
+          "resistorTypes": [
+            "rock",
+            "steel",
+            "electric",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "ice",
+            "dragon",
+            "fairy"
+          ]
+        }
+      ]
     }
   ]
 }
