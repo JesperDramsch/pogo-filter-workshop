@@ -4306,9 +4306,9 @@ export function buildFilters(
 		// one per typing that recurs across phases, identical ones merged.
 		// Each builds like a leader phase; `slot` is the display label.
 		if (trainer.counters?.length) {
-			const counters = trainer.counters.map((c) => ({
+			const counters = trainer.counters.map((c, index) => ({
 				...buildLeaderPhase({ ...c, slot: c.phases.join(' + ') }),
-				key: `${c.recurring ? 'recurring' : 'phase'}_${c.phases.join('_')}`,
+				key: `${c.recurring ? 'recurring' : 'phase'}_${c.phases.join('_')}_${index}`,
 				recurring: !!c.recurring,
 				alsoPhases: c.alsoPhases || [],
 				alsoPokemons: localizePokemons(c.alsoPokemons),
