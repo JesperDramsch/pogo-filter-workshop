@@ -14,8 +14,8 @@
 //   C4 — windows and `uncovered` partition the distinct lineup
 //   C5 — tanks: top-fraction cutoff, regional forms, best-multiplier move types
 
+import { indexTypes } from "./lib/rocket-derive.mjs";
 import {
-  indexTypes,
   counterPlan,
   distinctSpecies,
   bestTypesAgainst,

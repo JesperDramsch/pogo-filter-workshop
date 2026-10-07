@@ -7,23 +7,35 @@
 //   * leader         — Giovanni / Cliff / Sierra / Arlo. Per-phase counters
 //                      so the user can swap Pokémon between phases.
 //   * typed_grunt    — 18 type-themed grunts. Resistor selection considers
-//                      the full union of lineup types (so a ground secondary
-//                      like Swinub knocks steel out of the defender list).
+//                      the full union of lineup types (so a ground
+//                      secondary like Swinub knocks steel out of the
+//                      defender list). Their counters come from a
+//                      `counterPlan` (see below), not from `seMoveTypes`.
 //   * generic_grunt  — Male/Female/Decoy. Lineups too varied for a clean
-//                      universal resistor. A *themed* lineup (every phase
-//                      offers the same set of primary types, e.g. the
-//                      Grass/Fire/Water starter lines) gets `themeTypes` plus
-//                      typed-grunt-style resistors. See themeTypesOf.
+//                      universal resistor, so an unthemed lineup gets
+//                      `counters`: one group per phase, one per typing that
+//                      recurs across phases (Snorlax), identical groups
+//                      merged, move types limited to ones nobody in the
+//                      group resists. A *themed* lineup (every phase offers
+//                      the same set of primary types, e.g. Grass/Fire/Water
+//                      starter lines) instead gets `themeTypes` plus
+//                      typed-grunt-style resistors and SE move types. Both
+//                      also carry the top-3 "hits SE" ranking.
 //
-// Every grunt, typed or generic, then gets a `counterPlan` and its `tanks`
-// (scripts/lib/rocket-cover.mjs). The plan is an exhaustive set cover of the
-// distinct lineup by move type: one window when a single move type is
-// super-effective against everyone, else the best split into two windows (a
-// two-counter team brings two picks), else the best two plus the species
-// nothing reaches. Tanks are lineup species whose base Defence × Stamina is in
-// the top eighth of all species, read from the game master through
-// scripts/lib/game-master.mjs; each gets its own hard-hitter filter in the app.
-// The per-species bulk figures and the cutoff are stored at the top level
+// The derivation lives in scripts/lib/rocket-derive.mjs (pure, pinned by
+// scripts/check-rocket-counters.mjs); this file does the I/O.
+//
+// Typed grunts then get a `counterPlan` and their `tanks`
+// (scripts/lib/rocket-cover.mjs, pinned by scripts/check-rocket-cover.mjs).
+// The plan is an exhaustive set cover of the distinct lineup by move type:
+// one window when a single move type is super-effective against everyone,
+// else the best split into two windows (buddy lead plus two counters), else
+// the best two plus the species nothing reaches. Tanks are lineup species
+// whose base Defence × Stamina is in the top eighth of all species, read from
+// the game master through scripts/lib/game-master.mjs; each gets its own
+// hard-hitter filter in the app. Generic grunts keep their per-phase
+// `counters`; their `tanks` only mark species as tanky in the UI. The
+// per-species bulk figures and the cutoff are stored at the top level
 // (`bulk`) so a game-master outage can reuse them instead of dropping tanks.
 //
 // During a Team GO Rocket takeover the fetcher also reads LeekDuck's lineup
@@ -44,9 +56,15 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
 import {
-  indexTypes,
-  eff,
-  effVsPokemon,
+  LEEKDUCK_ROCKET_URL,
+  findActiveTakeover,
+  shouldReadLeekDuck,
+  sameTakeover,
+  missingTrainers,
+  parseLeekDuckLineups,
+} from "./lib/rocket-takeover.mjs";
+import { indexTypes, deriveTrainer } from "./lib/rocket-derive.mjs";
+import {
   counterPlan,
   bulkTable,
   bulkOf,
@@ -57,14 +75,6 @@ import {
 } from "./lib/rocket-cover.mjs";
 import { fetchGameMaster, pokemonTemplates, formSuffix, warnIfStale } from "./lib/game-master.mjs";
 import { loadNameDict } from "./lib/species-dex.mjs";
-import {
-  LEEKDUCK_ROCKET_URL,
-  findActiveTakeover,
-  shouldReadLeekDuck,
-  sameTakeover,
-  missingTrainers,
-  parseLeekDuckLineups,
-} from "./lib/rocket-takeover.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -91,165 +101,6 @@ async function fetchJson(url) {
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
   return res.json();
-}
-
-// Effectiveness of a typed STAB attack from attacker (single type) against
-// defender (single type). Used to compute resistors when the boss-side is
-// represented as a union of types from a multi-Pokémon set.
-function defenderTakesFromBossTypes(defenderType, bossTypes, typeIdx) {
-  // For each boss STAB type, what does the defender take?
-  return bossTypes.map(bt => eff(bt, defenderType, typeIdx));
-}
-
-// Resistors for a boss represented as a union of types (drawn from one or
-// more Pokémon's typings). Same rule as the raid-counter logic.
-function resistorsFor(bossTypes, allTypeNames, typeIdx) {
-  if (bossTypes.length === 0) return [];
-  const out = [];
-  for (const cand of allTypeNames) {
-    const effs = defenderTakesFromBossTypes(cand, bossTypes, typeIdx);
-    const maxEff = Math.max(...effs);
-    if (maxEff > 1) continue;
-    if (!effs.some(e => e < 1)) continue;
-    out.push(cand);
-  }
-  return out;
-}
-
-// SE move types: per-Pokémon iteration. A type Y is "useful SE" iff it hits
-// AT LEAST ONE Pokémon in the lineup super-effectively. Union-of-types
-// would undercount because a dual-type Pokémon's resistance to one of its
-// types can cancel out the SE on the other in the product.
-function seVsAnyPokemon(pokemons, allTypeNames, typeIdx) {
-  if (pokemons.length === 0) return [];
-  const out = [];
-  for (const cand of allTypeNames) {
-    for (const p of pokemons) {
-      if (effVsPokemon(cand, (p.types || []).map(t => t.toLowerCase()), typeIdx) > 1) {
-        out.push(cand);
-        break;
-      }
-    }
-  }
-  return out;
-}
-
-function unionTypesOf(pokemons) {
-  const set = new Set();
-  for (const p of pokemons) {
-    for (const t of (p.types || [])) set.add(t.toLowerCase());
-  }
-  return [...set];
-}
-
-// Types that appear on enough of the lineup's Pokémon to be worth a partial
-// weakness guard for generic grunts. Counts per Pokémon entry (so a species
-// appearing in multiple phases votes multiple times — that's the actual
-// encounter exposure). Returned alphabetically for stable JSON diffs.
-function commonStabsOf(pokemons, threshold) {
-  const counts = {};
-  for (const p of pokemons) {
-    for (const t of (p.types || [])) {
-      const k = t.toLowerCase();
-      counts[k] = (counts[k] || 0) + 1;
-    }
-  }
-  return Object.keys(counts).filter(t => counts[t] >= threshold).sort();
-}
-
-function pokemonSummary(p) {
-  return { name: p.name, types: (p.types || []).map(t => t.toLowerCase()) };
-}
-
-// Phases come from ScrapedDuck under camelCase keys.
-function phasesOf(entry) {
-  return [entry.firstPokemon || [], entry.secondPokemon || [], entry.thirdPokemon || []];
-}
-
-function deriveLeader(entry, allTypeNames, typeIdx) {
-  const phases = phasesOf(entry).map((slot, i) => {
-    const pokemons = slot.map(pokemonSummary);
-    const unionTypes = unionTypesOf(slot);
-    return {
-      slot: i + 1,
-      pokemons,
-      resistorTypes: resistorsFor(unionTypes, allTypeNames, typeIdx),
-      seMoveTypes: seVsAnyPokemon(pokemons, allTypeNames, typeIdx),
-    };
-  });
-  return { name: entry.name, kind: "leader", phases };
-}
-
-function deriveTypedGrunt(entry, allTypeNames, typeIdx) {
-  const slots = phasesOf(entry);
-  const pokemons = slots.flat().map(pokemonSummary);
-  const unionTypes = unionTypesOf(slots.flat());
-  return {
-    name: entry.name,
-    kind: "typed_grunt",
-    type: entry.type,
-    phases: slots.map((slot, i) => ({ slot: i + 1, pokemons: slot.map(pokemonSummary) })),
-    resistorTypes: resistorsFor(unionTypes, allTypeNames, typeIdx),
-    lineupSize: pokemons.length,
-  };
-}
-
-// A generic grunt's lineup is "themed" when every phase offers the same set
-// of primary types and that set has at least two members — the shape of a
-// starter-trio lineup (Bulbasaur/Charmander/Squirtle → … → Venusaur/
-// Charizard/Blastoise is Grass/Fire/Water in all three phases). Derived from
-// the lineup, never from species names, so a rotation to another trio (or
-// away from trios) is picked up by the next sync. Returns the theme types
-// in lineup order, or null.
-function themeTypesOf(slots) {
-  if (slots.length === 0 || slots.some(s => s.length < 2)) return null;
-  const primaries = slots.map(slot => slot.map(p => (p.types?.[0] || "").toLowerCase()));
-  if (primaries.some(list => list.some(t => !t))) return null;
-  const key = list => [...new Set(list)].sort().join(",");
-  const first = key(primaries[0]);
-  if (!primaries.every(list => key(list) === first)) return null;
-  const theme = [...new Set(primaries[0])];
-  return theme.length >= 2 ? theme : null;
-}
-
-function deriveGenericGrunt(entry, allTypeNames, typeIdx) {
-  const slots = phasesOf(entry);
-  const pokemons = slots.flat().map(pokemonSummary);
-  const commonStabThreshold = Math.max(2, Math.ceil(pokemons.length / 3));
-  const commonStabTypes = commonStabsOf(pokemons, commonStabThreshold);
-  const themeTypes = themeTypesOf(slots);
-  const theme = themeTypes
-    ? {
-        themeTypes,
-        resistorTypes: resistorsFor(unionTypesOf(slots.flat()), allTypeNames, typeIdx),
-      }
-    : {};
-  return {
-    name: entry.name,
-    kind: "generic_grunt",
-    phases: slots.map((slot, i) => ({ slot: i + 1, pokemons: slot.map(pokemonSummary) })),
-    commonStabTypes,
-    commonStabThreshold,
-    ...theme,
-    lineupSize: pokemons.length,
-  };
-}
-
-const LEADER_NAMES = new Set(["Giovanni", "Cliff", "Sierra", "Arlo"]);
-
-function classify(entry) {
-  if (LEADER_NAMES.has(entry.name)) return "leader";
-  if (entry.type) return "typed_grunt";
-  return "generic_grunt";
-}
-
-function deriveTrainer(entry, allTypeNames, typeIdx) {
-  switch (classify(entry)) {
-    case "leader":        return deriveLeader(entry, allTypeNames, typeIdx);
-    case "typed_grunt":   return deriveTypedGrunt(entry, allTypeNames, typeIdx);
-    case "generic_grunt": return deriveGenericGrunt(entry, allTypeNames, typeIdx);
-  }
-  return null;
 }
 
 const isGrunt = (t) => t.kind === "typed_grunt" || t.kind === "generic_grunt";
@@ -285,17 +136,16 @@ async function lineupBulk(trainers, prev) {
   }
 }
 
-// counterPlan + tanks on every grunt. Runs on the FINAL trainer list (after
-// the LeekDuck pin decision), so it never feeds the pin digest.
+// counterPlan on typed grunts, tanks on every grunt. Runs on the FINAL
+// trainer list (after the LeekDuck pin decision), so it never feeds the pin
+// digest.
 function annotateGrunts(trainers, bulk, allTypeNames, typeIdx) {
   return trainers.map(t => {
     if (!isGrunt(t)) return t;
     const lineup = lineupOf(t);
-    return {
-      ...t,
-      counterPlan: counterPlan(lineup, allTypeNames, typeIdx),
-      tanks: tanksOf(lineup, bulk.species, bulk.cutoff, allTypeNames, typeIdx),
-    };
+    const tanks = tanksOf(lineup, bulk.species, bulk.cutoff, allTypeNames, typeIdx);
+    if (t.kind === "generic_grunt") return { ...t, tanks };
+    return { ...t, counterPlan: counterPlan(lineup, allTypeNames, typeIdx), tanks };
   });
 }
 
@@ -447,10 +297,12 @@ async function main() {
   console.log(`✓ wrote ${OUT_PATH} (source: ${source})`);
   console.log(`  trainers: ${trainers.length} total — ${counts.leader || 0} leaders, ${counts.typed_grunt || 0} typed grunts, ${counts.generic_grunt || 0} generic`);
   for (const t of trainers.filter(isGrunt)) {
-    const plan = t.counterPlan.windows.map(w => w.types.join("/")).join(" + ");
-    const miss = t.counterPlan.uncovered.length ? `, uncovered: ${t.counterPlan.uncovered.join(", ")}` : "";
+    const plan = t.counterPlan
+      ? t.counterPlan.windows.map(w => w.types.join("/")).join(" + ") +
+        (t.counterPlan.uncovered.length ? `, uncovered: ${t.counterPlan.uncovered.join(", ")}` : "")
+      : "per-phase counters";
     const tanks = t.tanks.length ? `, tanks: ${t.tanks.map(k => k.name).join(", ")}` : "";
-    console.log(`    ${t.name}: ${plan}${miss}${tanks}`);
+    console.log(`    ${t.name}: ${plan}${tanks}`);
   }
 
   // A failed takeover read is exactly the silent staleness this exists to

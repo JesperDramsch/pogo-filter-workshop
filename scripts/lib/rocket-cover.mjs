@@ -20,39 +20,9 @@
 
 // ── Type chart ─────────────────────────────────────────────────────────────
 
-// lily-dex-api's types.json → { type: { doubleFrom, halfFrom, noFrom } }.
-// lily-dex's matchup table matches PoGo's (Gen VI+), verified across all 18
-// types against the canonical chart, so no PoGo-specific override layer is
-// applied. If a future audit finds a divergence, patch the index here.
-// ScrapedDuck uses lowercase type names ("fire"); lily-dex-api uses TitleCase
-// ("Fire"). Normalize both sides to lowercase.
-export function indexTypes(typesArr) {
-  const idx = {};
-  for (const entry of typesArr) {
-    const key = entry.type.toLowerCase();
-    idx[key] = {
-      doubleFrom: new Set((entry.doubleDamageFrom || []).map(s => s.toLowerCase())),
-      halfFrom:   new Set((entry.halfDamageFrom   || []).map(s => s.toLowerCase())),
-      noFrom:     new Set((entry.noDamageFrom     || []).map(s => s.toLowerCase())),
-    };
-  }
-  return idx;
-}
-
-export function eff(att, def, typeIdx) {
-  const d = typeIdx[def];
-  if (!d) return 1;
-  if (d.noFrom.has(att))     return 0;
-  if (d.halfFrom.has(att))   return 0.5;
-  if (d.doubleFrom.has(att)) return 2;
-  return 1;
-}
-
-// Combined effectiveness of attacker type Y against a Pokémon with possibly
-// multiple types (PoGo: multiplicative).
-export function effVsPokemon(att, pokemonTypes, typeIdx) {
-  return pokemonTypes.reduce((acc, t) => acc * eff(att, t, typeIdx), 1);
-}
+// The type chart helpers live in scripts/lib/rocket-derive.mjs, shared with
+// the lineup derivation.
+import { effVsPokemon } from "./rocket-derive.mjs";
 
 // Move types that hit a Pokémon of these types super-effectively, sorted.
 export function seTypesAgainst(pokemonTypes, allTypeNames, typeIdx) {
@@ -61,8 +31,8 @@ export function seTypesAgainst(pokemonTypes, allTypeNames, typeIdx) {
 }
 
 // Only the move types at the highest multiplier against these types: Ice
-// alone on Dragonite (4×), Fighting/Steel on Aurorus (4×; Ground is only 2×), all three
-// 2× types on Wobbuffet. Empty when nothing is super-effective.
+// alone on Dragonite (4×), Fighting/Steel on Aurorus (4×; Ground is only
+// 2×), all three 2× types on Wobbuffet. Empty when nothing is super-effective.
 export function bestTypesAgainst(pokemonTypes, allTypeNames, typeIdx) {
   const types = (pokemonTypes || []).map(t => t.toLowerCase());
   const scored = allTypeNames.map(t => [t, effVsPokemon(t, types, typeIdx)]);

@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-07T15:48:17.188Z",
+  "fetchedAt": "2026-10-07T17:35:34.965Z",
   "source": "scrapedduck",
   "bulk": {
     "metric": "baseDefense*baseStamina",
@@ -692,6 +692,9 @@
         "psychic",
         "fairy"
       ],
+      "seMoveTypes": [
+        "fighting"
+      ],
       "lineupSize": 9,
       "counterPlan": {
         "windows": [
@@ -810,6 +813,11 @@
         "dragon",
         "fairy"
       ],
+      "seMoveTypes": [
+        "ground",
+        "rock",
+        "water"
+      ],
       "lineupSize": 9,
       "counterPlan": {
         "windows": [
@@ -923,6 +931,10 @@
         "water",
         "ice"
       ],
+      "seMoveTypes": [
+        "electric",
+        "grass"
+      ],
       "lineupSize": 9,
       "counterPlan": {
         "windows": [
@@ -1025,6 +1037,10 @@
         "water",
         "electric",
         "dragon"
+      ],
+      "seMoveTypes": [
+        "electric",
+        "grass"
       ],
       "lineupSize": 5,
       "counterPlan": {
@@ -1131,6 +1147,9 @@
         "steel",
         "electric",
         "dragon"
+      ],
+      "seMoveTypes": [
+        "ground"
       ],
       "lineupSize": 9,
       "counterPlan": {
@@ -1249,6 +1268,13 @@
         "poison",
         "grass",
         "fairy"
+      ],
+      "seMoveTypes": [
+        "bug",
+        "fire",
+        "flying",
+        "ice",
+        "poison"
       ],
       "lineupSize": 9,
       "counterPlan": {
@@ -1373,6 +1399,12 @@
         "steel",
         "water",
         "electric"
+      ],
+      "seMoveTypes": [
+        "fighting",
+        "fire",
+        "rock",
+        "steel"
       ],
       "lineupSize": 9,
       "counterPlan": {
@@ -1503,6 +1535,11 @@
         "dragon",
         "fairy"
       ],
+      "seMoveTypes": [
+        "fairy",
+        "flying",
+        "psychic"
+      ],
       "lineupSize": 9,
       "counterPlan": {
         "windows": [
@@ -1630,6 +1667,10 @@
         "electric",
         "psychic"
       ],
+      "seMoveTypes": [
+        "ground",
+        "psychic"
+      ],
       "lineupSize": 9,
       "counterPlan": {
         "windows": [
@@ -1741,6 +1782,11 @@
         "ground",
         "dark",
         "fairy"
+      ],
+      "seMoveTypes": [
+        "grass",
+        "ice",
+        "water"
       ],
       "lineupSize": 9,
       "counterPlan": {
@@ -1864,6 +1910,11 @@
         "flying",
         "ghost",
         "water"
+      ],
+      "seMoveTypes": [
+        "electric",
+        "ice",
+        "rock"
       ],
       "lineupSize": 9,
       "counterPlan": {
@@ -1991,6 +2042,11 @@
         "bug",
         "fire",
         "fairy"
+      ],
+      "seMoveTypes": [
+        "bug",
+        "dark",
+        "ghost"
       ],
       "lineupSize": 9,
       "counterPlan": {
@@ -2125,6 +2181,11 @@
         "electric",
         "dragon"
       ],
+      "seMoveTypes": [
+        "fire",
+        "flying",
+        "rock"
+      ],
       "lineupSize": 9,
       "counterPlan": {
         "windows": [
@@ -2240,6 +2301,13 @@
       ],
       "resistorTypes": [
         "fighting",
+        "water"
+      ],
+      "seMoveTypes": [
+        "fighting",
+        "grass",
+        "ground",
+        "steel",
         "water"
       ],
       "lineupSize": 9,
@@ -2365,6 +2433,10 @@
         "ice",
         "dark"
       ],
+      "seMoveTypes": [
+        "dark",
+        "ghost"
+      ],
       "lineupSize": 9,
       "counterPlan": {
         "windows": [
@@ -2482,6 +2554,11 @@
         "flying",
         "dark",
         "fairy"
+      ],
+      "seMoveTypes": [
+        "dragon",
+        "fairy",
+        "ice"
       ],
       "lineupSize": 9,
       "counterPlan": {
@@ -2610,6 +2687,11 @@
         "dark",
         "fairy"
       ],
+      "seMoveTypes": [
+        "bug",
+        "fairy",
+        "fighting"
+      ],
       "lineupSize": 8,
       "counterPlan": {
         "windows": [
@@ -2723,6 +2805,11 @@
         "electric",
         "psychic",
         "dark"
+      ],
+      "seMoveTypes": [
+        "fighting",
+        "fire",
+        "ground"
       ],
       "lineupSize": 9,
       "counterPlan": {
@@ -2869,6 +2956,10 @@
         "psychic",
         "ice"
       ],
+      "seMoveTypes": [
+        "poison",
+        "steel"
+      ],
       "lineupSize": 9,
       "counterPlan": {
         "windows": [
@@ -2969,6 +3060,28 @@
           ]
         }
       ],
+      "topOffensiveTypes": [
+        "electric",
+        "fire",
+        "flying"
+      ],
+      "topHits": [
+        {
+          "type": "electric",
+          "hits": 4,
+          "total": 9
+        },
+        {
+          "type": "fire",
+          "hits": 3,
+          "total": 9
+        },
+        {
+          "type": "flying",
+          "hits": 3,
+          "total": 9
+        }
+      ],
       "commonStabTypes": [
         "fire",
         "grass",
@@ -2988,39 +3101,12 @@
         "electric",
         "dragon"
       ],
+      "seMoveTypes": [
+        "flying",
+        "psychic",
+        "rock"
+      ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "electric"
-            ],
-            "covers": [
-              "Squirtle",
-              "Wartortle",
-              "Charizard",
-              "Blastoise"
-            ]
-          },
-          {
-            "types": [
-              "fire",
-              "flying",
-              "ice",
-              "psychic"
-            ],
-            "covers": [
-              "Bulbasaur",
-              "Ivysaur",
-              "Venusaur"
-            ]
-          }
-        ],
-        "uncovered": [
-          "Charmander",
-          "Charmeleon"
-        ]
-      },
       "tanks": []
     },
     {
@@ -3096,38 +3182,164 @@
           ]
         }
       ],
+      "counters": [
+        {
+          "phases": [
+            1
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            },
+            {
+              "name": "Lapras",
+              "types": [
+                "water",
+                "ice"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "ghost",
+            "steel",
+            "water",
+            "ice"
+          ],
+          "seMoveTypes": [
+            "fighting"
+          ],
+          "alsoPhases": [
+            2,
+            3
+          ],
+          "alsoPokemons": [
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ]
+        },
+        {
+          "phases": [
+            2
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Poliwrath",
+              "types": [
+                "water",
+                "fighting"
+              ]
+            },
+            {
+              "name": "Gardevoir",
+              "types": [
+                "psychic",
+                "fairy"
+              ]
+            },
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "flying",
+            "bug",
+            "ghost",
+            "water",
+            "grass",
+            "psychic",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "poison",
+            "grass",
+            "electric",
+            "fairy"
+          ]
+        },
+        {
+          "phases": [
+            3
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Gyarados",
+              "types": [
+                "water",
+                "flying"
+              ]
+            },
+            {
+              "name": "Dragonite",
+              "types": [
+                "dragon",
+                "flying"
+              ]
+            },
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "ghost",
+            "steel",
+            "water",
+            "electric",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "electric",
+            "ice",
+            "dragon",
+            "fairy"
+          ]
+        }
+      ],
+      "topOffensiveTypes": [
+        "fighting",
+        "electric",
+        "rock"
+      ],
+      "topHits": [
+        {
+          "type": "fighting",
+          "hits": 4,
+          "total": 8
+        },
+        {
+          "type": "electric",
+          "hits": 3,
+          "total": 8
+        },
+        {
+          "type": "rock",
+          "hits": 3,
+          "total": 8
+        }
+      ],
       "commonStabTypes": [
         "normal",
         "water"
       ],
       "commonStabThreshold": 3,
       "lineupSize": 8,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "electric"
-            ],
-            "covers": [
-              "Lapras",
-              "Poliwrath",
-              "Gyarados"
-            ]
-          },
-          {
-            "types": [
-              "fighting"
-            ],
-            "covers": [
-              "Snorlax"
-            ]
-          }
-        ],
-        "uncovered": [
-          "Gardevoir",
-          "Dragonite"
-        ]
-      },
       "tanks": [
         {
           "name": "Snorlax",
@@ -3215,6 +3427,113 @@
           ]
         }
       ],
+      "counters": [
+        {
+          "phases": [
+            1,
+            2
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Bellsprout",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            },
+            {
+              "name": "Weepinbell",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            },
+            {
+              "name": "Raticate",
+              "types": [
+                "normal"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
+            "steel",
+            "fire",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "fire",
+            "psychic",
+            "ice"
+          ]
+        },
+        {
+          "phases": [
+            3
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Raticate",
+              "types": [
+                "normal"
+              ]
+            },
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "rock",
+            "ghost",
+            "steel"
+          ],
+          "seMoveTypes": [
+            "fighting"
+          ],
+          "alsoPhases": [
+            2
+          ],
+          "alsoPokemons": [
+            {
+              "name": "Raticate",
+              "types": [
+                "normal"
+              ]
+            }
+          ]
+        }
+      ],
+      "topOffensiveTypes": [
+        "fighting",
+        "fire",
+        "flying"
+      ],
+      "topHits": [
+        {
+          "type": "fighting",
+          "hits": 3,
+          "total": 5
+        },
+        {
+          "type": "fire",
+          "hits": 2,
+          "total": 5
+        },
+        {
+          "type": "flying",
+          "hits": 2,
+          "total": 5
+        }
+      ],
       "commonStabTypes": [
         "grass",
         "normal",
@@ -3222,32 +3541,6 @@
       ],
       "commonStabThreshold": 2,
       "lineupSize": 5,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "fighting"
-            ],
-            "covers": [
-              "Raticate",
-              "Snorlax"
-            ]
-          },
-          {
-            "types": [
-              "fire",
-              "flying",
-              "ice",
-              "psychic"
-            ],
-            "covers": [
-              "Bellsprout",
-              "Weepinbell"
-            ]
-          }
-        ],
-        "uncovered": []
-      },
       "tanks": [
         {
           "name": "Snorlax",

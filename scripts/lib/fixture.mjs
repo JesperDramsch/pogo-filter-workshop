@@ -110,10 +110,10 @@ export function buildFixture() {
   return fixture;
 }
 
-// Every box a grunt card renders: each counter window (and its broad variant)
-// and each tank's hard-hitter filter. Keyed by position, not by the localized
-// tank name, so the key set is the same in every locale.
-function gruntClauses(g) {
+// Every box a typed grunt card renders: each counter window (and its broad
+// variant) and each tank's hard-hitter filter. Keyed by position, not by the
+// localized tank name, so the key set is the same in every locale.
+function typedGruntClauses(g) {
   const out = {};
   (g.windows || []).forEach((w, i) => {
     out[`window${i + 1}`] = w.clause || "";
@@ -136,10 +136,13 @@ export function buildDataFilters(locale) {
         Object.fromEntries(l.phases.map(p => [String(p.slot), p.clause || ""]))])
     ),
     rocketTypedGrunts: Object.fromEntries(
-      (result.rocketTypedGrunts || []).map(g => [g.name, gruntClauses(g)])
+      (result.rocketTypedGrunts || []).map(g => [g.name, typedGruntClauses(g)])
     ),
+    // A phased generic grunt maps counter key → clause, like a leader's phases.
     rocketGenericGrunts: Object.fromEntries(
-      (result.rocketGenericGrunts || []).map(g => [g.name, gruntClauses(g)])
+      (result.rocketGenericGrunts || []).map(g => [g.name, g.phased
+        ? Object.fromEntries(g.counters.map(c => [c.key, c.clause || ""]))
+        : g.clause])
     ),
     pvpFilters: Object.fromEntries(
       Object.entries(result.pvpFilters || {}).map(([k, v]) => [k, v.clause || ""])
