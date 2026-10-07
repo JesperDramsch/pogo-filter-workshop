@@ -381,6 +381,9 @@ console.log("\nD9 — generic grunts: themed lineups get the typed shape, the re
           !!built && built.phased && !built.themeTypes && !built.displayName &&
             live.length === (t.counters || []).length && live.length > 0,
           built ? "" : "missing from buildFilters output");
+        const keys = counters.map((c) => c.key);
+        check(`${loc}: ${t.name} counter keys are unique (copy state, fixture map)`,
+          new Set(keys).size === keys.length, keys.join(", "));
         continue;
       }
       const kw = pogoKeywords(loc);
