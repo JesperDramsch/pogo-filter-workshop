@@ -1,0 +1,272 @@
+[
+  {
+    "type": "Normal",
+    "doubleDamageFrom": [
+      "Fighting"
+    ],
+    "halfDamageFrom": [],
+    "noDamageFrom": [
+      "Ghost"
+    ]
+  },
+  {
+    "type": "Fighting",
+    "doubleDamageFrom": [
+      "Flying",
+      "Psychic",
+      "Fairy"
+    ],
+    "halfDamageFrom": [
+      "Rock",
+      "Bug",
+      "Dark"
+    ],
+    "noDamageFrom": []
+  },
+  {
+    "type": "Flying",
+    "doubleDamageFrom": [
+      "Rock",
+      "Electric",
+      "Ice"
+    ],
+    "halfDamageFrom": [
+      "Fighting",
+      "Bug",
+      "Grass"
+    ],
+    "noDamageFrom": [
+      "Ground"
+    ]
+  },
+  {
+    "type": "Poison",
+    "doubleDamageFrom": [
+      "Ground",
+      "Psychic"
+    ],
+    "halfDamageFrom": [
+      "Fighting",
+      "Poison",
+      "Bug",
+      "Grass",
+      "Fairy"
+    ],
+    "noDamageFrom": []
+  },
+  {
+    "type": "Ground",
+    "doubleDamageFrom": [
+      "Water",
+      "Grass",
+      "Ice"
+    ],
+    "halfDamageFrom": [
+      "Poison",
+      "Rock"
+    ],
+    "noDamageFrom": [
+      "Electric"
+    ]
+  },
+  {
+    "type": "Rock",
+    "doubleDamageFrom": [
+      "Fighting",
+      "Ground",
+      "Steel",
+      "Water",
+      "Grass"
+    ],
+    "halfDamageFrom": [
+      "Normal",
+      "Flying",
+      "Poison",
+      "Fire"
+    ],
+    "noDamageFrom": []
+  },
+  {
+    "type": "Bug",
+    "doubleDamageFrom": [
+      "Flying",
+      "Rock",
+      "Fire"
+    ],
+    "halfDamageFrom": [
+      "Fighting",
+      "Ground",
+      "Grass"
+    ],
+    "noDamageFrom": []
+  },
+  {
+    "type": "Ghost",
+    "doubleDamageFrom": [
+      "Ghost",
+      "Dark"
+    ],
+    "halfDamageFrom": [
+      "Poison",
+      "Bug"
+    ],
+    "noDamageFrom": [
+      "Normal",
+      "Fighting"
+    ]
+  },
+  {
+    "type": "Steel",
+    "doubleDamageFrom": [
+      "Fighting",
+      "Ground",
+      "Fire"
+    ],
+    "halfDamageFrom": [
+      "Normal",
+      "Flying",
+      "Rock",
+      "Bug",
+      "Steel",
+      "Grass",
+      "Psychic",
+      "Ice",
+      "Dragon",
+      "Fairy"
+    ],
+    "noDamageFrom": [
+      "Poison"
+    ]
+  },
+  {
+    "type": "Fire",
+    "doubleDamageFrom": [
+      "Ground",
+      "Rock",
+      "Water"
+    ],
+    "halfDamageFrom": [
+      "Bug",
+      "Steel",
+      "Fire",
+      "Grass",
+      "Ice",
+      "Fairy"
+    ],
+    "noDamageFrom": []
+  },
+  {
+    "type": "Water",
+    "doubleDamageFrom": [
+      "Grass",
+      "Electric"
+    ],
+    "halfDamageFrom": [
+      "Steel",
+      "Fire",
+      "Water",
+      "Ice"
+    ],
+    "noDamageFrom": []
+  },
+  {
+    "type": "Grass",
+    "doubleDamageFrom": [
+      "Flying",
+      "Poison",
+      "Bug",
+      "Fire",
+      "Ice"
+    ],
+    "halfDamageFrom": [
+      "Ground",
+      "Water",
+      "Grass",
+      "Electric"
+    ],
+    "noDamageFrom": []
+  },
+  {
+    "type": "Electric",
+    "doubleDamageFrom": [
+      "Ground"
+    ],
+    "halfDamageFrom": [
+      "Flying",
+      "Steel",
+      "Electric"
+    ],
+    "noDamageFrom": []
+  },
+  {
+    "type": "Psychic",
+    "doubleDamageFrom": [
+      "Bug",
+      "Ghost",
+      "Dark"
+    ],
+    "halfDamageFrom": [
+      "Fighting",
+      "Psychic"
+    ],
+    "noDamageFrom": []
+  },
+  {
+    "type": "Ice",
+    "doubleDamageFrom": [
+      "Fighting",
+      "Rock",
+      "Steel",
+      "Fire"
+    ],
+    "halfDamageFrom": [
+      "Ice"
+    ],
+    "noDamageFrom": []
+  },
+  {
+    "type": "Dragon",
+    "doubleDamageFrom": [
+      "Ice",
+      "Dragon",
+      "Fairy"
+    ],
+    "halfDamageFrom": [
+      "Fire",
+      "Water",
+      "Grass",
+      "Electric"
+    ],
+    "noDamageFrom": []
+  },
+  {
+    "type": "Dark",
+    "doubleDamageFrom": [
+      "Fighting",
+      "Bug",
+      "Fairy"
+    ],
+    "halfDamageFrom": [
+      "Ghost",
+      "Dark"
+    ],
+    "noDamageFrom": [
+      "Psychic"
+    ]
+  },
+  {
+    "type": "Fairy",
+    "doubleDamageFrom": [
+      "Poison",
+      "Steel"
+    ],
+    "halfDamageFrom": [
+      "Fighting",
+      "Bug",
+      "Dark"
+    ],
+    "noDamageFrom": [
+      "Dragon"
+    ]
+  }
+]

@@ -4092,10 +4092,12 @@ export function buildFilters(
 	// Three trainer kinds, each with its own filter shape:
 	//   leader        → 3 phase clauses (you swap Pokémon between phases)
 	//   typed_grunt   → 1 aggregated clause across the whole lineup
-	//   generic_grunt → offensive-only clause (top-3 SE move types) plus a
-	//                   lineup hint, since the lineup is too varied for a
-	//                   universal resistor. Themed lineups (`themeTypes`, e.g.
-	//                   the Grass/Fire/Water starter trio) get the typed shape.
+	//   generic_grunt → the lineup is too varied for a universal resistor, so
+	//                   unthemed lineups get the leader shape: one clause per
+	//                   phase. Themed lineups (`themeTypes`, e.g. the
+	//                   Grass/Fire/Water starter trio) get the typed shape.
+	//                   Snapshots without per-phase counters fall back to an
+	//                   offensive-only clause (top-3 SE move types).
 
 	// ScrapedDuck stores Pokémon names in EN ("Persian", "Kangaskhan"); the
 	// teaser/hint render layer surfaces these directly. Resolve to the user's
@@ -4297,6 +4299,30 @@ export function buildFilters(
 				quotes,
 				...themed,
 				skipped: false,
+			};
+		}
+		// The fetcher attaches counter groups to unthemed lineups (see
+		// genericCountersOf in scripts/lib/rocket-derive.mjs): one per phase,
+		// one per typing that recurs across phases, identical ones merged.
+		// Each builds like a leader phase; `slot` is the display label.
+		if (trainer.counters?.length) {
+			const counters = trainer.counters.map((c, index) => ({
+				...buildLeaderPhase({ ...c, slot: c.phases.join(' + ') }),
+				key: `${c.recurring ? 'recurring' : 'phase'}_${c.phases.join('_')}_${index}`,
+				recurring: !!c.recurring,
+				alsoPhases: c.alsoPhases || [],
+				alsoPokemons: localizePokemons(c.alsoPokemons),
+			}));
+			return {
+				name: trainer.name,
+				phased: true,
+				phases: localizedPhases,
+				counters,
+				topHits: localizedTopHits,
+				quotes,
+				clause: '',
+				clauses: [],
+				skipped: counters.every((c) => c.skipped),
 			};
 		}
 		if (seMoveList.length === 0) {
@@ -9097,6 +9123,60 @@ function GruntQuoteList({ quotes, t }) {
 	);
 }
 
+// One filter box per phase (plus its lenient fallback), for leaders and for
+// generic grunts whose lineup only resolves phase by phase. Generic grunt
+// counters can also be `recurring` (a typing seen in several phases, labelled
+// by its Pokémon) or carry `alsoPhases` / `alsoPokemons` (a recurring typing
+// folded in, e.g. phase 1 that also handles Snorlax in phases 2 and 3).
+function RocketPhaseFilters({ phases, keyPrefix, accent, lenientCounters, copied, copyToClipboard, t }) {
+	return phases.map((phase) => {
+		if (phase.skipped) return null;
+		const copyKey = `${keyPrefix}_${phase.key || phase.slot}`;
+		const lenientKey = `${copyKey}_lenient`;
+		const names = phase.pokemons.map((p) => p.name).join(t('app.filter.rocket_lineup_or'));
+		const label = phase.recurring
+			? t('app.filter.rocket_recurring_label', { params: { names, slots: phase.slot } })
+			: t('app.filter.rocket_phase_label', { params: { slot: phase.slot } });
+		const hint = phase.recurring
+			? t('app.filter.rocket_recurring_hint', { params: { slots: phase.slot } })
+			: t('app.filter.rocket_phase_hint', { params: { names } }) +
+				(phase.alsoPhases?.length
+					? ` ${t('app.filter.rocket_phase_also_hint', {
+							params: {
+								names: phase.alsoPokemons.map((p) => p.name).join(t('app.filter.rocket_lineup_or')),
+								slots: phase.alsoPhases.join(' + '),
+							},
+						})}`
+					: '');
+		return (
+			<Fragment key={copyKey}>
+				<FilterBox
+					label={label}
+					accent={accent}
+					filterStr={phase.clause}
+					copied={copied[copyKey]}
+					onCopy={() => copyToClipboard(copyKey, phase.clause)}
+					hint={hint}
+				/>
+				{lenientCounters && phase.lenient?.clause && (
+					<FilterBox
+						label={
+							phase.recurring
+								? t('app.filter.rocket_recurring_label_lenient', { params: { names } })
+								: t('app.filter.rocket_phase_label_lenient', { params: { slot: phase.slot } })
+						}
+						accent='#E08E0B'
+						filterStr={phase.lenient.clause}
+						copied={copied[lenientKey]}
+						onCopy={() => copyToClipboard(lenientKey, phase.lenient.clause)}
+						hint={t('app.filter.rocket_lenient_hint')}
+					/>
+				)}
+			</Fragment>
+		);
+	});
+}
+
 function RocketCollapsible({
 	fetchedAt,
 	leaders,
@@ -9115,7 +9195,9 @@ function RocketCollapsible({
 	const totalFilters =
 		leaders.reduce((a, l) => a + l.phases.filter((p) => !p.skipped).length, 0) +
 		typedGrunts.filter((g) => !g.skipped).length +
-		genericGrunts.filter((g) => !g.skipped).length;
+		genericGrunts
+			.filter((g) => !g.skipped)
+			.reduce((a, g) => a + (g.phased ? g.counters.filter((c) => !c.skipped).length : 1), 0);
 	const age = formatSyncAge(fetchedAt, t);
 	const headerLabel = t('app.collapsible.aux_rocket');
 	const countLabel = t('app.collapsible.aux_rocket_count', { params: { count: totalFilters } });
@@ -9152,43 +9234,15 @@ function RocketCollapsible({
 									teaser={leaderTeaser(leader, t)}
 									accent='#C0392B'
 								>
-									{leader.phases.map((phase) => {
-										if (phase.skipped) return null;
-										const copyKey = `rocket_${leader.name}_${phase.slot}`;
-										const lenientKey = `${copyKey}_lenient`;
-										return (
-											<Fragment key={copyKey}>
-												<FilterBox
-													label={t('app.filter.rocket_phase_label', {
-														params: { slot: phase.slot },
-													})}
-													accent='#C0392B'
-													filterStr={phase.clause}
-													copied={copied[copyKey]}
-													onCopy={() => copyToClipboard(copyKey, phase.clause)}
-													hint={t('app.filter.rocket_phase_hint', {
-														params: {
-															names: phase.pokemons
-																.map((p) => p.name)
-																.join(t('app.filter.rocket_lineup_or')),
-														},
-													})}
-												/>
-												{lenientCounters && phase.lenient?.clause && (
-													<FilterBox
-														label={t('app.filter.rocket_phase_label_lenient', {
-															params: { slot: phase.slot },
-														})}
-														accent='#E08E0B'
-														filterStr={phase.lenient.clause}
-														copied={copied[lenientKey]}
-														onCopy={() => copyToClipboard(lenientKey, phase.lenient.clause)}
-														hint={t('app.filter.rocket_lenient_hint')}
-													/>
-												)}
-											</Fragment>
-										);
-									})}
+									<RocketPhaseFilters
+										phases={leader.phases}
+										keyPrefix={`rocket_${leader.name}`}
+										accent='#C0392B'
+										lenientCounters={lenientCounters}
+										copied={copied}
+										copyToClipboard={copyToClipboard}
+										t={t}
+									/>
 								</TrainerAccordion>
 							))}
 						</div>
@@ -9252,31 +9306,49 @@ function RocketCollapsible({
 									<TrainerAccordion
 										key={copyKey}
 										name={g.displayName || g.name}
-										teaser={themed ? typedGruntTeaser(g, t) : genericGruntTeaser(g, t)}
+										teaser={
+											g.phased || themed
+													? typedGruntTeaser(g, t)
+													: genericGruntTeaser(g, t)
+										}
 										accent='#16A085'
 									>
 										{(g.quotes || []).length > 0 && <GruntQuoteList quotes={g.quotes} t={t} />}
-										<FilterBox
-											label={t('app.filter.rocket_grunt_filter_label')}
-											accent='#16A085'
-											filterStr={g.clause}
-											copied={copied[copyKey]}
-											onCopy={() => copyToClipboard(copyKey, g.clause)}
-											hint={
-												themed
-													? lineupHint(g.phases, t)
-													: `${topHitsHint(g.topHits, t)} — ${lineupHint(g.phases, t)}`
-											}
-										/>
-										{themed && lenientCounters && g.lenient?.clause && (
-											<FilterBox
-												label={t('app.filter.rocket_grunt_filter_label_lenient')}
-												accent='#E08E0B'
-												filterStr={g.lenient.clause}
-												copied={copied[`${copyKey}_lenient`]}
-												onCopy={() => copyToClipboard(`${copyKey}_lenient`, g.lenient.clause)}
-												hint={t('app.filter.rocket_lenient_hint')}
+										{g.phased ? (
+											<RocketPhaseFilters
+												phases={g.counters}
+												keyPrefix={copyKey}
+												accent='#16A085'
+												lenientCounters={lenientCounters}
+												copied={copied}
+												copyToClipboard={copyToClipboard}
+												t={t}
 											/>
+										) : (
+											<>
+											<FilterBox
+												label={t('app.filter.rocket_grunt_filter_label')}
+												accent='#16A085'
+												filterStr={g.clause}
+												copied={copied[copyKey]}
+												onCopy={() => copyToClipboard(copyKey, g.clause)}
+												hint={
+													themed
+														? lineupHint(g.phases, t)
+														: `${topHitsHint(g.topHits, t)} — ${lineupHint(g.phases, t)}`
+												}
+											/>
+											{themed && lenientCounters && g.lenient?.clause && (
+												<FilterBox
+													label={t('app.filter.rocket_grunt_filter_label_lenient')}
+													accent='#E08E0B'
+													filterStr={g.lenient.clause}
+													copied={copied[`${copyKey}_lenient`]}
+													onCopy={() => copyToClipboard(`${copyKey}_lenient`, g.lenient.clause)}
+													hint={t('app.filter.rocket_lenient_hint')}
+												/>
+											)}
+											</>
 										)}
 									</TrainerAccordion>
 								);

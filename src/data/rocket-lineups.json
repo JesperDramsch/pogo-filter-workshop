@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-05T08:54:13.810Z",
+  "fetchedAt": "2026-10-07T14:37:52.804Z",
   "source": "scrapedduck",
   "trainers": [
     {
@@ -2388,6 +2388,136 @@
           ]
         }
       ],
+      "counters": [
+        {
+          "phases": [
+            1
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            },
+            {
+              "name": "Lapras",
+              "types": [
+                "water",
+                "ice"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "ghost",
+            "steel",
+            "water",
+            "ice"
+          ],
+          "seMoveTypes": [
+            "fighting"
+          ],
+          "alsoPhases": [
+            2,
+            3
+          ],
+          "alsoPokemons": [
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ]
+        },
+        {
+          "phases": [
+            2
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Poliwrath",
+              "types": [
+                "water",
+                "fighting"
+              ]
+            },
+            {
+              "name": "Gardevoir",
+              "types": [
+                "psychic",
+                "fairy"
+              ]
+            },
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "flying",
+            "bug",
+            "ghost",
+            "water",
+            "grass",
+            "psychic",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "poison",
+            "grass",
+            "electric",
+            "fairy"
+          ]
+        },
+        {
+          "phases": [
+            3
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Gyarados",
+              "types": [
+                "water",
+                "flying"
+              ]
+            },
+            {
+              "name": "Dragonite",
+              "types": [
+                "dragon",
+                "flying"
+              ]
+            },
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "ghost",
+            "steel",
+            "water",
+            "electric",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "electric",
+            "ice",
+            "dragon",
+            "fairy"
+          ]
+        }
+      ],
       "topOffensiveTypes": [
         "fighting",
         "electric",
@@ -2462,6 +2592,91 @@
             },
             {
               "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ]
+        }
+      ],
+      "counters": [
+        {
+          "phases": [
+            1,
+            2
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Bellsprout",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            },
+            {
+              "name": "Weepinbell",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            },
+            {
+              "name": "Raticate",
+              "types": [
+                "normal"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
+            "steel",
+            "fire",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "fire",
+            "psychic",
+            "ice"
+          ]
+        },
+        {
+          "phases": [
+            3
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Raticate",
+              "types": [
+                "normal"
+              ]
+            },
+            {
+              "name": "Snorlax",
+              "types": [
+                "normal"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "rock",
+            "ghost",
+            "steel"
+          ],
+          "seMoveTypes": [
+            "fighting"
+          ],
+          "alsoPhases": [
+            2
+          ],
+          "alsoPokemons": [
+            {
+              "name": "Raticate",
               "types": [
                 "normal"
               ]
