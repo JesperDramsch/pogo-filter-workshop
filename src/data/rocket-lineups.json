@@ -1,6 +1,176 @@
 {
-  "fetchedAt": "2026-10-07T14:37:52.804Z",
+  "fetchedAt": "2026-10-07T17:35:34.965Z",
   "source": "scrapedduck",
+  "bulk": {
+    "metric": "baseDefense*baseStamina",
+    "topFraction": 0.125,
+    "cutoff": 40182,
+    "species": {
+      "Absol": 19560,
+      "Aggron": 44204,
+      "Alolan Exeggutor": 33048,
+      "Alolan Geodude": 15840,
+      "Alolan Ninetales": 34161,
+      "Alolan Rattata": 7140,
+      "Alolan Sandshrew": 17673,
+      "Alolan Sandslash": 35295,
+      "Alolan Vulpix": 12644,
+      "Amoonguss": 34611,
+      "Ampharos": 34983,
+      "Annihilape": 43076,
+      "Anorith": 12800,
+      "Aron": 19317,
+      "Aurorus": 43195,
+      "Axew": 13130,
+      "Beldum": 15840,
+      "Bellsprout": 8357,
+      "Blastoise": 38916,
+      "Blaziken": 26790,
+      "Bulbasaur": 14208,
+      "Camerupt": 23392,
+      "Carvanha": 4992,
+      "Charizard": 32178,
+      "Charmander": 10974,
+      "Charmeleon": 19026,
+      "Chesnaught": 41616,
+      "Claydol": 35495,
+      "Cofagrigus": 35787,
+      "Conkeldurr": 36814,
+      "Cradily": 38800,
+      "Cranidos": 11857,
+      "Darmanitan": 26562,
+      "Deino": 13113,
+      "Delibird": 11520,
+      "Delphox": 34209,
+      "Dewpider": 13572,
+      "Dragonair": 21060,
+      "Dragonite": 41382,
+      "Drowzee": 21080,
+      "Duosion": 16789,
+      "Dusclops": 28080,
+      "Duskull": 13770,
+      "Electabuzz": 25754,
+      "Feebas": 7225,
+      "Flygon": 31920,
+      "Fomantis": 7680,
+      "Froslass": 25800,
+      "Gabite": 21125,
+      "Galarian Weezing": 32111,
+      "Gallade": 32955,
+      "Galvantula": 22016,
+      "Garchomp": 46127,
+      "Gardevoir": 32955,
+      "Gengar": 23095,
+      "Glalie": 30780,
+      "Gligar": 29992,
+      "Golem": 37620,
+      "Golurk": 31570,
+      "Granbull": 27117,
+      "Graveler": 23944,
+      "Greninja": 26752,
+      "Gyarados": 40176,
+      "Helioptile": 9906,
+      "Hippowdon": 45649,
+      "Hitmonchan": 26989,
+      "Hitmonlee": 24797,
+      "Hitmontop": 28359,
+      "Hoothoot": 13640,
+      "Houndour": 10624,
+      "Hydreigon": 39668,
+      "Infernape": 27633,
+      "Ivysaur": 22165,
+      "Kabuto": 14280,
+      "Kangaskhan": 38445,
+      "Kirlia": 10440,
+      "Krabby": 12648,
+      "Lairon": 30690,
+      "Lapras": 48198,
+      "Liepard": 17172,
+      "Lileep": 24750,
+      "Litwick": 13426,
+      "Loudred": 15957,
+      "Luxray": 29640,
+      "Magikarp": 7225,
+      "Magmar": 25102,
+      "Magmortar": 31132,
+      "Magnemite": 11253,
+      "Makuhita": 9504,
+      "Malamar": 33000,
+      "Mankey": 9840,
+      "Metang": 27280,
+      "Morelull": 14280,
+      "Mudkip": 12741,
+      "Nidorina": 20640,
+      "Nidorino": 17316,
+      "Noibat": 8760,
+      "Oddish": 14336,
+      "Onix": 25752,
+      "Phantump": 12875,
+      "Pinsir": 29666,
+      "Poliwrath": 38088,
+      "Ponyta": 17399,
+      "Poochyena": 6771,
+      "Porygon": 22168,
+      "Probopass": 42625,
+      "Qwilfish": 22494,
+      "Ralts": 5841,
+      "Raticate": 20294,
+      "Reuniclus": 35816,
+      "Rhyhorn": 24130,
+      "Rookidee": 7772,
+      "Sableye": 18632,
+      "Salamence": 36288,
+      "Sandygast": 17228,
+      "Sceptile": 29068,
+      "Scizor": 31132,
+      "Scolipede": 27125,
+      "Scyther": 29240,
+      "Sealeo": 27324,
+      "Seel": 19723,
+      "Sharpedo": 14276,
+      "Shieldon": 19890,
+      "Shinx": 8192,
+      "Skarmory": 36838,
+      "Sneasel": 21316,
+      "Snorlax": 55770,
+      "Snubbull": 13175,
+      "Spheal": 15480,
+      "Squirtle": 15367,
+      "Starly": 6960,
+      "Stufful": 16340,
+      "Swablu": 16896,
+      "Swampert": 39375,
+      "Swanna": 23892,
+      "Swellow": 19220,
+      "Taillow": 7320,
+      "Tangela": 27547,
+      "Teddiursa": 14415,
+      "Tentacool": 17880,
+      "Tentacruel": 39710,
+      "Timburr": 15747,
+      "Torchic": 11136,
+      "Toucannon": 27740,
+      "Toxicroak": 25935,
+      "Trapinch": 9984,
+      "Trevenant": 30492,
+      "Tyrantrum": 36863,
+      "Ursaring": 29808,
+      "Venonat": 15500,
+      "Venusaur": 35910,
+      "Vibrava": 13563,
+      "Vikavolt": 29072,
+      "Voltorb": 13320,
+      "Walrein": 42592,
+      "Wartortle": 23715,
+      "Weedle": 6000,
+      "Weepinbell": 14996,
+      "Weezing": 32111,
+      "Wimpod": 6882,
+      "Wobbuffet": 40492,
+      "Yamask": 16356,
+      "Zubat": 8760
+    }
+  },
   "trainers": [
     {
       "name": "Giovanni",
@@ -525,7 +695,38 @@
       "seMoveTypes": [
         "fighting"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "fighting"
+            ],
+            "covers": [
+              "Teddiursa",
+              "Porygon",
+              "Loudred",
+              "Stufful",
+              "Ursaring",
+              "Kangaskhan"
+            ]
+          },
+          {
+            "types": [
+              "electric",
+              "ice",
+              "rock"
+            ],
+            "covers": [
+              "Hoothoot",
+              "Starly",
+              "Swellow"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": []
     },
     {
       "name": "Fire-type Female Grunt",
@@ -617,7 +818,30 @@
         "rock",
         "water"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "ground",
+              "water"
+            ],
+            "covers": [
+              "Litwick",
+              "Ponyta",
+              "Torchic",
+              "Magmar",
+              "Blaziken",
+              "Camerupt",
+              "Darmanitan",
+              "Delphox",
+              "Magmortar"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": []
     },
     {
       "name": "Water-type Female Grunt",
@@ -711,7 +935,50 @@
         "electric",
         "grass"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "electric"
+            ],
+            "covers": [
+              "Mudkip",
+              "Tentacool",
+              "Krabby",
+              "Dewpider",
+              "Sharpedo",
+              "Walrein",
+              "Greninja",
+              "Tentacruel"
+            ]
+          },
+          {
+            "types": [
+              "grass"
+            ],
+            "covers": [
+              "Swampert"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": [
+        {
+          "name": "Walrein",
+          "types": [
+            "ice",
+            "water"
+          ],
+          "seMoveTypes": [
+            "electric",
+            "fighting",
+            "grass",
+            "rock"
+          ]
+        }
+      ]
     },
     {
       "name": "Water-type Male Grunt",
@@ -775,7 +1042,23 @@
         "electric",
         "grass"
       ],
-      "lineupSize": 5
+      "lineupSize": 5,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "electric"
+            ],
+            "covers": [
+              "Magikarp",
+              "Feebas",
+              "Gyarados"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": []
     },
     {
       "name": "Electric-type Female Grunt",
@@ -868,7 +1151,37 @@
       "seMoveTypes": [
         "ground"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "ground"
+            ],
+            "covers": [
+              "Voltorb",
+              "Shinx",
+              "Helioptile",
+              "Electabuzz",
+              "Magnemite",
+              "Alolan Geodude",
+              "Luxray",
+              "Ampharos"
+            ]
+          },
+          {
+            "types": [
+              "fire",
+              "rock"
+            ],
+            "covers": [
+              "Galvantula"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": []
     },
     {
       "name": "Grass-type Male Grunt",
@@ -963,7 +1276,40 @@
         "ice",
         "poison"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "ice"
+            ],
+            "covers": [
+              "Phantump",
+              "Fomantis",
+              "Tangela",
+              "Lileep",
+              "Sceptile",
+              "Morelull",
+              "Chesnaught",
+              "Trevenant",
+              "Cradily"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": [
+        {
+          "name": "Chesnaught",
+          "types": [
+            "grass",
+            "fighting"
+          ],
+          "seMoveTypes": [
+            "flying"
+          ]
+        }
+      ]
     },
     {
       "name": "Ice-type Female Grunt",
@@ -1060,7 +1406,49 @@
         "rock",
         "steel"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "rock",
+              "steel"
+            ],
+            "covers": [
+              "Delibird",
+              "Froslass",
+              "Alolan Ninetales",
+              "Aurorus",
+              "Glalie"
+            ]
+          },
+          {
+            "types": [
+              "electric",
+              "grass"
+            ],
+            "covers": [
+              "Seel",
+              "Spheal",
+              "Sealeo"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": [
+        {
+          "name": "Aurorus",
+          "types": [
+            "rock",
+            "ice"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "steel"
+          ]
+        }
+      ]
     },
     {
       "name": "Fighting-type Female Grunt",
@@ -1152,7 +1540,44 @@
         "flying",
         "psychic"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "flying",
+              "psychic"
+            ],
+            "covers": [
+              "Timburr",
+              "Mankey",
+              "Makuhita",
+              "Hitmontop",
+              "Hitmonlee",
+              "Hitmonchan",
+              "Conkeldurr",
+              "Annihilape",
+              "Infernape"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": [
+        {
+          "name": "Annihilape",
+          "types": [
+            "fighting",
+            "ghost"
+          ],
+          "seMoveTypes": [
+            "fairy",
+            "flying",
+            "ghost",
+            "psychic"
+          ]
+        }
+      ]
     },
     {
       "name": "Poison-type Female Grunt",
@@ -1246,7 +1671,29 @@
         "ground",
         "psychic"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "psychic"
+            ],
+            "covers": [
+              "Oddish",
+              "Zubat",
+              "Qwilfish",
+              "Galarian Weezing",
+              "Nidorino",
+              "Nidorina",
+              "Weezing",
+              "Toxicroak",
+              "Amoonguss"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": []
     },
     {
       "name": "Ground-type Male Grunt",
@@ -1341,7 +1788,40 @@
         "ice",
         "water"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "ice"
+            ],
+            "covers": [
+              "Rhyhorn",
+              "Gligar",
+              "Trapinch",
+              "Claydol",
+              "Vibrava",
+              "Golurk",
+              "Hippowdon",
+              "Flygon"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": [
+        {
+          "name": "Hippowdon",
+          "types": [
+            "ground"
+          ],
+          "seMoveTypes": [
+            "grass",
+            "ice",
+            "water"
+          ]
+        }
+      ]
     },
     {
       "name": "Flying-type Female Grunt",
@@ -1436,7 +1916,48 @@
         "ice",
         "rock"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "ice"
+            ],
+            "covers": [
+              "Taillow",
+              "Rookidee",
+              "Swablu",
+              "Scyther",
+              "Zubat",
+              "Gligar",
+              "Dragonite",
+              "Toucannon"
+            ]
+          },
+          {
+            "types": [
+              "electric",
+              "rock"
+            ],
+            "covers": [
+              "Swanna"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": [
+        {
+          "name": "Dragonite",
+          "types": [
+            "dragon",
+            "flying"
+          ],
+          "seMoveTypes": [
+            "ice"
+          ]
+        }
+      ]
     },
     {
       "name": "Psychic-type Male Grunt",
@@ -1527,7 +2048,47 @@
         "dark",
         "ghost"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "ghost"
+            ],
+            "covers": [
+              "Wobbuffet",
+              "Ralts",
+              "Drowzee",
+              "Duosion",
+              "Gallade",
+              "Reuniclus"
+            ]
+          },
+          {
+            "types": [
+              "bug",
+              "fairy"
+            ],
+            "covers": [
+              "Malamar"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": [
+        {
+          "name": "Wobbuffet",
+          "types": [
+            "psychic"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "dark",
+            "ghost"
+          ]
+        }
+      ]
     },
     {
       "name": "Bug-type Male Grunt",
@@ -1625,7 +2186,36 @@
         "flying",
         "rock"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "rock"
+            ],
+            "covers": [
+              "Venonat",
+              "Weedle",
+              "Wimpod",
+              "Pinsir",
+              "Anorith",
+              "Dewpider",
+              "Scolipede",
+              "Vikavolt"
+            ]
+          },
+          {
+            "types": [
+              "fire"
+            ],
+            "covers": [
+              "Scizor"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": []
     },
     {
       "name": "Rock-type Male Grunt",
@@ -1720,7 +2310,41 @@
         "steel",
         "water"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "fighting",
+              "ground"
+            ],
+            "covers": [
+              "Onix",
+              "Kabuto",
+              "Cranidos",
+              "Shieldon",
+              "Graveler",
+              "Tyrantrum",
+              "Golem",
+              "Aurorus"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": [
+        {
+          "name": "Aurorus",
+          "types": [
+            "rock",
+            "ice"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "steel"
+          ]
+        }
+      ]
     },
     {
       "name": "Ghost-type Male Grunt",
@@ -1813,7 +2437,36 @@
         "dark",
         "ghost"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "dark",
+              "ghost"
+            ],
+            "covers": [
+              "Duskull",
+              "Sandygast",
+              "Yamask",
+              "Dusclops",
+              "Cofagrigus",
+              "Gengar",
+              "Froslass"
+            ]
+          },
+          {
+            "types": [
+              "fairy"
+            ],
+            "covers": [
+              "Sableye"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": []
     },
     {
       "name": "Dragon-type Female Grunt",
@@ -1907,7 +2560,52 @@
         "fairy",
         "ice"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "dragon",
+              "fairy",
+              "ice"
+            ],
+            "covers": [
+              "Noibat",
+              "Deino",
+              "Axew",
+              "Alolan Exeggutor",
+              "Dragonair",
+              "Gabite",
+              "Dragonite",
+              "Garchomp",
+              "Salamence"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": [
+        {
+          "name": "Dragonite",
+          "types": [
+            "dragon",
+            "flying"
+          ],
+          "seMoveTypes": [
+            "ice"
+          ]
+        },
+        {
+          "name": "Garchomp",
+          "types": [
+            "dragon",
+            "ground"
+          ],
+          "seMoveTypes": [
+            "ice"
+          ]
+        }
+      ]
     },
     {
       "name": "Dark-type Female Grunt",
@@ -1994,7 +2692,28 @@
         "fairy",
         "fighting"
       ],
-      "lineupSize": 8
+      "lineupSize": 8,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "fighting"
+            ],
+            "covers": [
+              "Carvanha",
+              "Poochyena",
+              "Alolan Rattata",
+              "Sneasel",
+              "Houndour",
+              "Absol",
+              "Liepard",
+              "Hydreigon"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": []
     },
     {
       "name": "Steel-type Male Grunt",
@@ -2092,7 +2811,61 @@
         "fire",
         "ground"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "fire"
+            ],
+            "covers": [
+              "Alolan Sandshrew",
+              "Beldum",
+              "Skarmory",
+              "Metang",
+              "Alolan Sandslash"
+            ]
+          },
+          {
+            "types": [
+              "fighting",
+              "ground",
+              "water"
+            ],
+            "covers": [
+              "Aron",
+              "Lairon",
+              "Aggron",
+              "Probopass"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": [
+        {
+          "name": "Aggron",
+          "types": [
+            "steel",
+            "rock"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "ground"
+          ]
+        },
+        {
+          "name": "Probopass",
+          "types": [
+            "rock",
+            "steel"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "ground"
+          ]
+        }
+      ]
     },
     {
       "name": "Fairy-type Female Grunt",
@@ -2187,7 +2960,27 @@
         "poison",
         "steel"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "counterPlan": {
+        "windows": [
+          {
+            "types": [
+              "steel"
+            ],
+            "covers": [
+              "Ralts",
+              "Snubbull",
+              "Alolan Vulpix",
+              "Galarian Weezing",
+              "Kirlia",
+              "Alolan Ninetales",
+              "Granbull"
+            ]
+          }
+        ],
+        "uncovered": []
+      },
+      "tanks": []
     },
     {
       "name": "Male Grunt",
@@ -2313,7 +3106,8 @@
         "psychic",
         "rock"
       ],
-      "lineupSize": 9
+      "lineupSize": 9,
+      "tanks": []
     },
     {
       "name": "Female Grunt",
@@ -2545,7 +3339,41 @@
         "water"
       ],
       "commonStabThreshold": 3,
-      "lineupSize": 8
+      "lineupSize": 8,
+      "tanks": [
+        {
+          "name": "Snorlax",
+          "types": [
+            "normal"
+          ],
+          "seMoveTypes": [
+            "fighting"
+          ]
+        },
+        {
+          "name": "Lapras",
+          "types": [
+            "water",
+            "ice"
+          ],
+          "seMoveTypes": [
+            "electric",
+            "fighting",
+            "grass",
+            "rock"
+          ]
+        },
+        {
+          "name": "Dragonite",
+          "types": [
+            "dragon",
+            "flying"
+          ],
+          "seMoveTypes": [
+            "ice"
+          ]
+        }
+      ]
     },
     {
       "name": "Decoy Female Grunt",
@@ -2712,7 +3540,18 @@
         "poison"
       ],
       "commonStabThreshold": 2,
-      "lineupSize": 5
+      "lineupSize": 5,
+      "tanks": [
+        {
+          "name": "Snorlax",
+          "types": [
+            "normal"
+          ],
+          "seMoveTypes": [
+            "fighting"
+          ]
+        }
+      ]
     }
   ]
 }

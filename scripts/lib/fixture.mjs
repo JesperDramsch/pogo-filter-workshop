@@ -110,6 +110,19 @@ export function buildFixture() {
   return fixture;
 }
 
+// Every box a typed grunt card renders: each counter window (and its broad
+// variant) and each tank's hard-hitter filter. Keyed by position, not by the
+// localized tank name, so the key set is the same in every locale.
+function typedGruntClauses(g) {
+  const out = {};
+  (g.windows || []).forEach((w, i) => {
+    out[`window${i + 1}`] = w.clause || "";
+    if (w.lenient?.clause) out[`window${i + 1}_lenient`] = w.lenient.clause;
+  });
+  (g.tanks || []).forEach((t, i) => { out[`tank${i + 1}`] = t.clause || ""; });
+  return out;
+}
+
 // The data-derived filter families, exposed for the property checks. Shapes
 // mirror what the UI consumes.
 export function buildDataFilters(locale) {
@@ -123,7 +136,7 @@ export function buildDataFilters(locale) {
         Object.fromEntries(l.phases.map(p => [String(p.slot), p.clause || ""]))])
     ),
     rocketTypedGrunts: Object.fromEntries(
-      (result.rocketTypedGrunts || []).map(g => [g.name, g.clause])
+      (result.rocketTypedGrunts || []).map(g => [g.name, typedGruntClauses(g)])
     ),
     // A phased generic grunt maps counter key → clause, like a leader's phases.
     rocketGenericGrunts: Object.fromEntries(

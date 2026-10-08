@@ -18,6 +18,9 @@
 //   D7 — the shadow keeper filters carry every keeper, in every locale
 //   D8 — every Rocket lineup Pokémon resolves to a real name in every locale
 //   D9 — a themed generic grunt is named after its theme and filtered like one
+//   D10 — every typed grunt's counter plan partitions its lineup, every window
+//         and tank renders as a filter in every locale, and generic grunts
+//         only mark their tanks
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
@@ -396,6 +399,70 @@ console.log("\nD9 — generic grunts: themed lineups get the typed shape, the re
         !!built?.displayName && missing.length === 0,
         missing.length ? `missing ${missing.join(", ")}` : "");
     }
+  }
+}
+
+console.log("\nD10 — typed grunt counter plans and tanks");
+{
+  // The plan is computed by the fetcher (scripts/lib/rocket-cover.mjs, unit-
+  // tested in check-rocket-cover.mjs); this asserts the snapshot it wrote is
+  // internally sound and that the app renders every part of it. Re-deriving
+  // the set cover would need the type chart, which only the fetcher has.
+  const grunts = (ROCKET_LINEUPS.trainers || []).filter((t) => t.kind !== "leader");
+  const typed = grunts.filter((t) => t.kind === "typed_grunt");
+  const bulk = ROCKET_LINEUPS.bulk || {};
+  check("snapshot carries a bulk cutoff", typeof bulk.cutoff === "number" && bulk.cutoff > 0,
+    "without it no grunt can have tanks");
+  const distinct = (t) => [...new Set((t.phases || []).flatMap((p) => (p.pokemons || []).map((pk) => pk.name)))];
+  const unmeasured = [...new Set(grunts.flatMap(distinct))].filter((n) => !(n in (bulk.species || {})));
+  check("every grunt lineup species has a bulk entry", unmeasured.length === 0, unmeasured.slice(0, 5).join(", "));
+  for (const t of grunts) {
+    const lineup = distinct(t);
+    const badTanks = (t.tanks || []).filter((k) =>
+      !lineup.includes(k.name) || !((bulk.species?.[k.name] ?? -1) >= bulk.cutoff) || (k.seMoveTypes || []).length === 0);
+    check(`${t.name}: ${(t.tanks || []).length} tank(s), each in the lineup, at or over the cutoff, with move types`,
+      badTanks.length === 0, badTanks.map((k) => k.name).join(", "));
+    const missedTanks = lineup.filter((n) => (bulk.species?.[n] ?? -1) >= bulk.cutoff && !(t.tanks || []).some((k) => k.name === n));
+    check(`${t.name}: no lineup species over the cutoff is missing from tanks`, missedTanks.length === 0, missedTanks.join(", "));
+  }
+  for (const t of typed) {
+    const plan = t.counterPlan || {};
+    const windows = plan.windows || [];
+    const placed = [...windows.flatMap((w) => w.covers || []), ...(plan.uncovered || [])];
+    const lineup = distinct(t);
+    check(`${t.name}: 1–2 windows, each with move types and someone to cover`,
+      windows.length >= 1 && windows.length <= 2 && windows.every((w) => (w.types || []).length > 0 && (w.covers || []).length > 0),
+      JSON.stringify(windows.map((w) => w.types)));
+    check(`${t.name}: windows + uncovered partition the ${lineup.length} distinct lineup species`,
+      placed.length === lineup.length && new Set(placed).size === placed.length && lineup.every((n) => placed.includes(n)),
+      `placed ${placed.join(", ")}`);
+  }
+  // The builder keeps data order and never drops a typed grunt (D2), and
+  // typed-grunt names are localized, so pair by position.
+  for (const loc of localeNames) {
+    const result = buildResult(loc);
+    const bad = [];
+    typed.forEach((t, i) => {
+      const g = result.rocketTypedGrunts?.[i];
+      if (!g) { bad.push(`${t.name} missing`); return; }
+      if ((g.windows || []).length !== (t.counterPlan?.windows || []).length) bad.push(`${t.name} windows`);
+      if ((g.windows || []).some((w) => !w.clause)) bad.push(`${t.name} empty window`);
+      if ((g.tanks || []).length !== (t.tanks || []).length) bad.push(`${t.name} tanks`);
+      if ((g.tanks || []).some((k) => !k.clause)) bad.push(`${t.name} empty tank filter`);
+      if ((g.uncovered || []).length !== (t.counterPlan?.uncovered || []).length) bad.push(`${t.name} uncovered`);
+    });
+    // Generic grunts keep their per-phase counters and get no tank boxes;
+    // their tanks are only marked in the counter groups.
+    for (const g of result.rocketGenericGrunts || []) {
+      if (g.tanks || g.windows) bad.push(`${g.name} grew windows or tank boxes`);
+    }
+    const generic = grunts.filter((t) => t.kind === "generic_grunt" && (t.tanks || []).length && t.counters?.length);
+    for (const t of generic) {
+      const g = (result.rocketGenericGrunts || []).find((x) => x.name === t.name);
+      const marked = (g?.counters || []).some((c) => [...(c.pokemons || []), ...(c.alsoPokemons || [])].some((p) => p.tanky));
+      if (!marked) bad.push(`${t.name} tanks not marked`);
+    }
+    check(`${loc}: typed windows and tanks render; generic grunts only mark tanks`, bad.length === 0, bad.slice(0, 5).join(", "));
   }
 }
 

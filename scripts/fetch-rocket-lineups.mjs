@@ -6,16 +6,11 @@
 // Three trainer kinds:
 //   * leader         — Giovanni / Cliff / Sierra / Arlo. Per-phase counters
 //                      so the user can swap Pokémon between phases.
-//   * typed_grunt    — 18 type-themed grunts. Resistor selection still
-//                      considers the full union of lineup types (so a
-//                      ground secondary like Swinub knocks steel out of
-//                      the defender list). SE move selection anchors to
-//                      the type chart counters of the grunt's primary
-//                      type and only adds bonus types that hit ≥half of
-//                      the lineup AND aren't resisted by the primary —
-//                      otherwise a single off-type secondary (e.g.
-//                      Swinub's ground on an ice grunt) used to leak
-//                      water/grass/etc into the SE list.
+//   * typed_grunt    — 18 type-themed grunts. Resistor selection considers
+//                      the full union of lineup types (so a ground
+//                      secondary like Swinub knocks steel out of the
+//                      defender list). Their counters come from a
+//                      `counterPlan` (see below), not from `seMoveTypes`.
 //   * generic_grunt  — Male/Female/Decoy. Lineups too varied for a clean
 //                      universal resistor, so an unthemed lineup gets
 //                      `counters`: one group per phase, one per typing that
@@ -29,6 +24,19 @@
 //
 // The derivation lives in scripts/lib/rocket-derive.mjs (pure, pinned by
 // scripts/check-rocket-counters.mjs); this file does the I/O.
+//
+// Typed grunts then get a `counterPlan` and their `tanks`
+// (scripts/lib/rocket-cover.mjs, pinned by scripts/check-rocket-cover.mjs).
+// The plan is an exhaustive set cover of the distinct lineup by move type:
+// one window when a single move type is super-effective against everyone,
+// else the best split into two windows (buddy lead plus two counters), else
+// the best two plus the species nothing reaches. Tanks are lineup species
+// whose base Defence × Stamina is in the top eighth of all species, read from
+// the game master through scripts/lib/game-master.mjs; each gets its own
+// hard-hitter filter in the app. Generic grunts keep their per-phase
+// `counters`; their `tanks` only mark species as tanky in the UI. The
+// per-species bulk figures and the cutoff are stored at the top level
+// (`bulk`) so a game-master outage can reuse them instead of dropping tanks.
 //
 // During a Team GO Rocket takeover the fetcher also reads LeekDuck's lineup
 // page directly, at most once per UTC day, until it shows a lineup ScrapedDuck
@@ -56,11 +64,23 @@ import {
   parseLeekDuckLineups,
 } from "./lib/rocket-takeover.mjs";
 import { indexTypes, deriveTrainer } from "./lib/rocket-derive.mjs";
+import {
+  counterPlan,
+  bulkTable,
+  bulkOf,
+  enNameIndex,
+  tanksOf,
+  distinctSpecies,
+  TANK_TOP_FRACTION,
+} from "./lib/rocket-cover.mjs";
+import { fetchGameMaster, pokemonTemplates, formSuffix, warnIfStale } from "./lib/game-master.mjs";
+import { loadNameDict } from "./lib/species-dex.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const DATA_DIR = resolve(ROOT, "src/data");
 const OUT_PATH = resolve(DATA_DIR, "rocket-lineups.json");
+const NAMES_PATH = resolve(ROOT, "src/locales/pokemon-names.json");
 
 const ENDPOINTS = {
   rocket: "https://raw.githubusercontent.com/bigfoott/ScrapedDuck/data/rocketLineups.min.json",
@@ -81,6 +101,52 @@ async function fetchJson(url) {
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} for ${url}`);
   return res.json();
+}
+
+const isGrunt = (t) => t.kind === "typed_grunt" || t.kind === "generic_grunt";
+const lineupOf = (t) => (t.phases || []).flatMap(p => p.pokemons || []);
+
+// Base Defence × Stamina for every grunt lineup species, plus the top-eighth
+// cutoff over all species. A game-master outage reuses the previous
+// snapshot's figures (species it never measured stay null, so never tanks)
+// rather than publishing a snapshot with every tank filter silently gone.
+async function lineupBulk(trainers, prev) {
+  const names = [...new Set(trainers.filter(isGrunt).flatMap(t => distinctSpecies(lineupOf(t)).map(s => s.name)))].sort();
+  try {
+    console.log("→ Fetching the game master for lineup bulk (tank flags)");
+    const gm = await fetchGameMaster({ userAgent: "pogo-filter-workshop rocket-fetcher/1.0" });
+    warnIfStale(gm, "Rocket tank flags may miss newly added species.");
+    const forms = pokemonTemplates(gm.templates).map(t => ({ dex: t.dex, suffix: formSuffix(t), stats: t.settings?.stats }));
+    const table = bulkTable(forms);
+    if (table.cutoff == null) throw new Error("game master carried no species stats");
+    const enIdx = enNameIndex(loadNameDict(NAMES_PATH));
+    const species = {};
+    for (const n of names) species[n] = bulkOf(n, table, enIdx);
+    const unresolved = names.filter(n => species[n] == null);
+    if (unresolved.length > 0) {
+      console.warn(`  ⚠ no base stats for ${unresolved.join(", ")} — never flagged as tanks`);
+    }
+    return { metric: "baseDefense*baseStamina", topFraction: TANK_TOP_FRACTION, cutoff: table.cutoff, species };
+  } catch (e) {
+    if (prev?.bulk?.cutoff == null) throw e;
+    console.warn(`  ⚠ game master unavailable (${e.message}); reusing the previous snapshot's bulk figures`);
+    const species = {};
+    for (const n of names) species[n] = prev.bulk.species?.[n] ?? null;
+    return { ...prev.bulk, species };
+  }
+}
+
+// counterPlan on typed grunts, tanks on every grunt. Runs on the FINAL
+// trainer list (after the LeekDuck pin decision), so it never feeds the pin
+// digest.
+function annotateGrunts(trainers, bulk, allTypeNames, typeIdx) {
+  return trainers.map(t => {
+    if (!isGrunt(t)) return t;
+    const lineup = lineupOf(t);
+    const tanks = tanksOf(lineup, bulk.species, bulk.cutoff, allTypeNames, typeIdx);
+    if (t.kind === "generic_grunt") return { ...t, tanks };
+    return { ...t, counterPlan: counterPlan(lineup, allTypeNames, typeIdx), tanks };
+  });
 }
 
 async function fetchText(url) {
@@ -206,9 +272,22 @@ async function main() {
     takeoverState = prev.takeover; // prebuild must not drop the sync's state
   }
 
-  const newContent = { trainers };
+  let bulk;
+  try {
+    bulk = await lineupBulk(trainers, prev);
+  } catch (e) {
+    console.error(`✗ Game master fetch failed and no previous bulk figures exist: ${e.message}`);
+    if (offlineOk && existsSync(OUT_PATH)) {
+      console.warn(`⚠  --offline-ok and cached ${OUT_PATH} exists; build will use cache.`);
+      return;
+    }
+    process.exit(1);
+  }
+  trainers = annotateGrunts(trainers, bulk, allTypeNames, typeIdx);
+
+  const newContent = { bulk, trainers };
   let fetchedAt = new Date(now).toISOString();
-  if (prev && prev.fetchedAt && canonicalStringify({ trainers: prev.trainers }) === canonicalStringify(newContent)) {
+  if (prev && prev.fetchedAt && canonicalStringify({ bulk: prev.bulk, trainers: prev.trainers }) === canonicalStringify(newContent)) {
     fetchedAt = prev.fetchedAt;
     console.log("  ↺ content unchanged — preserving previous fetchedAt");
   }
@@ -217,6 +296,14 @@ async function main() {
   const counts = trainers.reduce((acc, t) => { acc[t.kind] = (acc[t.kind] || 0) + 1; return acc; }, {});
   console.log(`✓ wrote ${OUT_PATH} (source: ${source})`);
   console.log(`  trainers: ${trainers.length} total — ${counts.leader || 0} leaders, ${counts.typed_grunt || 0} typed grunts, ${counts.generic_grunt || 0} generic`);
+  for (const t of trainers.filter(isGrunt)) {
+    const plan = t.counterPlan
+      ? t.counterPlan.windows.map(w => w.types.join("/")).join(" + ") +
+        (t.counterPlan.uncovered.length ? `, uncovered: ${t.counterPlan.uncovered.join(", ")}` : "")
+      : "per-phase counters";
+    const tanks = t.tanks.length ? `, tanks: ${t.tanks.map(k => k.name).join(", ")}` : "";
+    console.log(`    ${t.name}: ${plan}${tanks}`);
+  }
 
   // A failed takeover read is exactly the silent staleness this exists to
   // catch, so the sync job goes red. A build (--offline-ok) carries on.

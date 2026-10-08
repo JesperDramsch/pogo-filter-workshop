@@ -37,6 +37,7 @@
     "test:eventwindow": "vite-node scripts/check-event-window.mjs",
   "test:rockettakeover": "vite-node scripts/check-rocket-takeover.mjs",
   "test:rocketcounters": "vite-node scripts/check-rocket-counters.mjs",
+  "test:rocketcover": "vite-node scripts/check-rocket-cover.mjs",
   "test:a11ynames": "vite-node scripts/check-a11y-names.mjs",
   "test:a11ykbd": "vite-node scripts/check-a11y-keyboard.mjs",
   "test:a11ydialogs": "vite-node scripts/check-a11y-dialogs.mjs",

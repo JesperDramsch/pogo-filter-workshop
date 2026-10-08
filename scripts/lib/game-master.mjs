@@ -4,10 +4,11 @@
 // This started life inside fetch-meta-rankings.mjs, which needed PvE move
 // mechanics and discovered the hard way that "the game master" is not one feed
 // but several mirrors of the same Niantic dump, published at wildly different
-// cadences. Six scripts now read it — the raid-attacker ranking, the
+// cadences. Seven scripts now read it — the raid-attacker ranking, the
 // species-meta pools, the rebalance watch, the evolution-cost pools, the
-// regional-form catalog and the raid-boss name index — so the mirror list and
-// the preference loop live here rather than in six drifting copies.
+// regional-form catalog, the raid-boss name index and the Rocket tank flags —
+// so the mirror list and the preference loop live here rather than in seven
+// drifting copies.
 //
 // The last four of those arrived when pogoapi.net was retired in August 2026.
 // It had stopped publishing in November 2025 and carried no freshness signal of
@@ -96,8 +97,8 @@ async function defaultFetchText(url, userAgent) {
 
 // ── Batch-stamped download cache ────────────────────────────────────────────
 //
-// The dump is ~19 MB and six fetchers read it. `npm run prebuild` runs five of
-// them back to back, so without a cache one build pulls the same bytes five
+// The dump is ~19 MB and seven fetchers read it. `npm run prebuild` runs six of
+// them back to back, so without a cache one build pulls the same bytes six
 // times. The key is the mirror's OWN batch stamp, never a clock: the tiny
 // timestamp file is fetched on every call and the big one only when the batch
 // id actually moved. That makes this correctness-preserving rather than a
