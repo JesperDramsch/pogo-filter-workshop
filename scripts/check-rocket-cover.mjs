@@ -182,6 +182,8 @@ console.log("\nC6 — typed-grunt boxes on the toy chart");
   check("handover: backup moves hit the handed-over Pokémon super-effectively", backup.moveTypes.join() === "x");
   check("backup guards against recurring types and the handed-over Pokémon's types",
     backup.guardTypes.join() === "a,x");
+  check("backup resistors resist any slot 2/3 type, not only the guarded ones (d is immune to x, b halves it)",
+    backup.resistorTypes.join() === "b,d", backup.resistorTypes.join());
 
   // A resisted type never makes the handover's move types: B3 halves x.
   const walledHandover = typedGruntBoxes(
@@ -265,8 +267,9 @@ console.log("\nC7 — typed-grunt boxes for real lineups (lily-dex chart snapsho
     iceF.backup.handedOver.length === 0 && iceF.backup.moveTypes.join() === "fire,rock,steel");
   check("Ice ♀: backup guards against Ice and Ghost (Froslass in two slots)",
     iceF.backup.guardTypes.join() === "ghost,ice", iceF.backup.guardTypes.join());
-  check("Ice ♀: backup resistors are the types that resist Ice or Ghost and fear neither",
-    iceF.backup.resistorTypes.join() === "normal,steel,fire,water,ice,dark", iceF.backup.resistorTypes.join());
+  check("Ice ♀: backup resistors are the types that resist any slot 2/3 type, Rock and Fairy included",
+    iceF.backup.resistorTypes.join() === "normal,fighting,poison,ground,steel,fire,water,grass,ice,dragon,dark",
+    iceF.backup.resistorTypes.join());
 
   // No single fast type hits Teddiursa, Hoothoot and Porygon: two versions.
   // Stufful's Fighting is the killer (the Ice and Rock attackers fear it).

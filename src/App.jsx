@@ -4199,8 +4199,9 @@ export function buildFilters(
 	// Pokémon carrying those are handed over to Box 2, the backup, which is then
 	// built for them; otherwise it is the general backup for slots 2 and 3.
 	// Either way: a move in either slot from the fetcher's move types, the soft
-	// resistor allowlist (top attackers bypass it) and not weak to the types that
-	// recur in slots 2 and 3 or that the handed-over Pokémon carry.
+	// allowlist of types resisting anything in slots 2 and 3 (top attackers
+	// bypass it) and not weak to the types that recur there or that the
+	// handed-over Pokémon carry.
 	const buildMainBox = (version, guardTypes) => {
 		const fastList = (version.fastTypes || []).map((t) => kw.type[t]).filter(Boolean);
 		if (fastList.length === 0) return null;
@@ -4229,7 +4230,7 @@ export function buildFilters(
 				: tFn(`app.clause_why.${key}`);
 		const clauses = [];
 		if (resistorList.length > 0) {
-			push(clauses, withAllowlist(resistorList.join(',')), why('rocket_backup_resists'));
+			push(clauses, withAllowlist(resistorList.join(',')), tFn('app.clause_why.rocket_backup_resists'));
 		}
 		push(clauses, `${fastMoveClause(moveList)},${chargeMoveClause(moveList)}`, why('rocket_backup_moves'));
 		const second = buildSecondMoveAndAppraise();

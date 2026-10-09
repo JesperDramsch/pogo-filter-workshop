@@ -25,7 +25,7 @@
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
 import LILY_TYPES from "./__fixtures__/lily-dex-types.json";
-import { indexTypes, effVsPokemon, resistorsFor } from "./lib/rocket-derive.mjs";
+import { indexTypes, effVsPokemon } from "./lib/rocket-derive.mjs";
 import { recurringTypesOf, KILLER_ONE_IN } from "./lib/rocket-cover.mjs";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import META_RANKINGS from "../src/data/meta-rankings.json";
@@ -494,10 +494,10 @@ console.log("\nD10 — typed grunt boxes and tanks");
     const backupGuard = [...new Set([...recurringTypesOf(late), ...handed.flatMap((p) => p.types)])].sort();
     check(`${t.name}: backup guards against recurring types and the handed-over Pokémon's types`,
       JSON.stringify(backup.guardTypes) === JSON.stringify(backupGuard), `${backup.guardTypes} vs ${backupGuard}`);
-    check(`${t.name}: backup resistor types are the resistors of its guard types`,
-      (backup.resistorTypes || []).length > 0 &&
-      JSON.stringify(backup.resistorTypes) === JSON.stringify(resistorsFor(backup.guardTypes, Object.keys(typeIdx), typeIdx)),
-      `${backup.resistorTypes}`);
+    const resisting = Object.keys(typeIdx).filter((d) => lateTypes.some((a) => effVsPokemon(a, [d], typeIdx) < 1));
+    check(`${t.name}: backup resistor types are the types that resist at least one slot 2/3 type`,
+      (backup.resistorTypes || []).length > 0 && JSON.stringify(backup.resistorTypes) === JSON.stringify(resisting),
+      `${backup.resistorTypes} vs ${resisting}`);
     check(`${t.name}: no leftover counter windows`, !("counterPlan" in t));
   }
   // The builder keeps data order and never drops a typed grunt (D2), and

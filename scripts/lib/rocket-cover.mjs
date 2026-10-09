@@ -40,15 +40,18 @@
 //          types that hit a slot-2/3 tank hardest when nobody resists those.
 //          Defence is "weak to none of the types that recur in slots 2 and 3
 //          (two entries or more) or that the handed-over Pokémon carry", and
-//          resists one of them or is a top attacker. Guarding against every
-//          one-off type as well left the Water grunt's Box 2 with 14 regular
-//          species.
+//          resists at least one slot 2/3 type or is a top attacker. Guarding
+//          against every one-off type as well left the Water grunt's Box 2 with
+//          14 regular species. Asking it to resist one of the guarded types
+//          instead of any slot 2/3 type tied the two together: a guard of Ghost
+//          alone left only Normal and Dark as resisting types, and cut the
+//          Ghost grunt's Box 2 from 244 regular species to 133.
 
 // ── Type chart ─────────────────────────────────────────────────────────────
 
 // The type chart helpers live in scripts/lib/rocket-derive.mjs, shared with
 // the lineup derivation.
-import { effVsPokemon, resistorsFor } from "./rocket-derive.mjs";
+import { effVsPokemon } from "./rocket-derive.mjs";
 
 // Only the move types at the highest multiplier against these types: Ice
 // alone on Dragonite (4×), Fighting/Steel on Aurorus (4×; Ground is only
@@ -280,6 +283,8 @@ export function recurringTypesOf(pokemons, min = 2) {
 //   main:   { versions: [{ fastTypes, leads }], uncoveredLeads,
 //             candidates: { total, weakTo }, killerTypes, guardTypes }
 //   backup: { targets, handedOver, moveTypes, resistorTypes, guardTypes }
+// `resistorTypes` are the types that resist at least one slot 2/3 type;
+// weakness is the guard's job, so they are not filtered on it.
 // `countCandidates(fastTypes, types)` returns candidateCounts() for Box 1's
 // fast types (every version's) against the slot 2/3 types, or null when the
 // game master is unavailable; a type it has no count for is never a killer,
@@ -327,7 +332,7 @@ export function typedGruntBoxes(phases, tanks, allTypeNames, typeIdx, countCandi
     targets: lateSpecies.map(s => s.name),
     handedOver: handedOver.map(s => s.name),
     moveTypes,
-    resistorTypes: guardTypes.length ? resistorsFor(guardTypes, allTypeNames, typeIdx) : [],
+    resistorTypes: allTypeNames.filter(d => lateTypes.some(t => effVsPokemon(t, [d], typeIdx) < 1)),
     guardTypes,
   };
   return { main, backup };

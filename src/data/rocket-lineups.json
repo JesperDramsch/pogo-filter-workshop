@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-09T12:25:41.771Z",
+  "fetchedAt": "2026-10-09T13:01:49.314Z",
   "source": "scrapedduck",
   "bulk": {
     "metric": "baseDefense*baseStamina",
@@ -757,7 +757,10 @@
           "resistorTypes": [
             "flying",
             "poison",
+            "rock",
+            "bug",
             "ghost",
+            "steel",
             "electric",
             "psychic",
             "fairy"
@@ -912,10 +915,19 @@
             "water"
           ],
           "resistorTypes": [
+            "flying",
+            "poison",
             "rock",
+            "bug",
+            "ghost",
+            "steel",
             "fire",
             "water",
-            "dragon"
+            "grass",
+            "psychic",
+            "dragon",
+            "dark",
+            "fairy"
           ],
           "guardTypes": [
             "fire"
@@ -1072,9 +1084,16 @@
           "resistorTypes": [
             "fighting",
             "flying",
+            "poison",
+            "ground",
+            "rock",
             "bug",
+            "ghost",
+            "steel",
+            "fire",
             "water",
             "grass",
+            "ice",
             "dragon",
             "dark",
             "fairy"
@@ -1207,8 +1226,10 @@
             "rock"
           ],
           "resistorTypes": [
+            "rock",
             "steel",
             "water",
+            "grass",
             "electric",
             "dragon"
           ],
@@ -1358,10 +1379,18 @@
             "ground"
           ],
           "resistorTypes": [
+            "fighting",
+            "flying",
+            "poison",
             "ground",
+            "ghost",
+            "steel",
+            "fire",
+            "water",
             "grass",
             "electric",
-            "dragon"
+            "dragon",
+            "fairy"
           ],
           "guardTypes": [
             "electric"
@@ -1520,11 +1549,20 @@
             "steel"
           ],
           "resistorTypes": [
+            "normal",
             "fighting",
+            "flying",
             "poison",
+            "ground",
+            "bug",
+            "ghost",
             "steel",
+            "fire",
             "grass",
-            "dragon"
+            "psychic",
+            "dragon",
+            "dark",
+            "fairy"
           ],
           "guardTypes": [
             "grass",
@@ -1691,10 +1729,15 @@
           ],
           "resistorTypes": [
             "normal",
+            "fighting",
+            "poison",
+            "ground",
             "steel",
             "fire",
             "water",
+            "grass",
             "ice",
+            "dragon",
             "dark"
           ],
           "guardTypes": [
@@ -1860,9 +1903,17 @@
             "psychic"
           ],
           "resistorTypes": [
+            "normal",
             "flying",
             "poison",
+            "rock",
             "bug",
+            "ghost",
+            "fire",
+            "water",
+            "psychic",
+            "dragon",
+            "dark",
             "fairy"
           ],
           "guardTypes": [
@@ -2027,11 +2078,18 @@
             "psychic"
           ],
           "resistorTypes": [
+            "flying",
             "poison",
             "ground",
             "rock",
+            "bug",
             "ghost",
-            "steel"
+            "steel",
+            "fire",
+            "grass",
+            "psychic",
+            "dragon",
+            "fairy"
           ],
           "guardTypes": [
             "poison"
@@ -2185,9 +2243,15 @@
             "water"
           ],
           "resistorTypes": [
+            "normal",
             "flying",
+            "rock",
             "bug",
+            "steel",
             "grass",
+            "electric",
+            "psychic",
+            "dark",
             "fairy"
           ],
           "guardTypes": [
@@ -2361,7 +2425,20 @@
             "ice"
           ],
           "resistorTypes": [
-            "flying"
+            "fighting",
+            "flying",
+            "poison",
+            "ground",
+            "rock",
+            "bug",
+            "ghost",
+            "steel",
+            "fire",
+            "water",
+            "grass",
+            "electric",
+            "dragon",
+            "fairy"
           ],
           "guardTypes": [
             "flying",
@@ -2520,7 +2597,13 @@
             "fairy"
           ],
           "resistorTypes": [
+            "fighting",
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
             "steel",
+            "psychic",
             "dark",
             "fairy"
           ],
@@ -2698,9 +2781,15 @@
           ],
           "resistorTypes": [
             "fighting",
+            "flying",
             "poison",
+            "ground",
+            "rock",
             "ghost",
             "steel",
+            "fire",
+            "water",
+            "grass",
             "electric",
             "dragon",
             "fairy"
@@ -2867,7 +2956,16 @@
           ],
           "resistorTypes": [
             "fighting",
-            "water"
+            "flying",
+            "ground",
+            "bug",
+            "steel",
+            "fire",
+            "water",
+            "grass",
+            "electric",
+            "ice",
+            "fairy"
           ],
           "guardTypes": [
             "ground",
@@ -3030,7 +3128,17 @@
           ],
           "resistorTypes": [
             "normal",
-            "dark"
+            "fighting",
+            "poison",
+            "ground",
+            "rock",
+            "ghost",
+            "steel",
+            "fire",
+            "water",
+            "ice",
+            "dark",
+            "fairy"
           ],
           "guardTypes": [
             "ghost"
@@ -3183,6 +3291,14 @@
           ],
           "resistorTypes": [
             "flying",
+            "poison",
+            "rock",
+            "bug",
+            "steel",
+            "fire",
+            "grass",
+            "electric",
+            "dragon",
             "fairy"
           ],
           "guardTypes": [
@@ -3355,8 +3471,10 @@
           "resistorTypes": [
             "fighting",
             "rock",
+            "steel",
             "fire",
             "water",
+            "ice",
             "dragon",
             "dark",
             "fairy"
@@ -3519,9 +3637,15 @@
           ],
           "resistorTypes": [
             "fighting",
+            "ground",
+            "rock",
             "steel",
+            "fire",
             "water",
-            "electric"
+            "electric",
+            "psychic",
+            "ice",
+            "dark"
           ],
           "guardTypes": [
             "ice",
@@ -3700,7 +3824,11 @@
             "rock",
             "ghost",
             "steel",
-            "fire"
+            "fire",
+            "water",
+            "psychic",
+            "ice",
+            "dark"
           ],
           "guardTypes": [
             "fairy",
