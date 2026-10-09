@@ -15,6 +15,8 @@
 //   C3 — identical groups merge, subset phases included (the decoy: 2 groups)
 //   C4 — themed trios drop move types a secondary type walls (Swampert's
 //        ground halves rock) and keep the Kanto trio's moves as they were
+//   C5 — themed trios get one filter per line (grass, fire, water), each
+//        covering its line in every phase with moves unwalled within the line
 
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -120,6 +122,27 @@ console.log("\nC4 — themed trios");
   const walled = hoenn.seMoveTypes.filter((m) => !lineupMons.every((p) => effVsPokemon(m, p.types, typeIdx) >= 1));
   check(`Hoenn: ${hoenn.seMoveTypes.join(", ")} resisted by nobody in the lineup`,
     hoenn.seMoveTypes.length > 0 && walled.length === 0, walled.join(", "));
+}
+
+console.log("\nC5 — one filter per starter line");
+for (const [label, entry] of [["Kanto", KANTO], ["Johto", JOHTO], ["Hoenn", HOENN]]) {
+  const t = derive(entry);
+  const lines = (t.counters || []).map((c) => c.line).join(",");
+  check(`${label}: one filter per line (${lines})`, lines === t.themeTypes.join(","));
+  for (const c of t.counters || []) {
+    const walled = c.seMoveTypes.filter((m) => !unwalled(m, c.pokemons));
+    check(`${label} ${c.line} line [${c.pokemons.map((p) => p.name).join(" > ")}]: phases 1-3, ${c.seMoveTypes.join(", ")} never resisted`,
+      c.phases.join(",") === "1,2,3" && c.pokemons.length === 3 && c.seMoveTypes.length > 0 &&
+        c.resistorTypes.length > 0 && walled.length === 0, walled.join(", "));
+  }
+}
+{
+  const water = derive(HOENN).counters.find((c) => c.line === "water");
+  check("Hoenn water line (Swampert): grass kept, electric dropped (ground is immune)",
+    water.seMoveTypes.includes("grass") && !water.seMoveTypes.includes("electric"), water.seMoveTypes.join(", "));
+  const fire = derive(KANTO).counters.find((c) => c.line === "fire");
+  check("Kanto fire line: rock, water and electric (Charizard's flying half)",
+    fire.seMoveTypes.join(",") === "rock,water,electric", fire.seMoveTypes.join(", "));
 }
 
 done("All Rocket counter checks passed.", (n) => `${n} Rocket counter check(s) failed.`);

@@ -324,6 +324,36 @@ function genericCountersOf(slots, allTypeNames, typeIdx) {
     .sort((a, b) => (b.recurring - a.recurring) || (a.phases[0] - b.phases[0]));
 }
 
+// Counter filters for a themed lineup: one per line, a line being every
+// Pokémon whose primary type is one theme type (the Bulbasaur line for grass).
+// Every phase offers one of each line, so a single "phase" filter has to
+// compromise across all of them and ends up nearly the same for every phase;
+// a filter per line hard-counters that line wherever it appears, one per team
+// slot. Move types are unwalled within the line (Swampert's ground half still
+// drops rock from the water line).
+function lineCountersOf(themeTypes, slots, allTypeNames, typeIdx) {
+  return themeTypes.map(line => {
+    const phases = [];
+    const pokemons = new Map();
+    slots.forEach((slot, i) => {
+      for (const p of slot.map(pokemonSummary)) {
+        if (p.types[0] !== line) continue;
+        if (!phases.includes(i + 1)) phases.push(i + 1);
+        pokemons.set(p.name, p);
+      }
+    });
+    const list = [...pokemons.values()];
+    return {
+      line,
+      phases,
+      recurring: false,
+      pokemons: list,
+      resistorTypes: resistorsFor(unionTypesOf(list), allTypeNames, typeIdx),
+      seMoveTypes: seMoveTypesUnwalled(list, allTypeNames, typeIdx),
+    };
+  });
+}
+
 function deriveGenericGrunt(entry, allTypeNames, typeIdx) {
   const slots = phasesOf(entry);
   const pokemons = slots.flat().map(pokemonSummary);
@@ -342,7 +372,9 @@ function deriveGenericGrunt(entry, allTypeNames, typeIdx) {
     name: entry.name,
     kind: "generic_grunt",
     phases: slots.map((slot, i) => ({ slot: i + 1, pokemons: slot.map(pokemonSummary) })),
-    ...(themeTypes ? {} : { counters: genericCountersOf(slots, allTypeNames, typeIdx) }),
+    counters: themeTypes
+      ? lineCountersOf(themeTypes, slots, allTypeNames, typeIdx)
+      : genericCountersOf(slots, allTypeNames, typeIdx),
     topOffensiveTypes: top,
     topHits: top.map(t => ({ type: t, hits: hitMap[t], total: pokemons.length })),
     commonStabTypes,

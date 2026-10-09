@@ -390,8 +390,12 @@ console.log("\nD9 — generic grunts: themed lineups get the typed shape, the re
         continue;
       }
       const kw = pogoKeywords(loc);
-      check(`${loc}: ${t.name} renders as themed with a non-empty clause`,
-        !!built && !built.skipped && built.clause.length > 0 && Array.isArray(built.themeTypes),
+      // One filter per line (theme type), each live, so a team gets one
+      // counter per starter line instead of one compromise box.
+      const lines = (built?.counters || []).filter((c) => c.line && !c.skipped && c.clause.length > 0);
+      check(`${loc}: ${t.name} renders one filter per line (${lines.length}/${theme.split(",").length})`,
+        !!built && !built.skipped && built.phased && Array.isArray(built.themeTypes) &&
+          lines.length === theme.split(",").length,
         built ? "" : "missing from buildFilters output");
       const name = (built?.displayName || "").toLowerCase();
       const missing = theme.split(",").filter((ty) => !name.includes(kw.type[ty]));
