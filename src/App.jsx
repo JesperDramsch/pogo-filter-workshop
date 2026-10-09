@@ -4351,7 +4351,9 @@ export function buildFilters(
 		// recognize the encounter regardless of which line was rolled.
 		const gender = gruntGender(trainer.name);
 		const quotes = (ROCKET_GRUNT_QUOTES.generic || []).map((e) => resolveQuote(e, gender)).filter(Boolean);
-		const themed = trainer.themeTypes?.length ? buildThemedGruntFilter(trainer) : null;
+		// Snapshots from before line counters still get the single themed box.
+		const themed =
+			trainer.themeTypes?.length && !trainer.counters?.length ? buildThemedGruntFilter(trainer) : null;
 		if (themed) {
 			return {
 				name: trainer.name,
@@ -4380,14 +4382,20 @@ export function buildFilters(
 				return {
 					...built,
 					pokemons: markTanky(built.pokemons, c.pokemons),
-					key: `${c.recurring ? 'recurring' : 'phase'}_${c.phases.join('_')}_${index}`,
+					key: `${c.line ? `line_${c.line}` : c.recurring ? 'recurring' : 'phase'}_${c.phases.join('_')}_${index}`,
+					line: c.line ? localizedTypeDisplay(c.line) : null,
 					recurring: !!c.recurring,
 					alsoPhases: c.alsoPhases || [],
 					alsoPokemons: markTanky(localizePokemons(c.alsoPokemons), c.alsoPokemons),
 				};
 			});
+			// Themed lineups (the starter trio) get one counter per line.
+			const themedName = trainer.themeTypes?.length
+				? { displayName: localizedThemedGruntName(trainer), themeTypes: trainer.themeTypes }
+				: {};
 			return {
 				name: trainer.name,
+				...themedName,
 				phased: true,
 				phases: localizedPhases,
 				counters,
@@ -9284,10 +9292,16 @@ function RocketPhaseFilters({ phases, keyPrefix, accent, lenientCounters, copied
 		const copyKey = `${keyPrefix}_${phase.key || phase.slot}`;
 		const lenientKey = `${copyKey}_lenient`;
 		const names = phase.pokemons.map(nameOf).join(t('app.filter.rocket_lineup_or'));
-		const label = phase.recurring
-			? t('app.filter.rocket_recurring_label', { params: { names, slots: phase.slot } })
-			: t('app.filter.rocket_phase_label', { params: { slot: phase.slot } });
-		const hint = phase.recurring
+		const label = phase.line
+			? t('app.filter.rocket_line_label', {
+					params: { type: phase.line, names: phase.pokemons.map(nameOf).join(' → ') },
+				})
+			: phase.recurring
+				? t('app.filter.rocket_recurring_label', { params: { names, slots: phase.slot } })
+				: t('app.filter.rocket_phase_label', { params: { slot: phase.slot } });
+		const hint = phase.line
+			? t('app.filter.rocket_line_hint', { params: { slots: phase.slot } })
+			: phase.recurring
 			? t('app.filter.rocket_recurring_hint', { params: { slots: phase.slot } })
 			: t('app.filter.rocket_phase_hint', { params: { names } }) +
 				(phase.alsoPhases?.length
@@ -9311,7 +9325,9 @@ function RocketPhaseFilters({ phases, keyPrefix, accent, lenientCounters, copied
 				{lenientCounters && phase.lenient?.clause && (
 					<FilterBox
 						label={
-							phase.recurring
+							phase.line
+								? t('app.filter.rocket_line_label_lenient', { params: { type: phase.line } })
+								: phase.recurring
 								? t('app.filter.rocket_recurring_label_lenient', { params: { names } })
 								: t('app.filter.rocket_phase_label_lenient', { params: { slot: phase.slot } })
 						}

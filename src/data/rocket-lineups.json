@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-07T17:35:34.965Z",
+  "fetchedAt": "2026-10-09T09:27:05.761Z",
   "source": "scrapedduck",
   "bulk": {
     "metric": "baseDefense*baseStamina",
@@ -3057,6 +3057,135 @@
                 "water"
               ]
             }
+          ]
+        }
+      ],
+      "counters": [
+        {
+          "line": "grass",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Bulbasaur",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            },
+            {
+              "name": "Ivysaur",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            },
+            {
+              "name": "Venusaur",
+              "types": [
+                "grass",
+                "poison"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
+            "steel",
+            "fire",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "flying",
+            "fire",
+            "psychic",
+            "ice"
+          ]
+        },
+        {
+          "line": "fire",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Charmander",
+              "types": [
+                "fire"
+              ]
+            },
+            {
+              "name": "Charmeleon",
+              "types": [
+                "fire"
+              ]
+            },
+            {
+              "name": "Charizard",
+              "types": [
+                "fire",
+                "flying"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "rock",
+            "fire",
+            "water",
+            "electric",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "water",
+            "electric"
+          ]
+        },
+        {
+          "line": "water",
+          "phases": [
+            1,
+            2,
+            3
+          ],
+          "recurring": false,
+          "pokemons": [
+            {
+              "name": "Squirtle",
+              "types": [
+                "water"
+              ]
+            },
+            {
+              "name": "Wartortle",
+              "types": [
+                "water"
+              ]
+            },
+            {
+              "name": "Blastoise",
+              "types": [
+                "water"
+              ]
+            }
+          ],
+          "resistorTypes": [
+            "water",
+            "grass",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "grass",
+            "electric"
           ]
         }
       ],
