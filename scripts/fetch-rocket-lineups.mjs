@@ -143,7 +143,9 @@ function annotateGrunts(trainers, bulk, allTypeNames, typeIdx) {
     if (!isGrunt(t)) return t;
     const tanks = tanksOf(lineupOf(t), bulk.species, bulk.cutoff, allTypeNames, typeIdx);
     if (t.kind === "generic_grunt") return { ...t, tanks };
-    return { ...t, boxes: typedGruntBoxes(t.phases, tanks, allTypeNames, typeIdx), tanks };
+    // A LeekDuck-pinned trainer list can predate `boxes`; drop its counterPlan.
+    const { counterPlan: _legacy, ...rest } = t;
+    return { ...rest, boxes: typedGruntBoxes(t.phases, tanks, allTypeNames, typeIdx), tanks };
   });
 }
 

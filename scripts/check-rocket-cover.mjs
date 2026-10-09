@@ -197,6 +197,8 @@ console.log("\nC7 — typed-grunt boxes for real lineups (lily-dex chart snapsho
     iceF.main.versions.length === 1 && iceF.main.versions[0].fastTypes.join() === "electric");
   check("Ice ♀: backup is Fire/Rock/Steel; Aurorus' Fighting stays out (Froslass is immune)",
     iceF.backup.moveTypes.join() === "fire,rock,steel");
+  check("Ice ♀: backup resistors are Normal/Poison/Steel/Water",
+    iceF.backup.resistorTypes.join() === "normal,poison,steel,water", iceF.backup.resistorTypes.join());
 
   // No single fast type hits Teddiursa, Hoothoot and Porygon: two versions.
   const normalM = boxes(phases(

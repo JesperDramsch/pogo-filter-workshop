@@ -1194,7 +1194,7 @@
   "app.clause_why.rocket_not_weak_to_main_type": "Verteidiger nicht schwach gegen den Haupttyp des Lineups (bei mindestens der Hälfte von Slot 2 und 3)",
   "app.clause_why.rocket_backup_moves": "hat einen Move (beliebiger Slot), der gegen die meisten in Slot 2 und 3 sehr effektiv ist und von keinem resistiert wird",
   "app.clause_why.rocket_backup_resists": "Verteidiger-Typ resistiert mindestens einen Typ aus Slot 2 und 3 und ist gegen keinen schwach, oder ist einer deiner Top-Angreifer",
-  "app.clause_why.rocket_not_weak_to_late": "Verteidiger nicht schwach gegen einen Typ aus Slot 2 und 3",
+  "app.clause_why.rocket_not_weak_to_late": "Verteidiger gegen keinen Typ aus Slot 2 und 3 schwach",
   "app.filter.rocket_tanky": "tanky",
   "app.protect.rocket_lenient_counters.label": "Breite Ausweich-Counter für Rocket zeigen",
   "app.protect.rocket_lenient_counters.help": "Fügt pro Leader-Phase und Filter der generischen Rüpel eine zweite, breitere Counter-Box hinzu: irgendein sehr effektiver Move (egal welcher Slot) oder WP ≥ 3500, weiterhin gegen die Schwächen des Lineups abgesichert. An per Default; zum Aufräumen ausschalten.",

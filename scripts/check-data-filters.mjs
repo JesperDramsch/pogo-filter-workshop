@@ -24,7 +24,7 @@
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
 import LILY_TYPES from "./__fixtures__/lily-dex-types.json";
-import { indexTypes, effVsPokemon } from "./lib/rocket-derive.mjs";
+import { indexTypes, effVsPokemon, resistorsFor } from "./lib/rocket-derive.mjs";
 import { mainTypesOf } from "./lib/rocket-cover.mjs";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import META_RANKINGS from "../src/data/meta-rankings.json";
@@ -463,6 +463,10 @@ console.log("\nD10 — typed grunt boxes and tanks");
       (backup.moveTypes || []).length > 0 && badMoves.length === 0, badMoves.join(", "));
     check(`${t.name}: backup guards against every slot 2/3 type`,
       JSON.stringify(backup.guardTypes) === JSON.stringify([...new Set(targets.flatMap((p) => p.types))].sort()));
+    check(`${t.name}: backup resistor types are the resistors of the slot 2/3 types`,
+      (backup.resistorTypes || []).length > 0 &&
+      JSON.stringify(backup.resistorTypes) === JSON.stringify(resistorsFor(backup.guardTypes, Object.keys(typeIdx), typeIdx)),
+      `${backup.resistorTypes}`);
     check(`${t.name}: no leftover counter windows`, !("counterPlan" in t));
   }
   // The builder keeps data order and never drops a typed grunt (D2), and
@@ -476,6 +480,12 @@ console.log("\nD10 — typed grunt boxes and tanks");
       if ((g.main || []).length !== (t.boxes?.main?.versions || []).length) bad.push(`${t.name} main versions`);
       if ((g.main || []).some((b) => !b.clause)) bad.push(`${t.name} empty main box`);
       if (!g.backup?.clause) bad.push(`${t.name} no backup box`);
+      // The resistor allowlist is the backup's first clause; every resistor
+      // type must be in it, in this locale's keywords.
+      const kw = pogoKeywords(loc);
+      const allow = (g.backup?.clauses?.[0]?.clause || "").split(",");
+      const missingResistors = (t.boxes?.backup?.resistorTypes || []).filter((r) => !allow.includes(kw.type[r]));
+      if (missingResistors.length) bad.push(`${t.name} backup lacks resistor ${missingResistors.join("/")}`);
       if ("windows" in g || "tanks" in g || "lenient" in g) bad.push(`${t.name} still has windows, tank or broad boxes`);
     });
     // Generic grunts keep their per-phase counters and get no boxes of their

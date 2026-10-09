@@ -1194,7 +1194,7 @@
   "app.clause_why.rocket_not_weak_to_main_type": "défenseur pas faible au type principal de la composition (sur au moins la moitié des emplacements 2 et 3)",
   "app.clause_why.rocket_backup_moves": "a une attaque (n'importe quel emplacement) super efficace contre la plupart des emplacements 2 et 3 et résistée par aucun",
   "app.clause_why.rocket_backup_resists": "le type du défenseur résiste à au moins un type des emplacements 2 et 3 et n'est faible à aucun, ou c'est un de tes attaquants top",
-  "app.clause_why.rocket_not_weak_to_late": "défenseur pas faible à un type des emplacements 2 et 3",
+  "app.clause_why.rocket_not_weak_to_late": "défenseur faible à aucun type des emplacements 2 et 3",
   "app.filter.rocket_tanky": "tanky",
   "app.protect.rocket_lenient_counters.label": "Afficher des counters de secours larges pour la Team GO Rocket",
   "app.protect.rocket_lenient_counters.help": "Ajoute une deuxième boîte de counters plus large par phase de leader et filtre de sbire générique : n'importe quelle attaque super efficace (n'importe quel emplacement) ou PC ≥ 3500, toujours protégé contre les faiblesses de la composition. Activé par défaut ; désactivez pour alléger l'affichage.",
