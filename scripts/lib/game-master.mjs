@@ -303,6 +303,18 @@ export function typesOf(settings) {
   return [typeSlug(settings?.type), typeSlug(settings?.type2)].filter(Boolean);
 }
 
+// movementId → type slug ("THUNDER_SHOCK_FAST" → "electric") for every
+// moveSettings template. Species templates name their moves by movementId.
+export function moveTypesById(templates) {
+  const map = new Map();
+  for (const entry of templateList(templates)) {
+    const move = templateNode(entry)?.moveSettings;
+    const type = typeSlug(move?.pokemonType);
+    if (move?.movementId != null && type) map.set(move.movementId, type);
+  }
+  return map;
+}
+
 // ── Species-level parsers ───────────────────────────────────────────────────
 
 // pokemonId enum name → dex, from every pokemonSettings template. Evolution

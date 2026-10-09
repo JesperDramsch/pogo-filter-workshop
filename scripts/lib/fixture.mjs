@@ -110,16 +110,12 @@ export function buildFixture() {
   return fixture;
 }
 
-// Every box a typed grunt card renders: each counter window (and its broad
-// variant) and each tank's hard-hitter filter. Keyed by position, not by the
-// localized tank name, so the key set is the same in every locale.
+// Every box a typed grunt card renders: each main-counter version and the
+// backup. Keyed by position, so the key set is the same in every locale.
 function typedGruntClauses(g) {
   const out = {};
-  (g.windows || []).forEach((w, i) => {
-    out[`window${i + 1}`] = w.clause || "";
-    if (w.lenient?.clause) out[`window${i + 1}_lenient`] = w.lenient.clause;
-  });
-  (g.tanks || []).forEach((t, i) => { out[`tank${i + 1}`] = t.clause || ""; });
+  (g.main || []).forEach((box, i) => { out[`main${i + 1}`] = box.clause || ""; });
+  if (g.backup) out.backup = g.backup.clause || "";
   return out;
 }
 

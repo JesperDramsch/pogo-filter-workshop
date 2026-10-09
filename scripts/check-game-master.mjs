@@ -25,6 +25,7 @@ import {
   evolutionChainsFromSteps,
   evolutionStepsFromGameMaster,
   formSuffix,
+  moveTypesById,
   pokemonTemplates,
   releasedDexFromPvpoke,
   templateList,
@@ -76,6 +77,13 @@ console.log("\nG1: payload and template normalization");
     JSON.stringify(typesOf({ type: T("FIRE"), type2: T("FLYING") })) === '["fire","flying"]' &&
     JSON.stringify(typesOf({ type: T("NORMAL") })) === '["normal"]');
   check("dexByPokemonId maps the species enum", dexByPokemonId(sample).get("MEOWTH") === 52);
+  const moves = moveTypesById([
+    { templateId: "V0221_MOVE_THUNDER_SHOCK_FAST", data: { moveSettings: { movementId: "THUNDER_SHOCK_FAST", pokemonType: T("ELECTRIC") } } },
+    { templateId: "V0001_MOVE_TYPELESS", data: { moveSettings: { movementId: "TYPELESS" } } },
+    ...sample,
+  ]);
+  check("moveTypesById maps a move to its type and skips typeless moves",
+    moves.get("THUNDER_SHOCK_FAST") === "electric" && moves.size === 1);
 
   check("releasedDexFromPvpoke reads the released flag",
     JSON.stringify([...releasedDexFromPvpoke({
