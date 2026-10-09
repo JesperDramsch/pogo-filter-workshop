@@ -25,18 +25,24 @@
 //   Box 1: a fast move super-effective against EVERY Pokémon that can lead.
 //          When no single type manages that (the Normal grunt: Fighting for
 //          Teddiursa and Porygon, nothing for Hoothoot), Box 1 splits into one
-//          version per group of leads. Defence is only "not weak to the
-//          lineup's main type" (types on at least half of slots 2 and 3).
-//          Not weak to EVERY slot 2/3 type let one secondary typing veto a whole
-//          move type: Swampert's Ground removed every Electric attacker from
-//          the Water grunt's main counter. Requiring a charged-move type as
-//          well, or the resistor list, cut the Ice grunt's main counter from
-//          119 matches to 21 in a real storage.
-//   Box 2: a move in either slot whose type is super-effective against at
-//          least half of slots 2 and 3 and resisted by none of them, plus the
+//          version per group of leads. Defence is "weak to nothing slots 2 and
+//          3 can throw", except a KILLER type: one that on its own rules out at
+//          least a third of the species carrying the right fast move (the
+//          candidates). Swampert's Ground is one for the Water grunt: every
+//          Electric attacker is weak to it. Ghost on the Ice grunt is not, so
+//          Froslass stays in the check, as a search in a real storage showed it
+//          should. A Pokémon carrying a killer type is handed over to Box 2.
+//   Box 2: built for the handed-over Pokémon when there are any. A move in
+//          either slot whose type hits as many of them as possible (all of them,
+//          so far) super-effectively and that nothing in slots 2 and 3 resists.
+//          Without a handover it is the general backup: a type super-effective
+//          against at least half of slots 2 and 3 and resisted by none, plus the
 //          types that hit a slot-2/3 tank hardest when nobody resists those.
-//          Defence is the full check: resists everything slots 2 and 3 can
-//          throw (or is a top attacker) and is weak to none of it.
+//          Defence is "weak to none of the types that recur in slots 2 and 3
+//          (two entries or more) or that the handed-over Pokémon carry", and
+//          resists one of them or is a top attacker. Guarding against every
+//          one-off type as well left the Water grunt's Box 2 with 14 regular
+//          species.
 
 // ── Type chart ─────────────────────────────────────────────────────────────
 
@@ -157,8 +163,8 @@ function better(score, key, best) {
 // the level-independent bulk ranking. Measured 2026-10-07 over 1,024 species:
 // Snorlax sits at 1.2 %, Wobbuffet at 11.8 %, while Seel (63 %) is not bulky at
 // all: its problem was move coverage, which Box 1's slot-1 rule solves.
-// On typed grunts a tank only steers Box 2's move types; generic grunts mark
-// their tanks in the counter hints.
+// On typed grunts a tank only steers the general backup's move types (Box 2
+// without a handover); generic grunts mark their tanks in the counter hints.
 export const TANK_TOP_FRACTION = 1 / 8;
 
 // Regional prefixes ScrapedDuck puts on lineup names → the game master's form
@@ -218,50 +224,108 @@ export function tanksOf(pokemons, bulkBySpecies, cutoff, allTypeNames, typeIdx) 
     .filter(t => t.seMoveTypes.length > 0);
 }
 
+// ── Box 1 candidates ───────────────────────────────────────────────────────
+
+// A slot-2/3 type is a killer when one in KILLER_ONE_IN candidates or more is
+// weak to it. A third separates Swampert's Ground on the Water grunt (a killer)
+// from Froslass' Ghost on the Ice grunt (not one), and leaves every Box 1 with
+// at least seven strong regular species.
+export const KILLER_ONE_IN = 3;
+
+// Every base and regional form, as { types, fastTypes }: the population Box 1
+// draws its candidates from. `forms` is the output of pokemonTemplates() +
+// formSuffix() + typesOf() from scripts/lib/game-master.mjs, passed in as
+// { dex, suffix, types, fastTypes } so this file stays free of the dump's
+// shape. The game master ships some forms twice; the first one wins.
+export function attackerPool(forms) {
+  const regional = new Set(Object.values(REGION_FORM));
+  const seen = new Set();
+  const pool = [];
+  for (const { dex, suffix, types, fastTypes } of forms) {
+    const form = suffix ?? "NORMAL";
+    if (form !== "NORMAL" && !regional.has(form)) continue;
+    const key = `${dex}|${form}`;
+    if (seen.has(key) || !types?.length || !fastTypes?.length) continue;
+    seen.add(key);
+    pool.push({ types: types.map(t => t.toLowerCase()), fastTypes: [...new Set(fastTypes.map(t => t.toLowerCase()))] });
+  }
+  return pool;
+}
+
+// How many of the pool carry one of `fastTypes` on a fast move (`total`), and
+// how many of those each of `types` hits super-effectively (`weakTo`).
+export function candidateCounts(pool, fastTypes, types, typeIdx) {
+  const wanted = new Set(fastTypes);
+  const candidates = pool.filter(a => a.fastTypes.some(t => wanted.has(t)));
+  const weakTo = {};
+  for (const t of types) weakTo[t] = candidates.filter(a => effVsPokemon(t, a.types, typeIdx) > 1).length;
+  return { total: candidates.length, weakTo };
+}
+
 // ── Typed grunt boxes ──────────────────────────────────────────────────────
 
 const lower = (pokemons) => (pokemons || []).map(p => ({ name: p.name, types: (p.types || []).map(t => t.toLowerCase()) }));
 
-// The lineup's main type: types carried by at least half of the entries
-// (counted per entry, so a species offered in two slots counts twice). On a
-// typed grunt that is the grunt's own type; the Steel grunt also has Rock.
-export function mainTypesOf(pokemons) {
-  const list = lower(pokemons);
+// Types carried by at least `min` lineup entries (counted per entry, so
+// Froslass offered in slots 2 and 3 makes Ghost recur on the Ice grunt).
+export function recurringTypesOf(pokemons, min = 2) {
   const counts = new Map();
-  for (const p of list) for (const t of new Set(p.types)) counts.set(t, (counts.get(t) || 0) + 1);
-  return [...counts].filter(([, n]) => n * 2 >= list.length).map(([t]) => t).sort();
+  for (const p of lower(pokemons)) for (const t of new Set(p.types)) counts.set(t, (counts.get(t) || 0) + 1);
+  return [...counts].filter(([, n]) => n >= min).map(([t]) => t).sort();
 }
 
 // Both boxes of a typed grunt from its phases ([{ slot, pokemons }], slot 1
 // first) and its tanks (tanksOf). See the header for why each rule is what
 // it is.
-//   main:   { versions: [{ fastTypes, leads }], uncoveredLeads, guardTypes }
-//   backup: { targets, moveTypes, resistorTypes, guardTypes }
+//   main:   { versions: [{ fastTypes, leads }], uncoveredLeads,
+//             candidates: { total, weakTo }, killerTypes, guardTypes }
+//   backup: { targets, handedOver, moveTypes, resistorTypes, guardTypes }
+// `countCandidates(fastTypes, types)` returns candidateCounts() for Box 1's
+// fast types (every version's) against the slot 2/3 types, or null when the
+// game master is unavailable; a type it has no count for is never a killer,
+// so Box 1 then falls back to the full check.
 // A backup with no move types (nothing is unresisted by slots 2 and 3) has an
 // empty `moveTypes`; the app then shows no backup box.
-export function typedGruntBoxes(phases, tanks, allTypeNames, typeIdx) {
+export function typedGruntBoxes(phases, tanks, allTypeNames, typeIdx, countCandidates = () => null) {
   const [slot1 = [], slot2 = [], slot3 = []] = (phases || []).map(p => lower(p.pokemons));
   const late = [...slot2, ...slot3];
   const lateSpecies = distinctSpecies(late);
+  const lateTypes = [...new Set(lateSpecies.flatMap(s => s.types))].sort();
 
   const leads = counterPlan(slot1, allTypeNames, typeIdx);
+  const fastTypes = [...new Set(leads.windows.flatMap(w => w.types))].sort();
+  const candidates = countCandidates(fastTypes, lateTypes) || { total: 0, weakTo: {} };
+  const killerTypes = lateTypes.filter(t =>
+    candidates.total > 0 && candidates.weakTo[t] != null && candidates.weakTo[t] * KILLER_ONE_IN >= candidates.total);
   const main = {
     versions: leads.windows.map(w => ({ fastTypes: w.types, leads: w.covers })),
     uncoveredLeads: leads.uncovered,
-    guardTypes: mainTypesOf(late),
+    candidates,
+    killerTypes,
+    guardTypes: lateTypes.filter(t => !killerTypes.includes(t)),
   };
 
+  const handedOver = lateSpecies.filter(s => s.types.some(t => killerTypes.includes(t)));
   const resisted = (t) => lateSpecies.some(s => effVsPokemon(t, s.types, typeIdx) < 1);
-  const seCount = (t) => late.filter(p => effVsPokemon(t, p.types, typeIdx) > 1).length;
-  const lateNames = new Set(lateSpecies.map(s => s.name));
-  const tankTypes = (tanks || []).filter(k => lateNames.has(k.name)).flatMap(k => k.seMoveTypes || []);
-  const moveTypes = [...new Set([
-    ...allTypeNames.filter(t => seCount(t) > 0 && seCount(t) * 2 >= late.length),
-    ...tankTypes,
-  ])].filter(t => !resisted(t)).sort();
-  const guardTypes = [...new Set(lateSpecies.flatMap(s => s.types))].sort();
+  let moveTypes;
+  if (handedOver.length > 0) {
+    const hits = (t) => handedOver.filter(s => effVsPokemon(t, s.types, typeIdx) > 1).length;
+    const usable = allTypeNames.filter(t => !resisted(t) && hits(t) > 0);
+    const most = Math.max(0, ...usable.map(hits));
+    moveTypes = usable.filter(t => hits(t) === most).sort();
+  } else {
+    const seCount = (t) => late.filter(p => effVsPokemon(t, p.types, typeIdx) > 1).length;
+    const lateNames = new Set(lateSpecies.map(s => s.name));
+    const tankTypes = (tanks || []).filter(k => lateNames.has(k.name)).flatMap(k => k.seMoveTypes || []);
+    moveTypes = [...new Set([
+      ...allTypeNames.filter(t => seCount(t) > 0 && seCount(t) * 2 >= late.length),
+      ...tankTypes,
+    ])].filter(t => !resisted(t)).sort();
+  }
+  const guardTypes = [...new Set([...recurringTypesOf(late), ...handedOver.flatMap(s => s.types)])].sort();
   const backup = {
     targets: lateSpecies.map(s => s.name),
+    handedOver: handedOver.map(s => s.name),
     moveTypes,
     resistorTypes: guardTypes.length ? resistorsFor(guardTypes, allTypeNames, typeIdx) : [],
     guardTypes,

@@ -4193,12 +4193,14 @@ export function buildFilters(
 	};
 	// Typed grunt boxes. scripts/lib/rocket-cover.mjs explains the battle they
 	// are built for. Box 1, the main counter: a fast move super-effective
-	// against every Pokémon that can lead, and not weak to the lineup's main
-	// type, with one version per group of leads when no single fast-move type
-	// covers them all. Box 2, the backup for slots 2 and 3: a move in either
-	// slot from the types the fetcher found super-effective against most of
-	// them and resisted by none, the soft resistor allowlist (top attackers
-	// bypass it) and the full weakness guard.
+	// against every Pokémon that can lead, with one version per group of leads
+	// when no single fast-move type covers them all, and not weak to anything in
+	// slots 2 and 3 except the types that would rule out too many counters. The
+	// Pokémon carrying those are handed over to Box 2, the backup, which is then
+	// built for them; otherwise it is the general backup for slots 2 and 3.
+	// Either way: a move in either slot from the fetcher's move types, the soft
+	// resistor allowlist (top attackers bypass it) and not weak to the types that
+	// recur in slots 2 and 3 or that the handed-over Pokémon carry.
 	const buildMainBox = (version, guardTypes) => {
 		const fastList = (version.fastTypes || []).map((t) => kw.type[t]).filter(Boolean);
 		if (fastList.length === 0) return null;
@@ -4207,7 +4209,7 @@ export function buildFilters(
 		const second = buildSecondMoveAndAppraise();
 		if (second) push(clauses, second.clause, second.why);
 		const wGuard = weaknessGuard(guardTypes);
-		if (wGuard) push(clauses, wGuard, tFn('app.clause_why.rocket_not_weak_to_main_type'));
+		if (wGuard) push(clauses, wGuard, tFn('app.clause_why.rocket_main_not_weak'));
 		return {
 			fastTypes: (version.fastTypes || []).map(localizedTypeDisplay),
 			leads: (version.leads || []).map(localizePokemonName),
@@ -4219,19 +4221,21 @@ export function buildFilters(
 		const moveList = (backup?.moveTypes || []).map((t) => kw.type[t]).filter(Boolean);
 		if (moveList.length === 0) return null;
 		const resistorList = (backup.resistorTypes || []).map((t) => kw.type[t]).filter(Boolean);
+		const handedOver = (backup.handedOver || []).map(localizePokemonName);
+		// The handover variants name the Pokémon the backup is built for.
+		const why = (key) =>
+			handedOver.length > 0
+				? tFn(`app.clause_why.${key}_handover`, { params: { names: handedOver.join(', ') } })
+				: tFn(`app.clause_why.${key}`);
 		const clauses = [];
 		if (resistorList.length > 0) {
-			push(clauses, withAllowlist(resistorList.join(',')), tFn('app.clause_why.rocket_backup_resists'));
+			push(clauses, withAllowlist(resistorList.join(',')), why('rocket_backup_resists'));
 		}
-		push(
-			clauses,
-			`${fastMoveClause(moveList)},${chargeMoveClause(moveList)}`,
-			tFn('app.clause_why.rocket_backup_moves'),
-		);
+		push(clauses, `${fastMoveClause(moveList)},${chargeMoveClause(moveList)}`, why('rocket_backup_moves'));
 		const second = buildSecondMoveAndAppraise();
 		if (second) push(clauses, second.clause, second.why);
 		const wGuard = weaknessGuard(backup.guardTypes);
-		if (wGuard) push(clauses, wGuard, tFn('app.clause_why.rocket_not_weak_to_late'));
+		if (wGuard) push(clauses, wGuard, why('rocket_backup_not_weak'));
 		return {
 			moveTypes: (backup.moveTypes || []).map(localizedTypeDisplay),
 			targets: (backup.targets || []).map(localizePokemonName),
@@ -4251,6 +4255,8 @@ export function buildFilters(
 			quote: resolveQuote(ROCKET_GRUNT_QUOTES.typed?.[trainer.type], gender),
 			main,
 			uncoveredLeads: (boxes.main?.uncoveredLeads || []).map(localizePokemonName),
+			killerTypes: (boxes.main?.killerTypes || []).map(localizedTypeDisplay),
+			handedOver: (boxes.backup?.handedOver || []).map(localizePokemonName),
 			backup,
 			// The first main box doubles as the grunt's one filter wherever only
 			// one fits.
@@ -9169,11 +9175,13 @@ function GruntQuoteList({ quotes, t }) {
 
 // A typed grunt's boxes: the main counter (one version per group of leads
 // when no single fast-move type covers every slot-1 Pokémon) and the backup
-// for slots 2 and 3. The first main box keeps the copy key the grunt's single
+// for slots 2 and 3, built for the Pokémon the main counter hands over when
+// there are any. The first main box keeps the copy key the grunt's single
 // filter always had.
 function TypedGruntBoxes({ g, copyKey, accent, copied, copyToClipboard, t }) {
 	const or = t('app.filter.rocket_lineup_or');
 	const split = g.main.length > 1;
+	const handedOver = g.handedOver || [];
 	const backupKey = `${copyKey}_backup`;
 	return (
 		<>
@@ -9191,9 +9199,20 @@ function TypedGruntBoxes({ g, copyKey, accent, copied, copyToClipboard, t }) {
 						filterStr={box.clause}
 						copied={copied[key]}
 						onCopy={() => copyToClipboard(key, box.clause)}
-						hint={t('app.filter.rocket_main_hint', {
-							params: { types: box.fastTypes.join(or), names: box.leads.join(', ') },
-						})}
+						hint={
+							handedOver.length > 0
+								? t('app.filter.rocket_main_hint_handover', {
+										params: {
+											types: box.fastTypes.join(or),
+											names: box.leads.join(', '),
+											killers: g.killerTypes.join(', '),
+											handed: handedOver.join(', '),
+										},
+									})
+								: t('app.filter.rocket_main_hint', {
+										params: { types: box.fastTypes.join(or), names: box.leads.join(', ') },
+									})
+						}
 					/>
 				);
 			})}
@@ -9209,9 +9228,15 @@ function TypedGruntBoxes({ g, copyKey, accent, copied, copyToClipboard, t }) {
 					filterStr={g.backup.clause}
 					copied={copied[backupKey]}
 					onCopy={() => copyToClipboard(backupKey, g.backup.clause)}
-					hint={t('app.filter.rocket_backup_hint', {
-						params: { types: g.backup.moveTypes.join(or), names: g.backup.targets.join(', ') },
-					})}
+					hint={
+						handedOver.length > 0
+							? t('app.filter.rocket_backup_hint_handover', {
+									params: { types: g.backup.moveTypes.join(or), handed: handedOver.join(', ') },
+								})
+							: t('app.filter.rocket_backup_hint', {
+									params: { types: g.backup.moveTypes.join(or), names: g.backup.targets.join(', ') },
+								})
+					}
 				/>
 			)}
 		</>

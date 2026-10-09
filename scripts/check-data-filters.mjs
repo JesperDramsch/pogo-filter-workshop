@@ -18,14 +18,15 @@
 //   D7 — the shadow keeper filters carry every keeper, in every locale
 //   D8 — every Rocket lineup Pokémon resolves to a real name in every locale
 //   D9 — a themed generic grunt is named after its theme and filtered like one
-//   D10 — every typed grunt's main counter and backup obey their type rules,
-//         render in every locale, and generic grunts only mark their tanks
+//   D10 — every typed grunt's main counter and backup obey their type rules
+//         (including the killer handover), render in every locale, and
+//         generic grunts only mark their tanks
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
 import LILY_TYPES from "./__fixtures__/lily-dex-types.json";
 import { indexTypes, effVsPokemon, resistorsFor } from "./lib/rocket-derive.mjs";
-import { mainTypesOf } from "./lib/rocket-cover.mjs";
+import { recurringTypesOf, KILLER_ONE_IN } from "./lib/rocket-cover.mjs";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import META_RANKINGS from "../src/data/meta-rankings.json";
 import { buildDataFilters, buildResult, FIXTURE_CONFIG } from "./lib/fixture.mjs";
@@ -450,20 +451,50 @@ console.log("\nD10 — typed grunt boxes and tanks");
     check(`${t.name}: versions + uncovered leads partition the ${leads.length} slot-1 options`,
       placed.length === leads.length && new Set(placed).size === placed.length && leads.every((p) => placed.includes(p.name)),
       `placed ${placed.join(", ")}`);
-    check(`${t.name}: main counter guards against the lineup's main type`,
-      JSON.stringify(main.guardTypes) === JSON.stringify(mainTypesOf(late)), `${main.guardTypes} vs ${mainTypesOf(late)}`);
     const targets = distinct(late);
+    const lateTypes = [...new Set(targets.flatMap((p) => p.types))].sort();
+    const cand = main.candidates || {};
+    // A game-master outage can leave a type uncounted (see candidateCounter in
+    // the fetcher). That type is never a killer, so the main counter keeps the
+    // full check: degraded, not wrong, and the next good sync heals it.
+    const uncounted = lateTypes.filter((ty) => !(cand.total > 0) || cand.weakTo?.[ty] == null);
+    if (uncounted.length) {
+      console.warn(`  ⚠ ${t.name}: no Box 1 candidate counts for ${uncounted.join(", ")}; they stay in the main counter's check`);
+    }
+    const badCounts = Object.entries(cand.weakTo || {}).filter(([, n]) => !(n >= 0 && n <= cand.total));
+    check(`${t.name}: Box 1 candidate counts are within the candidate total`,
+      badCounts.length === 0, badCounts.map(([ty, n]) => `${ty} ${n}/${cand.total}`).join(", "));
+    const killers = lateTypes.filter((ty) => cand.total > 0 && cand.weakTo?.[ty] != null &&
+      cand.weakTo[ty] * KILLER_ONE_IN >= cand.total);
+    check(`${t.name}: killer types are the slot 2/3 types that rule out a third of the candidates`,
+      JSON.stringify(main.killerTypes) === JSON.stringify(killers), `${main.killerTypes} vs ${killers}`);
+    check(`${t.name}: main counter guards against every slot 2/3 type except killers`,
+      JSON.stringify(main.guardTypes) === JSON.stringify(lateTypes.filter((ty) => !killers.includes(ty))),
+      `${main.guardTypes}`);
+    const handed = targets.filter((p) => p.types.some((ty) => killers.includes(ty)));
+    check(`${t.name}: the Pokémon carrying a killer type are handed over`,
+      JSON.stringify(backup.handedOver) === JSON.stringify(handed.map((p) => p.name)), `${backup.handedOver}`);
     check(`${t.name}: backup targets are exactly the slot 2/3 options`,
       JSON.stringify(backup.targets) === JSON.stringify(targets.map((p) => p.name)));
-    const tankTypes = new Set((t.tanks || []).filter((k) => targets.some((p) => p.name === k.name)).flatMap((k) => k.seMoveTypes));
-    const badMoves = (backup.moveTypes || []).filter((ty) =>
-      targets.some((p) => eff(ty, p) < 1) ||
-      !(tankTypes.has(ty) || late.filter((p) => eff(ty, p) > 1).length * 2 >= late.length));
-    check(`${t.name}: backup has move types, none resisted by slots 2/3, each SE on half of them or a tank's best`,
-      (backup.moveTypes || []).length > 0 && badMoves.length === 0, badMoves.join(", "));
-    check(`${t.name}: backup guards against every slot 2/3 type`,
-      JSON.stringify(backup.guardTypes) === JSON.stringify([...new Set(targets.flatMap((p) => p.types))].sort()));
-    check(`${t.name}: backup resistor types are the resistors of the slot 2/3 types`,
+    const resisted = (ty) => targets.some((p) => eff(ty, p) < 1);
+    let expectedMoves;
+    if (handed.length) {
+      const hits = (ty) => handed.filter((p) => eff(ty, p) > 1).length;
+      const usable = Object.keys(typeIdx).filter((ty) => !resisted(ty) && hits(ty) > 0);
+      const most = Math.max(0, ...usable.map(hits));
+      expectedMoves = usable.filter((ty) => hits(ty) === most).sort();
+    } else {
+      const tankTypes = new Set((t.tanks || []).filter((k) => targets.some((p) => p.name === k.name)).flatMap((k) => k.seMoveTypes));
+      expectedMoves = Object.keys(typeIdx).filter((ty) => !resisted(ty) &&
+        (tankTypes.has(ty) || (late.filter((p) => eff(ty, p) > 1).length * 2 >= late.length && late.some((p) => eff(ty, p) > 1)))).sort();
+    }
+    check(`${t.name}: backup move types ${handed.length ? "hit the handed-over Pokémon" : "hit half of slots 2/3 or a tank"}, none resisted`,
+      (backup.moveTypes || []).length > 0 && JSON.stringify(backup.moveTypes) === JSON.stringify(expectedMoves),
+      `${backup.moveTypes} vs ${expectedMoves}`);
+    const backupGuard = [...new Set([...recurringTypesOf(late), ...handed.flatMap((p) => p.types)])].sort();
+    check(`${t.name}: backup guards against recurring types and the handed-over Pokémon's types`,
+      JSON.stringify(backup.guardTypes) === JSON.stringify(backupGuard), `${backup.guardTypes} vs ${backupGuard}`);
+    check(`${t.name}: backup resistor types are the resistors of its guard types`,
       (backup.resistorTypes || []).length > 0 &&
       JSON.stringify(backup.resistorTypes) === JSON.stringify(resistorsFor(backup.guardTypes, Object.keys(typeIdx), typeIdx)),
       `${backup.resistorTypes}`);
@@ -487,6 +518,16 @@ console.log("\nD10 — typed grunt boxes and tanks");
       const missingResistors = (t.boxes?.backup?.resistorTypes || []).filter((r) => !allow.includes(kw.type[r]));
       if (missingResistors.length) bad.push(`${t.name} backup lacks resistor ${missingResistors.join("/")}`);
       if ("windows" in g || "tanks" in g || "lenient" in g) bad.push(`${t.name} still has windows, tank or broad boxes`);
+      // A killer type stays out of every main box's weakness check, and the
+      // backup names each Pokémon it was handed in its move clause's reason.
+      const killerGuards = (t.boxes?.main?.killerTypes || []).map((ty) => `!<${kw.type[ty]}`);
+      if ((g.main || []).some((b) => b.clause.split("&").some((c) => killerGuards.includes(c)))) {
+        bad.push(`${t.name} main box guards against a killer type`);
+      }
+      const handed = t.boxes?.backup?.handedOver || [];
+      if ((g.handedOver || []).length !== handed.length) bad.push(`${t.name} handed-over names`);
+      const movesWhy = (g.backup?.clauses || []).map((c) => c.why).join(" ");
+      if ((g.handedOver || []).some((n) => !movesWhy.includes(n))) bad.push(`${t.name} backup reasons miss a handed-over name`);
     });
     // Generic grunts keep their per-phase counters and get no boxes of their
     // own for tanks; their tanks are only marked in the counter groups.

@@ -28,14 +28,19 @@
 // Typed grunts then get `boxes` (scripts/lib/rocket-cover.mjs, pinned by
 // scripts/check-rocket-cover.mjs): Box 1, the main counter, carries a fast
 // move super-effective against every possible slot-1 Pokémon; Box 2, the
-// backup, covers slots 2 and 3. The header of rocket-cover.mjs explains the
-// battle each rule is built for. Every grunt also gets its `tanks`: lineup
-// species whose base Defence × Stamina is in the top eighth of all species,
-// read from the game master through scripts/lib/game-master.mjs. On typed
-// grunts a tank steers Box 2's move types; generic grunts keep their
-// per-phase `counters` and only mark tanks as tanky in the UI. The
-// per-species bulk figures and the cutoff are stored at the top level
-// (`bulk`) so a game-master outage can reuse them instead of dropping tanks.
+// backup, covers slots 2 and 3, and takes over any Pokémon whose type would
+// rule out too many of Box 1's candidates. The header of rocket-cover.mjs
+// explains the battle each rule is built for. Both need the game master, read
+// once through scripts/lib/game-master.mjs:
+//   * every species' fast-move types, to count Box 1's candidates. The counts
+//     are stored per grunt (`boxes.main.candidates`), and a game-master outage
+//     reuses them for a grunt whose Box 1 fast types have not changed.
+//   * base Defence × Stamina, for each grunt's `tanks`: lineup species in the
+//     top eighth of all species. On typed grunts a tank steers the general
+//     backup's move types; generic grunts keep their per-phase `counters` and
+//     only mark tanks as tanky in the UI. The per-species bulk figures and the
+//     cutoff are stored at the top level (`bulk`) so an outage can reuse them
+//     instead of dropping tanks.
 //
 // During a Team GO Rocket takeover the fetcher also reads LeekDuck's lineup
 // page directly, at most once per UTC day, until it shows a lineup ScrapedDuck
@@ -70,9 +75,18 @@ import {
   enNameIndex,
   tanksOf,
   distinctSpecies,
+  attackerPool,
+  candidateCounts,
   TANK_TOP_FRACTION,
 } from "./lib/rocket-cover.mjs";
-import { fetchGameMaster, pokemonTemplates, formSuffix, warnIfStale } from "./lib/game-master.mjs";
+import {
+  fetchGameMaster,
+  pokemonTemplates,
+  formSuffix,
+  typesOf,
+  moveTypesById,
+  warnIfStale,
+} from "./lib/game-master.mjs";
 import { loadNameDict } from "./lib/species-dex.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -105,19 +119,33 @@ async function fetchJson(url) {
 const isGrunt = (t) => t.kind === "typed_grunt" || t.kind === "generic_grunt";
 const lineupOf = (t) => (t.phases || []).flatMap(p => p.pokemons || []);
 
-// Base Defence × Stamina for every grunt lineup species, plus the top-eighth
-// cutoff over all species. A game-master outage reuses the previous
-// snapshot's figures (species it never measured stay null, so never tanks)
-// rather than publishing a snapshot with every tank filter silently gone.
-async function lineupBulk(trainers, prev) {
+// From one game-master read: base Defence × Stamina for every grunt lineup
+// species plus the top-eighth cutoff over all species (`bulk`), and Box 1's
+// candidate population (`pool`, see attackerPool). A game-master outage
+// reuses the previous snapshot's bulk figures (species it never measured stay
+// null, so never tanks) rather than publishing a snapshot with every tank
+// filter silently gone, and returns no pool (annotateGrunts then reuses the
+// previous candidate counts).
+async function gameMasterFacts(trainers, prev) {
   const names = [...new Set(trainers.filter(isGrunt).flatMap(t => distinctSpecies(lineupOf(t)).map(s => s.name)))].sort();
   try {
-    console.log("→ Fetching the game master for lineup bulk (tank flags)");
+    console.log("→ Fetching the game master for lineup bulk (tank flags) and fast moves (Box 1 candidates)");
     const gm = await fetchGameMaster({ userAgent: "pogo-filter-workshop rocket-fetcher/1.0" });
-    warnIfStale(gm, "Rocket tank flags may miss newly added species.");
-    const forms = pokemonTemplates(gm.templates).map(t => ({ dex: t.dex, suffix: formSuffix(t), stats: t.settings?.stats }));
-    const table = bulkTable(forms);
+    warnIfStale(gm, "Rocket tank flags and Box 1 candidates may miss newly added species.");
+    const templates = pokemonTemplates(gm.templates);
+    const table = bulkTable(templates.map(t => ({ dex: t.dex, suffix: formSuffix(t), stats: t.settings?.stats })));
     if (table.cutoff == null) throw new Error("game master carried no species stats");
+    const moveType = moveTypesById(gm.templates);
+    const pool = attackerPool(templates
+      .filter(t => t.settings.modelScaleV2 != null) // release gate, as in fetch-meta-rankings.mjs
+      .map(t => ({
+        dex: t.dex,
+        suffix: formSuffix(t),
+        types: typesOf(t.settings),
+        fastTypes: [...(t.settings.quickMoves || []), ...(t.settings.eliteQuickMove || [])]
+          .map(m => moveType.get(m)).filter(Boolean),
+      })));
+    if (pool.length === 0) throw new Error("game master carried no fast moves");
     const enIdx = enNameIndex(loadNameDict(NAMES_PATH));
     const species = {};
     for (const n of names) species[n] = bulkOf(n, table, enIdx);
@@ -125,27 +153,48 @@ async function lineupBulk(trainers, prev) {
     if (unresolved.length > 0) {
       console.warn(`  ⚠ no base stats for ${unresolved.join(", ")} — never flagged as tanks`);
     }
-    return { metric: "baseDefense*baseStamina", topFraction: TANK_TOP_FRACTION, cutoff: table.cutoff, species };
+    return {
+      bulk: { metric: "baseDefense*baseStamina", topFraction: TANK_TOP_FRACTION, cutoff: table.cutoff, species },
+      pool,
+    };
   } catch (e) {
     if (prev?.bulk?.cutoff == null) throw e;
-    console.warn(`  ⚠ game master unavailable (${e.message}); reusing the previous snapshot's bulk figures`);
+    console.warn(`  ⚠ game master unavailable (${e.message}); reusing the previous snapshot's bulk figures and Box 1 candidate counts`);
     const species = {};
     for (const n of names) species[n] = prev.bulk.species?.[n] ?? null;
-    return { ...prev.bulk, species };
+    return { bulk: { ...prev.bulk, species }, pool: null };
   }
+}
+
+// Box 1 candidate counts for one typed grunt: fresh from the pool, or on an
+// outage the previous snapshot's, while that grunt's Box 1 fast types are
+// unchanged. A type without a count is never a killer, so the worst an outage
+// does is fall back to Box 1's full check.
+function candidateCounter(pool, prevTrainer, typeIdx) {
+  if (pool) return (fastTypes, types) => candidateCounts(pool, fastTypes, types, typeIdx);
+  const prevMain = prevTrainer?.boxes?.main;
+  const prevFast = [...new Set((prevMain?.versions || []).flatMap(v => v.fastTypes))].sort().join();
+  return (fastTypes, types) => {
+    if (!prevMain?.candidates || prevFast !== fastTypes.join()) return null;
+    const weakTo = {};
+    for (const t of types) if (prevMain.candidates.weakTo?.[t] != null) weakTo[t] = prevMain.candidates.weakTo[t];
+    return { total: prevMain.candidates.total, weakTo };
+  };
 }
 
 // Boxes on typed grunts, tanks on every grunt. Runs on the FINAL
 // trainer list (after the LeekDuck pin decision), so it never feeds the pin
 // digest.
-function annotateGrunts(trainers, bulk, allTypeNames, typeIdx) {
+function annotateGrunts(trainers, facts, prevTrainers, allTypeNames, typeIdx) {
+  const prevByName = new Map((prevTrainers || []).map(t => [t.name, t]));
   return trainers.map(t => {
     if (!isGrunt(t)) return t;
-    const tanks = tanksOf(lineupOf(t), bulk.species, bulk.cutoff, allTypeNames, typeIdx);
+    const tanks = tanksOf(lineupOf(t), facts.bulk.species, facts.bulk.cutoff, allTypeNames, typeIdx);
     if (t.kind === "generic_grunt") return { ...t, tanks };
     // A LeekDuck-pinned trainer list can predate `boxes`; drop its counterPlan.
     const { counterPlan: _legacy, ...rest } = t;
-    return { ...rest, boxes: typedGruntBoxes(t.phases, tanks, allTypeNames, typeIdx), tanks };
+    const counter = candidateCounter(facts.pool, prevByName.get(t.name), typeIdx);
+    return { ...rest, boxes: typedGruntBoxes(t.phases, tanks, allTypeNames, typeIdx, counter), tanks };
   });
 }
 
@@ -272,9 +321,9 @@ async function main() {
     takeoverState = prev.takeover; // prebuild must not drop the sync's state
   }
 
-  let bulk;
+  let facts;
   try {
-    bulk = await lineupBulk(trainers, prev);
+    facts = await gameMasterFacts(trainers, prev);
   } catch (e) {
     console.error(`✗ Game master fetch failed and no previous bulk figures exist: ${e.message}`);
     if (offlineOk && existsSync(OUT_PATH)) {
@@ -283,7 +332,8 @@ async function main() {
     }
     process.exit(1);
   }
-  trainers = annotateGrunts(trainers, bulk, allTypeNames, typeIdx);
+  trainers = annotateGrunts(trainers, facts, prev?.trainers, allTypeNames, typeIdx);
+  const { bulk } = facts;
 
   const newContent = { bulk, trainers };
   let fetchedAt = new Date(now).toISOString();
@@ -300,7 +350,8 @@ async function main() {
     const plan = t.boxes
       ? `main ${t.boxes.main.versions.map(v => v.fastTypes.join("/")).join(" | ")}` +
         (t.boxes.main.uncoveredLeads.length ? ` (no fast type for ${t.boxes.main.uncoveredLeads.join(", ")})` : "") +
-        `, backup ${t.boxes.backup.moveTypes.join("/") || "none"}`
+        `, backup ${t.boxes.backup.moveTypes.join("/") || "none"}` +
+        (t.boxes.backup.handedOver.length ? ` for ${t.boxes.backup.handedOver.join(", ")} (${t.boxes.main.killerTypes.join("/")})` : "")
       : "per-phase counters";
     const tanks = t.tanks.length ? `, tanks: ${t.tanks.map(k => k.name).join(", ")}` : "";
     console.log(`    ${t.name}: ${plan}${tanks}`);

@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-09T11:16:46.090Z",
+  "fetchedAt": "2026-10-09T12:25:41.771Z",
   "source": "scrapedduck",
   "bulk": {
     "metric": "baseDefense*baseStamina",
@@ -720,7 +720,19 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 337,
+            "weakTo": {
+              "fighting": 128,
+              "flying": 74,
+              "normal": 0
+            }
+          },
+          "killerTypes": [
+            "fighting"
+          ],
           "guardTypes": [
+            "flying",
             "normal"
           ]
         },
@@ -733,8 +745,14 @@
             "Swellow",
             "Kangaskhan"
           ],
+          "handedOver": [
+            "Stufful"
+          ],
           "moveTypes": [
-            "fighting"
+            "fairy",
+            "fighting",
+            "flying",
+            "psychic"
           ],
           "resistorTypes": [
             "flying",
@@ -861,8 +879,21 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 294,
+            "weakTo": {
+              "fighting": 93,
+              "fire": 20,
+              "ground": 86,
+              "psychic": 23
+            }
+          },
+          "killerTypes": [],
           "guardTypes": [
-            "fire"
+            "fighting",
+            "fire",
+            "ground",
+            "psychic"
           ]
         },
         "backup": {
@@ -874,24 +905,20 @@
             "Delphox",
             "Magmortar"
           ],
+          "handedOver": [],
           "moveTypes": [
             "ground",
             "rock",
             "water"
           ],
           "resistorTypes": [
-            "flying",
-            "ghost",
+            "rock",
+            "fire",
             "water",
-            "psychic",
-            "dragon",
-            "fairy"
+            "dragon"
           ],
           "guardTypes": [
-            "fighting",
-            "fire",
-            "ground",
-            "psychic"
+            "fire"
           ]
         }
       },
@@ -1005,7 +1032,25 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 100,
+            "weakTo": {
+              "bug": 12,
+              "dark": 10,
+              "ground": 68,
+              "ice": 12,
+              "poison": 11,
+              "water": 9
+            }
+          },
+          "killerTypes": [
+            "ground"
+          ],
           "guardTypes": [
+            "bug",
+            "dark",
+            "ice",
+            "poison",
             "water"
           ]
         },
@@ -1018,21 +1063,25 @@
             "Greninja",
             "Tentacruel"
           ],
+          "handedOver": [
+            "Swampert"
+          ],
           "moveTypes": [
             "grass"
           ],
           "resistorTypes": [
             "fighting",
+            "flying",
             "bug",
             "water",
-            "ice"
+            "grass",
+            "dragon",
+            "dark",
+            "fairy"
           ],
           "guardTypes": [
-            "bug",
             "dark",
             "ground",
-            "ice",
-            "poison",
             "water"
           ]
         }
@@ -1131,6 +1180,16 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 211,
+            "weakTo": {
+              "flying": 97,
+              "water": 9
+            }
+          },
+          "killerTypes": [
+            "flying"
+          ],
           "guardTypes": [
             "water"
           ]
@@ -1140,9 +1199,12 @@
             "Magikarp",
             "Gyarados"
           ],
+          "handedOver": [
+            "Gyarados"
+          ],
           "moveTypes": [
             "electric",
-            "grass"
+            "rock"
           ],
           "resistorTypes": [
             "steel",
@@ -1265,8 +1327,21 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 113,
+            "weakTo": {
+              "bug": 9,
+              "electric": 25,
+              "rock": 6,
+              "steel": 12
+            }
+          },
+          "killerTypes": [],
           "guardTypes": [
-            "electric"
+            "bug",
+            "electric",
+            "rock",
+            "steel"
           ]
         },
         "backup": {
@@ -1278,23 +1353,18 @@
             "Ampharos",
             "Galvantula"
           ],
+          "handedOver": [],
           "moveTypes": [
             "ground"
           ],
           "resistorTypes": [
-            "fighting",
-            "poison",
             "ground",
-            "ghost",
-            "steel",
+            "grass",
             "electric",
             "dragon"
           ],
           "guardTypes": [
-            "bug",
-            "electric",
-            "rock",
-            "steel"
+            "electric"
           ]
         }
       },
@@ -1411,7 +1481,23 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 236,
+            "weakTo": {
+              "fairy": 24,
+              "fighting": 52,
+              "ghost": 27,
+              "grass": 25,
+              "rock": 180
+            }
+          },
+          "killerTypes": [
+            "rock"
+          ],
           "guardTypes": [
+            "fairy",
+            "fighting",
+            "ghost",
             "grass"
           ]
         },
@@ -1424,23 +1510,23 @@
             "Trevenant",
             "Cradily"
           ],
+          "handedOver": [
+            "Lileep",
+            "Cradily"
+          ],
           "moveTypes": [
             "bug",
-            "fire",
-            "flying",
             "ice",
-            "poison",
             "steel"
           ],
           "resistorTypes": [
+            "fighting",
             "poison",
+            "steel",
             "grass",
-            "fairy"
+            "dragon"
           ],
           "guardTypes": [
-            "fairy",
-            "fighting",
-            "ghost",
             "grass",
             "rock"
           ]
@@ -1570,8 +1656,23 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 100,
+            "weakTo": {
+              "fairy": 6,
+              "ghost": 13,
+              "ice": 12,
+              "rock": 12,
+              "water": 9
+            }
+          },
+          "killerTypes": [],
           "guardTypes": [
-            "ice"
+            "fairy",
+            "ghost",
+            "ice",
+            "rock",
+            "water"
           ]
         },
         "backup": {
@@ -1582,6 +1683,7 @@
             "Aurorus",
             "Glalie"
           ],
+          "handedOver": [],
           "moveTypes": [
             "fire",
             "rock",
@@ -1589,16 +1691,15 @@
           ],
           "resistorTypes": [
             "normal",
-            "poison",
             "steel",
-            "water"
+            "fire",
+            "water",
+            "ice",
+            "dark"
           ],
           "guardTypes": [
-            "fairy",
             "ghost",
-            "ice",
-            "rock",
-            "water"
+            "ice"
           ]
         }
       },
@@ -1724,8 +1825,20 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 274,
+            "weakTo": {
+              "fighting": 32,
+              "fire": 63,
+              "ghost": 94
+            }
+          },
+          "killerTypes": [
+            "ghost"
+          ],
           "guardTypes": [
-            "fighting"
+            "fighting",
+            "fire"
           ]
         },
         "backup": {
@@ -1737,6 +1850,9 @@
             "Annihilape",
             "Infernape"
           ],
+          "handedOver": [
+            "Annihilape"
+          ],
           "moveTypes": [
             "fairy",
             "flying",
@@ -1746,14 +1862,11 @@
           "resistorTypes": [
             "flying",
             "poison",
-            "fire",
-            "water",
-            "dragon",
+            "bug",
             "fairy"
           ],
           "guardTypes": [
             "fighting",
-            "fire",
             "ghost"
           ]
         }
@@ -1882,7 +1995,20 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 146,
+            "weakTo": {
+              "fairy": 14,
+              "fighting": 24,
+              "grass": 19,
+              "poison": 24
+            }
+          },
+          "killerTypes": [],
           "guardTypes": [
+            "fairy",
+            "fighting",
+            "grass",
             "poison"
           ]
         },
@@ -1895,22 +2021,19 @@
             "Toxicroak",
             "Amoonguss"
           ],
+          "handedOver": [],
           "moveTypes": [
             "ground",
             "psychic"
           ],
           "resistorTypes": [
-            "flying",
             "poison",
-            "bug",
+            "ground",
+            "rock",
             "ghost",
-            "fire",
-            "psychic"
+            "steel"
           ],
           "guardTypes": [
-            "fairy",
-            "fighting",
-            "grass",
             "poison"
           ]
         }
@@ -2027,8 +2150,23 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 202,
+            "weakTo": {
+              "dragon": 10,
+              "flying": 15,
+              "ghost": 18,
+              "ground": 32,
+              "psychic": 9
+            }
+          },
+          "killerTypes": [],
           "guardTypes": [
-            "ground"
+            "dragon",
+            "flying",
+            "ghost",
+            "ground",
+            "psychic"
           ]
         },
         "backup": {
@@ -2040,23 +2178,21 @@
             "Hippowdon",
             "Flygon"
           ],
+          "handedOver": [],
           "moveTypes": [
             "grass",
             "ice",
             "water"
           ],
           "resistorTypes": [
-            "normal",
             "flying",
-            "dark",
+            "bug",
+            "grass",
             "fairy"
           ],
           "guardTypes": [
             "dragon",
-            "flying",
-            "ghost",
-            "ground",
-            "psychic"
+            "ground"
           ]
         }
       },
@@ -2185,8 +2321,28 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 215,
+            "weakTo": {
+              "bug": 24,
+              "dragon": 8,
+              "flying": 10,
+              "ground": 115,
+              "normal": 0,
+              "poison": 17,
+              "water": 57
+            }
+          },
+          "killerTypes": [
+            "ground"
+          ],
           "guardTypes": [
-            "flying"
+            "bug",
+            "dragon",
+            "flying",
+            "normal",
+            "poison",
+            "water"
           ]
         },
         "backup": {
@@ -2198,23 +2354,18 @@
             "Toucannon",
             "Swanna"
           ],
+          "handedOver": [
+            "Gligar"
+          ],
           "moveTypes": [
-            "ice",
-            "rock"
+            "ice"
           ],
           "resistorTypes": [
-            "flying",
-            "ghost",
-            "water"
+            "flying"
           ],
           "guardTypes": [
-            "bug",
-            "dragon",
             "flying",
-            "ground",
-            "normal",
-            "poison",
-            "water"
+            "ground"
           ]
         }
       },
@@ -2336,7 +2487,19 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 122,
+            "weakTo": {
+              "dark": 66,
+              "fighting": 29,
+              "psychic": 9
+            }
+          },
+          "killerTypes": [
+            "dark"
+          ],
           "guardTypes": [
+            "fighting",
             "psychic"
           ]
         },
@@ -2349,19 +2512,20 @@
             "Malamar",
             "Reuniclus"
           ],
+          "handedOver": [
+            "Malamar"
+          ],
           "moveTypes": [
             "bug",
-            "dark",
-            "ghost"
+            "fairy"
           ],
           "resistorTypes": [
-            "flying",
-            "bug",
+            "steel",
+            "dark",
             "fairy"
           ],
           "guardTypes": [
             "dark",
-            "fighting",
             "psychic"
           ]
         }
@@ -2493,8 +2657,26 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 166,
+            "weakTo": {
+              "bug": 9,
+              "electric": 86,
+              "poison": 7,
+              "rock": 85,
+              "steel": 42,
+              "water": 59
+            }
+          },
+          "killerTypes": [
+            "electric",
+            "rock",
+            "water"
+          ],
           "guardTypes": [
-            "bug"
+            "bug",
+            "poison",
+            "steel"
           ]
         },
         "backup": {
@@ -2506,9 +2688,12 @@
             "Scolipede",
             "Vikavolt"
           ],
+          "handedOver": [
+            "Anorith",
+            "Dewpider",
+            "Vikavolt"
+          ],
           "moveTypes": [
-            "fire",
-            "flying",
             "rock"
           ],
           "resistorTypes": [
@@ -2517,14 +2702,13 @@
             "ghost",
             "steel",
             "electric",
-            "dragon"
+            "dragon",
+            "fairy"
           ],
           "guardTypes": [
             "bug",
             "electric",
-            "poison",
             "rock",
-            "steel",
             "water"
           ]
         }
@@ -2642,8 +2826,24 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 340,
+            "weakTo": {
+              "dragon": 11,
+              "ground": 69,
+              "ice": 158,
+              "rock": 32,
+              "steel": 36
+            }
+          },
+          "killerTypes": [
+            "ice"
+          ],
           "guardTypes": [
-            "rock"
+            "dragon",
+            "ground",
+            "rock",
+            "steel"
           ]
         },
         "backup": {
@@ -2653,6 +2853,9 @@
             "Cranidos",
             "Tyrantrum",
             "Golem",
+            "Aurorus"
+          ],
+          "handedOver": [
             "Aurorus"
           ],
           "moveTypes": [
@@ -2667,11 +2870,9 @@
             "water"
           ],
           "guardTypes": [
-            "dragon",
             "ground",
             "ice",
-            "rock",
-            "steel"
+            "rock"
           ]
         }
       },
@@ -2797,8 +2998,21 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 276,
+            "weakTo": {
+              "dark": 71,
+              "ghost": 72,
+              "ice": 78,
+              "poison": 29
+            }
+          },
+          "killerTypes": [],
           "guardTypes": [
-            "ghost"
+            "dark",
+            "ghost",
+            "ice",
+            "poison"
           ]
         },
         "backup": {
@@ -2809,26 +3023,17 @@
             "Gengar",
             "Froslass"
           ],
+          "handedOver": [],
           "moveTypes": [
             "dark",
             "ghost"
           ],
           "resistorTypes": [
             "normal",
-            "fighting",
-            "poison",
-            "rock",
-            "steel",
-            "fire",
-            "water",
-            "ice",
             "dark"
           ],
           "guardTypes": [
-            "dark",
-            "ghost",
-            "ice",
-            "poison"
+            "ghost"
           ]
         }
       },
@@ -2944,8 +3149,21 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 166,
+            "weakTo": {
+              "dragon": 48,
+              "flying": 24,
+              "grass": 24,
+              "ground": 28
+            }
+          },
+          "killerTypes": [],
           "guardTypes": [
-            "dragon"
+            "dragon",
+            "flying",
+            "grass",
+            "ground"
           ]
         },
         "backup": {
@@ -2957,6 +3175,7 @@
             "Garchomp",
             "Salamence"
           ],
+          "handedOver": [],
           "moveTypes": [
             "dragon",
             "fairy",
@@ -2969,7 +3188,6 @@
           "guardTypes": [
             "dragon",
             "flying",
-            "grass",
             "ground"
           ]
         }
@@ -3100,8 +3318,22 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 287,
+            "weakTo": {
+              "dark": 19,
+              "dragon": 3,
+              "fire": 114,
+              "ice": 72
+            }
+          },
+          "killerTypes": [
+            "fire"
+          ],
           "guardTypes": [
-            "dark"
+            "dark",
+            "dragon",
+            "ice"
           ]
         },
         "backup": {
@@ -3112,24 +3344,26 @@
             "Liepard",
             "Hydreigon"
           ],
+          "handedOver": [
+            "Houndour"
+          ],
           "moveTypes": [
-            "bug",
-            "fairy",
-            "fighting"
+            "fighting",
+            "ground",
+            "rock"
           ],
           "resistorTypes": [
             "fighting",
             "rock",
             "fire",
             "water",
+            "dragon",
             "dark",
             "fairy"
           ],
           "guardTypes": [
             "dark",
-            "dragon",
-            "fire",
-            "ice"
+            "fire"
           ]
         }
       },
@@ -3247,7 +3481,22 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 113,
+            "weakTo": {
+              "flying": 8,
+              "ice": 51,
+              "psychic": 10,
+              "rock": 6,
+              "steel": 12
+            }
+          },
+          "killerTypes": [
+            "ice"
+          ],
           "guardTypes": [
+            "flying",
+            "psychic",
             "rock",
             "steel"
           ]
@@ -3261,22 +3510,21 @@
             "Alolan Sandslash",
             "Probopass"
           ],
+          "handedOver": [
+            "Alolan Sandslash"
+          ],
           "moveTypes": [
             "fighting",
-            "fire",
-            "water"
+            "fire"
           ],
           "resistorTypes": [
+            "fighting",
             "steel",
             "water",
-            "electric",
-            "psychic",
-            "dark"
+            "electric"
           ],
           "guardTypes": [
-            "flying",
             "ice",
-            "psychic",
             "rock",
             "steel"
           ]
@@ -3416,8 +3664,21 @@
             }
           ],
           "uncoveredLeads": [],
+          "candidates": {
+            "total": 89,
+            "weakTo": {
+              "fairy": 12,
+              "ice": 25,
+              "poison": 3,
+              "psychic": 6
+            }
+          },
+          "killerTypes": [],
           "guardTypes": [
-            "fairy"
+            "fairy",
+            "ice",
+            "poison",
+            "psychic"
           ]
         },
         "backup": {
@@ -3428,24 +3689,22 @@
             "Alolan Ninetales",
             "Granbull"
           ],
+          "handedOver": [],
           "moveTypes": [
             "poison",
             "steel"
           ],
           "resistorTypes": [
+            "poison",
+            "ground",
             "rock",
             "ghost",
             "steel",
-            "fire",
-            "water",
-            "psychic",
-            "ice"
+            "fire"
           ],
           "guardTypes": [
             "fairy",
-            "ice",
-            "poison",
-            "psychic"
+            "poison"
           ]
         }
       },
