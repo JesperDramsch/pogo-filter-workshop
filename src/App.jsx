@@ -4191,109 +4191,72 @@ export function buildFilters(
 		const key = isFemale ? 'app.filter.rocket_grunt_female' : 'app.filter.rocket_grunt_male';
 		return tFn(key, { params: { type: typeCap }, fallback: trainer.name });
 	};
-	// Counter windows (typed grunts): scripts/lib/rocket-cover.mjs splits the
-	// lineup into at most two parts, each with the move types super-effective
-	// against EVERY Pokémon in that part. One window means one counter type
-	// handles the whole lineup; two mean a two-counter team brings one pick from each. Each
-	// window keeps the trainer kind's clause stack (soft resistor allowlist,
-	// SE fast + charge, weakness guard); only the move types are per window.
-	const buildCounterWindow = (win, { resistorList, guardTypes, guardWhy, lenientGuardTypes }) => {
-		const seMoveList = (win.types || []).map((t) => kw.type[t]).filter(Boolean);
-		if (seMoveList.length === 0) return null;
+	// Typed grunt boxes. scripts/lib/rocket-cover.mjs explains the battle they
+	// are built for. Box 1, the main counter: a fast move super-effective
+	// against every Pokémon that can lead, and not weak to the lineup's main
+	// type, with one version per group of leads when no single fast-move type
+	// covers them all. Box 2, the backup for slots 2 and 3: a move in either
+	// slot from the types the fetcher found super-effective against most of
+	// them and resisted by none, the soft resistor allowlist (top attackers
+	// bypass it) and the full weakness guard.
+	const buildMainBox = (version, guardTypes) => {
+		const fastList = (version.fastTypes || []).map((t) => kw.type[t]).filter(Boolean);
+		if (fastList.length === 0) return null;
 		const clauses = [];
-		if (resistorList && resistorList.length > 0) {
-			push(clauses, withAllowlist(resistorList.join(',')), tFn('app.clause_why.rocket_resistor_types'));
-		}
-		push(clauses, fastMoveClause(seMoveList), tFn('app.clause_why.rocket_window_se_fast'));
-		push(clauses, chargeMoveClause(seMoveList), tFn('app.clause_why.rocket_window_se_charge'));
+		push(clauses, fastMoveClause(fastList), tFn('app.clause_why.rocket_main_fast'));
 		const second = buildSecondMoveAndAppraise();
 		if (second) push(clauses, second.clause, second.why);
 		const wGuard = weaknessGuard(guardTypes);
-		if (wGuard) push(clauses, wGuard, guardWhy);
+		if (wGuard) push(clauses, wGuard, tFn('app.clause_why.rocket_not_weak_to_main_type'));
 		return {
-			types: (win.types || []).map(localizedTypeDisplay),
-			covers: (win.covers || []).map(localizePokemonName),
+			fastTypes: (version.fastTypes || []).map(localizedTypeDisplay),
+			leads: (version.leads || []).map(localizePokemonName),
 			clause: clauses.map((c) => c.clause).join('&'),
 			clauses,
-			lenient: lenientGuardTypes ? buildLenientCounters(seMoveList, lenientGuardTypes) : null,
 		};
 	};
-	const buildCounterWindows = (trainer, opts) =>
-		(trainer.counterPlan?.windows || []).map((w) => buildCounterWindow(w, opts)).filter(Boolean);
-
-	// Tanks: lineup Pokémon in the bulkiest eighth of all species (base
-	// Defence × Stamina, from the game master via the fetcher). Being covered
-	// by a window does not make Wobbuffet faint faster, so each tank gets a
-	// hard-hitter filter of its own: a top raid attacker (meta-rankings.json
-	// perType + shadowPerType) for a move type that hits it super-effectively,
-	// or a high-CP pick, carrying such a move in both slots and not weak to
-	// the tank's own types.
-	const hardHittersFor = (moveTypes) => {
-		const out = new Set();
-		for (const type of moveTypes) {
-			for (const e of [...(META_RANKINGS.perType?.[type] || []), ...(META_RANKINGS.shadowPerType?.[type] || [])]) {
-				const name = speciesForOutput(e.species, outputLocale);
-				if (name) out.add(name);
-			}
-		}
-		return [...out];
-	};
-	const buildTank = (tank) => {
-		const seMoveList = (tank.seMoveTypes || []).map((t) => kw.type[t]).filter(Boolean);
-		if (seMoveList.length === 0) return null;
+	const buildBackupBox = (backup) => {
+		const moveList = (backup?.moveTypes || []).map((t) => kw.type[t]).filter(Boolean);
+		if (moveList.length === 0) return null;
+		const resistorList = (backup.resistorTypes || []).map((t) => kw.type[t]).filter(Boolean);
 		const clauses = [];
-		const pool = [...hardHittersFor(tank.seMoveTypes), `${kw.numeric.cp}${ROCKET_LENIENT_CP_FLOOR}-`].join(',');
-		push(clauses, pool, tFn('app.clause_why.rocket_tank_hitters'));
-		push(clauses, fastMoveClause(seMoveList), tFn('app.clause_why.rocket_tank_se_fast'));
-		push(clauses, chargeMoveClause(seMoveList), tFn('app.clause_why.rocket_tank_se_charge'));
+		if (resistorList.length > 0) {
+			push(clauses, withAllowlist(resistorList.join(',')), tFn('app.clause_why.rocket_backup_resists'));
+		}
+		push(
+			clauses,
+			`${fastMoveClause(moveList)},${chargeMoveClause(moveList)}`,
+			tFn('app.clause_why.rocket_backup_moves'),
+		);
 		const second = buildSecondMoveAndAppraise();
 		if (second) push(clauses, second.clause, second.why);
-		const wGuard = weaknessGuard(tank.types);
-		if (wGuard) push(clauses, wGuard, tFn('app.clause_why.rocket_not_weak_to_tank'));
+		const wGuard = weaknessGuard(backup.guardTypes);
+		if (wGuard) push(clauses, wGuard, tFn('app.clause_why.rocket_not_weak_to_late'));
 		return {
-			name: localizePokemonName(tank.name),
-			types: (tank.seMoveTypes || []).map(localizedTypeDisplay),
+			moveTypes: (backup.moveTypes || []).map(localizedTypeDisplay),
+			targets: (backup.targets || []).map(localizePokemonName),
 			clause: clauses.map((c) => c.clause).join('&'),
 			clauses,
 		};
 	};
-	const buildTanks = (trainer) => (trainer.tanks || []).map(buildTank).filter(Boolean);
-
-	// The grunt-level fields every consumer reads: `windows` (one or two),
-	// `uncovered` (species no two windows reach), `tanks`, and the first
-	// window mirrored onto `clause` / `clauses` / `lenient` so a grunt reads
-	// as one filter wherever only one fits.
-	const gruntCounters = (trainer, opts) => {
-		const windows = buildCounterWindows(trainer, opts);
-		const first = windows[0];
-		return {
-			windows,
-			uncovered: (trainer.counterPlan?.uncovered || []).map(localizePokemonName),
-			tanks: buildTanks(trainer),
-			clause: first?.clause || '',
-			clauses: first?.clauses || [],
-			lenient: first?.lenient || null,
-			skipped: !first,
-		};
-	};
-
 	const buildTypedGrunt = (trainer) => {
-		const resistorList = (trainer.resistorTypes || []).map((t) => kw.type[t]).filter(Boolean);
 		const gender = gruntGender(trainer.name);
-		// Whole-lineup weakness guard. Includes secondary types from any
-		// phase's roster (e.g. flying on a Fire grunt's Charizard).
-		const lineupTypes = unionTypesOf((trainer.phases || []).flatMap((p) => p.pokemons || []));
+		const boxes = trainer.boxes || {};
+		const main = (boxes.main?.versions || []).map((v) => buildMainBox(v, boxes.main.guardTypes)).filter(Boolean);
+		const backup = buildBackupBox(boxes.backup);
 		return {
 			name: localizedGruntName(trainer),
 			type: trainer.type,
 			phases: localizePhases(trainer.phases),
 			quote: resolveQuote(ROCKET_GRUNT_QUOTES.typed?.[trainer.type], gender),
-			...gruntCounters(trainer, {
-				resistorList,
-				guardTypes: lineupTypes,
-				guardWhy: tFn('app.clause_why.rocket_not_weak_to_lineup'),
-				lenientGuardTypes: lineupTypes,
-			}),
+			main,
+			uncoveredLeads: (boxes.main?.uncoveredLeads || []).map(localizePokemonName),
+			backup,
+			// The first main box doubles as the grunt's one filter wherever only
+			// one fits.
+			clause: main[0]?.clause || '',
+			clauses: main[0]?.clauses || [],
+			skipped: main.length === 0 && !backup,
 		};
 	};
 	// Capitalized localized type name for display ("Feuer", "Wasser"). The
@@ -9204,77 +9167,53 @@ function GruntQuoteList({ quotes, t }) {
 	);
 }
 
-// The counter boxes of one grunt: one window, or one per counter pick when
-// the lineup needs two move types; a note for species no two counters reach;
-// then one hard-hitter box per tank. Window 1 keeps the copy keys the single
-// grunt filter always had.
-function GruntCounterBoxes({ g, copyKey, accent, lenientCounters, copied, copyToClipboard, t }) {
-	const windows = g.windows || [];
-	const single = windows.length === 1;
+// A typed grunt's boxes: the main counter (one version per group of leads
+// when no single fast-move type covers every slot-1 Pokémon) and the backup
+// for slots 2 and 3. The first main box keeps the copy key the grunt's single
+// filter always had.
+function TypedGruntBoxes({ g, copyKey, accent, copied, copyToClipboard, t }) {
 	const or = t('app.filter.rocket_lineup_or');
+	const split = g.main.length > 1;
+	const backupKey = `${copyKey}_backup`;
 	return (
 		<>
-			{windows.map((w, i) => {
-				const key = i === 0 ? copyKey : `${copyKey}_w${i + 1}`;
-				const lenientKey = `${key}_lenient`;
-				return (
-					<Fragment key={key}>
-						<FilterBox
-							label={
-								single
-									? t('app.filter.rocket_grunt_filter_label')
-									: t('app.filter.rocket_window_label', { params: { n: i + 1 } })
-							}
-							accent={accent}
-							filterStr={w.clause}
-							copied={copied[key]}
-							onCopy={() => copyToClipboard(key, w.clause)}
-							hint={
-								single
-									? `${t('app.filter.rocket_window_single_hint', { params: { types: w.types.join(or) } })} ${lineupHint(g.phases, t)}`
-									: t('app.filter.rocket_window_hint', {
-											params: { types: w.types.join(or), names: w.covers.join(', ') },
-										})
-							}
-						/>
-						{lenientCounters && w.lenient?.clause && (
-							<FilterBox
-								label={
-									single
-										? t('app.filter.rocket_grunt_filter_label_lenient')
-										: t('app.filter.rocket_window_label_lenient', { params: { n: i + 1 } })
-								}
-								accent='#E08E0B'
-								filterStr={w.lenient.clause}
-								copied={copied[lenientKey]}
-								onCopy={() => copyToClipboard(lenientKey, w.lenient.clause)}
-								hint={t('app.filter.rocket_lenient_hint')}
-							/>
-						)}
-					</Fragment>
-				);
-			})}
-			{(g.uncovered || []).length > 0 && (
-				<p className='mono text-[11px] leading-snug text-[#E08E0B]'>
-					{t('app.filter.rocket_uncovered_note', { params: { names: g.uncovered.join(', ') } })}
-				</p>
-			)}
-			{(g.tanks || []).map((tank) => {
-				const key = `${copyKey}_tank_${tank.name}`;
+			{g.main.map((box, i) => {
+				const key = i === 0 ? copyKey : `${copyKey}_main${i + 1}`;
 				return (
 					<FilterBox
 						key={key}
-						label={t('app.filter.rocket_tank_label', { params: { name: tank.name } })}
-						accent='#D35400'
-						filterStr={tank.clause}
+						label={
+							split
+								? t('app.filter.rocket_main_label_leads', { params: { names: box.leads.join(or) } })
+								: t('app.filter.rocket_main_label')
+						}
+						accent={accent}
+						filterStr={box.clause}
 						copied={copied[key]}
-						onCopy={() => copyToClipboard(key, tank.clause)}
-						hint={t('app.filter.rocket_tank_hint', {
-							params: { name: tank.name, types: tank.types.join(or) },
+						onCopy={() => copyToClipboard(key, box.clause)}
+						hint={t('app.filter.rocket_main_hint', {
+							params: { types: box.fastTypes.join(or), names: box.leads.join(', ') },
 						})}
 					/>
 				);
 			})}
+			{(g.uncoveredLeads || []).length > 0 && (
+				<p className='mono text-[11px] leading-snug text-[#E08E0B]'>
+					{t('app.filter.rocket_main_uncovered', { params: { names: g.uncoveredLeads.join(', ') } })}
+				</p>
+			)}
+			{g.backup && (
+				<FilterBox
+					label={t('app.filter.rocket_backup_label')}
+					accent={accent}
+					filterStr={g.backup.clause}
+					copied={copied[backupKey]}
+					onCopy={() => copyToClipboard(backupKey, g.backup.clause)}
+					hint={t('app.filter.rocket_backup_hint', {
+						params: { types: g.backup.moveTypes.join(or), names: g.backup.targets.join(', ') },
+					})}
+				/>
+			)}
 		</>
 	);
 }
@@ -9362,7 +9301,7 @@ function RocketCollapsible({
 		leaders.reduce((a, l) => a + l.phases.filter((p) => !p.skipped).length, 0) +
 		typedGrunts
 			.filter((g) => !g.skipped)
-			.reduce((a, g) => a + (g.windows || []).length + (g.tanks || []).length, 0) +
+			.reduce((a, g) => a + g.main.length + (g.backup ? 1 : 0), 0) +
 		genericGrunts
 			.filter((g) => !g.skipped)
 			.reduce((a, g) => a + (g.phased ? g.counters.filter((c) => !c.skipped).length : 1), 0);
@@ -9435,11 +9374,10 @@ function RocketCollapsible({
 										highlight={g.type === highlightedType}
 									>
 										{g.quote && <GruntQuoteLine quote={g.quote} t={t} />}
-										<GruntCounterBoxes
+										<TypedGruntBoxes
 											g={g}
 											copyKey={copyKey}
 											accent='#9B59B6'
-											lenientCounters={lenientCounters}
 											copied={copied}
 											copyToClipboard={copyToClipboard}
 											t={t}

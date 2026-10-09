@@ -1,34 +1,48 @@
-// Counter planning for Team GO Rocket grunts: which move types to bring, and
-// which lineup Pokémon are tanks that deserve their own hard-hitter filter.
+// Counter planning for Team GO Rocket typed grunts: which counters to bring,
+// and which lineup Pokémon are tanks.
 //
 // Pure functions only. scripts/fetch-rocket-lineups.mjs feeds them the
 // lily-dex-api type chart and the game master; scripts/check-rocket-cover.mjs
 // pins their behaviour on a toy chart, offline.
 //
-// WHY A SET COVER. A grunt battle is fought one slot at a time, and a two-slot
-// grunt team (buddy lead for hearts, then two counters) brings exactly two
-// counters. The old typed-grunt rule merged every "good" move type into one
-// list, which looks like full coverage while no single pick from it covers the
-// lineup: a Dark attacker out of the Psychic grunt's Bug/Dark/Ghost list is
-// neutral on Gallade and Ralts. Worse, it anchored on the grunt's headline type,
-// so a pure-Water Seel in the Ice grunt's first slot took neutral or resisted
-// hits from the whole list (Fire and Steel are halved by Water) and nothing
-// flagged it. Here every lineup species is a set element, every move type the
-// set of species it hits super-effectively, and the question is answered
-// exhaustively: one window if one move type covers everyone, else the best
-// split into two windows, else the best two plus the species nothing reaches.
+// THE BATTLE THIS PLANS FOR. A grunt fight is PvP-style: switching has a
+// cooldown, and both a switch and a charged attack stun the grunt. The team is
+// a buddy lead (for hearts, usually no useful moves), then two counters:
+//
+//   Box 1, the main counter, comes in right after the lead and fast-moves the
+//   grunt's slot 1 down while it builds energy. If its fast move is not
+//   super-effective against whatever slot 1 turned out to be, the fight is
+//   too slow to be worth finishing. The switch cooldown then keeps it in for
+//   slot 2, and its charged move lands wherever the bar is full, often slot 3.
+//
+//   Box 2, the backup, takes over when the main counter goes down, so it only
+//   ever faces slots 2 and 3.
+//
+// Every rule below follows from that, and each was checked against the whole
+// game master (every released species with its learnable moves) before it
+// went in:
+//
+//   Box 1: a fast move super-effective against EVERY Pokémon that can lead.
+//          When no single type manages that (the Normal grunt: Fighting for
+//          Teddiursa and Porygon, nothing for Hoothoot), Box 1 splits into one
+//          version per group of leads. Defence is only "not weak to the
+//          lineup's main type" (types on at least half of slots 2 and 3).
+//          Not weak to EVERY slot 2/3 type let one secondary typing veto a whole
+//          move type: Swampert's Ground removed every Electric attacker from
+//          the Water grunt's main counter. Requiring a charged-move type as
+//          well, or the resistor list, cut the Ice grunt's main counter from
+//          119 matches to 21 in a real storage.
+//   Box 2: a move in either slot whose type is super-effective against at
+//          least half of slots 2 and 3 and resisted by none of them, plus the
+//          types that hit a slot-2/3 tank hardest when nobody resists those.
+//          Defence is the full check: resists everything slots 2 and 3 can
+//          throw (or is a top attacker) and is weak to none of it.
 
 // ── Type chart ─────────────────────────────────────────────────────────────
 
 // The type chart helpers live in scripts/lib/rocket-derive.mjs, shared with
 // the lineup derivation.
-import { effVsPokemon } from "./rocket-derive.mjs";
-
-// Move types that hit a Pokémon of these types super-effectively, sorted.
-export function seTypesAgainst(pokemonTypes, allTypeNames, typeIdx) {
-  const types = (pokemonTypes || []).map(t => t.toLowerCase());
-  return allTypeNames.filter(t => effVsPokemon(t, types, typeIdx) > 1).sort();
-}
+import { effVsPokemon, resistorsFor } from "./rocket-derive.mjs";
 
 // Only the move types at the highest multiplier against these types: Ice
 // alone on Dragonite (4×), Fighting/Steel on Aurorus (4×; Ground is only
@@ -41,11 +55,7 @@ export function bestTypesAgainst(pokemonTypes, allTypeNames, typeIdx) {
   return scored.filter(([, e]) => e === top).map(([t]) => t).sort();
 }
 
-// ── Counter windows ────────────────────────────────────────────────────────
-
-// Two windows is the most a two-counter team can use. A lineup that needs more
-// gets the best two plus an explicit `uncovered` list, never a third window.
-export const MAX_WINDOWS = 2;
+// ── Covering a set of Pokémon with move types ──────────────────────────────
 
 // Distinct species of a lineup, first appearance wins. A species offered in two
 // slots (Froslass, Wobbuffet) is still one element to cover.
@@ -61,7 +71,7 @@ export function distinctSpecies(pokemons) {
   return [...seen.values()];
 }
 
-// The counter plan for one lineup:
+// The move-type cover of a group of Pokémon (Box 1 uses it on slot 1):
 //   { windows: [{ types, covers }], uncovered }
 // Every move type in a window is super-effective against every species that
 // window `covers`, so any counter carrying those moves handles that whole
@@ -146,7 +156,9 @@ function better(score, key, best) {
 // (damage ∝ attack / defence, and it has to chew through stamina), so it is
 // the level-independent bulk ranking. Measured 2026-10-07 over 1,024 species:
 // Snorlax sits at 1.2 %, Wobbuffet at 11.8 %, while Seel (63 %) is not bulky at
-// all — its problem was move coverage, which the windows above solve.
+// all: its problem was move coverage, which Box 1's slot-1 rule solves.
+// On typed grunts a tank only steers Box 2's move types; generic grunts mark
+// their tanks in the counter hints.
 export const TANK_TOP_FRACTION = 1 / 8;
 
 // Regional prefixes ScrapedDuck puts on lineup names → the game master's form
@@ -204,4 +216,55 @@ export function tanksOf(pokemons, bulkBySpecies, cutoff, allTypeNames, typeIdx) 
     .filter(s => (bulkBySpecies[s.name] ?? -1) >= cutoff)
     .map(s => ({ name: s.name, types: s.types, seMoveTypes: bestTypesAgainst(s.types, allTypeNames, typeIdx) }))
     .filter(t => t.seMoveTypes.length > 0);
+}
+
+// ── Typed grunt boxes ──────────────────────────────────────────────────────
+
+const lower = (pokemons) => (pokemons || []).map(p => ({ name: p.name, types: (p.types || []).map(t => t.toLowerCase()) }));
+
+// The lineup's main type: types carried by at least half of the entries
+// (counted per entry, so a species offered in two slots counts twice). On a
+// typed grunt that is the grunt's own type; the Steel grunt also has Rock.
+export function mainTypesOf(pokemons) {
+  const list = lower(pokemons);
+  const counts = new Map();
+  for (const p of list) for (const t of new Set(p.types)) counts.set(t, (counts.get(t) || 0) + 1);
+  return [...counts].filter(([, n]) => n * 2 >= list.length).map(([t]) => t).sort();
+}
+
+// Both boxes of a typed grunt from its phases ([{ slot, pokemons }], slot 1
+// first) and its tanks (tanksOf). See the header for why each rule is what
+// it is.
+//   main:   { versions: [{ fastTypes, leads }], uncoveredLeads, guardTypes }
+//   backup: { targets, moveTypes, resistorTypes, guardTypes }
+// A backup with no move types (nothing is unresisted by slots 2 and 3) has an
+// empty `moveTypes`; the app then shows no backup box.
+export function typedGruntBoxes(phases, tanks, allTypeNames, typeIdx) {
+  const [slot1 = [], slot2 = [], slot3 = []] = (phases || []).map(p => lower(p.pokemons));
+  const late = [...slot2, ...slot3];
+  const lateSpecies = distinctSpecies(late);
+
+  const leads = counterPlan(slot1, allTypeNames, typeIdx);
+  const main = {
+    versions: leads.windows.map(w => ({ fastTypes: w.types, leads: w.covers })),
+    uncoveredLeads: leads.uncovered,
+    guardTypes: mainTypesOf(late),
+  };
+
+  const resisted = (t) => lateSpecies.some(s => effVsPokemon(t, s.types, typeIdx) < 1);
+  const seCount = (t) => late.filter(p => effVsPokemon(t, p.types, typeIdx) > 1).length;
+  const lateNames = new Set(lateSpecies.map(s => s.name));
+  const tankTypes = (tanks || []).filter(k => lateNames.has(k.name)).flatMap(k => k.seMoveTypes || []);
+  const moveTypes = [...new Set([
+    ...allTypeNames.filter(t => seCount(t) > 0 && seCount(t) * 2 >= late.length),
+    ...tankTypes,
+  ])].filter(t => !resisted(t)).sort();
+  const guardTypes = [...new Set(lateSpecies.flatMap(s => s.types))].sort();
+  const backup = {
+    targets: lateSpecies.map(s => s.name),
+    moveTypes,
+    resistorTypes: guardTypes.length ? resistorsFor(guardTypes, allTypeNames, typeIdx) : [],
+    guardTypes,
+  };
+  return { main, backup };
 }

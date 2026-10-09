@@ -1,10 +1,10 @@
-// Offline checks for scripts/lib/rocket-cover.mjs — the Rocket counter plan
-// (set cover of a grunt lineup by move type) and the tank flags.
+// Offline checks for scripts/lib/rocket-cover.mjs: the move-type cover, the
+// tank flags and the typed-grunt boxes (main counter and backup).
 // Run with: npx vite-node scripts/check-rocket-cover.mjs
 //
-// A toy type chart keeps every case hand-checkable and independent of the
-// lily-dex-api fetch. The real snapshot's invariants live in
-// check-data-filters.mjs (D10).
+// A toy type chart keeps C1–C6 hand-checkable; C7 pins real lineups against
+// the lily-dex-api chart snapshotted in scripts/__fixtures__. The live
+// snapshot's invariants live in check-data-filters.mjs (D10).
 //
 // Covers:
 //   C1 — one window when a single move type covers the lineup
@@ -13,10 +13,19 @@
 //   C3 — more than two needed: the best two by slot exposure, the rest listed
 //   C4 — windows and `uncovered` partition the distinct lineup
 //   C5 — tanks: top-fraction cutoff, regional forms, best-multiplier move types
+//   C6 — typed-grunt boxes on the toy chart: main type threshold, the backup
+//        drops resisted types, a tank's best type joins only when unresisted
+//   C7 — typed-grunt boxes for real lineups: Water ♀ (the Swampert case),
+//        Ice ♀ (the Seel case), Normal ♂ (split main counter), Psycho (tank)
 
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { indexTypes } from "./lib/rocket-derive.mjs";
 import {
   counterPlan,
+  mainTypesOf,
+  typedGruntBoxes,
   distinctSpecies,
   bestTypesAgainst,
   bulkTable,
@@ -124,6 +133,91 @@ console.log("\nC5 — tanks");
   check("tanks are the species at or above the cutoff", tanks.map((t) => t.name).join() === "Eight,Alolan Three");
   check("each tank carries its best move types", tanks.find((t) => t.name === "Alolan Three")?.seMoveTypes.join() === "x");
   check("no cutoff → no tanks", tanksOf([mon("Eight", "e")], bulk, null, TYPES, CHART).length === 0);
+}
+
+// Phases in the shape the fetcher stores: [{ slot, pokemons }], slot 1 first.
+const phases = (...slots) => slots.map((pokemons, i) => ({ slot: i + 1, pokemons }));
+
+console.log("\nC6 — typed-grunt boxes on the toy chart");
+{
+  check("main type: carried by at least half of the entries",
+    mainTypesOf([mon("P", "a"), mon("Q", "a", "b"), mon("R", "c"), mon("S", "a")]).join() === "a");
+  check("main type: a tie at exactly half counts", mainTypesOf([mon("P", "a"), mon("Q", "b")]).join() === "a,b");
+
+  // Slot 1 is all type a (x hits it); slots 2/3 are a, c, b and a, so a is
+  // the main type. y is SE on c and b (half of them), x on a and c but halved
+  // by b, so the backup keeps y and drops x.
+  const { main, backup } = typedGruntBoxes(
+    phases([mon("A1", "a")], [mon("A2", "a"), mon("C2", "c")], [mon("B3", "b"), mon("A3", "a")]),
+    [], TYPES, CHART,
+  );
+  check("main counter: one version with the fast type that hits every lead",
+    main.versions.length === 1 && main.versions[0].fastTypes.join() === "x");
+  check("main counter guards against the main type of slots 2/3", main.guardTypes.join() === "a");
+  check("backup targets every slot 2/3 option", backup.targets.join() === "A2,C2,B3,A3");
+  check("backup drops a type resisted by any slot 2/3 option", !backup.moveTypes.includes("x"));
+  check("backup keeps a type SE on half of slots 2/3 and resisted by none", backup.moveTypes.join() === "y");
+  check("backup guards against every slot 2/3 type", backup.guardTypes.join() === "a,b,c");
+
+  // A tank in slot 3 whose best type (w, on e) nobody else resists joins the
+  // backup; the same tank next to a d (immune to x) cannot pull x in.
+  const tankE = { name: "E3", types: ["e"], seMoveTypes: bestTypesAgainst(["e"], TYPES, CHART) };
+  const withTank = typedGruntBoxes(phases([mon("A1", "a")], [mon("A2", "a")], [mon("E3", "e")]), [tankE], TYPES, CHART);
+  check("a tank's unresisted best type joins the backup", withTank.backup.moveTypes.includes("w"));
+  const walled = typedGruntBoxes(phases([mon("A1", "a")], [mon("D2", "d")], [mon("E3", "e")]), [tankE], TYPES, CHART);
+  check("a tank's best type stays out when slots 2/3 resist it", !walled.backup.moveTypes.includes("x"));
+}
+
+console.log("\nC7 — typed-grunt boxes for real lineups (lily-dex chart snapshot)");
+{
+  const here = dirname(fileURLToPath(import.meta.url));
+  const LILY = indexTypes(JSON.parse(readFileSync(resolve(here, "__fixtures__/lily-dex-types.json"), "utf8")));
+  const ALL = Object.keys(LILY);
+  const tank = (name, ...types) => ({ name, types, seMoveTypes: bestTypesAgainst(types, ALL, LILY) });
+  const boxes = (p, tanks = []) => typedGruntBoxes(p, tanks, ALL, LILY);
+
+  // Swampert's Ground no longer vetoes Electric for the main counter: the
+  // main counter only avoids the lineup's main type (Water).
+  const waterF = boxes(phases(
+    [mon("Mudkip", "water"), mon("Tentacool", "water", "poison"), mon("Krabby", "water")],
+    [mon("Dewpider", "water", "bug"), mon("Swampert", "water", "ground"), mon("Sharpedo", "water", "dark")],
+    [mon("Walrein", "ice", "water"), mon("Greninja", "water", "dark"), mon("Tentacruel", "water", "poison")],
+  ), [tank("Walrein", "ice", "water")]);
+  check("Water ♀: main counter is Electric, guarded only against Water",
+    waterF.main.versions.map((v) => v.fastTypes.join("/")).join("|") === "electric" && waterF.main.guardTypes.join() === "water");
+  check("Water ♀: backup is Grass (Electric is out, Swampert is immune)", waterF.backup.moveTypes.join() === "grass");
+
+  // Seel is pure Water in slot 1: only Electric hits all three leads.
+  const iceF = boxes(phases(
+    [mon("Seel", "water"), mon("Delibird", "ice", "flying"), mon("Spheal", "ice", "water")],
+    [mon("Sealeo", "ice", "water"), mon("Froslass", "ice", "ghost"), mon("Alolan Ninetales", "ice", "fairy")],
+    [mon("Aurorus", "rock", "ice"), mon("Froslass", "ice", "ghost"), mon("Glalie", "ice")],
+  ), [tank("Aurorus", "rock", "ice")]);
+  check("Ice ♀: main counter is Electric (Seel, Delibird, Spheal)",
+    iceF.main.versions.length === 1 && iceF.main.versions[0].fastTypes.join() === "electric");
+  check("Ice ♀: backup is Fire/Rock/Steel; Aurorus' Fighting stays out (Froslass is immune)",
+    iceF.backup.moveTypes.join() === "fire,rock,steel");
+
+  // No single fast type hits Teddiursa, Hoothoot and Porygon: two versions.
+  const normalM = boxes(phases(
+    [mon("Teddiursa", "normal"), mon("Hoothoot", "normal", "flying"), mon("Porygon", "normal")],
+    [mon("Loudred", "normal"), mon("Stufful", "normal", "fighting"), mon("Starly", "normal", "flying")],
+    [mon("Ursaring", "normal"), mon("Swellow", "normal", "flying"), mon("Kangaskhan", "normal")],
+  ));
+  const versions = normalM.main.versions.map((v) => `${v.fastTypes.join("/")}:${v.leads.join("+")}`);
+  check("Normal ♂: main counter splits into Fighting and Electric/Ice/Rock versions",
+    versions.join("|") === "fighting:Teddiursa+Porygon|electric/ice/rock:Hoothoot", versions.join("|"));
+  check("Normal ♂: every lead is covered", normalM.main.uncoveredLeads.length === 0);
+
+  // Wobbuffet is a tank in slots 1 and 2; its best types (Bug/Dark/Ghost)
+  // reach the backup, and Ghost alone covers every lead.
+  const psychicM = boxes(phases(
+    [mon("Wobbuffet", "psychic"), mon("Ralts", "psychic", "fairy"), mon("Drowzee", "psychic")],
+    [mon("Drowzee", "psychic"), mon("Duosion", "psychic"), mon("Wobbuffet", "psychic")],
+    [mon("Gallade", "psychic", "fighting"), mon("Malamar", "dark", "psychic"), mon("Reuniclus", "psychic")],
+  ), [tank("Wobbuffet", "psychic")]);
+  check("Psycho: main counter is Ghost", psychicM.main.versions.map((v) => v.fastTypes.join()).join("|") === "ghost");
+  check("Psycho: backup is Bug/Dark/Ghost", psychicM.backup.moveTypes.join() === "bug,dark,ghost");
 }
 
 done("All rocket-cover checks passed.", (n) => `${n} rocket-cover check(s) failed.`);

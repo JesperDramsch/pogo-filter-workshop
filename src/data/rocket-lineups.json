@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-09T09:27:05.761Z",
+  "fetchedAt": "2026-10-09T11:16:46.090Z",
   "source": "scrapedduck",
   "bulk": {
     "metric": "baseDefense*baseStamina",
@@ -696,35 +696,60 @@
         "fighting"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "fighting"
-            ],
-            "covers": [
-              "Teddiursa",
-              "Porygon",
-              "Loudred",
-              "Stufful",
-              "Ursaring",
-              "Kangaskhan"
-            ]
-          },
-          {
-            "types": [
-              "electric",
-              "ice",
-              "rock"
-            ],
-            "covers": [
-              "Hoothoot",
-              "Starly",
-              "Swellow"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "fighting"
+              ],
+              "leads": [
+                "Teddiursa",
+                "Porygon"
+              ]
+            },
+            {
+              "fastTypes": [
+                "electric",
+                "ice",
+                "rock"
+              ],
+              "leads": [
+                "Hoothoot"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "normal"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Loudred",
+            "Stufful",
+            "Starly",
+            "Ursaring",
+            "Swellow",
+            "Kangaskhan"
+          ],
+          "moveTypes": [
+            "fighting"
+          ],
+          "resistorTypes": [
+            "flying",
+            "poison",
+            "ghost",
+            "electric",
+            "psychic",
+            "fairy"
+          ],
+          "guardTypes": [
+            "fighting",
+            "flying",
+            "normal"
+          ]
+        }
       },
       "tanks": []
     },
@@ -819,27 +844,56 @@
         "water"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "ground",
-              "water"
-            ],
-            "covers": [
-              "Litwick",
-              "Ponyta",
-              "Torchic",
-              "Magmar",
-              "Blaziken",
-              "Camerupt",
-              "Darmanitan",
-              "Delphox",
-              "Magmortar"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "ground",
+                "rock",
+                "water"
+              ],
+              "leads": [
+                "Litwick",
+                "Ponyta",
+                "Torchic"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "fire"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Magmar",
+            "Blaziken",
+            "Camerupt",
+            "Darmanitan",
+            "Delphox",
+            "Magmortar"
+          ],
+          "moveTypes": [
+            "ground",
+            "rock",
+            "water"
+          ],
+          "resistorTypes": [
+            "flying",
+            "ghost",
+            "water",
+            "psychic",
+            "dragon",
+            "fairy"
+          ],
+          "guardTypes": [
+            "fighting",
+            "fire",
+            "ground",
+            "psychic"
+          ]
+        }
       },
       "tanks": []
     },
@@ -936,33 +990,52 @@
         "grass"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "electric"
-            ],
-            "covers": [
-              "Mudkip",
-              "Tentacool",
-              "Krabby",
-              "Dewpider",
-              "Sharpedo",
-              "Walrein",
-              "Greninja",
-              "Tentacruel"
-            ]
-          },
-          {
-            "types": [
-              "grass"
-            ],
-            "covers": [
-              "Swampert"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "electric"
+              ],
+              "leads": [
+                "Mudkip",
+                "Tentacool",
+                "Krabby"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "water"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Dewpider",
+            "Swampert",
+            "Sharpedo",
+            "Walrein",
+            "Greninja",
+            "Tentacruel"
+          ],
+          "moveTypes": [
+            "grass"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "bug",
+            "water",
+            "ice"
+          ],
+          "guardTypes": [
+            "bug",
+            "dark",
+            "ground",
+            "ice",
+            "poison",
+            "water"
+          ]
+        }
       },
       "tanks": [
         {
@@ -1043,20 +1116,45 @@
         "grass"
       ],
       "lineupSize": 5,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "electric"
-            ],
-            "covers": [
-              "Magikarp",
-              "Feebas",
-              "Gyarados"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "electric",
+                "grass"
+              ],
+              "leads": [
+                "Magikarp",
+                "Feebas"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "water"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Magikarp",
+            "Gyarados"
+          ],
+          "moveTypes": [
+            "electric",
+            "grass"
+          ],
+          "resistorTypes": [
+            "steel",
+            "water",
+            "electric",
+            "dragon"
+          ],
+          "guardTypes": [
+            "flying",
+            "water"
+          ]
+        }
       },
       "tanks": []
     },
@@ -1152,34 +1250,53 @@
         "ground"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "ground"
-            ],
-            "covers": [
-              "Voltorb",
-              "Shinx",
-              "Helioptile",
-              "Electabuzz",
-              "Magnemite",
-              "Alolan Geodude",
-              "Luxray",
-              "Ampharos"
-            ]
-          },
-          {
-            "types": [
-              "fire",
-              "rock"
-            ],
-            "covers": [
-              "Galvantula"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "ground"
+              ],
+              "leads": [
+                "Voltorb",
+                "Shinx",
+                "Helioptile"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "electric"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Electabuzz",
+            "Magnemite",
+            "Alolan Geodude",
+            "Luxray",
+            "Ampharos",
+            "Galvantula"
+          ],
+          "moveTypes": [
+            "ground"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "poison",
+            "ground",
+            "ghost",
+            "steel",
+            "electric",
+            "dragon"
+          ],
+          "guardTypes": [
+            "bug",
+            "electric",
+            "rock",
+            "steel"
+          ]
+        }
       },
       "tanks": []
     },
@@ -1277,26 +1394,57 @@
         "poison"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "ice"
-            ],
-            "covers": [
-              "Phantump",
-              "Fomantis",
-              "Tangela",
-              "Lileep",
-              "Sceptile",
-              "Morelull",
-              "Chesnaught",
-              "Trevenant",
-              "Cradily"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "fire",
+                "flying",
+                "ice"
+              ],
+              "leads": [
+                "Phantump",
+                "Fomantis",
+                "Tangela"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "grass"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Lileep",
+            "Sceptile",
+            "Morelull",
+            "Chesnaught",
+            "Trevenant",
+            "Cradily"
+          ],
+          "moveTypes": [
+            "bug",
+            "fire",
+            "flying",
+            "ice",
+            "poison",
+            "steel"
+          ],
+          "resistorTypes": [
+            "poison",
+            "grass",
+            "fairy"
+          ],
+          "guardTypes": [
+            "fairy",
+            "fighting",
+            "ghost",
+            "grass",
+            "rock"
+          ]
+        }
       },
       "tanks": [
         {
@@ -1407,34 +1555,52 @@
         "steel"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "rock",
-              "steel"
-            ],
-            "covers": [
-              "Delibird",
-              "Froslass",
-              "Alolan Ninetales",
-              "Aurorus",
-              "Glalie"
-            ]
-          },
-          {
-            "types": [
-              "electric",
-              "grass"
-            ],
-            "covers": [
-              "Seel",
-              "Spheal",
-              "Sealeo"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "electric"
+              ],
+              "leads": [
+                "Seel",
+                "Delibird",
+                "Spheal"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "ice"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Sealeo",
+            "Froslass",
+            "Alolan Ninetales",
+            "Aurorus",
+            "Glalie"
+          ],
+          "moveTypes": [
+            "fire",
+            "rock",
+            "steel"
+          ],
+          "resistorTypes": [
+            "normal",
+            "poison",
+            "steel",
+            "water"
+          ],
+          "guardTypes": [
+            "fairy",
+            "ghost",
+            "ice",
+            "rock",
+            "water"
+          ]
+        }
       },
       "tanks": [
         {
@@ -1541,27 +1707,56 @@
         "psychic"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "flying",
-              "psychic"
-            ],
-            "covers": [
-              "Timburr",
-              "Mankey",
-              "Makuhita",
-              "Hitmontop",
-              "Hitmonlee",
-              "Hitmonchan",
-              "Conkeldurr",
-              "Annihilape",
-              "Infernape"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "fairy",
+                "flying",
+                "psychic"
+              ],
+              "leads": [
+                "Timburr",
+                "Mankey",
+                "Makuhita"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "fighting"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Hitmontop",
+            "Hitmonlee",
+            "Hitmonchan",
+            "Conkeldurr",
+            "Annihilape",
+            "Infernape"
+          ],
+          "moveTypes": [
+            "fairy",
+            "flying",
+            "ghost",
+            "psychic"
+          ],
+          "resistorTypes": [
+            "flying",
+            "poison",
+            "fire",
+            "water",
+            "dragon",
+            "fairy"
+          ],
+          "guardTypes": [
+            "fighting",
+            "fire",
+            "ghost"
+          ]
+        }
       },
       "tanks": [
         {
@@ -1672,26 +1867,53 @@
         "psychic"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "psychic"
-            ],
-            "covers": [
-              "Oddish",
-              "Zubat",
-              "Qwilfish",
-              "Galarian Weezing",
-              "Nidorino",
-              "Nidorina",
-              "Weezing",
-              "Toxicroak",
-              "Amoonguss"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "psychic"
+              ],
+              "leads": [
+                "Oddish",
+                "Zubat",
+                "Qwilfish"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "poison"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Galarian Weezing",
+            "Nidorino",
+            "Nidorina",
+            "Weezing",
+            "Toxicroak",
+            "Amoonguss"
+          ],
+          "moveTypes": [
+            "ground",
+            "psychic"
+          ],
+          "resistorTypes": [
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
+            "fire",
+            "psychic"
+          ],
+          "guardTypes": [
+            "fairy",
+            "fighting",
+            "grass",
+            "poison"
+          ]
+        }
       },
       "tanks": []
     },
@@ -1789,25 +2011,54 @@
         "water"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "ice"
-            ],
-            "covers": [
-              "Rhyhorn",
-              "Gligar",
-              "Trapinch",
-              "Claydol",
-              "Vibrava",
-              "Golurk",
-              "Hippowdon",
-              "Flygon"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "ice",
+                "water"
+              ],
+              "leads": [
+                "Rhyhorn",
+                "Gligar",
+                "Trapinch"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "ground"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Gligar",
+            "Claydol",
+            "Vibrava",
+            "Golurk",
+            "Hippowdon",
+            "Flygon"
+          ],
+          "moveTypes": [
+            "grass",
+            "ice",
+            "water"
+          ],
+          "resistorTypes": [
+            "normal",
+            "flying",
+            "dark",
+            "fairy"
+          ],
+          "guardTypes": [
+            "dragon",
+            "flying",
+            "ghost",
+            "ground",
+            "psychic"
+          ]
+        }
       },
       "tanks": [
         {
@@ -1917,34 +2168,55 @@
         "rock"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "ice"
-            ],
-            "covers": [
-              "Taillow",
-              "Rookidee",
-              "Swablu",
-              "Scyther",
-              "Zubat",
-              "Gligar",
-              "Dragonite",
-              "Toucannon"
-            ]
-          },
-          {
-            "types": [
-              "electric",
-              "rock"
-            ],
-            "covers": [
-              "Swanna"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "electric",
+                "ice",
+                "rock"
+              ],
+              "leads": [
+                "Taillow",
+                "Rookidee",
+                "Swablu"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "flying"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Scyther",
+            "Zubat",
+            "Gligar",
+            "Dragonite",
+            "Toucannon",
+            "Swanna"
+          ],
+          "moveTypes": [
+            "ice",
+            "rock"
+          ],
+          "resistorTypes": [
+            "flying",
+            "ghost",
+            "water"
+          ],
+          "guardTypes": [
+            "bug",
+            "dragon",
+            "flying",
+            "ground",
+            "normal",
+            "poison",
+            "water"
+          ]
+        }
       },
       "tanks": [
         {
@@ -2049,32 +2321,50 @@
         "ghost"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "ghost"
-            ],
-            "covers": [
-              "Wobbuffet",
-              "Ralts",
-              "Drowzee",
-              "Duosion",
-              "Gallade",
-              "Reuniclus"
-            ]
-          },
-          {
-            "types": [
-              "bug",
-              "fairy"
-            ],
-            "covers": [
-              "Malamar"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "ghost"
+              ],
+              "leads": [
+                "Wobbuffet",
+                "Ralts",
+                "Drowzee"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "psychic"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Drowzee",
+            "Duosion",
+            "Wobbuffet",
+            "Gallade",
+            "Malamar",
+            "Reuniclus"
+          ],
+          "moveTypes": [
+            "bug",
+            "dark",
+            "ghost"
+          ],
+          "resistorTypes": [
+            "flying",
+            "bug",
+            "fairy"
+          ],
+          "guardTypes": [
+            "dark",
+            "fighting",
+            "psychic"
+          ]
+        }
       },
       "tanks": [
         {
@@ -2187,33 +2477,57 @@
         "rock"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "rock"
-            ],
-            "covers": [
-              "Venonat",
-              "Weedle",
-              "Wimpod",
-              "Pinsir",
-              "Anorith",
-              "Dewpider",
-              "Scolipede",
-              "Vikavolt"
-            ]
-          },
-          {
-            "types": [
-              "fire"
-            ],
-            "covers": [
-              "Scizor"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "flying",
+                "rock"
+              ],
+              "leads": [
+                "Venonat",
+                "Weedle",
+                "Wimpod"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "bug"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Pinsir",
+            "Anorith",
+            "Dewpider",
+            "Scizor",
+            "Scolipede",
+            "Vikavolt"
+          ],
+          "moveTypes": [
+            "fire",
+            "flying",
+            "rock"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "poison",
+            "ghost",
+            "steel",
+            "electric",
+            "dragon"
+          ],
+          "guardTypes": [
+            "bug",
+            "electric",
+            "poison",
+            "rock",
+            "steel",
+            "water"
+          ]
+        }
       },
       "tanks": []
     },
@@ -2311,26 +2625,55 @@
         "water"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "fighting",
-              "ground"
-            ],
-            "covers": [
-              "Onix",
-              "Kabuto",
-              "Cranidos",
-              "Shieldon",
-              "Graveler",
-              "Tyrantrum",
-              "Golem",
-              "Aurorus"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "fighting",
+                "grass",
+                "ground"
+              ],
+              "leads": [
+                "Onix",
+                "Kabuto",
+                "Cranidos"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "rock"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Shieldon",
+            "Graveler",
+            "Cranidos",
+            "Tyrantrum",
+            "Golem",
+            "Aurorus"
+          ],
+          "moveTypes": [
+            "fighting",
+            "grass",
+            "ground",
+            "steel",
+            "water"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "water"
+          ],
+          "guardTypes": [
+            "dragon",
+            "ground",
+            "ice",
+            "rock",
+            "steel"
+          ]
+        }
       },
       "tanks": [
         {
@@ -2438,33 +2781,56 @@
         "ghost"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "dark",
-              "ghost"
-            ],
-            "covers": [
-              "Duskull",
-              "Sandygast",
-              "Yamask",
-              "Dusclops",
-              "Cofagrigus",
-              "Gengar",
-              "Froslass"
-            ]
-          },
-          {
-            "types": [
-              "fairy"
-            ],
-            "covers": [
-              "Sableye"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "dark",
+                "ghost"
+              ],
+              "leads": [
+                "Duskull",
+                "Sandygast",
+                "Yamask"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "ghost"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Dusclops",
+            "Sableye",
+            "Cofagrigus",
+            "Gengar",
+            "Froslass"
+          ],
+          "moveTypes": [
+            "dark",
+            "ghost"
+          ],
+          "resistorTypes": [
+            "normal",
+            "fighting",
+            "poison",
+            "rock",
+            "steel",
+            "fire",
+            "water",
+            "ice",
+            "dark"
+          ],
+          "guardTypes": [
+            "dark",
+            "ghost",
+            "ice",
+            "poison"
+          ]
+        }
       },
       "tanks": []
     },
@@ -2561,28 +2927,52 @@
         "ice"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "dragon",
-              "fairy",
-              "ice"
-            ],
-            "covers": [
-              "Noibat",
-              "Deino",
-              "Axew",
-              "Alolan Exeggutor",
-              "Dragonair",
-              "Gabite",
-              "Dragonite",
-              "Garchomp",
-              "Salamence"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "dragon",
+                "fairy",
+                "ice"
+              ],
+              "leads": [
+                "Noibat",
+                "Deino",
+                "Axew"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "dragon"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Alolan Exeggutor",
+            "Dragonair",
+            "Gabite",
+            "Dragonite",
+            "Garchomp",
+            "Salamence"
+          ],
+          "moveTypes": [
+            "dragon",
+            "fairy",
+            "ice"
+          ],
+          "resistorTypes": [
+            "flying",
+            "fairy"
+          ],
+          "guardTypes": [
+            "dragon",
+            "flying",
+            "grass",
+            "ground"
+          ]
+        }
       },
       "tanks": [
         {
@@ -2693,25 +3083,55 @@
         "fighting"
       ],
       "lineupSize": 8,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "fighting"
-            ],
-            "covers": [
-              "Carvanha",
-              "Poochyena",
-              "Alolan Rattata",
-              "Sneasel",
-              "Houndour",
-              "Absol",
-              "Liepard",
-              "Hydreigon"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "bug",
+                "fairy",
+                "fighting"
+              ],
+              "leads": [
+                "Carvanha",
+                "Poochyena",
+                "Alolan Rattata"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "dark"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Sneasel",
+            "Houndour",
+            "Absol",
+            "Liepard",
+            "Hydreigon"
+          ],
+          "moveTypes": [
+            "bug",
+            "fairy",
+            "fighting"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "rock",
+            "fire",
+            "water",
+            "dark",
+            "fairy"
+          ],
+          "guardTypes": [
+            "dark",
+            "dragon",
+            "fire",
+            "ice"
+          ]
+        }
       },
       "tanks": []
     },
@@ -2812,35 +3232,55 @@
         "ground"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "fire"
-            ],
-            "covers": [
-              "Alolan Sandshrew",
-              "Beldum",
-              "Skarmory",
-              "Metang",
-              "Alolan Sandslash"
-            ]
-          },
-          {
-            "types": [
-              "fighting",
-              "ground",
-              "water"
-            ],
-            "covers": [
-              "Aron",
-              "Lairon",
-              "Aggron",
-              "Probopass"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "ground"
+              ],
+              "leads": [
+                "Alolan Sandshrew",
+                "Aron",
+                "Beldum"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "rock",
+            "steel"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Lairon",
+            "Skarmory",
+            "Metang",
+            "Aggron",
+            "Alolan Sandslash",
+            "Probopass"
+          ],
+          "moveTypes": [
+            "fighting",
+            "fire",
+            "water"
+          ],
+          "resistorTypes": [
+            "steel",
+            "water",
+            "electric",
+            "psychic",
+            "dark"
+          ],
+          "guardTypes": [
+            "flying",
+            "ice",
+            "psychic",
+            "rock",
+            "steel"
+          ]
+        }
       },
       "tanks": [
         {
@@ -2961,24 +3401,53 @@
         "steel"
       ],
       "lineupSize": 9,
-      "counterPlan": {
-        "windows": [
-          {
-            "types": [
-              "steel"
-            ],
-            "covers": [
-              "Ralts",
-              "Snubbull",
-              "Alolan Vulpix",
-              "Galarian Weezing",
-              "Kirlia",
-              "Alolan Ninetales",
-              "Granbull"
-            ]
-          }
-        ],
-        "uncovered": []
+      "boxes": {
+        "main": {
+          "versions": [
+            {
+              "fastTypes": [
+                "steel"
+              ],
+              "leads": [
+                "Ralts",
+                "Snubbull",
+                "Alolan Vulpix"
+              ]
+            }
+          ],
+          "uncoveredLeads": [],
+          "guardTypes": [
+            "fairy"
+          ]
+        },
+        "backup": {
+          "targets": [
+            "Snubbull",
+            "Galarian Weezing",
+            "Kirlia",
+            "Alolan Ninetales",
+            "Granbull"
+          ],
+          "moveTypes": [
+            "poison",
+            "steel"
+          ],
+          "resistorTypes": [
+            "rock",
+            "ghost",
+            "steel",
+            "fire",
+            "water",
+            "psychic",
+            "ice"
+          ],
+          "guardTypes": [
+            "fairy",
+            "ice",
+            "poison",
+            "psychic"
+          ]
+        }
       },
       "tanks": []
     },

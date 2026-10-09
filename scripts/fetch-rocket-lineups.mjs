@@ -9,8 +9,8 @@
 //   * typed_grunt    — 18 type-themed grunts. Resistor selection considers
 //                      the full union of lineup types (so a ground
 //                      secondary like Swinub knocks steel out of the
-//                      defender list). Their counters come from a
-//                      `counterPlan` (see below), not from `seMoveTypes`.
+//                      defender list). Their counters come from `boxes`
+//                      (see below), not from `seMoveTypes`.
 //   * generic_grunt  — Male/Female/Decoy. Lineups too varied for a clean
 //                      universal resistor, so an unthemed lineup gets
 //                      `counters`: one group per phase, one per typing that
@@ -25,16 +25,15 @@
 // The derivation lives in scripts/lib/rocket-derive.mjs (pure, pinned by
 // scripts/check-rocket-counters.mjs); this file does the I/O.
 //
-// Typed grunts then get a `counterPlan` and their `tanks`
-// (scripts/lib/rocket-cover.mjs, pinned by scripts/check-rocket-cover.mjs).
-// The plan is an exhaustive set cover of the distinct lineup by move type:
-// one window when a single move type is super-effective against everyone,
-// else the best split into two windows (buddy lead plus two counters), else
-// the best two plus the species nothing reaches. Tanks are lineup species
-// whose base Defence × Stamina is in the top eighth of all species, read from
-// the game master through scripts/lib/game-master.mjs; each gets its own
-// hard-hitter filter in the app. Generic grunts keep their per-phase
-// `counters`; their `tanks` only mark species as tanky in the UI. The
+// Typed grunts then get `boxes` (scripts/lib/rocket-cover.mjs, pinned by
+// scripts/check-rocket-cover.mjs): Box 1, the main counter, carries a fast
+// move super-effective against every possible slot-1 Pokémon; Box 2, the
+// backup, covers slots 2 and 3. The header of rocket-cover.mjs explains the
+// battle each rule is built for. Every grunt also gets its `tanks`: lineup
+// species whose base Defence × Stamina is in the top eighth of all species,
+// read from the game master through scripts/lib/game-master.mjs. On typed
+// grunts a tank steers Box 2's move types; generic grunts keep their
+// per-phase `counters` and only mark tanks as tanky in the UI. The
 // per-species bulk figures and the cutoff are stored at the top level
 // (`bulk`) so a game-master outage can reuse them instead of dropping tanks.
 //
@@ -65,7 +64,7 @@ import {
 } from "./lib/rocket-takeover.mjs";
 import { indexTypes, deriveTrainer } from "./lib/rocket-derive.mjs";
 import {
-  counterPlan,
+  typedGruntBoxes,
   bulkTable,
   bulkOf,
   enNameIndex,
@@ -136,16 +135,15 @@ async function lineupBulk(trainers, prev) {
   }
 }
 
-// counterPlan on typed grunts, tanks on every grunt. Runs on the FINAL
+// Boxes on typed grunts, tanks on every grunt. Runs on the FINAL
 // trainer list (after the LeekDuck pin decision), so it never feeds the pin
 // digest.
 function annotateGrunts(trainers, bulk, allTypeNames, typeIdx) {
   return trainers.map(t => {
     if (!isGrunt(t)) return t;
-    const lineup = lineupOf(t);
-    const tanks = tanksOf(lineup, bulk.species, bulk.cutoff, allTypeNames, typeIdx);
+    const tanks = tanksOf(lineupOf(t), bulk.species, bulk.cutoff, allTypeNames, typeIdx);
     if (t.kind === "generic_grunt") return { ...t, tanks };
-    return { ...t, counterPlan: counterPlan(lineup, allTypeNames, typeIdx), tanks };
+    return { ...t, boxes: typedGruntBoxes(t.phases, tanks, allTypeNames, typeIdx), tanks };
   });
 }
 
@@ -297,9 +295,10 @@ async function main() {
   console.log(`✓ wrote ${OUT_PATH} (source: ${source})`);
   console.log(`  trainers: ${trainers.length} total — ${counts.leader || 0} leaders, ${counts.typed_grunt || 0} typed grunts, ${counts.generic_grunt || 0} generic`);
   for (const t of trainers.filter(isGrunt)) {
-    const plan = t.counterPlan
-      ? t.counterPlan.windows.map(w => w.types.join("/")).join(" + ") +
-        (t.counterPlan.uncovered.length ? `, uncovered: ${t.counterPlan.uncovered.join(", ")}` : "")
+    const plan = t.boxes
+      ? `main ${t.boxes.main.versions.map(v => v.fastTypes.join("/")).join(" | ")}` +
+        (t.boxes.main.uncoveredLeads.length ? ` (no fast type for ${t.boxes.main.uncoveredLeads.join(", ")})` : "") +
+        `, backup ${t.boxes.backup.moveTypes.join("/") || "none"}`
       : "per-phase counters";
     const tanks = t.tanks.length ? `, tanks: ${t.tanks.map(k => k.name).join(", ")}` : "";
     console.log(`    ${t.name}: ${plan}${tanks}`);
