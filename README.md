@@ -2,6 +2,8 @@
 
 Pokémon GO Suchstring-Generator. Hundo-aware Trash & Trade filters, regional map (KMZ-driven), Tausch-Buddies.
 
+Live: https://pogo.amplt.de/
+
 ## Quickstart
 
 ```bash
