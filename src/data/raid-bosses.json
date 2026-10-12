@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-08T14:54:13.268Z",
+  "fetchedAt": "2026-10-12T16:58:45.243Z",
   "raids": {
     "mega": [
       {
@@ -143,27 +143,104 @@
     ],
     "lvl1": [
       {
-        "id": "PIKACHU",
+        "id": "CLEFAIRY",
         "names": {
-          "en": "Pikachu",
-          "de": "Pikachu",
-          "fr": "Pikachu",
-          "it": "Pikachu",
-          "ja": "ピカチュウ",
-          "ko": "피카츄",
-          "es": "Pikachu"
+          "en": "Clefairy",
+          "de": "Piepi",
+          "fr": "Mélofée",
+          "it": "Clefairy",
+          "ja": "ピッピ",
+          "ko": "삐삐",
+          "es": "Clefairy"
         },
         "types": [
-          "electric"
+          "fairy"
         ],
         "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
-          "dragon"
+          "poison",
+          "steel",
+          "fire"
         ],
         "seMoveTypes": [
-          "ground"
+          "poison",
+          "steel"
+        ]
+      },
+      {
+        "id": "TEDDIURSA",
+        "names": {
+          "en": "Teddiursa",
+          "de": "Teddiursa",
+          "fr": "Teddiursa",
+          "it": "Teddiursa",
+          "ja": "ヒメグマ",
+          "ko": "깜지곰",
+          "es": "Teddiursa"
+        },
+        "types": [
+          "normal"
+        ],
+        "resistorTypes": [
+          "rock",
+          "ghost",
+          "steel"
+        ],
+        "seMoveTypes": [
+          "fighting"
+        ]
+      },
+      {
+        "id": "ELGYEM",
+        "names": {
+          "en": "Elgyem",
+          "de": "Pygraulon",
+          "fr": "Lewsor",
+          "it": "Elgyem",
+          "ja": "リグレー",
+          "ko": "리그레",
+          "es": "Elgyem"
+        },
+        "types": [
+          "psychic"
+        ],
+        "resistorTypes": [
+          "steel",
+          "psychic",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "bug",
+          "dark",
+          "ghost"
+        ]
+      },
+      {
+        "id": "AMAURA",
+        "names": {
+          "en": "Amaura",
+          "de": "Amarino",
+          "fr": "Amagara",
+          "it": "Amaura",
+          "ja": "アマルス",
+          "ko": "아마루스",
+          "es": "Amaura"
+        },
+        "types": [
+          "rock",
+          "ice"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "steel",
+          "water"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "steel",
+          "grass",
+          "ground",
+          "rock",
+          "water"
         ]
       }
     ],
