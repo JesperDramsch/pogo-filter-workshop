@@ -1075,11 +1075,16 @@ async function main() {
   assertOrDie(new Set(shadowKeepers).size === shadowKeepers.length, "shadowKeepers has duplicates");
 
   // Dynamax eligibility, against species whose Max forms are well known. The
-  // negative check is the one that matters: it is what caught the old
-  // hand-maintained seed listing Zacian and the legendary birds.
+  // positive half is asserted against the parsed flags, not against
+  // topMaxAttackers: that list is a top-N cut, and a well-known Dynamax species
+  // can be pushed out of it when a stronger one gains a Max form (Blastoise fell
+  // to 7th in Water when Palkia did). The negative half is the one that
+  // matters: it is what caught the old hand-maintained seed listing Zacian and
+  // the legendary birds.
   const tma = new Set(topMaxAttackers);
-  for (const n of ["charizard", "gengar", "machamp", "blastoise", "venusaur", "cinderace"]) {
-    assertOrDie(tma.has(n), `${n} ∈ topMaxAttackers`);
+  for (const [dex, n] of [[6, "charizard"], [94, "gengar"], [68, "machamp"],
+                          [9, "blastoise"], [3, "venusaur"], [815, "cinderace"]]) {
+    assertOrDie(dynamax.has(dex), `${n} (dex ${dex}) has no BREAD_MODE breadOverride`);
   }
   for (const n of ["zacian", "mewtwo", "rayquaza", "groudon"]) {
     assertOrDie(!tma.has(n), `${n} ∉ topMaxAttackers (no breadOverrides)`);
