@@ -1,9 +1,9 @@
 {
-  "fetchedAt": "2026-10-10T14:43:32.060Z",
-  "gameMasterTimestamp": "1791542216859",
+  "fetchedAt": "2026-10-12T10:15:19.859Z",
+  "gameMasterTimestamp": "1791665208383",
   "sources": {
     "mechanics": "alexelgt/game_masters",
-    "mechanicsBatch": "2026-10-09T10:36:56.859Z",
+    "mechanicsBatch": "2026-10-10T20:46:48.383Z",
     "roster": "pvpoke/pvpoke",
     "rosterBatch": "2026-10-10 00:17:18"
   },
@@ -235,9 +235,11 @@
     "landorus": "legendary"
   },
   "topMaxAttackers": [
+    "palkia",
     "metagross",
     "zapdos",
     "moltres",
+    "dialga",
     "articuno",
     "cinderace",
     "gigalith",
@@ -287,7 +289,6 @@
     "raichu",
     "sylveon",
     "starmie",
-    "blastoise",
     "kabutops",
     "hitmonlee",
     "walrein",
@@ -304,7 +305,6 @@
     "registeel",
     "vespiquen",
     "dubwool",
-    "meowth",
     "sableye"
   ],
   "gigantamaxSpecies": [
@@ -325,6 +325,7 @@
     "inteleon",
     "toxtricity",
     "grimmsnarl",
+    "duraludon",
     "urshifu"
   ],
   "perType": {
