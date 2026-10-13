@@ -8737,6 +8737,17 @@ function bossCounterBox(boss, { keyPrefix, eventID, accent, copied, copyToClipbo
 	);
 }
 
+// The events a panel still shows. The snapshot refreshes once a day, and the
+// scheduled sync starts hours late, so an event can end long before the next
+// sync drops it: a Max Monday that closed at 21:00 would otherwise read
+// "starts 06:00" until the next run. Event times are local game time, which is
+// how Date.parse reads an ISO string without an offset. An unparsable end
+// keeps the event, as before.
+function liveEventGroups(eventGroups) {
+	const now = Date.now();
+	return (eventGroups || []).filter((event) => !(Date.parse(event.end) < now));
+}
+
 // Short-window events as accordion rows, one per event: a running event opens
 // highlighted, an upcoming one collapses with a window teaser. The raid panel
 // renders its event raids with this, the Max Battle panel its Max Mondays and
@@ -8785,7 +8796,8 @@ function BossCollapsible({
 	locale,
 }) {
 	const tierBosses = tierOrder.flatMap((tier) => bossesByTier?.[tier] || []);
-	const eventBosses = (eventGroups || []).flatMap((g) => g.bosses || []);
+	const events = liveEventGroups(eventGroups);
+	const eventBosses = events.flatMap((g) => g.bosses || []);
 	const totalBosses = tierBosses.length + eventBosses.length;
 	const age = formatSyncAge(fetchedAt, t);
 	const headerLabel = t(titleKey);
@@ -8802,7 +8814,7 @@ function BossCollapsible({
 	}
 	const renderBossBox = (boss, eventID) =>
 		bossCounterBox(boss, { keyPrefix, eventID, accent, copied, copyToClipboard, t });
-	const hasEvents = (eventGroups || []).length > 0;
+	const hasEvents = events.length > 0;
 	return (
 		<Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
 			<div className='space-y-5'>
@@ -8812,7 +8824,7 @@ function BossCollapsible({
 						<h4 className='mono text-xs uppercase tracking-wide text-[#8090A0]'>
 							{t('app.collapsible.aux_event_raids_heading')}
 						</h4>
-						{eventBossGroups(eventGroups, { accent, t, locale, renderBoss: renderBossBox })}
+						{eventBossGroups(events, { accent, t, locale, renderBoss: renderBossBox })}
 					</div>
 				)}
 				{tierOrder.map((tier) => {
@@ -9025,7 +9037,8 @@ function MaxBattleCollapsible({
 	locale,
 }) {
 	const tierBosses = tierOrder.flatMap((tier) => bossesByTier?.[tier] || []);
-	const eventBosses = (eventGroups || []).flatMap((g) => g.bosses || []);
+	const events = liveEventGroups(eventGroups);
+	const eventBosses = events.flatMap((g) => g.bosses || []);
 	const totalBosses = tierBosses.length + eventBosses.length;
 	const hasCharger = !!maxTank?.clause;
 	const filterCount = totalBosses + (hasCharger ? 1 : 0);
@@ -9068,7 +9081,13 @@ function MaxBattleCollapsible({
 						<h4 className='mono text-xs uppercase tracking-wide text-[#8090A0]'>
 							{t('app.collapsible.aux_max_attacker')}
 						</h4>
-						{eventBossGroups(eventGroups || [], { accent, t, locale, renderBoss: renderBossBox })}
+						{/* Its own block, spaced as the raid panel spaces its event raids,
+						    so the dated rows stay grouped once standing tiers return. */}
+						{events.length > 0 && (
+							<div className='space-y-3'>
+								{eventBossGroups(events, { accent, t, locale, renderBoss: renderBossBox })}
+							</div>
+						)}
 						{tierOrder.map((tier) => {
 							const list = bossesByTier?.[tier];
 							if (!list || list.length === 0) return null;
