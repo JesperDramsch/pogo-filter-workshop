@@ -15,7 +15,7 @@
 // would be a second thing to keep in sync, which is the bug this file exists to
 // remove. That is also why this runs under vite-node rather than plain node.
 //
-// Run: npm run generate-pvp-meta-reference   (wired into the PvP sync workflow)
+// Run: npm run generate-pvp-meta-reference   (wired into .github/workflows/sync-data.yml)
 
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
