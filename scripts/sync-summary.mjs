@@ -151,8 +151,8 @@ export function md(value, max = 120) {
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const pad = (n) => String(n).padStart(2, "0");
-const monthDay = (iso) => String(iso ?? "").slice(5, 10) || "?";
-const dateOnly = (iso) => String(iso ?? "").slice(0, 10) || "?";
+const monthDay = (iso) => md(String(iso ?? "").slice(5, 10), 10) || "?";
+const dateOnly = (iso) => md(String(iso ?? "").slice(0, 10), 10) || "?";
 
 // "2026-10-13 01:07:13" and "2026-10-13T01:07:13.000Z" both read "10-13 01:07".
 function stampValue(v) {

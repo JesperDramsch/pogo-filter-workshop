@@ -320,6 +320,10 @@ console.log("\nY4: the layer-B renderers");
   checkQuiet("raid tier swap with the snapshot's own names", raids.includes("- zz\\_tier: +Newmon · −Oldmon"), raids.join(" / "));
   checkQuiet("new event raid", raids.includes("- event raids: +Newmon in 5-star Raid Battles (10-14 → 10-20)"), raids.join(" / "));
   check("untouched tiers are not listed", raids.length === 2, String(raids.length));
+  const oddDate = structuredClone(rHead);
+  oddDate.eventRaids.at(-1).start = "2099-**|<>xyz";
+  checkQuiet("a date slice is escaped like any upstream text",
+    renderRaids(rBase, oddDate).lines.includes("- event raids: +Newmon in 5-star Raid Battles (\\*\\*\\|\\<\\> → 10-20)"), renderRaids(rBase, oddDate).lines.join(" / "));
 
   const watch = renderWatch(watchDoc, watchWithHistory).lines;
   check("one line per new history entry", watch.length === 2, String(watch.length));
