@@ -124,7 +124,7 @@ jobs:
         continue-on-error: true
         timeout-minutes: 2
         run: npm run fetch-rocket-lineups
-      - name: Fetch Team Rocket grunt quotes from PokeMiners
+      - name: Fetch Team Rocket grunt quotes from holoholo-text
         id: rocket-quotes
         if: env.SYNC_ALL == 'true' || inputs.rocket-quotes
         continue-on-error: true
@@ -209,50 +209,29 @@ jobs:
           private-key: ${{ secrets.APP_SECRET }}
           permission-contents: write
       - name: Commit + push if anything changed
+        id: commit
         env:
           APP_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Name the upstream the PvP snapshot actually came from. The fetcher
-          # falls back to lily-dex whenever PvPoke is unreachable, and that
-          # snapshot is materially different (no speciesId, score or forms, so
-          # the reference's "Ranked form" and "Score" columns collapse to "—").
-          # The git log is the provenance trail CLAUDE.md points at.
-          PVP_SOURCE=$(node -p "require('./src/data/pvp-rankings.json').source")
-          REF=skills/pokemon-go-filters/references
-
-          # track <scope> <what moved> <path>...
-          # One body line per snapshot that moved, so the commit still names
-          # every source, and the game-master line still names the move-stat
-          # watch, whose diff (`history[0].changes`) IS the notification.
-          paths=(); scopes=(); body=()
-          track() {
-            local scope=$1 what=$2; shift 2
-            git diff --quiet -- "$@" && return 0
-            paths+=("$@")
-            body+=("- ${scope}: ${what}")
-            [[ " ${scopes[*]} " == *" ${scope} "* ]] || scopes+=("$scope")
-          }
-          track raids        "boss snapshot from lily-dex-api"                       src/data/raid-bosses.json
-          track rocket       "lineup snapshot"                                       src/data/rocket-lineups.json
-          track rocket       "grunt quotes from PokeMiners"                          src/data/rocket-grunt-quotes.json
-          track pvp          "ranking snapshot from ${PVP_SOURCE}"                   src/data/pvp-rankings.json
-          track meta         "raid-attacker + shadow-keeper rankings from the game master" src/data/meta-rankings.json
-          track species-meta "special-trade/starter/power-line/mega pools"           src/data/species-meta.json
-          track events       "wildspawn snapshot from leak-duck"                     src/data/events.json
-          track forms        "regional-form catalog from the game master"            src/data/regional-forms.json
-          track game-master  "move stats"                                            src/data/game-master-watch.json
-          track reference    "regenerated PvP meta reference"                        "$REF/META.md" "$REF/pvp-meta.json"
-
+          # One body line per part that moved, so the commit still names every
+          # source. Only parts whose content changed reach the subject; a part
+          # where nothing but an upstream batch stamp moved is still committed
+          # (check-meta-rankings needs the roster stamp to advance) and reads
+          # "- <scope>: provenance only (<stamp>)". The game-master line names
+          # each new history entry, which IS the rebalance notification. The
+          # parts, their files and their wording are the PARTS table in
+          # scripts/sync-summary.mjs, which the job summary reads too.
+          npx vite-node scripts/sync-summary.mjs classify --base HEAD --out "$RUNNER_TEMP/sync"
+          mapfile -t paths < "$RUNNER_TEMP/sync/commit-paths.txt"
           if [ ${#paths[@]} -eq 0 ]; then
             echo "No snapshot changes — skipping commit."
             exit 0
           fi
-          subject="chore(data): sync $(printf '%s, ' "${scopes[@]}" | sed 's/, $//')"
           git add -- "${paths[@]}"
-          git commit -m "$subject" -m "$(printf '%s\n' "${body[@]}")"
+          git commit -F "$RUNNER_TEMP/sync/commit-message.txt"
           git log -1 --stat
 
           # main can move while the fetches run. The commit only touches
@@ -268,6 +247,8 @@ jobs:
             git pull --rebase origin "$GITHUB_REF_NAME" &&
               git push "$remote" "HEAD:$GITHUB_REF_NAME"
           }
+          # After the push: a rebase gives the commit a new sha.
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Fail if any fetch failed
         if: ${{ !cancelled() }}
