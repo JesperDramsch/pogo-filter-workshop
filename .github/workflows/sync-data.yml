@@ -4,7 +4,9 @@ name: Sync data
 # spinning up its own runner, checkout and `npm ci` to run a fetch of a few
 # seconds, and each data commit pushed separately, so Tests, CodeQL and Deploy
 # ran once per snapshot that moved. Here the snapshots that moved go out as one
-# commit and one push.
+# commit and one push. Two small jobs sit beside it: the push itself runs on a
+# runner of its own, and translations open a PR rather than pushing (see the
+# bottom).
 #
 # The fetches run one after another on purpose. Six of them read the same
 # 19 MB game master, and scripts/lib/game-master.mjs caches it on disk keyed by
@@ -51,9 +53,11 @@ on:
         description: Translations (opens a PR)
         type: boolean
 
+# Read-only unless a job says otherwise. The sync job pushes with the app
+# token, not github.token, so it needs nothing more; only the translations
+# job writes, and only to open its PR.
 permissions:
-  contents: write
-  pull-requests: write # the translations PR
+  contents: read
 
 # A manual dispatch must not race the scheduled run to the same push.
 concurrency:
@@ -62,45 +66,82 @@ concurrency:
 
 jobs:
   sync:
+    # Everything except a manual run that ticked translations and nothing
+    # else, which is the translations job's alone.
+    if: github.event_name != 'workflow_dispatch' || !inputs.translations || inputs.raids || inputs.rocket-lineups || inputs.rocket-quotes || inputs.pvp || inputs.meta || inputs.species-meta || inputs.events || inputs.regional-forms || inputs.game-master-watch
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    # For the push job: the commit it applies its bundle on, and whether there
+    # is a bundle at all.
+    outputs:
+      base: ${{ steps.base.outputs.sha }}
+      changed: ${{ steps.local-commit.outputs.changed }}
     env:
       # Scheduled runs, and a manual run with nothing ticked, sync everything.
-      SYNC_ALL: ${{ github.event_name != 'workflow_dispatch' || !(inputs.raids || inputs.rocket-lineups || inputs.rocket-quotes || inputs.pvp || inputs.meta || inputs.species-meta || inputs.events || inputs.regional-forms || inputs.game-master-watch || inputs.translations) }}
+      SYNC_ALL: ${{ github.event_name != 'workflow_dispatch' || !(inputs.raids || inputs.rocket-lineups || inputs.rocket-quotes || inputs.pvp || inputs.meta || inputs.species-meta || inputs.events || inputs.regional-forms || inputs.game-master-watch) }}
     steps:
-      # Push as the Pushologist GitHub App so the commit can bypass the
-      # branch protection on main (GITHUB_TOKEN pushes are rejected there).
-      - name: Mint Pushologist app token
-        id: app-token
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_SECRET }}
+      # No token, and nothing persisted. Checkout writes the token it is given
+      # into the git config, where every later step can read it, and every
+      # step from npm ci to the validation runs code from npm dependencies.
+      # This job never holds the app token at all; only the push job does.
       - uses: actions/checkout@v4
         with:
-          token: ${{ steps.app-token.outputs.token }}
+          persist-credentials: false
+      # The commit the job summary compares every snapshot against, and the
+      # one the push job applies the data commit on. Normally GITHUB_SHA.
+      - name: Record the commit the sync starts from
+        id: base
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: Make a directory for the step logs
+        run: mkdir -p "$RUNNER_TEMP/sync"
 
       # ── Fetch ────────────────────────────────────────────────────────────
       # Every fetch exits 1 on real failure (fetch error, empty or shrunken
-      # upstream, a sanity assertion tripping) and writes nothing when it does,
-      # so one broken upstream must not hold back the others: each step carries
-      # on, and "Fail if any fetch failed" turns the run red at the end. A red
-      # run + GitHub notification is the only intervention the user wants.
+      # upstream, a sanity assertion tripping). Most write nothing when they
+      # do; the raid and Rocket fetchers write their healthy part first, as
+      # their steps note. Either way one broken upstream must not hold back
+      # the others: each step carries on, and the last step turns the run red
+      # at the end. A red run + GitHub notification is the only intervention
+      # the user wants.
+      #
+      # Each fetch is cut off at 2 minutes; a normal one takes about a second,
+      # the first 19 MB game-master download a few. No fetcher sets a request
+      # timeout and Node's fetch waits up to 300 s for headers, so one hung
+      # upstream could otherwise run the job into its own timeout before
+      # "Commit + push", losing every other source's update that day. A step
+      # that times out reports outcome=failure, so the run still names it. The
+      # job allows 9 × 2 minutes plus setup and validation. No retries: the
+      # failures in the run history are deterministic, not transient.
+      #
+      # Each fetch also tees its output to $RUNNER_TEMP/sync/<step id>.log, for
+      # the job summary: its ⚠ lines and a failed step's last ✗ line. `shell:
+      # bash` is what keeps that honest: it adds pipefail, so the step fails
+      # when the fetch does, not only when tee does. The default shell is
+      # `bash -e` without pipefail.
       #
       # Deliberately does NOT regenerate the fixture: the snapshot pins only
       # config-derived filters, and the data-derived ones these feed are covered
       # by property checks in scripts/check-data-filters.mjs. See the split in
       # scripts/lib/fixture.mjs before adding a regeneration step back.
-      - name: Fetch raid + max-battle bosses from lily-dex-api
+      #
+      # A raid or Max Battle family that comes back empty exits non-zero AFTER
+      # writing: that family keeps the previous snapshot's bosses, and the
+      # healthy one and the event lists are committed below. The run goes red
+      # at the end.
+      - name: Fetch raid + Max Battle bosses from lily-dex-api + ScrapedDuck events
         id: raids
         if: env.SYNC_ALL == 'true' || inputs.raids
         continue-on-error: true
-        run: npm run fetch-raid-bosses
+        timeout-minutes: 2
+        shell: bash
+        run: npm run fetch-raid-bosses 2>&1 | tee "$RUNNER_TEMP/sync/raids.log"
       # A failed takeover read exits non-zero AFTER writing the ScrapedDuck
       # snapshot. That snapshot is still committed below; the run goes red at
       # the end.
@@ -108,48 +149,64 @@ jobs:
         id: rocket-lineups
         if: env.SYNC_ALL == 'true' || inputs.rocket-lineups
         continue-on-error: true
-        run: npm run fetch-rocket-lineups
-      - name: Fetch Team Rocket grunt quotes from PokeMiners
+        timeout-minutes: 2
+        shell: bash
+        run: npm run fetch-rocket-lineups 2>&1 | tee "$RUNNER_TEMP/sync/rocket-lineups.log"
+      - name: Fetch Team Rocket grunt quotes from holoholo-text
         id: rocket-quotes
         if: env.SYNC_ALL == 'true' || inputs.rocket-quotes
         continue-on-error: true
-        run: npm run fetch-rocket-grunt-quotes
+        timeout-minutes: 2
+        shell: bash
+        run: npm run fetch-rocket-grunt-quotes 2>&1 | tee "$RUNNER_TEMP/sync/rocket-quotes.log"
       - name: Fetch Great / Ultra / Master + cup rankings from PvPoke (lily-dex fallback)
         id: pvp
         if: env.SYNC_ALL == 'true' || inputs.pvp
         continue-on-error: true
-        run: npm run fetch-pvp-rankings
+        timeout-minutes: 2
+        shell: bash
+        run: npm run fetch-pvp-rankings 2>&1 | tee "$RUNNER_TEMP/sync/pvp.log"
       - name: Derive raid-attacker rankings from the game master (alexelgt, PokeMiners fallback)
         id: meta
         if: env.SYNC_ALL == 'true' || inputs.meta
         continue-on-error: true
-        run: npm run fetch-meta-rankings
+        timeout-minutes: 2
+        shell: bash
+        run: npm run fetch-meta-rankings 2>&1 | tee "$RUNNER_TEMP/sync/meta.log"
       # The friend-collect packs read this snapshot at build time.
       - name: Derive species meta from the game master + PvPoke roster
         id: species-meta
         if: env.SYNC_ALL == 'true' || inputs.species-meta
         continue-on-error: true
-        run: npm run fetch-species-meta
+        timeout-minutes: 2
+        shell: bash
+        run: npm run fetch-species-meta 2>&1 | tee "$RUNNER_TEMP/sync/species-meta.log"
       # Event spawn filters are time-windowed and excluded from the fixture
       # snapshot (like event raids).
       - name: Fetch wild-spawn events from leak-duck
         id: events
         if: env.SYNC_ALL == 'true' || inputs.events
         continue-on-error: true
-        run: npm run fetch-events
+        timeout-minutes: 2
+        shell: bash
+        run: npm run fetch-events 2>&1 | tee "$RUNNER_TEMP/sync/events.log"
       # Self-validates known forms, so a changed upstream shape fails here.
       - name: Derive the regional-form catalog from the game master
         id: regional-forms
         if: env.SYNC_ALL == 'true' || inputs.regional-forms
         continue-on-error: true
-        run: npm run fetch-regional-forms
+        timeout-minutes: 2
+        shell: bash
+        run: npm run fetch-regional-forms 2>&1 | tee "$RUNNER_TEMP/sync/regional-forms.log"
       # After the PvP fetch, so a rebalance and the rankings that respond to it
       # land in the same reference regeneration below.
-      - name: Snapshot PvP move stats and probe the PokeMiners mirror
+      - name: Snapshot PvP + PvE move stats from PvPoke and the game master
         id: game-master-watch
         if: env.SYNC_ALL == 'true' || inputs.game-master-watch
         continue-on-error: true
-        run: npm run fetch-game-master-watch
+        timeout-minutes: 2
+        shell: bash
+        run: npm run fetch-game-master-watch 2>&1 | tee "$RUNNER_TEMP/sync/game-master-watch.log"
 
       # ── Regenerate + validate ────────────────────────────────────────────
       # The skill's meta reference is generated from the snapshots we just
@@ -168,110 +225,72 @@ jobs:
       # before the commit turns that into a failed sync instead, and holds back
       # the whole push: check-data-filters covers raids, Rocket and PvP alike.
       - name: Validate the snapshots and the regenerated reference
+        id: validate
+        shell: bash
         run: |
-          npm run test:datafilters
-          npm run test:metaref
+          npm run test:datafilters 2>&1 | tee "$RUNNER_TEMP/sync/validate.log"
+          npm run test:metaref 2>&1 | tee -a "$RUNNER_TEMP/sync/validate.log"
 
-      # ── Commit + push ────────────────────────────────────────────────────
-      - name: Commit + push if anything changed
+      # ── Commit + hand off ────────────────────────────────────────────────
+      - name: Commit the snapshots that moved
+        id: local-commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Name the upstream the PvP snapshot actually came from. The fetcher
-          # falls back to lily-dex whenever PvPoke is unreachable, and that
-          # snapshot is materially different (no speciesId, score or forms, so
-          # the reference's "Ranked form" and "Score" columns collapse to "—").
-          # The git log is the provenance trail CLAUDE.md points at.
-          PVP_SOURCE=$(node -p "require('./src/data/pvp-rankings.json').source")
-          REF=skills/pokemon-go-filters/references
-
-          # track <scope> <what moved> <path>...
-          # One body line per snapshot that moved, so the commit still names
-          # every source, and the game-master line still names the move-stat
-          # watch, whose diff (`history[0].changes`) IS the notification.
-          paths=(); scopes=(); body=()
-          track() {
-            local scope=$1 what=$2; shift 2
-            git diff --quiet -- "$@" && return 0
-            paths+=("$@")
-            body+=("- ${scope}: ${what}")
-            [[ " ${scopes[*]} " == *" ${scope} "* ]] || scopes+=("$scope")
-          }
-          track raids        "boss snapshot from lily-dex-api"                       src/data/raid-bosses.json
-          track rocket       "lineup snapshot"                                       src/data/rocket-lineups.json
-          track rocket       "grunt quotes from PokeMiners"                          src/data/rocket-grunt-quotes.json
-          track pvp          "ranking snapshot from ${PVP_SOURCE}"                   src/data/pvp-rankings.json
-          track meta         "raid-attacker + shadow-keeper rankings from the game master" src/data/meta-rankings.json
-          track species-meta "special-trade/starter/power-line/mega pools"           src/data/species-meta.json
-          track events       "wildspawn snapshot from leak-duck"                     src/data/events.json
-          track forms        "regional-form catalog from the game master"            src/data/regional-forms.json
-          track game-master  "move stats"                                            src/data/game-master-watch.json
-          track reference    "regenerated PvP meta reference"                        "$REF/META.md" "$REF/pvp-meta.json"
-
+          # One body line per part that moved, so the commit still names every
+          # source. Only parts whose content changed reach the subject; a part
+          # where nothing but an upstream batch stamp moved is still committed
+          # (check-meta-rankings needs the roster stamp to advance) and reads
+          # "- <scope>: provenance only (<stamp>)". The game-master line names
+          # each new history entry, which IS the rebalance notification. The
+          # parts, their files and their wording are the PARTS table in
+          # scripts/sync-summary.mjs, which the job summary reads too.
+          npx vite-node scripts/sync-summary.mjs classify --base HEAD --out "$RUNNER_TEMP/sync"
+          mapfile -t paths < "$RUNNER_TEMP/sync/commit-paths.txt"
           if [ ${#paths[@]} -eq 0 ]; then
             echo "No snapshot changes — skipping commit."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          subject="chore(data): sync $(printf '%s, ' "${scopes[@]}" | sed 's/, $//')"
           git add -- "${paths[@]}"
-          git commit -m "$subject" -m "$(printf '%s\n' "${body[@]}")"
+          git commit -F "$RUNNER_TEMP/sync/commit-message.txt"
           git log -1 --stat
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-          # main can move while the fetches run. The commit only touches
-          # snapshot files nobody edits by hand, so a rebase onto the new tip
-          # is clean, and test.yml still runs on the result.
-          git push || { git pull --rebase origin "$GITHUB_REF_NAME" && git push; }
-
-      # ── Translations ─────────────────────────────────────────────────────
-      # Last, so whatever create-pull-request does to the checkout cannot touch
-      # the data push above. It opens a PR instead of pushing to main, and it
-      # carries any local commit that was never pushed into that PR, so start
-      # from the remote tip: after a failed push or validation this drops the
-      # snapshot changes, which the next run fetches again.
-      - name: Reset the checkout to the remote branch
-        if: ${{ !cancelled() && (env.SYNC_ALL == 'true' || inputs.translations) }}
-        run: |
-          git fetch origin "$GITHUB_REF_NAME"
-          git reset --hard "origin/$GITHUB_REF_NAME"
-      - name: Fetch translations from Google Sheet
-        id: translations
-        if: ${{ !cancelled() && (env.SYNC_ALL == 'true' || inputs.translations) }}
-        continue-on-error: true
-        run: npm run fetch-translations
-      # The sheet supplies the in-game keywords that go straight into generated
-      # filters — a corrected DE word for "shiny" changes the trash string — so
-      # the snapshot has to move with the locales. It must also be listed in
-      # add-paths below, or the PR this opens fails check-fixtures with no way
-      # to fix it from inside the PR.
-      - name: Regenerate fixture snapshot
-        if: ${{ !cancelled() && steps.translations.outcome == 'success' }}
-        run: npm run fixtures:update
-      - name: Open PR if locale files changed
-        if: ${{ !cancelled() && steps.translations.outcome == 'success' }}
-        uses: peter-evans/create-pull-request@v6
+      # The push job below takes the commit from here as a git bundle and
+      # checks it before it pushes: one commit on the base, snapshot files
+      # only.
+      - name: Bundle the data commit for the push job
+        if: steps.local-commit.outputs.changed == 'true'
+        env:
+          BASE_SHA: ${{ steps.base.outputs.sha }}
+        run: git bundle create "$RUNNER_TEMP/data-commit.bundle" "$BASE_SHA..HEAD"
+      - uses: actions/upload-artifact@v4
+        if: steps.local-commit.outputs.changed == 'true'
         with:
-          # The checkout above holds the app token; the PR keeps going out as
-          # github-actions, as it did when this was its own workflow.
-          token: ${{ github.token }}
-          commit-message: "chore(i18n): sync translations from spreadsheet"
-          branch: chore/sync-translations
-          delete-branch: true
-          title: "chore(i18n): sync translations from spreadsheet"
-          body: |
-            Automated translation sync from the published Google Sheet.
+          name: data-commit
+          path: ${{ runner.temp }}/data-commit.bundle
+          retention-days: 1
+          if-no-files-found: error
+          overwrite: true
 
-            Generated by `.github/workflows/sync-data.yml` running
-            `npm run fetch-translations`.
-
-            Review `src/locales/_meta.json` for warnings (truncation, mojibake).
-          add-paths: |
-            src/locales/**
-            src/__fixtures__/default-filter-output.json
-
-      - name: Fail if any fetch failed
+      # ── Report ───────────────────────────────────────────────────────────
+      # The job summary: a row per part, what moved in PvP, events, raids and
+      # the move-stat watch, and the folded warnings. It runs first and with
+      # `|| true`, because it is a report and must never be what turns a run
+      # red. It compares every snapshot with the commit the job started from,
+      # so it reads the same whether a commit was made or validation held one
+      # back. The push job adds its own line with the sha that landed.
+      - name: Write the job summary; fail if any fetch failed
         if: ${{ !cancelled() }}
         env:
+          BASE_SHA: ${{ steps.base.outputs.sha }}
+          VALIDATE: ${{ steps.validate.outcome }}
+          COMMIT: ${{ steps.local-commit.outcome }}
+          COMMIT_SHA: ${{ steps.local-commit.outputs.sha }}
+          INPUTS: ${{ toJSON(inputs) }}
           OUTCOMES: >-
             raids=${{ steps.raids.outcome }}
             rocket-lineups=${{ steps.rocket-lineups.outcome }}
@@ -282,8 +301,9 @@ jobs:
             events=${{ steps.events.outcome }}
             regional-forms=${{ steps.regional-forms.outcome }}
             game-master-watch=${{ steps.game-master-watch.outcome }}
-            translations=${{ steps.translations.outcome }}
         run: |
+          npx vite-node scripts/sync-summary.mjs render --base "${BASE_SHA:-$GITHUB_SHA}" --logs "$RUNNER_TEMP/sync" >> "$GITHUB_STEP_SUMMARY" || true
+
           failed=$(tr ' ' '\n' <<<"$OUTCOMES" | grep '=failure$' | cut -d= -f1 || true)
           if [ -n "$failed" ]; then
             echo "These fetches failed (see their step logs):"
@@ -291,3 +311,198 @@ jobs:
             exit 1
           fi
           echo "All fetches succeeded."
+
+  # The push, on a runner of its own. The sync job ran npm code (the fetchers,
+  # Vite, the checks), and on a shared runner any of it could reach a secret:
+  # through git config or a hook, through $GITHUB_ENV or $GITHUB_PATH (a
+  # BASH_ENV written there runs before a later step's first line), or through
+  # a process left running. This job runs no npm code at all, so the app
+  # token, which can push past main's protection, only ever exists here. It
+  # also refuses a bundle that is anything but one commit of snapshot files
+  # on the base, so a compromised sync job cannot push code through it.
+  push:
+    needs: sync
+    # Also when the sync job went red: one failed fetch must not hold back
+    # the other snapshots, and a failed job's outputs still reach this one.
+    if: ${{ !cancelled() && needs.sync.outputs.changed == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.sync.outputs.base }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: data-commit
+          path: ${{ runner.temp }}/data
+      - name: Check the data commit
+        id: check
+        env:
+          BASE_SHA: ${{ needs.sync.outputs.base }}
+          # The files a sync may change: every path in the PARTS table and
+          # REFERENCE in scripts/sync-summary.mjs. scripts/check-sync-summary.mjs
+          # fails if the two lists differ.
+          ALLOWED: >-
+            src/data/raid-bosses.json
+            src/data/rocket-lineups.json
+            src/data/rocket-grunt-quotes.json
+            src/data/pvp-rankings.json
+            src/data/meta-rankings.json
+            src/data/species-meta.json
+            src/data/events.json
+            src/data/regional-forms.json
+            src/data/game-master-watch.json
+            skills/pokemon-go-filters/references/pvp-meta.json
+            skills/pokemon-go-filters/references/META.md
+        run: |
+          git fetch -q "$RUNNER_TEMP/data/data-commit.bundle" HEAD
+          commit=$(git rev-parse FETCH_HEAD)
+          if [ "$(git rev-list --count "$BASE_SHA..$commit")" != 1 ] || [ "$(git rev-parse "$commit^")" != "$BASE_SHA" ]; then
+            echo "::error::The bundle is not one commit on top of $BASE_SHA; not pushing it."
+            exit 1
+          fi
+          # Modified or added regular files on the list, nothing else: no
+          # deletions, no symlinks, no executable bits, no other path.
+          bad=$(git diff-tree -r --no-commit-id --no-renames "$BASE_SHA" "$commit" | awk -v allowed=" $ALLOWED " '
+            { split($0, f, "\t"); split(f[1], m, " ")
+              if (m[2] != "100644" || (m[5] != "M" && m[5] != "A") || index(allowed, " " f[2] " ") == 0) print f[2] }')
+          if [ -n "$bad" ]; then
+            echo "::error::The data commit changes files a sync may not change; not pushing it."
+            echo "$bad"
+            exit 1
+          fi
+          echo "sha=$commit" >> "$GITHUB_OUTPUT"
+      # Push as the Pushologist GitHub App so the commit can bypass the
+      # branch protection on main (GITHUB_TOKEN pushes are rejected there).
+      # Scoped to the one permission a push needs.
+      - name: Mint Pushologist app token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_SECRET }}
+          permission-contents: write
+      - name: Push the data commit
+        id: push
+        env:
+          APP_TOKEN: ${{ steps.app-token.outputs.token }}
+          COMMIT: ${{ steps.check.outputs.sha }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -B sync-data "$COMMIT"
+          # main can move while the sync runs. The commit only touches
+          # snapshot files nobody edits by hand, so a rebase onto the new tip
+          # is clean, and test.yml still runs on the result. The pull needs no
+          # token: the repo is public. The token goes into the URL of each
+          # push and nowhere else; the token action registers it as a secret,
+          # so the runner masks it in the log.
+          remote="https://x-access-token:${APP_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if ! git push "$remote" "HEAD:$GITHUB_REF_NAME"; then
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            # A rebase that finds nothing to replay leaves HEAD on main's tip,
+            # and the push below would then succeed without sending anything.
+            # Exactly the one data commit must sit on top of what was fetched.
+            if [ "$(git rev-list --count FETCH_HEAD..HEAD)" != 1 ]; then
+              echo "::error::The rebase onto $GITHUB_REF_NAME did not leave exactly the data commit on top; not pushing."
+              exit 1
+            fi
+            git push "$remote" "HEAD:$GITHUB_REF_NAME"
+          fi
+          # After the push: a rebase gives the commit a new sha.
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Summarise
+        if: ${{ !cancelled() }}
+        env:
+          CHECK: ${{ steps.check.outcome }}
+          PUSH: ${{ steps.push.outcome }}
+          SHA: ${{ steps.push.outputs.sha }}
+        run: |
+          case "$CHECK/$PUSH" in
+            success/success) line="pushed [\`${SHA:0:7}\`]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$SHA) to $GITHUB_REF_NAME" ;;
+            failure/*) line="⛔ refused: the data commit is not one a sync may push (see \"Check the data commit\")" ;;
+            *) line="❌ not pushed, nothing landed (see the step logs)" ;;
+          esac
+          echo "## Push · $line" >> "$GITHUB_STEP_SUMMARY"
+
+  # Translations open a PR instead of pushing to main, so they never need the
+  # app token. They run here, in parallel and on github.token alone, so the
+  # third-party PR action never shares a runner with APP_SECRET, and the sync
+  # job never has to reset its checkout to keep unpushed data out of the PR.
+  translations:
+    # Scheduled runs, a manual run with nothing ticked, and a manual run
+    # that ticked translations.
+    if: github.event_name != 'workflow_dispatch' || inputs.translations || !(inputs.raids || inputs.rocket-lineups || inputs.rocket-quotes || inputs.pvp || inputs.meta || inputs.species-meta || inputs.events || inputs.regional-forms || inputs.game-master-watch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # No continue-on-error: this job does one thing, so a red job is the
+      # alert.
+      - name: Fetch translations from holoholo-text
+        id: fetch
+        timeout-minutes: 2
+        run: npm run fetch-translations
+      # The export supplies the in-game keywords that go straight into
+      # generated filters (a corrected DE word for "shiny" changes the trash
+      # string), so the snapshot has to move with the locales. It must also be
+      # listed in add-paths below, or the PR this opens fails check-fixtures
+      # with no way to fix it from inside the PR.
+      - name: Regenerate fixture snapshot
+        run: npm run fixtures:update
+      - name: Open PR if locale files changed
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          # The PR keeps going out as github-actions, as it did when this was
+          # its own workflow.
+          token: ${{ github.token }}
+          commit-message: "chore(i18n): sync translations from holoholo-text"
+          branch: chore/sync-translations
+          delete-branch: true
+          title: "chore(i18n): sync translations from holoholo-text"
+          body: |
+            Automated translation sync from sora10pls/holoholo-text (Niantic's localized text export).
+
+            Generated by `.github/workflows/sync-data.yml` running
+            `npm run fetch-translations`.
+
+            Review `src/locales/_meta.json` for warnings (truncation, mojibake).
+
+            CI on bot-opened PRs waits for approval: Checks → Approve and run. Update branch first if main has moved, as the required checks are strict.
+          add-paths: |
+            src/locales/**
+            src/__fixtures__/default-filter-output.json
+      # create-pull-request reports created, updated or closed, and nothing
+      # (or "none", depending on the version) when the locales did not move.
+      # A closed PR comes with no number or URL to link.
+      - name: Summarise
+        if: ${{ !cancelled() }}
+        env:
+          FETCH: ${{ steps.fetch.outcome }}
+          CPR: ${{ steps.cpr.outcome }}
+          PR_OP: ${{ steps.cpr.outputs.pull-request-operation }}
+          PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
+          PR_URL: ${{ steps.cpr.outputs.pull-request-url }}
+        run: |
+          case "$FETCH/$CPR/$PR_OP" in
+            success/success/created | success/success/updated) line="PR [#$PR_NUMBER]($PR_URL) $PR_OP" ;;
+            success/success/closed) line="PR closed (branch chore/sync-translations deleted), the locales match main again" ;;
+            success/success/*) line="no locale change, no PR" ;;
+            failure/*) line="fetch failed, no PR (see its step log)" ;;
+            *) line="no PR, a step failed (see the step logs)" ;;
+          esac
+          echo "## Translations · $line" >> "$GITHUB_STEP_SUMMARY"

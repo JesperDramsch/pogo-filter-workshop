@@ -133,9 +133,9 @@
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { canonicalStringify, writeJson } from "./lib/json.mjs";
+import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
 import {
-  fetchGameMaster, warnIfStale, gameMasterProvenance, gameMasterAgeDays,
+  fetchGameMaster, warnIfStale, gameMasterProvenance, gameMasterAgeDays, batchMsFromIso,
 } from "./lib/game-master.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -725,9 +725,12 @@ async function main() {
 
     // First mirror that answers wins; the rest are fallback. See
     // scripts/lib/game-master.mjs — an unparsable response counts as a failure,
-    // not as an empty result.
+    // not as an empty result. So does a batch older than the one this snapshot
+    // was built from, so an outage answered by a fallback that is behind fails
+    // like any other outage instead of rolling the mechanics back.
     const gm = await fetchGameMaster({
       userAgent: "pogo-filter-workshop meta-rankings-fetcher/2.0",
+      minBatchMs: batchMsFromIso(readPreviousJson(OUT_PATH)?.sources?.mechanicsBatch),
     });
     ({ templates, mirror: mirrorName, batchMs: gameMasterBatchMs } = gm);
     if (gm.failures.length > 0) {

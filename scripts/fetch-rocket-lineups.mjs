@@ -85,6 +85,7 @@ import {
   formSuffix,
   typesOf,
   moveTypesById,
+  mechanicsBatchFloor,
   warnIfStale,
 } from "./lib/game-master.mjs";
 import { loadNameDict } from "./lib/species-dex.mjs";
@@ -130,7 +131,13 @@ async function gameMasterFacts(trainers, prev) {
   const names = [...new Set(trainers.filter(isGrunt).flatMap(t => distinctSpecies(lineupOf(t)).map(s => s.name)))].sort();
   try {
     console.log("→ Fetching the game master for lineup bulk (tank flags) and fast moves (Box 1 candidates)");
-    const gm = await fetchGameMaster({ userAgent: "pogo-filter-workshop rocket-fetcher/1.0" });
+    // Floored at meta-rankings.json's batch, as this snapshot records none: a
+    // fallback that is behind takes the reuse path below rather than
+    // recomputing the bulk figures from an older dump.
+    const gm = await fetchGameMaster({
+      userAgent: "pogo-filter-workshop rocket-fetcher/1.0",
+      minBatchMs: mechanicsBatchFloor(),
+    });
     warnIfStale(gm, "Rocket tank flags and Box 1 candidates may miss newly added species.");
     const templates = pokemonTemplates(gm.templates);
     const table = bulkTable(templates.map(t => ({ dex: t.dex, suffix: formSuffix(t), stats: t.settings?.stats })));

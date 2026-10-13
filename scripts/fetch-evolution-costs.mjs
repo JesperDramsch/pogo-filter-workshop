@@ -49,6 +49,7 @@ import {
   evolutionStepsFromGameMaster,
   fetchGameMaster,
   gameMasterAgeDays,
+  mechanicsBatchFloor,
   warnIfStale,
 } from "./lib/game-master.mjs";
 
@@ -82,8 +83,11 @@ async function main() {
   let templates, mirrorName, ageDays;
   try {
     console.log("→ Fetching game master (evolutionBranch source)");
+    // This snapshot records no batch of its own, so the floor is the one
+    // meta-rankings.json was built from. See mechanicsBatchFloor().
     const gm = await fetchGameMaster({
       userAgent: "pogo-filter-workshop evolution-costs-fetcher/1.0",
+      minBatchMs: mechanicsBatchFloor(),
     });
     templates = gm.templates;
     mirrorName = gm.mirror;

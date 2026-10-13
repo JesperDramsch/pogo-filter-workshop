@@ -93,8 +93,9 @@
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { canonicalStringify, writeJson } from "./lib/json.mjs";
+import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
 import {
+  batchMsFromIso,
   evoParentsFromSteps,
   evolutionChainsFromSteps,
   evolutionStepsFromGameMaster,
@@ -226,8 +227,11 @@ async function main() {
     const pvpokePromise = fetchPvpokeGameMaster({
       userAgent: "pogo-filter-workshop species-meta-fetcher/1.0",
     });
+    // Floored at the batch this snapshot was built from, so a fallback mirror
+    // that is behind fails like an outage instead of rolling it back.
     const gm = await fetchGameMaster({
       userAgent: "pogo-filter-workshop species-meta-fetcher/1.0",
+      minBatchMs: batchMsFromIso(readPreviousJson(OUT_PATH)?.sources?.gameMasterBatch),
     });
     templates = gm.templates;
     gmSource = { mirror: gm.mirror, batchMs: gm.batchMs };

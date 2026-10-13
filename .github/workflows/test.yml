@@ -5,11 +5,36 @@ on:
   push:
     branches: [main]
 
+# Without this the token gets the repository default, which is write-all, on
+# a job that runs every npm dependency and a live-fetching build. It only
+# needs to read the checkout.
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # GitHub does not reject a misspelled `steps.x` or `inputs.x`; it reads
+      # as empty. In sync-data.yml's OUTCOMES list that lets a fetch fail
+      # without the run going red, which is the only alert the sync has.
+      # actionlint catches it, and runs the workflow shell through shellcheck
+      # (preinstalled on the runner). Before npm ci, since it needs no Node;
+      # in this job rather than a path-filtered workflow, so it shares the
+      # required "test" check and is never left pending. The checksum is
+      # pinned here, not read from the release it would be verifying: to bump
+      # the version, take the new linux_amd64 line from the release's
+      # checksums.txt.
+      - name: Lint workflows
+        run: |
+          v=1.7.12
+          sha=8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+          tgz="actionlint_${v}_linux_amd64.tar.gz"
+          curl -sSfL -o "$RUNNER_TEMP/$tgz" "https://github.com/rhysd/actionlint/releases/download/v$v/$tgz"
+          echo "$sha  $RUNNER_TEMP/$tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/$tgz" -C "$RUNNER_TEMP" actionlint
+          "$RUNNER_TEMP/actionlint" -color
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -40,4 +65,5 @@ jobs:
       - run: npm run test:a11ystate
       - run: npm run test:a11ytargets
       - run: npm run test:speciessuggest
+      - run: npm run test:syncsummary
       - run: npm run build

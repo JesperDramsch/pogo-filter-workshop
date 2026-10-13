@@ -48,14 +48,21 @@
 // truncated body, an object where an array belongs — counts as a FAILURE and
 // falls through to the next one. Publishing a hole is the one outcome worse
 // than using the fallback, which is what MIN_GAME_MASTER_TEMPLATES guards.
+//
+// So does a mirror whose batch is OLDER than the one the caller's snapshot was
+// already built from, when the caller passes that batch as `minBatchMs`. An
+// older dump parses, passes every size check and every downstream validation,
+// and is still a rollback. See fetchGameMaster below.
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { readPreviousJson } from "./json.mjs";
 
 // Every mirror below serves the same Niantic template array. `parseStamp` maps
-// that mirror's own timestamp file to epoch millis; an unreadable stamp costs
-// the staleness warning and nothing else, so it is never fatal.
+// that mirror's own timestamp file to epoch millis. Without a batch floor an
+// unreadable stamp costs the staleness warning and the cache, nothing else;
+// under one it disqualifies the mirror (see fetchGameMaster).
 export const GAME_MASTER_MIRRORS = [
   {
     // Primary. Commits every one to three days — 57 times in the three months
@@ -72,7 +79,9 @@ export const GAME_MASTER_MIRRORS = [
     // Fallback. The better-known mirror, and the one every guide points at, but
     // it stalls: it served a 2026-04-17 batch for at least 133 days. Kept
     // because a second source costs one request and a stalled mirror is still
-    // better than no mechanics at all.
+    // better than no mechanics at all. It is not better than a snapshot already
+    // built from something newer, though: on 2026-10-13 it served 2026-08-28
+    // against alexelgt's 2026-10-10, which is what `minBatchMs` is for.
     name: "PokeMiners/game_masters",
     gameMaster: "https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/latest.json",
     timestamp: "https://raw.githubusercontent.com/PokeMiners/game_masters/master/latest/timestamp.txt",
@@ -103,19 +112,20 @@ async function defaultFetchText(url, userAgent) {
 // timestamp file is fetched on every call and the big one only when the batch
 // id actually moved. That makes this correctness-preserving rather than a
 // staleness window — a new batch is never served from cache, and an unreadable
-// stamp falls through to a fresh download. Every cache failure is non-fatal: it
-// costs the download and nothing else.
+// stamp falls through to a fresh download (or, under a batch floor, to the next
+// mirror). Every cache failure is non-fatal: it costs the download and nothing
+// else.
 //
 // Fetching the stamp FIRST is what buys this, and it is why the two requests
 // are no longer issued in parallel. One extra round-trip on a small file, in
 // exchange for skipping 19 MB.
 const CACHE_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "../../.cache/game-master");
-const cacheFile = (name) => resolve(CACHE_DIR, `${name.replace(/[^a-z0-9]+/gi, "-")}.json`);
+const cacheFile = (dir, name) => resolve(dir, `${name.replace(/[^a-z0-9]+/gi, "-")}.json`);
 
-function readCache(name, batchMs) {
+function readCache(dir, name, batchMs) {
   if (batchMs == null) return null;
   try {
-    const cached = JSON.parse(readFileSync(cacheFile(name), "utf8"));
+    const cached = JSON.parse(readFileSync(cacheFile(dir, name), "utf8"));
     if (cached?.batchMs !== batchMs || !Array.isArray(cached.templates)) return null;
     return cached.templates;
   } catch {
@@ -123,36 +133,86 @@ function readCache(name, batchMs) {
   }
 }
 
-function writeCache(name, batchMs, templates) {
+function writeCache(dir, name, batchMs, templates) {
   if (batchMs == null) return;
   try {
-    mkdirSync(CACHE_DIR, { recursive: true });
-    writeFileSync(cacheFile(name), JSON.stringify({ batchMs, templates }), "utf8");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(cacheFile(dir, name), JSON.stringify({ batchMs, templates }), "utf8");
   } catch { /* a cache that cannot be written just costs the next download */ }
+}
+
+// A batch stamp as a calendar day, for messages; the full instant when two
+// stamps share a day, so a same-day rejection does not read "X older than X".
+function batchLabels(batchMs, floorMs) {
+  const iso = (ms) => new Date(ms).toISOString();
+  const [a, b] = [iso(batchMs).slice(0, 10), iso(floorMs).slice(0, 10)];
+  return a === b ? [iso(batchMs), iso(floorMs)] : [a, b];
 }
 
 // First mirror that answers with a plausible template array wins; the rest are
 // pure fallback. Returns { templates, mirror, batchMs, failures, fromCache } —
 // `failures` is the list of mirrors that were tried and rejected, so a caller
 // can say out loud that it fell back. Throws only when every mirror failed.
+//
+// `minBatchMs` is the rollback guard: the batch the caller's committed snapshot
+// was built from (batchMsFromIso() turns the recorded ISO batch back into one).
+// A mirror stamped older than that goes into `failures` like an outage would,
+// and the next mirror is tried. If none qualifies the call throws exactly as an
+// outage does, so every caller's outage path applies unchanged: `--offline-ok`
+// keeps the cache, the sync step goes red, and the soft readers (the Rocket
+// bulk figures, the watch's PvE half) keep their previous data. Without it, the
+// fallback that exists for an alexelgt outage would answer that outage with a
+// dump weeks older than the one already committed, and the snapshots rebuilt
+// from it would pass validation and be committed green. Omitted or null means
+// no floor; fetch-raid-bosses passes none on purpose, because there an older
+// batch only costs event-boss name resolution, which already warns, while a
+// throw would take the whole raid rotation down with it.
+//
+// Under a floor an UNREADABLE stamp disqualifies the mirror too, rather than
+// falling through to a download as it does without one. The floor is a claim
+// that the dump is no older than the snapshot, and an unstamped dump cannot
+// back it: waving it through would make "the timestamp request failed" the one
+// path on which the guard silently does nothing. The price is a red step on a
+// day when only the stamp request flakes, which the next run heals. A silent
+// rollback gets committed and deployed, and writes a false PvE "change" into
+// the rebalance watch's permanent history on the way.
+//
+// `cacheDir` exists for the offline checks, which must not touch the real cache.
 export async function fetchGameMaster({
   userAgent = "pogo-filter-workshop game-master-fetcher/1.0",
   minTemplates = MIN_GAME_MASTER_TEMPLATES,
   mirrors = GAME_MASTER_MIRRORS,
   fetchText = (url) => defaultFetchText(url, userAgent),
   cache = true,
+  cacheDir = CACHE_DIR,
+  minBatchMs = null,
 } = {}) {
+  const floor = Number.isFinite(minBatchMs) && minBatchMs > 0 ? minBatchMs : null;
   const failures = [];
   for (const mirror of mirrors) {
     try {
-      const stampText = await fetchText(mirror.timestamp).catch(() => "");
+      let stampError = null;
+      const stampText = await fetchText(mirror.timestamp).catch((e) => { stampError = e; return ""; });
       let batchMs = null;
       try {
         const ms = mirror.parseStamp(stampText);
         if (Number.isFinite(ms) && ms > 0) batchMs = ms;
       } catch { /* an unreadable stamp costs the staleness warning and the cache */ }
 
-      const cached = cache ? readCache(mirror.name, batchMs) : null;
+      // Before the cache read, and that order is load-bearing: the cache only
+      // ever serves the batch this stamp names, so rejecting the stamp here is
+      // also what keeps a cached dump older than the floor from being served.
+      if (floor != null && batchMs == null) {
+        const why = stampError ? `unreachable (${stampError.message})` : "unreadable";
+        throw new Error(`batch stamp ${why}, so it cannot be checked against snapshot's ` +
+          `${new Date(floor).toISOString().slice(0, 10)}`);
+      }
+      if (floor != null && batchMs < floor) {
+        const [batch, snapshot] = batchLabels(batchMs, floor);
+        throw new Error(`batch ${batch} older than snapshot's ${snapshot}`);
+      }
+
+      const cached = cache ? readCache(cacheDir, mirror.name, batchMs) : null;
       if (cached && cached.length >= minTemplates) {
         return { templates: cached, mirror: mirror.name, batchMs, failures, fromCache: true };
       }
@@ -161,7 +221,7 @@ export async function fetchGameMaster({
       if (!Array.isArray(parsed) || parsed.length < minTemplates) {
         throw new Error(`parsed as ${Array.isArray(parsed) ? `${parsed.length} templates` : typeof parsed}`);
       }
-      if (cache) writeCache(mirror.name, batchMs, parsed);
+      if (cache) writeCache(cacheDir, mirror.name, batchMs, parsed);
       return { templates: parsed, mirror: mirror.name, batchMs, failures, fromCache: false };
     } catch (err) {
       failures.push(`${mirror.name}: ${err.message}`);
@@ -188,6 +248,29 @@ export function gameMasterProvenance({ mirror, batchMs }, now = Date.now()) {
     ageDays,
     stale: ageDays == null ? null : ageDays > GAME_MASTER_STALE_WARN_DAYS,
   };
+}
+
+// The inverse of gameMasterProvenance().batch: the ISO batch a snapshot
+// recorded, back as the epoch millis fetchGameMaster's `minBatchMs` takes.
+// Null for a missing or unparsable value, so a first run, or a snapshot that
+// predates the field, fetches with no floor exactly as before.
+export function batchMsFromIso(iso) {
+  const ms = typeof iso === "string" ? Date.parse(iso) : NaN;
+  return Number.isFinite(ms) && ms > 0 ? ms : null;
+}
+
+// The floor for the fetchers whose own snapshot records no batch
+// (regional-forms, rocket-lineups, evolution-costs): the batch meta-rankings.json
+// was built from. It is the sibling read from the same dump in the same sync
+// job and the same prebuild, and it runs before every one of them except
+// rocket-lineups, so the floor is either the committed batch or the one this
+// run just advanced it to; it can never be lowered, because meta-rankings is
+// floored by its own value. A missing file or field means no floor.
+export const MECHANICS_SNAPSHOT_PATH =
+  resolve(dirname(fileURLToPath(import.meta.url)), "../../src/data/meta-rankings.json");
+
+export function mechanicsBatchFloor(path = MECHANICS_SNAPSHOT_PATH) {
+  return batchMsFromIso(readPreviousJson(path)?.sources?.mechanicsBatch);
 }
 
 // One place that decides how a stale mirror is announced, so all three readers
