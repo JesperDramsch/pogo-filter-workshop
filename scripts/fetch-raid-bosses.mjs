@@ -10,7 +10,9 @@
 //   - lily-dex-api refreshes every 6h; user runs this on demand before raid hour.
 //
 // Flags:
-//   --offline-ok   tolerate fetch failures if src/data/raid-bosses.json exists.
+//   --offline-ok   tolerate fetch failures if src/data/raid-bosses.json exists,
+//                  and leave that cache whole when a family comes back empty
+//                  (see guardEmptiedFamilies).
 
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -342,6 +344,54 @@ function canonicalStringify(value) {
   return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalStringify(value[k])}`).join(",")}}`;
 }
 
+function readPrevious(path) {
+  if (!existsSync(path)) return null;
+  try { return JSON.parse(readFileSync(path, "utf8")); } catch { return null; }
+}
+
+// The two standing rotations lily-dex-api publishes. eventRaids is not one of
+// them: it is a 7-day window, and it is legitimately empty between events.
+const GUARDED_FAMILIES = ["raids", "maxBattles"];
+
+function bossCount(tiers) {
+  return Object.values(tiers || {}).reduce((n, list) => n + (Array.isArray(list) ? list.length : 0), 0);
+}
+
+// Decides what an emptied family costs. lily-dex-api reports an outage as a
+// well-formed empty list with HTTP 200, not as an error: maxbattles.json has
+// answered {"currentList":[]} since 2026-06-11 while its Last-Modified kept
+// moving, and the old guard, which fired only when raids AND maxBattles were
+// both empty, kept the sync green for four months. So the refusal is per
+// family and judged against the previous snapshot: a family that had bosses
+// and now has none is refused. One that was already empty stays quiet, or
+// every daily run would fail on a hole nothing in this repo can fill. An
+// entirely empty result is refused whatever came before, since no rotation
+// ever looks like that.
+//
+// Returns { refused, write, exitCode }. `refused` lists { family, was }, and
+// `write` is the content to write, or null to leave the cache untouched:
+//   - under --offline-ok (prebuild) the whole cache stays and the exit is 0,
+//     as on every other offline route: a refusal must not take down
+//     `npm run build` over a problem the committed snapshot already solves.
+//   - in the sync job each refused family keeps the previous snapshot's tiers,
+//     the rest is written, and the exit is 1, so the healthy family and the
+//     event raids still land and the run goes red. A failed Rocket takeover
+//     read is handled the same way.
+//   - with no previous snapshot there is nothing to keep, so nothing is
+//     written and the exit is 1.
+export function guardEmptiedFamilies(prev, next, { offlineOk = false } = {}) {
+  const allEmpty = GUARDED_FAMILIES.every((f) => bossCount(next[f]) === 0);
+  const refused = GUARDED_FAMILIES
+    .map((family) => ({ family, was: bossCount(prev?.[family]) }))
+    .filter(({ family, was }) => bossCount(next[family]) === 0 && (was > 0 || allEmpty));
+  if (refused.length === 0) return { refused, write: next, exitCode: 0 };
+  if (!prev) return { refused, write: null, exitCode: 1 };
+  if (offlineOk) return { refused, write: null, exitCode: 0 };
+  const write = { ...next };
+  for (const { family } of refused) write[family] = prev[family] || {};
+  return { refused, write, exitCode: 1 };
+}
+
 async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
@@ -370,14 +420,22 @@ async function main() {
   }
   const typeIdx = indexTypes(typesArr);
 
+  const prev = readPrevious(OUT_PATH);
   // lily-dex-api wraps boss listings in `currentList`; the rest of the response
   // is graphics/headers we don't need.
-  const raids = deriveTiered(raidBossRaw?.currentList, typesArr, typeIdx);
-  const maxBattles = deriveTiered(maxBattlesRaw?.currentList, typesArr, typeIdx);
-
-  if (Object.keys(raids).length === 0 && Object.keys(maxBattles).length === 0) {
-    throw new Error("Both raids and maxBattles came back empty — refusing to overwrite cache");
+  const guard = guardEmptiedFamilies(prev, {
+    raids: deriveTiered(raidBossRaw?.currentList, typesArr, typeIdx),
+    maxBattles: deriveTiered(maxBattlesRaw?.currentList, typesArr, typeIdx),
+  }, { offlineOk });
+  for (const { family, was } of guard.refused) {
+    console.error(`✗ ${family} came back empty (${was} bosses in the previous snapshot): refusing to overwrite it`);
   }
+  if (!guard.write) {
+    if (guard.exitCode !== 0) process.exit(guard.exitCode);
+    console.warn(`⚠  --offline-ok and cached ${OUT_PATH} exists; build will use cache.`);
+    return;
+  }
+  const { raids, maxBattles } = guard.write;
 
   // Event raids — currently active + upcoming within the lookahead window.
   // Built after the standing-tier derivation so dedupe can prune events
@@ -428,15 +486,12 @@ async function main() {
   // when nothing material changed in the rotation.
   const newContent = { raids, maxBattles };
   let fetchedAt = new Date().toISOString();
-  if (existsSync(OUT_PATH)) {
-    try {
-      const prev = JSON.parse(readFileSync(OUT_PATH, "utf8"));
-      const prevContent = { raids: prev.raids, maxBattles: prev.maxBattles };
-      if (canonicalStringify(prevContent) === canonicalStringify(newContent) && prev.fetchedAt) {
-        fetchedAt = prev.fetchedAt;
-        console.log("  ↺ content unchanged — preserving previous fetchedAt");
-      }
-    } catch { /* ignore parse errors; fall through to fresh write */ }
+  if (prev) {
+    const prevContent = { raids: prev.raids, maxBattles: prev.maxBattles };
+    if (canonicalStringify(prevContent) === canonicalStringify(newContent) && prev.fetchedAt) {
+      fetchedAt = prev.fetchedAt;
+      console.log("  ↺ content unchanged — preserving previous fetchedAt");
+    }
   }
 
   writeJson(OUT_PATH, { fetchedAt, ...newContent, eventRaids });
@@ -447,10 +502,15 @@ async function main() {
   const gmAgeDays = gameMasterAgeDays(gameMaster.batchMs);
   console.log(`  boss name index: ${nameIdx.size} species from ${gameMaster.mirror}` +
     `${gmAgeDays != null ? ` (${gmAgeDays}d old)` : " (unstamped)"}`);
+  if (guard.exitCode !== 0) {
+    const kept = guard.refused.map((r) => r.family).join(" and ");
+    console.error(`✗ kept the previous ${kept} and wrote the rest; failing the run so the empty upstream is seen`);
+    process.exitCode = guard.exitCode;
+  }
 }
 
 // Only run when executed directly — the offline checks import buildNameIndex
-// above without triggering a fetch.
+// and guardEmptiedFamilies above without triggering a fetch.
 import { pathToFileURL } from "node:url";
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((e) => {

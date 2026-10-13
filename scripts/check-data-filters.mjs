@@ -21,6 +21,8 @@
 //   D10 — every typed grunt's main counter and backup obey their type rules
 //         (including the killer handover), render in every locale, and
 //         generic grunts only mark their tanks
+//   D11 — the raid fetcher refuses a raid or Max Battle family that empties,
+//         one family at a time (D5 is the reporting half; this is the refusal)
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
@@ -37,6 +39,7 @@ import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
 // the old per-locale assertion unable to fail.
 import { POKEMON_NAMES_DICT, SUPPORTED_NAME_LOCALES, resolveSpecies, resolveRegionalSpecies } from "../src/data/species.js";
 import { unresolvableDexEntries, formSuffixedDexEntries, NAME_LOCALES } from "./lib/species-dex.mjs";
+import { guardEmptiedFamilies } from "./fetch-raid-bosses.mjs";
 
 let failures = 0;
 function check(label, cond, detail = "") {
@@ -543,6 +546,67 @@ console.log("\nD10 — typed grunt boxes and tanks");
     check(`${loc}: typed grunts render a main counter and a backup; generic grunts only mark tanks`,
       bad.length === 0, bad.slice(0, 5).join(", "));
   }
+}
+
+console.log("\nD11 — the raid fetcher refuses a family that empties, one family at a time");
+{
+  // D5 only reports. The refusal lives in scripts/fetch-raid-bosses.mjs and
+  // only runs in the daily sync against a live feed nothing in CI sees, so the
+  // decision is pinned here. The shape that motivated it: lily-dex-api's
+  // maxbattles.json answering 200 with an empty list while raids stay healthy.
+  const tiers = (n) => ({ tier_1: Array.from({ length: n }, (_, i) => ({ id: `BOSS_${i}` })) });
+  const prev = { raids: tiers(4), maxBattles: tiers(3) };
+  const fresh = { raids: tiers(5), maxBattles: tiers(2) };
+  const families = (g) => g.refused.map((r) => r.family).join(",");
+
+  let g = guardEmptiedFamilies(prev, fresh);
+  check("both families populated: nothing refused, fresh content written, exit 0",
+    g.refused.length === 0 && g.write === fresh && g.exitCode === 0);
+
+  g = guardEmptiedFamilies(prev, { ...fresh, maxBattles: {} });
+  check("maxBattles empties in the sync: only maxBattles is refused", families(g) === "maxBattles", families(g));
+  check("… the previous maxBattles is kept and the fresh raids are written",
+    g.write?.maxBattles === prev.maxBattles && g.write?.raids === fresh.raids);
+  check("… and the run fails", g.exitCode === 1);
+
+  g = guardEmptiedFamilies(prev, { ...fresh, maxBattles: {} }, { offlineOk: true });
+  check("maxBattles empties under --offline-ok: the whole cache stays and the build goes on",
+    families(g) === "maxBattles" && g.write === null && g.exitCode === 0);
+
+  g = guardEmptiedFamilies(prev, { ...fresh, raids: {} });
+  check("raids empties: only raids is refused, the fresh maxBattles is written",
+    families(g) === "raids" && g.write?.raids === prev.raids && g.write?.maxBattles === fresh.maxBattles && g.exitCode === 1);
+
+  // A tier key with an empty list is still an empty family.
+  g = guardEmptiedFamilies(prev, { ...fresh, maxBattles: { tier_1: [] } });
+  check("a family of empty tiers counts as empty", families(g) === "maxBattles");
+
+  g = guardEmptiedFamilies({ raids: tiers(4), maxBattles: {} }, { ...fresh, maxBattles: {} });
+  check("a family that was already empty stays quiet (no red run every day for a known hole)",
+    g.refused.length === 0 && g.exitCode === 0);
+
+  g = guardEmptiedFamilies(prev, { raids: {}, maxBattles: {} });
+  check("both families empty: both refused, both kept", families(g) === "raids,maxBattles" &&
+    g.write?.raids === prev.raids && g.write?.maxBattles === prev.maxBattles && g.exitCode === 1);
+
+  g = guardEmptiedFamilies({ raids: {}, maxBattles: {} }, { raids: {}, maxBattles: {} });
+  check("an entirely empty result is refused even when the previous snapshot was empty too",
+    families(g) === "raids,maxBattles" && g.exitCode === 1);
+
+  for (const offlineOk of [false, true]) {
+    g = guardEmptiedFamilies(null, { raids: {}, maxBattles: {} }, { offlineOk });
+    check(`no previous snapshot and nothing fetched${offlineOk ? " (--offline-ok)" : ""}: nothing written, exit 1`,
+      g.write === null && g.exitCode === 1);
+  }
+  g = guardEmptiedFamilies(null, { ...fresh, maxBattles: {} });
+  check("no previous snapshot and one family empty: written as is (nothing to compare against)",
+    g.refused.length === 0 && g.write?.maxBattles && g.exitCode === 0);
+
+  // Against the committed snapshot, which D2 asserts has raids: losing them is
+  // refused, and today's state of maxBattles is what it is.
+  g = guardEmptiedFamilies(RAID_BOSSES, { raids: {}, maxBattles: RAID_BOSSES.maxBattles });
+  check("with the committed snapshot as the previous one, an empty raids fetch is refused",
+    families(g).split(",").includes("raids") && g.write?.raids === RAID_BOSSES.raids);
 }
 
 console.log(`\n${failures === 0 ? "✓ All data-filter property checks passed." : `✗ ${failures} failure(s).`}`);
