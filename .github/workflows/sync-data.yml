@@ -14,7 +14,42 @@ name: Sync data
 on:
   schedule:
     - cron: "17 6 * * *" # daily at 06:17 UTC
+  # Run workflow → tick the parts to sync, e.g. the one that failed this
+  # morning. Nothing ticked syncs everything, like the schedule does. The
+  # reference regeneration, validation and commit always run, so a partial
+  # run is held to the same checks as a full one.
   workflow_dispatch:
+    inputs:
+      raids:
+        description: Raid + max-battle bosses
+        type: boolean
+      rocket-lineups:
+        description: Team Rocket lineups
+        type: boolean
+      rocket-quotes:
+        description: Team Rocket grunt quotes
+        type: boolean
+      pvp:
+        description: PvP rankings
+        type: boolean
+      meta:
+        description: Raid-attacker + shadow-keeper rankings
+        type: boolean
+      species-meta:
+        description: Species meta (friend-collect pools)
+        type: boolean
+      events:
+        description: Wild-spawn events
+        type: boolean
+      regional-forms:
+        description: Regional-form catalog
+        type: boolean
+      game-master-watch:
+        description: Game master move-stat watch
+        type: boolean
+      translations:
+        description: Translations (opens a PR)
+        type: boolean
 
 permissions:
   contents: write
@@ -29,6 +64,9 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      # Scheduled runs, and a manual run with nothing ticked, sync everything.
+      SYNC_ALL: ${{ github.event_name != 'workflow_dispatch' || !(inputs.raids || inputs.rocket-lineups || inputs.rocket-quotes || inputs.pvp || inputs.meta || inputs.species-meta || inputs.events || inputs.regional-forms || inputs.game-master-watch || inputs.translations) }}
     steps:
       # Push as the Pushologist GitHub App so the commit can bypass the
       # branch protection on main (GITHUB_TOKEN pushes are rejected there).
@@ -60,6 +98,7 @@ jobs:
       # scripts/lib/fixture.mjs before adding a regeneration step back.
       - name: Fetch raid + max-battle bosses from lily-dex-api
         id: raids
+        if: env.SYNC_ALL == 'true' || inputs.raids
         continue-on-error: true
         run: npm run fetch-raid-bosses
       # A failed takeover read exits non-zero AFTER writing the ScrapedDuck
@@ -67,40 +106,48 @@ jobs:
       # the end.
       - name: Fetch Team Rocket lineups from ScrapedDuck (+ LeekDuck during a takeover) + lily-dex-api types
         id: rocket-lineups
+        if: env.SYNC_ALL == 'true' || inputs.rocket-lineups
         continue-on-error: true
         run: npm run fetch-rocket-lineups
       - name: Fetch Team Rocket grunt quotes from PokeMiners
         id: rocket-quotes
+        if: env.SYNC_ALL == 'true' || inputs.rocket-quotes
         continue-on-error: true
         run: npm run fetch-rocket-grunt-quotes
       - name: Fetch Great / Ultra / Master + cup rankings from PvPoke (lily-dex fallback)
         id: pvp
+        if: env.SYNC_ALL == 'true' || inputs.pvp
         continue-on-error: true
         run: npm run fetch-pvp-rankings
       - name: Derive raid-attacker rankings from the game master (alexelgt, PokeMiners fallback)
         id: meta
+        if: env.SYNC_ALL == 'true' || inputs.meta
         continue-on-error: true
         run: npm run fetch-meta-rankings
       # The friend-collect packs read this snapshot at build time.
       - name: Derive species meta from the game master + PvPoke roster
         id: species-meta
+        if: env.SYNC_ALL == 'true' || inputs.species-meta
         continue-on-error: true
         run: npm run fetch-species-meta
       # Event spawn filters are time-windowed and excluded from the fixture
       # snapshot (like event raids).
       - name: Fetch wild-spawn events from leak-duck
         id: events
+        if: env.SYNC_ALL == 'true' || inputs.events
         continue-on-error: true
         run: npm run fetch-events
       # Self-validates known forms, so a changed upstream shape fails here.
       - name: Derive the regional-form catalog from the game master
         id: regional-forms
+        if: env.SYNC_ALL == 'true' || inputs.regional-forms
         continue-on-error: true
         run: npm run fetch-regional-forms
       # After the PvP fetch, so a rebalance and the rankings that respond to it
       # land in the same reference regeneration below.
       - name: Snapshot PvP move stats and probe the PokeMiners mirror
         id: game-master-watch
+        if: env.SYNC_ALL == 'true' || inputs.game-master-watch
         continue-on-error: true
         run: npm run fetch-game-master-watch
 
@@ -183,13 +230,13 @@ jobs:
       # from the remote tip: after a failed push or validation this drops the
       # snapshot changes, which the next run fetches again.
       - name: Reset the checkout to the remote branch
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && (env.SYNC_ALL == 'true' || inputs.translations) }}
         run: |
           git fetch origin "$GITHUB_REF_NAME"
           git reset --hard "origin/$GITHUB_REF_NAME"
       - name: Fetch translations from Google Sheet
         id: translations
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && (env.SYNC_ALL == 'true' || inputs.translations) }}
         continue-on-error: true
         run: npm run fetch-translations
       # The sheet supplies the in-game keywords that go straight into generated
