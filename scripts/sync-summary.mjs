@@ -410,8 +410,8 @@ function partRow(r, outcome, selected, log) {
     if (r.kind === "none") return `❌ ${why} · kept the committed snapshot (last changed ${dateOnly(r.before?.fetchedAt)})`;
     return `❌ ${why} · wrote its snapshot anyway: ${what}`;
   }
-  if (!selected) return "— not selected";
-  return `— did not run${outcome ? ` (${md(outcome, 20)})` : ""}`;
+  if (!selected) return "➖ not selected";
+  return `➖ did not run${outcome ? ` (${md(outcome, 20)})` : ""}`;
 }
 
 function referenceLine(results) {

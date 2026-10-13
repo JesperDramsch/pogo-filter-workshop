@@ -9,14 +9,14 @@
 // under the OS temp directory.
 //
 // Covers:
-//   Y1 — stamp-only: stripping, moved stamps, the three verdicts, missing files
-//   Y2 — the commit message: subject scopes, provenance-only lines, the
-//        stamps-only subject, one line per new game-master history entry
-//   Y3 — classify end to end in a temp git repo, a file missing from HEAD
-//   Y4 — layer-B renderers: PvP, events, raids, the game-master watch
-//   Y5 — layer A: header, verdicts, rows, held back, failed steps, warnings,
-//        escaping, and the fallback when a renderer throws
-//   Y6 — render end to end in a temp git repo, with step logs on disk
+//   Y1  stamp-only stripping, moved stamps, the three verdicts, missing files
+//   Y2  the commit message (subject scopes, provenance-only lines, the
+//       stamps-only subject, one line per new game-master history entry)
+//   Y3  classify end to end in a temp git repo, a file missing from HEAD
+//   Y4  the layer-B renderers for PvP, events, raids and the game-master watch
+//   Y5  layer A (header, verdicts, rows, held back, failed steps, warnings,
+//       escaping, and the fallback when a renderer throws)
+//   Y6  render end to end in a temp git repo, with step logs on disk
 
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -111,7 +111,7 @@ watchWithHistory.history = [
 ];
 
 // ─── Y1 ──────────────────────────────────────────────────────────────────────
-console.log("Y1 — stamp-only: stripping, moved stamps, verdicts");
+console.log("Y1: stamp-only stripping, moved stamps, verdicts");
 {
   const stripped = stripStamps(metaDoc);
   check("strips fetchedAt and gameMasterTimestamp", !("fetchedAt" in stripped) && !("gameMasterTimestamp" in stripped));
@@ -152,7 +152,7 @@ console.log("Y1 — stamp-only: stripping, moved stamps, verdicts");
 }
 
 // ─── Y2 ──────────────────────────────────────────────────────────────────────
-console.log("\nY2 — the commit message");
+console.log("\nY2: the commit message");
 {
   check("nothing moved → no commit", commitMessage(classifyAll(memReader(CURRENT, CURRENT))) === null);
 
@@ -197,7 +197,7 @@ console.log("\nY2 — the commit message");
 }
 
 // ─── Y3 ──────────────────────────────────────────────────────────────────────
-console.log("\nY3 — classify end to end in a temp git repo");
+console.log("\nY3: classify end to end in a temp git repo");
 const TMP = mkdtempSync(join(tmpdir(), "sync-summary-"));
 process.on("exit", () => rmSync(TMP, { recursive: true, force: true }));
 const git = (cwd, ...args) => execFileSync("git", ["-c", "user.name=check", "-c", "user.email=check@example.invalid", ...args],
@@ -247,7 +247,7 @@ function tempRepo(name) {
 }
 
 // ─── Y4 ──────────────────────────────────────────────────────────────────────
-console.log("\nY4 — layer-B renderers");
+console.log("\nY4: the layer-B renderers");
 {
   const pvp = renderPvp(pvpDoc, pvpMutated);
   const greatLine = pvp.lines.find((l) => l.startsWith("- Great: ")) ?? "";
@@ -318,7 +318,7 @@ console.log("\nY4 — layer-B renderers");
 }
 
 // ─── Y5 ──────────────────────────────────────────────────────────────────────
-console.log("\nY5 — layer A: header, verdicts, rows, warnings");
+console.log("\nY5: layer A (header, verdicts, rows, warnings)");
 {
   const ALL = Object.fromEntries(PARTS.map((p) => [p.id, "success"]));
   const SHA = "0123456789abcdef0123456789abcdef01234567";
@@ -355,7 +355,7 @@ console.log("\nY5 — layer A: header, verdicts, rows, warnings");
   });
   check("manual with ticks names them", partial.split("\n")[0].endsWith("· manual run, ticked: raids, translations"), partial.split("\n")[0]);
   check("…counts only selected parts, nothing to push", partial.split("\n")[1] === "✅ All 1 selected part ran · no snapshot changes, nothing to push", partial.split("\n")[1]);
-  check("…and the rest read not selected", partial.includes("| PvP rankings | — not selected |") && partial.includes("| Raids | ✅ no change |"));
+  check("…and the rest read not selected", partial.includes("| PvP rankings | ➖ not selected |") && partial.includes("| Raids | ✅ no change |"));
 
   const failLog = "> npm run fetch-events\n✗ Fetch failed: HTTP 503 from <leak-duck>\nError: boom\n";
   const failed = renderSummary({ ...base, results: resultsPvpMeta, outcomes: { ...ALL, events: "failure" }, logs: { events: failLog } });
@@ -406,7 +406,7 @@ console.log("\nY5 — layer A: header, verdicts, rows, warnings");
 }
 
 // ─── Y6 ──────────────────────────────────────────────────────────────────────
-console.log("\nY6 — render end to end in a temp git repo");
+console.log("\nY6: render end to end in a temp git repo");
 {
   const dir = tempRepo("render");
   const baseSha = git(dir, "rev-parse", "HEAD");
