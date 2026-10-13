@@ -396,6 +396,20 @@ async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
 
+  // A failed fetch and a refused result take the same route, as in
+  // fetch-pvp-rankings.mjs: rejecting what came back means the committed cache
+  // is the better answer, not that `npm run build` should die. A throw here
+  // used to exit 1 under --offline-ok too, and prebuild chains every fetcher
+  // with &&.
+  const keepCacheOrExit = (message) => {
+    console.error(`✗ ${message}`);
+    if (offlineOk && existsSync(OUT_PATH)) {
+      console.warn(`⚠  --offline-ok and cached ${OUT_PATH} exists; build will use cache.`);
+      return;
+    }
+    process.exit(1);
+  };
+
   let typesArr, raidBossRaw, maxBattlesRaw, eventsRaw, gameMaster;
   try {
     console.log("→ Fetching lily-dex-api + ScrapedDuck + game master");
@@ -407,16 +421,11 @@ async function main() {
       fetchGameMaster({ userAgent: "pogo-filter-workshop raid-fetcher/1.0" }),
     ]);
   } catch (e) {
-    console.error(`✗ Fetch failed: ${e.message}`);
-    if (offlineOk && existsSync(OUT_PATH)) {
-      console.warn(`⚠  --offline-ok and cached ${OUT_PATH} exists; build will use cache.`);
-      return;
-    }
-    process.exit(1);
+    return keepCacheOrExit(`Fetch failed: ${e.message}`);
   }
 
   if (!Array.isArray(typesArr) || typesArr.length < 18) {
-    throw new Error(`types.json missing or too short (got ${typesArr?.length ?? 0} entries)`);
+    return keepCacheOrExit(`types.json missing or too short (got ${typesArr?.length ?? 0} entries)`);
   }
   const typeIdx = indexTypes(typesArr);
 
@@ -449,7 +458,7 @@ async function main() {
     JSON.parse(readFileSync(NAMES_PATH, "utf8")),
   );
   if (nameIdx.size < 500) {
-    throw new Error(`species name index collapsed to ${nameIdx.size} entries — refusing to drop event bosses silently`);
+    return keepCacheOrExit(`species name index collapsed to ${nameIdx.size} entries — refusing to drop event bosses silently`);
   }
   const dedupeSet = buildStandingDedupeSet(raids);
   const now = Date.now();
