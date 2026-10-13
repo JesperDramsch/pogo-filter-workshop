@@ -88,6 +88,8 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: Make a directory for the step logs
+        run: mkdir -p "$RUNNER_TEMP/sync"
 
       # ── Fetch ────────────────────────────────────────────────────────────
       # Every fetch exits 1 on real failure (fetch error, empty or shrunken
@@ -105,6 +107,12 @@ jobs:
       # job allows 9 × 2 minutes plus setup and validation. No retries: the
       # failures in the run history are deterministic, not transient.
       #
+      # Each fetch also tees its output to $RUNNER_TEMP/sync/<step id>.log, for
+      # a report of its ⚠ lines and of a failed step's last ✗ line. `shell:
+      # bash` is what keeps that honest: it adds pipefail, so the step fails
+      # when the fetch does, not only when tee does. The default shell is
+      # `bash -e` without pipefail.
+      #
       # Deliberately does NOT regenerate the fixture: the snapshot pins only
       # config-derived filters, and the data-derived ones these feed are covered
       # by property checks in scripts/check-data-filters.mjs. See the split in
@@ -114,7 +122,8 @@ jobs:
         if: env.SYNC_ALL == 'true' || inputs.raids
         continue-on-error: true
         timeout-minutes: 2
-        run: npm run fetch-raid-bosses
+        shell: bash
+        run: npm run fetch-raid-bosses 2>&1 | tee "$RUNNER_TEMP/sync/raids.log"
       # A failed takeover read exits non-zero AFTER writing the ScrapedDuck
       # snapshot. That snapshot is still committed below; the run goes red at
       # the end.
@@ -123,32 +132,37 @@ jobs:
         if: env.SYNC_ALL == 'true' || inputs.rocket-lineups
         continue-on-error: true
         timeout-minutes: 2
-        run: npm run fetch-rocket-lineups
+        shell: bash
+        run: npm run fetch-rocket-lineups 2>&1 | tee "$RUNNER_TEMP/sync/rocket-lineups.log"
       - name: Fetch Team Rocket grunt quotes from holoholo-text
         id: rocket-quotes
         if: env.SYNC_ALL == 'true' || inputs.rocket-quotes
         continue-on-error: true
         timeout-minutes: 2
-        run: npm run fetch-rocket-grunt-quotes
+        shell: bash
+        run: npm run fetch-rocket-grunt-quotes 2>&1 | tee "$RUNNER_TEMP/sync/rocket-quotes.log"
       - name: Fetch Great / Ultra / Master + cup rankings from PvPoke (lily-dex fallback)
         id: pvp
         if: env.SYNC_ALL == 'true' || inputs.pvp
         continue-on-error: true
         timeout-minutes: 2
-        run: npm run fetch-pvp-rankings
+        shell: bash
+        run: npm run fetch-pvp-rankings 2>&1 | tee "$RUNNER_TEMP/sync/pvp.log"
       - name: Derive raid-attacker rankings from the game master (alexelgt, PokeMiners fallback)
         id: meta
         if: env.SYNC_ALL == 'true' || inputs.meta
         continue-on-error: true
         timeout-minutes: 2
-        run: npm run fetch-meta-rankings
+        shell: bash
+        run: npm run fetch-meta-rankings 2>&1 | tee "$RUNNER_TEMP/sync/meta.log"
       # The friend-collect packs read this snapshot at build time.
       - name: Derive species meta from the game master + PvPoke roster
         id: species-meta
         if: env.SYNC_ALL == 'true' || inputs.species-meta
         continue-on-error: true
         timeout-minutes: 2
-        run: npm run fetch-species-meta
+        shell: bash
+        run: npm run fetch-species-meta 2>&1 | tee "$RUNNER_TEMP/sync/species-meta.log"
       # Event spawn filters are time-windowed and excluded from the fixture
       # snapshot (like event raids).
       - name: Fetch wild-spawn events from leak-duck
@@ -156,14 +170,16 @@ jobs:
         if: env.SYNC_ALL == 'true' || inputs.events
         continue-on-error: true
         timeout-minutes: 2
-        run: npm run fetch-events
+        shell: bash
+        run: npm run fetch-events 2>&1 | tee "$RUNNER_TEMP/sync/events.log"
       # Self-validates known forms, so a changed upstream shape fails here.
       - name: Derive the regional-form catalog from the game master
         id: regional-forms
         if: env.SYNC_ALL == 'true' || inputs.regional-forms
         continue-on-error: true
         timeout-minutes: 2
-        run: npm run fetch-regional-forms
+        shell: bash
+        run: npm run fetch-regional-forms 2>&1 | tee "$RUNNER_TEMP/sync/regional-forms.log"
       # After the PvP fetch, so a rebalance and the rankings that respond to it
       # land in the same reference regeneration below.
       - name: Snapshot PvP move stats and probe the PokeMiners mirror
@@ -171,7 +187,8 @@ jobs:
         if: env.SYNC_ALL == 'true' || inputs.game-master-watch
         continue-on-error: true
         timeout-minutes: 2
-        run: npm run fetch-game-master-watch
+        shell: bash
+        run: npm run fetch-game-master-watch 2>&1 | tee "$RUNNER_TEMP/sync/game-master-watch.log"
 
       # ── Regenerate + validate ────────────────────────────────────────────
       # The skill's meta reference is generated from the snapshots we just
@@ -190,9 +207,11 @@ jobs:
       # before the commit turns that into a failed sync instead, and holds back
       # the whole push: check-data-filters covers raids, Rocket and PvP alike.
       - name: Validate the snapshots and the regenerated reference
+        id: validate
+        shell: bash
         run: |
-          npm run test:datafilters
-          npm run test:metaref
+          npm run test:datafilters 2>&1 | tee "$RUNNER_TEMP/sync/validate.log"
+          npm run test:metaref 2>&1 | tee -a "$RUNNER_TEMP/sync/validate.log"
 
       # ── Commit + push ────────────────────────────────────────────────────
       # Push as the Pushologist GitHub App so the commit can bypass the
