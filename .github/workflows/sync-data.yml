@@ -83,6 +83,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      # The commit the job summary compares every snapshot against. Normally
+      # GITHUB_SHA; recorded here because a rebase before the push moves HEAD.
+      - name: Record the commit the sync starts from
+        id: base
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -95,8 +100,8 @@ jobs:
       # Every fetch exits 1 on real failure (fetch error, empty or shrunken
       # upstream, a sanity assertion tripping) and writes nothing when it does,
       # so one broken upstream must not hold back the others: each step carries
-      # on, and "Fail if any fetch failed" turns the run red at the end. A red
-      # run + GitHub notification is the only intervention the user wants.
+      # on, and the last step turns the run red at the end. A red run + GitHub
+      # notification is the only intervention the user wants.
       #
       # Each fetch is cut off at 2 minutes; a normal one takes about a second,
       # the first 19 MB game-master download a few. No fetcher sets a request
@@ -108,7 +113,7 @@ jobs:
       # failures in the run history are deterministic, not transient.
       #
       # Each fetch also tees its output to $RUNNER_TEMP/sync/<step id>.log, for
-      # a report of its ⚠ lines and of a failed step's last ✗ line. `shell:
+      # the job summary: its ⚠ lines and a failed step's last ✗ line. `shell:
       # bash` is what keeps that honest: it adds pipefail, so the step fails
       # when the fetch does, not only when tee does. The default shell is
       # `bash -e` without pipefail.
@@ -269,9 +274,20 @@ jobs:
           # After the push: a rebase gives the commit a new sha.
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Fail if any fetch failed
+      # ── Report ───────────────────────────────────────────────────────────
+      # The job summary: a row per part, what moved in PvP, events, raids and
+      # the move-stat watch, and the folded warnings. It runs first and with
+      # `|| true`, because it is a report and must never be what turns a run
+      # red. It compares every snapshot with the commit the job started from,
+      # so it reads the same after a push as when validation held one back.
+      - name: Write the job summary; fail if any fetch failed
         if: ${{ !cancelled() }}
         env:
+          BASE_SHA: ${{ steps.base.outputs.sha }}
+          VALIDATE: ${{ steps.validate.outcome }}
+          COMMIT: ${{ steps.commit.outcome }}
+          COMMIT_SHA: ${{ steps.commit.outputs.sha }}
+          INPUTS: ${{ toJSON(inputs) }}
           OUTCOMES: >-
             raids=${{ steps.raids.outcome }}
             rocket-lineups=${{ steps.rocket-lineups.outcome }}
@@ -283,6 +299,8 @@ jobs:
             regional-forms=${{ steps.regional-forms.outcome }}
             game-master-watch=${{ steps.game-master-watch.outcome }}
         run: |
+          npx vite-node scripts/sync-summary.mjs render --base "${BASE_SHA:-$GITHUB_SHA}" --logs "$RUNNER_TEMP/sync" >> "$GITHUB_STEP_SUMMARY" || true
+
           failed=$(tr ' ' '\n' <<<"$OUTCOMES" | grep '=failure$' | cut -d= -f1 || true)
           if [ -n "$failed" ]; then
             echo "These fetches failed (see their step logs):"
