@@ -432,8 +432,8 @@ function formatWhen(now) {
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
 }
 
-// ctx: { results, outcomes: {id: outcome}, validate, commit, commitSha, event,
-// inputs, repoUrl, ref, logs: {id|"validate": text}, now }
+// ctx: { results, outcomes: {id: outcome}, validate, commit, push, commitSha,
+// event, inputs, repoUrl, ref, logs: {id|"validate": text}, now }
 export function renderSummary(ctx) {
   const { results, outcomes = {}, logs = {}, now = Date.now() } = ctx;
   const out = [];
@@ -466,7 +466,9 @@ export function renderSummary(ctx) {
     const link = ctx.repoUrl ? `[\`${sha}\`](${ctx.repoUrl}/commit/${encodeURIComponent(ctx.commitSha)})` : `\`${sha}\``;
     out.push(`${ranText} · ${moved} · pushed ${link} to ${md(ctx.ref || "main", 40)}`);
   } else if (ctx.commit === "failure") {
-    out.push(`❌ ${ranText.replace(/^\S+ /, "")} · ${moved} · the commit or push failed, nothing landed (see "Commit + push")`);
+    out.push(`❌ ${ranText.replace(/^\S+ /, "")} · ${moved} · the commit failed, nothing landed (see "Commit the snapshots that moved")`);
+  } else if (ctx.push === "failure") {
+    out.push(`❌ ${ranText.replace(/^\S+ /, "")} · ${moved} · committed but not pushed, nothing landed (see "Mint Pushologist app token" and "Push the data commit")`);
   } else if (!anyMoved) {
     out.push(`${ranText} · no snapshot changes, nothing to push`);
   } else {
@@ -573,7 +575,8 @@ export function classifyCli(argv) {
 }
 
 // The rest of the run's state comes from the env the workflow step sets:
-// OUTCOMES, VALIDATE, COMMIT, COMMIT_SHA, INPUTS and GitHub's own GITHUB_*.
+// OUTCOMES, VALIDATE, COMMIT, PUSH, COMMIT_SHA, INPUTS and GitHub's own
+// GITHUB_*.
 export function renderCli(argv, env = process.env) {
   const opts = args(argv);
   const root = resolve(opts.root ?? process.cwd());
@@ -591,6 +594,7 @@ export function renderCli(argv, env = process.env) {
     outcomes: parseOutcomes(env.OUTCOMES),
     validate: env.VALIDATE,
     commit: env.COMMIT,
+    push: env.PUSH,
     commitSha: env.COMMIT_SHA,
     event: env.GITHUB_EVENT_NAME,
     inputs,

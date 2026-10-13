@@ -323,7 +323,7 @@ console.log("\nY5: layer A (header, verdicts, rows, warnings)");
   const ALL = Object.fromEntries(PARTS.map((p) => [p.id, "success"]));
   const SHA = "0123456789abcdef0123456789abcdef01234567";
   const base = {
-    outcomes: ALL, validate: "success", commit: "success", commitSha: SHA, event: "schedule", inputs: {},
+    outcomes: ALL, validate: "success", commit: "success", push: "success", commitSha: SHA, event: "schedule", inputs: {},
     repoUrl: "https://github.com/owner/repo", ref: "main", logs: {}, now: NOW,
   };
   const results = classifyAll(mutated({ [P.pvp]: pvpMutated, [P.meta]: metaStampOnly, [P.events]: null }));
@@ -367,12 +367,17 @@ console.log("\nY5: layer A (header, verdicts, rows, warnings)");
   const wrote = renderSummary({ ...base, results: resultsPvpMeta, outcomes: { ...ALL, pvp: "failure" }, logs: { pvp: "✗ takeover read failed\n" } });
   check("a failed step that still wrote its snapshot says so", wrote.includes("| PvP rankings | ❌ failed: takeover read failed · wrote its snapshot anyway: **changed**"));
 
-  const held = renderSummary({ ...base, results: resultsPvpMeta, validate: "failure", commit: "skipped", commitSha: "" });
+  const held = renderSummary({ ...base, results: resultsPvpMeta, validate: "failure", commit: "skipped", push: "skipped", commitSha: "" });
   check("held back when validation failed", held.split("\n")[1].startsWith("⛔ Held back because validation failed, nothing pushed · All 9 parts ran · 1 snapshot changed"), held.split("\n")[1]);
   check("…shows what would have landed", held.includes("Not pushed. This is what would have landed:") && held.includes("**PvP**"));
   check("…and links no commit", !held.includes("/commit/"));
-  const pushFail = renderSummary({ ...base, results: resultsPvpMeta, commit: "failure", commitSha: "" });
-  check("push failure", pushFail.split("\n")[1].includes("the commit or push failed, nothing landed"), pushFail.split("\n")[1]);
+  const commitFail = renderSummary({ ...base, results: resultsPvpMeta, commit: "failure", push: "skipped", commitSha: "" });
+  check("commit failure names the commit step",
+    commitFail.split("\n")[1].includes('the commit failed, nothing landed (see "Commit the snapshots that moved")'), commitFail.split("\n")[1]);
+  // The workflow folds a failed mint into PUSH: no token, no push.
+  const pushFail = renderSummary({ ...base, results: resultsPvpMeta, commit: "success", push: "failure", commitSha: "" });
+  check("push failure says it was committed but not pushed",
+    pushFail.split("\n")[1].includes("committed but not pushed, nothing landed"), pushFail.split("\n")[1]);
 
   // Warnings: fetcher ⚠ lines and validation "!" lines, folded and escaped;
   // the events line about a new event's unresolved names is already shown.
@@ -420,7 +425,7 @@ console.log("\nY6: render end to end in a temp git repo");
   writeFileSync(join(logDir, "events.log"), "✗ Fetch failed: timeout\n");
   const env = {
     OUTCOMES: PARTS.map((p) => `${p.id}=${p.id === "events" ? "failure" : "success"}`).join(" "),
-    VALIDATE: "success", COMMIT: "success", COMMIT_SHA: git(dir, "rev-parse", "HEAD"),
+    VALIDATE: "success", COMMIT: "success", PUSH: "success", COMMIT_SHA: git(dir, "rev-parse", "HEAD"),
     GITHUB_EVENT_NAME: "workflow_dispatch", INPUTS: "not json",
     GITHUB_SERVER_URL: "https://github.com", GITHUB_REPOSITORY: "o/r", GITHUB_REF_NAME: "main",
   };

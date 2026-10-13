@@ -219,23 +219,12 @@ jobs:
           npm run test:metaref 2>&1 | tee -a "$RUNNER_TEMP/sync/validate.log"
 
       # ── Commit + push ────────────────────────────────────────────────────
-      # Push as the Pushologist GitHub App so the commit can bypass the
-      # branch protection on main (GITHUB_TOKEN pushes are rejected there).
-      # That bypass makes this token the most valuable secret in the repo: a
-      # push to main deploys the site. So it is minted here, after every step
-      # that runs dependency code, and scoped to the one permission a push
-      # needs.
-      - name: Mint Pushologist app token
-        id: app-token
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_SECRET }}
-          permission-contents: write
-      - name: Commit + push if anything changed
-        id: commit
-        env:
-          APP_TOKEN: ${{ steps.app-token.outputs.token }}
+      # The commit is made before the app token exists. Building its message
+      # runs vite-node, which starts Vite and loads its plugins, PostCSS,
+      # Tailwind and the rest of the dependency tree, so it must not run in a
+      # process that has the token in its environment.
+      - name: Commit the snapshots that moved
+        id: local-commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -252,12 +241,41 @@ jobs:
           mapfile -t paths < "$RUNNER_TEMP/sync/commit-paths.txt"
           if [ ${#paths[@]} -eq 0 ]; then
             echo "No snapshot changes — skipping commit."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git add -- "${paths[@]}"
           git commit -F "$RUNNER_TEMP/sync/commit-message.txt"
           git log -1 --stat
+          echo "changed=true" >> "$GITHUB_OUTPUT"
 
+      # Push as the Pushologist GitHub App so the commit can bypass the
+      # branch protection on main (GITHUB_TOKEN pushes are rejected there).
+      # That bypass makes this token the most valuable secret in the repo: a
+      # push to main deploys the site. So it is minted only when there is a
+      # commit to push, after the last step that runs dependency code, scoped
+      # to the one permission a push needs, and handed to the push step
+      # alone, which runs nothing but git. The job summary step after it runs
+      # vite-node again but never sees the token.
+      #
+      # This narrows the exposure; it is not a hard boundary. APP_SECRET is on
+      # this runner from the start of the job, where a compromised dependency
+      # that scrapes the runner's memory could still reach it. Only a push
+      # job of its own, with no npm code in it, would close that.
+      - name: Mint Pushologist app token
+        id: app-token
+        if: steps.local-commit.outputs.changed == 'true'
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_SECRET }}
+          permission-contents: write
+      - name: Push the data commit
+        id: commit
+        if: steps.local-commit.outputs.changed == 'true'
+        env:
+          APP_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
           # main can move while the fetches run. The commit only touches
           # snapshot files nobody edits by hand, so a rebase onto the new tip
           # is clean, and test.yml still runs on the result. The pull needs no
@@ -285,7 +303,9 @@ jobs:
         env:
           BASE_SHA: ${{ steps.base.outputs.sha }}
           VALIDATE: ${{ steps.validate.outcome }}
-          COMMIT: ${{ steps.commit.outcome }}
+          COMMIT: ${{ steps.local-commit.outcome }}
+          # No token means no push, so a failed mint reads as a failed push.
+          PUSH: ${{ steps.app-token.outcome == 'failure' && 'failure' || steps.commit.outcome }}
           COMMIT_SHA: ${{ steps.commit.outputs.sha }}
           INPUTS: ${{ toJSON(inputs) }}
           OUTCOMES: >-
