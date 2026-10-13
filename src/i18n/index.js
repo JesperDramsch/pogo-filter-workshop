@@ -9,9 +9,10 @@ import zhTW from "../locales/zh-TW.json";
 import hi from "../locales/hi.json";
 import ja from "../locales/ja.json";
 
-// App-UI strings live in a separate per-locale file so the spreadsheet-driven
-// fetch script can overwrite the in-game/Pokémon JSONs without stomping our
-// hand-maintained UI translations. Merged at module load.
+// App-UI strings live in a separate per-locale file so the translations fetch
+// (scripts/fetch-translations.mjs, which reads Niantic's own text export) can
+// overwrite the in-game/Pokémon JSONs without stomping our hand-maintained UI
+// translations. Merged at module load.
 import appEn from "../locales/app/en.json";
 import appDe from "../locales/app/de.json";
 import appEs from "../locales/app/es.json";
