@@ -284,10 +284,23 @@ jobs:
           # The app token goes into the URL of each push and nowhere else, so
           # it is never written to the git config. The token action registers
           # it as a secret, so the runner masks it in the log.
+          #
+          # Every earlier step ran dependency code, which can write git config
+          # and hooks. A pre-push hook is handed the push URL, token and all; a
+          # credential helper is handed the credentials; a URL rewrite or proxy
+          # sends them elsewhere. So git runs here without global or system
+          # config, hooks or credential helpers, and refuses to push at all if
+          # the repo's own config rewrites, proxies or includes anything.
+          export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
+          if git config --local --get-regexp '^(url\..*\.(push)?insteadof|http\..*proxy|include\..*|includeif\..*)$'; then
+            echo "::error::.git/config rewrites, proxies or includes the remote; not pushing the app token through it"
+            exit 1
+          fi
+          g() { git -c core.hooksPath=/dev/null -c credential.helper= "$@"; }
           remote="https://x-access-token:${APP_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push "$remote" "HEAD:$GITHUB_REF_NAME" || {
-            git pull --rebase origin "$GITHUB_REF_NAME" &&
-              git push "$remote" "HEAD:$GITHUB_REF_NAME"
+          g push "$remote" "HEAD:$GITHUB_REF_NAME" || {
+            g pull --rebase origin "$GITHUB_REF_NAME" &&
+              g push "$remote" "HEAD:$GITHUB_REF_NAME"
           }
           # After the push: a rebase gives the commit a new sha.
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
