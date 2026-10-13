@@ -124,6 +124,7 @@ jobs:
       # config-derived filters, and the data-derived ones these feed are covered
       # by property checks in scripts/check-data-filters.mjs. See the split in
       # scripts/lib/fixture.mjs before adding a regeneration step back.
+      #
       # A raid or Max Battle family that comes back empty exits non-zero AFTER
       # writing: that family keeps the previous snapshot's bosses, and the
       # healthy one and the event lists are committed below. The run goes red

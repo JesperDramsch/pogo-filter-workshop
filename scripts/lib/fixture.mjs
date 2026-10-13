@@ -79,10 +79,11 @@ export function buildResult(locale, { hundos = DEFAULT_HUNDOS, luckies = DEFAULT
 // snapshot is good at.
 //
 // Deliberately NOT pinned: raidFilters, maxBattleFilters,
-// eventMaxBattleFilters, maxTank, rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, pvpFilters,
-// shadowSafe and shadowFrustration. Those are projections of data that syncs
-// daily — 17 of the last 20 commits touching this fixture were automated
-// raid/PvP syncs, one of them rewriting 126 lines.
+// eventMaxBattleFilters, maxTank, rocketLeaders, rocketTypedGrunts,
+// rocketGenericGrunts, pvpFilters, shadowSafe and shadowFrustration. Those
+// are projections of data that syncs daily — 17 of the last 20 commits
+// touching this fixture were automated raid/PvP syncs, one of them rewriting
+// 126 lines.
 // Pinning a daily-changing value cannot distinguish "the boss rotation moved"
 // from "the counter logic broke": the sync regenerates the snapshot in the same
 // job, so it always heals and nobody ever reviews it. That is churn, not a test.

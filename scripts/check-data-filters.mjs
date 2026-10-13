@@ -47,7 +47,7 @@ import {
 } from "../src/data/species.js";
 import { unresolvableDexEntries, formSuffixedDexEntries, NAME_LOCALES } from "./lib/species-dex.mjs";
 import {
-  buildEventMaxBattles, buildNameIndex, guardEmptiedFamilies, parseMaxEventBosses,
+  GUARDED_FAMILIES, buildEventMaxBattles, buildNameIndex, guardEmptiedFamilies, parseMaxEventBosses,
 } from "./fetch-raid-bosses.mjs";
 
 let failures = 0;
@@ -186,10 +186,14 @@ console.log("\nD5 — filter families that are entirely empty");
   // snapshot hides it forever.
   const SOURCES = {
     maxBattleFilters: `raid-bosses.json maxBattles, lily-dex-api's standing list (${JSON.stringify(RAID_BOSSES.maxBattles || {}).slice(0, 40)})`,
-    eventMaxBattleFilters: "raid-bosses.json eventMaxBattles, ScrapedDuck's Max Mondays and Max Battle Days (empty between events)",
     maxTank: "meta-rankings.json, the 0.5-second charger moves",
   };
-  const empty = FAMILIES.filter((f) => leaves(byLocale.en[f], f).filter((l) => l.clause !== "").length === 0);
+  // The event Max Battle list is empty between events by design, so it is
+  // left to the panel line below, which flags only when the panel has no
+  // attackers at all. Flagged here too, a day without a Max event would put
+  // three warnings for one condition into the sync summary.
+  const empty = FAMILIES.filter((f) => f !== "eventMaxBattleFilters")
+    .filter((f) => leaves(byLocale.en[f], f).filter((l) => l.clause !== "").length === 0);
   if (empty.length === 0) console.log("  ✓ none");
   for (const f of empty) console.log(`  ! ${f} is empty — check ${SOURCES[f] ?? "its source data"}`);
   // The Max Battle panel has two sources, so each gets its own count whether
@@ -651,7 +655,8 @@ console.log("\nD12 — event Max Battles: parsed, date-gated, resolved and built
   // Game-master templates in the shape the mirrors publish (as in
   // check-game-master.mjs), named through the real dictionary, for the
   // species the live feed named on 2026-10-13 and one with a Gigantamax form.
-  // Sableye is left out on purpose: it is the name this index cannot resolve.
+  // Sableye is left out of this synthetic index on purpose, so its event is
+  // the unresolvable case. The real index resolves it.
   const T = (t) => (t ? `POKEMON_TYPE_${t}` : undefined);
   const mon = (dex, type, type2) => {
     const id = en(dex).toUpperCase();
@@ -775,6 +780,10 @@ console.log("\nD12 — event Max Battles: parsed, date-gated, resolved and built
   g = guardEmptiedFamilies({ raids: tiers(4), maxBattles: tiers(3) }, { raids: tiers(4), maxBattles: {}, eventMaxBattles: out.entries });
   check("guard: event Max Battles do not stand in for an emptied standing list",
     g.refused.map((r) => r.family).join() === "maxBattles" && g.write?.eventMaxBattles === out.entries);
+  // The two checks above cannot catch an event family added to the guard:
+  // bossCount reads an event array as zero bosses either way. So pin the list.
+  check("guard: only the two standing rotations are guarded",
+    JSON.stringify(GUARDED_FAMILIES) === JSON.stringify(["raids", "maxBattles"]), JSON.stringify(GUARDED_FAMILIES));
 }
 
 console.log(`\n${failures === 0 ? "✓ All data-filter property checks passed." : `✗ ${failures} failure(s).`}`);

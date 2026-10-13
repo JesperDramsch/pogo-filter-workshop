@@ -470,7 +470,7 @@ function readPrevious(path) {
 // The two standing rotations lily-dex-api publishes. Neither event list is
 // one of them: eventRaids and eventMaxBattles are 7-day windows, legitimately
 // empty between events, and they are built after this guard runs.
-const GUARDED_FAMILIES = ["raids", "maxBattles"];
+export const GUARDED_FAMILIES = ["raids", "maxBattles"];
 
 function bossCount(tiers) {
   return Object.values(tiers || {}).reduce((n, list) => n + (Array.isArray(list) ? list.length : 0), 0);
