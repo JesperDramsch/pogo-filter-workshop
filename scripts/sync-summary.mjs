@@ -109,9 +109,12 @@ export function classifyAll(read) {
 
 // History entries in `after` that `before` does not have, newest first. Keyed by
 // the whole entry: on 2026-09-09 a pvp and a pve entry shared one timestamp.
+// A history that is not a list of objects reads as empty: classify builds the
+// data commit, and a malformed watch file must not cost the day's push.
+const historyOf = (doc) => (Array.isArray(doc?.history) ? doc.history.filter((h) => h && typeof h === "object") : []);
 export function newHistory(before, after) {
-  const seen = new Set((before?.history ?? []).map(canonicalStringify));
-  return (after?.history ?? []).filter((h) => !seen.has(canonicalStringify(h)));
+  const seen = new Set(historyOf(before).map(canonicalStringify));
+  return historyOf(after).filter((h) => !seen.has(canonicalStringify(h)));
 }
 
 const stampKeys = (stamps) => [...new Set(namedStamps(stamps).map((s) => s.key))];

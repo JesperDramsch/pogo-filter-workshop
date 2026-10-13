@@ -192,6 +192,16 @@ console.log("\nY2: the commit message");
   const plain = commitMessage(classifyAll(mutated({ [P["game-master-watch"]]: moves })));
   check("content change with no new history → move stats", plain?.body.join() === "- game-master: move stats", plain?.body.join());
 
+  // classify runs inside the commit step: a malformed history must cost the
+  // line its detail, not the day's commit.
+  for (const [label, history] of [["an object", {}], ["a string", "x"], ["null entries", [null, 1]]]) {
+    const bad = structuredClone(moves);
+    bad.history = history;
+    let msg;
+    try { msg = commitMessage(classifyAll(mutated({ [P["game-master-watch"]]: bad }))); } catch (e) { msg = { body: [`threw: ${e.message}`] }; }
+    check(`history as ${label} → move stats, no throw`, msg?.body.join() === "- game-master: move stats", msg?.body.join());
+  }
+
   const fresh = commitMessage(classifyAll(memReader({ ...CURRENT, [P.events]: undefined }, CURRENT)));
   check("a file missing from the base is a content change", fresh?.subject === "chore(data): sync events", fresh?.subject);
 }
