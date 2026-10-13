@@ -1,54 +1,6 @@
 {
-  "fetchedAt": "2026-10-10T14:27:18.761Z",
+  "fetchedAt": "2026-10-13T12:54:31.454Z",
   "events": [
-    {
-      "id": "event-harvest-festival-2026-applin-picking-2026-09-29t10-00-00",
-      "title": "Harvest Festival 2026: Applin Picking",
-      "category": "Event",
-      "start": "2026-09-29T10:00:00",
-      "end": "2026-10-05T20:00:00",
-      "isLocalTime": true,
-      "spawnDex": [
-        143,
-        285,
-        590,
-        819,
-        840,
-        915,
-        928
-      ],
-      "spawns": [
-        "Applin",
-        "Foongus",
-        "Lechonk",
-        "Shroomish",
-        "Skwovet",
-        "Smoliv",
-        "Snorlax"
-      ],
-      "unresolved": []
-    },
-    {
-      "id": "event-harvest-festival-taken-over-2026-10-02t00-00-00",
-      "title": "Harvest Festival: Taken Over",
-      "category": "Event",
-      "start": "2026-10-02T00:00:00",
-      "end": "2026-10-05T20:00:00",
-      "isLocalTime": true,
-      "spawnDex": [
-        109,
-        126,
-        218,
-        322
-      ],
-      "spawns": [
-        "Koffing",
-        "Magmar",
-        "Numel",
-        "Slugma"
-      ],
-      "unresolved": []
-    },
     {
       "id": "community-day-zorua-community-day-2026-10-10t14-00-00",
       "title": "Zorua Community Day",
@@ -77,8 +29,10 @@
         84,
         187,
         227,
+        234,
         290,
         309,
+        331,
         522,
         557,
         694,
@@ -87,6 +41,7 @@
       "spawns": [
         "Blitzle",
         "Bramblin",
+        "Cacnea",
         "Doduo",
         "Dwebble",
         "Electrike",
@@ -95,7 +50,8 @@
         "Hoppip",
         "Nincada",
         "Ponyta",
-        "Skarmory"
+        "Skarmory",
+        "Stantler"
       ],
       "unresolved": []
     },
@@ -113,6 +69,24 @@
         "Minior"
       ],
       "unresolved": []
+    },
+    {
+      "id": "event-pok-mon-go-halloween-2026-part-i-2026-10-27t10-00-00",
+      "title": "Pokémon GO Halloween 2026 Part I",
+      "category": "Event",
+      "start": "2026-10-27T10:00:00",
+      "end": "2026-11-01T10:00:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        355
+      ],
+      "spawns": [
+        "Duskull"
+      ],
+      "unresolved": [
+        "Piplup wearing a Halloween Mischief costume",
+        "Zubat wearing a top hat"
+      ]
     }
   ],
   "eggPools": [
