@@ -13,7 +13,8 @@
 //   Y2  the commit message (subject scopes, provenance-only lines, the
 //       stamps-only subject, one line per new game-master history entry)
 //   Y3  classify end to end in a temp git repo, a file missing from HEAD
-//   Y4  the layer-B renderers for PvP, events, raids and the game-master watch
+//   Y4  the layer-B renderers for PvP, events, raids (event raids and event
+//       Max Battles included) and the game-master watch
 //   Y5  layer A (header, verdicts, rows, held back, failed steps, warnings,
 //       escaping, and the fallback when a renderer throws)
 //   Y6  render end to end in a temp git repo, with step logs on disk
@@ -324,6 +325,21 @@ console.log("\nY4: the layer-B renderers");
   oddDate.eventRaids.at(-1).start = "2099-**|<>xyz";
   checkQuiet("a date slice is escaped like any upstream text",
     renderRaids(rBase, oddDate).lines.includes("- event raids: +Newmon in 5-star Raid Battles (\\*\\*\\|\\<\\> → 10-20)"), renderRaids(rBase, oddDate).lines.join(" / "));
+
+  // Event Max Battles: one that ended drops out and the next Max Monday
+  // arrives, on a snapshot that may not have the field at all yet.
+  const maxEvent = (eventID, name, start, end) => ({ eventID, name, eventType: "max-mondays", start, end, bosses: [boss("ZZ_NEW", "Newmon")] });
+  const mBase = { ...json(P.raids), eventMaxBattles: [maxEvent("zz-max-old", "Dynamax Oldmon during Max Monday", "2099-10-12T06:00:00.000", "2099-10-12T21:00:00.000")] };
+  const mHead = { ...mBase, eventMaxBattles: [maxEvent("zz-max-new", "Dynamax Newmon during Max *Monday*", "2099-10-19T06:00:00.000", "2099-10-19T21:00:00.000")] };
+  const maxLines = renderRaids(mBase, mHead).lines;
+  checkQuiet("new event Max Battle with its window, name escaped",
+    maxLines.includes("- event Max Battles: +Dynamax Newmon during Max \\*Monday\\* (10-19 → 10-19)"), maxLines.join(" / "));
+  checkQuiet("an event Max Battle that left the window", maxLines.includes("- event Max Battles: −Dynamax Oldmon during Max Monday"), maxLines.join(" / "));
+  checkQuiet("event Max Battles are not listed as event raids", maxLines.length === 2 && !maxLines.some((l) => l.startsWith("- event raids:")), maxLines.join(" / "));
+  const noField = structuredClone(mBase);
+  delete noField.eventMaxBattles;
+  checkQuiet("a snapshot from before the field reads as no event Max Battles",
+    JSON.stringify(renderRaids(noField, mHead).lines) === JSON.stringify([maxLines[0]]), renderRaids(noField, mHead).lines.join(" / "));
 
   const watch = renderWatch(watchDoc, watchWithHistory).lines;
   check("one line per new history entry", watch.length === 2, String(watch.length));

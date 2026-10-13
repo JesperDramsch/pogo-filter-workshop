@@ -50,7 +50,7 @@ const REF = "skills/pokemon-go-filters/references";
 // summary row where the fetcher can fall back to another one.
 export const PARTS = [
   { id: "raids", scope: "raids", label: "Raids",
-    what: () => "boss snapshot from lily-dex-api", paths: ["src/data/raid-bosses.json"] },
+    what: () => "boss snapshot from lily-dex-api + ScrapedDuck events", paths: ["src/data/raid-bosses.json"] },
   { id: "rocket-lineups", scope: "rocket", label: "Rocket lineups",
     what: () => "lineup snapshot", paths: ["src/data/rocket-lineups.json"],
     source: (doc) => doc?.source },
@@ -289,7 +289,9 @@ export function renderEvents(before, after, now = Date.now()) {
 }
 
 // Per tier, by boss id, named with the snapshot's own names: raid bosses carry
-// no dex number, so pokemonNameFor has nothing to look up.
+// no dex number, so pokemonNameFor has nothing to look up. The event raids and
+// event Max Battles are dated, so each is listed by its title and window when
+// it arrives and by its title when it goes.
 export function renderRaids(before, after) {
   const lines = [];
   const bossName = (b) => md(b?.names?.en ?? b?.id, 40);
@@ -306,14 +308,18 @@ export function renderRaids(before, after) {
       lines.push(`- ${prefix}${md(tier, 30)}: ${sides.join(" · ")}`);
     }
   };
+  const events = (key, label) => {
+    const byId = (j) => new Map((j?.[key] ?? []).map((e) => [e.eventID, e]));
+    const oldE = byId(before), newE = byId(after);
+    for (const [id, e] of newE) {
+      if (!oldE.has(id)) lines.push(`- ${label}: +${md(e.name, 80)} (${monthDay(e.start)} → ${monthDay(e.end)})`);
+    }
+    for (const [id, e] of oldE) if (!newE.has(id)) lines.push(`- ${label}: −${md(e.name, 80)}`);
+  };
   tiers("", before?.raids, after?.raids);
   tiers("max ", before?.maxBattles, after?.maxBattles);
-  const byId = (j) => new Map((j?.eventRaids ?? []).map((e) => [e.eventID, e]));
-  const oldE = byId(before), newE = byId(after);
-  for (const [id, e] of newE) {
-    if (!oldE.has(id)) lines.push(`- event raids: +${md(e.name, 80)} (${monthDay(e.start)} → ${monthDay(e.end)})`);
-  }
-  for (const [id, e] of oldE) if (!newE.has(id)) lines.push(`- event raids: −${md(e.name, 80)}`);
+  events("eventRaids", "event raids");
+  events("eventMaxBattles", "event Max Battles");
   return { title: "**Raids**", lines };
 }
 
