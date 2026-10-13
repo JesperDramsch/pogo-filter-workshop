@@ -69,7 +69,7 @@ jobs:
     # else, which is the translations job's alone.
     if: github.event_name != 'workflow_dispatch' || !inputs.translations || inputs.raids || inputs.rocket-lineups || inputs.rocket-quotes || inputs.pvp || inputs.meta || inputs.species-meta || inputs.events || inputs.regional-forms || inputs.game-master-watch
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     permissions:
       contents: read
     env:
@@ -96,6 +96,15 @@ jobs:
       # on, and "Fail if any fetch failed" turns the run red at the end. A red
       # run + GitHub notification is the only intervention the user wants.
       #
+      # Each fetch is cut off at 2 minutes; a normal one takes about a second,
+      # the first 19 MB game-master download a few. No fetcher sets a request
+      # timeout and Node's fetch waits up to 300 s for headers, so one hung
+      # upstream could otherwise run the job into its own timeout before
+      # "Commit + push", losing every other source's update that day. A step
+      # that times out reports outcome=failure, so the run still names it. The
+      # job allows 9 × 2 minutes plus setup and validation. No retries: the
+      # failures in the run history are deterministic, not transient.
+      #
       # Deliberately does NOT regenerate the fixture: the snapshot pins only
       # config-derived filters, and the data-derived ones these feed are covered
       # by property checks in scripts/check-data-filters.mjs. See the split in
@@ -104,6 +113,7 @@ jobs:
         id: raids
         if: env.SYNC_ALL == 'true' || inputs.raids
         continue-on-error: true
+        timeout-minutes: 2
         run: npm run fetch-raid-bosses
       # A failed takeover read exits non-zero AFTER writing the ScrapedDuck
       # snapshot. That snapshot is still committed below; the run goes red at
@@ -112,27 +122,32 @@ jobs:
         id: rocket-lineups
         if: env.SYNC_ALL == 'true' || inputs.rocket-lineups
         continue-on-error: true
+        timeout-minutes: 2
         run: npm run fetch-rocket-lineups
       - name: Fetch Team Rocket grunt quotes from PokeMiners
         id: rocket-quotes
         if: env.SYNC_ALL == 'true' || inputs.rocket-quotes
         continue-on-error: true
+        timeout-minutes: 2
         run: npm run fetch-rocket-grunt-quotes
       - name: Fetch Great / Ultra / Master + cup rankings from PvPoke (lily-dex fallback)
         id: pvp
         if: env.SYNC_ALL == 'true' || inputs.pvp
         continue-on-error: true
+        timeout-minutes: 2
         run: npm run fetch-pvp-rankings
       - name: Derive raid-attacker rankings from the game master (alexelgt, PokeMiners fallback)
         id: meta
         if: env.SYNC_ALL == 'true' || inputs.meta
         continue-on-error: true
+        timeout-minutes: 2
         run: npm run fetch-meta-rankings
       # The friend-collect packs read this snapshot at build time.
       - name: Derive species meta from the game master + PvPoke roster
         id: species-meta
         if: env.SYNC_ALL == 'true' || inputs.species-meta
         continue-on-error: true
+        timeout-minutes: 2
         run: npm run fetch-species-meta
       # Event spawn filters are time-windowed and excluded from the fixture
       # snapshot (like event raids).
@@ -140,12 +155,14 @@ jobs:
         id: events
         if: env.SYNC_ALL == 'true' || inputs.events
         continue-on-error: true
+        timeout-minutes: 2
         run: npm run fetch-events
       # Self-validates known forms, so a changed upstream shape fails here.
       - name: Derive the regional-form catalog from the game master
         id: regional-forms
         if: env.SYNC_ALL == 'true' || inputs.regional-forms
         continue-on-error: true
+        timeout-minutes: 2
         run: npm run fetch-regional-forms
       # After the PvP fetch, so a rebalance and the rankings that respond to it
       # land in the same reference regeneration below.
@@ -153,6 +170,7 @@ jobs:
         id: game-master-watch
         if: env.SYNC_ALL == 'true' || inputs.game-master-watch
         continue-on-error: true
+        timeout-minutes: 2
         run: npm run fetch-game-master-watch
 
       # ── Regenerate + validate ────────────────────────────────────────────
