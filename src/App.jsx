@@ -1793,6 +1793,10 @@ export function buildFilters(
 	tFn = (k) => k,
 	homeLocalTypeChecks = [],
 	bazaarSpecies = [],
+	// The raid-bosses.json snapshot. A parameter so check-data-filters.mjs can
+	// run synthetic event Max Battles through this builder on a day the
+	// committed snapshot has none.
+	raidBosses = RAID_BOSSES,
 ) {
 	const kw = pogoKeywords(outputLocale);
 
@@ -3922,13 +3926,41 @@ export function buildFilters(
 		return { clause: clauses.map((c) => c.clause).join('&'), clauses };
 	};
 
+	// ScrapedDuck stores Pokémon names in EN ("Persian", "Kangaskhan"), in its
+	// Rocket lineups and in the event titles the raid and Max Battle event
+	// bosses are named from; the teaser/hint render layer surfaces these
+	// directly. Resolve to the user's outputLocale via the existing species
+	// dictionary so a DE user sees "Snobilikat, Kangama" instead of "Persian,
+	// Kangaskhan". Falls back to the EN name if the dictionary doesn't have
+	// the entry. Capitalized for display (resolveSpecies returns lowercase per
+	// the filter convention).
+	// Regional forms arrive as "Alolan Vulpix"; they render as the localized
+	// base name plus the region label, "Vulpix (Alola)", the parenthetical
+	// style formRegionLabel uses. The label is part of the NAME, so it comes
+	// from the output locale's bundle, not tFn (the UI locale) — otherwise an
+	// English UI with Japanese output renders "ロコン (Alola)".
+	const outputRegionLabel = (region) => {
+		const key = `app.buddy_targets.form_region.${region}`;
+		return LOCALES[outputLocale]?.messages[key] ?? LOCALES.en.messages[key] ?? region;
+	};
+	const localizePokemonName = (name) => {
+		const hit = resolveRegionalSpecies(name, outputLocale);
+		if (!hit?.name) return name;
+		const base = hit.name.charAt(0).toUpperCase() + hit.name.slice(1);
+		return hit.region ? `${base} (${outputRegionLabel(hit.region)})` : base;
+	};
+
+	// A boss's display name: lily-dex-api's own for its standing tiers, else
+	// the EN name through the species dictionary. Event bosses carry only an EN
+	// name, and lily-dex-api has no zh-TW or hi one.
+	const bossName = (boss) => boss.names?.[outputLocale] || localizePokemonName(boss.names?.en) || boss.id;
 	const buildBossEntry = (boss, { requiresDynamax = false } = {}) => {
 		const resistorList = (boss.resistorTypes || []).map((t) => kw.type[t]).filter(Boolean);
 		const seMoveList = (boss.seMoveTypes || []).map((t) => kw.type[t]).filter(Boolean);
 		if (resistorList.length === 0 || seMoveList.length === 0) {
 			return {
 				id: boss.id,
-				name: boss.names?.[outputLocale] || boss.names?.en || boss.id,
+				name: bossName(boss),
 				clause: '',
 				clauses: [],
 				skipped: true,
@@ -3962,7 +3994,7 @@ export function buildFilters(
 		if (wGuard) push(clauses, wGuard, tFn('app.clause_why.raid_not_weak_to_boss'));
 		return {
 			id: boss.id,
-			name: boss.names?.[outputLocale] || boss.names?.en || boss.id,
+			name: bossName(boss),
 			clause: clauses.map((c) => c.clause).join('&'),
 			clauses,
 			skipped: false,
@@ -3975,24 +4007,34 @@ export function buildFilters(
 		}
 		return out;
 	};
-	const raidFilters = buildBossTiers(RAID_BOSSES.raids);
-	const maxBattleFilters = buildBossTiers(RAID_BOSSES.maxBattles, { requiresDynamax: true });
-	const raidBossesFetchedAt = RAID_BOSSES.fetchedAt || null;
+	const raidFilters = buildBossTiers(raidBosses.raids);
+	const maxBattleFilters = buildBossTiers(raidBosses.maxBattles, { requiresDynamax: true });
+	const raidBossesFetchedAt = raidBosses.fetchedAt || null;
 
 	// Event raids — short-window bosses (Raid Day / Raid Hour / etc.) sourced
 	// from ScrapedDuck's events feed. Each entry carries its own start/end
 	// window plus a parallel boss list with the same shape as the standing
 	// tiers, so the UI can reuse FilterBox for each derived counter.
-	const eventRaidFilters = (RAID_BOSSES.eventRaids || []).map((event) => ({
+	const eventBossGroup = (event, opts) => ({
 		eventID: event.eventID,
 		name: event.name,
 		eventType: event.eventType,
 		start: event.start,
 		end: event.end,
+		bosses: (event.bosses || []).map((b) => buildBossEntry(b, opts)),
+	});
+	const eventRaidFilters = (raidBosses.eventRaids || []).map((event) => ({
+		...eventBossGroup(event),
 		isShadow: !!event.isShadow,
 		isMega: !!event.isMega,
-		bosses: (event.bosses || []).map((b) => buildBossEntry(b)),
 	}));
+	// Event Max Battles: Max Mondays and Max Battle Days from the same feed,
+	// built like the standing Max Battle tiers. lily-dex-api's standing list
+	// has been empty since 2026-06-11, so these are what the Max Battle panel
+	// has to show.
+	const eventMaxBattleFilters = (raidBosses.eventMaxBattles || []).map((event) =>
+		eventBossGroup(event, { requiresDynamax: true }),
+	);
 
 	// -- EVENT WILD SPAWNS · per-event curation workflow -----------------
 	// Each event's spawn species render as family-expanded German names
@@ -4099,27 +4141,6 @@ export function buildFilters(
 	//                   Snapshots without per-phase counters fall back to an
 	//                   offensive-only clause (top-3 SE move types).
 
-	// ScrapedDuck stores Pokémon names in EN ("Persian", "Kangaskhan"); the
-	// teaser/hint render layer surfaces these directly. Resolve to the user's
-	// outputLocale via the existing species dictionary so a DE user sees
-	// "Snobilikat, Kangama" instead of "Persian, Kangaskhan". Falls back to
-	// the EN name if the dictionary doesn't have the entry. Capitalized for
-	// display (resolveSpecies returns lowercase per the filter convention).
-	// Regional forms arrive as "Alolan Vulpix"; they render as the localized
-	// base name plus the region label, "Vulpix (Alola)", the parenthetical
-	// style formRegionLabel uses. The label is part of the NAME, so it comes
-	// from the output locale's bundle, not tFn (the UI locale) — otherwise an
-	// English UI with Japanese output renders "ロコン (Alola)".
-	const outputRegionLabel = (region) => {
-		const key = `app.buddy_targets.form_region.${region}`;
-		return LOCALES[outputLocale]?.messages[key] ?? LOCALES.en.messages[key] ?? region;
-	};
-	const localizePokemonName = (name) => {
-		const hit = resolveRegionalSpecies(name, outputLocale);
-		if (!hit?.name) return name;
-		const base = hit.name.charAt(0).toUpperCase() + hit.name.slice(1);
-		return hit.region ? `${base} (${outputRegionLabel(hit.region)})` : base;
-	};
 	const localizePokemons = (list) => (list || []).map((pk) => ({ ...pk, name: localizePokemonName(pk.name) }));
 	const localizePhases = (phases) => (phases || []).map((p) => ({ ...p, pokemons: localizePokemons(p.pokemons) }));
 
@@ -4600,6 +4621,7 @@ export function buildFilters(
 		raidFilters,
 		eventRaidFilters,
 		maxBattleFilters,
+		eventMaxBattleFilters,
 		raidBossesFetchedAt,
 		maxTank,
 		// Event wild-spawn curation filters
@@ -5739,6 +5761,7 @@ export default function App() {
 		raidFilters,
 		eventRaidFilters,
 		maxBattleFilters,
+		eventMaxBattleFilters,
 		raidBossesFetchedAt,
 		maxTank,
 		eventFilters,
@@ -6866,6 +6889,7 @@ export default function App() {
 											fetchedAt={raidBossesFetchedAt}
 											maxTank={maxTank}
 											bossesByTier={maxBattleFilters}
+											eventGroups={eventMaxBattleFilters}
 											tierOrder={['tier_3', 'tier_2', 'tier_1']}
 											accent='#F39C12'
 											open={showAuxMaxBattles}
@@ -6873,6 +6897,7 @@ export default function App() {
 											copied={copied}
 											copyToClipboard={copyToClipboard}
 											t={t}
+											locale={locale}
 										/>
 									</div>
 
@@ -8686,6 +8711,56 @@ function formatEventWindow(start, end, t, locale) {
 	});
 }
 
+// One boss's counter FilterBox, or a short italic note when the boss has no
+// clean counter. Shared by the raid and Max Battle panels. The copy key is
+// distinct per (panel, event, boss), so an event-context Latios and a
+// standing-tier Latios don't share copy state.
+function bossCounterBox(boss, { keyPrefix, eventID, accent, copied, copyToClipboard, t }) {
+	if (boss.skipped) {
+		return (
+			<p key={boss.id} className='text-xs italic text-[#8B98A5] pl-2'>
+				{t('app.filter.boss_no_clean_counter', { params: { boss: boss.name } })}
+			</p>
+		);
+	}
+	const copyKey = eventID ? `${keyPrefix}_evt_${eventID}_${boss.id}` : `${keyPrefix}_${boss.id}`;
+	return (
+		<FilterBox
+			key={boss.id}
+			label={t('app.filter.raid_counter_label', { params: { boss: boss.name } })}
+			accent={accent}
+			filterStr={boss.clause}
+			copied={copied[copyKey]}
+			onCopy={() => copyToClipboard(copyKey, boss.clause)}
+			hint={t('app.filter.raid_counter_hint', { params: { boss: boss.name } })}
+		/>
+	);
+}
+
+// Short-window events as accordion rows, one per event: a running event opens
+// highlighted, an upcoming one collapses with a window teaser. The raid panel
+// renders its event raids with this, the Max Battle panel its Max Mondays and
+// Max Battle Days.
+function eventBossGroups(events, { accent, t, locale, renderBoss }) {
+	return events.map((event) => {
+		const startMs = Date.parse(event.start);
+		const endMs = Date.parse(event.end);
+		const isActive = Date.now() >= startMs && Date.now() <= endMs;
+		const teaser = formatEventWindow(event.start, event.end, t, locale);
+		return (
+			<TrainerAccordion
+				key={event.eventID}
+				name={event.name}
+				teaser={teaser}
+				accent={accent}
+				highlight={isActive}
+			>
+				{(event.bosses || []).map((b) => renderBoss(b, event.eventID))}
+			</TrainerAccordion>
+		);
+	});
+}
+
 // Renders a single per-aspect boss collapsible (Raids or Max Battles). Each
 // boss inside becomes one FilterBox; skipped bosses (no clean counter) get a
 // short italic note instead. Header shows total boss count and last sync age.
@@ -8725,29 +8800,8 @@ function BossCollapsible({
 			</Collapsible>
 		);
 	}
-	const renderBossBox = (boss, eventIdSuffix) => {
-		if (boss.skipped) {
-			return (
-				<p key={boss.id} className='text-xs italic text-[#8B98A5] pl-2'>
-					{t('app.filter.boss_no_clean_counter', { params: { boss: boss.name } })}
-				</p>
-			);
-		}
-		// Distinct copy key per (event, boss) pair so an event-context Latios
-		// and a standing-tier Latios don't share copy state.
-		const copyKey = eventIdSuffix ? `${keyPrefix}_evt_${eventIdSuffix}_${boss.id}` : `${keyPrefix}_${boss.id}`;
-		return (
-			<FilterBox
-				key={boss.id}
-				label={t('app.filter.raid_counter_label', { params: { boss: boss.name } })}
-				accent={accent}
-				filterStr={boss.clause}
-				copied={copied[copyKey]}
-				onCopy={() => copyToClipboard(copyKey, boss.clause)}
-				hint={t('app.filter.raid_counter_hint', { params: { boss: boss.name } })}
-			/>
-		);
-	};
+	const renderBossBox = (boss, eventID) =>
+		bossCounterBox(boss, { keyPrefix, eventID, accent, copied, copyToClipboard, t });
 	const hasEvents = (eventGroups || []).length > 0;
 	return (
 		<Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
@@ -8758,23 +8812,7 @@ function BossCollapsible({
 						<h4 className='mono text-xs uppercase tracking-wide text-[#8090A0]'>
 							{t('app.collapsible.aux_event_raids_heading')}
 						</h4>
-						{eventGroups.map((event) => {
-							const startMs = Date.parse(event.start);
-							const endMs = Date.parse(event.end);
-							const isActive = Date.now() >= startMs && Date.now() <= endMs;
-							const teaser = formatEventWindow(event.start, event.end, t, locale);
-							return (
-								<TrainerAccordion
-									key={event.eventID}
-									name={event.name}
-									teaser={teaser}
-									accent={accent}
-									highlight={isActive}
-								>
-									{(event.bosses || []).map((b) => renderBossBox(b, event.eventID))}
-								</TrainerAccordion>
-							);
-						})}
+						{eventBossGroups(eventGroups, { accent, t, locale, renderBoss: renderBossBox })}
 					</div>
 				)}
 				{tierOrder.map((tier) => {
@@ -8967,10 +9005,16 @@ function genericGruntTeaser(g, t) {
 // applies regardless of boss, so it sits at the top above the per-tier boss
 // fan-out. Footer shows the boss-snapshot age since that's what rotates;
 // the charger move list is essentially static.
+//
+// `eventGroups` (optional) renders the dated Max Mondays and Max Battle Days
+// above the standing tiers, as BossCollapsible renders event raids. Since
+// lily-dex-api's standing list emptied they are usually all the attackers
+// there are.
 function MaxBattleCollapsible({
 	fetchedAt,
 	maxTank,
 	bossesByTier,
+	eventGroups,
 	tierOrder,
 	accent,
 	open,
@@ -8978,9 +9022,11 @@ function MaxBattleCollapsible({
 	copied,
 	copyToClipboard,
 	t,
+	locale,
 }) {
-	const allBosses = tierOrder.flatMap((tier) => bossesByTier?.[tier] || []);
-	const totalBosses = allBosses.length;
+	const tierBosses = tierOrder.flatMap((tier) => bossesByTier?.[tier] || []);
+	const eventBosses = (eventGroups || []).flatMap((g) => g.bosses || []);
+	const totalBosses = tierBosses.length + eventBosses.length;
 	const hasCharger = !!maxTank?.clause;
 	const filterCount = totalBosses + (hasCharger ? 1 : 0);
 	const age = formatSyncAge(fetchedAt, t);
@@ -8997,6 +9043,8 @@ function MaxBattleCollapsible({
 		);
 	}
 	const hasBosses = totalBosses > 0;
+	const renderBossBox = (boss, eventID) =>
+		bossCounterBox(boss, { keyPrefix: 'max', eventID, accent, copied, copyToClipboard, t });
 	return (
 		<Collapsible icon='💥' label={headerLabel} open={open} onToggle={onToggle}>
 			<div className='space-y-5'>
@@ -9020,6 +9068,7 @@ function MaxBattleCollapsible({
 						<h4 className='mono text-xs uppercase tracking-wide text-[#8090A0]'>
 							{t('app.collapsible.aux_max_attacker')}
 						</h4>
+						{eventBossGroups(eventGroups || [], { accent, t, locale, renderBoss: renderBossBox })}
 						{tierOrder.map((tier) => {
 							const list = bossesByTier?.[tier];
 							if (!list || list.length === 0) return null;
@@ -9034,33 +9083,7 @@ function MaxBattleCollapsible({
 									accent={accent}
 									highlight={false}
 								>
-									{list.map((boss) => {
-										if (boss.skipped) {
-											return (
-												<p key={boss.id} className='text-xs italic text-[#8B98A5] pl-2'>
-													{t('app.filter.boss_no_clean_counter', {
-														params: { boss: boss.name },
-													})}
-												</p>
-											);
-										}
-										const copyKey = `max_${boss.id}`;
-										return (
-											<FilterBox
-												key={boss.id}
-												label={t('app.filter.raid_counter_label', {
-													params: { boss: boss.name },
-												})}
-												accent={accent}
-												filterStr={boss.clause}
-												copied={copied[copyKey]}
-												onCopy={() => copyToClipboard(copyKey, boss.clause)}
-												hint={t('app.filter.raid_counter_hint', {
-													params: { boss: boss.name },
-												})}
-											/>
-										);
-									})}
+									{list.map((boss) => renderBossBox(boss))}
 								</TrainerAccordion>
 							);
 						})}
