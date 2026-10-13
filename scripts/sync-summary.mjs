@@ -15,7 +15,10 @@
 // Both modes compare each tracked file between a base commit and the working
 // tree. classify runs before the commit with base HEAD; render runs at the end
 // with base = the commit the job checked out, so it is right after a push and
-// equally right when validation held the push back.
+// equally right when validation held the push back. One known gap: when the
+// push had to rebase and main had meanwhile changed a tracked snapshot, render
+// credits that change to this sync. Nobody edits the snapshots by hand, so it
+// is left as is.
 //
 // render must never be what turns a run red. The workflow runs it with
 // `|| true`, and every per-part renderer falls back to the plain
