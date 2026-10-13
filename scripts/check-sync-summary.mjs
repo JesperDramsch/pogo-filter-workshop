@@ -371,7 +371,7 @@ console.log("\nY5: layer A (header, verdicts, rows, warnings)");
   const failed = renderSummary({ ...base, results: resultsPvpMeta, outcomes: { ...ALL, events: "failure" }, logs: { events: failLog } });
   check("failure verdict", failed.split("\n")[1].startsWith("❌ 1 of 9 parts failed · "), failed.split("\n")[1]);
   check("failed row: last ✗ line, escaped, and the kept snapshot",
-    failed.includes(`| Events | ❌ failed: Fetch failed: HTTP 503 from \\<leak-duck\\> · kept the committed snapshot (last changed ${json(P.events).fetchedAt.slice(0, 10)}) |`));
+    failed.includes(`| Events | ❌ failed: Fetch failed: HTTP 503 from \\<leak-duck\\> · kept the committed snapshot (last written ${json(P.events).fetchedAt.slice(0, 10)}) |`));
   const timedOut = renderSummary({ ...base, results: resultsPvpMeta, outcomes: { ...ALL, raids: "failure" }, logs: { raids: "> fetching\n" } });
   check("failed row with no ✗ line says so", timedOut.includes("| Raids | ❌ failed (no ✗ line in its log) · kept the committed snapshot"));
   const wrote = renderSummary({ ...base, results: resultsPvpMeta, outcomes: { ...ALL, pvp: "failure" }, logs: { pvp: "✗ takeover read failed\n" } });
@@ -381,6 +381,9 @@ console.log("\nY5: layer A (header, verdicts, rows, warnings)");
   check("held back when validation failed", held.split("\n")[1].startsWith("⛔ Held back because validation failed, nothing pushed · All 9 parts ran · 1 snapshot changed"), held.split("\n")[1]);
   check("…shows what would have landed", held.includes("Not pushed. This is what would have landed:") && held.includes("**PvP**"));
   check("…and links no commit", !held.includes("/commit/"));
+  const validateLog = "D3 — raid filters\n  ✓ fine\n  ✗ tier <5> filter is non-empty — 0 clauses\nM1 — next\n  ✓ fine\n";
+  const heldWhy = renderSummary({ ...base, results: resultsPvpMeta, validate: "failure", commit: "skipped", push: "skipped", commitSha: "", logs: { validate: validateLog } });
+  check("…naming the failed check, escaped", heldWhy.split("\n")[1].endsWith("· failed: tier \\<5\\> filter is non-empty — 0 clauses"), heldWhy.split("\n")[1]);
   const commitFail = renderSummary({ ...base, results: resultsPvpMeta, commit: "failure", push: "skipped", commitSha: "" });
   check("commit failure names the commit step",
     commitFail.split("\n")[1].includes('the commit failed, nothing landed (see "Commit the snapshots that moved")'), commitFail.split("\n")[1]);

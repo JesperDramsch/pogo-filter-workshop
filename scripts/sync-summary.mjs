@@ -410,7 +410,7 @@ function partRow(r, outcome, selected, log) {
   if (outcome === "failure") {
     const err = lastError(log);
     const why = err ? `failed: ${md(err, 160)}` : "failed (no ✗ line in its log)";
-    if (r.kind === "none") return `❌ ${why} · kept the committed snapshot (last changed ${dateOnly(r.before?.fetchedAt)})`;
+    if (r.kind === "none") return `❌ ${why} · kept the committed snapshot (last written ${dateOnly(r.before?.fetchedAt)})`;
     return `❌ ${why} · wrote its snapshot anyway: ${what}`;
   }
   if (!selected) return "➖ not selected";
@@ -460,7 +460,8 @@ export function renderSummary(ctx) {
   let heldBack = false;
   if (ctx.validate === "failure") {
     heldBack = true;
-    out.push(`⛔ Held back because validation failed, nothing pushed · ${ranText.replace(/^\S+ /, "")} · ${moved}`);
+    const err = lastError(logs.validate);
+    out.push(`⛔ Held back because validation failed, nothing pushed · ${ranText.replace(/^\S+ /, "")} · ${moved}${err ? ` · failed: ${md(err, 160)}` : ""}`);
   } else if (ctx.validate !== "success" && ctx.validate !== undefined) {
     heldBack = true;
     out.push(`⛔ Held back because a step before validation failed, nothing pushed · ${ranText.replace(/^\S+ /, "")}`);
