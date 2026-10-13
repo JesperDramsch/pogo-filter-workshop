@@ -389,8 +389,9 @@ jobs:
             src/__fixtures__/default-filter-output.json
       # create-pull-request reports created, updated or closed, and nothing
       # (or "none", depending on the version) when the locales did not move.
+      # A closed PR comes with no number or URL to link.
       - name: Summarise
-        if: always()
+        if: ${{ !cancelled() }}
         env:
           FETCH: ${{ steps.fetch.outcome }}
           CPR: ${{ steps.cpr.outcome }}
@@ -400,7 +401,7 @@ jobs:
         run: |
           case "$FETCH/$CPR/$PR_OP" in
             success/success/created | success/success/updated) line="PR [#$PR_NUMBER]($PR_URL) $PR_OP" ;;
-            success/success/closed) line="PR [#$PR_NUMBER]($PR_URL) closed, the locales match main again" ;;
+            success/success/closed) line="PR closed (branch chore/sync-translations deleted), the locales match main again" ;;
             success/success/*) line="no locale change, no PR" ;;
             failure/*) line="fetch failed, no PR (see its step log)" ;;
             *) line="no PR, a step failed (see the step logs)" ;;
