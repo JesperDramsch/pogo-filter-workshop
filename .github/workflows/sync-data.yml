@@ -98,10 +98,12 @@ jobs:
 
       # ── Fetch ────────────────────────────────────────────────────────────
       # Every fetch exits 1 on real failure (fetch error, empty or shrunken
-      # upstream, a sanity assertion tripping) and writes nothing when it does,
-      # so one broken upstream must not hold back the others: each step carries
-      # on, and the last step turns the run red at the end. A red run + GitHub
-      # notification is the only intervention the user wants.
+      # upstream, a sanity assertion tripping). Most write nothing when they
+      # do; the raid and Rocket fetchers write their healthy part first, as
+      # their steps note. Either way one broken upstream must not hold back
+      # the others: each step carries on, and the last step turns the run red
+      # at the end. A red run + GitHub notification is the only intervention
+      # the user wants.
       #
       # Each fetch is cut off at 2 minutes; a normal one takes about a second,
       # the first 19 MB game-master download a few. No fetcher sets a request
@@ -122,7 +124,11 @@ jobs:
       # config-derived filters, and the data-derived ones these feed are covered
       # by property checks in scripts/check-data-filters.mjs. See the split in
       # scripts/lib/fixture.mjs before adding a regeneration step back.
-      - name: Fetch raid + max-battle bosses from lily-dex-api
+      # A raid or Max Battle family that comes back empty exits non-zero AFTER
+      # writing: that family keeps the previous snapshot's bosses, and the
+      # healthy one and the event lists are committed below. The run goes red
+      # at the end.
+      - name: Fetch raid + Max Battle bosses from lily-dex-api + ScrapedDuck events
         id: raids
         if: env.SYNC_ALL == 'true' || inputs.raids
         continue-on-error: true
