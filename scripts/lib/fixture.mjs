@@ -39,6 +39,12 @@ function flattenBossMap(byTier) {
   return out;
 }
 
+// Flattens dated event groups to eventID→{bossId: clause}, the same leaf shape.
+function flattenEventGroups(groups) {
+  return Object.fromEntries((groups || []).map(g =>
+    [g.eventID, Object.fromEntries((g.bosses || []).map(b => [b.id, b.clause]))]));
+}
+
 // The config every real user actually runs. App.jsx loads persisted config
 // through mergeImportedConfig (and, since the resetAll fix, so does reset), so
 // raw DEFAULT_CONFIG — regionalGroups {} and enabledTradeEvos [] — is a
@@ -59,8 +65,12 @@ export const FIXTURE_CONFIG = mergeImportedConfig(DEFAULT_CONFIG);
 //
 // `uiLocale` defaults to the output locale; expert mode lets the two differ, and
 // output that must follow the OUTPUT locale (names) is only testable when they do.
-export function buildResult(locale, { hundos = DEFAULT_HUNDOS, luckies = DEFAULT_LUCKIES, uiLocale = locale } = {}) {
-  return buildFilters(hundos, luckies, FIXTURE_CONFIG, [], locale, makeTFn(uiLocale));
+//
+// `raidBosses` stands in for the raid-bosses.json snapshot, so a check can build
+// event Max Battles on a day the committed snapshot has none. Left undefined,
+// buildFilters reads the snapshot.
+export function buildResult(locale, { hundos = DEFAULT_HUNDOS, luckies = DEFAULT_LUCKIES, uiLocale = locale, raidBosses } = {}) {
+  return buildFilters(hundos, luckies, FIXTURE_CONFIG, [], locale, makeTFn(uiLocale), undefined, undefined, raidBosses);
 }
 
 // Exact-pinned fields: everything derived from config, species data and the
@@ -68,8 +78,8 @@ export function buildResult(locale, { hundos = DEFAULT_HUNDOS, luckies = DEFAULT
 // A diff here means the filter LOGIC changed, which is exactly the signal a
 // snapshot is good at.
 //
-// Deliberately NOT pinned: raidFilters, maxBattleFilters, maxTank,
-// rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, pvpFilters,
+// Deliberately NOT pinned: raidFilters, maxBattleFilters,
+// eventMaxBattleFilters, maxTank, rocketLeaders, rocketTypedGrunts, rocketGenericGrunts, pvpFilters,
 // shadowSafe and shadowFrustration. Those are projections of data that syncs
 // daily — 17 of the last 20 commits touching this fixture were automated
 // raid/PvP syncs, one of them rewriting 126 lines.
@@ -126,6 +136,7 @@ export function buildDataFilters(locale) {
   return {
     raidFilters: flattenBossMap(result.raidFilters),
     maxBattleFilters: flattenBossMap(result.maxBattleFilters),
+    eventMaxBattleFilters: flattenEventGroups(result.eventMaxBattleFilters),
     maxTank: result.maxTank?.clause || "",
     rocketLeaders: Object.fromEntries(
       (result.rocketLeaders || []).map(l => [l.name,
