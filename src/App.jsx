@@ -6878,7 +6878,7 @@ export default function App() {
 
 									{/* PvP section — top-30 meta picks per league with loose
                     PvP rank-1 IVs. Rankings pulled from lily-dex-api;
-                    daily sync via .github/workflows/sync-pvp-rankings.yml. */}
+                    daily sync via .github/workflows/sync-data.yml. */}
 									<div className='space-y-3 pt-4'>
 										<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
 											{t('app.collapsible.aux_section_pvp')}

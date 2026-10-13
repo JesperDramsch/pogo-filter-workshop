@@ -1,0 +1,246 @@
+name: Sync data
+
+# One job for every upstream snapshot. These used to be ten workflows, each
+# spinning up its own runner, checkout and `npm ci` to run a fetch of a few
+# seconds, and each data commit pushed separately, so Tests, CodeQL and Deploy
+# ran once per snapshot that moved. Here the snapshots that moved go out as one
+# commit and one push.
+#
+# The fetches run one after another on purpose. Six of them read the same
+# 19 MB game master, and scripts/lib/game-master.mjs caches it on disk keyed by
+# batch, so in sequence only the first one downloads it. Run in parallel, they
+# would all miss the cache and download it at once.
+
+on:
+  schedule:
+    - cron: "17 6 * * *" # daily at 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write # the translations PR
+
+# A manual dispatch must not race the scheduled run to the same push.
+concurrency:
+  group: sync-data
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # Push as the Pushologist GitHub App so the commit can bypass the
+      # branch protection on main (GITHUB_TOKEN pushes are rejected there).
+      - name: Mint Pushologist app token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_SECRET }}
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      # ── Fetch ────────────────────────────────────────────────────────────
+      # Every fetch exits 1 on real failure (fetch error, empty or shrunken
+      # upstream, a sanity assertion tripping) and writes nothing when it does,
+      # so one broken upstream must not hold back the others: each step carries
+      # on, and "Fail if any fetch failed" turns the run red at the end. A red
+      # run + GitHub notification is the only intervention the user wants.
+      #
+      # Deliberately does NOT regenerate the fixture: the snapshot pins only
+      # config-derived filters, and the data-derived ones these feed are covered
+      # by property checks in scripts/check-data-filters.mjs. See the split in
+      # scripts/lib/fixture.mjs before adding a regeneration step back.
+      - name: Fetch raid + max-battle bosses from lily-dex-api
+        id: raids
+        continue-on-error: true
+        run: npm run fetch-raid-bosses
+      # A failed takeover read exits non-zero AFTER writing the ScrapedDuck
+      # snapshot. That snapshot is still committed below; the run goes red at
+      # the end.
+      - name: Fetch Team Rocket lineups from ScrapedDuck (+ LeekDuck during a takeover) + lily-dex-api types
+        id: rocket-lineups
+        continue-on-error: true
+        run: npm run fetch-rocket-lineups
+      - name: Fetch Team Rocket grunt quotes from PokeMiners
+        id: rocket-quotes
+        continue-on-error: true
+        run: npm run fetch-rocket-grunt-quotes
+      - name: Fetch Great / Ultra / Master + cup rankings from PvPoke (lily-dex fallback)
+        id: pvp
+        continue-on-error: true
+        run: npm run fetch-pvp-rankings
+      - name: Derive raid-attacker rankings from the game master (alexelgt, PokeMiners fallback)
+        id: meta
+        continue-on-error: true
+        run: npm run fetch-meta-rankings
+      # The friend-collect packs read this snapshot at build time.
+      - name: Derive species meta from the game master + PvPoke roster
+        id: species-meta
+        continue-on-error: true
+        run: npm run fetch-species-meta
+      # Event spawn filters are time-windowed and excluded from the fixture
+      # snapshot (like event raids).
+      - name: Fetch wild-spawn events from leak-duck
+        id: events
+        continue-on-error: true
+        run: npm run fetch-events
+      # Self-validates known forms, so a changed upstream shape fails here.
+      - name: Derive the regional-form catalog from the game master
+        id: regional-forms
+        continue-on-error: true
+        run: npm run fetch-regional-forms
+      # After the PvP fetch, so a rebalance and the rankings that respond to it
+      # land in the same reference regeneration below.
+      - name: Snapshot PvP move stats and probe the PokeMiners mirror
+        id: game-master-watch
+        continue-on-error: true
+        run: npm run fetch-game-master-watch
+
+      # ── Regenerate + validate ────────────────────────────────────────────
+      # The skill's meta reference is generated from the snapshots we just
+      # wrote, in THIS job, because check-meta-reference.mjs (M1) fails CI when
+      # the two drift. That is the whole guarantee: a synced snapshot can never
+      # leave a refrozen tier list behind it. It reads both pvp-rankings.json
+      # and game-master-watch.json (its "Move rebalance watch" section), so it
+      # runs once, after both fetches.
+      - name: Regenerate the skill-facing PvP meta reference
+        run: npm run generate-pvp-meta-reference
+
+      # Fail CLOSED. This job pushes straight to a protected branch, so without
+      # a validation step here any generation that breaks M1-M6 lands on main
+      # first and is only discovered when test.yml fires on the resulting push,
+      # leaving main red with no automated revert. Running the same checks
+      # before the commit turns that into a failed sync instead, and holds back
+      # the whole push: check-data-filters covers raids, Rocket and PvP alike.
+      - name: Validate the snapshots and the regenerated reference
+        run: |
+          npm run test:datafilters
+          npm run test:metaref
+
+      # ── Commit + push ────────────────────────────────────────────────────
+      - name: Commit + push if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Name the upstream the PvP snapshot actually came from. The fetcher
+          # falls back to lily-dex whenever PvPoke is unreachable, and that
+          # snapshot is materially different (no speciesId, score or forms, so
+          # the reference's "Ranked form" and "Score" columns collapse to "—").
+          # The git log is the provenance trail CLAUDE.md points at.
+          PVP_SOURCE=$(node -p "require('./src/data/pvp-rankings.json').source")
+          REF=skills/pokemon-go-filters/references
+
+          # track <scope> <what moved> <path>...
+          # One body line per snapshot that moved, so the commit still names
+          # every source, and the game-master line still names the move-stat
+          # watch, whose diff (`history[0].changes`) IS the notification.
+          paths=(); scopes=(); body=()
+          track() {
+            local scope=$1 what=$2; shift 2
+            git diff --quiet -- "$@" && return 0
+            paths+=("$@")
+            body+=("- ${scope}: ${what}")
+            [[ " ${scopes[*]} " == *" ${scope} "* ]] || scopes+=("$scope")
+          }
+          track raids        "boss snapshot from lily-dex-api"                       src/data/raid-bosses.json
+          track rocket       "lineup snapshot"                                       src/data/rocket-lineups.json
+          track rocket       "grunt quotes from PokeMiners"                          src/data/rocket-grunt-quotes.json
+          track pvp          "ranking snapshot from ${PVP_SOURCE}"                   src/data/pvp-rankings.json
+          track meta         "raid-attacker + shadow-keeper rankings from the game master" src/data/meta-rankings.json
+          track species-meta "special-trade/starter/power-line/mega pools"           src/data/species-meta.json
+          track events       "wildspawn snapshot from leak-duck"                     src/data/events.json
+          track forms        "regional-form catalog from the game master"            src/data/regional-forms.json
+          track game-master  "move stats"                                            src/data/game-master-watch.json
+          track reference    "regenerated PvP meta reference"                        "$REF/META.md" "$REF/pvp-meta.json"
+
+          if [ ${#paths[@]} -eq 0 ]; then
+            echo "No snapshot changes — skipping commit."
+            exit 0
+          fi
+          subject="chore(data): sync $(printf '%s, ' "${scopes[@]}" | sed 's/, $//')"
+          git add -- "${paths[@]}"
+          git commit -m "$subject" -m "$(printf '%s\n' "${body[@]}")"
+          git log -1 --stat
+
+          # main can move while the fetches run. The commit only touches
+          # snapshot files nobody edits by hand, so a rebase onto the new tip
+          # is clean, and test.yml still runs on the result.
+          git push || { git pull --rebase origin "$GITHUB_REF_NAME" && git push; }
+
+      # ── Translations ─────────────────────────────────────────────────────
+      # Last, so whatever create-pull-request does to the checkout cannot touch
+      # the data push above. It opens a PR instead of pushing to main, and it
+      # carries any local commit that was never pushed into that PR, so start
+      # from the remote tip: after a failed push or validation this drops the
+      # snapshot changes, which the next run fetches again.
+      - name: Reset the checkout to the remote branch
+        if: ${{ !cancelled() }}
+        run: |
+          git fetch origin "$GITHUB_REF_NAME"
+          git reset --hard "origin/$GITHUB_REF_NAME"
+      - name: Fetch translations from Google Sheet
+        id: translations
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: npm run fetch-translations
+      # The sheet supplies the in-game keywords that go straight into generated
+      # filters — a corrected DE word for "shiny" changes the trash string — so
+      # the snapshot has to move with the locales. It must also be listed in
+      # add-paths below, or the PR this opens fails check-fixtures with no way
+      # to fix it from inside the PR.
+      - name: Regenerate fixture snapshot
+        if: ${{ !cancelled() && steps.translations.outcome == 'success' }}
+        run: npm run fixtures:update
+      - name: Open PR if locale files changed
+        if: ${{ !cancelled() && steps.translations.outcome == 'success' }}
+        uses: peter-evans/create-pull-request@v6
+        with:
+          # The checkout above holds the app token; the PR keeps going out as
+          # github-actions, as it did when this was its own workflow.
+          token: ${{ github.token }}
+          commit-message: "chore(i18n): sync translations from spreadsheet"
+          branch: chore/sync-translations
+          delete-branch: true
+          title: "chore(i18n): sync translations from spreadsheet"
+          body: |
+            Automated translation sync from the published Google Sheet.
+
+            Generated by `.github/workflows/sync-data.yml` running
+            `npm run fetch-translations`.
+
+            Review `src/locales/_meta.json` for warnings (truncation, mojibake).
+          add-paths: |
+            src/locales/**
+            src/__fixtures__/default-filter-output.json
+
+      - name: Fail if any fetch failed
+        if: ${{ !cancelled() }}
+        env:
+          OUTCOMES: >-
+            raids=${{ steps.raids.outcome }}
+            rocket-lineups=${{ steps.rocket-lineups.outcome }}
+            rocket-quotes=${{ steps.rocket-quotes.outcome }}
+            pvp=${{ steps.pvp.outcome }}
+            meta=${{ steps.meta.outcome }}
+            species-meta=${{ steps.species-meta.outcome }}
+            events=${{ steps.events.outcome }}
+            regional-forms=${{ steps.regional-forms.outcome }}
+            game-master-watch=${{ steps.game-master-watch.outcome }}
+            translations=${{ steps.translations.outcome }}
+        run: |
+          failed=$(tr ' ' '\n' <<<"$OUTCOMES" | grep '=failure$' | cut -d= -f1 || true)
+          if [ -n "$failed" ]; then
+            echo "These fetches failed (see their step logs):"
+            while read -r step; do echo "  - $step"; done <<<"$failed"
+            exit 1
+          fi
+          echo "All fetches succeeded."
