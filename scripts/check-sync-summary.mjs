@@ -353,8 +353,8 @@ console.log("\nY5: layer A (header, verdicts, rows, warnings)");
   const ALL = Object.fromEntries(PARTS.map((p) => [p.id, "success"]));
   const SHA = "0123456789abcdef0123456789abcdef01234567";
   const base = {
-    outcomes: ALL, validate: "success", commit: "success", push: "success", commitSha: SHA, event: "schedule", inputs: {},
-    repoUrl: "https://github.com/owner/repo", ref: "main", logs: {}, now: NOW,
+    outcomes: ALL, validate: "success", commit: "success", commitSha: SHA, event: "schedule", inputs: {},
+    logs: {}, now: NOW,
   };
   const results = classifyAll(mutated({ [P.pvp]: pvpMutated, [P.meta]: metaStampOnly, [P.events]: null }));
   check("a file deleted from the working tree is a change", kindOf(results, "events") === "content");
@@ -362,8 +362,8 @@ console.log("\nY5: layer A (header, verdicts, rows, warnings)");
   const s = renderSummary({ ...base, results: resultsPvpMeta });
   const lines = s.split("\n");
   check("header names the trigger", lines[0] === "## Sync data · 13 Oct 12:54 UTC · scheduled run", lines[0]);
-  check("verdict: all ran, counts, commit link",
-    lines[1] === `✅ All 9 parts ran · 1 snapshot changed, 1 provenance only · pushed [\`0123456\`](https://github.com/owner/repo/commit/${SHA}) to main`, lines[1]);
+  check("verdict: all ran, counts, the commit handed to the push job",
+    lines[1] === "✅ All 9 parts ran · 1 snapshot changed, 1 provenance only · committed `0123456`, handed to the push job", lines[1]);
   check("changed row with its source", s.includes(`| PvP rankings | ✅ **changed** (${pvpDoc.source}) |`));
   check("provenance row names the stamp and its move",
     s.includes(`| Raid attackers (meta) | ✅ provenance only (PvPoke roster stamp ${String(metaDoc.sources.rosterBatch).slice(5, 10)}`) && s.includes("→ 01-02 03:04) |"));
@@ -397,20 +397,16 @@ console.log("\nY5: layer A (header, verdicts, rows, warnings)");
   const wrote = renderSummary({ ...base, results: resultsPvpMeta, outcomes: { ...ALL, pvp: "failure" }, logs: { pvp: "✗ takeover read failed\n" } });
   check("a failed step that still wrote its snapshot says so", wrote.includes("| PvP rankings | ❌ failed: takeover read failed · wrote its snapshot anyway: **changed**"));
 
-  const held = renderSummary({ ...base, results: resultsPvpMeta, validate: "failure", commit: "skipped", push: "skipped", commitSha: "" });
+  const held = renderSummary({ ...base, results: resultsPvpMeta, validate: "failure", commit: "skipped", commitSha: "" });
   check("held back when validation failed", held.split("\n")[1].startsWith("⛔ Held back because validation failed, nothing pushed · All 9 parts ran · 1 snapshot changed"), held.split("\n")[1]);
   check("…shows what would have landed", held.includes("Not pushed. This is what would have landed:") && held.includes("**PvP**"));
-  check("…and links no commit", !held.includes("/commit/"));
+  check("…and names no commit", !held.includes("handed to the push job"));
   const validateLog = "D3 — raid filters\n  ✓ fine\n  ✗ tier <5> filter is non-empty — 0 clauses\nM1 — next\n  ✓ fine\n";
-  const heldWhy = renderSummary({ ...base, results: resultsPvpMeta, validate: "failure", commit: "skipped", push: "skipped", commitSha: "", logs: { validate: validateLog } });
+  const heldWhy = renderSummary({ ...base, results: resultsPvpMeta, validate: "failure", commit: "skipped", commitSha: "", logs: { validate: validateLog } });
   check("…naming the failed check, escaped", heldWhy.split("\n")[1].endsWith("· failed: tier \\<5\\> filter is non-empty — 0 clauses"), heldWhy.split("\n")[1]);
-  const commitFail = renderSummary({ ...base, results: resultsPvpMeta, commit: "failure", push: "skipped", commitSha: "" });
+  const commitFail = renderSummary({ ...base, results: resultsPvpMeta, commit: "failure", commitSha: "" });
   check("commit failure names the commit step",
     commitFail.split("\n")[1].includes('the commit failed, nothing landed (see "Commit the snapshots that moved")'), commitFail.split("\n")[1]);
-  // The workflow folds a failed mint into PUSH: no token, no push.
-  const pushFail = renderSummary({ ...base, results: resultsPvpMeta, commit: "success", push: "failure", commitSha: "" });
-  check("push failure says it was committed but not pushed",
-    pushFail.split("\n")[1].includes("committed but not pushed, nothing landed"), pushFail.split("\n")[1]);
 
   // Warnings: fetcher ⚠ lines and validation "!" lines, folded and escaped;
   // the events line about a new event's unresolved names is already shown.
@@ -458,7 +454,7 @@ console.log("\nY6: render end to end in a temp git repo");
   writeFileSync(join(logDir, "events.log"), "✗ Fetch failed: timeout\n");
   const env = {
     OUTCOMES: PARTS.map((p) => `${p.id}=${p.id === "events" ? "failure" : "success"}`).join(" "),
-    VALIDATE: "success", COMMIT: "success", PUSH: "success", COMMIT_SHA: git(dir, "rev-parse", "HEAD"),
+    VALIDATE: "success", COMMIT: "success", COMMIT_SHA: git(dir, "rev-parse", "HEAD"),
     GITHUB_EVENT_NAME: "workflow_dispatch", INPUTS: "not json",
     GITHUB_SERVER_URL: "https://github.com", GITHUB_REPOSITORY: "o/r", GITHUB_REF_NAME: "main",
   };
@@ -467,7 +463,25 @@ console.log("\nY6: render end to end in a temp git repo");
   check("events.json, missing from the base, reads changed", out.includes("| Events | ❌ failed: Fetch failed: timeout · wrote its snapshot anyway: **changed**"));
   check("reads step logs from disk", out.includes("- regional-forms: Burmy (412): forms not type-distinguishable, skipped"));
   check("unparsable INPUTS reads as nothing ticked", out.split("\n")[0].endsWith("manual run, nothing ticked → all parts"));
-  check("commit link built from the GitHub env", out.includes(`(https://github.com/o/r/commit/${env.COMMIT_SHA})`));
+  check("names the local commit it hands to the push job", out.includes(`committed \`${env.COMMIT_SHA.slice(0, 7)}\`, handed to the push job`));
+}
+
+// ─── Y7 ──────────────────────────────────────────────────────────────────────
+console.log("\nY7: the push job's allowlist is the parts' paths");
+{
+  // The push job in sync-data.yml refuses a data commit that touches any file
+  // not on its ALLOWED list. It runs no Node, so it cannot import PARTS; the
+  // list is written out in the workflow, and this keeps the two the same. A
+  // part added here without the workflow would have its commits refused; a
+  // path left in the workflow after a part goes would stay pushable.
+  const wf = readFileSync(join(ROOT, ".github/workflows/sync-data.yml"), "utf8");
+  const block = wf.match(/^(\s*)ALLOWED: >-\n((?:\1\s+\S+\n)+)/m);
+  const allowed = block ? block[2].trim().split(/\s+/).sort() : [];
+  const expected = [...PARTS, REFERENCE].flatMap((p) => p.paths).sort();
+  check("the workflow has an ALLOWED list", allowed.length > 0);
+  check("it lists exactly the PARTS and REFERENCE paths", JSON.stringify(allowed) === JSON.stringify(expected),
+    `only in workflow: ${allowed.filter((a) => !expected.includes(a)).join(", ") || "none"}; ` +
+    `only in PARTS: ${expected.filter((e) => !allowed.includes(e)).join(", ") || "none"}`);
 }
 
 done("All sync-summary checks passed.", (n) => `${n} sync-summary check(s) failed.`);
