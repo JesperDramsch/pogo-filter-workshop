@@ -14,17 +14,26 @@
 //   G3 — the regional-form catalog off game-master form suffixes
 //   G4 — the raid-boss name index (ids, canonical form, apostrophe folding)
 //   G5 — the PvP species index's base names (PvPoke's gamemaster.min.json)
+//   G6: the batch floor, fetchGameMaster refusing a mirror older than the
+//       snapshot it would replace, cache included (fake mirrors, no network)
 //
 // The generation table that replaced pogoapi's pokemon_generations feed is
 // covered where its consumer is: scripts/check-friend-collect.mjs, Scenario 12.
 
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
+  batchMsFromIso,
   dexByPokemonId,
   dexFromTemplateId,
   evoParentsFromSteps,
   evolutionChainsFromSteps,
   evolutionStepsFromGameMaster,
+  fetchGameMaster,
   formSuffix,
+  mechanicsBatchFloor,
   moveTypesById,
   pokemonTemplates,
   releasedDexFromPvpoke,
@@ -32,6 +41,7 @@ import {
   typeSlug,
   typesOf,
 } from "./lib/game-master.mjs";
+import { readPreviousJson } from "./lib/json.mjs";
 import { buildCatalog, validate } from "./fetch-regional-forms.mjs";
 import { buildNameIndex } from "./fetch-raid-bosses.mjs";
 import { buildSpeciesIndex, topNByDex, topNFromPvpoke } from "./fetch-pvp-rankings.mjs";
@@ -310,6 +320,196 @@ console.log("\nG5: PvP base names off PvPoke's gamemaster.min.json");
   check("the fallback path folds by dex and strips stacked suffixes too",
     lily.map((r) => `${r.dex}:${r.name}`).join(", ") === "487:Giratina, 52:Meowth",
     lily.map((r) => `${r.dex}:${r.name}`).join(", "));
+}
+
+console.log("\nG6: the batch floor refuses a mirror older than the snapshot");
+{
+  // The dates that motivated the floor: alexelgt on 2026-10-10 while the
+  // PokeMiners fallback served 2026-08-28. Two fake mirrors answer from a URL
+  // table through the injected fetch, so this never touches the network or
+  // the real download cache.
+  const NEW = Date.parse("2026-10-10T20:46:48.383Z");
+  const OLD = Date.parse("2026-08-28T07:35:50.208Z");
+  const mirror = (name) => ({
+    name,
+    gameMaster: `fake://${name}/GAME_MASTER.json`,
+    timestamp: `fake://${name}/timestamp.txt`,
+    parseStamp: (text) => Number(text.trim()),
+  });
+  const PRIMARY = mirror("primary");
+  const FALLBACK = mirror("fallback");
+  const dump = (tag) => JSON.stringify([{ templateId: tag }, { templateId: tag }]);
+  const down = new Error("HTTP 503 Service Unavailable");
+
+  // `served` maps url → body, or an Error to throw; anything absent is a 404.
+  // Returns the outcome plus every URL that was requested, so a check can
+  // assert that a rejected mirror's 19 MB body was never downloaded.
+  async function attempt(served, opts = {}) {
+    const requested = [];
+    const fetchText = async (url) => {
+      requested.push(url);
+      const body = served[url];
+      if (body instanceof Error) throw body;
+      if (body == null) throw new Error(`HTTP 404 Not Found for ${url}`);
+      return body;
+    };
+    try {
+      const gm = await fetchGameMaster({
+        mirrors: [PRIMARY, FALLBACK], fetchText, cache: false, minTemplates: 1, ...opts,
+      });
+      return { gm, requested };
+    } catch (err) {
+      return { err, requested };
+    }
+  }
+  const primaryDown = {
+    [PRIMARY.timestamp]: down,
+    [PRIMARY.gameMaster]: down,
+    [FALLBACK.timestamp]: String(OLD),
+    [FALLBACK.gameMaster]: dump("fallback"),
+  };
+
+  // The outage the floor exists for: primary down, fallback 43 days behind.
+  {
+    const { gm, err, requested } = await attempt(primaryDown, { minBatchMs: NEW });
+    check("primary down + older fallback under a floor throws, as an outage does",
+      !gm && /^all game-master mirrors failed/.test(err?.message || ""), err?.message);
+    check("the rejection names both batches, readably",
+      (err?.message || "").includes("fallback: batch 2026-08-28 older than snapshot's 2026-10-10"), err?.message);
+    check("a rejected mirror's dump is never downloaded",
+      !requested.includes(FALLBACK.gameMaster), requested.join(", "));
+  }
+
+  // The case the fallback was kept for still works: a primary that is the one
+  // behind is skipped, and a newer fallback wins.
+  {
+    const { gm, err } = await attempt({
+      [PRIMARY.timestamp]: String(OLD),
+      [PRIMARY.gameMaster]: dump("primary"),
+      [FALLBACK.timestamp]: String(NEW),
+      [FALLBACK.gameMaster]: dump("fallback"),
+    }, { minBatchMs: NEW });
+    check("an older primary falls back to a fallback that meets the floor",
+      gm?.mirror === "fallback" && gm?.batchMs === NEW, err?.message || gm?.mirror);
+    check("the skipped primary is reported in failures with its reason",
+      gm?.failures.length === 1 && gm.failures[0] === "primary: batch 2026-08-28 older than snapshot's 2026-10-10",
+      gm?.failures.join("; "));
+  }
+
+  // A batch equal to the floor is the ordinary unchanged day, not a rollback.
+  {
+    const { gm } = await attempt({
+      [PRIMARY.timestamp]: String(NEW),
+      [PRIMARY.gameMaster]: dump("primary"),
+    }, { minBatchMs: NEW });
+    check("a batch equal to the floor is accepted", gm?.mirror === "primary" && gm.failures.length === 0);
+  }
+  {
+    const { err } = await attempt({
+      [PRIMARY.timestamp]: String(NEW - 3600000),
+      [PRIMARY.gameMaster]: dump("primary"),
+    }, { minBatchMs: NEW });
+    check("a same-day older batch is told apart by its full instant",
+      (err?.message || "").includes("batch 2026-10-10T19:46:48.383Z older than snapshot's 2026-10-10T20:46:48.383Z"),
+      err?.message);
+  }
+
+  // No floor: byte-for-byte the behaviour before minBatchMs existed.
+  for (const minBatchMs of [undefined, null, NaN]) {
+    const { gm, err } = await attempt(primaryDown, { minBatchMs });
+    check(`no floor (${minBatchMs}) still takes the older fallback`,
+      gm?.mirror === "fallback" && gm?.batchMs === OLD && gm.failures.length === 1, err?.message);
+  }
+  {
+    const { gm } = await attempt({
+      [PRIMARY.timestamp]: "<html>rate limited</html>",
+      [PRIMARY.gameMaster]: dump("primary"),
+    });
+    check("no floor: an unreadable stamp still falls through to the download",
+      gm?.mirror === "primary" && gm?.batchMs === null);
+  }
+
+  // Under a floor an unstamped dump is disqualified, never waved through: it
+  // cannot show it is no older than the snapshot. See fetchGameMaster.
+  {
+    const { gm } = await attempt({
+      [PRIMARY.timestamp]: "<html>rate limited</html>",
+      [PRIMARY.gameMaster]: dump("primary"),
+      [FALLBACK.timestamp]: String(NEW),
+      [FALLBACK.gameMaster]: dump("fallback"),
+    }, { minBatchMs: NEW });
+    check("under a floor an unreadable stamp skips the mirror",
+      gm?.mirror === "fallback" &&
+      gm.failures[0] === "primary: batch stamp unreadable, so it cannot be checked against snapshot's 2026-10-10",
+      gm?.failures.join("; "));
+  }
+  {
+    const { gm, err, requested } = await attempt({
+      [PRIMARY.timestamp]: down,
+      [PRIMARY.gameMaster]: dump("primary"),
+      [FALLBACK.timestamp]: down,
+      [FALLBACK.gameMaster]: dump("fallback"),
+    }, { minBatchMs: NEW });
+    check("under a floor, every stamp unreachable fails the call",
+      !gm && (err?.message || "").includes("primary: batch stamp unreachable (HTTP 503 Service Unavailable)"),
+      err?.message);
+    check("under a floor, unreachable stamps download neither dump",
+      !requested.includes(PRIMARY.gameMaster) && !requested.includes(FALLBACK.gameMaster));
+  }
+
+  // The batch-keyed download cache must not become a way around the floor.
+  {
+    const cacheDir = mkdtempSync(join(tmpdir(), "gm-floor-cache-"));
+    try {
+      const stale = { [PRIMARY.timestamp]: String(OLD), [PRIMARY.gameMaster]: dump("primary") };
+      const seeded = await attempt(stale, { cache: true, cacheDir });
+      check("the cache is seeded with the older batch", seeded.gm?.fromCache === false && seeded.gm.batchMs === OLD);
+      const { gm, err } = await attempt({ [PRIMARY.timestamp]: String(OLD) }, { cache: true, cacheDir, minBatchMs: NEW });
+      check("a cached dump older than the floor is not served",
+        !gm && (err?.message || "").includes("primary: batch 2026-08-28 older than snapshot's 2026-10-10"),
+        err?.message || `served ${gm?.mirror} fromCache=${gm?.fromCache}`);
+      const atFloor = await attempt({ [PRIMARY.timestamp]: String(OLD) }, { cache: true, cacheDir, minBatchMs: OLD });
+      check("a cached dump that meets the floor is still served from cache",
+        atFloor.gm?.fromCache === true && !atFloor.requested.includes(PRIMARY.gameMaster));
+    } finally {
+      rmSync(cacheDir, { recursive: true, force: true });
+    }
+  }
+
+  // The floors are read back from what gameMasterProvenance() recorded.
+  check("batchMsFromIso round-trips a recorded batch",
+    batchMsFromIso(new Date(NEW).toISOString()) === NEW);
+  check("batchMsFromIso: a missing or unparsable batch means no floor",
+    [undefined, null, "", "not a date", 1791665208383].every((v) => batchMsFromIso(v) === null));
+  {
+    const dir = mkdtempSync(join(tmpdir(), "gm-floor-snapshot-"));
+    try {
+      const path = join(dir, "meta-rankings.json");
+      check("mechanicsBatchFloor: a missing snapshot means no floor", mechanicsBatchFloor(path) === null);
+      writeFileSync(path, JSON.stringify({ sources: { mechanics: "alexelgt/game_masters" } }));
+      check("mechanicsBatchFloor: a snapshot without mechanicsBatch means no floor", mechanicsBatchFloor(path) === null);
+      writeFileSync(path, "{ truncated");
+      check("mechanicsBatchFloor: an unreadable snapshot means no floor", mechanicsBatchFloor(path) === null);
+      writeFileSync(path, JSON.stringify({ sources: { mechanicsBatch: new Date(NEW).toISOString() } }));
+      check("mechanicsBatchFloor reads sources.mechanicsBatch", mechanicsBatchFloor(path) === NEW);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }
+
+  // A renamed provenance field would not fail anything: the floor would just
+  // quietly become null. So pin that every field a caller floors on is present
+  // and parsable in the committed snapshots. A presence property, not a value.
+  const DATA = resolve(dirname(fileURLToPath(import.meta.url)), "../src/data");
+  for (const [file, field] of [
+    ["meta-rankings.json", "mechanicsBatch"],
+    ["species-meta.json", "gameMasterBatch"],
+    ["game-master-watch.json", "pveBatch"],
+  ]) {
+    const recorded = readPreviousJson(resolve(DATA, file))?.sources?.[field];
+    check(`${file} records sources.${field} as a batch the floor can read`,
+      batchMsFromIso(recorded) !== null, String(recorded));
+  }
 }
 
 done("All game-master checks passed.", (n) => `${n} game-master check(s) failed.`);
