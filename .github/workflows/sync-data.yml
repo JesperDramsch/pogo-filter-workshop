@@ -187,7 +187,7 @@ jobs:
         run: npm run fetch-regional-forms 2>&1 | tee "$RUNNER_TEMP/sync/regional-forms.log"
       # After the PvP fetch, so a rebalance and the rankings that respond to it
       # land in the same reference regeneration below.
-      - name: Snapshot PvP move stats and probe the PokeMiners mirror
+      - name: Snapshot PvP + PvE move stats from PvPoke and the game master
         id: game-master-watch
         if: env.SYNC_ALL == 'true' || inputs.game-master-watch
         continue-on-error: true
