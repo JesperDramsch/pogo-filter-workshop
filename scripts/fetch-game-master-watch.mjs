@@ -53,7 +53,7 @@ import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
-import { fetchGameMaster, warnIfStale, gameMasterProvenance } from "./lib/game-master.mjs";
+import { fetchGameMaster, warnIfStale, gameMasterProvenance, batchMsFromIso } from "./lib/game-master.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -202,6 +202,11 @@ async function main() {
   // `sources.pve` is seeded from the cache for the same reason #58 seeded the
   // PokeMiners probe from it: a mirror that 503s must not erase the record of
   // which mirror last answered and when.
+  //
+  // The fetch is floored at that recorded batch. A fallback mirror that is
+  // behind would otherwise be diffed against a newer snapshot and land in the
+  // permanent history as a PvE "change", and again as its reversal once the
+  // primary came back. Rejected, it takes the soft path below like an outage.
   let pveMoves = prev?.pveMoves || null;
   let pveSource = {
     mirror: prev?.sources?.pve ?? null,
@@ -210,7 +215,10 @@ async function main() {
   let pveFresh = false;
   try {
     console.log("→ Niantic game master (PvE move mechanics)");
-    const gm = await fetchGameMaster({ userAgent: UA["User-Agent"] });
+    const gm = await fetchGameMaster({
+      userAgent: UA["User-Agent"],
+      minBatchMs: batchMsFromIso(pveSource.batch),
+    });
     const extracted = extractPveMoves(gm.templates);
     assertNotShrunken(gm.mirror, Object.keys(extracted).length,
       Object.keys(pveMoves || {}).length, MIN_PVE_MOVES);

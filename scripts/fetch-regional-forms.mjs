@@ -31,6 +31,7 @@ import {
   fetchGameMaster,
   formSuffix,
   gameMasterAgeDays,
+  mechanicsBatchFloor,
   pokemonTemplates,
   typesOf,
   warnIfStale,
@@ -275,8 +276,11 @@ async function main() {
   let templates, mirrorName, ageDays;
   try {
     console.log("→ Fetching game master (per-form type source)");
+    // This snapshot records no batch of its own, so the floor is the one
+    // meta-rankings.json was built from. See mechanicsBatchFloor().
     const gm = await fetchGameMaster({
       userAgent: "pogo-filter-workshop regional-forms-fetcher/1.0",
+      minBatchMs: mechanicsBatchFloor(),
     });
     templates = gm.templates;
     mirrorName = gm.mirror;
