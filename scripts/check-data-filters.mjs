@@ -32,7 +32,7 @@
 //         species and that form's types, in event raids and event Max Battles
 //         alike; a bare name takes the default form; an unknown forme is
 //         skipped, never guessed
-//   D14 — every boss carries its form, and an event dedupes against the
+//   D16 — every boss carries its form, and an event dedupes against the
 //         standing tiers by form where both sides name one: Origin Giratina
 //         is not standing Altered Giratina. Where either side cannot be
 //         placed (a Mega, a snapshot from before the field) it falls back to
@@ -69,7 +69,7 @@ function check(label, cond, detail = "") {
 // A boss's keys apart from the ones not every boss has: `gigantamax`, set only
 // on a boss the title calls Gigantamax, and `form`, which a snapshot written
 // before bosses carried one lacks. D12 and D13 compare event bosses to the
-// committed snapshot's standing ones through this; D14 checks `form` itself.
+// committed snapshot's standing ones through this; D16 checks `form` itself.
 const bossShape = (boss) => Object.keys(boss).filter((k) => k !== "gigantamax" && k !== "form").sort().join(",");
 
 const localeNames = Object.keys(LOCALES);
@@ -972,7 +972,7 @@ console.log("\nD13 — a forme in brackets resolves to its species and form, in 
   }
 }
 
-console.log("\nD14 — every boss carries its form; events dedupe by form where both sides name one, by species otherwise");
+console.log("\nD16 — every boss carries its form; events dedupe by form where both sides name one, by species otherwise");
 {
   // lily-dex-api relays pokemon-go-api's `form`, which spells a boss three
   // ways: the bare id for a plain species ("YVELTAL"), the game master's enum
