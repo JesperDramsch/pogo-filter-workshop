@@ -32,6 +32,8 @@
 //         species and that form's types, in event raids and event Max Battles
 //         alike; a bare name takes the default form; an unknown forme is
 //         skipped, never guessed
+//   D14 — boss boxes that share an id within one list (Mega Charizard X and Y
+//         are both CHARIZARD) still get distinct React and copy keys
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
@@ -41,6 +43,7 @@ import { recurringTypesOf, KILLER_ONE_IN } from "./lib/rocket-cover.mjs";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import META_RANKINGS from "../src/data/meta-rankings.json";
 import { buildDataFilters, buildResult, FIXTURE_CONFIG } from "./lib/fixture.mjs";
+import { bossBoxKeys } from "../src/App.jsx";
 import { LOCALES } from "../src/i18n/index.js";
 import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
 // `resolveSpecies` is D7's; the dictionary and locale list are D6's. D6 no
@@ -958,6 +961,53 @@ console.log("\nD13 — a forme in brackets resolves to its species and form, in 
     check(`${loc}: ${groups.length} forme event(s) build a filter per boss, named from the dictionary`,
       groups.length > 0 && bad.length === 0, bad.slice(0, 4).join(" | "));
   }
+}
+
+console.log("\nD14 — boss boxes that share an id within one list get distinct keys");
+{
+  // A boss's id is the species enum, so one list can hold it twice: ScrapedDuck
+  // listed "Mega Charizard X and Mega Charizard Y in Mega Raids" for
+  // 2026-10-21, and both resolve to CHARIZARD. The raid and Max Battle panels
+  // key each box, for React and for its copy state, by bossBoxKeys; keyed by
+  // the bare id, the two boxes collided and copying one marked both copied.
+  const keys = bossBoxKeys([{ id: "CHARIZARD" }, { id: "CHARIZARD" }, { id: "BLASTOISE" }, { id: "CHARIZARD" }]);
+  check("repeats of an id get distinct keys, the first keeping the bare id",
+    keys.join() === "CHARIZARD,CHARIZARD#2,BLASTOISE,CHARIZARD#3", keys.join());
+
+  // Every list the app builds from the committed snapshot: keys are distinct,
+  // and where no id repeats they are the bare ids, so copy state for such a
+  // list is keyed as it was before.
+  const result = buildResult("en", {});
+  const lists = [
+    ...Object.entries(result.raidFilters || {}),
+    ...Object.entries(result.maxBattleFilters || {}),
+    ...[...(result.eventRaidFilters || []), ...(result.eventMaxBattleFilters || [])].map((g) => [g.eventID, g.bosses]),
+  ];
+  const bad = lists.flatMap(([label, list]) => {
+    const k = bossBoxKeys(list);
+    const ids = list.map((b) => String(b.id));
+    if (new Set(k).size !== k.length) return [`${label}: repeated key`];
+    if (new Set(ids).size === ids.length && k.join() !== ids.join()) return [`${label}: unique ids not kept`];
+    return [];
+  });
+  check(`snapshot: all ${lists.length} boss list(s) get distinct keys, the bare id where no id repeats`,
+    lists.length > 0 && bad.length === 0, bad.slice(0, 4).join(" | "));
+
+  // Through the app's builder: an event with two bosses sharing an id keeps
+  // both, and they key apart. The bosses are the snapshot's first standing
+  // boss twice, the second with other types, as a lettered Mega pair arrives.
+  const [first] = Object.values(RAID_BOSSES.raids)[0];
+  const twin = { ...first, names: { en: `${first.names?.en ?? first.id} twin` }, types: ["fire", "dragon"] };
+  const raidBosses = {
+    ...RAID_BOSSES,
+    eventRaids: [{ eventID: "zz-pair", name: "pair", eventType: "raid-battles", start: null, end: null,
+      isShadow: false, isMega: true, bosses: [first, twin] }],
+  };
+  const group = (buildResult("en", { raidBosses }).eventRaidFilters || []).find((g) => g.eventID === "zz-pair");
+  const pairKeys = bossBoxKeys(group?.bosses);
+  check("an event with two bosses sharing an id builds both, keyed apart",
+    group?.bosses?.length === 2 && group.bosses.every((b) => b.id === first.id) && new Set(pairKeys).size === 2,
+    JSON.stringify(pairKeys));
 }
 
 console.log(`\n${failures === 0 ? "✓ All data-filter property checks passed." : `✗ ${failures} failure(s).`}`);

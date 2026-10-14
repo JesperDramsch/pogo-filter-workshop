@@ -8711,22 +8711,37 @@ function formatEventWindow(start, end, t, locale) {
 	});
 }
 
+// A key per boss in one list, for React and for copy state. A boss's id is the
+// species enum, and two bosses in one list can share it: Mega Charizard X and
+// Mega Charizard Y in one event are both CHARIZARD. The first keeps the bare
+// id, so a list without repeats is keyed exactly as before, and each repeat
+// gets its place among its namesakes.
+export function bossBoxKeys(bosses) {
+	const seen = new Map();
+	return (bosses || []).map((boss) => {
+		const n = (seen.get(boss.id) || 0) + 1;
+		seen.set(boss.id, n);
+		return n === 1 ? String(boss.id) : `${boss.id}#${n}`;
+	});
+}
+
 // One boss's counter FilterBox, or a short italic note when the boss has no
 // clean counter. Shared by the raid and Max Battle panels. The copy key is
-// distinct per (panel, event, boss), so an event-context Latios and a
-// standing-tier Latios don't share copy state.
-function bossCounterBox(boss, { keyPrefix, eventID, accent, copied, copyToClipboard, t }) {
+// distinct per (panel, list, boss): `scope` names the list, a tier or
+// `evt_<eventID>`, so an event-context Latios and a standing-tier Latios, or
+// Bagon in lvl1 and in shadow_lvl1, don't share copy state.
+function bossCounterBox(boss, { keyPrefix, scope, bossKey, accent, copied, copyToClipboard, t }) {
 	if (boss.skipped) {
 		return (
-			<p key={boss.id} className='text-xs italic text-[#8B98A5] pl-2'>
+			<p key={bossKey} className='text-xs italic text-[#8B98A5] pl-2'>
 				{t('app.filter.boss_no_clean_counter', { params: { boss: boss.name } })}
 			</p>
 		);
 	}
-	const copyKey = eventID ? `${keyPrefix}_evt_${eventID}_${boss.id}` : `${keyPrefix}_${boss.id}`;
+	const copyKey = `${keyPrefix}_${scope}_${bossKey}`;
 	return (
 		<FilterBox
-			key={boss.id}
+			key={bossKey}
 			label={t('app.filter.raid_counter_label', { params: { boss: boss.name } })}
 			accent={accent}
 			filterStr={boss.clause}
@@ -8735,6 +8750,12 @@ function bossCounterBox(boss, { keyPrefix, eventID, accent, copied, copyToClipbo
 			hint={t('app.filter.raid_counter_hint', { params: { boss: boss.name } })}
 		/>
 	);
+}
+
+// Every boss of one list as a counter box, keyed by bossBoxKeys.
+function bossCounterBoxes(bosses, scope, opts) {
+	const keys = bossBoxKeys(bosses);
+	return (bosses || []).map((boss, i) => bossCounterBox(boss, { ...opts, scope, bossKey: keys[i] }));
 }
 
 // The events a panel still shows. The snapshot refreshes once a day, and the
@@ -8752,7 +8773,7 @@ function liveEventGroups(eventGroups) {
 // highlighted, an upcoming one collapses with a window teaser. The raid panel
 // renders its event raids with this, the Max Battle panel its Max Mondays and
 // Max Battle Days.
-function eventBossGroups(events, { accent, t, locale, renderBoss }) {
+function eventBossGroups(events, { accent, t, locale, renderBosses }) {
 	return events.map((event) => {
 		const startMs = Date.parse(event.start);
 		const endMs = Date.parse(event.end);
@@ -8766,7 +8787,7 @@ function eventBossGroups(events, { accent, t, locale, renderBoss }) {
 				accent={accent}
 				highlight={isActive}
 			>
-				{(event.bosses || []).map((b) => renderBoss(b, event.eventID))}
+				{renderBosses(event.bosses, `evt_${event.eventID}`)}
 			</TrainerAccordion>
 		);
 	});
@@ -8812,8 +8833,8 @@ function BossCollapsible({
 			</Collapsible>
 		);
 	}
-	const renderBossBox = (boss, eventID) =>
-		bossCounterBox(boss, { keyPrefix, eventID, accent, copied, copyToClipboard, t });
+	const renderBosses = (bosses, scope) =>
+		bossCounterBoxes(bosses, scope, { keyPrefix, accent, copied, copyToClipboard, t });
 	const hasEvents = events.length > 0;
 	return (
 		<Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
@@ -8824,7 +8845,7 @@ function BossCollapsible({
 						<h4 className='mono text-xs uppercase tracking-wide text-[#8090A0]'>
 							{t('app.collapsible.aux_event_raids_heading')}
 						</h4>
-						{eventBossGroups(events, { accent, t, locale, renderBoss: renderBossBox })}
+						{eventBossGroups(events, { accent, t, locale, renderBosses })}
 					</div>
 				)}
 				{tierOrder.map((tier) => {
@@ -8841,7 +8862,7 @@ function BossCollapsible({
 							accent={accent}
 							highlight={false}
 						>
-							{list.map((boss) => renderBossBox(boss))}
+							{renderBosses(list, tier)}
 						</TrainerAccordion>
 					);
 				})}
@@ -9056,8 +9077,8 @@ function MaxBattleCollapsible({
 		);
 	}
 	const hasBosses = totalBosses > 0;
-	const renderBossBox = (boss, eventID) =>
-		bossCounterBox(boss, { keyPrefix: 'max', eventID, accent, copied, copyToClipboard, t });
+	const renderBosses = (bosses, scope) =>
+		bossCounterBoxes(bosses, scope, { keyPrefix: 'max', accent, copied, copyToClipboard, t });
 	return (
 		<Collapsible icon='💥' label={headerLabel} open={open} onToggle={onToggle}>
 			<div className='space-y-5'>
@@ -9085,7 +9106,7 @@ function MaxBattleCollapsible({
 						    so the dated rows stay grouped once standing tiers return. */}
 						{events.length > 0 && (
 							<div className='space-y-3'>
-								{eventBossGroups(events, { accent, t, locale, renderBoss: renderBossBox })}
+								{eventBossGroups(events, { accent, t, locale, renderBosses })}
 							</div>
 						)}
 						{tierOrder.map((tier) => {
@@ -9102,7 +9123,7 @@ function MaxBattleCollapsible({
 									accent={accent}
 									highlight={false}
 								>
-									{list.map((boss) => renderBossBox(boss))}
+									{renderBosses(list, tier)}
 								</TrainerAccordion>
 							);
 						})}
