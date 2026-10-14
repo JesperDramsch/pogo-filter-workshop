@@ -25,6 +25,7 @@ import {
   formSuffix,
   gameMasterAgeDays,
   pokemonTemplates,
+  typeSlug,
   typesOf,
   warnIfStale,
 } from "./lib/game-master.mjs";
@@ -196,6 +197,9 @@ const titleTypes = (types) => types.map(t => t[0].toUpperCase() + t.slice(1));
 // gets Hero Zacian's, where the form-less template carries the Crowned ones.
 // `forms` maps every form suffix of the species (INCARNATE, CROWNED_SWORD,
 // ALOLA, …) to that form's types, for resolveBossKey.
+//
+// The index also holds every temporary evolution the dictionary names, under
+// that name: "mega charizard x", "primal groudon" (see tempEvoEntries).
 export function buildNameIndex(templates, names) {
   const defaults = defaultFormByDex(templates);
   const rank = (template, form) => {
@@ -230,7 +234,84 @@ export function buildNameIndex(templates, names) {
       forms,
     });
   }
+  // A species name always wins over a temporary evolution's.
+  for (const [key, entry] of tempEvoEntries(byDex, names)) {
+    if (!idx.has(key)) idx.set(key, entry);
+  }
   return idx;
+}
+
+// A temporary evolution's words as its tempEvoId spells them:
+// TEMP_EVOLUTION_MEGA_X → mega, x; TEMP_EVOLUTION_PRIMAL → primal.
+function tempEvoWords(tempEvoId) {
+  return tempEvoId.replace(/^TEMP_EVOLUTION_/, "").toLowerCase().split("_").filter(Boolean);
+}
+
+// `words` with each of `remove` taken out once, or null if one is missing.
+function withoutWords(words, remove) {
+  const rest = [...words];
+  for (const word of remove) {
+    const i = rest.indexOf(word);
+    if (i < 0) return null;
+    rest.splice(i, 1);
+  }
+  return rest;
+}
+
+// Index entries for the temporary evolutions, Mega and Primal, keyed by the
+// dictionary's own name for each. Event titles name a Mega by that name, and
+// a lettered one has nothing else to go by: "Mega Charizard X" with the tier
+// word stripped is "charizard x", which is no species.
+//
+// The game master carries a temporary evolution's types in its species'
+// tempEvoOverrides, on the default form's template, which is the one byDex
+// kept: TEMP_EVOLUTION_MEGA_X makes Charizard fire/dragon. The dictionary
+// names it under the Niantic text key pokemon_name_<dex>_<n> ("6_2"), but <n>
+// does not name the evolution reliably (Mega Absol Z is 359_2, Mega Lucario Z
+// 448_5), so the two are joined by words: the dictionary name with the
+// species' own name taken out ("Mega Charizard X" → mega, x) must be exactly
+// the tempEvoId's words. A name no override matches, such as Mega Absol Z
+// while the game master has no TEMP_EVOLUTION_MEGA_Z, gets no entry and so
+// stays unresolved: there are no types to give it. Three-part keys
+// ("6_178_2") are Gigantamax names, not temporary evolutions.
+//
+// Each entry is { id, types, displayName }: the species' id, so a Mega
+// dedupes against lily-dex-api's species-level ids as a forme does, the
+// evolution's types, and the dictionary name, through which the app names it
+// in every locale.
+function tempEvoEntries(byDex, names) {
+  const namesByDex = new Map();
+  for (const [dexKey, entry] of Object.entries(names)) {
+    const parts = dexKey.split("_");
+    if (parts.length !== 2 || !entry?.en) continue;
+    const dex = Number(parts[0]);
+    if (!namesByDex.has(dex)) namesByDex.set(dex, []);
+    namesByDex.get(dex).push(entry.en);
+  }
+  const out = new Map();
+  for (const [dex, { template }] of byDex) {
+    const speciesName = names[String(dex)]?.en;
+    const overrides = template.settings.tempEvoOverrides;
+    if (!speciesName || !Array.isArray(overrides)) continue;
+    const speciesWords = nameKey(speciesName).split(/\s+/);
+    for (const evoName of namesByDex.get(dex) || []) {
+      const rest = withoutWords(nameKey(evoName).split(/\s+/), speciesWords);
+      if (!rest) continue;
+      const match = overrides.find((o) => {
+        if (typeof o?.tempEvoId !== "string") return false;
+        const words = tempEvoWords(o.tempEvoId);
+        return words.length === rest.length && words.every((w) => rest.includes(w));
+      });
+      const types = [typeSlug(match?.typeOverride1), typeSlug(match?.typeOverride2)].filter(Boolean);
+      if (types.length === 0) continue;
+      out.set(nameKey(evoName), {
+        id: template.settings.pokemonId,
+        types: titleTypes(types),
+        displayName: evoName,
+      });
+    }
+  }
+  return out;
 }
 
 // "landorus (incarnate)" from a raid-battles boss list, "giratina (origin
@@ -250,7 +331,8 @@ function qualifierWords(qualifier) {
 }
 
 // Resolves a boss key through the name index to {id, types, displayName}, or
-// null. A bare species name is a plain lookup. A forme in brackets resolves
+// null. A bare species name is a plain lookup, and so is a temporary
+// evolution's own name ("mega charizard x"). A forme in brackets resolves
 // against that species' own form suffixes in the game master: the form whose
 // suffix words all appear in the qualifier wins, the longest such suffix if
 // several do, so "Incarnate" and "Incarnate Forme" both find
@@ -286,9 +368,11 @@ export function resolveBossKey(nameIdx, key) {
 // since the names are already canonical. raid-day / raid-hour / raid-weekend
 // entries only have a marketing title, so we strip the event-type tail
 // ("Raid Day"/"Raid Hour"/"Raid Weekend"), the "Super Mega" community-day
-// qualifier (which is not a Mega-tier marker), the leading Shadow/Mega
-// prefix (which IS a tier flag), and split multi-boss titles like
-// "Buzzwole, Pheromosa, and Xurkitree Raid Hour".
+// qualifier (which is not a Mega-tier marker) and the leading Shadow prefix
+// (which IS a tier flag), and split multi-boss titles like
+// "Buzzwole, Pheromosa, and Xurkitree Raid Hour". A leading Mega stays on the
+// name, as it is in a raid-battles boss list: it is part of a lettered Mega's
+// name, and buildEventEntry reads it off each name.
 function parseEventBosses(event) {
   const title = event.name || "";
   // "Super Mega" is a community-day qualifier ("Falinks Super Mega Raid Day"),
@@ -312,8 +396,7 @@ function parseEventBosses(event) {
     .replace(/\s+Raid\s+(Day|Hour|Weekend)$/i, "")
     .replace(/\s+Super\s+Mega$/i, "")
     .replace(/^Super\s+Mega\s+/i, "")
-    .replace(/^Shadow\s+/i, "")
-    .replace(/^Mega\s+/i, "");
+    .replace(/^Shadow\s+/i, "");
   // Multi-boss split — try ", and ", " and ", then ", " in that order so
   // "A, B, and C" splits cleanly into [A, B, C].
   const names = s
@@ -390,14 +473,18 @@ function buildEventEntry(event, nameIdx, allTypes, typeIdx, dedupeSet) {
 
   // Dedupe against the standing tier rotation so e.g. Shadow Latios doesn't
   // appear twice (once in shadow_lvl5, once as a raid-battles event).
-  const picks = names.map((rawName) => ({
-    name: rawName,
-    key: nameKey(rawName)
-      .replace(/^shadow\s+/i, "")
-      .replace(/^mega\s+/i, "")
-      .trim(),
-    dedupeKey: (id) => `${id}|${isShadow ? "S" : ""}|${isMega ? "M" : ""}`,
-  }));
+  const picks = names.map((rawName) => {
+    const named = nameKey(rawName).replace(/^shadow\s+/i, "").trim();
+    const bare = named.replace(/^mega\s+/i, "").trim();
+    return {
+      name: rawName,
+      // The species name first, as a Mega has always been looked up, and the
+      // Mega's own name only when that finds nothing: "charizard x" is no
+      // species, "mega charizard x" is in the index (see tempEvoEntries).
+      key: bare === named || resolveBossKey(nameIdx, bare) ? bare : named,
+      dedupeKey: (id) => `${id}|${isShadow ? "S" : ""}|${isMega ? "M" : ""}`,
+    };
+  });
   const { bosses, status } = resolveEventBosses(event, picks, nameIdx, allTypes, typeIdx, dedupeSet);
   if (bosses.length === 0) return { entry: null, status };
   return {
