@@ -100,7 +100,7 @@ function MapStrip({ act, t, reducedMotion }) {
           return (
             <div
               key={key}
-              className="rounded p-2 text-center transition-all"
+              className="rounded-sm p-2 text-center transition-all"
               style={{
                 backgroundColor: `${color}${isHome ? "26" : "12"}`,
                 border: `1px solid ${color}${isHome ? "70" : "40"}`,

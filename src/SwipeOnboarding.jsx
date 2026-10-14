@@ -290,7 +290,7 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
           </button>
           <button
             onClick={onSkip}
-            className="mono text-xs px-3 py-1.5 rounded inline-flex items-center gap-1.5 transition"
+            className="mono text-xs px-3 py-1.5 rounded-sm inline-flex items-center gap-1.5 transition"
             style={{ color: C.dim, border: `1px solid ${C.border}` }}
             onMouseEnter={(e) => { e.currentTarget.style.color = C.text; e.currentTarget.style.borderColor = C.borderHi; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = C.dim; e.currentTarget.style.borderColor = C.border; }}
@@ -398,7 +398,7 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
 
                     {/* Drag overlays */}
                     <motion.div
-                      className="absolute top-4 left-4 mono text-sm font-bold px-2.5 py-1 rounded"
+                      className="absolute top-4 left-4 mono text-sm font-bold px-2.5 py-1 rounded-sm"
                       style={{
                         opacity: keepOpacity,
                         color: C.green,
@@ -410,7 +410,7 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
                       {t("app.onboarding.swipe.keep")}
                     </motion.div>
                     <motion.div
-                      className="absolute top-4 right-4 mono text-sm font-bold px-2.5 py-1 rounded"
+                      className="absolute top-4 right-4 mono text-sm font-bold px-2.5 py-1 rounded-sm"
                       style={{
                         opacity: tossOpacity,
                         color: C.red,
@@ -498,14 +498,14 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
                 <div className="flex flex-col gap-2.5 mt-6">
                   <button
                     onClick={() => { setPhase("advanced"); setIndex(0); }}
-                    className="mono text-sm font-bold px-5 py-2.5 rounded transition"
+                    className="mono text-sm font-bold px-5 py-2.5 rounded-sm transition"
                     style={{ backgroundColor: C.cyan, color: C.bg }}
                   >
                     {t("app.onboarding.swipe.offer_yes")}
                   </button>
                   <button
                     onClick={() => setPhase("done")}
-                    className="mono text-sm px-5 py-2.5 rounded transition"
+                    className="mono text-sm px-5 py-2.5 rounded-sm transition"
                     style={{ backgroundColor: "transparent", color: C.dim, border: `1px solid ${C.border}` }}
                   >
                     {t("app.onboarding.swipe.offer_no")}
@@ -539,7 +539,7 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
                 <div className="flex flex-col gap-2.5 mt-6">
                   <button
                     onClick={() => onComplete(decisions)}
-                    className="mono text-sm font-bold px-5 py-2.5 rounded transition inline-flex items-center justify-center gap-2"
+                    className="mono text-sm font-bold px-5 py-2.5 rounded-sm transition inline-flex items-center justify-center gap-2"
                     style={{ backgroundColor: C.red, color: "#fff" }}
                     onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#FF5A4A")}
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = C.red)}
@@ -548,7 +548,7 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
                   </button>
                   <button
                     onClick={() => onComplete(decisions, "where")}
-                    className="mono text-sm px-5 py-2.5 rounded transition inline-flex items-center justify-center gap-2"
+                    className="mono text-sm px-5 py-2.5 rounded-sm transition inline-flex items-center justify-center gap-2"
                     style={{ backgroundColor: "transparent", color: C.cyan, border: `1px solid ${C.cyan}59` }}
                     onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = `${C.cyan}1A`)}
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
@@ -557,7 +557,7 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
                   </button>
                   <button
                     onClick={startOver}
-                    className="mono text-xs px-5 py-2 rounded transition inline-flex items-center justify-center gap-1.5"
+                    className="mono text-xs px-5 py-2 rounded-sm transition inline-flex items-center justify-center gap-1.5"
                     style={{ backgroundColor: "transparent", color: C.dim, border: `1px solid ${C.border}` }}
                   >
                     <Undo2 size={13} /> {t("app.onboarding.swipe.done_restart")}
@@ -613,14 +613,14 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
                   // never the destructive one.
                   ref={confirmKeepRef}
                   onClick={() => commit(true)}
-                  className="mono text-sm font-bold px-5 py-2.5 rounded transition"
+                  className="mono text-sm font-bold px-5 py-2.5 rounded-sm transition"
                   style={{ backgroundColor: C.green, color: C.bg }}
                 >
                   {t("app.onboarding.swipe.confirm_no")}
                 </button>
                 <button
                   onClick={() => commit(false)}
-                  className="mono text-sm px-5 py-2.5 rounded transition"
+                  className="mono text-sm px-5 py-2.5 rounded-sm transition"
                   style={{ backgroundColor: "transparent", color: C.red, border: `1px solid ${C.red}59` }}
                 >
                   {t("app.onboarding.swipe.confirm_yes")}

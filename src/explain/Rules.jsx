@@ -50,7 +50,7 @@ function RuleCard({ rule, color, t }) {
     >
       <div className="flex items-baseline gap-3 mb-2">
         <span
-          className="mono text-xs font-bold px-2 py-0.5 rounded shrink-0"
+          className="mono text-xs font-bold px-2 py-0.5 rounded-sm shrink-0"
           style={{
             backgroundColor: `${color}20`,
             color,
@@ -77,7 +77,7 @@ function GroupSection({ groupKey, rules, t }) {
     <section className="space-y-3">
       <div className="flex items-baseline gap-3 mb-1 mt-2">
         <span
-          className="inline-flex items-center justify-center w-7 h-7 rounded shrink-0"
+          className="inline-flex items-center justify-center w-7 h-7 rounded-sm shrink-0"
           style={{
             backgroundColor: `${meta.color}20`,
             color: meta.color,

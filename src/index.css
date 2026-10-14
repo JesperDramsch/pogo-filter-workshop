@@ -1,6 +1,32 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Tailwind v3 Preflight defaults that v4 changed, restored so the UI looks the
+   same after the upgrade (snippets from the v4 upgrade guide):
+   - border colour: v4 defaults `border` / `divide` to currentColor, v3 used
+     gray-200. Drop this rule only once every border utility names a colour.
+   - placeholder colour: v4 uses the text colour at 50% opacity; v3 used
+     gray-400. Inputs with their own `placeholder:` utility are unaffected.
+   - button cursor: v4 leaves buttons on `cursor: default`; v3 set pointer.
+   In @layer base so any utility on the element still wins. */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-gray-400);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
 
 /* Make sure body fills the viewport */
 html, body, #root {
@@ -16,14 +42,17 @@ body {
 }
 
 /* Visible focus, everywhere.
-   23 controls in App.jsx carry Tailwind's `outline-none`, which emits
-   `outline: 2px solid transparent` — it removes the browser's focus ring and
-   nothing in the repo replaced it, so keyboard users had no idea where they
-   were. Those fields DO set `focus:border-[#5EAFC5]`, but a 1px border colour
-   change is not a reliable focus indicator (and disappears entirely in forced-
-   colours mode).
+   The text inputs in App.jsx carry Tailwind's `outline-hidden` (`outline-none`
+   before v4), which emits `outline: 2px solid transparent` — it removes the
+   browser's focus ring and nothing in the repo replaced it, so keyboard users
+   had no idea where they were. Those fields DO set `focus:border-[#5EAFC5]`,
+   but a 1px border colour change is not a reliable focus indicator (and
+   disappears entirely in forced-colours mode).
    :focus-visible rather than :focus so mouse clicks don't draw a ring.
-   The `outline-offset` keeps the ring clear of the control's own border. */
+   The `outline-offset` keeps the ring clear of the control's own border.
+   These rules are unlayered and v4 emits utilities into a cascade layer, so
+   they beat every utility, variants included: `focus:outline-hidden` no longer
+   out-specifies the ring as `focus:outline-none` did under v3. */
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
   outline: 2px solid #5EAFC5;
   outline-offset: 2px;

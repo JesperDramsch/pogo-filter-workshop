@@ -1,11 +1,16 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 // Served from custom domain pogo.amplt.de, so base is "/".
 export default defineConfig({
   plugins: [
     react(),
+    // Tailwind v4 runs as a Vite plugin: no postcss.config.js, no
+    // tailwind.config.js (theme customisation would live in src/index.css via
+    // @theme), and no autoprefixer — v4 does its own vendor prefixing.
+    tailwindcss(),
     // PWA conversion exists primarily so Firefox Mobile honours
     // navigator.storage.persist() — Fenix gates durable storage on
     // PWA-install heuristics (manifest + SW + icons), and without them
@@ -54,6 +59,12 @@ export default defineConfig({
     }),
   ],
   base: "/",
+  // No PostCSS pipeline since Tailwind v4 moved into its own Vite plugin. An
+  // inline (empty) config stops Vite from searching parent directories for a
+  // postcss.config.js — a checkout nested inside another one (e.g. a git
+  // worktree under .claude/worktrees/) otherwise picks up the outer repo's
+  // config and runs its Tailwind v3 PostCSS plugin over our v4 CSS.
+  css: { postcss: {} },
   build: {
     outDir: "dist",
     sourcemap: false,

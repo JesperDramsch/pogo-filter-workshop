@@ -135,7 +135,7 @@ export function Dialog({
 	role = 'dialog',
 	initialFocusRef,
 	className = 'border border-[#2D3A47] rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4',
-	backdropClassName = 'fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center p-4',
+	backdropClassName = 'fixed inset-0 z-50 backdrop-blur-xs flex items-center justify-center p-4',
 	children,
 }) {
 	const panelRef = useRef(null);

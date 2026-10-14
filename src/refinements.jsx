@@ -394,7 +394,7 @@ export const CHIP_REMOVE_TARGET = `inline-flex items-center justify-center ${TOU
 // The badge box itself, for the one have-list badge that is not an axis row
 // (the line-scope toggle in App.jsx): same size and touch rule as the rows
 // below, so it sits flush beside them and passes the same target check.
-export const CHIP_BADGE_TARGET = `${TOUCH_TARGET} inline-flex items-center justify-center rounded border transition`;
+export const CHIP_BADGE_TARGET = `${TOUCH_TARGET} inline-flex items-center justify-center rounded-sm border transition`;
 
 // Row spacing — the separation half of the rule above, kept beside the sizes it
 // has to stay in step with.
@@ -442,7 +442,7 @@ export function RefinementBadges({
 						aria-pressed={on}
 						aria-label={refinementAriaLabel(entry, key, t)}
 						title={titleFor ? titleFor(key) : undefined}
-						className={`${dims} ${TOUCH_TARGET} inline-flex items-center justify-center rounded border transition ${
+						className={`${dims} ${TOUCH_TARGET} inline-flex items-center justify-center rounded-sm border transition ${
 							on
 								? ''
 								: state === 'dropped'

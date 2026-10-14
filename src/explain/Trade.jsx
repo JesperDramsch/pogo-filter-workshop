@@ -20,7 +20,7 @@ function DistanceGauge({ t, reducedMotion }) {
         </span>
       </div>
       <motion.div
-        className="relative h-3 rounded overflow-hidden"
+        className="relative h-3 rounded-sm overflow-hidden"
         initial={{ scaleX: 0.6, opacity: 0 }}
         whileInView={{ scaleX: 1, opacity: 1 }}
         viewport={{ once: true, margin: "-40px" }}
@@ -74,7 +74,7 @@ function EvoFlow() {
           style={{ gridTemplateColumns: "1fr auto 1fr" }}
         >
           <span
-            className="mono text-xs px-3 py-1.5 rounded text-center"
+            className="mono text-xs px-3 py-1.5 rounded-sm text-center"
             style={{
               backgroundColor: `${C.dim}15`,
               color: C.dim,
@@ -85,7 +85,7 @@ function EvoFlow() {
           </span>
           <ArrowRight size={14} style={{ color: C.cyan }} />
           <span
-            className="mono text-xs px-3 py-1.5 rounded text-center font-bold"
+            className="mono text-xs px-3 py-1.5 rounded-sm text-center font-bold"
             style={{
               backgroundColor: `${C.cyan}1f`,
               color: C.cyan,
@@ -118,7 +118,7 @@ function BuddyRoster() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.4, delay: i * 0.1 }}
-          className="rounded p-3 flex items-center gap-3 flex-wrap"
+          className="rounded-sm p-3 flex items-center gap-3 flex-wrap"
           style={{
             backgroundColor: `${b.color}12`,
             border: `1px solid ${b.color}40`,
@@ -134,7 +134,7 @@ function BuddyRoster() {
             {b.name}
           </span>
           <span
-            className="mono text-[11px] px-2 py-0.5 rounded"
+            className="mono text-[11px] px-2 py-0.5 rounded-sm"
             style={{
               backgroundColor: `${b.color}26`,
               color: b.color,

@@ -121,7 +121,7 @@ export default function RocketQuoteLookup({
   })();
 
   return (
-    <div className="rounded border border-[#1F2933] bg-[#0E141A] p-3 space-y-2">
+    <div className="rounded-sm border border-[#1F2933] bg-[#0E141A] p-3 space-y-2">
       <div className="mono text-[11px] uppercase tracking-wider" style={{ color: C.dim }}>
         {t("app.filter.rocket_quote_lookup_title")}
       </div>
@@ -131,7 +131,7 @@ export default function RocketQuoteLookup({
         onChange={e => setInput(e.target.value)}
         placeholder={t("app.filter.rocket_quote_lookup_label")}
         aria-label={t("app.filter.rocket_quote_lookup_title")}
-        className="w-full mono text-xs bg-[#0A0F14] border border-[#1F2933] rounded px-2 py-1.5 text-[#E6EDF3] placeholder:text-[#5A6772] focus:outline-none focus:border-[#5EAFC5]"
+        className="w-full mono text-xs bg-[#0A0F14] border border-[#1F2933] rounded-sm px-2 py-1.5 text-[#E6EDF3] placeholder:text-[#5A6772] focus:outline-hidden focus:border-[#5EAFC5]"
       />
       <div className="mono text-[10.5px]" style={{ color: C.dim }}>
         {t("app.filter.rocket_quote_lookup_hint")}

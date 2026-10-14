@@ -7077,7 +7077,7 @@ function StepWrapper({ title, hint, children, onBack, onNext, nextLabel }) {
 				{onBack && (
 					<button
 						onClick={onBack}
-						className='mono text-sm bg-[#1F2933] hover:bg-[#2D3A47] text-[#E6EDF3] px-4 py-2 rounded transition'
+						className='mono text-sm bg-[#1F2933] hover:bg-[#2D3A47] text-[#E6EDF3] px-4 py-2 rounded-sm transition'
 					>
 						{t('app.step.back_button')}
 					</button>
@@ -7086,7 +7086,7 @@ function StepWrapper({ title, hint, children, onBack, onNext, nextLabel }) {
 				{onNext && (
 					<button
 						onClick={onNext}
-						className='mono text-sm bg-[#E74C3C] hover:bg-[#FF5A4A] text-white px-4 py-2 rounded transition'
+						className='mono text-sm bg-[#E74C3C] hover:bg-[#FF5A4A] text-white px-4 py-2 rounded-sm transition'
 					>
 						{nextLabel || t('app.step.next_default')}
 					</button>
@@ -7098,7 +7098,7 @@ function StepWrapper({ title, hint, children, onBack, onNext, nextLabel }) {
 
 function StatBox({ label, value }) {
 	return (
-		<div className='border border-[#1F2933] rounded px-3 py-2'>
+		<div className='border border-[#1F2933] rounded-sm px-3 py-2'>
 			<div className='text-[10px] uppercase tracking-wider text-[#8090A0]'>{label}</div>
 			<div className='text-[#E6EDF3] mt-0.5'>{value}</div>
 		</div>
@@ -7303,7 +7303,7 @@ function SeasonNote({ hemisphere, season, window, auto, onAuto, onOverride, over
 			? new Date(window.end).toLocaleDateString(locale, { day: 'numeric', month: 'short' })
 			: null;
 	return (
-		<div className='mt-4 rounded border border-[#2D3A47] bg-[#141C24] px-3 py-2'>
+		<div className='mt-4 rounded-sm border border-[#2D3A47] bg-[#141C24] px-3 py-2'>
 			<p className='mono text-[10px] leading-relaxed text-[#8B98A5]'>
 				{season
 					? t(overridden ? 'app.have_slots.season_note_manual' : 'app.have_slots.season_note', {
@@ -7321,7 +7321,7 @@ function SeasonNote({ hemisphere, season, window, auto, onAuto, onOverride, over
 				<button
 					onClick={onAuto}
 					aria-pressed={auto && !overridden}
-					className={`text-[9px] px-1 py-px rounded border transition ${
+					className={`text-[9px] px-1 py-px rounded-sm border transition ${
 						auto && !overridden
 							? 'bg-[#5EAFC5]/25 border-[#5EAFC5]/50 text-[#5EAFC5]'
 							: 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
@@ -7334,7 +7334,7 @@ function SeasonNote({ hemisphere, season, window, auto, onAuto, onOverride, over
 						key={sn}
 						onClick={() => onOverride(sn)}
 						aria-pressed={overridden && season === sn}
-						className={`text-[9px] px-1 py-px rounded border transition ${
+						className={`text-[9px] px-1 py-px rounded-sm border transition ${
 							overridden && season === sn
 								? 'bg-[#E2B93B]/25 border-[#E2B93B]/50 text-[#E2B93B]'
 								: 'bg-transparent border-[#2D3A47] text-[#5A6673] hover:text-[#E6EDF3]'
@@ -7385,7 +7385,7 @@ function QuickHaveAdd({ onAdd }) {
 	}
 
 	return (
-		<div className='mb-8 border border-[#1F2933] rounded p-3 bg-[#0B0F14] space-y-2.5'>
+		<div className='mb-8 border border-[#1F2933] rounded-sm p-3 bg-[#0B0F14] space-y-2.5'>
 			<div className='flex flex-wrap items-center justify-between gap-2'>
 				<span className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
 					{t('app.quick_add.title')}
@@ -7397,7 +7397,7 @@ function QuickHaveAdd({ onAdd }) {
 							onClick={() => setTarget(opt.id)}
 							aria-pressed={target === opt.id}
 							style={target === opt.id ? { color: opt.accent, borderColor: opt.accent } : undefined}
-							className={`mono text-xs px-2 py-0.5 rounded border transition ${
+							className={`mono text-xs px-2 py-0.5 rounded-sm border transition ${
 								target === opt.id
 									? 'bg-[#1F2933]'
 									: 'bg-transparent border-[#2D3A47] text-[#8090A0] hover:text-[#E6EDF3]'
@@ -7418,12 +7418,12 @@ function QuickHaveAdd({ onAdd }) {
 					onSubmit={submit}
 					aria-label={t('app.quick_add.input_label')}
 					placeholder={t('app.hundos.input_placeholder')}
-					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
+					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-3 py-2 rounded-sm text-[#E6EDF3] placeholder:text-[#8090A0]'
 				/>
 				<button
 					onClick={submit}
 					disabled={!canAdd}
-					className='mono text-sm bg-[#E74C3C] hover:bg-[#FF5A4A] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded transition flex items-center gap-1.5'
+					className='mono text-sm bg-[#E74C3C] hover:bg-[#FF5A4A] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded-sm transition flex items-center gap-1.5'
 				>
 					<Plus size={14} /> {t('app.hundos.add_button')}
 				</button>
@@ -7478,7 +7478,7 @@ function HundosEditor({
 				{hundos.map((h) => (
 					<span
 						key={h}
-						className='chip-enter mono text-xs bg-[#1F2933] hover:bg-[#2D3A47] text-[#E6EDF3] pl-2.5 pr-1.5 py-1 rounded flex items-center gap-1.5 transition group'
+						className='chip-enter mono text-xs bg-[#1F2933] hover:bg-[#2D3A47] text-[#E6EDF3] pl-2.5 pr-1.5 py-1 rounded-sm flex items-center gap-1.5 transition group'
 					>
 						<span className='text-[#5EAFC5]'>+</span>
 						{h}
@@ -7517,12 +7517,12 @@ function HundosEditor({
 					onSubmit={addHundo}
 					aria-label={t('app.a11y.species_input')}
 					placeholder={t('app.hundos.input_placeholder')}
-					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
+					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-3 py-2 rounded-sm text-[#E6EDF3] placeholder:text-[#8090A0]'
 				/>
 				<button
 					onClick={addHundo}
 					disabled={previewTokens.length === 0 || newResolved.length === 0}
-					className='mono text-sm bg-[#E74C3C] hover:bg-[#FF5A4A] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded transition flex items-center gap-1.5'
+					className='mono text-sm bg-[#E74C3C] hover:bg-[#FF5A4A] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded-sm transition flex items-center gap-1.5'
 				>
 					<Plus size={14} /> {t('app.hundos.add_button')}
 				</button>
@@ -7530,7 +7530,7 @@ function HundosEditor({
 
 			{/* Live preview of what would be added */}
 			{previewTokens.length > 0 && (
-				<div className='border border-[#1F2933] rounded p-2.5 bg-[#0B0F14] space-y-1.5'>
+				<div className='border border-[#1F2933] rounded-sm p-2.5 bg-[#0B0F14] space-y-1.5'>
 					<div className='mono text-[10px] uppercase tracking-wider text-[#8090A0]'>
 						{t('app.hundos.preview_summary', {
 							params: { new: newResolved.length, dupes: dupes.length, unresolved: unresolved.length },
@@ -7542,7 +7542,7 @@ function HundosEditor({
 								return (
 									<span
 										key={i}
-										className='mono text-[11px] bg-[#E74C3C]/15 text-[#E74C3C] px-2 py-0.5 rounded'
+										className='mono text-[11px] bg-[#E74C3C]/15 text-[#E74C3C] px-2 py-0.5 rounded-sm'
 										title={t('app.hundos.unresolved_title')}
 									>
 										✗ {tok.input}
@@ -7563,7 +7563,7 @@ function HundosEditor({
 							return (
 								<span
 									key={i}
-									className={`mono text-[11px] px-2 py-0.5 rounded flex items-center gap-1 ${
+									className={`mono text-[11px] px-2 py-0.5 rounded-sm flex items-center gap-1 ${
 										isDupe ? 'bg-[#8090A0]/15 text-[#8B98A5]' : 'bg-[#27AE60]/15 text-[#27AE60]'
 									}`}
 									title={`#${tok.info.dex} · EN: ${tok.info.names.en} · DE: ${tok.info.names.de}${isDupe ? ` (${t('app.hundos.dupe_marker')})` : ''}`}
@@ -7612,7 +7612,7 @@ function PackAddButtons({ packs, items, onAddPack, accent }) {
 						onClick={() => onAddPack(pack)}
 						disabled={fresh.length === 0}
 						title={pack.display?.join(', ')}
-						className='mono text-xs bg-[#1F2933] hover:bg-[#2D3A47] disabled:opacity-40 disabled:hover:bg-[#1F2933] text-[#E6EDF3] px-2.5 py-1 rounded flex items-center gap-1.5 transition'
+						className='mono text-xs bg-[#1F2933] hover:bg-[#2D3A47] disabled:opacity-40 disabled:hover:bg-[#1F2933] text-[#E6EDF3] px-2.5 py-1 rounded-sm flex items-center gap-1.5 transition'
 					>
 						<Plus size={12} style={{ color: accent }} />
 						{t(pack.labelKey)}
@@ -7672,7 +7672,7 @@ function SpeciesListEditor({
 				{items.map((s) => (
 					<span
 						key={s}
-						className='chip-enter mono text-xs bg-[#1F2933] hover:bg-[#2D3A47] text-[#E6EDF3] pl-2.5 pr-1.5 py-1 rounded flex items-center gap-1.5 transition group'
+						className='chip-enter mono text-xs bg-[#1F2933] hover:bg-[#2D3A47] text-[#E6EDF3] pl-2.5 pr-1.5 py-1 rounded-sm flex items-center gap-1.5 transition group'
 					>
 						<span style={{ color: accent }}>+</span>
 						{s}
@@ -7711,7 +7711,7 @@ function SpeciesListEditor({
 					onSubmit={addItem}
 					aria-label={t('app.a11y.species_input')}
 					placeholder={t(`${titleKey}.input_placeholder`)}
-					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
+					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-3 py-2 rounded-sm text-[#E6EDF3] placeholder:text-[#8090A0]'
 				/>
 				<button
 					onClick={addItem}
@@ -7719,14 +7719,14 @@ function SpeciesListEditor({
 					style={{
 						backgroundColor: previewTokens.length === 0 || newResolved.length === 0 ? undefined : accent,
 					}}
-					className='mono text-sm hover:brightness-110 disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded transition flex items-center gap-1.5'
+					className='mono text-sm hover:brightness-110 disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded-sm transition flex items-center gap-1.5'
 				>
 					<Plus size={14} /> {t(`${titleKey}.add_button`)}
 				</button>
 			</div>
 
 			{previewTokens.length > 0 && (
-				<div className='border border-[#1F2933] rounded p-2.5 bg-[#0B0F14] space-y-1.5'>
+				<div className='border border-[#1F2933] rounded-sm p-2.5 bg-[#0B0F14] space-y-1.5'>
 					<div className='mono text-[10px] uppercase tracking-wider text-[#8090A0]'>
 						{t(`${titleKey}.preview_summary`, {
 							params: { new: newResolved.length, dupes: dupes.length, unresolved: unresolved.length },
@@ -7738,7 +7738,7 @@ function SpeciesListEditor({
 								return (
 									<span
 										key={i}
-										className='mono text-[11px] bg-[#E74C3C]/15 text-[#E74C3C] px-2 py-0.5 rounded'
+										className='mono text-[11px] bg-[#E74C3C]/15 text-[#E74C3C] px-2 py-0.5 rounded-sm'
 										title={t(`${titleKey}.unresolved_title`)}
 									>
 										✗ {tok.input}
@@ -7759,7 +7759,7 @@ function SpeciesListEditor({
 							return (
 								<span
 									key={i}
-									className={`mono text-[11px] px-2 py-0.5 rounded flex items-center gap-1 ${
+									className={`mono text-[11px] px-2 py-0.5 rounded-sm flex items-center gap-1 ${
 										isDupe ? 'bg-[#8090A0]/15 text-[#8B98A5]' : 'bg-[#27AE60]/15 text-[#27AE60]'
 									}`}
 									title={`#${tok.info.dex} · EN: ${tok.info.names.en} · DE: ${tok.info.names.de}${isDupe ? ` (${t(`${titleKey}.dupe_marker`)})` : ''}`}
@@ -7833,7 +7833,7 @@ function CustomCollectiblesEditor({ list, onChange }) {
 					{list.map((sp) => (
 						<span
 							key={sp}
-							className='chip-enter mono text-xs bg-[#27AE60]/15 text-[#27AE60] border border-[#27AE60]/40 pl-2 pr-1 py-0.5 rounded flex items-center gap-1.5 group'
+							className='chip-enter mono text-xs bg-[#27AE60]/15 text-[#27AE60] border border-[#27AE60]/40 pl-2 pr-1 py-0.5 rounded-sm flex items-center gap-1.5 group'
 						>
 							{sp}
 							<button
@@ -7855,19 +7855,19 @@ function CustomCollectiblesEditor({ list, onChange }) {
 					onSubmit={addAll}
 					placeholder={t('app.collectibles.input_placeholder')}
 					aria-label={t('app.a11y.species_input')}
-					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
+					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-3 py-2 rounded-sm text-[#E6EDF3] placeholder:text-[#8090A0]'
 				/>
 				<button
 					onClick={addAll}
 					disabled={previewTokens.length === 0 || newResolved.length === 0}
-					className='mono text-sm bg-[#27AE60] hover:bg-[#3FCF80] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded transition flex items-center gap-1.5'
+					className='mono text-sm bg-[#27AE60] hover:bg-[#3FCF80] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded-sm transition flex items-center gap-1.5'
 				>
 					<Plus size={14} /> {t('app.collectibles.add_button')}
 				</button>
 			</div>
 
 			{previewTokens.length > 0 && (
-				<div className='border border-[#1F2933] rounded p-2.5 bg-[#0B0F14] mt-2 space-y-1.5'>
+				<div className='border border-[#1F2933] rounded-sm p-2.5 bg-[#0B0F14] mt-2 space-y-1.5'>
 					<div className='mono text-[10px] uppercase tracking-wider text-[#8090A0]'>
 						{t('app.collectibles.preview_summary', {
 							params: { new: newResolved.length, dupes: dupes.length, unresolved: unresolved.length },
@@ -7879,7 +7879,7 @@ function CustomCollectiblesEditor({ list, onChange }) {
 								return (
 									<span
 										key={i}
-										className='mono text-[11px] bg-[#FF6B5B]/15 text-[#FF6B5B] px-2 py-0.5 rounded'
+										className='mono text-[11px] bg-[#FF6B5B]/15 text-[#FF6B5B] px-2 py-0.5 rounded-sm'
 									>
 										✗ {tok.input}
 									</span>
@@ -7898,7 +7898,7 @@ function CustomCollectiblesEditor({ list, onChange }) {
 							return (
 								<span
 									key={i}
-									className={`mono text-[11px] px-2 py-0.5 rounded flex items-center gap-1 ${
+									className={`mono text-[11px] px-2 py-0.5 rounded-sm flex items-center gap-1 ${
 										isDupe ? 'bg-[#5C6975]/15 text-[#8090A0]' : 'bg-[#27AE60]/15 text-[#27AE60]'
 									}`}
 								>
@@ -7944,7 +7944,7 @@ function ClearListButton({ count, onClear }) {
 				onClear();
 			}}
 			title={t('app.clear_list.title')}
-			className={`mono text-[10.5px] px-2 py-0.5 rounded border transition flex items-center gap-1 ${
+			className={`mono text-[10.5px] px-2 py-0.5 rounded-sm border transition flex items-center gap-1 ${
 				armed
 					? 'bg-[#FF6B5B]/15 border-[#FF6B5B]/50 text-[#FF6B5B]'
 					: 'bg-transparent border-[#2D3A47] text-[#8090A0] hover:text-[#E6EDF3]'
@@ -8130,7 +8130,7 @@ function FriendCollectEditor({
 		<div className='space-y-3'>
 			<div className='flex items-center gap-2 flex-wrap'>
 				<span className='mono text-xs text-[#8090A0]'>{t('app.filter.friend_collect_mode_label')}</span>
-				<div className='flex rounded overflow-hidden border border-[#2D3A47]'>
+				<div className='flex rounded-sm overflow-hidden border border-[#2D3A47]'>
 					{['lucky', 'hundo', 'both'].map((m) => {
 						// Accent language matches the chip badges: amber = lucky,
 						// purple = hundo (4★), green = both goals.
@@ -8185,7 +8185,7 @@ function FriendCollectEditor({
 			)}
 
 			{suggestions.length > 0 && (
-				<div className='border border-[#1F2933] rounded'>
+				<div className='border border-[#1F2933] rounded-sm'>
 					<button
 						onClick={() => setShowPacks((s) => !s)}
 						// Custom disclosure, not <details> — nothing conveys open/closed
@@ -8217,10 +8217,10 @@ function FriendCollectEditor({
 											const selected = packSelection(s);
 											const offNames = new Set(packDeselected[s.id] ?? packDefaultOff(s));
 											return (
-											<div key={s.id} className='border border-[#1F2933] rounded px-2.5 py-1.5 bg-[#0B0F14]'>
+											<div key={s.id} className='border border-[#1F2933] rounded-sm px-2.5 py-1.5 bg-[#0B0F14]'>
 												<div className='flex items-center justify-between gap-2'>
 													<div className='mono text-xs text-[#E6EDF3] min-w-0'>
-														<span className='break-words'>{suggestionLabel(s)}</span>
+														<span className='wrap-break-word'>{suggestionLabel(s)}</span>
 														<span className='text-[#8090A0] ml-1.5 whitespace-nowrap'>
 															{t('app.filter.friend_collect_suggest_count', {
 																params: { count: s.species.length },
@@ -8230,7 +8230,7 @@ function FriendCollectEditor({
 													<button
 														onClick={() => addSet(selected)}
 														disabled={selected.length === 0}
-														className='mono text-xs bg-[#27AE60] hover:bg-[#3FCF80] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-2.5 py-1 rounded transition flex items-center gap-1 shrink-0'
+														className='mono text-xs bg-[#27AE60] hover:bg-[#3FCF80] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-2.5 py-1 rounded-sm transition flex items-center gap-1 shrink-0'
 													>
 														<Plus size={12} /> {t('app.collectibles.add_button')}
 														{selected.length < s.species.length &&
@@ -8277,7 +8277,7 @@ function FriendCollectEditor({
 																		key={name}
 																		onClick={() => togglePackSpecies(s, name, i)}
 																		aria-pressed={!off}
-																		className={`mono text-[11px] px-2 py-0.5 rounded border transition ${
+																		className={`mono text-[11px] px-2 py-0.5 rounded-sm border transition ${
 																			isCurated
 																				? 'bg-[#5EAFC5]/10 text-[#5EAFC5]/60 border-[#5EAFC5]/25 cursor-default'
 																				: off
@@ -8340,7 +8340,7 @@ function FriendCollectEditor({
 										? t(`app.filter.friend_collect_owned_${mode}`)
 										: undefined
 							}
-							className={`chip-enter mono text-xs pl-2 pr-1 py-0.5 rounded flex items-center gap-1.5 group border ${
+							className={`chip-enter mono text-xs pl-2 pr-1 py-0.5 rounded-sm flex items-center gap-1.5 group border ${
 								dimmed
 									? 'bg-[#8090A0]/10 text-[#8B98A5] border-[#2D3A47]'
 									: overridden
@@ -8373,7 +8373,7 @@ function FriendCollectEditor({
 							{tg.ownedLucky && (
 								<span
 									title={t('app.filter.friend_collect_badge_lucky')}
-									className='text-[9px] px-1 py-px rounded bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/40'
+									className='text-[9px] px-1 py-px rounded-sm bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/40'
 								>
 									✦
 								</span>
@@ -8381,7 +8381,7 @@ function FriendCollectEditor({
 							{tg.ownedHundo && (
 								<span
 									title={t('app.filter.friend_collect_badge_hundo')}
-									className='text-[9px] px-1 py-px rounded bg-[#9B59B6]/20 text-[#9B59B6] border border-[#9B59B6]/40'
+									className='text-[9px] px-1 py-px rounded-sm bg-[#9B59B6]/20 text-[#9B59B6] border border-[#9B59B6]/40'
 								>
 									4★
 								</span>
@@ -8396,7 +8396,7 @@ function FriendCollectEditor({
 									title={t('app.filter.friend_collect_badge_lucky_family', {
 										params: { species: capFirst(tg.lineLucky) },
 									})}
-									className='text-[9px] px-1 py-px rounded text-[#F5B82E]/70 border border-[#F5B82E]/25'
+									className='text-[9px] px-1 py-px rounded-sm text-[#F5B82E]/70 border border-[#F5B82E]/25'
 								>
 									+✦
 								</span>
@@ -8406,7 +8406,7 @@ function FriendCollectEditor({
 									title={t('app.filter.friend_collect_badge_hundo_family', {
 										params: { species: capFirst(tg.lineHundo) },
 									})}
-									className='text-[9px] px-1 py-px rounded text-[#9B59B6]/70 border border-[#9B59B6]/25'
+									className='text-[9px] px-1 py-px rounded-sm text-[#9B59B6]/70 border border-[#9B59B6]/25'
 								>
 									+4★
 								</span>
@@ -8477,19 +8477,19 @@ function FriendCollectEditor({
 					onSubmit={addAll}
 					placeholder={t('app.filter.friend_collect_input_placeholder')}
 					aria-label={t('app.a11y.species_input')}
-					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-2 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
+					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-3 py-2 rounded-sm text-[#E6EDF3] placeholder:text-[#8090A0]'
 				/>
 				<button
 					onClick={addAll}
 					disabled={previewTokens.length === 0 || newResolved.length === 0}
-					className='mono text-sm bg-[#27AE60] hover:bg-[#3FCF80] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded transition flex items-center gap-1.5'
+					className='mono text-sm bg-[#27AE60] hover:bg-[#3FCF80] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded-sm transition flex items-center gap-1.5'
 				>
 					<Plus size={14} /> {t('app.collectibles.add_button')}
 				</button>
 			</div>
 
 			{previewTokens.length > 0 && (
-				<div className='border border-[#1F2933] rounded p-2.5 bg-[#0B0F14] space-y-1.5'>
+				<div className='border border-[#1F2933] rounded-sm p-2.5 bg-[#0B0F14] space-y-1.5'>
 					<div className='mono text-[10px] uppercase tracking-wider text-[#8090A0]'>
 						{t('app.collectibles.preview_summary', {
 							params: { new: newResolved.length, dupes: dupes.length, unresolved: unresolved.length },
@@ -8501,7 +8501,7 @@ function FriendCollectEditor({
 								return (
 									<span
 										key={i}
-										className='mono text-[11px] bg-[#FF6B5B]/15 text-[#FF6B5B] px-2 py-0.5 rounded'
+										className='mono text-[11px] bg-[#FF6B5B]/15 text-[#FF6B5B] px-2 py-0.5 rounded-sm'
 									>
 										✗ {tok.input}
 									</span>
@@ -8510,7 +8510,7 @@ function FriendCollectEditor({
 							return (
 								<span
 									key={i}
-									className={`mono text-[11px] px-2 py-0.5 rounded flex items-center gap-1 ${
+									className={`mono text-[11px] px-2 py-0.5 rounded-sm flex items-center gap-1 ${
 										isDupe ? 'bg-[#5C6975]/15 text-[#8090A0]' : 'bg-[#27AE60]/15 text-[#27AE60]'
 									}`}
 								>
@@ -8569,7 +8569,7 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 	const buttonColor = copied === 'ok' ? '#27AE60' : copied === 'err' ? '#FF6B5B' : '#E6EDF3';
 
 	return (
-		<div className='border border-[#1F2933] rounded'>
+		<div className='border border-[#1F2933] rounded-sm'>
 			<div className='flex items-center justify-between px-4 py-2.5 border-b border-[#1F2933] bg-[#141A21] gap-3 flex-wrap'>
 				<div className='flex items-baseline gap-3 flex-wrap'>
 					<span className='mono text-xs font-semibold uppercase tracking-wider' style={{ color: accent }}>
@@ -8587,7 +8587,7 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 				</div>
 				<button
 					onClick={onCopy}
-					className='mono text-xs flex items-center gap-1.5 px-2.5 py-1 bg-[#1F2933] hover:bg-[#2D3A47] rounded transition'
+					className='mono text-xs flex items-center gap-1.5 px-2.5 py-1 bg-[#1F2933] hover:bg-[#2D3A47] rounded-sm transition'
 					style={{ color: buttonColor }}
 				>
 					{buttonLabel}
@@ -8639,7 +8639,7 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 
 function Collapsible({ icon, label, open, onToggle, children }) {
 	return (
-		<details open={open} className='border border-[#1F2933] rounded'>
+		<details open={open} className='border border-[#1F2933] rounded-sm'>
 			<summary
 				onClick={(e) => {
 					e.preventDefault();
@@ -8976,7 +8976,7 @@ function TrainerAccordion({ name, teaser, accent, highlight, children }) {
 		<details
 			key={highlight ? 'open' : 'auto'}
 			open={highlight || undefined}
-			className='border rounded bg-[#0E141A] transition'
+			className='border rounded-sm bg-[#0E141A] transition'
 			style={{
 				borderColor: highlight ? '#5EAFC5' : '#1F2933',
 				boxShadow: highlight ? '0 0 0 2px rgba(94, 175, 197, 0.25)' : 'none',
@@ -9653,11 +9653,11 @@ function ClauseList({ title, accent, clauses }) {
 			<div className='mono text-[10.5px] uppercase tracking-wider mb-2' style={{ color: accent }}>
 				{title} · {t('app.clauses.count_suffix', { params: { count: clauses.length } })}
 			</div>
-			<div className='border border-[#1F2933] rounded divide-y divide-[#1F2933]'>
+			<div className='border border-[#1F2933] rounded-sm divide-y divide-[#1F2933]'>
 				{clauses.map((c, i) => (
 					<div key={i} className='px-3 py-2 hover:bg-[#141A21] transition'>
 						<div className='flex items-baseline gap-2'>
-							<span className='text-[10px] text-[#8090A0] flex-shrink-0'>{i + 1}.</span>
+							<span className='text-[10px] text-[#8090A0] shrink-0'>{i + 1}.</span>
 							<code className='text-[#E6EDF3] flex-1 break-all'>{c.clause}</code>
 						</div>
 						<div className='text-[10.5px] text-[#8090A0] mt-1 ml-5 leading-tight'>{c.why}</div>
@@ -9802,7 +9802,7 @@ function VerifyPanel({ trash, trade, hundos, outputLocale = 'de' }) {
 					<label className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
 						{t('app.verify.field_star')}
 					</label>
-					<div className='mono text-xs w-full bg-[#0B0F14] border border-[#1F2933] px-2 py-1.5 rounded text-[#E6EDF3] mt-1'>
+					<div className='mono text-xs w-full bg-[#0B0F14] border border-[#1F2933] px-2 py-1.5 rounded-sm text-[#E6EDF3] mt-1'>
 						{mon.star}★ <span className='text-[#8090A0]'>· {mon.atk}/{mon.def}/{mon.hp}</span>
 					</div>
 				</div>
@@ -9814,7 +9814,7 @@ function VerifyPanel({ trash, trade, hundos, outputLocale = 'de' }) {
 						key={k}
 						onClick={() => setFlag(k, !m.flags[k])}
 						aria-pressed={!!m.flags[k]}
-						className={`mono text-[11px] px-2 py-1 rounded transition ${
+						className={`mono text-[11px] px-2 py-1 rounded-sm transition ${
 							m.flags[k]
 								? 'bg-[#5EAFC5] text-[#0F1419]'
 								: 'bg-[#1F2933] text-[#8B98A5] hover:bg-[#2D3A47]'
@@ -9876,7 +9876,7 @@ function ResultBox({ label, result, accent }) {
 	const color = isUnknown ? VERDICT_UNKNOWN_ACCENT : verdict ? accent : '#8090A0';
 	return (
 		<div
-			className='border rounded p-3'
+			className='border rounded-sm p-3'
 			style={{ borderColor: isUnknown || verdict ? color : '#1F2933' }}
 			role={isUnknown ? 'alert' : undefined}
 		>
@@ -9909,7 +9909,7 @@ function FieldText({ label, value, onChange, placeholder }) {
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
 				placeholder={placeholder}
-				className='mono text-xs w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3] placeholder:text-[#8090A0] mt-1'
+				className='mono text-xs w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3] placeholder:text-[#8090A0] mt-1'
 			/>
 		</div>
 	);
@@ -9926,7 +9926,7 @@ function FieldNum({ label, value, onChange, min, max }) {
 				onChange={(e) => onChange(e.target.value)}
 				min={min}
 				max={max}
-				className='mono text-xs w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3] mt-1'
+				className='mono text-xs w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3] mt-1'
 			/>
 		</div>
 	);
@@ -10141,7 +10141,7 @@ function PvpMetaPanel({ config, set, expert, packs, newItem, setNewItem }) {
 			<select
 				value={value}
 				onChange={(e) => set(key, e.target.value)}
-				className='mono text-xs bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
+				className='mono text-xs bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
 			>
 				{options.map((o) => (
 					<option key={o} value={o}>
@@ -10153,7 +10153,7 @@ function PvpMetaPanel({ config, set, expert, packs, newItem, setNewItem }) {
 	);
 
 	return (
-		<div className='mt-3 space-y-3 border border-[#1F2933] rounded p-3 bg-[#0B0F14]'>
+		<div className='mt-3 space-y-3 border border-[#1F2933] rounded-sm p-3 bg-[#0B0F14]'>
 			{items.length === 0 && (
 				<p className='mono text-[11px] text-[#D9A441] leading-snug'>{t('app.pvp.meta_empty_hint')}</p>
 			)}
@@ -10204,7 +10204,7 @@ function PvpMetaPanel({ config, set, expert, packs, newItem, setNewItem }) {
 						{items.length > 0 && (
 							<button
 								onClick={() => set('pvpMetaSpecies', [])}
-								className='mono text-xs bg-[#1F2933] hover:bg-[#2D3A47] text-[#8B98A5] hover:text-[#E74C3C] px-2.5 py-1 rounded transition'
+								className='mono text-xs bg-[#1F2933] hover:bg-[#2D3A47] text-[#8B98A5] hover:text-[#E74C3C] px-2.5 py-1 rounded-sm transition'
 							>
 								{t('app.pvp.meta_clear')}
 							</button>
@@ -10301,7 +10301,7 @@ function ConfigPanel({
 					const removedNames =
 						autoRemoved.length > 0 ? autoRemoved.join(', ') : t('app.protect.home_locals.none');
 					return (
-						<div className='border border-[#27AE60]/40 bg-[#27AE60]/5 rounded p-3 mono text-xs'>
+						<div className='border border-[#27AE60]/40 bg-[#27AE60]/5 rounded-sm p-3 mono text-xs'>
 							<div className='flex items-baseline gap-2'>
 								<span className='text-[#27AE60]'>⌂</span>
 								<div className='flex-1'>
@@ -10331,7 +10331,7 @@ function ConfigPanel({
 								key={key}
 								onClick={() => applyPreset(key)}
 								title={t(preset.descriptionKey)}
-								className={`mono text-xs px-3 py-1.5 rounded transition ${
+								className={`mono text-xs px-3 py-1.5 rounded-sm transition ${
 									active
 										? 'bg-[#5EAFC5] text-[#0F1419]'
 										: 'bg-[#1F2933] text-[#E6EDF3] hover:bg-[#5EAFC5] hover:text-[#0F1419]'
@@ -10369,7 +10369,7 @@ function ConfigPanel({
 							role='radio'
 							aria-checked={config.pvpMode === m}
 							title={t(descKey)}
-							className={`mono text-xs px-3 py-1.5 rounded transition ${
+							className={`mono text-xs px-3 py-1.5 rounded-sm transition ${
 								config.pvpMode === m
 									? 'bg-[#5EAFC5] text-[#0F1419]'
 									: 'bg-[#1F2933] text-[#8B98A5] hover:bg-[#2D3A47]'
@@ -10420,12 +10420,12 @@ function ConfigPanel({
 					})}
 				</div>
 				{!config.protectDynamax && config.protectGigantamax && (
-					<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
+					<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded-sm p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
 						{t('app.protect.dynamax_off_note')}
 					</div>
 				)}
 				{!config.protectShadows && config.protectShadowPurifyOnly && (
-					<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
+					<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded-sm p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
 						{t('app.protect.shadows_off_note')}
 					</div>
 				)}
@@ -10589,7 +10589,7 @@ function ConfigPanel({
 									title={t('app.protect.te_button_title', {
 										params: { name: teDisplay(b, outputLocale) },
 									})}
-									className={`mono text-xs px-2.5 py-1 rounded transition ${
+									className={`mono text-xs px-2.5 py-1 rounded-sm transition ${
 										on
 											? 'bg-[#5EAFC5] text-[#0F1419]'
 											: 'bg-[#1F2933] text-[#8090A0] hover:bg-[#2D3A47]'
@@ -10644,7 +10644,7 @@ function ToggleRow({ k, label, why, checked, onChange, expertBadge, requireConfi
 
 	return (
 		<label
-			className={`mono text-xs flex items-start gap-2 cursor-pointer rounded px-2 py-1.5 transition ${
+			className={`mono text-xs flex items-start gap-2 cursor-pointer rounded-sm px-2 py-1.5 transition ${
 				armed ? 'bg-[#E74C3C]/15 border border-[#E74C3C]/40' : 'hover:bg-[#141A21] border border-transparent'
 			}`}
 			title={why}
@@ -10729,7 +10729,7 @@ function RegionalGroupEditor({
 
 	return (
 		<div
-			className={`border rounded transition ${state.enabled ? 'border-[#2D3A47]' : 'border-[#1F2933] opacity-60'}`}
+			className={`border rounded-sm transition ${state.enabled ? 'border-[#2D3A47]' : 'border-[#1F2933] opacity-60'}`}
 		>
 			<div className='flex items-center gap-3 px-3 py-2'>
 				<input
@@ -10819,7 +10819,7 @@ function RegionalGroupEditor({
 											aria-pressed={on && !dropReason}
 											title={isHomeLocal ? t('app.regional_editor.home_local_title') : t(tc.noteKey)}
 											disabled={!state.enabled || !!dropReason}
-											className={`mono text-[11px] px-2 py-0.5 rounded transition ${
+											className={`mono text-[11px] px-2 py-0.5 rounded-sm transition ${
 												isHomeLocal
 													? 'bg-[#27AE60]/10 text-[#27AE60] border border-[#27AE60]/30 line-through opacity-60'
 													: on
@@ -10865,7 +10865,7 @@ function RegionalGroupEditor({
 														? t(noteKey)
 														: undefined
 											}
-											className={`mono text-[11px] px-2 py-0.5 rounded transition ${
+											className={`mono text-[11px] px-2 py-0.5 rounded-sm transition ${
 												effectivelyOn
 													? 'bg-[#F5B82E]/20 text-[#F5B82E] border border-[#F5B82E]/40'
 													: isHomeLocal
@@ -11129,7 +11129,7 @@ function RegionalMap({
 	return (
 		<div className='space-y-4'>
 			{/* MAP — clean, no polygon overlays */}
-			<div className='border border-[#1F2933] rounded bg-[#0B0F14] overflow-hidden relative'>
+			<div className='border border-[#1F2933] rounded-sm bg-[#0B0F14] overflow-hidden relative'>
 				{/* The map is a POINTER convenience. Everything it can do is also
 				    reachable from the coordinate/region form below it, which is the
 				    keyboard and screen-reader path — so the svg names itself and hides
@@ -11304,7 +11304,7 @@ function RegionalMap({
 			</div>
 
 			{/* Keyboard/AT path to the pin — see the note by submitCoords. */}
-			<form onSubmit={submitCoords} className='border border-[#1F2933] rounded p-3 space-y-2'>
+			<form onSubmit={submitCoords} className='border border-[#1F2933] rounded-sm p-3 space-y-2'>
 				<div className='mono text-[10.5px] text-[#8090A0]'>{t('app.map.coord_help')}</div>
 				<div className='flex flex-wrap items-end gap-2'>
 					<div>
@@ -11319,7 +11319,7 @@ function RegionalMap({
 							onChange={(e) => setLatInput(e.target.value)}
 							aria-invalid={coordError ? 'true' : undefined}
 							aria-describedby={coordError ? `${coordId}-err` : undefined}
-							className='mono text-xs w-24 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3] mt-1'
+							className='mono text-xs w-24 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3] mt-1'
 						/>
 					</div>
 					<div>
@@ -11334,12 +11334,12 @@ function RegionalMap({
 							onChange={(e) => setLonInput(e.target.value)}
 							aria-invalid={coordError ? 'true' : undefined}
 							aria-describedby={coordError ? `${coordId}-err` : undefined}
-							className='mono text-xs w-24 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3] mt-1'
+							className='mono text-xs w-24 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3] mt-1'
 						/>
 					</div>
 					<button
 						type='submit'
-						className='mono text-xs bg-[#5EAFC5] hover:bg-[#7FC7DB] text-[#0F1419] px-3 py-1.5 rounded transition'
+						className='mono text-xs bg-[#5EAFC5] hover:bg-[#7FC7DB] text-[#0F1419] px-3 py-1.5 rounded-sm transition'
 					>
 						{t('app.map.set_pin')}
 					</button>
@@ -11357,7 +11357,7 @@ function RegionalMap({
 									setLastPin(r.centroid);
 								}
 							}}
-							className='mono text-xs bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3] mt-1 max-w-[14rem]'
+							className='mono text-xs bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3] mt-1 max-w-56'
 						>
 							<option value=''>{t('app.map.region_select_placeholder')}</option>
 							{regionOptions.map((r) => (
@@ -11377,7 +11377,7 @@ function RegionalMap({
 
 			{/* Home banner */}
 			{homeLocation && (
-				<div className='border border-[#27AE60]/40 bg-[#27AE60]/5 rounded p-3 flex items-baseline gap-3 mono text-xs'>
+				<div className='border border-[#27AE60]/40 bg-[#27AE60]/5 rounded-sm p-3 flex items-baseline gap-3 mono text-xs'>
 					<span className='text-[#27AE60]'>⌂</span>
 					<div className='flex-1'>
 						<div className='text-[#E6EDF3]'>
@@ -11402,7 +11402,7 @@ function RegionalMap({
 
 			{/* Hover preview — live, replaces "tap somewhere" hint when hovering */}
 			{hoverPin && previewMatches !== null && (
-				<div className='border border-[#E74C3C]/30 rounded p-2.5 bg-[#E74C3C]/5'>
+				<div className='border border-[#E74C3C]/30 rounded-sm p-2.5 bg-[#E74C3C]/5'>
 					<div className='flex items-baseline gap-3 mono text-[11px]'>
 						<span className='text-[#8090A0]'>{t('app.map.preview_label')}</span>
 						<span className='text-[#E6EDF3]'>
@@ -11466,7 +11466,7 @@ function RegionalMap({
 						<span className='text-[#8090A0] flex-1' />
 						<button
 							onClick={() => setHomeLocation([lastPin[0], lastPin[1]])}
-							className='mono text-[11px] bg-[#27AE60]/15 hover:bg-[#27AE60]/25 text-[#27AE60] px-2 py-0.5 rounded transition'
+							className='mono text-[11px] bg-[#27AE60]/15 hover:bg-[#27AE60]/25 text-[#27AE60] px-2 py-0.5 rounded-sm transition'
 						>
 							{t('app.map.set_as_home')}
 						</button>
@@ -11492,7 +11492,7 @@ function RegionalMap({
 								{matches.map((m, i) => (
 									<div key={i} className='flex items-baseline gap-2 mono text-xs'>
 										<span
-											className='w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0'
+											className='w-1.5 h-1.5 rounded-full mt-1.5 shrink-0'
 											style={{ background: folderColor(m.folder) }}
 										/>
 										<div className='flex-1'>
@@ -11525,7 +11525,7 @@ function RegionalMap({
 														tagged ? removeFromBazaar(name) : addOneToBazaar(name)
 													}
 													aria-pressed={tagged}
-													className={`mono text-[11px] px-2 py-1 rounded transition ${
+													className={`mono text-[11px] px-2 py-1 rounded-sm transition ${
 														tagged
 															? 'bg-[#5EAFC5] text-[#0F1419]'
 															: 'bg-[#27AE60]/15 text-[#27AE60] border border-[#27AE60]/40 hover:bg-[#27AE60]/25'
@@ -11559,7 +11559,7 @@ function RegionalMap({
 													}
 													aria-pressed={tagged}
 													title={t('app.map.already_have_title')}
-													className={`mono text-[11px] px-2 py-1 rounded transition opacity-60 hover:opacity-100 ${
+													className={`mono text-[11px] px-2 py-1 rounded-sm transition opacity-60 hover:opacity-100 ${
 														tagged
 															? 'bg-[#5EAFC5] text-[#0F1419]'
 															: 'bg-[#1F2933] text-[#8090A0] hover:bg-[#2D3A47] hover:text-[#E6EDF3]'
@@ -11591,7 +11591,7 @@ function RegionalMap({
 
 					{/* Coiffwaff trim travel tip — cuts unlockable here but not at home */}
 					{newTrims.length > 0 && (
-						<div className='border border-[#9B59B6]/40 rounded p-3 bg-[#9B59B6]/5'>
+						<div className='border border-[#9B59B6]/40 rounded-sm p-3 bg-[#9B59B6]/5'>
 							<div className='mono text-[10.5px] uppercase tracking-wider text-[#9B59B6] mb-1'>
 								{t('app.map.furfrou_tip_title')}
 							</div>
@@ -11608,7 +11608,7 @@ function RegionalMap({
 			)}
 
 			{/* Tradeable accumulator */}
-			<div className='border border-[#5EAFC5]/40 rounded p-3 bg-[#5EAFC5]/5'>
+			<div className='border border-[#5EAFC5]/40 rounded-sm p-3 bg-[#5EAFC5]/5'>
 				<div className='flex items-baseline gap-2 mb-2'>
 					<div className='mono text-[10.5px] uppercase tracking-wider text-[#5EAFC5] flex-1'>
 						{t('app.map.bazaar_section_title', { params: { count: bazaarTags.length } })}
@@ -11645,7 +11645,7 @@ function RegionalMap({
 							{bazaarTags.map((name) => (
 								<span
 									key={name}
-									className='mono text-[11px] bg-[#5EAFC5]/20 text-[#E6EDF3] pl-2 pr-1 py-0.5 rounded flex items-center gap-1.5 group'
+									className='mono text-[11px] bg-[#5EAFC5]/20 text-[#E6EDF3] pl-2 pr-1 py-0.5 rounded-sm flex items-center gap-1.5 group'
 								>
 									{name}
 									<button
@@ -11697,7 +11697,7 @@ function NumField({ label, value, onChange, text, hint }) {
 				// The hint was previously reachable only as a title tooltip, i.e. not
 				// at all on touch and inconsistently in AT. Point at the rendered copy.
 				aria-describedby={hint ? hintId : undefined}
-				className='mono text-xs w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3] mt-1'
+				className='mono text-xs w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3] mt-1'
 			/>
 			{hint && <div id={hintId} className='mono text-[10px] text-[#8090A0] mt-1 leading-tight'>{hint}</div>}
 		</div>
@@ -11735,7 +11735,7 @@ function HundoRegionalNotice({ notices, onClose }) {
 				<div className='flex justify-end'>
 					<button
 						onClick={onClose}
-						className='mono text-xs bg-[#E67E22]/20 hover:bg-[#E67E22]/30 text-[#E67E22] px-3 py-1.5 rounded transition'
+						className='mono text-xs bg-[#E67E22]/20 hover:bg-[#E67E22]/30 text-[#E67E22] px-3 py-1.5 rounded-sm transition'
 					>
 						{t('app.regional_sync.ok')}
 					</button>
@@ -11757,7 +11757,7 @@ function FriendCollectCoveredNotice({ notices, onClose }) {
 	return (
 		<Dialog onClose={onClose} label={t('app.friend_covered.title')} className='border border-[#9B59B6]/40 rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'>
 				<h2 className='mono text-base font-semibold text-[#9B59B6]'>{t('app.friend_covered.title')}</h2>
-				<ul className='space-y-1 border border-[#9B59B6]/40 rounded p-3 bg-[#9B59B6]/5'>
+				<ul className='space-y-1 border border-[#9B59B6]/40 rounded-sm p-3 bg-[#9B59B6]/5'>
 					{notices.map((n) => (
 						<li key={`${n.species}-${n.goal}`} className='mono text-xs text-[#E6EDF3] flex items-baseline gap-2'>
 							<span className={n.goal === 'hundo' ? 'text-[#9B59B6]' : 'text-[#F5B82E]'}>
@@ -11782,7 +11782,7 @@ function FriendCollectCoveredNotice({ notices, onClose }) {
 				<div className='flex justify-end'>
 					<button
 						onClick={onClose}
-						className='mono text-xs bg-[#9B59B6]/20 hover:bg-[#9B59B6]/30 text-[#9B59B6] px-3 py-1.5 rounded transition'
+						className='mono text-xs bg-[#9B59B6]/20 hover:bg-[#9B59B6]/30 text-[#9B59B6] px-3 py-1.5 rounded-sm transition'
 					>
 						{t('app.regional_sync.ok')}
 					</button>
@@ -11814,13 +11814,13 @@ function RegionalSyncNotice({ notices, onClose, onShowChangelog }) {
 				<div className='flex gap-2 justify-end'>
 					<button
 						onClick={onShowChangelog}
-						className='mono text-xs text-[#8090A0] hover:text-[#E6EDF3] px-3 py-1.5 rounded border border-[#2D3A47] transition'
+						className='mono text-xs text-[#8090A0] hover:text-[#E6EDF3] px-3 py-1.5 rounded-sm border border-[#2D3A47] transition'
 					>
 						{t('app.regional_sync.changelog_button')}
 					</button>
 					<button
 						onClick={onClose}
-						className='mono text-xs bg-[#E67E22]/20 hover:bg-[#E67E22]/30 text-[#E67E22] px-3 py-1.5 rounded transition'
+						className='mono text-xs bg-[#E67E22]/20 hover:bg-[#E67E22]/30 text-[#E67E22] px-3 py-1.5 rounded-sm transition'
 					>
 						{t('app.regional_sync.ok')}
 					</button>
@@ -11852,7 +11852,7 @@ function ChangelogModal({ open, onClose }) {
 				</div>
 				<div className='p-5 space-y-4'>
 					{CHANGELOG.map((entry) => (
-						<div key={entry.id} className='border border-[#1F2933] rounded p-3 space-y-1'>
+						<div key={entry.id} className='border border-[#1F2933] rounded-sm p-3 space-y-1'>
 							<div className='flex items-baseline gap-2'>
 								<span className='mono text-sm text-[#E6EDF3] font-semibold'>
 									{t(`app.changelog.entry.${entry.id}.title`)}
@@ -11914,7 +11914,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 								<select id={`${fid}-ui`}
 									value={locale}
 									onChange={(e) => setLocale(e.target.value)}
-									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
+									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
 								>
 									{Object.entries(locales).map(([code, info]) => (
 										<option key={code} value={code}>
@@ -11935,7 +11935,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 										id={`${fid}-out-lang`}
 										value={outputLocale}
 										onChange={(e) => setOutputLocale(e.target.value)}
-										className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
+										className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
 									>
 										{Object.entries(locales).map(([code, info]) => (
 											<option key={code} value={code}>
@@ -11962,7 +11962,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 					</div>
 
 					{/* Mode toggle */}
-					<div className='flex items-center justify-between border border-[#2D3A47] rounded p-3'>
+					<div className='flex items-center justify-between border border-[#2D3A47] rounded-sm p-3'>
 						<div>
 							<div className='mono text-sm text-[#E6EDF3]'>
 								{t('app.modal.settings.mode_label', { params: { mode: modeLabel } })}
@@ -11976,7 +11976,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 						<button
 							onClick={() => set('expertMode', !expert)}
 							aria-pressed={!!expert}
-							className={`mono text-xs px-3 py-1.5 rounded transition ${
+							className={`mono text-xs px-3 py-1.5 rounded-sm transition ${
 								expert
 									? 'bg-[#F5B82E] text-[#0F1419]'
 									: 'bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47]'
@@ -12001,7 +12001,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 									value={config.basarTagName || ''}
 									onChange={(e) => set('basarTagName', e.target.value)}
 									placeholder={t('app.modal.tags.basar_placeholder')}
-									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
+									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
 								/>
 								<div className='mono text-[10px] text-[#8090A0] mt-1'>
 									{t('app.modal.tags.basar_clause')}{' '}
@@ -12017,7 +12017,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 									value={config.fernTauschTagName || ''}
 									onChange={(e) => set('fernTauschTagName', e.target.value)}
 									placeholder={t('app.modal.tags.fern_placeholder')}
-									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
+									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
 								/>
 								<div className='mono text-[10px] text-[#8090A0] mt-1'>
 									{t('app.modal.tags.fern_help')}
@@ -12033,7 +12033,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 										value={config.removeFrustrationTagName || ''}
 										onChange={(e) => set('removeFrustrationTagName', e.target.value)}
 										placeholder={t('app.modal.tags.frustration_placeholder')}
-										className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
+										className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
 									/>
 									<div className='mono text-[10px] text-[#8090A0] mt-1'>
 										{t('app.modal.tags.frustration_help')}
@@ -12050,7 +12050,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 										value={config.evoSwapTagName || ''}
 										onChange={(e) => set('evoSwapTagName', e.target.value)}
 										placeholder={t('app.modal.tags.evo_swap_placeholder')}
-										className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
+										className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
 									/>
 									<div className='mono text-[10px] text-[#8090A0] mt-1'>
 										{t('app.modal.tags.evo_swap_help')}
@@ -12073,7 +12073,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 									onChange={(e) => set('customProtectedTags', e.target.value)}
 									placeholder={t('app.modal.custom_tags.placeholder')}
 									aria-label={t('app.modal.custom_tags.section_title')}
-									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
+									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
 								/>
 								<div className='mono text-[10px] text-[#8090A0] mt-1'>
 									{t('app.modal.custom_tags.help')}
@@ -12091,7 +12091,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 									onChange={(e) => set('leagueTags', e.target.value)}
 									placeholder={t('app.modal.league.placeholder')}
 									aria-label={t('app.modal.league.section_title')}
-									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1.5 rounded text-[#E6EDF3]'
+									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
 								/>
 								<div className='mono text-[10px] text-[#8090A0] mt-1'>{t('app.modal.league.help')}</div>
 							</div>
@@ -12156,7 +12156,7 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 						</div>
 						<button
 							onClick={onResetAll}
-							className={`mono text-xs px-3 py-1.5 rounded transition flex items-center gap-1.5 ${
+							className={`mono text-xs px-3 py-1.5 rounded-sm transition flex items-center gap-1.5 ${
 								resetArmed
 									? 'bg-[#E74C3C] text-white'
 									: 'bg-[#1F2933] text-[#FF6B5B] hover:bg-[#2D3A47]'
@@ -12227,7 +12227,7 @@ function StoragePersistenceSection() {
 					<button
 						onClick={request}
 						disabled={requesting}
-						className='mono text-xs px-3 py-1.5 rounded transition bg-[#1F2933] text-[#5EAFC5] hover:bg-[#2D3A47] disabled:opacity-50'
+						className='mono text-xs px-3 py-1.5 rounded-sm transition bg-[#1F2933] text-[#5EAFC5] hover:bg-[#2D3A47] disabled:opacity-50'
 					>
 						{requesting ? t('app.modal.storage.requesting') : t('app.modal.storage.request_button')}
 					</button>
@@ -12297,7 +12297,7 @@ function HomeScreenSection() {
 					<button
 						onClick={install}
 						disabled={installing}
-						className='mono text-xs px-3 py-1.5 rounded transition bg-[#1F2933] text-[#5EAFC5] hover:bg-[#2D3A47] disabled:opacity-50'
+						className='mono text-xs px-3 py-1.5 rounded-sm transition bg-[#1F2933] text-[#5EAFC5] hover:bg-[#2D3A47] disabled:opacity-50'
 					>
 						{installing ? t('app.modal.home_screen.installing') : t('app.modal.home_screen.install_button')}
 					</button>
@@ -12447,14 +12447,14 @@ function BackupRestoreSection({ onExport, onImport }) {
 			<div className='flex flex-wrap items-center gap-2'>
 				<button
 					onClick={handleExportClick}
-					className='mono text-xs bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47] px-3 py-1.5 rounded transition flex items-center gap-1.5'
+					className='mono text-xs bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47] px-3 py-1.5 rounded-sm transition flex items-center gap-1.5'
 				>
 					<Download size={11} />
 					{t('app.modal.backup.export_button')}
 				</button>
 				<button
 					onClick={() => fileInputRef.current?.click()}
-					className='mono text-xs bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47] px-3 py-1.5 rounded transition flex items-center gap-1.5'
+					className='mono text-xs bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47] px-3 py-1.5 rounded-sm transition flex items-center gap-1.5'
 				>
 					<Upload size={11} />
 					{t('app.modal.backup.import_button')}
@@ -12471,7 +12471,7 @@ function BackupRestoreSection({ onExport, onImport }) {
 			{exportedNote && <div className='mono text-[10.5px] text-[#5EAFC5] mt-2'>{exportedNote}</div>}
 			{error && <div className='mono text-[10.5px] text-[#FF6B5B] mt-2'>{error}</div>}
 			{pending && (
-				<div className='mt-3 border border-[#2D3A47] rounded p-3 space-y-2 bg-[#0E141A]'>
+				<div className='mt-3 border border-[#2D3A47] rounded-sm p-3 space-y-2 bg-[#0E141A]'>
 					<div className='mono text-[11px] text-[#E6EDF3]'>
 						{pending.exportedAt
 							? t('app.modal.backup.import_preview_dated', {
@@ -12483,7 +12483,7 @@ function BackupRestoreSection({ onExport, onImport }) {
 					<div className='flex items-center gap-2 pt-1'>
 						<button
 							onClick={applyPending}
-							className={`mono text-xs px-3 py-1.5 rounded transition flex items-center gap-1.5 ${
+							className={`mono text-xs px-3 py-1.5 rounded-sm transition flex items-center gap-1.5 ${
 								armed ? 'bg-[#E74C3C] text-white' : 'bg-[#1F2933] text-[#FF6B5B] hover:bg-[#2D3A47]'
 							}`}
 						>
@@ -12491,7 +12491,7 @@ function BackupRestoreSection({ onExport, onImport }) {
 						</button>
 						<button
 							onClick={cancelPending}
-							className='mono text-xs bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47] px-3 py-1.5 rounded transition'
+							className='mono text-xs bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47] px-3 py-1.5 rounded-sm transition'
 						>
 							{t('app.modal.backup.import_cancel')}
 						</button>
@@ -12550,7 +12550,7 @@ function BuddyManager({ buddies, onChange }) {
 			{buddies.length > 0 && (
 				<div className='space-y-2 mb-3'>
 					{buddies.map((b) => (
-						<div key={b.id} className='border border-[#2D3A47] rounded p-2.5 space-y-2'>
+						<div key={b.id} className='border border-[#2D3A47] rounded-sm p-2.5 space-y-2'>
 							<div className='flex items-center gap-2'>
 								<input
 									type='checkbox'
@@ -12568,7 +12568,7 @@ function BuddyManager({ buddies, onChange }) {
 									onChange={(e) => update(b.id, { name: e.target.value })}
 									aria-label={t('app.a11y.buddy_name')}
 									placeholder={t('app.buddy.name_placeholder')}
-									className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1 rounded text-[#E6EDF3]'
+									className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1 rounded-sm text-[#E6EDF3]'
 								/>
 								<span className='mono text-[11px] text-[#8090A0]'>#</span>
 								<input
@@ -12577,7 +12577,7 @@ function BuddyManager({ buddies, onChange }) {
 									onChange={(e) => update(b.id, { tagPrefix: e.target.value })}
 									aria-label={t('app.a11y.buddy_prefix')}
 									placeholder={t('app.buddy.prefix_placeholder')}
-									className='mono text-sm w-32 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1 rounded text-[#E6EDF3]'
+									className='mono text-sm w-32 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1 rounded-sm text-[#E6EDF3]'
 								/>
 								<button
 									onClick={() => remove(b.id)}
@@ -12617,12 +12617,12 @@ function BuddyManager({ buddies, onChange }) {
 					onKeyDown={(e) => e.key === 'Enter' && addBuddy()}
 					aria-label={t('app.a11y.buddy_name')}
 					placeholder={t('app.buddy.add_placeholder')}
-					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-3 py-1.5 rounded text-[#E6EDF3]'
+					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-3 py-1.5 rounded-sm text-[#E6EDF3]'
 				/>
 				<button
 					onClick={addBuddy}
 					disabled={!newName.trim()}
-					className='mono text-sm bg-[#E67E22] hover:bg-[#FF9544] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-3 py-1.5 rounded transition flex items-center gap-1.5'
+					className='mono text-sm bg-[#E67E22] hover:bg-[#FF9544] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-3 py-1.5 rounded-sm transition flex items-center gap-1.5'
 				>
 					<Plus size={14} /> {t('app.buddy.add_button')}
 				</button>
@@ -12765,7 +12765,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 	}
 
 	return (
-		<div className='border border-[#E67E22]/20 rounded p-2.5 space-y-2'>
+		<div className='border border-[#E67E22]/20 rounded-sm p-2.5 space-y-2'>
 			{/* The toggle is a real <button> rather than a clickable <div>: the whole
 			    editor was unreachable by keyboard otherwise. The count + clear control
 			    is a SIBLING, not a child — nesting a button inside a button is invalid
@@ -12776,7 +12776,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 					onClick={() => setOpen((s) => !s)}
 					aria-expanded={open}
 					aria-controls={panelId}
-					className='flex items-baseline gap-2 flex-wrap select-none hover:bg-[#E67E22]/5 -m-1 p-1 rounded transition text-left'
+					className='flex items-baseline gap-2 flex-wrap select-none hover:bg-[#E67E22]/5 -m-1 p-1 rounded-sm transition text-left'
 				>
 					{open ? (
 						<ChevronDown size={12} className='text-[#E67E22] self-center shrink-0' />
@@ -12797,7 +12797,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 			{open && (
 				<div id={panelId} className='space-y-2'>
 			<label
-				className='mono text-[11px] flex items-center gap-2 cursor-pointer text-[#E6EDF3] hover:bg-[#E67E22]/5 rounded px-1 py-0.5 transition w-fit'
+				className='mono text-[11px] flex items-center gap-2 cursor-pointer text-[#E6EDF3] hover:bg-[#E67E22]/5 rounded-sm px-1 py-0.5 transition w-fit'
 				title={t('app.buddy_targets.te_toggle_title')}
 			>
 				<input
@@ -12825,14 +12825,14 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 						return (
 							<div
 								key={tg.species}
-								className='chip-enter mono text-[11px] bg-[#E67E22]/10 border border-[#E67E22]/30 rounded px-2 py-1 flex items-center gap-2 flex-wrap group'
+								className='chip-enter mono text-[11px] bg-[#E67E22]/10 border border-[#E67E22]/30 rounded-sm px-2 py-1 flex items-center gap-2 flex-wrap group'
 							>
 								<span className='text-[#E6EDF3]'>{capFirst(tg.species)}</span>
 								{/* Family-expansion toggle: exact species vs entire +family. */}
 								<button
 									onClick={() => updateAt(i, { expand: !tg.expand })}
 									title={t('app.buddy_targets.expand_toggle_title')}
-									className={`text-[10px] px-1.5 py-0.5 rounded border transition ${
+									className={`text-[10px] px-1.5 py-0.5 rounded-sm border transition ${
 										tg.expand
 											? 'bg-[#E67E22]/25 border-[#E67E22]/50 text-[#E67E22]'
 											: 'bg-transparent border-[#2D3A47] text-[#8090A0] hover:text-[#E6EDF3]'
@@ -12906,19 +12906,19 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 					onSubmit={addAll}
 					placeholder={t('app.buddy_targets.input_placeholder')}
 					aria-label={t('app.a11y.species_input')}
-					className='mono text-xs flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
+					className='mono text-xs flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1 rounded-sm text-[#E6EDF3] placeholder:text-[#8090A0]'
 				/>
 				<button
 					onClick={addAll}
 					disabled={previewTokens.length === 0 || newResolved.length === 0}
-					className='mono text-xs bg-[#E67E22]/20 hover:bg-[#E67E22]/30 disabled:bg-[#1F2933] disabled:text-[#8090A0] text-[#E67E22] px-2.5 py-1 rounded transition flex items-center gap-1'
+					className='mono text-xs bg-[#E67E22]/20 hover:bg-[#E67E22]/30 disabled:bg-[#1F2933] disabled:text-[#8090A0] text-[#E67E22] px-2.5 py-1 rounded-sm transition flex items-center gap-1'
 				>
 					<Plus size={11} /> {t('app.buddy_targets.add_button')}
 				</button>
 			</div>
 
 			{previewTokens.length > 0 && (
-				<div className='border border-[#1F2933] rounded p-2 bg-[#0B0F14] space-y-1.5'>
+				<div className='border border-[#1F2933] rounded-sm p-2 bg-[#0B0F14] space-y-1.5'>
 					<div className='mono text-[10px] uppercase tracking-wider text-[#8090A0]'>
 						{t('app.buddy_targets.preview_summary', {
 							params: { new: newResolved.length, dupes: dupes.length, unresolved: unresolved.length },
@@ -12930,7 +12930,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 								return (
 									<span
 										key={i}
-										className='mono text-[11px] bg-[#FF6B5B]/15 text-[#FF6B5B] px-2 py-0.5 rounded'
+										className='mono text-[11px] bg-[#FF6B5B]/15 text-[#FF6B5B] px-2 py-0.5 rounded-sm'
 									>
 										✗ {tok.input}
 									</span>
@@ -12949,7 +12949,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 							return (
 								<span
 									key={i}
-									className={`mono text-[11px] px-2 py-0.5 rounded flex items-center gap-1 ${
+									className={`mono text-[11px] px-2 py-0.5 rounded-sm flex items-center gap-1 ${
 										isDupe ? 'bg-[#5C6975]/15 text-[#8090A0]' : 'bg-[#E67E22]/15 text-[#E67E22]'
 									}`}
 								>
@@ -12976,7 +12976,7 @@ function BuddyTargetsRow({ buddy, onChange, expertMode }) {
 						onChange={(e) => onChange({ rawAppend: e.target.value })}
 						placeholder={t('app.buddy_targets.raw_placeholder')}
 						aria-describedby={`${rawId}-help`}
-						className='mono text-xs w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-none px-2 py-1 rounded text-[#E6EDF3] placeholder:text-[#8090A0]'
+						className='mono text-xs w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1 rounded-sm text-[#E6EDF3] placeholder:text-[#8090A0]'
 					/>
 					<p id={`${rawId}-help`} className='mono text-[10px] text-[#8090A0] leading-relaxed'>
 						{t('app.buddy_targets.raw_help')}

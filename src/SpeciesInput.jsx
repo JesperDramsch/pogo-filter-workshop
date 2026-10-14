@@ -117,7 +117,7 @@ export default function SpeciesInput({
 				role='listbox'
 				aria-label={ariaLabel}
 				hidden={!open}
-				className='absolute z-30 left-0 right-0 mt-1 max-h-72 overflow-y-auto rounded border border-[#2D3A47] bg-[#0B0F14] shadow-lg py-1'
+				className='absolute z-30 left-0 right-0 mt-1 max-h-72 overflow-y-auto rounded-sm border border-[#2D3A47] bg-[#0B0F14] shadow-lg py-1'
 			>
 				{open &&
 					suggestions.map((row, i) => (

@@ -122,7 +122,7 @@ function StoryLegend({ t }) {
       {LEGEND.map((item) => (
         <span
           key={item.key}
-          className="mono text-[11px] px-2.5 py-1 rounded inline-flex items-center gap-1.5"
+          className="mono text-[11px] px-2.5 py-1 rounded-sm inline-flex items-center gap-1.5"
           style={{
             backgroundColor: `${item.color}14`,
             color: item.color,
