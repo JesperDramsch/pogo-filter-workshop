@@ -39,6 +39,11 @@
 //         joined from the game master's tempEvoOverrides to the dictionary's
 //         name by words; a Mega the game master has no override for is
 //         skipped, never given the base form's types
+//   D16 — every boss carries its form, and an event dedupes against the
+//         standing tiers by form where both sides name one: Origin Giratina
+//         is not standing Altered Giratina. Where either side cannot be
+//         placed (a Mega, a snapshot from before the field) it falls back to
+//         the species, as it did before
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
@@ -59,8 +64,8 @@ import {
 } from "../src/data/species.js";
 import { unresolvableDexEntries, formSuffixedDexEntries, NAME_LOCALES } from "./lib/species-dex.mjs";
 import {
-  GUARDED_FAMILIES, buildEventMaxBattles, buildEventRaids, buildNameIndex, guardEmptiedFamilies, parseMaxEventBosses,
-  resolveBossKey,
+  GUARDED_FAMILIES, buildEventMaxBattles, buildEventRaids, buildNameIndex, deriveTiered, guardEmptiedFamilies,
+  parseMaxEventBosses, resolveBossKey,
 } from "./fetch-raid-bosses.mjs";
 
 let failures = 0;
@@ -68,6 +73,12 @@ function check(label, cond, detail = "") {
   console.log(`  ${cond ? "✓" : "✗"} ${label}${detail ? ` — ${detail}` : ""}`);
   if (!cond) failures++;
 }
+
+// A boss's keys apart from the ones not every boss has: `gigantamax`, set only
+// on a boss the title calls Gigantamax, and `form`, which a snapshot written
+// before bosses carried one lacks. D12 and D13 compare event bosses to the
+// committed snapshot's standing ones through this; D16 checks `form` itself.
+const bossShape = (boss) => Object.keys(boss).filter((k) => k !== "gigantamax" && k !== "form").sort().join(",");
 
 const localeNames = Object.keys(LOCALES);
 const byLocale = Object.fromEntries(localeNames.map((l) => [l, buildDataFilters(l)]));
@@ -727,10 +738,10 @@ console.log("\nD12 — event Max Battles: parsed, date-gated, resolved and built
   const eventKeys = "bosses,end,eventID,eventType,name,start";
   check("each entry has eventRaids' shape without the raid tier flags",
     out.entries.every((e) => Object.keys(e).sort().join(",") === eventKeys));
-  const standingKeys = Object.keys(Object.values(RAID_BOSSES.raids)[0][0]).sort().join(",");
+  const standingKeys = bossShape(Object.values(RAID_BOSSES.raids)[0][0]);
   const bosses = out.entries.flatMap((e) => e.bosses);
-  check(`each boss has the standing tiers' shape (${standingKeys}), plus a Gigantamax marker where the title says so`,
-    bosses.every((b) => Object.keys(b).filter((k) => k !== "gigantamax").sort().join(",") === standingKeys) &&
+  check(`each boss has the standing tiers' shape (${standingKeys}) and a form, plus a Gigantamax marker where the title says so`,
+    bosses.every((b) => bossShape(b) === standingKeys && "form" in b) &&
       bosses.filter((b) => b.gigantamax === true).map((b) => b.names.en).join() === en(131) &&
       bosses.every((b) => b.gigantamax === true || !("gigantamax" in b)));
   const deduped = run({ tier_1: [{ id: en(215).toUpperCase() }, { id: en(131).toUpperCase() }] });
@@ -876,8 +887,9 @@ console.log("\nD13 — a forme in brackets resolves to its species and form, in 
     check(`"${k}" → ${want}: ${why}`, got === want, got === want ? "" : got);
   }
   const hit = resolveBossKey(nameIdx, key(645, "Incarnate"));
-  check("a forme resolves to the species' id and dictionary name",
-    hit?.id === species(645)?.id && hit?.displayName === en(645) && Object.keys(hit).sort().join() === "displayName,id,types");
+  check("a forme resolves to the species' id and dictionary name, and to the form's own enum",
+    hit?.id === species(645)?.id && hit?.displayName === en(645) && hit?.form === `${species(645)?.id}_INCARNATE` &&
+      Object.keys(hit).sort().join() === "displayName,form,id,types", JSON.stringify(hit));
   check("a bare name is still a plain lookup", resolveBossKey(nameIdx, en(645).toLowerCase()) === species(645));
 
   // ScrapedDuck's shape: raid-battles events list their bosses in extraData,
@@ -942,9 +954,9 @@ console.log("\nD13 — a forme in brackets resolves to its species and form, in 
     JSON.stringify(maxBoss));
 
   const events = [...raids.entries, ...maxes.entries];
-  const standingKeys = Object.keys(Object.values(RAID_BOSSES.raids)[0][0]).sort().join(",");
-  check(`forme bosses have the standing tiers' shape (${standingKeys}); no index internals leak`,
-    events.flatMap((e) => e.bosses).every((b) => Object.keys(b).filter((k) => k !== "gigantamax").sort().join(",") === standingKeys));
+  const standingKeys = bossShape(Object.values(RAID_BOSSES.raids)[0][0]);
+  check(`forme bosses have the standing tiers' shape (${standingKeys}) and a form; no index internals leak`,
+    events.flatMap((e) => e.bosses).every((b) => bossShape(b) === standingKeys && "form" in b));
 
   // Through the app: a forme boss builds a filter, and its name is the
   // species' in every locale, from the dictionary, as D12 checks for Max
@@ -1085,9 +1097,11 @@ console.log("\nD15 — an event Mega resolves to its species and the Mega's own 
     check(`"${k}" → ${want}: ${why}`, got === want, got === want ? "" : got);
   }
   const x = resolveBossKey(nameIdx, key("6_2"));
-  check("a lettered Mega carries its species' id and the dictionary's name for it, nothing else",
-    x?.id === nameIdx.get(key(6))?.id && x?.displayName === en("6_2") &&
-      Object.keys(x).sort().join() === "displayName,id,types", JSON.stringify(x));
+  // No form: a temporary evolution is no game-master form, so a Mega dedupes
+  // by species, as D16 has a standing Mega do.
+  check("a lettered Mega carries its species' id, no form and the dictionary's name for it, nothing else",
+    x?.id === nameIdx.get(key(6))?.id && x?.form === null && x?.displayName === en("6_2") &&
+      Object.keys(x).sort().join() === "displayName,form,id,types", JSON.stringify(x));
 
   // ScrapedDuck's shape, as the live feed published the 10-21 event, plus a
   // raid-day title, which carries only the title.
@@ -1144,17 +1158,18 @@ console.log("\nD15 — an event Mega resolves to its species and the Mega's own 
   check("a lettered and a plain Mega the game master has no override for are skipped with a warning, never given the species' types",
     !raidEvent("zz-z") && !raidEvent("zz-clefable") && raids.unresolved === 2 && skipped.length === 2,
     `${raids.unresolved} unresolved; ${raids.warnings.join(" | ")}`);
-  const standingKeys = Object.keys(Object.values(RAID_BOSSES.raids)[0][0]).sort().join(",");
-  check(`Mega bosses have the standing tiers' shape (${standingKeys}); no index internals leak`,
-    raids.entries.flatMap((e) => e.bosses).every((b) => Object.keys(b).sort().join(",") === standingKeys));
+  const standingKeys = bossShape(Object.values(RAID_BOSSES.raids)[0][0]);
+  check(`Mega bosses have the standing tiers' shape (${standingKeys}) and a null form; no index internals leak`,
+    raids.entries.flatMap((e) => e.bosses).every((b) => bossShape(b) === standingKeys && b.form === null));
 
   // Dedupe stays the species' id with the Mega flag: lily-dex-api's standing
-  // mega tier lists Mega Raichu X as RAICHU and Mega Gyarados as GYARADOS. A
-  // standing non-Mega of the species is a different battle.
+  // mega tier lists Mega Raichu X as RAICHU and Mega Gyarados as GYARADOS,
+  // with pokemon-go-api's Mega suffix as the form, which places no game-master
+  // form (D16). A standing non-Mega of the species is a different battle.
   const dedupedBy = (standing) =>
     quietly(() => buildEventRaids(feed, { nameIdx, allTypes: LILY_TYPES, raids: standing, now: NOW }));
-  const megaTier = dedupedBy({ mega: [{ id: x?.id }, { id: gyarados?.id }] });
-  const lvl5 = dedupedBy({ lvl5: [{ id: x?.id }, { id: gyarados?.id }] });
+  const megaTier = dedupedBy({ mega: [{ id: x?.id, form: `${x?.id}_MEGA_X` }, { id: gyarados?.id, form: `${gyarados?.id}_MEGA` }] });
+  const lvl5 = dedupedBy({ lvl5: [{ id: x?.id, form: x?.id }, { id: gyarados?.id, form: gyarados?.id }] });
   const surfaced = (run, id) => run.entries.some((e) => e.eventID === id);
   check("with Charizard and Gyarados standing in the mega tier their events dedupe; in lvl5 they do not",
     !surfaced(megaTier, "zz-xy") && !surfaced(megaTier, "zz-gyarados") && megaTier.deduped === 2 &&
@@ -1187,6 +1202,150 @@ console.log("\nD15 — an event Mega resolves to its species and the Mega's own 
     check(`${loc}: Mega Charizard X, Y and Mega Gyarados build their own filters, named from the dictionary`,
       bad.length === 0, bad.slice(0, 4).join(" | "));
   }
+}
+
+console.log("\nD16 — every boss carries its form; events dedupe by form where both sides name one, by species otherwise");
+{
+  // lily-dex-api relays pokemon-go-api's `form`, which spells a boss three
+  // ways: the bare id for a plain species ("YVELTAL"), the game master's enum
+  // for a named forme ("LANDORUS_INCARNATE", as it published Shadow Landorus
+  // on 2026-10-14), and a suffix of its own for a Mega ("BLASTOISE_MEGA").
+  // The dedupe used to compare species ids alone, so a "Giratina (Origin
+  // Forme)" event was dropped against a standing Altered Giratina and its own
+  // types never shown. The species are picked for their form layout, not for
+  // any place in the rotation: three with a named default form (Giratina,
+  // Landorus, Urshifu), two with a NORMAL one (Yveltal, Blastoise). The
+  // templates are laid out as D13 lays them out, Blastoise's with the Mega
+  // override the game master gives it: an event Mega resolves by its own
+  // name, through that override (D15).
+  const DAY = 24 * 60 * 60 * 1000;
+  const HOUR = 60 * 60 * 1000;
+  const NOW = Date.parse("2026-10-14T12:00:00Z");
+  const feedTime = (ms) => new Date(ms - new Date(ms).getTimezoneOffset() * 60000).toISOString().slice(0, 23);
+  const en = (dex) => POKEMON_NAMES_DICT[String(dex)].en;
+  const ID = (dex) => en(dex).toUpperCase();
+  const pad = (dex) => String(dex).padStart(4, "0");
+  const T = (t) => (t ? `POKEMON_TYPE_${t}` : undefined);
+  const tpl = (dex, form, type, type2, tempEvoOverrides) => {
+    const templateId = `V${pad(dex)}_POKEMON_${ID(dex)}${form ? `_${form}` : ""}`;
+    const pokemonSettings = {
+      pokemonId: ID(dex), ...(form && { form: `${ID(dex)}_${form}` }), type: T(type), type2: T(type2), tempEvoOverrides,
+    };
+    return { templateId, data: { templateId, pokemonSettings } };
+  };
+  const formList = (dex, ...forms) => {
+    const templateId = `FORMS_V${pad(dex)}_POKEMON_${ID(dex)}`;
+    return { templateId, data: { templateId, formSettings: { pokemon: ID(dex), forms: forms.map((f) => ({ form: `${ID(dex)}_${f}` })) } } };
+  };
+  const megaBlastoise = [{ tempEvoId: "TEMP_EVOLUTION_MEGA", typeOverride1: T("WATER") }];
+  const nameIdx = buildNameIndex([
+    tpl(9, null, "WATER", undefined, megaBlastoise), tpl(9, "NORMAL", "WATER", undefined, megaBlastoise),
+    formList(9, "NORMAL"),
+    tpl(487, null, "GHOST", "DRAGON"), tpl(487, "ALTERED", "GHOST", "DRAGON"), tpl(487, "ORIGIN", "GHOST", "DRAGON"),
+    formList(487, "ALTERED", "ORIGIN"),
+    tpl(645, null, "GROUND", "FLYING"), tpl(645, "INCARNATE", "GROUND", "FLYING"), tpl(645, "THERIAN", "GROUND", "FLYING"),
+    formList(645, "INCARNATE", "THERIAN"),
+    tpl(717, null, "DARK", "FLYING"), tpl(717, "NORMAL", "DARK", "FLYING"), formList(717, "NORMAL"),
+    tpl(892, null, "FIGHTING"), tpl(892, "RAPID_STRIKE", "FIGHTING", "WATER"), tpl(892, "SINGLE_STRIKE", "FIGHTING", "DARK"),
+    formList(892, "SINGLE_STRIKE", "RAPID_STRIKE"),
+  ], POKEMON_NAMES_DICT);
+
+  // A standing boss as lily-dex-api's currentList carries it; no `form` key
+  // at all when `form` is undefined.
+  const lily = (dex, form, ...types) => ({ id: ID(dex), ...(form !== undefined && { form }), names: { English: en(dex) }, types });
+  const ev = (eventID, eventType, name, bosses) => ({
+    eventID, name, eventType, start: feedTime(NOW - HOUR), end: feedTime(NOW + DAY),
+    extraData: bosses
+      ? { raidbattles: { bosses: bosses.map((b) => ({ name: b, canBeShiny: true })) } }
+      : { generic: { hasSpawns: false, hasFieldResearchTasks: false } },
+  });
+  const feed = [
+    ev("zz-origin", "raid-hour", `${en(487)} (Origin Forme) Raid Hour`),
+    ev("zz-giratina", "raid-hour", `${en(487)} Raid Hour`),
+    ev("zz-yveltal", "raid-battles", `${en(717)} in 5-star Raid Battles`, [en(717)]),
+    ev("zz-mega", "raid-battles", `Mega ${en(9)} in Mega Raids`, [`Mega ${en(9)}`]),
+    ev("zz-landorus", "raid-battles", `Shadow ${en(645)} (Incarnate Forme) in Shadow Raids`, [`${en(645)} (Incarnate)`]),
+  ];
+  const quietly = (build) => {
+    const warnings = [];
+    const realWarn = console.warn;
+    console.warn = (...args) => warnings.push(args.join(" "));
+    try {
+      return { ...build(), warnings };
+    } finally {
+      console.warn = realWarn;
+    }
+  };
+  const run = (raids) => quietly(() => buildEventRaids(feed, { nameIdx, allTypes: LILY_TYPES, raids, now: NOW }));
+  const surfaced = (out) => out.entries.map((e) => e.eventID).sort().join(",");
+  const bossOf = (out, eventID) => out.entries.find((e) => e.eventID === eventID)?.bosses?.[0];
+
+  // As the 2026-10-14 rotation spelled its bosses, through the fetcher's own
+  // derivation, plus a boss with no form at all.
+  const tiers = deriveTiered({
+    lvl5: [lily(487, `${ID(487)}_ALTERED`, "Ghost", "Dragon"), lily(717, ID(717), "Dark", "Flying")],
+    lvl3: [lily(892, undefined, "Fighting", "Dark")],
+    mega: [lily(9, `${ID(9)}_MEGA`, "Water")],
+    shadow_lvl5: [lily(645, `${ID(645)}_INCARNATE`, "Ground", "Flying")],
+  }, LILY_TYPES);
+  const kept = JSON.stringify(Object.values(tiers).flat().map((b) => b.form));
+  check("a standing boss keeps lily-dex-api's form as spelled, and null where it gave none", kept ===
+    JSON.stringify([`${ID(487)}_ALTERED`, ID(717), null, `${ID(9)}_MEGA`, `${ID(645)}_INCARNATE`]), kept);
+
+  const live = run(tiers);
+  check("against that rotation, only the Origin forme event surfaces",
+    surfaced(live) === "zz-origin" && live.deduped === 4 && live.unresolved === 0 && live.warnings.length === 0,
+    `${surfaced(live)}; ${live.deduped} deduped, ${live.unresolved} unresolved`);
+  const origin = bossOf(live, "zz-origin");
+  check("the Origin event names its form and keeps its species id",
+    origin?.form === `${ID(487)}_ORIGIN` && origin?.id === ID(487) && origin?.types?.join("/") === "ghost/dragon",
+    JSON.stringify({ form: origin?.form, id: origin?.id }));
+
+  // pokemon-go-api's own pokedex spells Giratina's base GIRATINA, with the
+  // formes beside it. Either spelling of the default form is the one a bare
+  // event name stands for.
+  const base = run(deriveTiered({ lvl5: [lily(487, ID(487), "Ghost", "Dragon")] }, LILY_TYPES));
+  check("a standing boss spelled by its bare id is the species' default form, as a bare event name is",
+    !surfaced(base).includes("zz-giratina") && surfaced(base).includes("zz-origin"), surfaced(base));
+  check("a bare event name carries the default form's enum: NORMAL for a plain species",
+    bossOf(base, "zz-yveltal")?.form === `${ID(717)}_NORMAL`, bossOf(base, "zz-yveltal")?.form);
+
+  const swapped = run(deriveTiered({ lvl5: [lily(487, `${ID(487)}_ORIGIN`, "Ghost", "Dragon")] }, LILY_TYPES));
+  check("with Origin standing, the Origin event dedupes and the plain one surfaces as Altered",
+    !surfaced(swapped).includes("zz-origin") && bossOf(swapped, "zz-giratina")?.form === `${ID(487)}_ALTERED`,
+    `${surfaced(swapped)}; ${bossOf(swapped, "zz-giratina")?.form}`);
+
+  const giratinas = (out) => ["zz-origin", "zz-giratina"].filter((id) => surfaced(out).includes(id)).join(",") || "none";
+  const formless = run({ lvl5: [{ id: ID(487) }] });
+  check("a standing boss with no form, as the committed snapshot and the guard's kept tiers have, dedupes by species",
+    giratinas(formless) === "none", giratinas(formless));
+  const unplaced = run(deriveTiered({ lvl5: [lily(487, `${ID(487)}_SKY`, "Ghost", "Dragon")] }, LILY_TYPES));
+  check("so does one whose form the game master does not list, rather than letting a duplicate through",
+    giratinas(unplaced) === "none", giratinas(unplaced));
+
+  const notShadow = run(deriveTiered({ lvl5: [lily(645, `${ID(645)}_INCARNATE`, "Ground", "Flying")] }, LILY_TYPES));
+  check("the same form in another tier is still another raid: plain Landorus leaves the Shadow event standing",
+    surfaced(notShadow).includes("zz-landorus"), surfaced(notShadow));
+
+  // Max Battles go through the same comparison.
+  const maxFeed = [
+    ev("zz-max-rapid", "max-battles", `Dynamax ${en(892)} (Rapid Strike Style) Max Battle Day`),
+    ev("zz-max-bare", "max-battles", `Dynamax ${en(892)} Max Battle Day`),
+  ];
+  const maxes = quietly(() => buildEventMaxBattles(maxFeed, {
+    nameIdx, allTypes: LILY_TYPES, now: NOW,
+    maxBattles: deriveTiered({ tier_5: [lily(892, `${ID(892)}_SINGLE_STRIKE`, "Fighting", "Dark")] }, LILY_TYPES),
+  }));
+  check("a standing Single Strike Urshifu dedupes the bare Max Battle Day, not the Rapid Strike one",
+    surfaced(maxes) === "zz-max-rapid" && bossOf(maxes, "zz-max-rapid")?.form === `${ID(892)}_RAPID_STRIKE`,
+    `${surfaced(maxes)}; ${bossOf(maxes, "zz-max-rapid")?.form}`);
+
+  // The app reads no `form`: a standing tier builds the same filters with it
+  // as without it.
+  const strip = (t) => Object.fromEntries(Object.entries(t).map(([k, list]) => [k, list.map(({ form, ...b }) => b)]));
+  const withForm = JSON.stringify(buildResult("en", { raidBosses: { ...RAID_BOSSES, raids: tiers } }).raidFilters);
+  const withoutForm = JSON.stringify(buildResult("en", { raidBosses: { ...RAID_BOSSES, raids: strip(tiers) } }).raidFilters);
+  check("the app builds a standing boss the same with its form as without it", withForm === withoutForm);
 }
 
 console.log(`\n${failures === 0 ? "✓ All data-filter property checks passed." : `✗ ${failures} failure(s).`}`);
