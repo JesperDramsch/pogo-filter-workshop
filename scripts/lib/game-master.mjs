@@ -373,6 +373,26 @@ export function formSuffix({ form, settings }) {
   return form === id ? "NORMAL" : form;
 }
 
+// dex → the form enum a species' `FORMS_V####_POKEMON_*` template lists first
+// ("ZACIAN_HERO"), which is the form the game treats as the species when
+// nothing names another: in the 2026-10-13 alexelgt batch, of the 1024 species
+// with a form list, every one that has a NORMAL form lists it first. The
+// form-less template usually carries the same types, but not always: Zacian's
+// and Zamazenta's carry the Crowned types, and Urshifu's drops the second type
+// both its real forms have. A reader that wants the default form should ask
+// this rather than trust the bare template. dexFromTemplateId() deliberately
+// does not match the FORMS_ family, hence the pattern here.
+export function defaultFormByDex(templates) {
+  const out = new Map();
+  for (const entry of templateList(templates)) {
+    const node = templateNode(entry);
+    const m = /^FORMS_V(\d+)_POKEMON_/.exec(node?.templateId || entry?.templateId || "");
+    const first = node?.formSettings?.forms?.[0]?.form;
+    if (m && typeof first === "string") out.set(parseInt(m[1], 10), first);
+  }
+  return out;
+}
+
 // "POKEMON_TYPE_DARK" → "dark". Returns null for anything that isn't a type.
 export function typeSlug(value) {
   if (typeof value !== "string") return null;

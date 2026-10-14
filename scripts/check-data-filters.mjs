@@ -28,6 +28,10 @@
 //         Max Mondays and Max Battle Days, every boss resolves to a dex, the
 //         app builds each like a standing Max Battle boss and names it through
 //         pokemonNameFor, and the empty-family guard leaves them alone
+//   D13 — a forme in brackets ("Landorus (Incarnate)") resolves to its
+//         species and that form's types, in event raids and event Max Battles
+//         alike; a bare name takes the default form; an unknown forme is
+//         skipped, never guessed
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
@@ -47,7 +51,8 @@ import {
 } from "../src/data/species.js";
 import { unresolvableDexEntries, formSuffixedDexEntries, NAME_LOCALES } from "./lib/species-dex.mjs";
 import {
-  GUARDED_FAMILIES, buildEventMaxBattles, buildNameIndex, guardEmptiedFamilies, parseMaxEventBosses,
+  GUARDED_FAMILIES, buildEventMaxBattles, buildEventRaids, buildNameIndex, guardEmptiedFamilies, parseMaxEventBosses,
+  resolveBossKey,
 } from "./fetch-raid-bosses.mjs";
 
 let failures = 0;
@@ -784,6 +789,175 @@ console.log("\nD12 — event Max Battles: parsed, date-gated, resolved and built
   // bossCount reads an event array as zero bosses either way. So pin the list.
   check("guard: only the two standing rotations are guarded",
     JSON.stringify(GUARDED_FAMILIES) === JSON.stringify(["raids", "maxBattles"]), JSON.stringify(GUARDED_FAMILIES));
+}
+
+console.log("\nD13 — a forme in brackets resolves to its species and form, in event raids and Max Battles alike");
+{
+  // ScrapedDuck puts a forme in brackets: "Landorus (Incarnate)" in a
+  // raid-battles boss list, "Giratina (Origin Forme)" in a raid-hour title. On
+  // 2026-10-13 the first was skipped as unresolvable, because the name index
+  // only knew bare species names. Both event builders resolve through one
+  // function, so a synthetic feed goes through each. The templates are laid
+  // out as the 2026-10-13 game master lays them out: a form-less template, one
+  // per form, and a FORMS_ template listing the default form first. Zacian's
+  // and Urshifu's form-less templates carry types neither default form has,
+  // which is the case the default-form rule is for.
+  const DAY = 24 * 60 * 60 * 1000;
+  const HOUR = 60 * 60 * 1000;
+  const NOW = Date.parse("2026-10-13T12:00:00Z");
+  const feedTime = (ms) => new Date(ms - new Date(ms).getTimezoneOffset() * 60000).toISOString().slice(0, 23);
+  const en = (dex) => POKEMON_NAMES_DICT[String(dex)].en;
+  const pad = (dex) => String(dex).padStart(4, "0");
+  const T = (t) => (t ? `POKEMON_TYPE_${t}` : undefined);
+  // A species template; form-less when `form` is null.
+  const tpl = (dex, form, type, type2) => {
+    const id = en(dex).toUpperCase();
+    const templateId = `V${pad(dex)}_POKEMON_${id}${form ? `_${form}` : ""}`;
+    const pokemonSettings = { pokemonId: id, ...(form && { form: `${id}_${form}` }), type: T(type), type2: T(type2) };
+    return { templateId, data: { templateId, pokemonSettings } };
+  };
+  const formList = (dex, ...forms) => {
+    const id = en(dex).toUpperCase();
+    const templateId = `FORMS_V${pad(dex)}_POKEMON_${id}`;
+    return { templateId, data: { templateId, formSettings: { pokemon: id, forms: forms.map((f) => ({ form: `${id}_${f}` })) } } };
+  };
+  const nameIdx = buildNameIndex([
+    tpl(487, null, "GHOST", "DRAGON"), tpl(487, "ALTERED", "GHOST", "DRAGON"), tpl(487, "ORIGIN", "GHOST", "DRAGON"),
+    formList(487, "ALTERED", "ORIGIN"),
+    tpl(555, null, "FIRE"), tpl(555, "GALARIAN_STANDARD", "ICE"), tpl(555, "GALARIAN_ZEN", "ICE", "FIRE"),
+    tpl(555, "STANDARD", "FIRE"), tpl(555, "ZEN", "FIRE", "PSYCHIC"),
+    formList(555, "STANDARD", "ZEN", "GALARIAN_STANDARD", "GALARIAN_ZEN"),
+    tpl(645, null, "GROUND", "FLYING"), tpl(645, "INCARNATE", "GROUND", "FLYING"), tpl(645, "THERIAN", "GROUND", "FLYING"),
+    formList(645, "INCARNATE", "THERIAN"),
+    tpl(741, null, "FIRE", "FLYING"), tpl(741, "BAILE", "FIRE", "FLYING"), tpl(741, "PAU", "PSYCHIC", "FLYING"),
+    tpl(741, "POMPOM", "ELECTRIC", "FLYING"), tpl(741, "SENSU", "GHOST", "FLYING"),
+    formList(741, "BAILE", "POMPOM", "PAU", "SENSU"),
+    tpl(888, null, "FAIRY", "STEEL"), tpl(888, "CROWNED_SWORD", "FAIRY", "STEEL"), tpl(888, "HERO", "FAIRY"),
+    formList(888, "HERO", "CROWNED_SWORD"),
+    tpl(892, null, "FIGHTING"), tpl(892, "RAPID_STRIKE", "FIGHTING", "WATER"), tpl(892, "SINGLE_STRIKE", "FIGHTING", "DARK"),
+    formList(892, "SINGLE_STRIKE", "RAPID_STRIKE"),
+    tpl(898, null, "PSYCHIC", "GRASS"), tpl(898, "ICE_RIDER", "PSYCHIC", "ICE"), tpl(898, "NORMAL", "PSYCHIC", "GRASS"),
+    tpl(898, "SHADOW_RIDER", "PSYCHIC", "GHOST"), formList(898, "NORMAL", "ICE_RIDER", "SHADOW_RIDER"),
+  ], POKEMON_NAMES_DICT);
+  const species = (dex) => nameIdx.get(en(dex).toLowerCase());
+  const typesOf = (hit) => (hit ? hit.types.join("/") : "unresolved");
+
+  const bare = [888, 892, 645, 555].map((dex) => typesOf(species(dex))).join(", ");
+  check("a bare name takes the default form's types, not the form-less template's, where the two differ",
+    bare === "Fairy, Fighting/Dark, Ground/Flying, Fire", bare);
+
+  // Index keys, as nameKey() spells them: lowercase, straight apostrophes.
+  const key = (dex, forme) => `${en(dex)} (${forme})`.toLowerCase();
+  const cases = [
+    [key(645, "Incarnate"), "Ground/Flying", "the forme alone, as raid-battles boss lists spell it"],
+    [key(487, "Origin Forme"), "Ghost/Dragon", "with \"Forme\", as event titles spell it"],
+    [key(888, "Crowned Sword"), "Fairy/Steel", "a two-word form"],
+    [key(892, "Rapid Strike Style"), "Fighting/Water", "a form whose types the default form lacks"],
+    [key(555, "Zen Mode"), "Fire/Psychic", "only the suffix the words cover"],
+    [key(555, "Galarian Zen Mode"), "Ice/Fire", "the longest suffix the words cover"],
+    [key(741, "Pa'u Style"), "Psychic/Flying", "an apostrophe inside a word"],
+    [key(741, "Pom-Pom Style"), "Electric/Flying", "a hyphen inside a word"],
+    [key(898, "Shadow Rider"), "Psychic/Ghost", "a form named with a tier word"],
+    [key(645, "Origin Forme"), "unresolved", "another species' form"],
+    [key(888, "Crowned"), "unresolved", "half a form's words"],
+    [key(555, "Galarian Standard Zen"), "unresolved", "two forms matching equally well"],
+    [key(302, "Incarnate"), "unresolved", "a species the index does not hold"],
+  ];
+  for (const [k, want, why] of cases) {
+    const got = typesOf(resolveBossKey(nameIdx, k));
+    check(`"${k}" → ${want}: ${why}`, got === want, got === want ? "" : got);
+  }
+  const hit = resolveBossKey(nameIdx, key(645, "Incarnate"));
+  check("a forme resolves to the species' id and dictionary name",
+    hit?.id === species(645)?.id && hit?.displayName === en(645) && Object.keys(hit).sort().join() === "displayName,id,types");
+  check("a bare name is still a plain lookup", resolveBossKey(nameIdx, en(645).toLowerCase()) === species(645));
+
+  // ScrapedDuck's shape: raid-battles events list their bosses in extraData,
+  // raid-hour events only have the title.
+  const ev = (eventID, eventType, name, bosses) => ({
+    eventID, name, eventType, start: feedTime(NOW - HOUR), end: feedTime(NOW + DAY),
+    extraData: bosses
+      ? { raidbattles: { bosses: bosses.map((b) => ({ name: b, canBeShiny: true })) } }
+      : { generic: { hasSpawns: false, hasFieldResearchTasks: false } },
+  });
+  const feed = [
+    // The event the fetcher skipped on 2026-10-13, as the live feed published it.
+    ev("zz-landorus", "raid-battles", `Shadow ${en(645)} (Incarnate Forme) in Shadow Raids`, [`${en(645)} (Incarnate)`]),
+    ev("zz-giratina", "raid-hour", `${en(487)} (Origin Forme) Raid Hour`),
+    ev("zz-urshifu", "raid-battles", `${en(892)} (Rapid Strike Style) in 5-star Raid Battles`, [`${en(892)} (Rapid Strike)`]),
+    ev("zz-unknown", "raid-battles", `${en(645)} (Origin Forme) in 5-star Raid Battles`, [`${en(645)} (Origin)`]),
+    ev("zz-calyrex", "raid-battles", `${en(898)} (Shadow Rider) in 5-star Raid Battles`, [`${en(898)} (Shadow Rider)`]),
+    ev("zz-max", "max-battles", `Gigantamax ${en(892)} (Rapid Strike Style) Max Battle Day`),
+  ];
+  const quietly = (build) => {
+    const warnings = [];
+    const realWarn = console.warn;
+    console.warn = (...args) => warnings.push(args.join(" "));
+    try {
+      return { ...build(), warnings };
+    } finally {
+      console.warn = realWarn;
+    }
+  };
+  const raids = quietly(() => buildEventRaids(feed, { nameIdx, allTypes: LILY_TYPES, raids: {}, now: NOW }));
+  const raidEvent = (id) => raids.entries.find((e) => e.eventID === id);
+  const landorus = raidEvent("zz-landorus")?.bosses?.[0];
+  check("the Shadow Landorus event the live feed lost resolves, as a shadow raid of the species",
+    raidEvent("zz-landorus")?.isShadow === true && landorus?.id === species(645)?.id &&
+      landorus?.names?.en === en(645) && landorus?.types?.join("/") === "ground/flying",
+    JSON.stringify(landorus));
+  check("a forme in a raid-hour title resolves too",
+    raidEvent("zz-giratina")?.bosses?.[0]?.names?.en === en(487));
+  // Electric hits Rapid Strike Urshifu's water side super-effectively, and is
+  // neutral on Single Strike's fighting/dark, so this tells the forms apart.
+  const urshifu = raidEvent("zz-urshifu")?.bosses?.[0];
+  check("the form's types reach the derived boss, and so its counters",
+    urshifu?.types?.join("/") === "fighting/water" && urshifu?.seMoveTypes?.includes("electric"), JSON.stringify(urshifu?.types));
+  const calyrex = raidEvent("zz-calyrex");
+  check("a tier word inside the brackets is part of the name, not a Shadow raid",
+    calyrex?.isShadow === false && calyrex?.bosses?.[0]?.types?.join("/") === "psychic/ghost",
+    JSON.stringify({ isShadow: calyrex?.isShadow, types: calyrex?.bosses?.[0]?.types }));
+  const warned = raids.unresolved === 1 && raids.warnings.some((w) => w.includes(`"${en(645)} (Origin)"`));
+  check("an unknown forme is skipped with a warning, never resolved to the bare species",
+    !raidEvent("zz-unknown") && warned, warned ? "" : raids.warnings.join(" | "));
+
+  const standing = { shadow_lvl5: [{ id: species(645)?.id }] };
+  const deduped = quietly(() => buildEventRaids(feed, { nameIdx, allTypes: LILY_TYPES, raids: standing, now: NOW }));
+  check("with Landorus standing in shadow_lvl5, as on 2026-10-13, the event dedupes rather than failing to resolve",
+    !deduped.entries.some((e) => e.eventID === "zz-landorus") && deduped.deduped === 1 && deduped.unresolved === 1,
+    `${deduped.deduped} deduped, ${deduped.unresolved} unresolved`);
+
+  const maxes = quietly(() => buildEventMaxBattles(feed, { nameIdx, allTypes: LILY_TYPES, maxBattles: {}, now: NOW }));
+  const maxBoss = maxes.entries.find((e) => e.eventID === "zz-max")?.bosses?.[0];
+  check("a Max Battle title's forme resolves through the same resolver",
+    maxBoss?.types?.join("/") === "fighting/water" && maxBoss?.gigantamax === true && maxBoss?.names?.en === en(892),
+    JSON.stringify(maxBoss));
+
+  const events = [...raids.entries, ...maxes.entries];
+  const standingKeys = Object.keys(Object.values(RAID_BOSSES.raids)[0][0]).sort().join(",");
+  check(`forme bosses have the standing tiers' shape (${standingKeys}); no index internals leak`,
+    events.flatMap((e) => e.bosses).every((b) => Object.keys(b).filter((k) => k !== "gigantamax").sort().join(",") === standingKeys));
+
+  // Through the app: a forme boss builds a filter, and its name is the
+  // species' in every locale, from the dictionary, as D12 checks for Max
+  // Battles. The strict lookup, since pokemonNameFor falls back to English.
+  const dataBoss = new Map(events.flatMap((e) => e.bosses.map((b) => [`${e.eventID}|${b.id}`, b])));
+  const raidBosses = { ...RAID_BOSSES, eventRaids: raids.entries, eventMaxBattles: maxes.entries };
+  for (const loc of localeNames) {
+    const result = buildResult(loc, { raidBosses });
+    const groups = [...(result.eventRaidFilters || []), ...(result.eventMaxBattleFilters || [])];
+    const bad = groups.length === events.length ? [] : [`${groups.length} groups for ${events.length} events`];
+    for (const g of groups) {
+      for (const b of g.bosses || []) {
+        const dexKey = resolveSpeciesInfo(dataBoss.get(`${g.eventID}|${b.id}`)?.names?.en, "en")?.dexKey;
+        const expected = dexKey && POKEMON_NAMES_DICT[dexKey]?.[loc]?.toLowerCase();
+        if (b.skipped || !b.clause) bad.push(`${g.eventID}/${b.id}: empty filter`);
+        if (!expected || String(b.name).toLowerCase() !== expected) bad.push(`${g.eventID}/${b.id}: named "${b.name}", not "${expected}"`);
+      }
+    }
+    check(`${loc}: ${groups.length} forme event(s) build a filter per boss, named from the dictionary`,
+      groups.length > 0 && bad.length === 0, bad.slice(0, 4).join(" | "));
+  }
 }
 
 console.log(`\n${failures === 0 ? "✓ All data-filter property checks passed." : `✗ ${failures} failure(s).`}`);
