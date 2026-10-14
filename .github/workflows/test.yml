@@ -35,9 +35,13 @@ jobs:
           echo "$sha  $RUNNER_TEMP/$tgz" | sha256sum -c -
           tar -xzf "$RUNNER_TEMP/$tgz" -C "$RUNNER_TEMP" actionlint
           "$RUNNER_TEMP/actionlint" -color
+      # Dependabot bumps the action ref, never this input, so nothing flags
+      # it at end of life. Keep it on an LTS that the engines fields in
+      # package-lock.json accept (vite, vite-node, rolldown, sharp), and move
+      # deploy.yml and both setup-node steps in sync-data.yml with it.
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run test:fixtures
