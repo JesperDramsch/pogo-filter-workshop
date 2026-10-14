@@ -1,11 +1,56 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+# Dependabot version updates, tuned for little noise: monthly, and every update
+# lands in a group, so each entry opens at most one PR per group per month.
+#
+# None of this changes security updates. The schedule and cooldown apply only
+# to version updates, and the groups leave `applies-to` at its default
+# (version-updates), so advisories still open their own PRs straight away.
+#
+# A config Dependabot cannot parse fails silently: the `package-ecosystem:
+# "node"` this replaced is not a valid value, and no version-update run ever
+# happened under it. Validate edits against SchemaStore's dependabot-2.0.json,
+# and after merging check Insights > Dependency graph > Dependabot.
+# Options: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
 
 version: 2
 updates:
-  - package-ecosystem: "node" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    # Skip releases younger than a week. A broken publish is usually yanked or
+    # patched by then, and a compromised one is usually caught by then.
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      npm-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      # Without a group, each major opens a PR of its own, and packages that
+      # must move together, like react, react-dom and their @types, arrive as
+      # separate PRs that each fail on their own. To decline one major, comment
+      # `@dependabot ignore <name> major version` on the group PR.
+      npm-major:
+        patterns: ["*"]
+        update-types: ["major"]
+
+  # Majors are included here: they are how the actions move off the deprecated
+  # Node 20 runtime. sync-data.yml runs only on schedule and dispatch, so on
+  # the group PR its actions are only linted (actionlint in test.yml), never
+  # run. Watch the next daily sync on main after merging. Do not dispatch it
+  # on the PR branch: its push job pushes the data commit to whichever ref the
+  # run started on.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    groups:
+      github-actions:
+        patterns: ["*"]
