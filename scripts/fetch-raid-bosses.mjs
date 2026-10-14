@@ -155,6 +155,12 @@ function lowerTypes(arr) {
   return arr.map((t) => String(t).toLowerCase());
 }
 
+// `form` is passed through as the source spells it, null when it has none. A
+// standing boss carries pokemon-go-api's spelling, which lily-dex-api relays:
+// the bare id for a species' plain form ("YVELTAL"), the game master's enum
+// for a named one ("LANDORUS_INCARNATE"), and a suffix of its own for a Mega
+// ("CHARIZARD_MEGA_X"). An event boss carries the game-master enum
+// resolveBossKey matched. standingForms() reads both spellings.
 function deriveBoss(boss, allTypes, typeIdx) {
   const bossTypes = boss.types || [];
   if (bossTypes.length === 0) return null;
@@ -166,6 +172,7 @@ function deriveBoss(boss, allTypes, typeIdx) {
 
   return {
     id: boss.id,
+    form: typeof boss.form === "string" && boss.form ? boss.form : null,
     names: normalizeNames(boss.names),
     types: lowerTypes(bossTypes),
     resistorTypes: lowerTypes(resistors),
@@ -187,15 +194,17 @@ function nameKey(name) {
 // `deriveBoss` handles the lowercase emit shape.
 const titleTypes = (types) => types.map(t => t[0].toUpperCase() + t.slice(1));
 
-// Build a lowercase-name → {id, types, displayName, forms} index from the game
-// master, named via this repo's own dictionary. `types` are the types of the
-// template a bare species name stands for, picked in this order: the default
-// form the species' FORMS_ template lists first (see defaultFormByDex), the
-// form-less template, the NORMAL form, then the first template seen. So bare
-// "Meowth" gets Kanto Meowth's types, not Alolan Meowth's, and bare "Zacian"
-// gets Hero Zacian's, where the form-less template carries the Crowned ones.
+// Build a lowercase-name → {id, form, types, displayName, forms} index from
+// the game master, named via this repo's own dictionary. `form` and `types`
+// are those of the template a bare species name stands for, picked in this
+// order: the default form the species' FORMS_ template lists first (see
+// defaultFormByDex), the form-less template, the NORMAL form, then the first
+// template seen. So bare "Meowth" gets Kanto Meowth's types, not Alolan
+// Meowth's, and bare "Zacian" gets Hero Zacian's, where the form-less template
+// carries the Crowned ones. `form` is that template's form enum
+// ("ZACIAN_HERO", "YVELTAL_NORMAL"), or null if it is the form-less one.
 // `forms` maps every form suffix of the species (INCARNATE, CROWNED_SWORD,
-// ALOLA, …) to that form's types, for resolveBossKey.
+// ALOLA, …) to that form's enum and types, for resolveBossKey.
 export function buildNameIndex(templates, names) {
   const defaults = defaultFormByDex(templates);
   const rank = (template, form) => {
@@ -213,7 +222,7 @@ export function buildNameIndex(templates, names) {
     if (!entry) byDex.set(template.dex, (entry = { template, types, rank: r, forms: new Map() }));
     // Among equals the first template seen stays.
     else if (r < entry.rank) Object.assign(entry, { template, types, rank: r });
-    if (form !== null) entry.forms.set(form, titleTypes(types));
+    if (form !== null) entry.forms.set(form, { form: template.form, types: titleTypes(types) });
   }
   const idx = new Map();
   for (const [dex, { template, types, forms }] of byDex) {
@@ -223,8 +232,10 @@ export function buildNameIndex(templates, names) {
       // The game's own species enum — TAPU_LELE, MR_MIME, HO_OH — which is the
       // convention lily-dex-api's boss ids follow, so the dedupe key built
       // from these matches the standing-tier ids exactly. A form template
-      // carries the same enum, so a forme-suffixed boss dedupes the same way.
+      // carries the same enum, so a forme-suffixed boss keys the same way, and
+      // standingForms() tells the forms apart.
       id: template.settings.pokemonId,
+      form: template.form,
       types: titleTypes(types),
       displayName: name,
       forms,
@@ -249,18 +260,18 @@ function qualifierWords(qualifier) {
   return words;
 }
 
-// Resolves a boss key through the name index to {id, types, displayName}, or
-// null. A bare species name is a plain lookup. A forme in brackets resolves
-// against that species' own form suffixes in the game master: the form whose
-// suffix words all appear in the qualifier wins, the longest such suffix if
-// several do, so "Incarnate" and "Incarnate Forme" both find
-// LANDORUS_INCARNATE and "Zen Mode" finds DARMANITAN_ZEN, not
-// DARMANITAN_GALARIAN_ZEN. A forme no form matches, or two match equally well,
-// stays unresolved: another form can carry other types, and a guessed form's
-// types build a counter filter for a different battle. Only the types are the
-// form's. The id and display name stay the species', so the boss dedupes
-// against lily-dex-api's species-level ids and the app names it through the
-// dictionary.
+// Resolves a boss key through the name index to {id, form, types,
+// displayName}, or null. A bare species name is a plain lookup, so it stands
+// for the species' default form. A forme in brackets resolves against that
+// species' own form suffixes in the game master: the form whose suffix words
+// all appear in the qualifier wins, the longest such suffix if several do, so
+// "Incarnate" and "Incarnate Forme" both find LANDORUS_INCARNATE and "Zen
+// Mode" finds DARMANITAN_ZEN, not DARMANITAN_GALARIAN_ZEN. A forme no form
+// matches, or two match equally well, stays unresolved: another form can carry
+// other types, and a guessed form's types build a counter filter for a
+// different battle. The form enum and types are the form's. The id and
+// display name stay the species', so the boss keys against lily-dex-api's
+// species-level ids and the app names it through the dictionary.
 export function resolveBossKey(nameIdx, key) {
   const hit = nameIdx.get(key);
   if (hit) return hit;
@@ -271,14 +282,52 @@ export function resolveBossKey(nameIdx, key) {
   let best = null;
   let bestLength = 0;
   let tied = false;
-  for (const [suffix, types] of species.forms || []) {
+  for (const [suffix, variant] of species.forms || []) {
     const parts = suffix.toLowerCase().split("_");
     if (!parts.every((p) => words.has(p))) continue;
-    if (parts.length > bestLength) [best, bestLength, tied] = [types, parts.length, false];
+    if (parts.length > bestLength) [best, bestLength, tied] = [variant, parts.length, false];
     else if (parts.length === bestLength) tied = true;
   }
   if (!best || tied) return null;
-  return { id: species.id, types: best, displayName: species.displayName };
+  return { id: species.id, form: best.form, types: best.types, displayName: species.displayName };
+}
+
+// Which forms of a boss the standing rotation already runs. Each standing
+// boss is placed as the game-master form enum it stands for, so both of
+// pokemon-go-api's spellings meet what resolveBossKey returns for an event:
+// the bare id ("YVELTAL", "GIRATINA") is the species' default form, as a bare
+// event name is, and a game-master enum ("LANDORUS_INCARNATE") is itself. A
+// boss that cannot be placed counts as every form of its species: one with no
+// form (a snapshot written before bosses carried one, which is also what the
+// empty-family guard puts back), one whose suffix is not a game-master form
+// (a Mega: "BLASTOISE_MEGA", "CHARIZARD_MEGA_X"; the tier key already says
+// Mega), or one of a species the name index does not hold. That is the
+// species-level dedupe this replaced, kept wherever form-level cannot be
+// trusted. `entries` is [{key, id, form}], `key` the tier dedupe key; returns
+// key → Set of placed forms, null among them for a boss that was not placed.
+function standingForms(entries, nameIdx) {
+  const byId = new Map();
+  for (const species of nameIdx.values()) byId.set(species.id, species);
+  const out = new Map();
+  for (const { key, id, form } of entries) {
+    const species = byId.get(id);
+    let placed = null;
+    if (species && typeof form === "string") {
+      if (form === id) placed = species.form;
+      else if ([...species.forms.values()].some((variant) => variant.form === form)) placed = form;
+    }
+    if (!out.has(key)) out.set(key, new Set());
+    out.get(key).add(placed);
+  }
+  return out;
+}
+
+// Whether an event boss is already standing: compared by form when both sides
+// name one, by species (the key alone) when either does not.
+function isStanding(standing, key, form) {
+  const forms = standing.get(key);
+  if (!forms) return false;
+  return form == null || forms.has(null) || forms.has(form);
 }
 
 // Pulls boss name(s) and shadow/mega flags out of a ScrapedDuck event entry.
@@ -349,12 +398,13 @@ export function parseMaxEventBosses(event) {
 
 // Resolves an event's boss names through the name index (resolveBossKey, so a
 // forme in brackets resolves too), drops the ones the standing rotation
-// already lists, and derives the rest. Each pick is
-// { name, key, dedupeKey(id), extra }: `name` as the feed spelled it (for the
-// warning), `key` the index key with any tier prefix stripped, `extra` fields
-// added to the derived boss. Returns `{bosses, status}` where status is
+// already runs (isStanding, by form where both sides name one), and derives
+// the rest. Each pick is { name, key, dedupeKey(id), extra }: `name` as the
+// feed spelled it (for the warning), `key` the index key with any tier prefix
+// stripped, `extra` fields added to the derived boss. `standing` comes from
+// standingForms(). Returns `{bosses, status}` where status is
 // "ok" | "deduped" | "unresolved", which the caller logs.
-function resolveEventBosses(event, picks, nameIdx, allTypes, typeIdx, dedupeSet) {
+function resolveEventBosses(event, picks, nameIdx, allTypes, typeIdx, standing) {
   const bosses = [];
   let anyUnresolved = false;
   let anyDeduped = false;
@@ -365,13 +415,13 @@ function resolveEventBosses(event, picks, nameIdx, allTypes, typeIdx, dedupeSet)
       console.warn(`  ⚠ event "${event.name}": cannot resolve boss "${name}" — skipped`);
       continue;
     }
-    if (dedupeSet.has(dedupeKey(hit.id))) { anyDeduped = true; continue; }
+    if (isStanding(standing, dedupeKey(hit.id), hit.form)) { anyDeduped = true; continue; }
 
     // `normalizeNames()` keys off lily-dex-api's TitleCase language labels
     // ("English", "German"), not BCP47 — pass the same shape so the resulting
     // boss carries an `en` name that buildBossEntry() can fall back on.
     const derived = deriveBoss(
-      { id: hit.id, names: { English: hit.displayName }, types: hit.types },
+      { id: hit.id, form: hit.form, names: { English: hit.displayName }, types: hit.types },
       allTypes, typeIdx,
     );
     if (derived) bosses.push({ ...derived, ...extra });
@@ -384,7 +434,7 @@ function resolveEventBosses(event, picks, nameIdx, allTypes, typeIdx, dedupeSet)
 // `{entry, status}` where status is "ok" | "deduped" | "unresolved". Caller
 // uses the status to log a meaningful summary; an entry of null means we
 // drop the event entirely so the UI doesn't render an empty accordion.
-function buildEventEntry(event, nameIdx, allTypes, typeIdx, dedupeSet) {
+function buildEventEntry(event, nameIdx, allTypes, typeIdx, standing) {
   const { isShadow, isMega, names } = parseEventBosses(event);
   if (names.length === 0) return { entry: null, status: "unresolved" };
 
@@ -396,9 +446,9 @@ function buildEventEntry(event, nameIdx, allTypes, typeIdx, dedupeSet) {
       .replace(/^shadow\s+/i, "")
       .replace(/^mega\s+/i, "")
       .trim(),
-    dedupeKey: (id) => `${id}|${isShadow ? "S" : ""}|${isMega ? "M" : ""}`,
+    dedupeKey: (id) => raidDedupeKey(id, isShadow, isMega),
   }));
-  const { bosses, status } = resolveEventBosses(event, picks, nameIdx, allTypes, typeIdx, dedupeSet);
+  const { bosses, status } = resolveEventBosses(event, picks, nameIdx, allTypes, typeIdx, standing);
   if (bosses.length === 0) return { entry: null, status };
   return {
     entry: {
@@ -422,7 +472,7 @@ const maxDedupeKey = (id, gigantamax) => `${id}|${gigantamax ? "G" : ""}`;
 // The Max Battle counterpart of buildEventEntry: the same entry without the
 // raid tier flags, each boss in the standing maxBattles shape, and
 // `gigantamax: true` on a boss the title calls Gigantamax.
-function buildMaxEventEntry(event, nameIdx, allTypes, typeIdx, dedupeSet) {
+function buildMaxEventEntry(event, nameIdx, allTypes, typeIdx, standing) {
   const parsed = parseMaxEventBosses(event);
   if (parsed.length === 0) {
     console.warn(`  ⚠ event "${event.name}": no boss named in the title, skipped`);
@@ -434,7 +484,7 @@ function buildMaxEventEntry(event, nameIdx, allTypes, typeIdx, dedupeSet) {
     dedupeKey: (id) => maxDedupeKey(id, gigantamax),
     extra: gigantamax ? { gigantamax: true } : undefined,
   }));
-  const { bosses, status } = resolveEventBosses(event, picks, nameIdx, allTypes, typeIdx, dedupeSet);
+  const { bosses, status } = resolveEventBosses(event, picks, nameIdx, allTypes, typeIdx, standing);
   if (bosses.length === 0) return { entry: null, status };
   return {
     entry: {
@@ -480,9 +530,9 @@ function surfaceEvents(eventsRaw, types, now, build) {
 // through it, as it does through buildEventMaxBattles below.
 export function buildEventRaids(eventsRaw, { nameIdx, allTypes, raids, now = Date.now() }) {
   const typeIdx = indexTypes(allTypes);
-  const dedupeSet = buildStandingDedupeSet(raids);
+  const standing = standingRaidForms(raids, nameIdx);
   return surfaceEvents(eventsRaw, EVENT_RAID_TYPES, now,
-    (event) => buildEventEntry(event, nameIdx, allTypes, typeIdx, dedupeSet));
+    (event) => buildEventEntry(event, nameIdx, allTypes, typeIdx, standing));
 }
 
 // Event Max Battles from ScrapedDuck's feed, deduped against lily-dex-api's
@@ -491,29 +541,40 @@ export function buildEventRaids(eventsRaw, { nameIdx, allTypes, raids, now = Dat
 // check-data-filters.mjs, which runs a synthetic feed through it.
 export function buildEventMaxBattles(eventsRaw, { nameIdx, allTypes, maxBattles, now = Date.now() }) {
   const typeIdx = indexTypes(allTypes);
-  const dedupeSet = new Set(
-    Object.values(maxBattles || {}).flatMap((list) => (list || []).map((b) => maxDedupeKey(b.id, false))),
+  const standing = standingForms(
+    Object.values(maxBattles || {}).flatMap((list) =>
+      (list || []).map((b) => ({ key: maxDedupeKey(b.id, false), id: b.id, form: b.form }))),
+    nameIdx,
   );
   return surfaceEvents(eventsRaw, EVENT_MAX_TYPES, now,
-    (event) => buildMaxEventEntry(event, nameIdx, allTypes, typeIdx, dedupeSet));
+    (event) => buildMaxEventEntry(event, nameIdx, allTypes, typeIdx, standing));
 }
 
-// Standing-tier dedupe set: every (id, shadow?, mega?) already covered by
-// raids.{mega, lvl5, shadow_lvl5, …}. Built from the derived tier output so
-// the ID format matches downstream consumers exactly.
-function buildStandingDedupeSet(tieredRaids) {
-  const set = new Set();
+// One raid boss's dedupe key: the species id and its tier flags, so a Shadow
+// or Mega raid is never taken for the plain one.
+const raidDedupeKey = (id, isShadow, isMega) => `${id}|${isShadow ? "S" : ""}|${isMega ? "M" : ""}`;
+
+// The standing raid forms: every (id, shadow?, mega?) already covered by
+// raids.{mega, lvl5, shadow_lvl5, …}, with the forms each runs (see
+// standingForms). Built from the derived tier output so the ID format matches
+// downstream consumers exactly.
+function standingRaidForms(tieredRaids, nameIdx) {
+  const entries = [];
   for (const [tier, list] of Object.entries(tieredRaids || {})) {
     const isShadow = tier.startsWith("shadow_");
     const isMega = tier === "mega";
     for (const boss of list) {
-      set.add(`${boss.id}|${isShadow ? "S" : ""}|${isMega ? "M" : ""}`);
+      entries.push({ key: raidDedupeKey(boss.id, isShadow, isMega), id: boss.id, form: boss.form });
     }
   }
-  return set;
+  return standingForms(entries, nameIdx);
 }
 
-function deriveTiered(rawBossesByTier, allTypes, typeIdx) {
+// lily-dex-api's tiered `currentList` → the snapshot's tiers. Exported for
+// check-data-filters.mjs, which runs lily-shaped tiers through it into the
+// event dedupe.
+export function deriveTiered(rawBossesByTier, allTypes) {
+  const typeIdx = indexTypes(allTypes);
   const out = {};
   for (const [tier, list] of Object.entries(rawBossesByTier || {})) {
     if (!Array.isArray(list)) continue;
@@ -624,14 +685,13 @@ async function main() {
   if (!Array.isArray(typesArr) || typesArr.length < 18) {
     return keepCacheOrExit(`types.json missing or too short (got ${typesArr?.length ?? 0} entries)`);
   }
-  const typeIdx = indexTypes(typesArr);
 
   const prev = readPrevious(OUT_PATH);
   // lily-dex-api wraps boss listings in `currentList`; the rest of the response
   // is graphics/headers we don't need.
   const guard = guardEmptiedFamilies(prev, {
-    raids: deriveTiered(raidBossRaw?.currentList, typesArr, typeIdx),
-    maxBattles: deriveTiered(maxBattlesRaw?.currentList, typesArr, typeIdx),
+    raids: deriveTiered(raidBossRaw?.currentList, typesArr),
+    maxBattles: deriveTiered(maxBattlesRaw?.currentList, typesArr),
   }, { offlineOk });
   for (const { family, was } of guard.refused) {
     console.error(`✗ ${family} came back empty (${was} bosses in the previous snapshot): refusing to overwrite it`);
@@ -708,8 +768,8 @@ async function main() {
 }
 
 // Only run when executed directly — the offline checks import buildNameIndex,
-// resolveBossKey, guardEmptiedFamilies and the event raid and Max Battle
-// builders above without triggering a fetch.
+// resolveBossKey, deriveTiered, guardEmptiedFamilies and the event raid and
+// Max Battle builders above without triggering a fetch.
 import { pathToFileURL } from "node:url";
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((e) => {
