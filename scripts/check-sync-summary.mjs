@@ -21,6 +21,7 @@
 
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -249,10 +250,16 @@ function tempRepo(name) {
     readFileSync(join(out2, "commit-paths.txt"), "utf8") === "" && readFileSync(join(out2, "commit-message.txt"), "utf8") === "");
 
   // Once through the real entry point, as the workflow calls it: vite-node
-  // passes no script path, so the mode is what makes it run.
+  // passes no script path, so the mode is what makes it run. node_modules/.bin
+  // holds a POSIX shim on Windows, which CreateProcess cannot execute (the .cmd
+  // next to it needs a shell, and a shell means quoting the temp-dir args), so
+  // run vite-node's own JS bin with this node. Its path comes from the `bin`
+  // field of its package.json, the same one npm links the shim to.
+  const viteNodePkg = createRequire(import.meta.url).resolve("vite-node/package.json");
+  const viteNodeBin = resolve(dirname(viteNodePkg), JSON.parse(readFileSync(viteNodePkg, "utf8")).bin["vite-node"]);
   const out3 = join(TMP, "cli-out");
-  const cli = execFileSync(join(ROOT, "node_modules/.bin/vite-node"),
-    [join(ROOT, "scripts/sync-summary.mjs"), "classify", "--root", dir, "--base", "HEAD", "--out", out3],
+  const cli = execFileSync(process.execPath,
+    [viteNodeBin, join(ROOT, "scripts/sync-summary.mjs"), "classify", "--root", dir, "--base", "HEAD", "--out", out3],
     { cwd: ROOT, encoding: "utf8" });
   check("the CLI runs classify and prints the message", cli.startsWith("chore(data): sync pvp, events"), cli.split("\n")[0]);
 }
