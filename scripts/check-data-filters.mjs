@@ -44,6 +44,10 @@
 //         is not standing Altered Giratina. Where either side cannot be
 //         placed (a Mega, a snapshot from before the field) it falls back to
 //         the species, as it did before
+//   D17 — a regional adjective ("Alolan Marowak", "Paldean Tauros (Blaze)")
+//         resolves to that regional form's enum and types, in event raids and
+//         Max Battles alike, and dedupes against a standing regional boss by
+//         form; an adjective naming no form, or several, is skipped
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
@@ -1346,6 +1350,194 @@ console.log("\nD16 — every boss carries its form; events dedupe by form where 
   const withForm = JSON.stringify(buildResult("en", { raidBosses: { ...RAID_BOSSES, raids: tiers } }).raidFilters);
   const withoutForm = JSON.stringify(buildResult("en", { raidBosses: { ...RAID_BOSSES, raids: strip(tiers) } }).raidFilters);
   check("the app builds a standing boss the same with its form as without it", withForm === withoutForm);
+}
+
+console.log("\nD17 — a regional adjective resolves to that regional form, and dedupes against it by form");
+{
+  // Leek Duck names a regional boss with an adjective ahead of the species:
+  // "Alolan Marowak Raid Day" (2020-10-31), and "Paldean Tauros (Blaze)",
+  // "(Aqua)", "(Combat)" in Journey to Paldea's raids (2025-12-02). The name
+  // index is keyed by species name, so before this every such boss was
+  // skipped as unresolvable. The species are picked for their form layout:
+  // one regional form under each head the 2026-10-13 game master carries
+  // (ALOLA, GALARIAN, HISUIAN, PALDEA), two regions on one species (Meowth),
+  // a region heading several forms (Tauros's breeds, Darmanitan's modes), and a
+  // two-word species name (Mr. Mime). The templates are laid out as D13 lays
+  // them out.
+  const DAY = 24 * 60 * 60 * 1000;
+  const HOUR = 60 * 60 * 1000;
+  const NOW = Date.parse("2026-10-14T12:00:00Z");
+  const feedTime = (ms) => new Date(ms - new Date(ms).getTimezoneOffset() * 60000).toISOString().slice(0, 23);
+  const en = (dex) => POKEMON_NAMES_DICT[String(dex)].en;
+  // The game's enum spelling: "Mr. Mime" is MR_MIME.
+  const ID = (dex) => en(dex).toUpperCase().replace(/[^A-Z0-9]+/g, "_").replace(/_$/, "");
+  const pad = (dex) => String(dex).padStart(4, "0");
+  const T = (t) => (t ? `POKEMON_TYPE_${t}` : undefined);
+  const tpl = (dex, form, type, type2) => {
+    const templateId = `V${pad(dex)}_POKEMON_${ID(dex)}${form ? `_${form}` : ""}`;
+    const pokemonSettings = { pokemonId: ID(dex), ...(form && { form: `${ID(dex)}_${form}` }), type: T(type), type2: T(type2) };
+    return { templateId, data: { templateId, pokemonSettings } };
+  };
+  const formList = (dex, ...forms) => {
+    const templateId = `FORMS_V${pad(dex)}_POKEMON_${ID(dex)}`;
+    return { templateId, data: { templateId, formSettings: { pokemon: ID(dex), forms: forms.map((f) => ({ form: `${ID(dex)}_${f}` })) } } };
+  };
+  const nameIdx = buildNameIndex([
+    tpl(52, null, "NORMAL"), tpl(52, "NORMAL", "NORMAL"), tpl(52, "ALOLA", "DARK"), tpl(52, "GALARIAN", "STEEL"),
+    formList(52, "NORMAL", "ALOLA", "GALARIAN"),
+    tpl(58, null, "FIRE"), tpl(58, "NORMAL", "FIRE"), tpl(58, "HISUIAN", "FIRE", "ROCK"), formList(58, "NORMAL", "HISUIAN"),
+    tpl(105, null, "GROUND"), tpl(105, "NORMAL", "GROUND"), tpl(105, "ALOLA", "FIRE", "GHOST"), formList(105, "NORMAL", "ALOLA"),
+    tpl(122, null, "PSYCHIC", "FAIRY"), tpl(122, "NORMAL", "PSYCHIC", "FAIRY"), tpl(122, "GALARIAN", "ICE", "PSYCHIC"),
+    formList(122, "NORMAL", "GALARIAN"),
+    tpl(128, null, "NORMAL"), tpl(128, "NORMAL", "NORMAL"), tpl(128, "PALDEA_AQUA", "FIGHTING", "WATER"),
+    tpl(128, "PALDEA_BLAZE", "FIGHTING", "FIRE"), tpl(128, "PALDEA_COMBAT", "FIGHTING"),
+    formList(128, "NORMAL", "PALDEA_COMBAT", "PALDEA_BLAZE", "PALDEA_AQUA"),
+    tpl(145, null, "ELECTRIC", "FLYING"), tpl(145, "NORMAL", "ELECTRIC", "FLYING"), tpl(145, "GALARIAN", "FIGHTING", "FLYING"),
+    formList(145, "NORMAL", "GALARIAN"),
+    tpl(194, null, "WATER", "GROUND"), tpl(194, "NORMAL", "WATER", "GROUND"), tpl(194, "PALDEA", "POISON", "GROUND"),
+    formList(194, "NORMAL", "PALDEA"),
+    tpl(487, null, "GHOST", "DRAGON"), tpl(487, "ALTERED", "GHOST", "DRAGON"), tpl(487, "ORIGIN", "GHOST", "DRAGON"),
+    formList(487, "ALTERED", "ORIGIN"),
+    tpl(555, null, "FIRE"), tpl(555, "GALARIAN_STANDARD", "ICE"), tpl(555, "GALARIAN_ZEN", "ICE", "FIRE"),
+    tpl(555, "STANDARD", "FIRE"), tpl(555, "ZEN", "FIRE", "PSYCHIC"),
+    formList(555, "STANDARD", "ZEN", "GALARIAN_STANDARD", "GALARIAN_ZEN"),
+  ], POKEMON_NAMES_DICT);
+  const typesOf = (hit) => (hit ? hit.types.join("/") : "unresolved");
+
+  // Index keys, as nameKey() spells them: lowercase, straight apostrophes.
+  const key = (adjective, dex, forme) => `${adjective} ${en(dex)}${forme ? ` (${forme})` : ""}`.toLowerCase();
+  const cases = [
+    [key("Alolan", 105), "Fire/Ghost", "the region with the demonym's -n (ALOLA)"],
+    [key("Galarian", 145), "Fighting/Flying", "the region as the game master spells it (GALARIAN)"],
+    [key("Hisuian", 58), "Fire/Rock", "HISUIAN"],
+    [key("Paldean", 194), "Poison/Ground", "PALDEA, where it heads a single form"],
+    [key("Alolan", 52), "Dark", "one of two regions on one species"],
+    [key("Galarian", 52), "Steel", "the other"],
+    [key("Galarian", 122), "Ice/Psychic", "a two-word species name after the adjective"],
+    [key("Paldean", 128, "Blaze"), "Fighting/Fire", "a region and a breed in brackets, as Leek Duck spells Tauros"],
+    [key("Paldean", 128, "Aqua Breed"), "Fighting/Water", "the breed with its noun"],
+    [key("Galarian", 555, "Zen Mode"), "Ice/Fire", "the regional Zen Mode, never the Unova one"],
+    [key("Paldean", 128), "unresolved", "a region heading three breeds and naming none of them"],
+    [key("Galarian", 555), "unresolved", "a region heading two modes"],
+    [key("Alolan", 145), "unresolved", "a region the species has no form of"],
+    [key("Alolan", 128, "Blaze"), "unresolved", "a breed under another region"],
+    [key("Alol", 105), "unresolved", "a clipped region word"],
+    [key("Kantonian", 105), "unresolved", "a region the game master has no form for"],
+    [key("Mega", 52), "unresolved", "a tier word, which heads no form: a Mega the index does not hold"],
+  ];
+  for (const [k, want, why] of cases) {
+    const got = typesOf(resolveBossKey(nameIdx, k));
+    check(`"${k}" → ${want}: ${why}`, got === want, got === want ? "" : got);
+  }
+  const hit = resolveBossKey(nameIdx, key("Alolan", 105));
+  check("a regional boss resolves to the species' id and dictionary name, and to the regional form's own enum",
+    hit?.id === ID(105) && hit?.displayName === en(105) && hit?.form === `${ID(105)}_ALOLA` &&
+      Object.keys(hit).sort().join() === "displayName,form,id,types", JSON.stringify(hit));
+  const origin = resolveBossKey(nameIdx, key("Origin", 487));
+  check("a leading word that heads a form which is not regional reads the same way",
+    origin?.form === `${ID(487)}_ORIGIN`, JSON.stringify(origin));
+
+  const ev = (eventID, eventType, name, bosses) => ({
+    eventID, name, eventType, start: feedTime(NOW - HOUR), end: feedTime(NOW + DAY),
+    extraData: bosses
+      ? { raidbattles: { bosses: bosses.map((b) => ({ name: b, canBeShiny: true })) } }
+      : { generic: { hasSpawns: false, hasFieldResearchTasks: false } },
+  });
+  const breeds = ["Blaze", "Aqua", "Combat"];
+  const feed = [
+    ev("zz-marowak", "raid-day", `Alolan ${en(105)} Raid Day`),
+    ev("zz-tauros", "raid-battles", `Paldean ${en(128)} in 3-star Raid Battles`, breeds.map((b) => `Paldean ${en(128)} (${b})`)),
+    ev("zz-zapdos", "raid-hour", `Shadow Galarian ${en(145)} Raid Hour`),
+    ev("zz-mime", "raid-battles", `Galarian ${en(122)} in 3-star Raid Battles`, [`Galarian ${en(122)}`]),
+    ev("zz-bare-tauros", "raid-hour", `Paldean ${en(128)} Raid Hour`),
+    ev("zz-max", "max-mondays", `Dynamax Hisuian ${en(58)} during Max Monday`),
+  ];
+  const quietly = (build) => {
+    const warnings = [];
+    const realWarn = console.warn;
+    console.warn = (...args) => warnings.push(args.join(" "));
+    try {
+      return { ...build(), warnings };
+    } finally {
+      console.warn = realWarn;
+    }
+  };
+  const run = (raids) => quietly(() => buildEventRaids(feed, { nameIdx, allTypes: LILY_TYPES, raids, now: NOW }));
+  const surfaced = (out) => out.entries.map((e) => e.eventID).sort().join(",");
+  const eventOf = (out, eventID) => out.entries.find((e) => e.eventID === eventID);
+
+  const fresh = run({});
+  const marowak = eventOf(fresh, "zz-marowak");
+  const boss = marowak?.bosses?.[0];
+  check("the Alolan Marowak Raid Day surfaces as Marowak's Alolan form, a plain raid",
+    marowak?.isShadow === false && marowak?.isMega === false && boss?.id === ID(105) && boss?.form === `${ID(105)}_ALOLA` &&
+      boss?.names?.en === en(105) && boss?.types?.join("/") === "fire/ghost",
+    JSON.stringify({ isShadow: marowak?.isShadow, isMega: marowak?.isMega, boss }));
+  // Ghost hits Alolan Marowak's ghost side super-effectively, and grass is
+  // super-effective only on Kanto Marowak's ground, so this tells them apart.
+  check("the regional form's types reach the counters",
+    boss?.seMoveTypes?.includes("ghost") && !boss?.seMoveTypes?.includes("grass"), JSON.stringify(boss?.seMoveTypes));
+  const tauros = eventOf(fresh, "zz-tauros")?.bosses || [];
+  const taurosForms = tauros.map((b) => `${b.form}=${b.types.join("/")}`).join(", ");
+  check("each Tauros breed in a raid-battles list resolves to its own form and types", taurosForms === [
+    `${ID(128)}_PALDEA_BLAZE=fighting/fire`, `${ID(128)}_PALDEA_AQUA=fighting/water`, `${ID(128)}_PALDEA_COMBAT=fighting`,
+  ].join(", "), taurosForms);
+  const zapdos = eventOf(fresh, "zz-zapdos");
+  check("a Shadow tier word ahead of the adjective is still the tier flag, and the rest still resolves",
+    zapdos?.isShadow === true && zapdos?.isMega === false && zapdos?.bosses?.[0]?.form === `${ID(145)}_GALARIAN` &&
+      zapdos?.bosses?.[0]?.types?.join("/") === "fighting/flying",
+    JSON.stringify({ isShadow: zapdos?.isShadow, isMega: zapdos?.isMega, boss: zapdos?.bosses?.[0] }));
+  check("a two-word species name after the adjective resolves in an event",
+    eventOf(fresh, "zz-mime")?.bosses?.[0]?.types?.join("/") === "ice/psychic");
+  const warned = fresh.unresolved === 1 && fresh.warnings.some((w) => w.includes(`"Paldean ${en(128)}"`));
+  check("a bare Paldean Tauros is skipped with a warning, never resolved to one breed or to Kanto Tauros",
+    !eventOf(fresh, "zz-bare-tauros") && warned, warned ? "" : fresh.warnings.join(" | "));
+
+  const maxes = quietly(() => buildEventMaxBattles(feed, { nameIdx, allTypes: LILY_TYPES, maxBattles: {}, now: NOW }));
+  const maxBoss = maxes.entries.find((e) => e.eventID === "zz-max")?.bosses?.[0];
+  check("a Max Battle title's regional adjective resolves through the same resolver",
+    maxBoss?.form === `${ID(58)}_HISUIAN` && maxBoss?.types?.join("/") === "fire/rock" && !maxBoss?.gigantamax,
+    JSON.stringify(maxBoss));
+
+  // A standing boss as lily-dex-api's currentList carries it. pokemon-go-api
+  // spells a regional form with the game master's enum, MAROWAK_ALOLA.
+  const lily = (dex, form, ...types) => ({ id: ID(dex), form, names: { English: en(dex) }, types });
+  const alolaStanding = run(deriveTiered({ lvl3: [lily(105, `${ID(105)}_ALOLA`, "Fire", "Ghost")] }, LILY_TYPES));
+  check("with Alolan Marowak standing in lvl3, the Raid Day dedupes by form",
+    !surfaced(alolaStanding).includes("zz-marowak") && alolaStanding.deduped === 1 && alolaStanding.unresolved === 1,
+    `${surfaced(alolaStanding)}; ${alolaStanding.deduped} deduped, ${alolaStanding.unresolved} unresolved`);
+  const kantoStanding = run(deriveTiered({ lvl3: [lily(105, ID(105), "Ground")] }, LILY_TYPES));
+  check("with Kanto Marowak standing (its bare id), the Alolan Raid Day is another battle and surfaces",
+    eventOf(kantoStanding, "zz-marowak")?.bosses?.[0]?.form === `${ID(105)}_ALOLA`, surfaced(kantoStanding));
+  const blazeStanding = run(deriveTiered({ lvl3: [lily(128, `${ID(128)}_PALDEA_BLAZE`, "Fighting", "Fire")] }, LILY_TYPES));
+  const leftBreeds = (eventOf(blazeStanding, "zz-tauros")?.bosses || []).map((b) => b.form).join(", ");
+  check("with Blaze Breed standing, the event keeps Aqua and Combat and drops Blaze",
+    leftBreeds === `${ID(128)}_PALDEA_AQUA, ${ID(128)}_PALDEA_COMBAT`, leftBreeds);
+  const shadowStanding = run(deriveTiered({ shadow_lvl5: [lily(145, `${ID(145)}_GALARIAN`, "Fighting", "Flying")] }, LILY_TYPES));
+  check("with Shadow Galarian Zapdos standing, the Shadow Raid Hour dedupes",
+    !surfaced(shadowStanding).includes("zz-zapdos") && shadowStanding.deduped === 1 && shadowStanding.unresolved === 1,
+    `${surfaced(shadowStanding)}; ${shadowStanding.deduped} deduped, ${shadowStanding.unresolved} unresolved`);
+
+  // Through the app: a regional boss builds a filter, and its name is the
+  // species' in every locale, from the dictionary, as D13 checks for formes.
+  const events = [...fresh.entries, ...maxes.entries];
+  const dataBoss = new Map(events.flatMap((e) => e.bosses.map((b) => [`${e.eventID}|${b.id}`, b])));
+  const raidBosses = { ...RAID_BOSSES, eventRaids: fresh.entries, eventMaxBattles: maxes.entries };
+  for (const loc of localeNames) {
+    const result = buildResult(loc, { raidBosses });
+    const groups = [...(result.eventRaidFilters || []), ...(result.eventMaxBattleFilters || [])];
+    const bad = groups.length === events.length ? [] : [`${groups.length} groups for ${events.length} events`];
+    for (const g of groups) {
+      for (const b of g.bosses || []) {
+        const dexKey = resolveSpeciesInfo(dataBoss.get(`${g.eventID}|${b.id}`)?.names?.en, "en")?.dexKey;
+        const expected = dexKey && POKEMON_NAMES_DICT[dexKey]?.[loc]?.toLowerCase();
+        if (b.skipped || !b.clause) bad.push(`${g.eventID}/${b.id}: empty filter`);
+        if (!expected || String(b.name).toLowerCase() !== expected) bad.push(`${g.eventID}/${b.id}: named "${b.name}", not "${expected}"`);
+      }
+    }
+    check(`${loc}: ${groups.length} regional event(s) build a filter per boss, named from the dictionary`,
+      groups.length > 0 && bad.length === 0, bad.slice(0, 4).join(" | "));
+  }
 }
 
 console.log(`\n${failures === 0 ? "✓ All data-filter property checks passed." : `✗ ${failures} failure(s).`}`);

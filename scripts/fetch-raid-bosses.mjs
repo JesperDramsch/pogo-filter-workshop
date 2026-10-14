@@ -347,6 +347,27 @@ function qualifierWords(qualifier) {
   return words;
 }
 
+// "alolan marowak", and "paldean tauros" out of "paldean tauros (blaze)": a
+// species name led by one word, as Leek Duck spells a regional boss.
+const LEADING_WORD = /^(\S+)\s+(.+)$/;
+
+// The head of one of the species' form suffixes that a leading adjective
+// names, or null. The head is a suffix's first word: ALOLA of ALOLA, PALDEA of
+// PALDEA_BLAZE. The adjective names it as itself ("Galarian" GALARIAN,
+// "Hisuian" HISUIAN) or with the English demonym's -n ("Alolan" ALOLA,
+// "Paldean" PALDEA). Read off the species' own suffixes rather than a list of
+// regions, so a region the game master adds resolves the batch it ships in,
+// and an adjective that heads no form of this species names nothing. A word
+// that heads a form which is not regional is read the same way, so "Origin
+// Giratina" is Giratina (Origin Forme).
+function formHeadNamed(adjective, species) {
+  for (const [suffix] of species.forms || []) {
+    const head = suffix.toLowerCase().split("_")[0];
+    if (adjective === head || adjective === `${head}n`) return head;
+  }
+  return null;
+}
+
 // Resolves a boss key through the name index to {id, form, types,
 // displayName}, or null. A bare species name is a plain lookup, so it stands
 // for the species' default form, and so is a temporary evolution's own name
@@ -355,24 +376,39 @@ function qualifierWords(qualifier) {
 // suffix words all appear in the qualifier wins, the longest such suffix if
 // several do, so "Incarnate" and "Incarnate Forme" both find
 // LANDORUS_INCARNATE and "Zen Mode" finds DARMANITAN_ZEN, not
-// DARMANITAN_GALARIAN_ZEN. A forme no form matches, or two match equally well,
-// stays unresolved: another form can carry other types, and a guessed form's
-// types build a counter filter for a different battle. The form enum and types
-// are the form's. The id and display name stay the species', so the boss keys
-// against lily-dex-api's species-level ids and the app names it through the
-// dictionary.
+// DARMANITAN_GALARIAN_ZEN. A regional adjective ahead of the name
+// (formHeadNamed) is one more qualifier word, and one the form must be headed
+// by: "Alolan Marowak" finds MAROWAK_ALOLA, "Paldean Tauros (Blaze)"
+// TAUROS_PALDEA_BLAZE, "Galarian Darmanitan (Zen Mode)"
+// DARMANITAN_GALARIAN_ZEN and never the Unova DARMANITAN_ZEN. A forme no form
+// matches, or two match equally well, stays unresolved: another form can carry
+// other types, and a guessed form's types build a counter filter for a
+// different battle. So does a bare "Paldean Tauros", whose region heads three
+// breeds and names none of them, and a Mega the index does not hold: no form
+// suffix is headed MEGA, so "mega gengar" names no form of Gengar. The form
+// enum and types are the form's. The id and display name stay the species',
+// so the boss keys against lily-dex-api's species-level ids and the app names
+// it through the dictionary.
 export function resolveBossKey(nameIdx, key) {
   const hit = nameIdx.get(key);
   if (hit) return hit;
-  const m = FORME_QUALIFIER.exec(key);
-  const species = m && nameIdx.get(m[1]);
-  if (!species) return null;
-  const words = qualifierWords(m[2]);
+  const bracket = FORME_QUALIFIER.exec(key);
+  const words = bracket ? qualifierWords(bracket[2]) : new Set();
+  let species = bracket && nameIdx.get(bracket[1]);
+  let head = null;
+  if (!species) {
+    const lead = LEADING_WORD.exec(bracket ? bracket[1] : key);
+    species = lead && nameIdx.get(lead[2]);
+    head = species && formHeadNamed(lead[1], species);
+    if (!head) return null;
+    words.add(head);
+  }
   let best = null;
   let bestLength = 0;
   let tied = false;
   for (const [suffix, variant] of species.forms || []) {
     const parts = suffix.toLowerCase().split("_");
+    if (head && parts[0] !== head) continue;
     if (!parts.every((p) => words.has(p))) continue;
     if (parts.length > bestLength) [best, bestLength, tied] = [variant, parts.length, false];
     else if (parts.length === bestLength) tied = true;
@@ -489,13 +525,13 @@ export function parseMaxEventBosses(event) {
 }
 
 // Resolves an event's boss names through the name index (resolveBossKey, so a
-// forme in brackets resolves too), drops the ones the standing rotation
-// already runs (isStanding, by form where both sides name one), and derives
-// the rest. Each pick is { name, key, dedupeKey(id), extra }: `name` as the
-// feed spelled it (for the warning), `key` the index key with any tier prefix
-// stripped, `extra` fields added to the derived boss. `standing` comes from
-// standingForms(). Returns `{bosses, status}` where status is
-// "ok" | "deduped" | "unresolved", which the caller logs.
+// forme in brackets and a regional adjective resolve too), drops the ones the
+// standing rotation already runs (isStanding, by form where both sides name
+// one), and derives the rest. Each pick is { name, key, dedupeKey(id), extra }:
+// `name` as the feed spelled it (for the warning), `key` the index key with
+// any tier prefix stripped, `extra` fields added to the derived boss.
+// `standing` comes from standingForms(). Returns `{bosses, status}` where
+// status is "ok" | "deduped" | "unresolved", which the caller logs.
 function resolveEventBosses(event, picks, nameIdx, allTypes, typeIdx, standing) {
   const bosses = [];
   let anyUnresolved = false;
