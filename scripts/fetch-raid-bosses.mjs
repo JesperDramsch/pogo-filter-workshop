@@ -20,6 +20,7 @@ import { writeFileSync, readFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  defaultFormByDex,
   fetchGameMaster,
   formSuffix,
   gameMasterAgeDays,
@@ -180,40 +181,104 @@ function nameKey(name) {
   return String(name).toLowerCase().replace(/[‘’ʼ]/g, "'").trim();
 }
 
-// Build a lowercase-name → {id, types} index from the game master, named via
-// this repo's own dictionary. The species-level template (no form) or the
-// NORMAL form wins where a dex has several form templates — we want canonical
-// non-form types for the derivation, not Alolan Meowth's.
+// Keep types in TitleCase ("Fire"/"Ground") to match the type index keys built
+// from the upstream typesArr — `eff()` lookups fail silently on case-mismatched
+// strings and would emit empty resistor/SE arrays. `lowerTypes()` inside
+// `deriveBoss` handles the lowercase emit shape.
+const titleTypes = (types) => types.map(t => t[0].toUpperCase() + t.slice(1));
+
+// Build a lowercase-name → {id, types, displayName, forms} index from the game
+// master, named via this repo's own dictionary. `types` are the types of the
+// template a bare species name stands for, picked in this order: the default
+// form the species' FORMS_ template lists first (see defaultFormByDex), the
+// form-less template, the NORMAL form, then the first template seen. So bare
+// "Meowth" gets Kanto Meowth's types, not Alolan Meowth's, and bare "Zacian"
+// gets Hero Zacian's, where the form-less template carries the Crowned ones.
+// `forms` maps every form suffix of the species (INCARNATE, CROWNED_SWORD,
+// ALOLA, …) to that form's types, for resolveBossKey.
 export function buildNameIndex(templates, names) {
+  const defaults = defaultFormByDex(templates);
+  const rank = (template, form) => {
+    if (template.form === defaults.get(template.dex)) return 0;
+    if (form === null) return 1;
+    return form === "NORMAL" ? 2 : 3;
+  };
   const byDex = new Map();
   for (const template of pokemonTemplates(templates)) {
     const types = typesOf(template.settings);
     if (types.length === 0) continue;
     const form = formSuffix(template);
-    // A later regional form must not displace a canonical one; a later
-    // canonical one may displace anything (bare and NORMAL agree on types).
-    const canonical = form === null || form === "NORMAL";
-    if (byDex.has(template.dex) && !canonical) continue;
-    byDex.set(template.dex, { template, types });
+    const r = rank(template, form);
+    let entry = byDex.get(template.dex);
+    if (!entry) byDex.set(template.dex, (entry = { template, types, rank: r, forms: new Map() }));
+    // Among equals the first template seen stays.
+    else if (r < entry.rank) Object.assign(entry, { template, types, rank: r });
+    if (form !== null) entry.forms.set(form, titleTypes(types));
   }
   const idx = new Map();
-  for (const [dex, { template, types }] of byDex) {
+  for (const [dex, { template, types, forms }] of byDex) {
     const name = names[String(dex)]?.en;
     if (!name) continue;
     idx.set(nameKey(name), {
       // The game's own species enum — TAPU_LELE, MR_MIME, HO_OH — which is the
       // convention lily-dex-api's boss ids follow, so the dedupe key built
-      // from these matches the standing-tier ids exactly.
+      // from these matches the standing-tier ids exactly. A form template
+      // carries the same enum, so a forme-suffixed boss dedupes the same way.
       id: template.settings.pokemonId,
-      // Keep types in TitleCase ("Fire"/"Ground") to match the type index
-      // keys built from the upstream typesArr — `eff()` lookups fail silently
-      // on case-mismatched strings and would emit empty resistor/SE arrays.
-      // `lowerTypes()` inside `deriveBoss` handles the lowercase emit shape.
-      types: types.map(t => t[0].toUpperCase() + t.slice(1)),
+      types: titleTypes(types),
       displayName: name,
+      forms,
     });
   }
   return idx;
+}
+
+// "landorus (incarnate)" from a raid-battles boss list, "giratina (origin
+// forme)" from a raid-hour title: a species name with its forme in brackets.
+const FORME_QUALIFIER = /^(.+?)\s*\(([^()]+)\)$/;
+
+// Every word of a forme qualifier, with any punctuation inside a word read
+// both ways, so "Pa'u" can meet PAU and "Rapid-Strike" RAPID_STRIKE.
+function qualifierWords(qualifier) {
+  const words = new Set();
+  for (const word of qualifier.split(/\s+/)) {
+    words.add(word.replace(/[^a-z0-9]/g, ""));
+    for (const part of word.split(/[^a-z0-9]+/)) words.add(part);
+  }
+  words.delete("");
+  return words;
+}
+
+// Resolves a boss key through the name index to {id, types, displayName}, or
+// null. A bare species name is a plain lookup. A forme in brackets resolves
+// against that species' own form suffixes in the game master: the form whose
+// suffix words all appear in the qualifier wins, the longest such suffix if
+// several do, so "Incarnate" and "Incarnate Forme" both find
+// LANDORUS_INCARNATE and "Zen Mode" finds DARMANITAN_ZEN, not
+// DARMANITAN_GALARIAN_ZEN. A forme no form matches, or two match equally well,
+// stays unresolved: another form can carry other types, and a guessed form's
+// types build a counter filter for a different battle. Only the types are the
+// form's. The id and display name stay the species', so the boss dedupes
+// against lily-dex-api's species-level ids and the app names it through the
+// dictionary.
+export function resolveBossKey(nameIdx, key) {
+  const hit = nameIdx.get(key);
+  if (hit) return hit;
+  const m = FORME_QUALIFIER.exec(key);
+  const species = m && nameIdx.get(m[1]);
+  if (!species) return null;
+  const words = qualifierWords(m[2]);
+  let best = null;
+  let bestLength = 0;
+  let tied = false;
+  for (const [suffix, types] of species.forms || []) {
+    const parts = suffix.toLowerCase().split("_");
+    if (!parts.every((p) => words.has(p))) continue;
+    if (parts.length > bestLength) [best, bestLength, tied] = [types, parts.length, false];
+    else if (parts.length === bestLength) tied = true;
+  }
+  if (!best || tied) return null;
+  return { id: species.id, types: best, displayName: species.displayName };
 }
 
 // Pulls boss name(s) and shadow/mega flags out of a ScrapedDuck event entry.
@@ -227,8 +292,10 @@ export function buildNameIndex(templates, names) {
 function parseEventBosses(event) {
   const title = event.name || "";
   // "Super Mega" is a community-day qualifier ("Falinks Super Mega Raid Day"),
-  // not a Mega-tier marker. Strip it before testing so it doesn't trip isMega.
-  const cleanTitle = title.replace(/\bSuper\s+Mega\b/gi, " ");
+  // not a Mega-tier marker, and a forme in brackets is part of a name
+  // ("Calyrex (Shadow Rider)"), not a Shadow one. Strip both before testing
+  // so neither trips a tier flag.
+  const cleanTitle = title.replace(/\bSuper\s+Mega\b/gi, " ").replace(/\([^()]*\)/g, " ");
   const isShadow = /\bShadow\b/i.test(cleanTitle);
   const isMega   = /\bMega\b/i.test(cleanTitle);
 
@@ -280,8 +347,9 @@ export function parseMaxEventBosses(event) {
   }));
 }
 
-// Resolves an event's boss names through the name index, drops the ones the
-// standing rotation already lists, and derives the rest. Each pick is
+// Resolves an event's boss names through the name index (resolveBossKey, so a
+// forme in brackets resolves too), drops the ones the standing rotation
+// already lists, and derives the rest. Each pick is
 // { name, key, dedupeKey(id), extra }: `name` as the feed spelled it (for the
 // warning), `key` the index key with any tier prefix stripped, `extra` fields
 // added to the derived boss. Returns `{bosses, status}` where status is
@@ -291,7 +359,7 @@ function resolveEventBosses(event, picks, nameIdx, allTypes, typeIdx, dedupeSet)
   let anyUnresolved = false;
   let anyDeduped = false;
   for (const { name, key, dedupeKey, extra } of picks) {
-    const hit = nameIdx.get(key);
+    const hit = resolveBossKey(nameIdx, key);
     if (!hit) {
       anyUnresolved = true;
       console.warn(`  ⚠ event "${event.name}": cannot resolve boss "${name}" — skipped`);
@@ -405,6 +473,16 @@ function surfaceEvents(eventsRaw, types, now, build) {
   // Chronological order so the UI can render top-down without re-sorting.
   entries.sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
   return { entries, deduped, unresolved };
+}
+
+// Event raids from ScrapedDuck's feed, deduped against the standing raid
+// tiers. Exported for check-data-filters.mjs, which runs a synthetic feed
+// through it, as it does through buildEventMaxBattles below.
+export function buildEventRaids(eventsRaw, { nameIdx, allTypes, raids, now = Date.now() }) {
+  const typeIdx = indexTypes(allTypes);
+  const dedupeSet = buildStandingDedupeSet(raids);
+  return surfaceEvents(eventsRaw, EVENT_RAID_TYPES, now,
+    (event) => buildEventEntry(event, nameIdx, allTypes, typeIdx, dedupeSet));
 }
 
 // Event Max Battles from ScrapedDuck's feed, deduped against lily-dex-api's
@@ -579,10 +657,8 @@ async function main() {
   if (nameIdx.size < 500) {
     return keepCacheOrExit(`species name index collapsed to ${nameIdx.size} entries — refusing to drop event bosses silently`);
   }
-  const dedupeSet = buildStandingDedupeSet(raids);
   const now = Date.now();
-  const raidEvents = surfaceEvents(eventsRaw, EVENT_RAID_TYPES, now,
-    (event) => buildEventEntry(event, nameIdx, typesArr, typeIdx, dedupeSet));
+  const raidEvents = buildEventRaids(eventsRaw, { nameIdx, allTypes: typesArr, raids, now });
   const eventRaids = raidEvents.entries;
   const maxEvents = buildEventMaxBattles(eventsRaw, { nameIdx, allTypes: typesArr, maxBattles, now });
   const eventMaxBattles = maxEvents.entries;
@@ -632,8 +708,8 @@ async function main() {
 }
 
 // Only run when executed directly — the offline checks import buildNameIndex,
-// guardEmptiedFamilies and the event Max Battle builders above without
-// triggering a fetch.
+// resolveBossKey, guardEmptiedFamilies and the event raid and Max Battle
+// builders above without triggering a fetch.
 import { pathToFileURL } from "node:url";
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((e) => {
