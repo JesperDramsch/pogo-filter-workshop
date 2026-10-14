@@ -1146,13 +1146,13 @@ function ClosingPunch({ t }) {
         }}
       >
         <p
-          className="mono text-base sm:text-lg leading-relaxed font-bold"
+          className="mono text-base sm:text-lg leading-relaxed sm:leading-7 font-bold"
           style={{ color: C.text }}
         >
           {t("app.algebra.s9.manifesto")}
         </p>
         <p
-          className="mono text-base sm:text-lg leading-relaxed font-bold mt-1"
+          className="mono text-base sm:text-lg leading-relaxed sm:leading-7 font-bold mt-1"
           style={{ color: C.cyan }}
         >
           {t("app.algebra.s9.manifesto_punch")}
@@ -1200,14 +1200,14 @@ export default function Algebra({ onNavigate }) {
           <HeroPill target="explain" />
         </div>
         <h1
-          className="mono text-3xl sm:text-4xl font-bold tracking-tight leading-tight"
+          className="mono text-3xl sm:text-4xl font-bold tracking-tight leading-tight sm:leading-10"
           style={{ color: C.text }}
         >
           {t("app.algebra.title")}{" "}
           <span style={{ color: C.cyan }}>{t("app.algebra.title_accent")}</span>
         </h1>
         <p
-          className="mt-4 text-sm sm:text-base max-w-xl mx-auto leading-relaxed"
+          className="mt-4 text-sm sm:text-base max-w-xl mx-auto leading-relaxed sm:leading-6"
           style={{ color: C.dim }}
         >
           {t("app.algebra.intro")}

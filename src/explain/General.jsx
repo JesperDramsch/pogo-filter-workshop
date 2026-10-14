@@ -216,7 +216,7 @@ function FinisherSection({ t, reducedMotion }) {
         {t("app.landing.finisher.heading")}
       </div>
       <p
-        className="text-lg sm:text-2xl leading-relaxed font-medium"
+        className="text-lg sm:text-2xl leading-relaxed sm:leading-8 font-medium"
         style={{ color: C.text }}
       >
         {t("app.landing.finisher.lead")}{" "}
@@ -311,14 +311,14 @@ export default function General({ onNavigate }) {
           <HeroPill target="explain" />
         </div>
         <h1
-          className="mono text-3xl sm:text-4xl font-bold tracking-tight leading-tight"
+          className="mono text-3xl sm:text-4xl font-bold tracking-tight leading-tight sm:leading-10"
           style={{ color: C.text }}
         >
           {t("app.landing.title")}{" "}
           <span style={{ color: C.red }}>{t("app.landing.title_accent")}</span>
         </h1>
         <p
-          className="mt-4 text-sm sm:text-base max-w-xl mx-auto leading-relaxed"
+          className="mt-4 text-sm sm:text-base max-w-xl mx-auto leading-relaxed sm:leading-6"
           style={{ color: C.dim }}
         >
           {t("app.landing.subtitle")}

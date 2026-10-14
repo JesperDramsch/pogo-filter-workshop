@@ -224,14 +224,14 @@ export default function Landing({ onNavigate }) {
               <HeroPill target="workshop" />
             </div>
             <h1
-              className="mono text-4xl sm:text-5xl font-bold tracking-tight leading-tight"
+              className="mono text-4xl sm:text-5xl font-bold tracking-tight leading-tight sm:leading-none"
               style={{ color: C.text }}
             >
               {t("app.landing.title")}{" "}
               <span style={{ color: C.red }}>{t("app.landing.title_accent")}</span>
             </h1>
             <p
-              className="mt-5 text-base sm:text-lg max-w-xl mx-auto leading-relaxed"
+              className="mt-5 text-base sm:text-lg max-w-xl mx-auto leading-relaxed sm:leading-7"
               style={{ color: C.dim }}
             >
               {t("app.landing.subtitle")}

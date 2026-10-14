@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+/* v3's font-size line heights were absolute (`text-xs` → 1rem); v4 made them
+   unitless ratios (`calc(1 / 0.75)`). Same result on the element itself, but
+   a ratio inherits as a ratio: the many `text-[10px]` labels nested in a
+   `text-xs` row would drop from 16px lines to 13.3px. Pin the v3 values so
+   inherited line heights stay as they were. (`text-5xl` is `1` in both.) */
+@theme {
+  --text-xs--line-height: 1rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl--line-height: 2.5rem;
+}
+
 /* Tailwind v3 Preflight defaults that v4 changed, restored so the UI looks the
    same after the upgrade (snippets from the v4 upgrade guide):
    - border colour: v4 defaults `border` / `divide` to currentColor, v3 used
