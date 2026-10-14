@@ -260,8 +260,10 @@ function withoutWords(words, remove) {
 
 // Index entries for the temporary evolutions, Mega and Primal, keyed by the
 // dictionary's own name for each. Event titles name a Mega by that name, and
-// a lettered one has nothing else to go by: "Mega Charizard X" with the tier
-// word stripped is "charizard x", which is no species.
+// buildEventEntry looks it up by that name. Stripped to its species, a Mega
+// took the base form's types (Mega Gyarados is water/dark, not water/flying),
+// and a lettered one found nothing at all: "Mega Charizard X" without the
+// tier word is "charizard x", which is no species.
 //
 // The game master carries a temporary evolution's types in its species'
 // tempEvoOverrides, on the default form's template, which is the one byDex
@@ -371,8 +373,8 @@ export function resolveBossKey(nameIdx, key) {
 // qualifier (which is not a Mega-tier marker) and the leading Shadow prefix
 // (which IS a tier flag), and split multi-boss titles like
 // "Buzzwole, Pheromosa, and Xurkitree Raid Hour". A leading Mega stays on the
-// name, as it is in a raid-battles boss list: it is part of a lettered Mega's
-// name, and buildEventEntry reads it off each name.
+// name, as it is in a raid-battles boss list: it is part of the Mega's name,
+// which buildEventEntry looks the boss up by.
 function parseEventBosses(event) {
   const title = event.name || "";
   // "Super Mega" is a community-day qualifier ("Falinks Super Mega Raid Day"),
@@ -473,18 +475,16 @@ function buildEventEntry(event, nameIdx, allTypes, typeIdx, dedupeSet) {
 
   // Dedupe against the standing tier rotation so e.g. Shadow Latios doesn't
   // appear twice (once in shadow_lvl5, once as a raid-battles event).
-  const picks = names.map((rawName) => {
-    const named = nameKey(rawName).replace(/^shadow\s+/i, "").trim();
-    const bare = named.replace(/^mega\s+/i, "").trim();
-    return {
-      name: rawName,
-      // The species name first, as a Mega has always been looked up, and the
-      // Mega's own name only when that finds nothing: "charizard x" is no
-      // species, "mega charizard x" is in the index (see tempEvoEntries).
-      key: bare === named || resolveBossKey(nameIdx, bare) ? bare : named,
-      dedupeKey: (id) => `${id}|${isShadow ? "S" : ""}|${isMega ? "M" : ""}`,
-    };
-  });
+  // Shadow is only a tier word, so it goes. Mega stays: a Mega is looked up
+  // by its own name, "mega gyarados", which the index holds with the Mega's
+  // types (see tempEvoEntries). Stripped to its species, it would take the
+  // base form's: water/flying for Mega Gyarados, which is water/dark. A Mega
+  // the index does not hold stays unresolved rather than getting those.
+  const picks = names.map((rawName) => ({
+    name: rawName,
+    key: nameKey(rawName).replace(/^shadow\s+/i, "").trim(),
+    dedupeKey: (id) => `${id}|${isShadow ? "S" : ""}|${isMega ? "M" : ""}`,
+  }));
   const { bosses, status } = resolveEventBosses(event, picks, nameIdx, allTypes, typeIdx, dedupeSet);
   if (bosses.length === 0) return { entry: null, status };
   return {

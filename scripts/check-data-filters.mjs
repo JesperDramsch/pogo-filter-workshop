@@ -34,10 +34,11 @@
 //         skipped, never guessed
 //   D14 — boss boxes that share an id within one list (Mega Charizard X and Y
 //         are both CHARIZARD) still get distinct React and copy keys
-//   D15 — a lettered Mega ("Mega Charizard X") resolves to its species' id
-//         and the Mega's own types, joined from the game master's
-//         tempEvoOverrides to the dictionary's name by words; a Mega the
-//         game master has no override for is skipped, never guessed
+//   D15 — an event Mega, lettered ("Mega Charizard X") or plain ("Mega
+//         Gyarados"), resolves to its species' id and the Mega's own types,
+//         joined from the game master's tempEvoOverrides to the dictionary's
+//         name by words; a Mega the game master has no override for is
+//         skipped, never given the base form's types
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
@@ -1014,14 +1015,16 @@ console.log("\nD14 — boss boxes that share an id within one list get distinct 
     JSON.stringify(pairKeys));
 }
 
-console.log("\nD15 — a lettered Mega resolves to its species and the Mega's own types");
+console.log("\nD15 — an event Mega resolves to its species and the Mega's own types");
 {
   // ScrapedDuck listed "Mega Charizard X and Mega Charizard Y in Mega Raids"
   // for 2026-10-21 to 10-27. On 2026-10-14, inside the 7-day window, the
   // fetcher skipped both bosses: with the tier word stripped, "Charizard X" is
-  // no species name. The index now holds each temporary evolution under the
-  // dictionary's name for it, with the types the game master's
-  // tempEvoOverrides give it. The templates are laid out as in the 2026-10-13
+  // no species name. A plain Mega did resolve that way, to the base form's
+  // types: water/flying for Mega Gyarados, which is water/dark. The index now
+  // holds each temporary evolution under the dictionary's name for it, with
+  // the types the game master's tempEvoOverrides give it, and an event Mega is
+  // looked up by that name. The templates are laid out as in the 2026-10-13
   // game master: the overrides sit on the form-less template and on the
   // default form's alike, and some carry no tempEvoId at all.
   const DAY = 24 * 60 * 60 * 1000;
@@ -1053,9 +1056,13 @@ console.log("\nD15 — a lettered Mega resolves to its species and the Mega's ow
   const nameIdx = buildNameIndex([
     ...species(6, ["FIRE", "FLYING"], [evo("MEGA_X", "FIRE", "DRAGON"), evo("MEGA_Y", "FIRE", "FLYING"), {}]),
     ...species(150, ["PSYCHIC"], [evo("MEGA_X", "PSYCHIC", "FIGHTING"), evo("MEGA_Y", "PSYCHIC")]),
+    ...species(130, ["WATER", "FLYING"], [evo("MEGA", "WATER", "DARK")]),
     // The dictionary also names a Mega Absol Z (359_2), which no override
     // matches.
     ...species(359, ["DARK"], [evo("MEGA", "DARK")]),
+    // The dictionary names a Mega Clefable (36_1); the 2026-10-13 game master
+    // carries no override for it.
+    ...species(36, ["FAIRY"], undefined),
     ...species(383, ["GROUND"], [evo("PRIMAL", "GROUND", "FIRE")]),
   ], POKEMON_NAMES_DICT);
   const key = (dexKey) => en(dexKey).toLowerCase();
@@ -1065,10 +1072,13 @@ console.log("\nD15 — a lettered Mega resolves to its species and the Mega's ow
     [key("6_2"), "Fire/Dragon", "a lettered Mega, under the dictionary's name for it"],
     [key("6_3"), "Fire/Flying", "its sibling, with the other override's types"],
     [key("150_2"), "Psychic/Fighting", "another lettered Mega"],
+    [key("130_1"), "Water/Dark", "a plain Mega, with the Mega's types, not the base form's"],
     [key("383_4"), "Ground/Fire", "a Primal, joined by the same words"],
     [key(6), "Fire/Flying", "the species itself keeps the default form's types"],
+    [key(130), "Water/Flying", "and so does a plain Mega's species"],
     [`${key(6)} x`, "unresolved", "the name with its tier word stripped, which is no species"],
-    [key("359_2"), "unresolved", "a Mega the game master has no override for"],
+    [key("359_2"), "unresolved", "a lettered Mega the game master has no override for"],
+    [key("36_1"), "unresolved", "a plain Mega the game master has no override for"],
   ];
   for (const [k, want, why] of cases) {
     const got = typesOf(resolveBossKey(nameIdx, k));
@@ -1090,7 +1100,9 @@ console.log("\nD15 — a lettered Mega resolves to its species and the Mega's ow
   const feed = [
     ev("zz-xy", "raid-battles", `${en("6_2")} and ${en("6_3")} in Mega Raids`, [en("6_2"), en("6_3")]),
     ev("zz-raid-day", "raid-day", `${en("150_2")} Raid Day`, null, NOW + DAY),
+    ev("zz-gyarados", "raid-battles", `${en("130_1")} in Mega Raids`, [en("130_1")], NOW - HOUR),
     ev("zz-z", "raid-battles", `${en("359_2")} in Mega Raids`, [en("359_2")], NOW + 2 * DAY),
+    ev("zz-clefable", "raid-battles", `${en("36_1")} in Mega Raids`, [en("36_1")], NOW + 3 * DAY),
   ];
   const quietly = (build) => {
     const warnings = [];
@@ -1119,42 +1131,60 @@ console.log("\nD15 — a lettered Mega resolves to its species and the Mega's ow
   const raidDay = raidEvent("zz-raid-day")?.bosses?.[0];
   check("a lettered Mega in a raid-day title resolves too",
     raidDay?.types?.join("/") === "psychic/fighting" && raidDay?.names?.en === en("150_2"), JSON.stringify(raidDay));
-  const warned = raids.unresolved === 1 && raids.warnings.some((w) => w.includes(`"${en("359_2")}"`));
-  check("a Mega the game master has no override for is skipped with a warning, never given the species' types",
-    !raidEvent("zz-z") && warned, warned ? "" : raids.warnings.join(" | "));
+  // Fighting hits Mega Gyarados' dark side and is resisted by the base form's
+  // flying one; rock is the other way round, resisted by water and neutral on
+  // dark. So the counters tell the Mega from the base form.
+  const gyarados = raidEvent("zz-gyarados")?.bosses?.[0];
+  check("a plain Mega is named and typed as the Mega, not its base form, under its species' id",
+    gyarados?.id === nameIdx.get(key(130))?.id && gyarados?.names?.en === en("130_1") &&
+      gyarados?.types?.join("/") === "water/dark" && gyarados.seMoveTypes.includes("fighting") &&
+      !gyarados.seMoveTypes.includes("rock"),
+    JSON.stringify(gyarados && { names: gyarados.names, types: gyarados.types, se: gyarados.seMoveTypes }));
+  const skipped = ["359_2", "36_1"].filter((k) => raids.warnings.some((w) => w.includes(`"${en(k)}"`)));
+  check("a lettered and a plain Mega the game master has no override for are skipped with a warning, never given the species' types",
+    !raidEvent("zz-z") && !raidEvent("zz-clefable") && raids.unresolved === 2 && skipped.length === 2,
+    `${raids.unresolved} unresolved; ${raids.warnings.join(" | ")}`);
   const standingKeys = Object.keys(Object.values(RAID_BOSSES.raids)[0][0]).sort().join(",");
   check(`Mega bosses have the standing tiers' shape (${standingKeys}); no index internals leak`,
     raids.entries.flatMap((e) => e.bosses).every((b) => Object.keys(b).sort().join(",") === standingKeys));
 
   // Dedupe stays the species' id with the Mega flag: lily-dex-api's standing
-  // mega tier lists Mega Raichu X as RAICHU, so a standing Mega Charizard is
-  // CHARIZARD there. A standing non-Mega Charizard is a different battle.
+  // mega tier lists Mega Raichu X as RAICHU and Mega Gyarados as GYARADOS. A
+  // standing non-Mega of the species is a different battle.
   const dedupedBy = (standing) =>
     quietly(() => buildEventRaids(feed, { nameIdx, allTypes: LILY_TYPES, raids: standing, now: NOW }));
-  const megaTier = dedupedBy({ mega: [{ id: x?.id }] });
-  const lvl5 = dedupedBy({ lvl5: [{ id: x?.id }] });
-  check("with Charizard standing in the mega tier the event dedupes; in lvl5 it does not",
-    !megaTier.entries.some((e) => e.eventID === "zz-xy") && megaTier.deduped === 1 &&
-      lvl5.entries.some((e) => e.eventID === "zz-xy"),
+  const megaTier = dedupedBy({ mega: [{ id: x?.id }, { id: gyarados?.id }] });
+  const lvl5 = dedupedBy({ lvl5: [{ id: x?.id }, { id: gyarados?.id }] });
+  const surfaced = (run, id) => run.entries.some((e) => e.eventID === id);
+  check("with Charizard and Gyarados standing in the mega tier their events dedupe; in lvl5 they do not",
+    !surfaced(megaTier, "zz-xy") && !surfaced(megaTier, "zz-gyarados") && megaTier.deduped === 2 &&
+      surfaced(lvl5, "zz-xy") && surfaced(lvl5, "zz-gyarados"),
     `${megaTier.deduped} deduped against mega, ${lvl5.entries.length} surfaced against lvl5`);
 
   // Through the app: each Mega is named from its own dictionary entry in every
-  // locale, not the species', builds its own filter, and the two key apart.
+  // locale, not the species', and builds its own filter; X and Y key apart.
   // The strict lookup, since pokemonNameFor falls back to English.
   const raidBosses = { ...RAID_BOSSES, eventRaids: raids.entries };
+  const expectedKeys = { "zz-xy": ["6_2", "6_3"], "zz-gyarados": ["130_1"] };
   for (const loc of localeNames) {
-    const group = (buildResult(loc, { raidBosses }).eventRaidFilters || []).find((g) => g.eventID === "zz-xy");
-    const bad = (group?.bosses || []).length === 2 ? [] : [`${(group?.bosses || []).length} bosses`];
-    (group?.bosses || []).forEach((b, i) => {
-      const dexKey = resolveSpeciesInfo([megaX, megaY][i]?.names?.en, "en")?.dexKey;
-      const expected = POKEMON_NAMES_DICT[["6_2", "6_3"][i]]?.[loc]?.toLowerCase();
-      if (dexKey !== ["6_2", "6_3"][i]) bad.push(`${b.id}: resolves to dictionary key ${dexKey}`);
-      if (b.skipped || !b.clause) bad.push(`${b.id}: empty filter`);
-      if (!expected || String(b.name).toLowerCase() !== expected) bad.push(`${b.id}: named "${b.name}", not "${expected}"`);
-    });
-    if (group && group.bosses[0]?.clause === group.bosses[1]?.clause) bad.push("X and Y build the same filter");
-    if (group && new Set(bossBoxKeys(group.bosses)).size !== 2) bad.push("X and Y share a key");
-    check(`${loc}: Mega Charizard X and Y build their own filters, named from the dictionary, keyed apart`,
+    const groups = buildResult(loc, { raidBosses }).eventRaidFilters || [];
+    const bad = [];
+    for (const [eventID, dictKeys] of Object.entries(expectedKeys)) {
+      const group = groups.find((g) => g.eventID === eventID);
+      const data = raidEvent(eventID)?.bosses || [];
+      if ((group?.bosses || []).length !== dictKeys.length) bad.push(`${eventID}: ${(group?.bosses || []).length} bosses`);
+      (group?.bosses || []).forEach((b, i) => {
+        const dexKey = resolveSpeciesInfo(data[i]?.names?.en, "en")?.dexKey;
+        const expected = POKEMON_NAMES_DICT[dictKeys[i]]?.[loc]?.toLowerCase();
+        if (dexKey !== dictKeys[i]) bad.push(`${b.id}: resolves to dictionary key ${dexKey}`);
+        if (b.skipped || !b.clause) bad.push(`${b.id}: empty filter`);
+        if (!expected || String(b.name).toLowerCase() !== expected) bad.push(`${b.id}: named "${b.name}", not "${expected}"`);
+      });
+    }
+    const xy = groups.find((g) => g.eventID === "zz-xy");
+    if (xy && xy.bosses[0]?.clause === xy.bosses[1]?.clause) bad.push("X and Y build the same filter");
+    if (xy && new Set(bossBoxKeys(xy.bosses)).size !== 2) bad.push("X and Y share a key");
+    check(`${loc}: Mega Charizard X, Y and Mega Gyarados build their own filters, named from the dictionary`,
       bad.length === 0, bad.slice(0, 4).join(" | "));
   }
 }
