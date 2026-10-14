@@ -65,7 +65,7 @@ function SyntaxCheatsheet({ t }) {
             style={{ gridTemplateColumns: "auto 1fr auto" }}
           >
             <span
-              className="mono text-base font-bold px-3 py-1.5 rounded shrink-0 text-center"
+              className="mono text-base font-bold px-3 py-1.5 rounded-sm shrink-0 text-center"
               style={{
                 backgroundColor: `${row.color}20`,
                 color: row.color,
@@ -77,7 +77,7 @@ function SyntaxCheatsheet({ t }) {
             </span>
             <span className="text-sm" style={{ color: C.text }}>{row.label}</span>
             <span
-              className="mono text-xs px-2 py-1 rounded"
+              className="mono text-xs px-2 py-1 rounded-sm"
               style={{
                 backgroundColor: C.bg,
                 color: C.dim,
@@ -127,7 +127,7 @@ function InversionPanels({ t }) {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.4 }}
-          className="rounded p-4 text-center"
+          className="rounded-sm p-4 text-center"
           style={{
             backgroundColor: `${C.cyan}10`,
             border: `1px solid ${C.cyan}40`,
@@ -156,7 +156,7 @@ function InversionPanels({ t }) {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="rounded p-4 text-center"
+          className="rounded-sm p-4 text-center"
           style={{
             backgroundColor: `${C.red}10`,
             border: `1px solid ${C.red}40`,
@@ -225,14 +225,14 @@ function SetAlgebraDefs({ t }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.3, delay: i * 0.08 }}
-          className="rounded p-4 flex gap-3 items-start"
+          className="rounded-sm p-4 flex gap-3 items-start"
           style={{
             backgroundColor: `${d.color}0d`,
             border: `1px solid ${d.color}33`,
           }}
         >
           <span
-            className="mono font-bold shrink-0 px-2.5 py-1 rounded text-center"
+            className="mono font-bold shrink-0 px-2.5 py-1 rounded-sm text-center"
             style={{
               backgroundColor: `${d.color}26`,
               color: d.color,
@@ -403,7 +403,7 @@ function WorkedExample({ t }) {
               <span style={{ color: C.dim }}>=</span>
               <span style={{ color: C.text }}>{r.desc}</span>
               <span
-                className="px-2 py-0.5 rounded"
+                className="px-2 py-0.5 rounded-sm"
                 style={{
                   backgroundColor: `${r.color}1f`,
                   color: r.color,
@@ -464,7 +464,7 @@ function WorkedExample({ t }) {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.4, delay: 1.1 }}
-          className="rounded p-3 flex items-center gap-2 mono"
+          className="rounded-sm p-3 flex items-center gap-2 mono"
           style={{
             backgroundColor: `${C.cyan}0d`,
             border: `1.5px solid ${C.cyan}66`,
@@ -654,7 +654,7 @@ function TradeSymmetric({ t }) {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, margin: "-40px" }}
         transition={{ duration: 0.4 }}
-        className="rounded p-4 text-center"
+        className="rounded-sm p-4 text-center"
         style={{ backgroundColor: `${C.red}10`, border: `1px solid ${C.red}40` }}
       >
         <div className="mono text-[10px] uppercase tracking-wider mb-1" style={{ color: C.dim }}>
@@ -672,7 +672,7 @@ function TradeSymmetric({ t }) {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, margin: "-40px" }}
         transition={{ duration: 0.4, delay: 0.15 }}
-        className="rounded p-4 text-center"
+        className="rounded-sm p-4 text-center"
         style={{ backgroundColor: `${C.cyan}10`, border: `1px solid ${C.cyan}40` }}
       >
         <div className="mono text-[10px] uppercase tracking-wider mb-1" style={{ color: C.dim }}>
@@ -737,7 +737,7 @@ function SearchBoxResult({ value, delay = 0.6 }) {
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.4, delay }}
-      className="rounded p-3 flex items-center gap-2 mono"
+      className="rounded-sm p-3 flex items-center gap-2 mono"
       style={{
         backgroundColor: `${C.cyan}0d`,
         border: `1.5px solid ${C.cyan}66`,
@@ -1049,7 +1049,7 @@ function MoveCard({ label, color, formula, caption, delay }) {
         {label}
       </div>
       <div
-        className="mono text-base font-bold flex items-center justify-center py-2 rounded"
+        className="mono text-base font-bold flex items-center justify-center py-2 rounded-sm"
         style={{
           backgroundColor: C.bg,
           color: C.text,
@@ -1146,13 +1146,13 @@ function ClosingPunch({ t }) {
         }}
       >
         <p
-          className="mono text-base sm:text-lg leading-relaxed font-bold"
+          className="mono text-base sm:text-lg leading-relaxed sm:leading-7 font-bold"
           style={{ color: C.text }}
         >
           {t("app.algebra.s9.manifesto")}
         </p>
         <p
-          className="mono text-base sm:text-lg leading-relaxed font-bold mt-1"
+          className="mono text-base sm:text-lg leading-relaxed sm:leading-7 font-bold mt-1"
           style={{ color: C.cyan }}
         >
           {t("app.algebra.s9.manifesto_punch")}
@@ -1200,14 +1200,14 @@ export default function Algebra({ onNavigate }) {
           <HeroPill target="explain" />
         </div>
         <h1
-          className="mono text-3xl sm:text-4xl font-bold tracking-tight leading-tight"
+          className="mono text-3xl sm:text-4xl font-bold tracking-tight leading-tight sm:leading-10"
           style={{ color: C.text }}
         >
           {t("app.algebra.title")}{" "}
           <span style={{ color: C.cyan }}>{t("app.algebra.title_accent")}</span>
         </h1>
         <p
-          className="mt-4 text-sm sm:text-base max-w-xl mx-auto leading-relaxed"
+          className="mt-4 text-sm sm:text-base max-w-xl mx-auto leading-relaxed sm:leading-6"
           style={{ color: C.dim }}
         >
           {t("app.algebra.intro")}

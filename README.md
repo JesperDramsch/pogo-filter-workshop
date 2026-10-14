@@ -56,7 +56,7 @@ This uses the `gh-pages` package to push `dist/` to a `gh-pages` branch. Set Pag
 ## Stack
 
 - **Vite** + React 18
-- **Tailwind CSS** (JIT, scans JSX directly)
+- **Tailwind CSS 4** via `@tailwindcss/vite` (scans JSX directly; CSS-first config in `src/index.css`, no `tailwind.config.js`)
 - **d3-geo** for map projection
 - **lucide-react** for icons
 - **localStorage** for state persistence (no backend, fully client-side)

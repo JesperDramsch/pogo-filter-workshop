@@ -275,7 +275,7 @@ export function WorkshopNav({ currentStepKey, onStepClick, onSettingsClick, onNa
       extras={
         <button
           onClick={onSettingsClick}
-          className="mono text-xs flex items-center gap-1.5 px-2.5 py-1.5 rounded transition"
+          className="mono text-xs flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm transition"
           style={{
             backgroundColor: "transparent",
             color: C.dim,
@@ -336,7 +336,7 @@ function NavChip({ icon: Icon, label, onClick, tone, current = false, iconRight 
     <button
       onClick={onClick}
       aria-current={current ? "page" : undefined}
-      className="mono text-xs flex items-center gap-1.5 px-2.5 py-1.5 rounded transition"
+      className="mono text-xs flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm transition"
       style={{
         backgroundColor: styles.bg,
         color: styles.fg,
@@ -479,7 +479,7 @@ export function ChapterShell({ currentKey, onNavigate, children }) {
           <div className="text-center">
             <button
               onClick={() => onNavigate("workshop")}
-              className="mono text-sm font-bold px-5 py-2.5 rounded transition inline-flex items-center gap-2"
+              className="mono text-sm font-bold px-5 py-2.5 rounded-sm transition inline-flex items-center gap-2"
               style={{ backgroundColor: C.red, color: "#fff" }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#FF5A4A")}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = C.red)}

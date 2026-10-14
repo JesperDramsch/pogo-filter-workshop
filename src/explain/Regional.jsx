@@ -100,7 +100,7 @@ function MapStrip({ act, t, reducedMotion }) {
           return (
             <div
               key={key}
-              className="rounded p-2 text-center transition-all"
+              className="rounded-sm p-2 text-center transition-all"
               style={{
                 backgroundColor: `${color}${isHome ? "26" : "12"}`,
                 border: `1px solid ${color}${isHome ? "70" : "40"}`,
@@ -197,13 +197,13 @@ export default function Regional({ onNavigate }) {
           <HeroPill target="explain" />
         </div>
         <h1
-          className="mono text-3xl sm:text-4xl font-bold tracking-tight leading-tight"
+          className="mono text-3xl sm:text-4xl font-bold tracking-tight leading-tight sm:leading-10"
           style={{ color: C.text }}
         >
           {t("app.landing.regional.intro_heading")}
         </h1>
         <p
-          className="mt-4 text-sm sm:text-base max-w-xl mx-auto leading-relaxed"
+          className="mt-4 text-sm sm:text-base max-w-xl mx-auto leading-relaxed sm:leading-6"
           style={{ color: C.dim }}
         >
           {t("app.landing.regional.intro_body")}
