@@ -1,9 +1,10 @@
 {
-  "fetchedAt": "2026-10-12T16:58:45.243Z",
+  "fetchedAt": "2026-10-14T12:02:40.040Z",
   "raids": {
     "mega": [
       {
         "id": "BLASTOISE",
+        "form": "BLASTOISE_MEGA",
         "names": {
           "en": "Mega Blastoise",
           "de": "Mega-Turtok",
@@ -30,6 +31,7 @@
     "lvl5": [
       {
         "id": "YVELTAL",
+        "form": "YVELTAL",
         "names": {
           "en": "Yveltal",
           "de": "Yveltal",
@@ -61,6 +63,7 @@
     "lvl3": [
       {
         "id": "STARMIE",
+        "form": "STARMIE",
         "names": {
           "en": "Starmie",
           "de": "Starmie",
@@ -92,6 +95,7 @@
       },
       {
         "id": "UMBREON",
+        "form": "UMBREON",
         "names": {
           "en": "Umbreon",
           "de": "Nachtara",
@@ -117,6 +121,7 @@
       },
       {
         "id": "GOTHITELLE",
+        "form": "GOTHITELLE",
         "names": {
           "en": "Gothitelle",
           "de": "Morbitesse",
@@ -144,6 +149,7 @@
     "lvl1": [
       {
         "id": "CLEFAIRY",
+        "form": "CLEFAIRY",
         "names": {
           "en": "Clefairy",
           "de": "Piepi",
@@ -168,6 +174,7 @@
       },
       {
         "id": "TEDDIURSA",
+        "form": "TEDDIURSA",
         "names": {
           "en": "Teddiursa",
           "de": "Teddiursa",
@@ -191,6 +198,7 @@
       },
       {
         "id": "ELGYEM",
+        "form": "ELGYEM",
         "names": {
           "en": "Elgyem",
           "de": "Pygraulon",
@@ -216,6 +224,7 @@
       },
       {
         "id": "AMAURA",
+        "form": "AMAURA",
         "names": {
           "en": "Amaura",
           "de": "Amarino",
@@ -247,6 +256,7 @@
     "shadow_lvl5": [
       {
         "id": "LANDORUS",
+        "form": "LANDORUS_INCARNATE",
         "names": {
           "en": "Landorus (Incarnate Forme)",
           "de": "Demeteros (Inkarnationsform)",
@@ -272,6 +282,7 @@
     "shadow_lvl3": [
       {
         "id": "PRIMEAPE",
+        "form": "PRIMEAPE",
         "names": {
           "en": "Primeape",
           "de": "Rasaff",
@@ -300,6 +311,7 @@
       },
       {
         "id": "KIRLIA",
+        "form": "KIRLIA",
         "names": {
           "en": "Kirlia",
           "de": "Kirlia",
@@ -326,6 +338,7 @@
       },
       {
         "id": "DRAPION",
+        "form": "DRAPION",
         "names": {
           "en": "Drapion",
           "de": "Piondragi",
@@ -355,6 +368,7 @@
     "shadow_lvl1": [
       {
         "id": "GASTLY",
+        "form": "GASTLY",
         "names": {
           "en": "Gastly",
           "de": "Nebulak",
@@ -385,6 +399,7 @@
       },
       {
         "id": "TOTODILE",
+        "form": "TOTODILE",
         "names": {
           "en": "Totodile",
           "de": "Karnimani",
@@ -409,6 +424,7 @@
       },
       {
         "id": "SHIELDON",
+        "form": "SHIELDON",
         "names": {
           "en": "Shieldon",
           "de": "Schilterus",
@@ -437,6 +453,7 @@
       },
       {
         "id": "GIBLE",
+        "form": "GIBLE",
         "names": {
           "en": "Gible",
           "de": "Kaumalat",
@@ -477,6 +494,7 @@
       "bosses": [
         {
           "id": "DIALGA",
+          "form": "DIALGA_NORMAL",
           "names": {
             "en": "Dialga"
           },
@@ -508,8 +526,9 @@
       "bosses": [
         {
           "id": "DRAGONITE",
+          "form": null,
           "names": {
-            "en": "Dragonite"
+            "en": "Mega Dragonite"
           },
           "types": [
             "dragon",
@@ -541,6 +560,7 @@
       "bosses": [
         {
           "id": "DIALGA",
+          "form": "DIALGA_NORMAL",
           "names": {
             "en": "Dialga"
           },
@@ -557,6 +577,133 @@
           "seMoveTypes": [
             "fighting",
             "ground"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-charizard-x-mega-charizard-y-in-mega-raids-october-2026",
+      "name": "Mega Charizard X and Mega Charizard Y in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-10-21T06:00:00.000",
+      "end": "2026-10-27T22:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "CHARIZARD",
+          "form": null,
+          "names": {
+            "en": "Mega Charizard X"
+          },
+          "types": [
+            "fire",
+            "dragon"
+          ],
+          "resistorTypes": [
+            "rock",
+            "fire",
+            "water",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "ground",
+            "rock",
+            "dragon"
+          ]
+        },
+        {
+          "id": "CHARIZARD",
+          "form": null,
+          "names": {
+            "en": "Mega Charizard Y"
+          },
+          "types": [
+            "fire",
+            "flying"
+          ],
+          "resistorTypes": [
+            "rock",
+            "fire",
+            "water",
+            "electric",
+            "dragon"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "water",
+            "electric"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "palkia-in-5-star-raid-battles-october-2026",
+      "name": "Palkia in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-10-21T06:00:00.000",
+      "end": "2026-10-27T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "PALKIA",
+          "form": "PALKIA_NORMAL",
+          "names": {
+            "en": "Palkia"
+          },
+          "types": [
+            "water",
+            "dragon"
+          ],
+          "resistorTypes": [
+            "steel",
+            "water",
+            "grass",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "dragon",
+            "fairy"
+          ]
+        }
+      ]
+    }
+  ],
+  "eventMaxBattles": [
+    {
+      "eventID": "max-mondays-2026-10-19",
+      "name": "Dynamax Sneasel during Max Monday",
+      "eventType": "max-mondays",
+      "start": "2026-10-19T06:00:00.000",
+      "end": "2026-10-19T21:00:00.000",
+      "bosses": [
+        {
+          "id": "SNEASEL",
+          "form": "SNEASEL_NORMAL",
+          "names": {
+            "en": "Sneasel"
+          },
+          "types": [
+            "dark",
+            "ice"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "steel",
+            "fire",
+            "water",
+            "ice",
+            "dark",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "rock",
+            "bug",
+            "steel",
+            "fire",
+            "fairy"
           ]
         }
       ]

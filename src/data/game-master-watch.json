@@ -1,11 +1,24 @@
 {
-  "fetchedAt": "2026-10-11T15:34:02.794Z",
+  "fetchedAt": "2026-10-14T12:02:44.844Z",
   "sources": {
     "pvp": "pvpoke-gamemaster",
     "pve": "alexelgt/game_masters",
-    "pveBatch": "2026-10-10T20:46:48.383Z"
+    "pveBatch": "2026-10-13T15:50:39.332Z"
   },
   "history": [
+    {
+      "at": "2026-10-14T12:02:44.844Z",
+      "stream": "pve",
+      "summary": "1 move(s) changed",
+      "changes": [
+        {
+          "move": "VM_MOVE_TEMP_EVOLUTION_MEGA_V0310_POKEMON_MANECTRIC",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        }
+      ]
+    },
     {
       "at": "2026-09-18T13:33:21.589Z",
       "stream": "pve",
@@ -5433,6 +5446,12 @@
       "durationMs": 3000,
       "energyDelta": -100,
       "pokemonType": "POKEMON_TYPE_DARK"
+    },
+    "VM_MOVE_TEMP_EVOLUTION_MEGA_V0310_POKEMON_MANECTRIC": {
+      "power": 150,
+      "durationMs": 2500,
+      "energyDelta": -100,
+      "pokemonType": "POKEMON_TYPE_ELECTRIC"
     },
     "VM_MOVE_TEMP_EVOLUTION_MEGA_V0398_POKEMON_STARAPTOR": {
       "power": 150,
