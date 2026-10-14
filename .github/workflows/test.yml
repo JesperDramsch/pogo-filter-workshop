@@ -15,7 +15,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # GitHub does not reject a misspelled `steps.x` or `inputs.x`; it reads
       # as empty. In sync-data.yml's OUTCOMES list that lets a fetch fail
       # without the run going red, which is the only alert the sync has.
@@ -41,7 +41,7 @@ jobs:
       # so nothing flags it at end of life. Keep it on an LTS that the engines
       # fields in package-lock.json accept (vite, vite-node, rolldown, sharp),
       # and raise "engines" in package.json along with it.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
