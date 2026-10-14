@@ -55,7 +55,7 @@ function Legend({ phase, t }) {
         return (
           <span
             key={role.key}
-            className="mono text-[11px] px-2.5 py-1 rounded inline-flex items-center gap-1.5 transition-all"
+            className="mono text-[11px] px-2.5 py-1 rounded-sm inline-flex items-center gap-1.5 transition-all"
             style={{
               backgroundColor: `${role.color}${active ? "26" : "12"}`,
               color: active ? role.color : C.dim,
@@ -86,7 +86,7 @@ function PhaseLabel({ phase, t }) {
   else if (phase === 6) key = "app.landing.demo.phase_trash";
   return (
     <div
-      className="mono text-xs uppercase tracking-wider min-h-[1.25rem] mt-4 text-center"
+      className="mono text-xs uppercase tracking-wider min-h-5 mt-4 text-center"
       style={{ color: C.dim }}
     >
       {key ? t(key) : "\u00A0"}
@@ -224,14 +224,14 @@ export default function Landing({ onNavigate }) {
               <HeroPill target="workshop" />
             </div>
             <h1
-              className="mono text-4xl sm:text-5xl font-bold tracking-tight leading-tight"
+              className="mono text-4xl sm:text-5xl font-bold tracking-tight leading-tight sm:leading-none"
               style={{ color: C.text }}
             >
               {t("app.landing.title")}{" "}
               <span style={{ color: C.red }}>{t("app.landing.title_accent")}</span>
             </h1>
             <p
-              className="mt-5 text-base sm:text-lg max-w-xl mx-auto leading-relaxed"
+              className="mt-5 text-base sm:text-lg max-w-xl mx-auto leading-relaxed sm:leading-7"
               style={{ color: C.dim }}
             >
               {t("app.landing.subtitle")}
@@ -243,7 +243,7 @@ export default function Landing({ onNavigate }) {
           <div className="flex items-center justify-center gap-3 flex-wrap mt-8">
             <button
               onClick={() => onNavigate("onboard")}
-              className="mono text-sm font-bold px-5 py-2.5 rounded transition flex items-center gap-2"
+              className="mono text-sm font-bold px-5 py-2.5 rounded-sm transition flex items-center gap-2"
               style={{ backgroundColor: C.red, color: "#fff" }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#FF5A4A")}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = C.red)}
@@ -252,7 +252,7 @@ export default function Landing({ onNavigate }) {
             </button>
             <button
               onClick={() => onNavigate("workshop")}
-              className="mono text-sm px-5 py-2.5 rounded transition flex items-center gap-2"
+              className="mono text-sm px-5 py-2.5 rounded-sm transition flex items-center gap-2"
               style={{
                 backgroundColor: "transparent",
                 color: C.dim,
@@ -271,7 +271,7 @@ export default function Landing({ onNavigate }) {
             </button>
             <button
               onClick={() => onNavigate("general")}
-              className="mono text-sm px-5 py-2.5 rounded transition flex items-center gap-2"
+              className="mono text-sm px-5 py-2.5 rounded-sm transition flex items-center gap-2"
               style={{
                 backgroundColor: "transparent",
                 color: C.dim,

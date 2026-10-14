@@ -50,7 +50,7 @@ function RuleCard({ rule, color, t }) {
     >
       <div className="flex items-baseline gap-3 mb-2">
         <span
-          className="mono text-xs font-bold px-2 py-0.5 rounded shrink-0"
+          className="mono text-xs font-bold px-2 py-0.5 rounded-sm shrink-0"
           style={{
             backgroundColor: `${color}20`,
             color,
@@ -75,9 +75,9 @@ function GroupSection({ groupKey, rules, t }) {
   const Icon = meta.icon;
   return (
     <section className="space-y-3">
-      <div className="flex items-baseline gap-3 mb-1 mt-2">
+      <div className="flex items-baseline gap-3 mt-2">
         <span
-          className="inline-flex items-center justify-center w-7 h-7 rounded shrink-0"
+          className="inline-flex items-center justify-center w-7 h-7 rounded-sm shrink-0"
           style={{
             backgroundColor: `${meta.color}20`,
             color: meta.color,
@@ -122,14 +122,14 @@ export default function Rules({ onNavigate }) {
           <HeroPill target="rules" />
         </div>
         <h1
-          className="mono text-3xl sm:text-4xl font-bold tracking-tight leading-tight"
+          className="mono text-3xl sm:text-4xl font-bold tracking-tight leading-tight sm:leading-10"
           style={{ color: C.text }}
         >
           {t("app.rules.title")}{" "}
           <span style={{ color: C.cyan }}>{t("app.rules.title_accent")}</span>
         </h1>
         <p
-          className="mt-4 text-sm sm:text-base max-w-xl mx-auto leading-relaxed"
+          className="mt-4 text-sm sm:text-base max-w-xl mx-auto leading-relaxed sm:leading-6"
           style={{ color: C.dim }}
         >
           {t("app.rules.intro")}

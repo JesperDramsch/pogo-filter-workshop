@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-13T12:54:31.454Z",
+  "fetchedAt": "2026-10-14T12:02:44.038Z",
   "events": [
     {
       "id": "community-day-zorua-community-day-2026-10-10t14-00-00",
@@ -69,6 +69,72 @@
         "Minior"
       ],
       "unresolved": []
+    },
+    {
+      "id": "city-safari-pok-mon-go-city-safari-boston-rescheduled-2026-10-24t10-00-00",
+      "title": "Pokémon GO City Safari: Boston (Rescheduled)",
+      "category": "City Safari",
+      "start": "2026-10-24T10:00:00",
+      "end": "2026-10-25T18:00:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        39,
+        63,
+        79,
+        158,
+        179,
+        183,
+        187,
+        234,
+        241,
+        278,
+        343,
+        418,
+        506,
+        548,
+        562,
+        574,
+        669,
+        688,
+        692,
+        701,
+        749,
+        765,
+        775,
+        973
+      ],
+      "spawns": [
+        "Abra",
+        "Baltoy",
+        "Binacle",
+        "Buizel",
+        "Clauncher",
+        "Flabébé",
+        "Flamigo",
+        "Gothita",
+        "Hawlucha",
+        "Hoppip",
+        "Jigglypuff",
+        "Komala",
+        "Lillipup",
+        "Mareep",
+        "Marill",
+        "Miltank",
+        "Mudbray",
+        "Oranguru",
+        "Petilil",
+        "Slowpoke",
+        "Stantler",
+        "Totodile",
+        "Wingull",
+        "Yamask"
+      ],
+      "unresolved": [
+        "Unown B",
+        "Unown L",
+        "Unown M",
+        "Unown R"
+      ]
     },
     {
       "id": "event-pok-mon-go-halloween-2026-part-i-2026-10-27t10-00-00",
@@ -152,6 +218,27 @@
         "Stunfisk",
         "Tyrogue",
         "Zigzagoon"
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "city-safari-pok-mon-go-city-safari-boston-rescheduled-2026-10-24t10-00-00-eggs",
+      "title": "Pokémon GO City Safari: Boston (Rescheduled)",
+      "category": "City Safari",
+      "start": "2026-10-24T10:00:00",
+      "end": "2026-10-25T18:00:00",
+      "isLocalTime": true,
+      "eggDex": [
+        669,
+        701,
+        749,
+        775
+      ],
+      "eggs": [
+        "Flabébé",
+        "Hawlucha",
+        "Komala",
+        "Mudbray"
       ],
       "unresolved": []
     }
