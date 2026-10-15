@@ -106,8 +106,8 @@ async function defaultFetchText(url, userAgent) {
 
 // ── Batch-stamped download cache ────────────────────────────────────────────
 //
-// The dump is ~19 MB and seven fetchers read it. `npm run prebuild` runs six of
-// them back to back, so without a cache one build pulls the same bytes six
+// The dump is ~19 MB and eight fetchers read it. `npm run prebuild` runs seven
+// of them back to back, so without a cache one build pulls the same bytes seven
 // times. The key is the mirror's OWN batch stamp, never a clock: the tiny
 // timestamp file is fetched on every call and the big one only when the batch
 // id actually moved. That makes this correctness-preserving rather than a
@@ -260,7 +260,7 @@ export function batchMsFromIso(iso) {
 }
 
 // The floor for the fetchers whose own snapshot records no batch
-// (regional-forms, rocket-lineups, evolution-costs): the batch meta-rankings.json
+// (regional-forms, rocket-lineups, evolution-costs, events): the batch meta-rankings.json
 // was built from. It is the sibling read from the same dump in the same sync
 // job and the same prebuild, and it runs before every one of them except
 // rocket-lineups, so the floor is either the committed batch or the one this
@@ -586,4 +586,94 @@ export function evoParentsFromSteps(steps) {
     if (prev === undefined || parentDex < prev) parents.set(childDex, parentDex);
   }
   return parents;
+}
+
+// ── Temporary evolutions (Mega / Primal) ────────────────────────────────────
+
+// A temporary evolution's words as its tempEvoId spells them:
+// TEMP_EVOLUTION_MEGA_X → mega, x; TEMP_EVOLUTION_PRIMAL → primal.
+export function tempEvoWords(tempEvoId) {
+  return tempEvoId.replace(/^TEMP_EVOLUTION_/, "").toLowerCase().split("_").filter(Boolean);
+}
+
+// `words` with each of `remove` taken out once, or null if one is missing.
+function withoutWords(words, remove) {
+  const rest = [...words];
+  for (const word of remove) {
+    const i = rest.indexOf(word);
+    if (i < 0) return null;
+    rest.splice(i, 1);
+  }
+  return rest;
+}
+
+// Lowercased, typographic apostrophes folded: the name dictionary and Leek
+// Duck's copy disagree on which apostrophe Farfetch'd gets.
+const dictionaryWords = (name) => String(name).toLowerCase().replace(/[‘’ʼ]/g, "'").trim().split(/\s+/);
+
+// Every temporary evolution the name dictionary names, joined to the
+// tempEvoOverrides entry that carries its types, as
+// { dex, key, en, tempEvoId, types }.
+//
+// `overridesByDex` maps dex → the tempEvoOverrides array of the template that
+// stands for the species (the default form's; fetch-raid-bosses passes the one
+// its name index kept). `names` is src/locales/pokemon-names.json.
+//
+// The dictionary names a temporary evolution under the Niantic text key
+// pokemon_name_<dex>_<n> ("6_2"), but <n> does not name the evolution reliably
+// (Mega Absol Z is 359_2, Mega Lucario Z 448_5), so the two are joined by
+// words: the dictionary name with the species' own name taken out ("Mega
+// Charizard X" → mega, x) must be exactly the tempEvoId's words. A name no
+// override matches, such as Mega Absol Z while the game master has no
+// TEMP_EVOLUTION_MEGA_Z, is left out: there are no types to give it.
+// Three-part keys ("6_178_2") are Gigantamax names, not temporary evolutions.
+export function temporaryEvolutionNames(overridesByDex, names) {
+  const keysByDex = new Map();
+  for (const [dexKey, entry] of Object.entries(names)) {
+    const parts = dexKey.split("_");
+    if (parts.length !== 2 || !entry?.en) continue;
+    const dex = Number(parts[0]);
+    if (!keysByDex.has(dex)) keysByDex.set(dex, []);
+    keysByDex.get(dex).push(dexKey);
+  }
+  const out = [];
+  for (const [dex, overrides] of overridesByDex) {
+    const speciesName = names[String(dex)]?.en;
+    if (!speciesName || !Array.isArray(overrides)) continue;
+    const speciesWords = dictionaryWords(speciesName);
+    for (const key of keysByDex.get(dex) || []) {
+      const en = names[key].en;
+      const rest = withoutWords(dictionaryWords(en), speciesWords);
+      if (!rest) continue;
+      const match = overrides.find((o) => {
+        if (typeof o?.tempEvoId !== "string") return false;
+        const words = tempEvoWords(o.tempEvoId);
+        return words.length === rest.length && words.every((w) => rest.includes(w));
+      });
+      const types = [typeSlug(match?.typeOverride1), typeSlug(match?.typeOverride2)].filter(Boolean);
+      if (types.length === 0) continue;
+      out.push({ dex, key, en, tempEvoId: match.tempEvoId, types });
+    }
+  }
+  return out;
+}
+
+// dex → the tempEvoOverrides of the template that stands for the species: the
+// default form's (defaultFormByDex), else the form-less template's, else the
+// NORMAL form's. Costume forms (CHARIZARD_GOGGLES_2026) repeat the same
+// overrides, so which one wins past those three does not matter; the first
+// seen stays.
+export function tempEvoOverridesByDex(templates) {
+  const defaults = defaultFormByDex(templates);
+  const best = new Map();
+  for (const template of pokemonTemplates(templates)) {
+    const overrides = template.settings.tempEvoOverrides;
+    if (!Array.isArray(overrides) || overrides.length === 0) continue;
+    const rank = template.form === defaults.get(template.dex) ? 0
+      : template.form === null ? 1
+      : formSuffix(template) === "NORMAL" ? 2 : 3;
+    const prev = best.get(template.dex);
+    if (!prev || rank < prev.rank) best.set(template.dex, { rank, overrides });
+  }
+  return new Map([...best].map(([dex, { overrides }]) => [dex, overrides]));
 }

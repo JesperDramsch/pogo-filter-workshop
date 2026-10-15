@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-14T12:02:44.038Z",
+  "fetchedAt": "2026-10-15T23:10:29.049Z",
   "events": [
     {
       "id": "community-day-zorua-community-day-2026-10-10t14-00-00",
@@ -14,7 +14,17 @@
       "spawns": [
         "Zorua"
       ],
-      "unresolved": []
+      "unresolved": [],
+      "spawnForms": [
+        {
+          "name": "Zorua",
+          "dex": 570,
+          "region": null,
+          "types": [
+            "dark"
+          ]
+        }
+      ]
     },
     {
       "id": "event-fall-marathon-buddy-trek-2026-10-13t10-00-00",
@@ -53,6 +63,128 @@
         "Skarmory",
         "Stantler"
       ],
+      "spawnForms": [
+        {
+          "name": "Hisuian Growlithe",
+          "dex": 58,
+          "region": "hisui",
+          "types": [
+            "fire",
+            "rock"
+          ]
+        },
+        {
+          "name": "Galarian Ponyta",
+          "dex": 77,
+          "region": "galar",
+          "types": [
+            "psychic"
+          ]
+        },
+        {
+          "name": "Ponyta",
+          "dex": 77,
+          "region": null,
+          "types": [
+            "fire"
+          ]
+        },
+        {
+          "name": "Doduo",
+          "dex": 84,
+          "region": null,
+          "types": [
+            "normal",
+            "flying"
+          ]
+        },
+        {
+          "name": "Hoppip",
+          "dex": 187,
+          "region": null,
+          "types": [
+            "grass",
+            "flying"
+          ]
+        },
+        {
+          "name": "Skarmory",
+          "dex": 227,
+          "region": null,
+          "types": [
+            "steel",
+            "flying"
+          ]
+        },
+        {
+          "name": "Stantler",
+          "dex": 234,
+          "region": null,
+          "types": [
+            "normal"
+          ]
+        },
+        {
+          "name": "Nincada",
+          "dex": 290,
+          "region": null,
+          "types": [
+            "bug",
+            "ground"
+          ]
+        },
+        {
+          "name": "Electrike",
+          "dex": 309,
+          "region": null,
+          "types": [
+            "electric"
+          ]
+        },
+        {
+          "name": "Cacnea",
+          "dex": 331,
+          "region": null,
+          "types": [
+            "grass"
+          ]
+        },
+        {
+          "name": "Blitzle",
+          "dex": 522,
+          "region": null,
+          "types": [
+            "electric"
+          ]
+        },
+        {
+          "name": "Dwebble",
+          "dex": 557,
+          "region": null,
+          "types": [
+            "bug",
+            "rock"
+          ]
+        },
+        {
+          "name": "Helioptile",
+          "dex": 694,
+          "region": null,
+          "types": [
+            "electric",
+            "normal"
+          ]
+        },
+        {
+          "name": "Bramblin",
+          "dex": 946,
+          "region": null,
+          "types": [
+            "grass",
+            "ghost"
+          ]
+        }
+      ],
       "unresolved": []
     },
     {
@@ -67,6 +199,17 @@
       ],
       "spawns": [
         "Minior"
+      ],
+      "spawnForms": [
+        {
+          "name": "Minior (Meteor Form)",
+          "dex": 774,
+          "region": null,
+          "types": [
+            "rock",
+            "flying"
+          ]
+        }
       ],
       "unresolved": []
     },
@@ -85,6 +228,7 @@
         179,
         183,
         187,
+        201,
         234,
         241,
         278,
@@ -126,15 +270,223 @@
         "Slowpoke",
         "Stantler",
         "Totodile",
+        "Unown",
         "Wingull",
         "Yamask"
       ],
-      "unresolved": [
-        "Unown B",
-        "Unown L",
-        "Unown M",
-        "Unown R"
-      ]
+      "spawnForms": [
+        {
+          "name": "Jigglypuff",
+          "dex": 39,
+          "region": null,
+          "types": [
+            "normal",
+            "fairy"
+          ]
+        },
+        {
+          "name": "Abra",
+          "dex": 63,
+          "region": null,
+          "types": [
+            "psychic"
+          ]
+        },
+        {
+          "name": "Slowpoke",
+          "dex": 79,
+          "region": null,
+          "types": [
+            "water",
+            "psychic"
+          ]
+        },
+        {
+          "name": "Totodile",
+          "dex": 158,
+          "region": null,
+          "types": [
+            "water"
+          ]
+        },
+        {
+          "name": "Mareep",
+          "dex": 179,
+          "region": null,
+          "types": [
+            "electric"
+          ]
+        },
+        {
+          "name": "Marill",
+          "dex": 183,
+          "region": null,
+          "types": [
+            "water",
+            "fairy"
+          ]
+        },
+        {
+          "name": "Hoppip",
+          "dex": 187,
+          "region": null,
+          "types": [
+            "grass",
+            "flying"
+          ]
+        },
+        {
+          "name": "Unown B",
+          "dex": 201,
+          "region": null,
+          "types": [
+            "psychic"
+          ]
+        },
+        {
+          "name": "Stantler",
+          "dex": 234,
+          "region": null,
+          "types": [
+            "normal"
+          ]
+        },
+        {
+          "name": "Miltank",
+          "dex": 241,
+          "region": null,
+          "types": [
+            "normal"
+          ]
+        },
+        {
+          "name": "Wingull",
+          "dex": 278,
+          "region": null,
+          "types": [
+            "water",
+            "flying"
+          ]
+        },
+        {
+          "name": "Baltoy",
+          "dex": 343,
+          "region": null,
+          "types": [
+            "ground",
+            "psychic"
+          ]
+        },
+        {
+          "name": "Buizel",
+          "dex": 418,
+          "region": null,
+          "types": [
+            "water"
+          ]
+        },
+        {
+          "name": "Lillipup",
+          "dex": 506,
+          "region": null,
+          "types": [
+            "normal"
+          ]
+        },
+        {
+          "name": "Petilil",
+          "dex": 548,
+          "region": null,
+          "types": [
+            "grass"
+          ]
+        },
+        {
+          "name": "Yamask",
+          "dex": 562,
+          "region": null,
+          "types": [
+            "ghost"
+          ]
+        },
+        {
+          "name": "Gothita",
+          "dex": 574,
+          "region": null,
+          "types": [
+            "psychic"
+          ]
+        },
+        {
+          "name": "Orange Flower Flabébé",
+          "dex": 669,
+          "region": null,
+          "types": [
+            "fairy"
+          ]
+        },
+        {
+          "name": "Binacle",
+          "dex": 688,
+          "region": null,
+          "types": [
+            "rock",
+            "water"
+          ]
+        },
+        {
+          "name": "Clauncher",
+          "dex": 692,
+          "region": null,
+          "types": [
+            "water"
+          ]
+        },
+        {
+          "name": "Hawlucha",
+          "dex": 701,
+          "region": null,
+          "types": [
+            "fighting",
+            "flying"
+          ]
+        },
+        {
+          "name": "Mudbray",
+          "dex": 749,
+          "region": null,
+          "types": [
+            "ground"
+          ]
+        },
+        {
+          "name": "Oranguru",
+          "dex": 765,
+          "region": null,
+          "types": [
+            "normal",
+            "psychic"
+          ]
+        },
+        {
+          "name": "Komala",
+          "dex": 775,
+          "region": null,
+          "types": [
+            "normal"
+          ]
+        },
+        {
+          "name": "Flamigo",
+          "dex": 973,
+          "region": null,
+          "types": [
+            "flying",
+            "fighting"
+          ]
+        }
+      ],
+      "unresolved": []
     },
     {
       "id": "event-pok-mon-go-halloween-2026-part-i-2026-10-27t10-00-00",
@@ -144,15 +496,43 @@
       "end": "2026-11-01T10:00:00",
       "isLocalTime": true,
       "spawnDex": [
-        355
+        41,
+        355,
+        393
       ],
       "spawns": [
-        "Duskull"
+        "Duskull",
+        "Piplup",
+        "Zubat"
       ],
-      "unresolved": [
-        "Piplup wearing a Halloween Mischief costume",
-        "Zubat wearing a top hat"
-      ]
+      "spawnForms": [
+        {
+          "name": "Zubat",
+          "dex": 41,
+          "region": null,
+          "types": [
+            "poison",
+            "flying"
+          ]
+        },
+        {
+          "name": "Duskull",
+          "dex": 355,
+          "region": null,
+          "types": [
+            "ghost"
+          ]
+        },
+        {
+          "name": "Piplup",
+          "dex": 393,
+          "region": null,
+          "types": [
+            "water"
+          ]
+        }
+      ],
+      "unresolved": []
     }
   ],
   "eggPools": [

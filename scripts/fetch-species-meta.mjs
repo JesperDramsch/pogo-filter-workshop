@@ -80,6 +80,17 @@
 //    dex (Charizard, not Charmander) — App.jsx's collectible-base remap turns
 //    that into the species a friend actually catches.
 //
+//  - megaForms: every released Mega and Primal FORM (Mega Charizard X and Y
+//    are two), as { key, dex, kind, types, boostTypes }. `key` is the name
+//    dictionary's key ("6_2"), through which the app names it in every
+//    locale; `types` are the form's own, from tempEvoOverrides. `boostTypes`
+//    are the types whose catches the active form boosts: the form's own types
+//    for a Mega, and for a Primal the pinned PRIMAL_BOOST_TYPES below, since
+//    the game master does not publish those. Released means PvPoke lists the
+//    form with `released: true`; the game master carries a Mega's data ahead of
+//    its launch, and recommending one nobody can evolve yet would be wrong.
+//    Feeds the "best Mega for these spawns" panel on the wild-spawn card.
+//
 //  - evoParentByDex: child dex → parent dex for every evolution step, so
 //    App.jsx can walk any species down to the base of its line (the
 //    friend-collect packs only suggest collectible bases — a lucky
@@ -104,6 +115,9 @@ import {
   gameMasterProvenance,
   pokemonTemplates,
   releasedDexFromPvpoke,
+  tempEvoOverridesByDex,
+  tempEvoWords,
+  temporaryEvolutionNames,
   warnIfStale,
 } from "./lib/game-master.mjs";
 import { lowestDexPerGeneration } from "./lib/generations.mjs";
@@ -112,6 +126,19 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const DATA_DIR = resolve(ROOT, "src/data");
 const OUT_PATH = resolve(DATA_DIR, "species-meta.json");
+const NAMES_PATH = resolve(ROOT, "src/locales/pokemon-names.json");
+
+// The types a Primal boosts catches of, beyond nothing the game master says:
+// its megaEvoLevelSettings carry the same sameTypeExtraCatchCandy effect as a
+// Mega's but no type list, and its tempEvoOverrides give only the form's own
+// types (Primal Kyogre is plain water). Fixed when Primal Reversion launched
+// and unchanged since, so pinned like the trade-evolution set rather than
+// fetched. Source: https://pokemongo.com/en/news/primal-reversion-2023
+// A Primal missing here falls back to its own types, with a warning.
+export const PRIMAL_BOOST_TYPES = {
+  382: ["water", "electric", "bug"],
+  383: ["ground", "fire", "grass"],
+};
 
 // The three starter BASE species per generation: each generation's regional
 // dex opens with its three starter lines as three consecutive trios — ONCE
@@ -179,6 +206,39 @@ export function megaDexFromGameMaster(templates) {
     if (branchMega || overrideMega) ids.add(dex);
   }
   return ids;
+}
+
+// Released Mega and Primal forms, as megaForms entries (see the header).
+// `pvpoke` is PvPoke's game master: its speciesId for a temporary evolution is
+// the species id and the tempEvoId's words, "charizard_mega_x",
+// "kyogre_primal". Exported for the offline test in scripts/check-mega-boost.mjs.
+export function megaFormsFromGameMaster(templates, names, pvpoke) {
+  const released = new Set(
+    (pvpoke?.pokemon || []).filter((p) => p?.released).map((p) => p.speciesId),
+  );
+  const idByDex = new Map();
+  for (const { dex, settings } of pokemonTemplates(templates)) {
+    if (settings?.pokemonId && !idByDex.has(dex)) idByDex.set(dex, settings.pokemonId);
+  }
+  const forms = [];
+  const unreleased = [];
+  for (const evo of temporaryEvolutionNames(tempEvoOverridesByDex(templates), names)) {
+    const words = tempEvoWords(evo.tempEvoId);
+    const kind = words[0] === "primal" ? "primal" : "mega";
+    const speciesId = [String(idByDex.get(evo.dex) || "").toLowerCase(), ...words].join("_");
+    if (!released.has(speciesId)) {
+      unreleased.push(evo.en);
+      continue;
+    }
+    let boostTypes = evo.types;
+    if (kind === "primal") {
+      if (PRIMAL_BOOST_TYPES[evo.dex]) boostTypes = PRIMAL_BOOST_TYPES[evo.dex];
+      else console.warn(`  ⚠ ${evo.en} has no pinned PRIMAL_BOOST_TYPES; using its own types`);
+    }
+    forms.push({ key: evo.key, dex: evo.dex, kind, types: evo.types, boostTypes });
+  }
+  forms.sort((a, b) => a.dex - b.dex || a.key.localeCompare(b.key));
+  return { forms, unreleased: unreleased.sort() };
 }
 
 // Best base stat product per dex, across every form template. "Best" rather
@@ -267,6 +327,13 @@ async function main() {
   // honest answer to "what can mega".
   const megas = megaDexFromGameMaster(templates);
 
+  // ── megaForms ──
+  const names = JSON.parse(readFileSync(NAMES_PATH, "utf8"));
+  const { forms: megaForms, unreleased: unreleasedMegas } = megaFormsFromGameMaster(templates, names, pvpoke);
+  if (unreleasedMegas.length > 0) {
+    console.log(`  not yet released per PvPoke, left out of megaForms: ${unreleasedMegas.join(", ")}`);
+  }
+
   // ── starterDex ──
   const starters = starterDexFromGenerations(STARTERS_PER_GENERATION, specialTrade);
 
@@ -324,6 +391,7 @@ async function main() {
     starterDex: [...starters].sort((a, b) => a - b),
     powerLineDex: [...powerLines].sort((a, b) => a - b),
     megaDex: [...megas].sort((a, b) => a - b),
+    megaForms,
     evoParentByDex,
   };
 
@@ -375,6 +443,27 @@ async function main() {
     newContent.megaDex.length <= 200,
     `megaDex is a roster, not the whole dex (${newContent.megaDex.length} ≤ 200)`,
   );
+  const megaForm = (key) => newContent.megaForms.find((f) => f.key === key);
+  assertOrDie(
+    megaForm("6_2")?.types.join("/") === "fire/dragon" && megaForm("6_3")?.types.join("/") === "fire/flying",
+    "Mega Charizard X is fire/dragon and Y fire/flying — two forms, each with its own types",
+  );
+  assertOrDie(
+    megaForm("130_1")?.types.join("/") === "water/dark",
+    "Mega Gyarados (130_1) is water/dark — the Mega's types, not the base form's",
+  );
+  assertOrDie(
+    newContent.megaForms.some((f) => f.dex === 382 && f.kind === "primal" && f.boostTypes.includes("electric")),
+    "Primal Kyogre boosts electric catches (PRIMAL_BOOST_TYPES)",
+  );
+  assertOrDie(
+    newContent.megaForms.length >= 40 && newContent.megaForms.length <= 200,
+    `megaForms covers the released roster (${newContent.megaForms.length} in 40..200)`,
+  );
+  assertOrDie(
+    newContent.megaForms.every((f) => f.kind === "primal" || newContent.megaDex.includes(f.dex)),
+    "every Mega in megaForms is a megaDex species",
+  );
   assertOrDie(
     newContent.starterDex.every((dex) => !specialTrade.has(dex)),
     "specialTradeDex ∩ starterDex = ∅",
@@ -414,6 +503,7 @@ async function main() {
   console.log(`  starters:      ${newContent.starterDex.length} dex`);
   console.log(`  power lines:   ${newContent.powerLineDex.length} base dex`);
   console.log(`  megas:         ${newContent.megaDex.length} dex`);
+  console.log(`  mega forms:    ${newContent.megaForms.length} released (Primals included)`);
 }
 
 // Only run when executed directly — check-friend-collect.mjs imports the

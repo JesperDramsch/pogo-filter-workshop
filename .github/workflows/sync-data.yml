@@ -230,6 +230,7 @@ jobs:
         run: |
           npm run test:datafilters 2>&1 | tee "$RUNNER_TEMP/sync/validate.log"
           npm run test:metaref 2>&1 | tee -a "$RUNNER_TEMP/sync/validate.log"
+          npm run test:megaboost 2>&1 | tee -a "$RUNNER_TEMP/sync/validate.log"
 
       # ── Commit + hand off ────────────────────────────────────────────────
       - name: Commit the snapshots that moved
