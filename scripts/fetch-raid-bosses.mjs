@@ -25,7 +25,7 @@ import {
   formSuffix,
   gameMasterAgeDays,
   pokemonTemplates,
-  typeSlug,
+  temporaryEvolutionNames,
   typesOf,
   warnIfStale,
 } from "./lib/game-master.mjs";
@@ -253,23 +253,6 @@ export function buildNameIndex(templates, names) {
   return idx;
 }
 
-// A temporary evolution's words as its tempEvoId spells them:
-// TEMP_EVOLUTION_MEGA_X → mega, x; TEMP_EVOLUTION_PRIMAL → primal.
-function tempEvoWords(tempEvoId) {
-  return tempEvoId.replace(/^TEMP_EVOLUTION_/, "").toLowerCase().split("_").filter(Boolean);
-}
-
-// `words` with each of `remove` taken out once, or null if one is missing.
-function withoutWords(words, remove) {
-  const rest = [...words];
-  for (const word of remove) {
-    const i = rest.indexOf(word);
-    if (i < 0) return null;
-    rest.splice(i, 1);
-  }
-  return rest;
-}
-
 // Index entries for the temporary evolutions, Mega and Primal, keyed by the
 // dictionary's own name for each. Event titles name a Mega by that name, and
 // buildEventEntry looks it up by that name. Stripped to its species, a Mega
@@ -279,15 +262,10 @@ function withoutWords(words, remove) {
 //
 // The game master carries a temporary evolution's types in its species'
 // tempEvoOverrides, on the default form's template, which is the one byDex
-// kept: TEMP_EVOLUTION_MEGA_X makes Charizard fire/dragon. The dictionary
-// names it under the Niantic text key pokemon_name_<dex>_<n> ("6_2"), but <n>
-// does not name the evolution reliably (Mega Absol Z is 359_2, Mega Lucario Z
-// 448_5), so the two are joined by words: the dictionary name with the
-// species' own name taken out ("Mega Charizard X" → mega, x) must be exactly
-// the tempEvoId's words. A name no override matches, such as Mega Absol Z
-// while the game master has no TEMP_EVOLUTION_MEGA_Z, gets no entry and so
-// stays unresolved: there are no types to give it. Three-part keys
-// ("6_178_2") are Gigantamax names, not temporary evolutions.
+// kept: TEMP_EVOLUTION_MEGA_X makes Charizard fire/dragon. Which dictionary
+// name belongs to which override is temporaryEvolutionNames' word join (in
+// scripts/lib/game-master.mjs, shared with fetch-species-meta); a name no
+// override matches, such as Mega Absol Z, gets no entry and stays unresolved.
 //
 // Each entry is { id, form, types, displayName }: the species' id, so a Mega
 // keys against lily-dex-api's species-level ids as a forme does; no form,
@@ -296,37 +274,17 @@ function withoutWords(words, remove) {
 // Mega; the evolution's types; and the dictionary name, through which the app
 // names it in every locale.
 function tempEvoEntries(byDex, names) {
-  const namesByDex = new Map();
-  for (const [dexKey, entry] of Object.entries(names)) {
-    const parts = dexKey.split("_");
-    if (parts.length !== 2 || !entry?.en) continue;
-    const dex = Number(parts[0]);
-    if (!namesByDex.has(dex)) namesByDex.set(dex, []);
-    namesByDex.get(dex).push(entry.en);
-  }
+  const overridesByDex = new Map();
+  for (const [dex, { template }] of byDex) overridesByDex.set(dex, template.settings.tempEvoOverrides);
   const out = new Map();
-  for (const [dex, { template }] of byDex) {
-    const speciesName = names[String(dex)]?.en;
-    const overrides = template.settings.tempEvoOverrides;
-    if (!speciesName || !Array.isArray(overrides)) continue;
-    const speciesWords = nameKey(speciesName).split(/\s+/);
-    for (const evoName of namesByDex.get(dex) || []) {
-      const rest = withoutWords(nameKey(evoName).split(/\s+/), speciesWords);
-      if (!rest) continue;
-      const match = overrides.find((o) => {
-        if (typeof o?.tempEvoId !== "string") return false;
-        const words = tempEvoWords(o.tempEvoId);
-        return words.length === rest.length && words.every((w) => rest.includes(w));
-      });
-      const types = [typeSlug(match?.typeOverride1), typeSlug(match?.typeOverride2)].filter(Boolean);
-      if (types.length === 0) continue;
-      out.set(nameKey(evoName), {
-        id: template.settings.pokemonId,
-        form: null,
-        types: titleTypes(types),
-        displayName: evoName,
-      });
-    }
+  for (const evo of temporaryEvolutionNames(overridesByDex, names)) {
+    const { template } = byDex.get(evo.dex);
+    out.set(nameKey(evo.en), {
+      id: template.settings.pokemonId,
+      form: null,
+      types: titleTypes(evo.types),
+      displayName: evo.en,
+    });
   }
   return out;
 }

@@ -25,14 +25,27 @@
 // down to the base species and resolve to its dex number — dex search in PoGo
 // is form-agnostic, which is exactly what "show me all my <species>" wants.
 //
+// Spawn TYPES are the exception to "base species": each event also carries
+// `spawnForms`, the form-aware list the Mega panel ranks against. A Mega boosts
+// catches by type, and the form decides the type — Hisuian Growlithe is
+// fire/rock, Galarian Ponyta psychic — so these are resolved against the game
+// master through the raid fetcher's name index (resolveBossKey), which reads a
+// regional adjective the way Leek Duck writes one. A name that names no form
+// (costumes, "Orange Flower Flabébé") gets the species' default form, which is
+// the form the game gives a bare name. The game master is a SOFT dependency
+// here: if every mirror fails, each spawn's form is carried from the previous
+// snapshot by name, so a mirror outage never blocks the event sync.
+//
 // Flags:
 //   --offline-ok   tolerate fetch failures if src/data/events.json exists.
 
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
 import { outsideWindow, carryOver } from "./lib/event-window.mjs";
+import { fetchGameMaster, mechanicsBatchFloor, warnIfStale } from "./lib/game-master.mjs";
+import { buildNameIndex as buildFormIndex, resolveBossKey } from "./fetch-raid-bosses.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -61,7 +74,7 @@ async function fetchJson(url) {
 // Build an English-name → base-dex-number map from pokemon-names.json. Only
 // base keys (numeric, no "_form" suffix) are indexed: spawns are base-species
 // names, and form keys ("6_2" = Mega Charizard X) would otherwise shadow them.
-function buildNameIndex(namesDict) {
+export function buildNameIndex(namesDict) {
   const idx = new Map();
   for (const [dexKey, names] of Object.entries(namesDict)) {
     if (!/^\d+$/.test(dexKey)) continue;        // skip mega/giga form keys
@@ -74,13 +87,21 @@ function buildNameIndex(namesDict) {
 
 // "Squawkabilly (Blue)" → "Squawkabilly"; "Alolan Vulpix" → "Vulpix". Drops the
 // parenthetical form tail first, then a leading regional / temp-form prefix.
+// Costume spawns come as "Piplup wearing a Halloween Mischief costume" since
+// the Halloween 2026 listings; the costume tail goes too (costumeTail).
 function normalizeSpawnName(raw) {
-  let s = String(raw).split(/\s*\(/)[0].trim();
+  let s = stripCostumeTail(String(raw).split(/\s*\(/)[0]).trim();
   s = s.replace(
     /^(Alolan|Galarian|Hisuian|Paldean|Mega|Primal|Shadow|Gigantamax|Dynamax)\s+/i,
     "",
   );
   return s.trim();
+}
+
+// "Zubat wearing a top hat" → "Zubat". Leek Duck's other costume spelling,
+// "Cake Hat Pikachu", is handled by the leading-word fallback in resolveBaseDex.
+function stripCostumeTail(name) {
+  return String(name).replace(/\s+wearing\b.*$/i, "");
 }
 
 // Deterministic, stable id (the feed carries no eventID). Same category+title+
@@ -98,7 +119,7 @@ function slugId(category, title, start) {
 // any clipping), then falls back to dropping leading words one at a time — this
 // rescues costume names like "Cake Hat Pikachu" → Pikachu without a hardcoded
 // costume list. Returns { dex, name } or null.
-function resolveBaseDex(raw, nameIdx) {
+export function resolveBaseDex(raw, nameIdx) {
   const base = normalizeSpawnName(raw);
   const direct = nameIdx.get(base.toLowerCase());
   if (direct) return { dex: direct, name: base };
@@ -108,7 +129,70 @@ function resolveBaseDex(raw, nameIdx) {
     const dex = nameIdx.get(tail.toLowerCase());
     if (dex) return { dex, name: tail };
   }
+  // A trailing form word: "Unown B" is Unown. Tried after the leading-word
+  // pass so "Cake Hat Pikachu" still resolves by its tail.
+  for (let i = words.length - 1; i >= 1; i--) {
+    const head = words.slice(0, i).join(" ");
+    const dex = nameIdx.get(head.toLowerCase());
+    if (dex) return { dex, name: head };
+  }
   return null;
+}
+
+// The region word the app's form badges use, from a form enum's suffix head:
+// GROWLITHE_HISUIAN → "hisui", PONYTA_GALARIAN → "galar". null for a form that
+// is not regional (a default form, MINIOR_METEOR_BLUE, …).
+const REGION_BY_FORM_HEAD = { ALOLA: "alola", GALARIAN: "galar", HISUIAN: "hisui", PALDEA: "paldea" };
+function regionOfForm(form, pokemonId) {
+  if (!form || !pokemonId || !form.startsWith(`${pokemonId}_`)) return null;
+  return REGION_BY_FORM_HEAD[form.slice(pokemonId.length + 1).split("_")[0]] || null;
+}
+
+// One spawn's form and types, as { name, dex, region, types }, or null.
+// `formIdx` is the raid fetcher's game-master name index. The full name goes
+// first so a regional adjective or a bracketed forme picks its form; a name
+// that resolves no form falls back to the species, i.e. its default form.
+// `name` is the feed's spelling minus any costume tail, which is what the
+// soft path keys the previous snapshot by.
+export function resolveSpawnForm(raw, hit, formIdx) {
+  const name = stripCostumeTail(raw).trim();
+  const key = name.toLowerCase().replace(/[‘’ʼ]/g, "'");
+  const species = formIdx.get(hit.name.toLowerCase().replace(/[‘’ʼ]/g, "'"));
+  const form = resolveBossKey(formIdx, key);
+  // resolveBossKey also answers temporary-evolution names; a wild spawn is
+  // never one, and a hit on another species is a misread, not a form.
+  const entry = form && species && form.id === species.id ? form : species;
+  if (!entry) return null;
+  return {
+    name,
+    dex: hit.dex,
+    region: entry === species ? null : regionOfForm(entry.form, entry.id),
+    types: entry.types.map((t) => t.toLowerCase()),
+  };
+}
+
+// The event's spawnForms: one entry per distinct dex + region + types, sorted
+// by dex. With no form index (game master unavailable), each name's form is
+// carried from the previous snapshot; a name the previous snapshot never saw
+// is left out and reported.
+function spawnFormsFor(spawns, nameIdx, formIdx, previousForms, missing) {
+  const out = new Map();
+  for (const entry of spawns) {
+    const raw = typeof entry === "string" ? entry : entry?.name;
+    if (!raw) continue;
+    const hit = resolveBaseDex(raw, nameIdx);
+    if (!hit) continue;
+    const form = formIdx
+      ? resolveSpawnForm(raw, hit, formIdx)
+      : previousForms.get(stripCostumeTail(raw).trim()) || null;
+    if (!form) {
+      missing.add(raw);
+      continue;
+    }
+    const k = `${form.dex}|${form.region}|${form.types.join("/")}`;
+    if (!out.has(k)) out.set(k, form);
+  }
+  return [...out.values()].sort((a, b) => a.dex - b.dex || String(a.region).localeCompare(String(b.region)));
 }
 
 // Resolve an event's spawn list to deduped sorted dex numbers + the base names
@@ -163,6 +247,26 @@ async function main() {
 
   const now = Date.now();
   const previous = readPreviousJson(OUT_PATH);
+
+  // Spawn types (see the header): soft, so a mirror outage carries the
+  // previous snapshot's forms instead of failing the sync.
+  let formIdx = null;
+  try {
+    console.log("→ Fetching game master (spawn form types)");
+    const gm = await fetchGameMaster({
+      userAgent: "pogo-filter-workshop events-fetcher/1.0",
+      minBatchMs: mechanicsBatchFloor(),
+    });
+    warnIfStale(gm, "New regional forms may resolve to their species' default types.");
+    formIdx = buildFormIndex(gm.templates, namesDict);
+  } catch (e) {
+    console.warn(`⚠  game master unavailable (${e.message}); spawn forms carried from the previous snapshot`);
+  }
+  const previousForms = new Map();
+  for (const ev of previous?.events || []) {
+    for (const f of ev.spawnForms || []) previousForms.set(f.name, f);
+  }
+  const missingForms = new Set();
 
   const eventsOut = [];
   const eggPoolsOut = [];
@@ -238,6 +342,7 @@ async function main() {
         isLocalTime: !!event.is_local_time,
         spawnDex,
         spawns: spawnNames,
+        spawnForms: spawnFormsFor(spawns, nameIdx, formIdx, previousForms, missingForms),
         unresolved,
       });
     }
@@ -257,6 +362,20 @@ async function main() {
   // Just-ended events come from the previous snapshot (leak-duck has already
   // dropped them); the result is chronological so the UI renders top-down.
   const events = carryOver(eventsOut, previous?.events, now);
+  // A record carried from a snapshot written before spawnForms existed has only
+  // its base names; resolve those. Regional spellings are already gone from
+  // them, so such a record ranks on default forms until it ages out.
+  // A copy, not an in-place write: the record may be the previous snapshot's
+  // own object, which the fetchedAt comparison below still reads.
+  events.merged = events.merged.map((rec) =>
+    Array.isArray(rec.spawnForms)
+      ? rec
+      : { ...rec, spawnForms: spawnFormsFor([...(rec.spawns || []), ...(rec.unresolved || [])], nameIdx, formIdx, previousForms, missingForms) },
+  );
+  if (missingForms.size > 0) {
+    console.warn(`  ⚠ no form/types for: ${[...missingForms].sort().join(", ")} — left out of the Mega ranking`);
+  }
+
   for (const id of events.carriedIds) console.log(`  ↩ carried over ended event ${id}`);
   for (const id of eggPools.carriedIds) console.log(`  ↩ carried over ended egg pool ${id}`);
 
@@ -280,7 +399,11 @@ async function main() {
   console.log(`  egg pools: ${eggPoolsOut.length} surfaced · ${eggPools.carriedIds.length} carried over`);
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+// Only run when executed directly — scripts/check-mega-boost.mjs imports
+// resolveSpawnForm without triggering a fetch.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}

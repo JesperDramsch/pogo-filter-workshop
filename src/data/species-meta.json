@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-15T11:39:36.195Z",
+  "fetchedAt": "2026-10-15T23:09:32.432Z",
   "sources": {
     "classes": "game master",
     "released": "pvpoke/pvpoke",
@@ -233,6 +233,791 @@
     687,
     719,
     870
+  ],
+  "megaForms": [
+    {
+      "key": "3_1",
+      "dex": 3,
+      "kind": "mega",
+      "types": [
+        "grass",
+        "poison"
+      ],
+      "boostTypes": [
+        "grass",
+        "poison"
+      ]
+    },
+    {
+      "key": "6_2",
+      "dex": 6,
+      "kind": "mega",
+      "types": [
+        "fire",
+        "dragon"
+      ],
+      "boostTypes": [
+        "fire",
+        "dragon"
+      ]
+    },
+    {
+      "key": "6_3",
+      "dex": 6,
+      "kind": "mega",
+      "types": [
+        "fire",
+        "flying"
+      ],
+      "boostTypes": [
+        "fire",
+        "flying"
+      ]
+    },
+    {
+      "key": "9_1",
+      "dex": 9,
+      "kind": "mega",
+      "types": [
+        "water"
+      ],
+      "boostTypes": [
+        "water"
+      ]
+    },
+    {
+      "key": "15_1",
+      "dex": 15,
+      "kind": "mega",
+      "types": [
+        "bug",
+        "poison"
+      ],
+      "boostTypes": [
+        "bug",
+        "poison"
+      ]
+    },
+    {
+      "key": "18_1",
+      "dex": 18,
+      "kind": "mega",
+      "types": [
+        "normal",
+        "flying"
+      ],
+      "boostTypes": [
+        "normal",
+        "flying"
+      ]
+    },
+    {
+      "key": "26_2",
+      "dex": 26,
+      "kind": "mega",
+      "types": [
+        "electric"
+      ],
+      "boostTypes": [
+        "electric"
+      ]
+    },
+    {
+      "key": "26_3",
+      "dex": 26,
+      "kind": "mega",
+      "types": [
+        "electric"
+      ],
+      "boostTypes": [
+        "electric"
+      ]
+    },
+    {
+      "key": "65_1",
+      "dex": 65,
+      "kind": "mega",
+      "types": [
+        "psychic"
+      ],
+      "boostTypes": [
+        "psychic"
+      ]
+    },
+    {
+      "key": "71_1",
+      "dex": 71,
+      "kind": "mega",
+      "types": [
+        "grass",
+        "poison"
+      ],
+      "boostTypes": [
+        "grass",
+        "poison"
+      ]
+    },
+    {
+      "key": "80_1",
+      "dex": 80,
+      "kind": "mega",
+      "types": [
+        "water",
+        "psychic"
+      ],
+      "boostTypes": [
+        "water",
+        "psychic"
+      ]
+    },
+    {
+      "key": "94_1",
+      "dex": 94,
+      "kind": "mega",
+      "types": [
+        "ghost",
+        "poison"
+      ],
+      "boostTypes": [
+        "ghost",
+        "poison"
+      ]
+    },
+    {
+      "key": "115_1",
+      "dex": 115,
+      "kind": "mega",
+      "types": [
+        "normal"
+      ],
+      "boostTypes": [
+        "normal"
+      ]
+    },
+    {
+      "key": "121_1",
+      "dex": 121,
+      "kind": "mega",
+      "types": [
+        "water",
+        "psychic"
+      ],
+      "boostTypes": [
+        "water",
+        "psychic"
+      ]
+    },
+    {
+      "key": "127_1",
+      "dex": 127,
+      "kind": "mega",
+      "types": [
+        "bug",
+        "flying"
+      ],
+      "boostTypes": [
+        "bug",
+        "flying"
+      ]
+    },
+    {
+      "key": "130_1",
+      "dex": 130,
+      "kind": "mega",
+      "types": [
+        "water",
+        "dark"
+      ],
+      "boostTypes": [
+        "water",
+        "dark"
+      ]
+    },
+    {
+      "key": "142_1",
+      "dex": 142,
+      "kind": "mega",
+      "types": [
+        "rock",
+        "flying"
+      ],
+      "boostTypes": [
+        "rock",
+        "flying"
+      ]
+    },
+    {
+      "key": "149_1",
+      "dex": 149,
+      "kind": "mega",
+      "types": [
+        "dragon",
+        "flying"
+      ],
+      "boostTypes": [
+        "dragon",
+        "flying"
+      ]
+    },
+    {
+      "key": "150_2",
+      "dex": 150,
+      "kind": "mega",
+      "types": [
+        "psychic",
+        "fighting"
+      ],
+      "boostTypes": [
+        "psychic",
+        "fighting"
+      ]
+    },
+    {
+      "key": "150_3",
+      "dex": 150,
+      "kind": "mega",
+      "types": [
+        "psychic"
+      ],
+      "boostTypes": [
+        "psychic"
+      ]
+    },
+    {
+      "key": "181_1",
+      "dex": 181,
+      "kind": "mega",
+      "types": [
+        "electric",
+        "dragon"
+      ],
+      "boostTypes": [
+        "electric",
+        "dragon"
+      ]
+    },
+    {
+      "key": "208_1",
+      "dex": 208,
+      "kind": "mega",
+      "types": [
+        "steel",
+        "ground"
+      ],
+      "boostTypes": [
+        "steel",
+        "ground"
+      ]
+    },
+    {
+      "key": "212_1",
+      "dex": 212,
+      "kind": "mega",
+      "types": [
+        "bug",
+        "steel"
+      ],
+      "boostTypes": [
+        "bug",
+        "steel"
+      ]
+    },
+    {
+      "key": "214_1",
+      "dex": 214,
+      "kind": "mega",
+      "types": [
+        "bug",
+        "fighting"
+      ],
+      "boostTypes": [
+        "bug",
+        "fighting"
+      ]
+    },
+    {
+      "key": "227_1",
+      "dex": 227,
+      "kind": "mega",
+      "types": [
+        "steel",
+        "flying"
+      ],
+      "boostTypes": [
+        "steel",
+        "flying"
+      ]
+    },
+    {
+      "key": "229_1",
+      "dex": 229,
+      "kind": "mega",
+      "types": [
+        "dark",
+        "fire"
+      ],
+      "boostTypes": [
+        "dark",
+        "fire"
+      ]
+    },
+    {
+      "key": "248_1",
+      "dex": 248,
+      "kind": "mega",
+      "types": [
+        "rock",
+        "dark"
+      ],
+      "boostTypes": [
+        "rock",
+        "dark"
+      ]
+    },
+    {
+      "key": "254_1",
+      "dex": 254,
+      "kind": "mega",
+      "types": [
+        "grass",
+        "dragon"
+      ],
+      "boostTypes": [
+        "grass",
+        "dragon"
+      ]
+    },
+    {
+      "key": "257_1",
+      "dex": 257,
+      "kind": "mega",
+      "types": [
+        "fire",
+        "fighting"
+      ],
+      "boostTypes": [
+        "fire",
+        "fighting"
+      ]
+    },
+    {
+      "key": "260_1",
+      "dex": 260,
+      "kind": "mega",
+      "types": [
+        "water",
+        "ground"
+      ],
+      "boostTypes": [
+        "water",
+        "ground"
+      ]
+    },
+    {
+      "key": "282_1",
+      "dex": 282,
+      "kind": "mega",
+      "types": [
+        "psychic",
+        "fairy"
+      ],
+      "boostTypes": [
+        "psychic",
+        "fairy"
+      ]
+    },
+    {
+      "key": "302_1",
+      "dex": 302,
+      "kind": "mega",
+      "types": [
+        "dark",
+        "ghost"
+      ],
+      "boostTypes": [
+        "dark",
+        "ghost"
+      ]
+    },
+    {
+      "key": "303_1",
+      "dex": 303,
+      "kind": "mega",
+      "types": [
+        "steel",
+        "fairy"
+      ],
+      "boostTypes": [
+        "steel",
+        "fairy"
+      ]
+    },
+    {
+      "key": "306_1",
+      "dex": 306,
+      "kind": "mega",
+      "types": [
+        "steel"
+      ],
+      "boostTypes": [
+        "steel"
+      ]
+    },
+    {
+      "key": "308_1",
+      "dex": 308,
+      "kind": "mega",
+      "types": [
+        "fighting",
+        "psychic"
+      ],
+      "boostTypes": [
+        "fighting",
+        "psychic"
+      ]
+    },
+    {
+      "key": "310_1",
+      "dex": 310,
+      "kind": "mega",
+      "types": [
+        "electric"
+      ],
+      "boostTypes": [
+        "electric"
+      ]
+    },
+    {
+      "key": "319_1",
+      "dex": 319,
+      "kind": "mega",
+      "types": [
+        "water",
+        "dark"
+      ],
+      "boostTypes": [
+        "water",
+        "dark"
+      ]
+    },
+    {
+      "key": "323_1",
+      "dex": 323,
+      "kind": "mega",
+      "types": [
+        "fire",
+        "ground"
+      ],
+      "boostTypes": [
+        "fire",
+        "ground"
+      ]
+    },
+    {
+      "key": "334_1",
+      "dex": 334,
+      "kind": "mega",
+      "types": [
+        "dragon",
+        "fairy"
+      ],
+      "boostTypes": [
+        "dragon",
+        "fairy"
+      ]
+    },
+    {
+      "key": "354_1",
+      "dex": 354,
+      "kind": "mega",
+      "types": [
+        "ghost"
+      ],
+      "boostTypes": [
+        "ghost"
+      ]
+    },
+    {
+      "key": "359_1",
+      "dex": 359,
+      "kind": "mega",
+      "types": [
+        "dark"
+      ],
+      "boostTypes": [
+        "dark"
+      ]
+    },
+    {
+      "key": "362_1",
+      "dex": 362,
+      "kind": "mega",
+      "types": [
+        "ice"
+      ],
+      "boostTypes": [
+        "ice"
+      ]
+    },
+    {
+      "key": "373_1",
+      "dex": 373,
+      "kind": "mega",
+      "types": [
+        "dragon",
+        "flying"
+      ],
+      "boostTypes": [
+        "dragon",
+        "flying"
+      ]
+    },
+    {
+      "key": "376_1",
+      "dex": 376,
+      "kind": "mega",
+      "types": [
+        "steel",
+        "psychic"
+      ],
+      "boostTypes": [
+        "steel",
+        "psychic"
+      ]
+    },
+    {
+      "key": "380_1",
+      "dex": 380,
+      "kind": "mega",
+      "types": [
+        "dragon",
+        "psychic"
+      ],
+      "boostTypes": [
+        "dragon",
+        "psychic"
+      ]
+    },
+    {
+      "key": "381_1",
+      "dex": 381,
+      "kind": "mega",
+      "types": [
+        "dragon",
+        "psychic"
+      ],
+      "boostTypes": [
+        "dragon",
+        "psychic"
+      ]
+    },
+    {
+      "key": "382_4",
+      "dex": 382,
+      "kind": "primal",
+      "types": [
+        "water"
+      ],
+      "boostTypes": [
+        "water",
+        "electric",
+        "bug"
+      ]
+    },
+    {
+      "key": "383_4",
+      "dex": 383,
+      "kind": "primal",
+      "types": [
+        "ground",
+        "fire"
+      ],
+      "boostTypes": [
+        "ground",
+        "fire",
+        "grass"
+      ]
+    },
+    {
+      "key": "384_1",
+      "dex": 384,
+      "kind": "mega",
+      "types": [
+        "dragon",
+        "flying"
+      ],
+      "boostTypes": [
+        "dragon",
+        "flying"
+      ]
+    },
+    {
+      "key": "398_1",
+      "dex": 398,
+      "kind": "mega",
+      "types": [
+        "fighting",
+        "flying"
+      ],
+      "boostTypes": [
+        "fighting",
+        "flying"
+      ]
+    },
+    {
+      "key": "428_1",
+      "dex": 428,
+      "kind": "mega",
+      "types": [
+        "normal",
+        "fighting"
+      ],
+      "boostTypes": [
+        "normal",
+        "fighting"
+      ]
+    },
+    {
+      "key": "445_1",
+      "dex": 445,
+      "kind": "mega",
+      "types": [
+        "dragon",
+        "ground"
+      ],
+      "boostTypes": [
+        "dragon",
+        "ground"
+      ]
+    },
+    {
+      "key": "448_1",
+      "dex": 448,
+      "kind": "mega",
+      "types": [
+        "fighting",
+        "steel"
+      ],
+      "boostTypes": [
+        "fighting",
+        "steel"
+      ]
+    },
+    {
+      "key": "460_1",
+      "dex": 460,
+      "kind": "mega",
+      "types": [
+        "grass",
+        "ice"
+      ],
+      "boostTypes": [
+        "grass",
+        "ice"
+      ]
+    },
+    {
+      "key": "475_1",
+      "dex": 475,
+      "kind": "mega",
+      "types": [
+        "psychic",
+        "fighting"
+      ],
+      "boostTypes": [
+        "psychic",
+        "fighting"
+      ]
+    },
+    {
+      "key": "531_1",
+      "dex": 531,
+      "kind": "mega",
+      "types": [
+        "normal",
+        "fairy"
+      ],
+      "boostTypes": [
+        "normal",
+        "fairy"
+      ]
+    },
+    {
+      "key": "652_1",
+      "dex": 652,
+      "kind": "mega",
+      "types": [
+        "grass",
+        "fighting"
+      ],
+      "boostTypes": [
+        "grass",
+        "fighting"
+      ]
+    },
+    {
+      "key": "655_1",
+      "dex": 655,
+      "kind": "mega",
+      "types": [
+        "fire",
+        "psychic"
+      ],
+      "boostTypes": [
+        "fire",
+        "psychic"
+      ]
+    },
+    {
+      "key": "658_1",
+      "dex": 658,
+      "kind": "mega",
+      "types": [
+        "water",
+        "dark"
+      ],
+      "boostTypes": [
+        "water",
+        "dark"
+      ]
+    },
+    {
+      "key": "687_1",
+      "dex": 687,
+      "kind": "mega",
+      "types": [
+        "dark",
+        "psychic"
+      ],
+      "boostTypes": [
+        "dark",
+        "psychic"
+      ]
+    },
+    {
+      "key": "719_1",
+      "dex": 719,
+      "kind": "mega",
+      "types": [
+        "rock",
+        "fairy"
+      ],
+      "boostTypes": [
+        "rock",
+        "fairy"
+      ]
+    },
+    {
+      "key": "870_1",
+      "dex": 870,
+      "kind": "mega",
+      "types": [
+        "fighting"
+      ],
+      "boostTypes": [
+        "fighting"
+      ]
+    }
   ],
   "evoParentByDex": {
     "2": 1,

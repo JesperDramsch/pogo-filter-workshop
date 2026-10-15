@@ -24,6 +24,7 @@ import {
 	splitSpeciesInput,
 } from './data/species.js';
 import SpeciesInput from './SpeciesInput.jsx';
+import { liveSpawnPool, rankMegaGroups } from './mega-boost.js';
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from './i18n/pogo-keywords.js';
 import RAID_BOSSES from './data/raid-bosses.json';
 import EVENTS from './data/events.json';
@@ -142,6 +143,12 @@ export const SEARCH_CHAR_BUDGET = 5000;
 // 20% is ~18 species: past there the list is the single biggest thing in the
 // filter and every further tap costs another ~56 characters.
 const PVP_META_COST_WARN = 0.2 * SEARCH_CHAR_BUDGET;
+// How many "best Mega" groups the wild-spawn card lists per spawn pool. Each
+// group is a set of interchangeable Megas (src/mega-boost.js), so three groups
+// usually name a dozen Megas, enough that one of them is likely charged.
+const MEGA_BOOST_GROUPS_SHOWN = 3;
+// Megas named per group before the rest fold into "+N more".
+const MEGA_BOOST_NAMES_SHOWN = 6;
 
 export const DEFAULT_HUNDOS = [];
 // Personal "lucky Pokémon" roster — species the user has at least one
@@ -4047,6 +4054,43 @@ export function buildFilters(
 		.map((s) => speciesForOutput(s, outputLocale))
 		.filter(Boolean);
 	const eventsFetchedAt = EVENTS.fetchedAt || null;
+
+	// -- MEGA BOOST · which Mega to have active for a spawn pool ---------
+	// Ranks every released Mega/Primal form by how many of the pool's spawn
+	// species share a boosted type with it (src/mega-boost.js). The top
+	// groups are shown; the filter finds your Pokémon of the first group's
+	// species that can Mega Evolve, i.e. "do I have one of these ready?".
+	//
+	// A Primal's species is OR'd into the mega-evolve clause: whether the
+	// in-game mega-evolve key matches a Pokémon that can Primal Revert is
+	// unverified, and if it does not, a Primal-topped pool would get a filter
+	// that matches nothing. `a,b&k,b` is (a OR b) AND (k OR b), i.e. Megas that
+	// can evolve plus every Primal-capable one; PoGo binds `,` tighter than `&`.
+	//
+	// Exposed as a function rather than a precomputed live panel: the card
+	// decides what is live at render time, as it already does for an event's
+	// active highlight, so a tab left open across an event's start or end does
+	// not keep the old pool until something else invalidates buildFilters.
+	const megaBoostFor = (spawnForms) => {
+		const pool = spawnForms || [];
+		const groups = rankMegaGroups(pool, SPECIES_META.megaForms || []).slice(0, MEGA_BOOST_GROUPS_SHOWN);
+		const top = groups[0]?.megas || [];
+		const namesOf = (megas) =>
+			[...new Set(megas.map((m) => m.dex))].map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean);
+		const topNames = namesOf(top);
+		const primalNames = namesOf(top.filter((m) => m.kind === 'primal'));
+		const megaClause = [kw.flag.mega_evolve, ...primalNames].join(',');
+		return {
+			poolSize: pool.length,
+			groups: groups.map((g) => ({
+				megaKeys: g.megas.map((m) => m.key),
+				spawns: g.matched.map((f) => ({ dex: f.dex, region: f.region })),
+				types: g.types,
+			})),
+			filter: topNames.length > 0 && kw.flag.mega_evolve ? `${topNames.join(',')}&${megaClause}` : '',
+		};
+	};
+
 	const eventFilters = (EVENTS.events || [])
 		.map((ev) => {
 			// "+name" expands to the whole evolution family; names localised from dex.
@@ -4078,6 +4122,8 @@ export function buildFilters(
 				end: ev.end,
 				isLocalTime: !!ev.isLocalTime,
 				spawnDex: ev.spawnDex || [],
+				spawnForms: ev.spawnForms || [],
+				megaBoost: megaBoostFor(ev.spawnForms),
 				// overview — every event spawn family, no other constraint
 				overview: fams,
 				// ① keep
@@ -4627,6 +4673,7 @@ export function buildFilters(
 		// Event wild-spawn curation filters
 		eventFilters,
 		eventsFetchedAt,
+		megaBoostFor,
 		// Team Rocket counters (leaders / typed grunts / generic grunts)
 		rocketLeaders,
 		rocketTypedGrunts,
@@ -5766,6 +5813,7 @@ export default function App() {
 		maxTank,
 		eventFilters,
 		eventsFetchedAt,
+		megaBoostFor,
 		rocketLeaders,
 		rocketTypedGrunts,
 		rocketGenericGrunts,
@@ -6844,6 +6892,8 @@ export default function App() {
 											icon='🌿'
 											fetchedAt={eventsFetchedAt}
 											events={eventFilters}
+											megaBoostFor={megaBoostFor}
+											typeLabels={rocketTypeLabels}
 											accent='#27AE60'
 											open={showAuxEvents}
 											onToggle={() => setShowAuxEvents((s) => !s)}
@@ -8881,6 +8931,8 @@ function EventSpawnCollapsible({
 	icon,
 	fetchedAt,
 	events,
+	megaBoostFor,
+	typeLabels,
 	accent,
 	open,
 	onToggle,
@@ -8904,9 +8956,38 @@ function EventSpawnCollapsible({
 		);
 	}
 	const fmtDow = new Intl.DateTimeFormat(locale, { weekday: 'short' });
+	// The current spawn pool: the events running now, decided at render like
+	// each event's active highlight below.
+	const live = liveSpawnPool(list, Date.now());
+	const liveMegaBoost =
+		megaBoostFor && live.spawnForms.length > 0
+			? { eventTitles: live.events.map((ev) => ev.title), ...megaBoostFor(live.spawnForms) }
+			: null;
+	const megaPanel = (boost, copyKey, heading, sub) => (
+		<MegaBoostPanel
+			boost={boost}
+			heading={heading}
+			sub={sub}
+			accent={accent}
+			copied={copied[copyKey]}
+			onCopy={() => copyToClipboard(copyKey, boost.filter)}
+			typeLabels={typeLabels}
+			t={t}
+			locale={locale}
+		/>
+	);
 	return (
 		<Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
 			<div className='space-y-5'>
+				{liveMegaBoost &&
+					megaPanel(
+						liveMegaBoost,
+						'event_mega_live',
+						t('app.events.mega_live_heading'),
+						t('app.events.mega_live_sub', {
+							params: { count: liveMegaBoost.poolSize, events: liveMegaBoost.eventTitles.join(' + ') },
+						}),
+					)}
 				{list.map((ev) => {
 					const startMs = Date.parse(ev.start);
 					const endMs = Date.parse(ev.end);
@@ -8945,6 +9026,8 @@ function EventSpawnCollapsible({
 							accent={accent}
 							highlight={isActive}
 						>
+							{ev.megaBoost?.poolSize > 0 &&
+								megaPanel(ev.megaBoost, `event_${ev.id}_mega`, t('app.events.mega_heading'))}
 							{box('overview', 'app.events.overview_label', 'app.events.overview_hint', ev.overview)}
 							{subHeading('app.events.group_keep')}
 							{box('souvenirs', 'app.events.souvenirs_label', 'app.events.souvenirs_hint', ev.souvenirs)}
@@ -8959,6 +9042,68 @@ function EventSpawnCollapsible({
 			</div>
 			<p className='mono text-[10.5px] text-[#8090A0] mt-4 pt-3 border-t border-[#1F2933]'>{footerLabel}</p>
 		</Collapsible>
+	);
+}
+
+// "Which Mega is worth it" for one spawn pool: the top groups of
+// interchangeable Megas (src/mega-boost.js), each with how much of the pool it
+// boosts and which spawns, then one filter for the top group's species. Names
+// are shown in the UI locale; the filter is built in the output locale.
+function MegaBoostPanel({ boost, heading, sub, accent, copied, onCopy, typeLabels, t, locale }) {
+	const nameOf = (key) => POKEMON_NAMES_DICT[key]?.[locale] ?? POKEMON_NAMES_DICT[key]?.en ?? key;
+	const spawnName = ({ dex, region }) => {
+		const base = nameOf(String(dex));
+		return region ? `${base} (${t(`app.buddy_targets.form_region.${region}`)})` : base;
+	};
+	const groups = boost.groups || [];
+	return (
+		<div className='space-y-2'>
+			<h5 className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{heading}</h5>
+			{sub && <p className='text-xs text-[#8B98A5]'>{sub}</p>}
+			{groups.length === 0 ? (
+				<p className='text-xs italic text-[#8B98A5]'>{t('app.events.mega_none')}</p>
+			) : (
+				<ol className='space-y-2'>
+					{groups.map((g, i) => {
+						const shown = g.megaKeys.slice(0, MEGA_BOOST_NAMES_SHOWN).map(nameOf);
+						const more = g.megaKeys.length - shown.length;
+						return (
+							<li key={g.megaKeys.join(',')} className='text-xs text-[#C9D1D9] space-y-0.5'>
+								<p>
+									<span className='mono text-[#8090A0]'>{i + 1}. </span>
+									<span className='font-medium' style={{ color: i === 0 ? accent : undefined }}>
+										{g.megaKeys.length > 1 && `${t('app.events.mega_any_of')} `}
+										{shown.join(' · ')}
+										{more > 0 && ` ${t('app.events.mega_more', { params: { count: more } })}`}
+									</span>
+								</p>
+								<p className='text-[#8B98A5]'>
+									{t('app.events.mega_covers', {
+										params: {
+											hits: g.spawns.length,
+											total: boost.poolSize,
+											types: g.types.map((k) => (typeLabels && typeLabels[k]) || k).join(', '),
+										},
+									})}
+									{': '}
+									{g.spawns.map(spawnName).join(', ')}
+								</p>
+							</li>
+						);
+					})}
+				</ol>
+			)}
+			{boost.filter && (
+				<FilterBox
+					label={t('app.events.mega_filter_label')}
+					accent={accent}
+					filterStr={boost.filter}
+					copied={copied}
+					onCopy={onCopy}
+					hint={t('app.events.mega_filter_hint')}
+				/>
+			)}
+		</div>
 	);
 }
 
