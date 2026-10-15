@@ -86,7 +86,7 @@ jobs:
       # into the git config, where every later step can read it, and every
       # step from npm ci to the validation runs code from npm dependencies.
       # This job never holds the app token at all; only the push job does.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       # The commit the job summary compares every snapshot against, and the
@@ -94,7 +94,7 @@ jobs:
       - name: Record the commit the sync starts from
         id: base
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -267,7 +267,7 @@ jobs:
         env:
           BASE_SHA: ${{ steps.base.outputs.sha }}
         run: git bundle create "$RUNNER_TEMP/data-commit.bundle" "$BASE_SHA..HEAD"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: steps.local-commit.outputs.changed == 'true'
         with:
           name: data-commit
@@ -330,11 +330,11 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.sync.outputs.base }}
           persist-credentials: false
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: data-commit
           path: ${{ runner.temp }}/data
@@ -442,10 +442,10 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -465,7 +465,7 @@ jobs:
         run: npm run fixtures:update
       - name: Open PR if locale files changed
         id: cpr
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           # The PR keeps going out as github-actions, as it did when this was
           # its own workflow.
