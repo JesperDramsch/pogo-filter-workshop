@@ -74,7 +74,7 @@ async function fetchJson(url) {
 // Build an English-name → base-dex-number map from pokemon-names.json. Only
 // base keys (numeric, no "_form" suffix) are indexed: spawns are base-species
 // names, and form keys ("6_2" = Mega Charizard X) would otherwise shadow them.
-function buildNameIndex(namesDict) {
+export function buildNameIndex(namesDict) {
   const idx = new Map();
   for (const [dexKey, names] of Object.entries(namesDict)) {
     if (!/^\d+$/.test(dexKey)) continue;        // skip mega/giga form keys
@@ -119,7 +119,7 @@ function slugId(category, title, start) {
 // any clipping), then falls back to dropping leading words one at a time — this
 // rescues costume names like "Cake Hat Pikachu" → Pikachu without a hardcoded
 // costume list. Returns { dex, name } or null.
-function resolveBaseDex(raw, nameIdx) {
+export function resolveBaseDex(raw, nameIdx) {
   const base = normalizeSpawnName(raw);
   const direct = nameIdx.get(base.toLowerCase());
   if (direct) return { dex: direct, name: base };

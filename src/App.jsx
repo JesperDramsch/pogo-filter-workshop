@@ -4060,11 +4060,26 @@ export function buildFilters(
 	// species share a boosted type with it (src/mega-boost.js). The top
 	// groups are shown; the filter finds your Pokémon of the first group's
 	// species that can Mega Evolve, i.e. "do I have one of these ready?".
+	//
+	// A Primal's species is OR'd into the mega-evolve clause: whether the
+	// in-game mega-evolve key matches a Pokémon that can Primal Revert is
+	// unverified, and if it does not, a Primal-topped pool would get a filter
+	// that matches nothing. `a,b&k,b` is (a OR b) AND (k OR b), i.e. Megas that
+	// can evolve plus every Primal-capable one; PoGo binds `,` tighter than `&`.
+	//
+	// Exposed as a function rather than a precomputed live panel: the card
+	// decides what is live at render time, as it already does for an event's
+	// active highlight, so a tab left open across an event's start or end does
+	// not keep the old pool until something else invalidates buildFilters.
 	const megaBoostFor = (spawnForms) => {
 		const pool = spawnForms || [];
 		const groups = rankMegaGroups(pool, SPECIES_META.megaForms || []).slice(0, MEGA_BOOST_GROUPS_SHOWN);
-		const topDex = [...new Set((groups[0]?.megas || []).map((m) => m.dex))];
-		const topNames = topDex.map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean);
+		const top = groups[0]?.megas || [];
+		const namesOf = (megas) =>
+			[...new Set(megas.map((m) => m.dex))].map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean);
+		const topNames = namesOf(top);
+		const primalNames = namesOf(top.filter((m) => m.kind === 'primal'));
+		const megaClause = [kw.flag.mega_evolve, ...primalNames].join(',');
 		return {
 			poolSize: pool.length,
 			groups: groups.map((g) => ({
@@ -4072,13 +4087,9 @@ export function buildFilters(
 				spawns: g.matched.map((f) => ({ dex: f.dex, region: f.region })),
 				types: g.types,
 			})),
-			filter: topNames.length > 0 && kw.flag.mega_evolve ? `${topNames.join(',')}&${kw.flag.mega_evolve}` : '',
+			filter: topNames.length > 0 && kw.flag.mega_evolve ? `${topNames.join(',')}&${megaClause}` : '',
 		};
 	};
-	const livePool = liveSpawnPool(EVENTS.events, Date.now());
-	const liveMegaBoost = livePool.spawnForms.length > 0
-		? { eventTitles: livePool.events.map((ev) => ev.title), ...megaBoostFor(livePool.spawnForms) }
-		: null;
 
 	const eventFilters = (EVENTS.events || [])
 		.map((ev) => {
@@ -4111,6 +4122,7 @@ export function buildFilters(
 				end: ev.end,
 				isLocalTime: !!ev.isLocalTime,
 				spawnDex: ev.spawnDex || [],
+				spawnForms: ev.spawnForms || [],
 				megaBoost: megaBoostFor(ev.spawnForms),
 				// overview — every event spawn family, no other constraint
 				overview: fams,
@@ -4661,7 +4673,7 @@ export function buildFilters(
 		// Event wild-spawn curation filters
 		eventFilters,
 		eventsFetchedAt,
-		liveMegaBoost,
+		megaBoostFor,
 		// Team Rocket counters (leaders / typed grunts / generic grunts)
 		rocketLeaders,
 		rocketTypedGrunts,
@@ -5801,7 +5813,7 @@ export default function App() {
 		maxTank,
 		eventFilters,
 		eventsFetchedAt,
-		liveMegaBoost,
+		megaBoostFor,
 		rocketLeaders,
 		rocketTypedGrunts,
 		rocketGenericGrunts,
@@ -6880,7 +6892,7 @@ export default function App() {
 											icon='🌿'
 											fetchedAt={eventsFetchedAt}
 											events={eventFilters}
-											liveMegaBoost={liveMegaBoost}
+											megaBoostFor={megaBoostFor}
 											typeLabels={rocketTypeLabels}
 											accent='#27AE60'
 											open={showAuxEvents}
@@ -8919,7 +8931,7 @@ function EventSpawnCollapsible({
 	icon,
 	fetchedAt,
 	events,
-	liveMegaBoost,
+	megaBoostFor,
 	typeLabels,
 	accent,
 	open,
@@ -8944,6 +8956,13 @@ function EventSpawnCollapsible({
 		);
 	}
 	const fmtDow = new Intl.DateTimeFormat(locale, { weekday: 'short' });
+	// The current spawn pool: the events running now, decided at render like
+	// each event's active highlight below.
+	const live = liveSpawnPool(list, Date.now());
+	const liveMegaBoost =
+		megaBoostFor && live.spawnForms.length > 0
+			? { eventTitles: live.events.map((ev) => ev.title), ...megaBoostFor(live.spawnForms) }
+			: null;
 	const megaPanel = (boost, copyKey, heading, sub) => (
 		<MegaBoostPanel
 			boost={boost}

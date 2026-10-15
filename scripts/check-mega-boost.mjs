@@ -13,10 +13,13 @@
 //   M4 — megaFormsFromGameMaster: one entry per form with the form's types,
 //        Primal boost types pinned, unreleased and unnamed forms left out
 //   M5 — resolveSpawnForm: a regional adjective picks the regional form's
-//        types; a costume or bare name falls back to the default form
+//        types; a costume or bare name falls back to the default form; and
+//        resolveBaseDex reaches the species for both costume spellings and
+//        for Unown letters, which never resolved before this check existed
 //   M6 — the committed snapshots carry what the panel reads
 //   M7 — the built filters, in every output locale: a panel per event, the
-//        filter is the top group's species AND the locale's mega-evolve key
+//        filter is the top group's species AND (the locale's mega-evolve key
+//        OR a Primal species of the group)
 //   M8 — the panel's UI strings exist in every locale with their placeholders
 
 import { readFileSync } from "node:fs";
@@ -25,7 +28,7 @@ import { fileURLToPath } from "node:url";
 import { createChecker } from "./lib/check.mjs";
 import { liveSpawnPool, mergeSpawnForms, rankMegaGroups } from "../src/mega-boost.js";
 import { megaFormsFromGameMaster, PRIMAL_BOOST_TYPES } from "./fetch-species-meta.mjs";
-import { resolveSpawnForm } from "./fetch-events.mjs";
+import { buildNameIndex as buildSpawnNameIndex, resolveBaseDex, resolveSpawnForm } from "./fetch-events.mjs";
 import { buildNameIndex } from "./fetch-raid-bosses.mjs";
 import { POKEMON_NAMES_DICT, pokemonNameFor } from "../src/data/species.js";
 import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
@@ -167,6 +170,16 @@ console.log("M5 — resolveSpawnForm");
   check("a costume spawn takes the species' types and drops the costume from its name",
     z?.types.join("/") === "poison/flying" && z.name === "Zubat", JSON.stringify(z));
   check("a species the index lacks resolves to null", resolveSpawnForm("Abra", { dex: 63, name: "Abra" }, formIdx) === null);
+
+  // Against the real dictionary: the names leak-duck actually published.
+  const spawnIdx = buildSpawnNameIndex(POKEMON_NAMES_DICT);
+  const dexOf = (raw) => resolveBaseDex(raw, spawnIdx)?.dex ?? null;
+  check("\"Zubat wearing a top hat\" reaches Zubat (41)", dexOf("Zubat wearing a top hat") === 41);
+  check("\"Piplup wearing a Halloween Mischief costume\" reaches Piplup (393)", dexOf("Piplup wearing a Halloween Mischief costume") === 393);
+  check("\"Unown B\" reaches Unown (201)", dexOf("Unown B") === 201);
+  check("\"Cake Hat Pikachu\" still reaches Pikachu (25) by its tail", dexOf("Cake Hat Pikachu") === 25);
+  check("\"Mr. Mime\" matches whole before any clipping (122)", dexOf("Mr. Mime") === 122);
+  check("\"Hisuian Growlithe\" and \"Minior (Meteor Form)\" reach their species", dexOf("Hisuian Growlithe") === 58 && dexOf("Minior (Meteor Form)") === 774);
 }
 
 // ── M6 ──
@@ -197,11 +210,21 @@ for (const locale of SUPPORTED_LOCALES) {
     if (boost.poolSize !== (src?.spawnForms || []).length) issues.push(`${ev.id}: poolSize`);
     if (boost.groups.some((g) => g.megaKeys.some((k) => !megaKeys.has(k)))) issues.push(`${ev.id}: unknown Mega`);
     if (boost.groups.length === 0) continue;
-    const topDex = [...new Set(boost.groups[0].megaKeys.map((k) => k.split("_")[0]))];
-    const expected = `${topDex.map((d) => pokemonNameFor(d, locale)).join(",")}&${kw.flag.mega_evolve}`;
+    const formOf = new Map((SPECIES_META.megaForms || []).map((f) => [f.key, f]));
+    const top = boost.groups[0].megaKeys.map((k) => formOf.get(k));
+    const names = (forms) => [...new Set(forms.map((f) => f.dex))].map((d) => pokemonNameFor(String(d), locale));
+    const primals = names(top.filter((f) => f.kind === "primal"));
+    const expected = `${names(top).join(",")}&${[kw.flag.mega_evolve, ...primals].join(",")}`;
     if (boost.filter !== expected) issues.push(`${ev.id}: filter ${boost.filter} ≠ ${expected}`);
   }
-  check(`${locale}: every event gets a Mega panel, filter = top species & ${kw.flag.mega_evolve}`, issues.length === 0, issues.slice(0, 3).join("; "));
+  if (locale === "en") {
+    const groudon = result.megaBoostFor([{ name: "Cacnea", dex: 331, region: null, types: ["grass"] },
+      { name: "Ponyta", dex: 77, region: null, types: ["fire"] }, { name: "Nincada", dex: 290, region: null, types: ["bug", "ground"] }]);
+    check("en: a Primal-topped pool keeps its Primal in the filter even if megaevolve skips Primals",
+      groudon.filter === "groudon&megaevolve,groudon", groudon.filter);
+    check("en: an empty pool builds no filter", result.megaBoostFor([]).filter === "" && result.megaBoostFor([]).groups.length === 0);
+  }
+  check(`${locale}: every event gets a Mega panel, filter = top species & (${kw.flag.mega_evolve} or a Primal of the group)`, issues.length === 0, issues.slice(0, 3).join("; "));
 }
 
 // ── M8 ──
