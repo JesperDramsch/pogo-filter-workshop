@@ -1,6 +1,6 @@
 # Pokémon GO PvP Meta Reference — GENERATED, DO NOT HAND-EDIT
 
-- **Snapshot taken:** 2026-10-15T11:39:35.282Z
+- **Snapshot taken:** 2026-10-17T10:53:10.245Z
 - **Source:** pvpoke — https://github.com/pvpoke/pvpoke (MIT)
 - **Snapshot URL:** https://raw.githubusercontent.com/JesperDramsch/pogo-filter-workshop/main/src/data/pvp-rankings.json
 - **Depth:** top 30 per league, deduped by base dex
@@ -309,6 +309,49 @@ CP cap: none (uncapped)
 
 ```
 382,150,130,149,384,445,383,248,376,652,381,380,655,214,373,260,483,306,484,212,716,718,6,647,809,901,249,94,646,888
+```
+
+### Fantasy Cup `fantasy-1500`
+
+Window: 2026-10-20 → 2026-10-27 (Ultra League, Master League: Mega Edition, and Fantasy Cup: Great League Edition | Twilight Trails)
+
+CP cap: 1500 CP
+
+| # | German | English | Dex | Ranked form | Score |
+|---:|---|---|---:|---|---:|
+| 1 | melmetal | melmetal | 809 | — | 97.4 |
+| 2 | mimigma | mimikyu | 778 | — | 95.9 |
+| 3 | flunschlik | stunfisk | 618 | `stunfisk_galarian` | 94.8 |
+| 4 | forstellka | forretress | 205 | — | 94.2 |
+| 5 | duokles | doublade | 680 | — | 93.1 |
+| 6 | registeel | registeel | 379 | — | 91.9 |
+| 7 | krarmor | corviknight | 823 | — | 89.1 |
+| 8 | tortunator | turtonator | 776 | — | 89 |
+| 9 | impoleon | empoleon | 395 | — | 87.3 |
+| 10 | durengard | aegislash | 681 | `aegislash_shield` | 86.2 |
+| 11 | stahlos | steelix | 208 | `steelix_shadow` | 85.5 |
+| 12 | schlurm | orthworm | 968 | — | 84.6 |
+| 13 | stalobor | excadrill | 530 | `excadrill_shadow` | 81.5 |
+| 14 | smogmog | weezing | 110 | `weezing_galarian` | 81.4 |
+| 15 | heatran | heatran | 485 | `heatran_shadow` | 81.2 |
+| 16 | bronzong | bronzong | 437 | — | 81 |
+| 17 | granforgita | tinkaton | 959 | — | 80.6 |
+| 18 | jirachi | jirachi | 385 | — | 80.2 |
+| 19 | togetic | togetic | 176 | — | 79.7 |
+| 20 | sandamer | sandslash | 28 | `sandslash_alolan` | 79.3 |
+| 21 | burmadame | wormadam | 413 | `wormadam_trash` | 78.4 |
+| 22 | clavion | klefki | 707 | — | 77.5 |
+| 23 | mauzinger | perrserker | 863 | — | 77.5 |
+| 24 | panzaeron | skarmory | 227 | — | 77.2 |
+| 25 | primarene | primarina | 730 | — | 77.1 |
+| 26 | kliklak | klang | 600 | — | 76.6 |
+| 27 | magnetilo | magnemite | 81 | `magnemite_shadow` | 75.6 |
+| 28 | togekiss | togekiss | 468 | — | 75.2 |
+| 29 | magnezone | magnezone | 462 | — | 75.1 |
+| 30 | altaria | altaria | 334 | — | 75 |
+
+```
+809,778,618,205,680,379,823,776,395,681,208,968,530,110,485,437,959,385,176,28,413,707,863,227,730,600,81,468,462,334
 ```
 
 ### Mega Great League `mega-1500`
