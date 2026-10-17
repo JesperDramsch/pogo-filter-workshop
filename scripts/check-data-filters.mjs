@@ -1521,9 +1521,10 @@ console.log("\nD17 — a regional adjective resolves to that regional form, and 
     `${surfaced(shadowStanding)}; ${shadowStanding.deduped} deduped, ${shadowStanding.unresolved} unresolved`);
 
   // Through the app: a regional boss builds a filter, and its box is labelled
-  // with the species' name from the dictionary and its form's region from the
-  // output locale's labels, the ones the buddy form picker shows, so the three
-  // Tauros breeds are three boxes a trainer can tell apart. A bare name, a
+  // with the species' name from the dictionary and its form's region (and
+  // breed) from the output locale's labels, the ones the buddy form picker
+  // shows, so the three Tauros breeds are three boxes a trainer can tell
+  // apart: "Tauros (Paldea, Blaze)". A bare name, a
   // forme that is no region and a regional mode go through the same event, and
   // a regional standing boss stands in lvl3. Each boss's region is written out
   // here rather than read back from regionForForm.
@@ -1591,10 +1592,19 @@ console.log("\nD17 — a regional adjective resolves to that regional form, and 
         return;
       }
       regional++;
+      // One pair of brackets after the bare name: the region, or the region
+      // and the breed joined in this locale's own punctuation, never
+      // "Paldea (Blaze)" nested inside the name's brackets.
       const [region, variant] = want;
-      const parts = [message(`app.buddy_targets.form_region.${region}`), ...(variant ? [message(`app.buddy_targets.form_variant.${variant}`)] : [])];
-      if (!b.name.startsWith(bareBoss?.name)) bad.push(`${where}: "${b.name}" does not lead with "${bareBoss?.name}"`);
-      for (const part of parts) if (!part || !label.includes(part)) bad.push(`${where}: "${label}" lacks "${part}"`);
+      const regionLabel = message(`app.buddy_targets.form_region.${region}`);
+      const variantLabel = variant && message(`app.buddy_targets.form_variant.${variant}`);
+      const joined = variant && message("app.filter.boss_form_variant")?.replace("{region}", regionLabel).replace("{variant}", variantLabel);
+      const formLabel = variant ? joined : regionLabel;
+      if (!regionLabel || (variant && !(variantLabel && joined?.includes(regionLabel) && joined.includes(variantLabel)))) {
+        bad.push(`${where}: no ${loc} label names ${want.join(" and ")}`);
+      } else if (b.name !== `${bareBoss?.name} (${formLabel})` || !label.includes(`(${formLabel})`)) {
+        bad.push(`${where}: "${label}", not "… ${bareBoss?.name} (${formLabel})"`);
+      }
     }));
     const taurosLabels = (groups.find((g) => g.eventID === "zz-tauros")?.bosses || []).map((b) => bossCounterLabel(b, t));
     if (new Set(taurosLabels).size !== 3) bad.push(`Tauros breeds: ${JSON.stringify(taurosLabels)}`);

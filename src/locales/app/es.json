@@ -188,6 +188,7 @@
   "app.filter.pilot_long_label": "Stash Piloto 1000+",
   "app.filter.pilot_long_hint": "Capturas a ≥1000km de tu casa y aún no intercambiadas. La pila más profunda de medalla Piloto (el filtro de intercambio normal ya cubre ≥100km).",
   "app.filter.raid_counter_label": "counters · {boss}",
+  "app.filter.boss_form_variant": "{region}, {variant}",
   "app.filter.raid_counter_hint": "Pokémon cuyo propio tipo resiste el STAB de {boss} Y que llevan un tipo de ataque súper efectivo. El filtro por tipo captura cada forma — Raichu de Alola aparece en Psíquico, Mega-Charizard X en Dragón. Elige tu coincidencia de mayor nivel; el DPS de incursión está dominado por nivel + moveset, no IV.",
   "app.filter.boss_no_clean_counter": "{boss}: sin counter limpio — trae a tu atacante de mayor DPS.",
   "app.filter.aux_bosses_empty": "No hay jefes en el snapshot actual. Ejecuta `npm run fetch-raid-bosses` para refrescar.",

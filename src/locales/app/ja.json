@@ -188,6 +188,7 @@
   "app.filter.pilot_long_label": "パイロット1000+ストック",
   "app.filter.pilot_long_hint": "ホームから≥1000kmで捕獲し、まだ交換していないもの。より深いパイロットメダル用パイル(通常の交換フィルターは既に≥100kmをカバー)。",
   "app.filter.raid_counter_label": "カウンター · {boss}",
+  "app.filter.boss_form_variant": "{region}、{variant}",
   "app.filter.raid_counter_hint": "自身のタイプが{boss}のSTABを軽減し、AND 効果抜群の技タイプを持つポケモン。タイプフィルターで全フォルムをキャッチ — アローラライチュウはエスパーの下、メガリザードンXはドラゴンの下に出る。最高レベルのマッチを選ぶ;レイドDPSはレベル+技構成が支配する、IVではない。",
   "app.filter.boss_no_clean_counter": "{boss}:綺麗なカウンターなし — 最高DPSのアタッカーを連れて行く。",
   "app.filter.aux_bosses_empty": "現在のスナップショットにボスなし。`npm run fetch-raid-bosses`を実行して更新。",

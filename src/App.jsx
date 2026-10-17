@@ -60,7 +60,7 @@ import {
 	regionalFormsFor,
 	togglePickedOption,
 } from './refinements.jsx';
-import { useTranslation } from './i18n/I18nProvider.jsx';
+import { lookup as lookupMessage, useTranslation } from './i18n/I18nProvider.jsx';
 import { LOCALES } from './i18n/index.js';
 import { useAnnounce } from './Announcer.jsx';
 import Landing from './Landing.jsx';
@@ -3940,7 +3940,7 @@ export function buildFilters(
 	// style formRegionLabel uses. The label is part of the NAME, so it comes
 	// from the output locale's bundle, not tFn (the UI locale) — otherwise an
 	// English UI with Japanese output renders "ロコン (Alola)".
-	const outputMessage = (key) => LOCALES[outputLocale]?.messages[key] ?? LOCALES.en.messages[key];
+	const outputMessage = (key, params) => lookupMessage(LOCALES[outputLocale]?.messages ?? {}, key, outputLocale, params);
 	const outputRegionLabel = (region) => outputMessage(`app.buddy_targets.form_region.${region}`) ?? region;
 	const localizePokemonName = (name) => {
 		const hit = resolveRegionalSpecies(name, outputLocale);
@@ -3957,10 +3957,13 @@ export function buildFilters(
 	// Tauros's three breeds would read "Tauros" three times. Its form enum says
 	// which battle each one is (TAUROS_PALDEA_BLAZE), and a regional one is
 	// named the way localizePokemonName names "Alolan Vulpix": "Marowak
-	// (Alola)", "Tauros (Paldea (Blaze))". A suffix regionForForm does not know
-	// is read by its head, so DARMANITAN_GALARIAN_ZEN is still Galar. The
-	// species' default form, a forme that is no region (LANDORUS_INCARNATE,
-	// GIRATINA_ORIGIN), an axis form and a Mega (form null) keep the bare name.
+	// (Alola)". A breed joins its region inside the same brackets, in the output
+	// locale's list punctuation ("Tauros (Paldea, Blaze)", "パルデア、ブレイズ"),
+	// rather than nesting formRegionLabel's "Paldea (Blaze)" in a second pair.
+	// A suffix regionForForm does not know is read by its head, so
+	// DARMANITAN_GALARIAN_ZEN is still Galar. The species' default form, a
+	// forme that is no region (LANDORUS_INCARNATE, GIRATINA_ORIGIN), an axis
+	// form and a Mega (form null) keep the bare name.
 	// Standing bosses never come through here: lily-dex-api's names already
 	// carry the region ("Alola-Knogga"), and so does the EN name the dictionary
 	// fallback reads ("Alolan Marowak").
@@ -3971,7 +3974,15 @@ export function buildFilters(
 		const suffix = boss.form.slice(prefix.length);
 		const isRegion = (form) => form?.region && form.region !== 'base';
 		const form = [regionForForm(suffix), regionForForm(suffix.split('_')[0])].find(isRegion);
-		return form ? `${name} (${formRegionLabel(form, (key) => outputMessage(key) ?? key)})` : name;
+		if (!form) return name;
+		const outputT = (key, params) => outputMessage(key, params) ?? key;
+		const label = form.variant
+			? outputT('app.filter.boss_form_variant', {
+					region: outputT(`app.buddy_targets.form_region.${form.region}`),
+					variant: outputT(`app.buddy_targets.form_variant.${form.variant}`),
+				})
+			: formRegionLabel(form, outputT);
+		return `${name} (${label})`;
 	};
 	const buildBossEntry = (boss, { requiresDynamax = false, name = bossName(boss) } = {}) => {
 		const resistorList = (boss.resistorTypes || []).map((t) => kw.type[t]).filter(Boolean);
@@ -8744,7 +8755,7 @@ export function bossBoxKeys(bosses) {
 	});
 }
 
-// A boss box's label, "counters · Tauros (Paldea (Blaze))". The form in it
+// A boss box's label, "counters · Tauros (Paldea, Blaze)". The form in it
 // comes from the boss's name (eventBossName in buildFilters). Exported so
 // scripts/check-data-filters.mjs reads the label the box renders.
 export function bossCounterLabel(boss, t) {

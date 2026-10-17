@@ -188,6 +188,7 @@
   "app.filter.pilot_long_label": "Pilot 1000+ Stash",
   "app.filter.pilot_long_hint": "Fänge ≥1000km von zu Hause und noch nicht getauscht. Der tiefere Pilot-Medaillen-Stapel (der reguläre Tausch-Filter deckt schon ≥100km ab).",
   "app.filter.raid_counter_label": "Counter · {boss}",
+  "app.filter.boss_form_variant": "{region}, {variant}",
   "app.filter.raid_counter_hint": "Pokémon, deren eigener Typ {boss}'s STAB resistiert UND die einen super-effektiven Move-Typ tragen. Typ-Filter erwischt jede Form — Alola-Raichu erscheint unter Psycho, Mega-Glurak X unter Drache. Wähle deinen höchstlevligen Match; Raid-DPS wird von Level + Moveset dominiert, nicht IV.",
   "app.filter.boss_no_clean_counter": "{boss}: kein sauberer Counter — bring deinen DPS-stärksten Angreifer.",
   "app.filter.aux_bosses_empty": "Keine Bosse im aktuellen Snapshot. Führe `npm run fetch-raid-bosses` aus zum Aktualisieren.",

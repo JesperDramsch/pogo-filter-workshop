@@ -188,6 +188,7 @@
   "app.filter.pilot_long_label": "Pilot 1000+ stash",
   "app.filter.pilot_long_hint": "Catches ≥1000km from your home and not yet traded. The deeper Pilot-medal pile (the regular trade filter already covers ≥100km).",
   "app.filter.raid_counter_label": "counters · {boss}",
+  "app.filter.boss_form_variant": "{region}, {variant}",
   "app.filter.raid_counter_hint": "Pokémon whose own type resists {boss}'s STAB AND who carry a super-effective move type. Type filtering catches every form — Alolan Raichu shows up under Psychic, Mega Charizard X under Dragon. Pick your highest-level match; raid DPS is dominated by level + moveset, not IV.",
   "app.filter.boss_no_clean_counter": "{boss}: no clean counter — bring your highest-DPS attacker.",
   "app.filter.aux_bosses_empty": "No bosses in the current snapshot. Run `npm run fetch-raid-bosses` to refresh.",
