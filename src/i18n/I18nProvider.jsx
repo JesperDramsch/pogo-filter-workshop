@@ -46,8 +46,10 @@ function initialOutputLocale(uiLocale) {
 }
 
 // Walks fallback chain [locale, en] and returns the first defined message,
-// applying {param} substitution if params are provided.
-function lookup(messages, key, locale, params) {
+// applying {param} substitution if params are provided. Exported for
+// buildFilters in App.jsx, which names Pokémon in the output locale rather
+// than the UI one.
+export function lookup(messages, key, locale, params) {
   let str = messages[key];
   if (str === undefined && locale !== "en") {
     str = LOCALES.en.messages[key];

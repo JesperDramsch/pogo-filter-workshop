@@ -86,7 +86,7 @@ const INVISIBLE_FORM_SLOTS = {
 	// BASCULIN_RED_STRIPED / _BLUE_STRIPED / _WHITE_STRIPED as separate form
 	// templates with separate stats blocks — and all three are POKEMON_TYPE_WATER
 	// with no second type, so no predicate can isolate one. The stripe axis is
-	// listed in fetch-regional-forms.mjs's NON_REGIONAL_AXES for exactly the
+	// listed in src/data/form-region.js's NON_REGIONAL_AXES for exactly the
 	// reason Burmy's cloaks are: the sync then computes the predicates, finds
 	// them indistinct, and drops the species with a warning — so if Niantic ever
 	// splits the types (White-Striped is the Basculegion parent), the species

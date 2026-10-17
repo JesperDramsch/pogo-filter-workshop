@@ -188,6 +188,7 @@
   "app.filter.pilot_long_label": "Stash Pilote 1000+",
   "app.filter.pilot_long_hint": "Captures à ≥1000km de chez toi et pas encore échangées. La pile plus profonde de la médaille Pilote (le filtre d'échange normal couvre déjà ≥100km).",
   "app.filter.raid_counter_label": "counters · {boss}",
+  "app.filter.boss_form_variant": "{region}, {variant}",
   "app.filter.raid_counter_hint": "Pokémon dont le type résiste au STAB de {boss} ET qui portent un type d'attaque super-efficace. Le filtrage par type capture chaque forme — Raichu d'Alola apparaît sous Psy, Méga-Dracaufeu X sous Dragon. Choisis ton match de plus haut niveau ; le DPS de raid est dominé par niveau + moveset, pas IV.",
   "app.filter.boss_no_clean_counter": "{boss} : pas de counter propre — amène ton attaquant au plus haut DPS.",
   "app.filter.aux_bosses_empty": "Aucun boss dans le snapshot actuel. Lance `npm run fetch-raid-bosses` pour rafraîchir.",

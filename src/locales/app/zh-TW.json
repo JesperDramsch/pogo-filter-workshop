@@ -188,6 +188,7 @@
   "app.filter.pilot_long_label": "飛行員 1000+ 庫存",
   "app.filter.pilot_long_hint": "在離家 ≥1000km 處捕獲且尚未交換。更深層的飛行員獎章堆(一般交換篩選器已涵蓋 ≥100km)。",
   "app.filter.raid_counter_label": "剋制 · {boss}",
+  "app.filter.boss_form_variant": "{region}、{variant}",
   "app.filter.raid_counter_hint": "屬性能抗 {boss} 的 STAB 且攜帶效果絕佳屬性招式的寶可夢。屬性篩選會抓到所有形態 — 阿羅拉雷丘出現在超能力下,超級噴火龍 X 出現在龍下。挑你最高等級的;團體戰 DPS 由等級+招式組合主導,不是 IV。",
   "app.filter.boss_no_clean_counter": "{boss}:沒有乾淨的剋制 — 帶上你 DPS 最高的攻擊手。",
   "app.filter.aux_bosses_empty": "目前快照沒有首領。執行 `npm run fetch-raid-bosses` 來更新。",

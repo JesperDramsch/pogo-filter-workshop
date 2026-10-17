@@ -23,6 +23,7 @@ import {
 	pokemonNameFor,
 	splitSpeciesInput,
 } from './data/species.js';
+import { regionForForm } from './data/form-region.js';
 import SpeciesInput from './SpeciesInput.jsx';
 import { liveSpawnPool, rankMegaGroups } from './mega-boost.js';
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from './i18n/pogo-keywords.js';
@@ -60,7 +61,7 @@ import {
 	regionalFormsFor,
 	togglePickedOption,
 } from './refinements.jsx';
-import { useTranslation } from './i18n/I18nProvider.jsx';
+import { lookup as lookupMessage, useTranslation } from './i18n/I18nProvider.jsx';
 import { LOCALES } from './i18n/index.js';
 import { useAnnounce } from './Announcer.jsx';
 import Landing from './Landing.jsx';
@@ -3946,10 +3947,8 @@ export function buildFilters(
 	// style formRegionLabel uses. The label is part of the NAME, so it comes
 	// from the output locale's bundle, not tFn (the UI locale) — otherwise an
 	// English UI with Japanese output renders "ロコン (Alola)".
-	const outputRegionLabel = (region) => {
-		const key = `app.buddy_targets.form_region.${region}`;
-		return LOCALES[outputLocale]?.messages[key] ?? LOCALES.en.messages[key] ?? region;
-	};
+	const outputMessage = (key, params) => lookupMessage(LOCALES[outputLocale]?.messages ?? {}, key, outputLocale, params);
+	const outputRegionLabel = (region) => outputMessage(`app.buddy_targets.form_region.${region}`) ?? region;
 	const localizePokemonName = (name) => {
 		const hit = resolveRegionalSpecies(name, outputLocale);
 		if (!hit?.name) return name;
@@ -3961,7 +3960,38 @@ export function buildFilters(
 	// the EN name through the species dictionary. Event bosses carry only an EN
 	// name, and lily-dex-api has no zh-TW or hi one.
 	const bossName = (boss) => boss.names?.[outputLocale] || localizePokemonName(boss.names?.en) || boss.id;
-	const buildBossEntry = (boss, { requiresDynamax = false } = {}) => {
+	// An event boss is named by its species, so an event listing Paldean
+	// Tauros's three breeds would read "Tauros" three times. Its form enum says
+	// which battle each one is (TAUROS_PALDEA_BLAZE), and a regional one is
+	// named the way localizePokemonName names "Alolan Vulpix": "Marowak
+	// (Alola)". A breed joins its region inside the same brackets, in the output
+	// locale's list punctuation ("Tauros (Paldea, Blaze)", "パルデア、ブレイズ"),
+	// rather than nesting formRegionLabel's "Paldea (Blaze)" in a second pair.
+	// A suffix regionForForm does not know is read by its head, so
+	// DARMANITAN_GALARIAN_ZEN is still Galar. The species' default form, a
+	// forme that is no region (LANDORUS_INCARNATE, GIRATINA_ORIGIN), an axis
+	// form and a Mega (form null) keep the bare name.
+	// Standing bosses never come through here: lily-dex-api's names already
+	// carry the region ("Alola-Knogga"), and so does the EN name the dictionary
+	// fallback reads ("Alolan Marowak").
+	const eventBossName = (boss) => {
+		const name = bossName(boss);
+		const prefix = `${boss.id}_`;
+		if (typeof boss.form !== 'string' || !boss.form.startsWith(prefix)) return name;
+		const suffix = boss.form.slice(prefix.length);
+		const isRegion = (form) => form?.region && form.region !== 'base';
+		const form = [regionForForm(suffix), regionForForm(suffix.split('_')[0])].find(isRegion);
+		if (!form) return name;
+		const outputT = (key, params) => outputMessage(key, params) ?? key;
+		const label = form.variant
+			? outputT('app.filter.boss_form_variant', {
+					region: outputT(`app.buddy_targets.form_region.${form.region}`),
+					variant: outputT(`app.buddy_targets.form_variant.${form.variant}`),
+				})
+			: formRegionLabel(form, outputT);
+		return `${name} (${label})`;
+	};
+	const buildBossEntry = (boss, { requiresDynamax = false, name = bossName(boss) } = {}) => {
 		const resistorList = (boss.resistorTypes || []).map((t) => kw.type[t]).filter(Boolean);
 		const seMoveList = (boss.seMoveTypes || []).map((t) => kw.type[t]).filter(Boolean);
 		if (resistorList.length === 0 || seMoveList.length === 0) {
@@ -4001,7 +4031,7 @@ export function buildFilters(
 		if (wGuard) push(clauses, wGuard, tFn('app.clause_why.raid_not_weak_to_boss'));
 		return {
 			id: boss.id,
-			name: bossName(boss),
+			name,
 			clause: clauses.map((c) => c.clause).join('&'),
 			clauses,
 			skipped: false,
@@ -4028,7 +4058,7 @@ export function buildFilters(
 		eventType: event.eventType,
 		start: event.start,
 		end: event.end,
-		bosses: (event.bosses || []).map((b) => buildBossEntry(b, opts)),
+		bosses: (event.bosses || []).map((b) => buildBossEntry(b, { ...opts, name: eventBossName(b) })),
 	});
 	const eventRaidFilters = (raidBosses.eventRaids || []).map((event) => ({
 		...eventBossGroup(event),
@@ -8775,6 +8805,13 @@ export function bossBoxKeys(bosses) {
 	});
 }
 
+// A boss box's label, "counters · Tauros (Paldea, Blaze)". The form in it
+// comes from the boss's name (eventBossName in buildFilters). Exported so
+// scripts/check-data-filters.mjs reads the label the box renders.
+export function bossCounterLabel(boss, t) {
+	return t('app.filter.raid_counter_label', { params: { boss: boss.name } });
+}
+
 // One boss's counter FilterBox, or a short italic note when the boss has no
 // clean counter. Shared by the raid and Max Battle panels. The copy key is
 // distinct per (panel, list, boss): `scope` names the list, a tier or
@@ -8792,7 +8829,7 @@ function bossCounterBox(boss, { keyPrefix, scope, bossKey, accent, copied, copyT
 	return (
 		<FilterBox
 			key={bossKey}
-			label={t('app.filter.raid_counter_label', { params: { boss: boss.name } })}
+			label={bossCounterLabel(boss, t)}
 			accent={accent}
 			filterStr={boss.clause}
 			copied={copied[copyKey]}
