@@ -749,6 +749,7 @@
   "app.clause_why.all_tags_protected": "all tags protected",
   "app.clause_why.shinies_protected": "Shinies protected",
   "app.clause_why.luckies_protected": "Lucky protected",
+  "app.clause_why.shadows_protected": "Shadows protected",
   "app.clause_why.valuables_no_locals": "Valuables: shiny, legendary, ultra beast, costume, background",
   "app.clause_why.valuables_with_locals": "Valuables: shiny, legendary, ultra beast, costume, background + local regionals ({count})",
   "app.clause_why.gift_must_traded": "MUST: not retradeable",

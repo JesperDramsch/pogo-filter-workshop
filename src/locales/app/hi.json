@@ -749,6 +749,7 @@
   "app.clause_why.all_tags_protected": "सभी टैग सुरक्षित",
   "app.clause_why.shinies_protected": "शाइनी सुरक्षित",
   "app.clause_why.luckies_protected": "लकी सुरक्षित",
+  "app.clause_why.shadows_protected": "शैडो सुरक्षित",
   "app.clause_why.valuables_no_locals": "क़ीमती: शाइनी, लीजेंडरी, अल्ट्रा बीस्ट, कॉस्ट्यूम, बैकग्राउंड",
   "app.clause_why.valuables_with_locals": "क़ीमती: शाइनी, लीजेंडरी, अल्ट्रा बीस्ट, कॉस्ट्यूम, बैकग्राउंड + लोकल रीजनल ({count})",
   "app.clause_why.gift_must_traded": "ज़रूरी: दोबारा ट्रेड नहीं हो सकते",

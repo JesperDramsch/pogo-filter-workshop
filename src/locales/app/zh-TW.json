@@ -749,6 +749,7 @@
   "app.clause_why.all_tags_protected": "所有標籤受保護",
   "app.clause_why.shinies_protected": "異色受保護",
   "app.clause_why.luckies_protected": "亮晶晶受保護",
+  "app.clause_why.shadows_protected": "暗影受保護",
   "app.clause_why.valuables_no_locals": "貴重:異色、傳說、究極異獸、變裝、背卡",
   "app.clause_why.valuables_with_locals": "貴重:異色、傳說、究極異獸、變裝、背卡 + 當地地區限定({count})",
   "app.clause_why.gift_must_traded": "必要:不可再交換",

@@ -749,6 +749,7 @@
   "app.clause_why.all_tags_protected": "toutes les étiquettes protégées",
   "app.clause_why.shinies_protected": "Chromatiques protégés",
   "app.clause_why.luckies_protected": "Chanceux protégés",
+  "app.clause_why.shadows_protected": "Obscurs protégés",
   "app.clause_why.valuables_no_locals": "Précieux : chromatique, légendaire, ultra-chimère, costume, fond",
   "app.clause_why.valuables_with_locals": "Précieux : chromatique, légendaire, ultra-chimère, costume, fond + régionaux locaux ({count})",
   "app.clause_why.gift_must_traded": "OBLIGATOIRE : non ré-échangeable",

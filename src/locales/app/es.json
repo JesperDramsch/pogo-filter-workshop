@@ -749,6 +749,7 @@
   "app.clause_why.all_tags_protected": "todas las etiquetas protegidas",
   "app.clause_why.shinies_protected": "Variocolor protegidos",
   "app.clause_why.luckies_protected": "Afortunados protegidos",
+  "app.clause_why.shadows_protected": "Oscuros protegidos",
   "app.clause_why.valuables_no_locals": "Valiosos: variocolor, legendario, ultraente, disfraz, fondo",
   "app.clause_why.valuables_with_locals": "Valiosos: variocolor, legendario, ultraente, disfraz, fondo + regionales locales ({count})",
   "app.clause_why.gift_must_traded": "OBLIGATORIO: no re-intercambiable",

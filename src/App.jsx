@@ -2750,6 +2750,7 @@ export function buildFilters(
 		if (cfg.protectFavorites) push(sortClauses, `!${kw.flag.favorite}`, tFn('app.clause_why.favorites_protected'));
 		if (cfg.protectShinies) push(sortClauses, `!${kw.flag.shiny}`, tFn('app.clause_why.shinies_protected'));
 		if (cfg.protectLuckies) push(sortClauses, `!${kw.flag.lucky}`, tFn('app.clause_why.luckies_protected'));
+		if (cfg.protectShadows) push(sortClauses, `!${kw.flag.shadow}`, tFn('app.clause_why.shadows_protected'));
 	}
 	const sort = sortClauses.map((c) => c.clause).join('&');
 
@@ -2798,6 +2799,8 @@ export function buildFilters(
 			push(luckySortClauses, `!${kw.flag.favorite}`, tFn('app.clause_why.favorites_protected'));
 		if (cfg.protectShinies) push(luckySortClauses, `!${kw.flag.shiny}`, tFn('app.clause_why.shinies_protected'));
 		if (cfg.protectLuckies) push(luckySortClauses, `!${kw.flag.lucky}`, tFn('app.clause_why.luckies_protected'));
+		if (cfg.protectShadows)
+			push(luckySortClauses, `!${kw.flag.shadow}`, tFn('app.clause_why.shadows_protected'));
 	}
 	const luckySort = luckySortClauses.map((c) => c.clause).join('&');
 

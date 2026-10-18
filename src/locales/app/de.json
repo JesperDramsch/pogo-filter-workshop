@@ -749,6 +749,7 @@
   "app.clause_why.all_tags_protected": "alle Tags geschützt",
   "app.clause_why.shinies_protected": "Schillernde geschützt",
   "app.clause_why.luckies_protected": "Glücks geschützt",
+  "app.clause_why.shadows_protected": "Crypto geschützt",
   "app.clause_why.valuables_no_locals": "Wertsachen: schillernd, legendär, Ultrabestie, Kostüm, Hintergrund",
   "app.clause_why.valuables_with_locals": "Wertsachen: schillernd, legendär, Ultrabestie, Kostüm, Hintergrund + lokale Regionale ({count})",
   "app.clause_why.gift_must_traded": "PFLICHT: nicht erneut tauschbar",

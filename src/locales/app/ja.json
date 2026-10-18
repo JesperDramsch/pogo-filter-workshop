@@ -749,6 +749,7 @@
   "app.clause_why.all_tags_protected": "すべてのタグ保護",
   "app.clause_why.shinies_protected": "色違い保護",
   "app.clause_why.luckies_protected": "きらきら保護",
+  "app.clause_why.shadows_protected": "シャドウ保護",
   "app.clause_why.valuables_no_locals": "貴重: 色違い、伝説、ウルトラビースト、コスチューム、背景",
   "app.clause_why.valuables_with_locals": "貴重: 色違い、伝説、ウルトラビースト、コスチューム、背景 + 地元のリージョン ({count})",
   "app.clause_why.gift_must_traded": "必須: 再交換不可",
