@@ -1,31 +1,6 @@
 {
-  "fetchedAt": "2026-10-15T23:10:29.049Z",
+  "fetchedAt": "2026-10-18T11:18:34.416Z",
   "events": [
-    {
-      "id": "community-day-zorua-community-day-2026-10-10t14-00-00",
-      "title": "Zorua Community Day",
-      "category": "Community Day",
-      "start": "2026-10-10T14:00:00",
-      "end": "2026-10-10T17:00:00",
-      "isLocalTime": true,
-      "spawnDex": [
-        570
-      ],
-      "spawns": [
-        "Zorua"
-      ],
-      "unresolved": [],
-      "spawnForms": [
-        {
-          "name": "Zorua",
-          "dex": 570,
-          "region": null,
-          "types": [
-            "dark"
-          ]
-        }
-      ]
-    },
     {
       "id": "event-fall-marathon-buddy-trek-2026-10-13t10-00-00",
       "title": "Fall Marathon: Buddy Trek",
@@ -529,6 +504,64 @@
           "region": null,
           "types": [
             "water"
+          ]
+        }
+      ],
+      "unresolved": []
+    },
+    {
+      "id": "event-pok-mon-go-halloween-2026-part-ii-2026-11-01t10-00-00",
+      "title": "Pokémon GO Halloween 2026 Part II",
+      "category": "Event",
+      "start": "2026-11-01T10:00:00",
+      "end": "2026-11-05T20:00:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        94,
+        607,
+        722,
+        971
+      ],
+      "spawns": [
+        "Gengar",
+        "Greavard",
+        "Litwick",
+        "Rowlet"
+      ],
+      "spawnForms": [
+        {
+          "name": "Gengar",
+          "dex": 94,
+          "region": null,
+          "types": [
+            "ghost",
+            "poison"
+          ]
+        },
+        {
+          "name": "Litwick",
+          "dex": 607,
+          "region": null,
+          "types": [
+            "ghost",
+            "fire"
+          ]
+        },
+        {
+          "name": "Rowlet",
+          "dex": 722,
+          "region": null,
+          "types": [
+            "grass",
+            "flying"
+          ]
+        },
+        {
+          "name": "Greavard",
+          "dex": 971,
+          "region": null,
+          "types": [
+            "ghost"
           ]
         }
       ],

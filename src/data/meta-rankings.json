@@ -1,9 +1,9 @@
 {
-  "fetchedAt": "2026-10-17T10:53:10.696Z",
-  "gameMasterTimestamp": "1791944086648",
+  "fetchedAt": "2026-10-18T11:18:33.581Z",
+  "gameMasterTimestamp": "1792192076843",
   "sources": {
     "mechanics": "alexelgt/game_masters",
-    "mechanicsBatch": "2026-10-14T02:14:46.648Z",
+    "mechanicsBatch": "2026-10-16T23:07:56.843Z",
     "roster": "pvpoke/pvpoke",
     "rosterBatch": "2026-10-17 03:10:24"
   },
@@ -235,6 +235,7 @@
     "landorus": "legendary"
   },
   "topMaxAttackers": [
+    "regidrago",
     "palkia",
     "metagross",
     "zapdos",
@@ -279,7 +280,6 @@
     "jolteon",
     "leafeon",
     "arcanine",
-    "drampa",
     "snorlax",
     "passimian",
     "hatterene",
@@ -299,6 +299,7 @@
     "regirock",
     "garbodor",
     "whimsicott",
+    "drampa",
     "corviknight",
     "butterfree",
     "greedent",
