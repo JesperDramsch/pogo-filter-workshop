@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-18T11:18:31.061Z",
+  "fetchedAt": "2026-10-19T13:31:09.624Z",
   "raids": {
     "mega": [
       {
@@ -722,6 +722,35 @@
             "bug",
             "ghost",
             "dark"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "max-mondays-2026-10-26",
+      "name": "Dynamax Sableye during Max Monday",
+      "eventType": "max-mondays",
+      "start": "2026-10-26T06:00:00.000",
+      "end": "2026-10-26T21:00:00.000",
+      "bosses": [
+        {
+          "id": "SABLEYE",
+          "form": "SABLEYE_NORMAL",
+          "names": {
+            "en": "Sableye"
+          },
+          "types": [
+            "dark",
+            "ghost"
+          ],
+          "resistorTypes": [
+            "normal",
+            "fighting",
+            "dark",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "fairy"
           ]
         }
       ]
