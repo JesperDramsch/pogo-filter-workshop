@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-19T13:31:09.624Z",
+  "fetchedAt": "2026-10-20T11:47:59.410Z",
   "raids": {
     "mega": [
       {
@@ -620,43 +620,6 @@
     }
   ],
   "eventMaxBattles": [
-    {
-      "eventID": "max-mondays-2026-10-19",
-      "name": "Dynamax Sneasel during Max Monday",
-      "eventType": "max-mondays",
-      "start": "2026-10-19T06:00:00.000",
-      "end": "2026-10-19T21:00:00.000",
-      "bosses": [
-        {
-          "id": "SNEASEL",
-          "form": "SNEASEL_NORMAL",
-          "names": {
-            "en": "Sneasel"
-          },
-          "types": [
-            "dark",
-            "ice"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "steel",
-            "fire",
-            "water",
-            "ice",
-            "dark",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "rock",
-            "bug",
-            "steel",
-            "fire",
-            "fairy"
-          ]
-        }
-      ]
-    },
     {
       "eventID": "dynamax-uxie-mesprit-azelf-max-battle-day-2026",
       "name": "Dynamax Uxie, Mesprit, and Azelf Max Battle Day",
