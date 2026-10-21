@@ -617,6 +617,72 @@
           ]
         }
       ]
+    },
+    {
+      "eventID": "giratina-origin-forme-in-5-star-raid-battles-october-2026",
+      "name": "Giratina (Origin Forme) in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-10-28T06:00:00.000",
+      "end": "2026-11-03T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "GIRATINA",
+          "form": "GIRATINA_ORIGIN",
+          "names": {
+            "en": "Giratina"
+          },
+          "types": [
+            "ghost",
+            "dragon"
+          ],
+          "resistorTypes": [
+            "normal",
+            "steel",
+            "dark",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "ghost",
+            "ice",
+            "dragon",
+            "dark",
+            "fairy"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-sableye-in-mega-raids-october-2026",
+      "name": "Mega Sableye in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-10-28T06:00:00.000",
+      "end": "2026-11-08T22:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "SABLEYE",
+          "form": null,
+          "names": {
+            "en": "Mega Sableye"
+          },
+          "types": [
+            "dark",
+            "ghost"
+          ],
+          "resistorTypes": [
+            "normal",
+            "fighting",
+            "dark",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "fairy"
+          ]
+        }
+      ]
     }
   ],
   "eventMaxBattles": [
