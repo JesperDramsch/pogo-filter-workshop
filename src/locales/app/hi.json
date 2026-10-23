@@ -188,6 +188,7 @@
   "app.filter.pilot_long_label": "Pilot 1000+ stash",
   "app.filter.pilot_long_hint": "आपके home से ≥1000km दूर पकड़े गए और अभी तक trade नहीं हुए। गहरी Pilot-medal pile (regular trade filter पहले से ≥100km cover करता है)।",
   "app.filter.raid_counter_label": "counters · {boss}",
+  "app.filter.boss_form_variant": "{region}, {variant}",
   "app.filter.raid_counter_hint": "ऐसे Pokémon जिनका अपना type {boss} के STAB को resist करता है AND जो super-effective move type carry करते हैं। Type filtering हर form को catch करता है — Alolan Raichu Psychic के नीचे, Mega Charizard X Dragon के नीचे आता है। अपना highest-level match चुनें; रेड DPS पर level + moveset का दबदबा है, IV का नहीं।",
   "app.filter.boss_no_clean_counter": "{boss}: कोई clean counter नहीं — अपना highest-DPS attacker लाएँ।",
   "app.filter.aux_bosses_empty": "Current snapshot में कोई bosses नहीं। Refresh करने के लिए `npm run fetch-raid-bosses` चलाएँ।",
