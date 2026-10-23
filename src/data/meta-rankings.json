@@ -1,9 +1,9 @@
 {
-  "fetchedAt": "2026-10-21T11:59:50.477Z",
-  "gameMasterTimestamp": "1792477975795",
+  "fetchedAt": "2026-10-23T11:47:44.938Z",
+  "gameMasterTimestamp": "1792650428589",
   "sources": {
     "mechanics": "alexelgt/game_masters",
-    "mechanicsBatch": "2026-10-20T06:32:55.795Z",
+    "mechanicsBatch": "2026-10-22T06:27:08.589Z",
     "roster": "pvpoke/pvpoke",
     "rosterBatch": "2026-10-21 03:50:13"
   },
