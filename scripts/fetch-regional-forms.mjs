@@ -37,6 +37,7 @@ import {
   warnIfStale,
 } from "./lib/game-master.mjs";
 import { originRegion } from "./lib/generations.mjs";
+import { regionForForm } from "../src/data/form-region.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -44,62 +45,12 @@ const DATA_DIR = resolve(ROOT, "src/data");
 const OUT_PATH = resolve(DATA_DIR, "regional-forms.json");
 const NAMES_PATH = resolve(ROOT, "src/locales/pokemon-names.json");
 
-// Stable form key + region from a game-master form suffix ("MEOWTH_ALOLA" has
-// suffix "ALOLA"). Returns null for non-regional forms (costumes, weather,
-// Unown letters, Deoxys, …) so they're filtered out — only true regional
-// variants reach the picker. The base form's region is overwritten with its
-// origin region (from dex) in buildCatalog.
-function regionForForm(form) {
-  if (form === "NORMAL") return { key: "base", region: "base" };
-  if (form === "ALOLA") return { key: "alola", region: "alola" };
-  if (form === "GALARIAN") return { key: "galar", region: "galar" };
-  if (form === "HISUIAN") return { key: "hisui", region: "hisui" };
-  if (form === "PALDEA") return { key: "paldea", region: "paldea" };
-  if (form.startsWith("PALDEA_")) {
-    const variant = form.slice("PALDEA_".length).toLowerCase(); // combat / blaze / aqua
-    return { key: `paldea:${variant}`, region: "paldea", variant };
-  }
-  return NON_REGIONAL_AXES[form] || null;
-}
-
-// Form axes that are NOT regional but ARE type-separable, so the same
-// {include, exclude} predicate machinery isolates them in PoGo search. They
-// carry `axis` instead of a meaningful region, which App.jsx's formRegionLabel
-// uses to render the variant alone ("Pflanzenumhang") rather than inventing a
-// region for it.
-//
-// Wormadam's cloaks really do differ: Plant Bug/Grass, Sandy Bug/Ground, Trash
-// Bug/Steel. Oricorio's four styles differ too (Fire / Electric / Psychic /
-// Ghost, all Flying) — the app previously blanket-protected Oricorio on the
-// stated grounds that "styles aren't separately searchable", which is wrong.
-//
-// Burmy's own cloaks are listed here on purpose even though all three are pure
-// Bug: predicateFor then reports them indistinct and buildCatalog drops the
-// species with a loud warning, which is the correct outcome and self-healing
-// if Niantic ever splits the types.
-//
-// Basculin's three stripes are here for the same reason and with the same
-// outcome today — red, blue and white all publish POKEMON_TYPE_WATER and
-// nothing else. Listing them is what makes that a checked fact rather than a
-// comment: the day any stripe gains a second type — White-Striped is the one
-// Basculegion evolves from, and Basculegion is not in PoGo at all yet — this
-// file starts emitting a real predicate instead of a warning, and the stripes
-// become searchable on their own. Whoever sees that happen must also drop dex
-// 550 from INVISIBLE_FORM_SLOTS (src/refinements.jsx) and add the form_variant
-// labels the picker will need — scripts/check-lucky-logic.mjs fails until they
-// do, because one chip may only ever render one badge group.
-const NON_REGIONAL_AXES = {
-  PLANT: { key: "cloak:plant", axis: "cloak", variant: "plant" },
-  SANDY: { key: "cloak:sandy", axis: "cloak", variant: "sandy" },
-  TRASH: { key: "cloak:trash", axis: "cloak", variant: "trash" },
-  BAILE: { key: "style:baile", axis: "style", variant: "baile" },
-  POMPOM: { key: "style:pompom", axis: "style", variant: "pompom" },
-  PAU: { key: "style:pau", axis: "style", variant: "pau" },
-  SENSU: { key: "style:sensu", axis: "style", variant: "sensu" },
-  RED_STRIPED: { key: "stripe:red", axis: "stripe", variant: "redstriped" },
-  BLUE_STRIPED: { key: "stripe:blue", axis: "stripe", variant: "bluestriped" },
-  WHITE_STRIPED: { key: "stripe:white", axis: "stripe", variant: "whitestriped" },
-};
+// Which forms reach the catalog, and as what, is regionForForm's call: a form
+// suffix to its key and region, or to its axis for the non-regional forms
+// that are type-separable (Wormadam's cloaks, Oricorio's styles, Basculin's
+// stripes). It lives in src/data/form-region.js, with the reasoning behind
+// each axis, because the app reads the same table to name an event raid
+// boss's regional form.
 
 // Render order: the base/origin form first, then the regional variants.
 const REGION_ORDER = { alola: 1, galar: 2, hisui: 3, paldea: 4 };

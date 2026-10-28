@@ -47,7 +47,9 @@
 //   D17 — a regional adjective ("Alolan Marowak", "Paldean Tauros (Blaze)")
 //         resolves to that regional form's enum and types, in event raids and
 //         Max Battles alike, and dedupes against a standing regional boss by
-//         form; an adjective naming no form, or several, is skipped
+//         form; an adjective naming no form, or several, is skipped. Its box
+//         is labelled with the region in every locale, so the Tauros breeds
+//         read apart; a plain boss's label and a standing one's are unchanged
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
@@ -56,8 +58,8 @@ import { indexTypes, effVsPokemon } from "./lib/rocket-derive.mjs";
 import { recurringTypesOf, KILLER_ONE_IN } from "./lib/rocket-cover.mjs";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import META_RANKINGS from "../src/data/meta-rankings.json";
-import { buildDataFilters, buildResult, FIXTURE_CONFIG } from "./lib/fixture.mjs";
-import { bossBoxKeys } from "../src/App.jsx";
+import { buildDataFilters, buildResult, FIXTURE_CONFIG, makeTFn } from "./lib/fixture.mjs";
+import { bossBoxKeys, bossCounterLabel } from "../src/App.jsx";
 import { LOCALES } from "../src/i18n/index.js";
 import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
 // `resolveSpecies` is D7's; the dictionary and locale list are D6's. D6 no
@@ -1518,25 +1520,113 @@ console.log("\nD17 — a regional adjective resolves to that regional form, and 
     !surfaced(shadowStanding).includes("zz-zapdos") && shadowStanding.deduped === 1 && shadowStanding.unresolved === 1,
     `${surfaced(shadowStanding)}; ${shadowStanding.deduped} deduped, ${shadowStanding.unresolved} unresolved`);
 
-  // Through the app: a regional boss builds a filter, and its name is the
-  // species' in every locale, from the dictionary, as D13 checks for formes.
-  const events = [...fresh.entries, ...maxes.entries];
-  const dataBoss = new Map(events.flatMap((e) => e.bosses.map((b) => [`${e.eventID}|${b.id}`, b])));
-  const raidBosses = { ...RAID_BOSSES, eventRaids: fresh.entries, eventMaxBattles: maxes.entries };
+  // Through the app: a regional boss builds a filter, and its box is labelled
+  // with the species' name from the dictionary and its form's region (and
+  // breed) from the output locale's labels, the ones the buddy form picker
+  // shows, so the three Tauros breeds are three boxes a trainer can tell
+  // apart: "Tauros (Paldea, Blaze)". A bare name, a
+  // forme that is no region and a regional mode go through the same event, and
+  // a regional standing boss stands in lvl3. Each boss's region is written out
+  // here rather than read back from regionForForm.
+  const REGION_OF = {
+    [`${ID(105)}_ALOLA`]: ["alola"],
+    [`${ID(128)}_PALDEA_BLAZE`]: ["paldea", "blaze"],
+    [`${ID(128)}_PALDEA_AQUA`]: ["paldea", "aqua"],
+    [`${ID(128)}_PALDEA_COMBAT`]: ["paldea", "combat"],
+    [`${ID(145)}_GALARIAN`]: ["galar"],
+    [`${ID(122)}_GALARIAN`]: ["galar"],
+    [`${ID(58)}_HISUIAN`]: ["hisui"],
+    // A regional suffix regionForForm does not list is read by its head.
+    [`${ID(555)}_GALARIAN_ZEN`]: ["galar"],
+  };
+  const PLAIN = [`${ID(105)}_NORMAL`, `${ID(487)}_ORIGIN`, `${ID(555)}_ZEN`];
+  const formes = quietly(() => buildEventRaids([
+    ev("zz-formes", "raid-battles", `${en(105)} in 3-star Raid Battles`,
+      [en(105), `${en(487)} (Origin)`, `${en(555)} (Zen Mode)`, `Galarian ${en(555)} (Zen Mode)`]),
+  ], { nameIdx, allTypes: LILY_TYPES, raids: {}, now: NOW }));
+  const formeForms = (eventOf(formes, "zz-formes")?.bosses || []).map((b) => b.form).join(", ");
+  check("a bare name, two formes that are no region and a regional mode resolve side by side in one event",
+    formeForms === [...PLAIN, `${ID(555)}_GALARIAN_ZEN`].join(", "), formeForms);
+
+  // The event groups in the order buildFilters emits them: raids, then Max Battles.
+  const events = [...fresh.entries, ...formes.entries, ...maxes.entries];
+  // lily-dex-api names a regional standing boss with its region ("Alolan
+  // Marowak", "Alola-Knogga"), so its label must not gain a second one.
+  const standing = deriveTiered({
+    lvl3: [{ id: ID(105), form: `${ID(105)}_ALOLA`, names: { English: `Alolan ${en(105)}` }, types: ["Fire", "Ghost"] }],
+  }, LILY_TYPES);
+  const formless = (bosses) => bosses.map((b) => ({ ...b, form: null }));
+  // The same bosses with no form: what the label was before forms reached it.
+  const snapshot = (strip) => ({
+    ...RAID_BOSSES,
+    raids: strip ? { lvl3: formless(standing.lvl3) } : standing,
+    eventRaids: [...fresh.entries, ...formes.entries].map((e) => (strip ? { ...e, bosses: formless(e.bosses) } : e)),
+    eventMaxBattles: maxes.entries.map((e) => (strip ? { ...e, bosses: formless(e.bosses) } : e)),
+  });
+  const groupsOf = (result) => [...(result.eventRaidFilters || []), ...(result.eventMaxBattleFilters || [])];
   for (const loc of localeNames) {
-    const result = buildResult(loc, { raidBosses });
-    const groups = [...(result.eventRaidFilters || []), ...(result.eventMaxBattleFilters || [])];
+    const t = makeTFn(loc);
+    const message = (key) => LOCALES[loc].messages[key];
+    const withForms = buildResult(loc, { raidBosses: snapshot(false) });
+    const withoutForms = buildResult(loc, { raidBosses: snapshot(true) });
+    const bare = groupsOf(withoutForms);
+    const groups = groupsOf(withForms);
     const bad = groups.length === events.length ? [] : [`${groups.length} groups for ${events.length} events`];
-    for (const g of groups) {
-      for (const b of g.bosses || []) {
-        const dexKey = resolveSpeciesInfo(dataBoss.get(`${g.eventID}|${b.id}`)?.names?.en, "en")?.dexKey;
-        const expected = dexKey && POKEMON_NAMES_DICT[dexKey]?.[loc]?.toLowerCase();
-        if (b.skipped || !b.clause) bad.push(`${g.eventID}/${b.id}: empty filter`);
-        if (!expected || String(b.name).toLowerCase() !== expected) bad.push(`${g.eventID}/${b.id}: named "${b.name}", not "${expected}"`);
+    let regional = 0;
+    let plain = 0;
+    groups.forEach((g, gi) => (g.bosses || []).forEach((b, bi) => {
+      const data = events[gi]?.bosses?.[bi];
+      const bareBoss = bare[gi]?.bosses?.[bi];
+      const where = `${g.eventID}/${data?.form}`;
+      const dexKey = resolveSpeciesInfo(data?.names?.en, "en")?.dexKey;
+      const expected = dexKey && POKEMON_NAMES_DICT[dexKey]?.[loc]?.toLowerCase();
+      if (b.skipped || !b.clause) bad.push(`${where}: empty filter`);
+      // Without its form a boss is named from the dictionary, as D13 checks for formes.
+      if (!expected || String(bareBoss?.name).toLowerCase() !== expected) bad.push(`${where}: named "${bareBoss?.name}", not "${expected}"`);
+      const label = bossCounterLabel(b, t);
+      const bareLabel = bareBoss && bossCounterLabel(bareBoss, t);
+      const want = REGION_OF[data?.form];
+      if (!want) {
+        plain++;
+        if (label !== bareLabel) bad.push(`${where}: "${label}", was "${bareLabel}"`);
+        return;
       }
+      regional++;
+      // One pair of brackets after the bare name: the region, or the region
+      // and the breed joined in this locale's own punctuation, never
+      // "Paldea (Blaze)" nested inside the name's brackets.
+      const [region, variant] = want;
+      const regionLabel = message(`app.buddy_targets.form_region.${region}`);
+      const variantLabel = variant && message(`app.buddy_targets.form_variant.${variant}`);
+      const joined = variant && message("app.filter.boss_form_variant")?.replace("{region}", regionLabel).replace("{variant}", variantLabel);
+      const formLabel = variant ? joined : regionLabel;
+      if (!regionLabel || (variant && !(variantLabel && joined?.includes(regionLabel) && joined.includes(variantLabel)))) {
+        bad.push(`${where}: no ${loc} label names ${want.join(" and ")}`);
+      } else if (b.name !== `${bareBoss?.name} (${formLabel})` || !label.includes(`(${formLabel})`)) {
+        bad.push(`${where}: "${label}", not "… ${bareBoss?.name} (${formLabel})"`);
+      }
+    }));
+    const taurosLabels = (groups.find((g) => g.eventID === "zz-tauros")?.bosses || []).map((b) => bossCounterLabel(b, t));
+    if (new Set(taurosLabels).size !== 3) bad.push(`Tauros breeds: ${JSON.stringify(taurosLabels)}`);
+    const standingLabel = withForms.raidFilters?.lvl3?.[0] && bossCounterLabel(withForms.raidFilters.lvl3[0], t);
+    const standingBare = withoutForms.raidFilters?.lvl3?.[0];
+    const alola = message("app.buddy_targets.form_region.alola");
+    if (!standingLabel || standingLabel !== bossCounterLabel(standingBare, t)) bad.push(`standing: "${standingLabel}"`);
+    else if (standingLabel.split(alola).length !== 2) bad.push(`standing names "${alola}" more than once: "${standingLabel}"`);
+    // A boss with no clean counter is skipped, and its note reads the same name.
+    const blazeEvent = fresh.entries.find((e) => e.eventID === "zz-tauros");
+    const noCounter = { ...blazeEvent, eventID: "zz-no-counter", bosses: [{ ...blazeEvent.bosses[0], resistorTypes: [] }] };
+    const skippedOut = buildResult(loc, { raidBosses: { ...snapshot(false), eventRaids: [noCounter], eventMaxBattles: [] } });
+    const skipped = groupsOf(skippedOut).find((g) => g.eventID === "zz-no-counter")?.bosses?.[0];
+    const blazeLabel = message("app.filter.boss_form_variant")
+      ?.replace("{region}", message("app.buddy_targets.form_region.paldea"))
+      .replace("{variant}", message("app.buddy_targets.form_variant.blaze"));
+    const blazeBare = bare.find((g) => g.eventID === "zz-tauros")?.bosses?.[0]?.name;
+    if (!skipped?.skipped || skipped.name !== `${blazeBare} (${blazeLabel})`) {
+      bad.push(`skipped boss named "${skipped?.name}", not "${blazeBare} (${blazeLabel})"`);
     }
-    check(`${loc}: ${groups.length} regional event(s) build a filter per boss, named from the dictionary`,
-      groups.length > 0 && bad.length === 0, bad.slice(0, 4).join(" | "));
+    check(`${loc}: ${regional} regional event boss labels carry their region, ${plain} plain ones and a regional standing boss are unchanged`,
+      regional === Object.keys(REGION_OF).length && plain === PLAIN.length && bad.length === 0, bad.slice(0, 4).join(" | "));
   }
 }
 
