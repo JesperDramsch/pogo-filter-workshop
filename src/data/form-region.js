@@ -27,7 +27,7 @@ export function regionForForm(form) {
 
 // Form axes that are NOT regional but ARE type-separable, so the same
 // {include, exclude} predicate machinery isolates them in PoGo search. They
-// carry `axis` instead of a meaningful region, which App.jsx's formRegionLabel
+// carry `axis` instead of a meaningful region, which refinements.jsx's formRegionLabel
 // uses to render the variant alone ("Pflanzenumhang") rather than inventing a
 // region for it.
 //

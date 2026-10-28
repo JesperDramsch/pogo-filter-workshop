@@ -1613,6 +1613,18 @@ console.log("\nD17 — a regional adjective resolves to that regional form, and 
     const alola = message("app.buddy_targets.form_region.alola");
     if (!standingLabel || standingLabel !== bossCounterLabel(standingBare, t)) bad.push(`standing: "${standingLabel}"`);
     else if (standingLabel.split(alola).length !== 2) bad.push(`standing names "${alola}" more than once: "${standingLabel}"`);
+    // A boss with no clean counter is skipped, and its note reads the same name.
+    const blazeEvent = fresh.entries.find((e) => e.eventID === "zz-tauros");
+    const noCounter = { ...blazeEvent, eventID: "zz-no-counter", bosses: [{ ...blazeEvent.bosses[0], resistorTypes: [] }] };
+    const skippedOut = buildResult(loc, { raidBosses: { ...snapshot(false), eventRaids: [noCounter], eventMaxBattles: [] } });
+    const skipped = groupsOf(skippedOut).find((g) => g.eventID === "zz-no-counter")?.bosses?.[0];
+    const blazeLabel = message("app.filter.boss_form_variant")
+      ?.replace("{region}", message("app.buddy_targets.form_region.paldea"))
+      .replace("{variant}", message("app.buddy_targets.form_variant.blaze"));
+    const blazeBare = bare.find((g) => g.eventID === "zz-tauros")?.bosses?.[0]?.name;
+    if (!skipped?.skipped || skipped.name !== `${blazeBare} (${blazeLabel})`) {
+      bad.push(`skipped boss named "${skipped?.name}", not "${blazeBare} (${blazeLabel})"`);
+    }
     check(`${loc}: ${regional} regional event boss labels carry their region, ${plain} plain ones and a regional standing boss are unchanged`,
       regional === Object.keys(REGION_OF).length && plain === PLAIN.length && bad.length === 0, bad.slice(0, 4).join(" | "));
   }

@@ -3990,7 +3990,7 @@ export function buildFilters(
 		if (resistorList.length === 0 || seMoveList.length === 0) {
 			return {
 				id: boss.id,
-				name: bossName(boss),
+				name,
 				clause: '',
 				clauses: [],
 				skipped: true,
