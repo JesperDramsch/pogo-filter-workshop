@@ -116,7 +116,8 @@ console.log("\nB2a — buddy tags protected in TRADE (granular-tag mode)");
   check("buddy tag protected in trash (baseline)", hasClauseMatching(r.trash, /^!#auri$/));
   check("buddy tag protected in TRADE", hasClauseMatching(r.trade, /^!#auri$/));
   // It should behave like the basar/fern trade tags (also protected in trade).
-  check("basar tag also protected in trade (parity sanity)", hasClauseMatching(r.trade, /^!#Trade$/));
+  const basar = DEFAULT_CONFIG.basarTagName;
+  check(`basar tag (#${basar}) also protected in trade (parity sanity)`, hasClauseMatching(r.trade, new RegExp(`^!#${basar}$`)));
 }
 
 console.log("\nB2a — protectAnyTag=true still covers buddy tags via !#");
@@ -134,7 +135,7 @@ console.log("\nB2b — buddy hand-off pile surfaced in PRESTAGED");
   check("prestaged surfaces #auri positively (in tag allow-list clause)",
     tagClause.split(",").includes("#auri"), `clause 1 = ${tagClause}`);
   check("prestaged still includes the basar/fern tags",
-    tagClause.includes("#Trade") && tagClause.includes("#Fern-Tausch"));
+    tagClause.split(",").includes(`#${DEFAULT_CONFIG.basarTagName}`) && tagClause.includes("#Fern-Tausch"));
 }
 
 console.log("\nTrade keeper-protection parity (XXS + new-dex evolutions)");

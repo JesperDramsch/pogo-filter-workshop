@@ -24,7 +24,7 @@
 // Run with: npx vite-node scripts/check-piles.mjs
 
 import {
-  BUDGET_DEFAULTS, BUDGET_ROWS, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET,
+  BUDGET_DEFAULTS, BUDGET_ROWS, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET,
 } from "../src/App.jsx";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import COMMUNITY_DAYS from "../src/data/community-days.json";
@@ -308,6 +308,30 @@ console.log("\nP8 — budgets");
   check("import keeps whole numbers ≥ 0, unknown keys included, and drops the rest",
     JSON.stringify(merged) === JSON.stringify({ pvpNormal: 2, futureJob: 5 }), JSON.stringify(merged));
   check("a config without budgets merges to no overrides", JSON.stringify(mergeImportedConfig({}).budgets) === "{}");
+}
+
+console.log("\nTagging scheme");
+{
+  const defaults = Object.values(jobTagsOf(mergeImportedConfig({})));
+  for (const loc of localeNames) {
+    const bad = defaults.flatMap((tag) => {
+      const c = tagClashes(tag, defaults, loc);
+      return [c.keyword && `#${tag} is a keyword`, c.prefixOf.length && `#${tag} prefixes #${c.prefixOf.join(", #")}`].filter(Boolean);
+    });
+    check(`${loc}: no suggested tag is a search keyword or prefixes another`, bad.length === 0, bad.join(" | "));
+  }
+  check("the clash check sees a keyword (#shiny, #Raid in en and de)",
+    tagClashes("shiny", [], "en").keyword && tagClashes("Raid", [], "en").keyword && tagClashes("Raid", [], "de").keyword);
+  check("the clash check sees a prefix (#Trade finds #Trade-Julia)",
+    tagClashes("Trade", ["Trade-Julia", "PvP"], "en").prefixOf.join() === "Trade-Julia");
+  check("tradebait is basarTagName, promised is not a stored tag",
+    jobTagsOf({ basarTagName: "Tausch-Basar" }).trade === "Tausch-Basar" && !("promised" in JOB_TAG_DEFAULTS));
+  const merged = mergeImportedConfig({ jobTags: { pvp: " #Kolosseum ", raid: "", show: 5 } }).jobTags;
+  check("import keeps renamed tags without #, drops empty or non-text ones", JSON.stringify(merged) === JSON.stringify({ pvp: "Kolosseum" }), JSON.stringify(merged));
+  for (const loc of localeNames) {
+    const missing = JOB_TAG_ORDER.filter((j) => loc !== "en" && LOCALES[loc].messages[`app.tags.${j}.label`] === undefined);
+    check(`${loc}: every job's tag row is translated`, missing.length === 0, missing.join(", "));
+  }
 }
 
 console.log("\nCommunity Day data (scripts/lib/community-days.mjs → src/data/community-days.json)");

@@ -767,6 +767,10 @@ export const DEFAULT_CONFIG = {
 	// added later reaches every saved config without a migration. Simple mode
 	// ignores them and uses the defaults (docs/sorting-workflow-spec.md).
 	budgets: {},
+	// Job tag names the user renamed (docs/sorting-workflow-spec.md, "Tagging
+	// scheme"); JOB_TAG_DEFAULTS for the rest. Tradebait is basarTagName and
+	// "promised" is each trade buddy's prefix, so neither is in here.
+	jobTags: {},
 
 	// PvP
 	pvpMode: 'strict', // "loose" | "intelligent" | "strict" | "none"
@@ -838,7 +842,7 @@ export const DEFAULT_CONFIG = {
 	protectBuddies: false,
 
 	// Trade tags (both protected as TAGS in PoGo via #name syntax)
-	basarTagName: 'Trade', // bulk trade tag (was hardcoded #)
+	basarTagName: 'Tradebait', // bulk trade tag; not `Trade`, which would prefix-match the `Trade-<Name>` buddy tags
 	fernTauschTagName: 'Fern-Tausch', // Niantic's official long-distance trade tag (Dec 2025)
 	// EvoSwap tag — used by the trade-buddy purified-dex coordination filter
 	// in the Team Rocket aux section. Renaming lets you run multiple parallel
@@ -1690,6 +1694,12 @@ export function mergeImportedConfig(raw, notices = []) {
 				});
 			return { rawAppend: '', ...b, targetSpecies };
 		});
+	// Job tag renames: non-empty strings, without a leading #.
+	merged.jobTags = Object.fromEntries(
+		Object.entries(merged.jobTags && typeof merged.jobTags === 'object' ? merged.jobTags : {})
+			.map(([k, v]) => [k, typeof v === 'string' ? v.trim().replace(/^#+/, '') : ''])
+			.filter(([, v]) => v),
+	);
 	// Budget overrides: whole numbers ≥ 0 only; anything else falls back to the
 	// default by being dropped. Unknown keys stay (a newer export).
 	merged.budgets = Object.fromEntries(
@@ -1903,6 +1913,44 @@ export const BUDGET_DEFAULTS = {
 	backgroundPerSpecies: 1,
 	backgroundTradeable: 3,
 };
+
+// The tagging scheme's suggested job tags. Every tag is a job; Dex-Evolve and
+// Crush are temporary (off once the line is evolved through / emptied on a
+// double transfer candy day). Names avoid the search keywords of every locale:
+// `Raid` and `Evolve` are keywords in some (en/de/fr, en).
+export const JOB_TAG_DEFAULTS = {
+	evolve: 'Dex-Evolve',
+	pvp: 'PvP',
+	raid: 'PvE-Raid',
+	show: 'Show',
+	souvenir: 'Souvenir',
+	shadow_keep: 'ShadowKeep',
+	parker: 'Parker',
+	crush: 'Crush',
+};
+// The scheme's rows in the spec's order; `trade` edits basarTagName and
+// `promised` shows the trade buddies' prefixes.
+export const JOB_TAG_ORDER = ['evolve', 'trade', 'promised', 'pvp', 'raid', 'show', 'souvenir', 'shadow_keep', 'parker', 'crush'];
+export function jobTagsOf(cfg) {
+	return { ...JOB_TAG_DEFAULTS, ...(cfg?.jobTags || {}), trade: cfg?.basarTagName || 'Tradebait' };
+}
+
+// What goes wrong with a tag name in this game language: `keyword` when the
+// name is a search keyword (searching #shiny also lists every shiny), and
+// `prefixOf`, the other tags it prefix-matches (PoGo matches #tags by prefix,
+// so #Trade would also find #Trade-Julia).
+export function tagClashes(tag, otherTags, outputLocale) {
+	const name = String(tag || '').trim().toLowerCase();
+	if (!name) return { keyword: false, prefixOf: [] };
+	const messages = LOCALES[outputLocale]?.messages || LOCALES.en.messages;
+	const keyword = Object.entries(messages).some(
+		([k, v]) => k.startsWith('ingame.') && String(v).toLowerCase().trim() === name,
+	);
+	const prefixOf = [...new Set(otherTags)].filter(
+		(o) => o && o.toLowerCase() !== name && o.toLowerCase().startsWith(name),
+	);
+	return { keyword, prefixOf };
+}
 
 // The budgets in force: the user's overrides in expert mode, the defaults in
 // simple mode.
@@ -6881,6 +6929,9 @@ export default function App() {
 			/>
 		</div>
 	);
+	const jobTagSettings = (
+		<JobTagsPanel config={config} setConfig={setConfig} copied={copied} copyToClipboard={copyToClipboard} t={t} />
+	);
 	const mythCarveOutSettings = effectiveConfig.expertMode && effectiveConfig.protectMythicals && (
 		<div>
 			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4'>
@@ -6966,6 +7017,7 @@ export default function App() {
 		),
 		sort: (
 			<div className='space-y-10'>
+				{jobTagSettings}
 				{haveListSettings}
 				{shadowKeeperSettings}
 				<BudgetsEditor config={config} setConfig={setConfig} t={t} />
@@ -7085,6 +7137,7 @@ export default function App() {
 							>
 								<div className='space-y-12'>
 										{haveListSettings}
+										{jobTagSettings}
 										{mythCarveOutSettings}
 										{shadowKeeperSettings}
 										{raidRosterSettings}
@@ -12949,6 +13002,89 @@ function ChangelogModal({ open, onClose }) {
 	);
 }
 
+// The tagging scheme (spec: "Tagging scheme"): one row per job with its tag,
+// renamable, a #tag search to copy, and a warning when the name is a search
+// keyword in the game language or prefix-matches another job's tag.
+function JobTagsPanel({ config, setConfig, copied, copyToClipboard, t }) {
+	const { outputLocale } = useTranslation();
+	const tags = jobTagsOf(config);
+	const buddyPrefixes = (config.buddies || []).filter((b) => b.active !== false && b.tagPrefix).map((b) => b.tagPrefix);
+	const allTags = [...JOB_TAG_ORDER.filter((j) => j !== 'promised').map((j) => tags[j]), ...buddyPrefixes, config.fernTauschTagName].filter(Boolean);
+	const rename = (job, raw) => {
+		const v = raw.replace(/^#+/, '');
+		setConfig((prev) => {
+			if (job === 'trade') return { ...prev, basarTagName: v };
+			const next = { ...(prev.jobTags || {}) };
+			if (!v.trim() || v === JOB_TAG_DEFAULTS[job]) delete next[job];
+			else next[job] = v;
+			return { ...prev, jobTags: next };
+		});
+	};
+	return (
+		<div>
+			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-2'>{t('app.tags.title')}</h3>
+			<p className='mono text-xs text-[#8B98A5] mb-4 leading-relaxed'>{t('app.tags.hint')}</p>
+			<ul className='space-y-4'>
+				{JOB_TAG_ORDER.map((job) => {
+					const label = t(`app.tags.${job}.label`);
+					if (job === 'promised') {
+						const shown = [...buddyPrefixes, config.fernTauschTagName].filter(Boolean);
+						return (
+							<li key={job} className='border-l-2 border-[#1F2933] pl-3'>
+								<div className='mono text-sm text-[#E6EDF3]'>{label}</div>
+								<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.tags.promised.hint')}</p>
+								<p className='mono text-xs text-[#5EAFC5] mt-1'>{shown.length ? shown.map((x) => `#${x}`).join(' · ') : '#Trade-<Name>'}</p>
+							</li>
+						);
+					}
+					const tag = tags[job];
+					const clash = tagClashes(tag, allTags, outputLocale);
+					const copyKey = `jobtag_${job}`;
+					return (
+						<li key={job} className='border-l-2 border-[#1F2933] pl-3'>
+							<div className='mono text-sm text-[#E6EDF3]'>
+								{label}
+								{(job === 'evolve' || job === 'crush') && (
+									<span className='ml-2 text-[10px] uppercase tracking-wide text-[#8090A0]'>{t('app.tags.temporary')}</span>
+								)}
+							</div>
+							<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t(`app.tags.${job}.hint`)}</p>
+							<div className='flex flex-wrap items-center gap-2 mt-1.5'>
+								<label className='mono text-[11px] text-[#8090A0] flex items-center gap-1'>
+									<span aria-hidden='true'>#</span>
+									<input
+										type='text'
+										value={tag}
+										onChange={(e) => rename(job, e.target.value)}
+										aria-label={`${label}: ${t('app.tags.name')}`}
+										className='mono text-sm w-40 min-h-[32px] bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 rounded-sm text-[#E6EDF3]'
+									/>
+								</label>
+								<button
+									type='button'
+									onClick={() => copyToClipboard(copyKey, `#${tag}`)}
+									className='mono text-xs min-h-[32px] px-2.5 rounded-sm bg-[#1F2933] text-[#5EAFC5] hover:bg-[#2D3A47]'
+									aria-label={`${t('app.tags.copy')}: #${tag}`}
+								>
+									{copied[copyKey] ? t('app.tags.copied') : t('app.tags.copy')}
+								</button>
+							</div>
+							{clash.keyword && (
+								<p role='alert' className='mono text-[11px] text-[#F5B82E] mt-1'>{t('app.tags.keyword_clash', { params: { tag } })}</p>
+							)}
+							{clash.prefixOf.length > 0 && (
+								<p role='alert' className='mono text-[11px] text-[#F5B82E] mt-1'>
+									{t('app.tags.prefix_clash', { params: { tag, other: clash.prefixOf.join(', #') } })}
+								</p>
+							)}
+						</li>
+					);
+				})}
+			</ul>
+		</div>
+	);
+}
+
 // The spec's budget table under Sorting → settings. Every row is shown in both
 // modes, with its rule filled in from the budgets in force; expert mode adds
 // the numbers. Setting a number back to its default drops the override.
@@ -13697,10 +13833,12 @@ function BuddyManager({ buddies, onChange }) {
 	function addBuddy() {
 		const name = newName.trim();
 		if (!name) return;
-		// Generate a default tag prefix from the name (alpha chars, capitalized)
-		const tagPrefix = name.replace(/[^a-zA-ZäöüÄÖÜß0-9]/g, '');
-		if (!tagPrefix) return;
-		const id = tagPrefix.toLowerCase() + '-' + Date.now().toString(36);
+		// Default tag prefix `Trade-<Name>` (the tagging scheme's "promised to a
+		// person" tag): letters and digits of the name. Editable per buddy.
+		const bare = name.replace(/[^a-zA-ZäöüÄÖÜß0-9]/g, '');
+		if (!bare) return;
+		const tagPrefix = `Trade-${bare}`;
+		const id = bare.toLowerCase() + '-' + Date.now().toString(36);
 		onChange([
 			...buddies,
 			{ id, name, tagPrefix, targetSpecies: [], wantsTradeEvos: false, rawAppend: '', active: true },
