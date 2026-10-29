@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-29T13:14:00.801Z",
+  "fetchedAt": "2026-10-29T18:21:00.387Z",
   "sources": {
     "classes": "game master",
     "released": "pvpoke/pvpoke",
@@ -1018,6 +1018,9 @@
         "fighting"
       ]
     }
+  ],
+  "upcomingMegaDex": [
+    609
   ],
   "evoParentByDex": {
     "2": 1,

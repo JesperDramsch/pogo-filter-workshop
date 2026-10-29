@@ -53,11 +53,12 @@ import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
-import { fetchGameMaster, warnIfStale, gameMasterProvenance, batchMsFromIso } from "./lib/game-master.mjs";
+import { fetchGameMaster, warnIfStale, gameMasterProvenance, batchMsFromIso, pokemonTemplates } from "./lib/game-master.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const OUT_PATH = resolve(ROOT, "src/data/game-master-watch.json");
+const WATCH_MOVES_PATH = resolve(dirname(OUT_PATH), "watch-moves.json");
 
 const PVPOKE_GM = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data/gamemaster.min.json";
 
@@ -173,15 +174,75 @@ function recordChanges(stream, changes, history, now) {
     .slice(0, MAX_HISTORY);
 }
 
+// Which species learn each move the history names: the sorting workflow's
+// watchlist keeps a few of every species whose move just changed. Movepools
+// come from the game master (quick, charged and both elite lists, any form)
+// and PvPoke's roster, which sometimes lists a new move first.
+// PvPoke names a fast move without the game master's _FAST suffix, so both
+// spellings count. A temporary-evolution entry
+// (VM_MOVE_TEMP_EVOLUTION_MEGA_V0609_POKEMON_CHANDELURE) names its species in
+// the id. Returns { MOVE: [dex, …] } for the moves anyone learns.
+export function learnersOf(templates, moveIds, pvpokePokemon = []) {
+  const byMove = new Map();
+  for (const p of pvpokePokemon) {
+    for (const mv of [...(p?.fastMoves || []), ...(p?.chargedMoves || [])]) {
+      if (!Number.isInteger(p?.dex)) continue;
+      if (!byMove.has(mv)) byMove.set(mv, new Set());
+      byMove.get(mv).add(p.dex);
+    }
+  }
+  for (const { dex, settings } of pokemonTemplates(templates)) {
+    for (const list of [settings.quickMoves, settings.cinematicMoves, settings.eliteQuickMove, settings.eliteCinematicMove]) {
+      for (const mv of Array.isArray(list) ? list : []) {
+        if (!byMove.has(mv)) byMove.set(mv, new Set());
+        byMove.get(mv).add(dex);
+      }
+    }
+  }
+  const out = {};
+  for (const id of [...new Set(moveIds)].sort()) {
+    const dex = new Set([...(byMove.get(id) || []), ...(byMove.get(`${id}_FAST`) || [])]);
+    const temp = /^VM_MOVE_TEMP_EVOLUTION_\w+?_V(\d{4})_POKEMON_/.exec(id);
+    if (temp) dex.add(Number(temp[1]));
+    if (dex.size > 0) out[id] = [...dex].sort((a, b) => a - b);
+  }
+  return out;
+}
+
+// The watchlist's move tier (docs/sorting-workflow-spec.md, "Meta and
+// watchlist"): a move ADDED to either stream (a new move, a new Mega, a _PLUS
+// move), and a CHANGED move only when it is a signature move, learned by at
+// most WATCH_SIGNATURE_LEARNERS species. A rebalance of Bite or Body Slam
+// touches a hundred species and would put half the dex on the watchlist.
+// One entry per move and day; the app applies the time window.
+export const WATCH_SIGNATURE_LEARNERS = 5;
+export function watchMovesFrom(history, learnedBy) {
+  const out = new Map();
+  for (const h of history || []) {
+    for (const c of h.changes || []) {
+      const learners = learnedBy[c.move] || [];
+      const added = c.to === "added";
+      if (!added && (learners.length === 0 || learners.length > WATCH_SIGNATURE_LEARNERS)) continue;
+      const key = `${c.move}|${h.at.slice(0, 10)}`;
+      if (out.has(key)) continue;
+      out.set(key, { move: c.move, change: added ? "added" : "changed", at: h.at, learners });
+    }
+  }
+  return [...out.values()].sort((a, b) => b.at.localeCompare(a.at) || a.move.localeCompare(b.move));
+}
+
 async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
   const prev = readPreviousJson(OUT_PATH);
 
   let moves;
+  let pvpokePokemon = [];
   try {
     console.log("→ PvPoke game master (PvP move stats)");
-    moves = extractMoves(await fetchJson(PVPOKE_GM));
+    const pvpokeGm = await fetchJson(PVPOKE_GM);
+    moves = extractMoves(pvpokeGm);
+    pvpokePokemon = Array.isArray(pvpokeGm?.pokemon) ? pvpokeGm.pokemon : [];
   } catch (e) {
     console.error(`✗ Fetch failed: ${e.message}`);
     if (offlineOk && existsSync(OUT_PATH)) {
@@ -213,6 +274,7 @@ async function main() {
     batch: prev?.sources?.pveBatch ?? null,
   };
   let pveFresh = false;
+  let gmTemplates = null;
   try {
     console.log("→ Niantic game master (PvE move mechanics)");
     const gm = await fetchGameMaster({
@@ -220,6 +282,7 @@ async function main() {
       minBatchMs: batchMsFromIso(pveSource.batch),
     });
     const extracted = extractPveMoves(gm.templates);
+    gmTemplates = gm.templates;
     assertNotShrunken(gm.mirror, Object.keys(extracted).length,
       Object.keys(pveMoves || {}).length, MIN_PVE_MOVES);
     pveMoves = extracted;
@@ -245,6 +308,21 @@ async function main() {
   }
   if (history.length === priorHistory.length && prev?.moves) {
     console.log("  ↺ no move stats changed on either stream");
+  }
+  // The watchlist's move tier, written to its own small snapshot so the app
+  // does not bundle this file. Kept as is when the game master is unreachable.
+  if (gmTemplates) {
+    const named = history.flatMap((h) => (h.changes || []).map((c) => c.move));
+    const learnedBy = learnersOf(gmTemplates, named, pvpokePokemon);
+    const nobody = [...new Set(named)].filter((m) => !learnedBy[m]);
+    if (nobody.length) console.log(`  moves in the history no species learns yet: ${nobody.join(", ")}`);
+    const watchMoves = watchMovesFrom(history, learnedBy);
+    const prevWatch = readPreviousJson(WATCH_MOVES_PATH);
+    const content = { signatureLearners: WATCH_SIGNATURE_LEARNERS, moves: watchMoves };
+    const same = prevWatch?.fetchedAt &&
+      canonicalStringify({ signatureLearners: prevWatch.signatureLearners, moves: prevWatch.moves }) === canonicalStringify(content);
+    writeJson(WATCH_MOVES_PATH, { fetchedAt: same ? prevWatch.fetchedAt : now, ...content });
+    console.log(`✓ wrote ${WATCH_MOVES_PATH} (${watchMoves.length} watch moves)`);
   }
 
   // No derived fields, per #58: `moveCount` and `trackedFields` restated a

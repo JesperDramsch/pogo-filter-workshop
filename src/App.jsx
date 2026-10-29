@@ -30,6 +30,7 @@ import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from './i18n/pog
 import RAID_BOSSES from './data/raid-bosses.json';
 import EVENTS from './data/events.json';
 import COMMUNITY_DAYS from './data/community-days.json';
+import WATCH_MOVES from './data/watch-moves.json';
 import ROCKET_LINEUPS from './data/rocket-lineups.json';
 import ROCKET_GRUNT_QUOTES from './data/rocket-grunt-quotes.json';
 import RocketQuoteLookup from './explain/RocketQuoteLookup.jsx';
@@ -1863,6 +1864,39 @@ export function protectionTail(kw, cfg) {
 //   lenses: [{ key, filter, text? }] where `filter` is a CNF chain (may hold
 //   `&`) and `text` ([label, hint, params]) names a lens the pile's wording
 //   table can't know in advance, such as one per active GBL cup
+// How many Pokémon each job holds per species (docs/sorting-workflow-spec.md,
+// "Budgets (defaults)"). The pile card reads these; expert mode edits them.
+export const BUDGET_DEFAULTS = {
+	raidMeta: 6,
+	pvpNormal: 1,
+	pvpShadow: 1,
+	watchShadow: 3,
+	watchNormal: 1,
+	standIn: 1,
+	shadowStandIn: 2,
+	evolve: 1,
+	luckyPerForm: 1,
+	xxlScore: 1000,
+	dynaBuild: 1,
+	dynaBuildTop: 3,
+	dynaParkers: 35,
+	cheapPurify: 23,
+	costumePerStage: 1,
+	costumeTradeable: 3,
+	cdBackground: 3,
+};
+
+// The watchlist's move tier looks back this far (watch-moves.json has every
+// qualifying entry; see scripts/fetch-game-master-watch.mjs for which qualify).
+export const WATCH_MOVE_DAYS = 90;
+
+// A move id as the move dictionary keys it: DOUBLE_IRON_BASH → "double iron
+// bash", OMINOUS_WIND_PLUS → "ominous wind+". English title case if unknown.
+function moveLabel(id, tFn) {
+	const en = id.replace(/_FAST$/, '').replace(/_PLUS$/, '+').toLowerCase().replace(/_/g, ' ');
+	return tFn(`move.${en}`, { fallback: en.replace(/\b\w/g, (c) => c.toUpperCase()) });
+}
+
 // Species whose Community Day came with a special background. Same rule as
 // communityDayBackgroundDex in scripts/lib/community-days.mjs (check-piles
 // holds the two equal): legacy entries with a background, every rolling one.
@@ -4871,6 +4905,165 @@ export function buildFilters(
 			cfg,
 		}),
 	].filter(Boolean);
+
+	// ── META / WATCHLIST / NON-META ────────────────────────────────────────
+	// Each species' class, with its reasons in words, for the pile card and the
+	// watchlist piles. All from data: raid and shadow-keeper ranks per type
+	// (meta-rankings.json), the Max roster, PvP ranks (pvp-rankings.json),
+	// Megas the game master carries ahead of release (species-meta.json), the
+	// move tier (watch-moves.json) and ranks just past the meta cut.
+	const budgets = { ...BUDGET_DEFAULTS, ...(cfg.budgets || {}) };
+	const dexOfName = (n) => resolveSpeciesInfo(n)?.dex;
+	const typeWord = (type) => capFirst(kw.type[type] || type);
+	const reasonsOf = (map, dex) => map.get(dex) || map.set(dex, []).get(dex);
+	const metaWhy = new Map();
+	// Which jobs a meta species holds, for its keep lines: PvE (raid, shadow
+	// keeper, Max, or your own attacker rosters) and PvP (a league or cup pool).
+	const pveDex = new Set();
+	const pvpDex = new Set();
+	for (const [type, entries] of Object.entries(META_RANKINGS.perType || {}))
+		entries.forEach((e, i) => {
+			pveDex.add(e.dex);
+			reasonsOf(metaWhy, e.dex).push(tFn('app.card.reason.raid', { params: { type: typeWord(type), rank: i + 1 } }));
+		});
+	for (const [type, entries] of Object.entries(META_RANKINGS.shadowPerType || {}))
+		entries.forEach((e, i) => {
+			pveDex.add(e.dex);
+			reasonsOf(metaWhy, e.dex).push(tFn('app.card.reason.shadow_keeper', { params: { type: typeWord(type), rank: i + 1 } }));
+		});
+	for (const name of topMaxAttackersList) {
+		const dex = dexOfName(name);
+		if (!dex) continue;
+		pveDex.add(dex);
+		reasonsOf(metaWhy, dex).push(tFn('app.card.reason.max'));
+	}
+	for (const pool of pvpPools) {
+		const league = pool.key === 'pvp_great' ? tFn('app.pile.lens.pvp_great_label') : pool.text[2].cup;
+		const seen = new Set();
+		(pool.league?.species || []).forEach((sp, i) => {
+			if (seen.has(sp.dex)) return;
+			seen.add(sp.dex);
+			pvpDex.add(sp.dex);
+			reasonsOf(metaWhy, sp.dex).push(tFn('app.card.reason.pvp', { params: { league, rank: i + 1 } }));
+		});
+	}
+	const metaDex = new Set(
+		[...topAttackersList, ...topMaxAttackersList, ...keeperResolved].map(dexOfName).filter(Boolean),
+	);
+	for (const pool of pvpPools) for (const sp of pool.league?.species || []) metaDex.add(sp.dex);
+	for (const name of [...topAttackersList, ...keeperResolved]) {
+		const dex = dexOfName(name);
+		if (dex) pveDex.add(dex);
+	}
+	for (const dex of metaDex) if (!metaWhy.has(dex)) reasonsOf(metaWhy, dex).push(tFn('app.card.reason.roster'));
+
+	const watchWhy = new Map();
+	for (const dex of SPECIES_META.upcomingMegaDex || []) reasonsOf(watchWhy, dex).push(tFn('app.card.reason.mega'));
+	const moveCutoff = Date.now() - WATCH_MOVE_DAYS * 86400000;
+	for (const m of WATCH_MOVES.moves || []) {
+		if (Date.parse(m.at) < moveCutoff) continue;
+		// A temporary-evolution entry is the game master touching a species' Mega
+		// (new or existing: Mega Beedrill has been out for years), so it reads as
+		// a Mega change, and only when no upcoming-Mega reason already says more.
+		const temp = /^VM_MOVE_TEMP_EVOLUTION_/.test(m.move);
+		for (const dex of m.learners || []) {
+			if (temp && (SPECIES_META.upcomingMegaDex || []).includes(dex)) continue;
+			reasonsOf(watchWhy, dex).push(
+				temp
+					? tFn('app.card.reason.mega_changed')
+					: tFn(m.change === 'added' ? 'app.card.reason.move_added' : 'app.card.reason.move_changed', {
+							params: { move: moveLabel(m.move, tFn) },
+						}),
+			);
+		}
+	}
+	// A meta species keeps its class, and its card still says a Mega or a move
+	// change is coming; the rank tier below only means something off the meta.
+	for (const dex of metaDex) {
+		if (!watchWhy.has(dex)) continue;
+		reasonsOf(metaWhy, dex).unshift(...watchWhy.get(dex));
+		watchWhy.delete(dex);
+	}
+	for (const [type, entries] of Object.entries(META_RANKINGS.watchPerType || {}))
+		for (const e of entries)
+			if (!metaDex.has(e.dex))
+				reasonsOf(watchWhy, e.dex).push(tFn('app.card.reason.rank', { params: { type: typeWord(type), rank: e.rank } }));
+
+	const nameOfDex = (dex) => pokemonNameFor(String(dex), outputLocale);
+	const watchNames = [...watchWhy.keys()].sort((a, b) => a - b).map(nameOfDex).filter(Boolean);
+	const classifiedNames = [...new Set([...metaDex, ...watchWhy.keys()])].map(nameOfDex).filter(Boolean);
+	const watchPile = buildPile({
+		id: 'watchlist',
+		head: famOf(watchNames),
+		lenses: [
+			{ key: 'shadow', filter: kw.flag.shadow },
+			{ key: 'high_iv', filter: highIv },
+		],
+		kw,
+		cfg,
+	});
+	// Everything else, as one De Morgan chain: not any meta or watchlist family.
+	const nonMetaPile = buildPile({
+		id: 'non_meta',
+		head: [...new Set(classifiedNames)].map((n) => `!+${n}`).join('&'),
+		lenses: [
+			{ key: 'souvenirs', filter: souvenirLens },
+			{ key: 'high_iv', filter: highIv },
+		],
+		kw,
+		cfg,
+	});
+	sortingPiles.splice(1, 0, ...[watchPile, nonMetaPile].filter(Boolean));
+
+	// ── PILE CARD ──────────────────────────────────────────────────────────
+	// Per species in a pile with a species list: class, reasons, keep N, why.
+	// The workshop never sees the storage, so it says "keep up to N".
+	const cardRow = (dex) => {
+		const meta = metaWhy.get(dex);
+		const watch = !meta && watchWhy.get(dex);
+		const cls = meta ? 'meta' : watch ? 'watchlist' : 'non_meta';
+		const keep = [];
+		if (meta) {
+			if (pveDex.has(dex)) keep.push(tFn('app.card.keep.raid', { params: { n: budgets.raidMeta } }));
+			if (pvpDex.has(dex))
+				keep.push(tFn('app.card.keep.pvp', { params: { normal: budgets.pvpNormal, shadow: budgets.pvpShadow } }));
+		} else if (watch) {
+			keep.push(tFn('app.card.keep.watch', { params: { shadow: budgets.watchShadow, normal: budgets.watchNormal } }));
+		} else {
+			keep.push(tFn('app.card.keep.standin', { params: { n: budgets.standIn } }));
+		}
+		return {
+			dex,
+			name: capFirst(nameOfDex(dex) || String(dex)),
+			cls,
+			reasons: (meta || watch || []).slice(0, 3),
+			keep,
+			why: tFn(`app.card.why.${cls}`),
+		};
+	};
+	const cardFor = (dexList) => ({ rows: [...new Set(dexList)].filter(Boolean).sort((a, b) => a - b).map(cardRow) });
+	const RULE_PARAMS = {
+		shadows: { standin: budgets.shadowStandIn, cheap: budgets.cheapPurify },
+		luckies: { n: budgets.luckyPerForm },
+		dynamax: { build: budgets.dynaBuild, top: budgets.dynaBuildTop, parkers: budgets.dynaParkers },
+		xxl: { score: budgets.xxlScore },
+		xxs: { n: budgets.evolve },
+		costumes: { n: budgets.costumePerStage, tradeable: budgets.costumeTradeable },
+		cd_backgrounds: { n: budgets.cdBackground },
+		non_meta: { standin: budgets.standIn, evolve: budgets.evolve },
+		traded: {},
+	};
+	const SPECIES_OF_PILE = {
+		meta: [...metaDex],
+		watchlist: [...watchWhy.keys()],
+		cd_backgrounds: COMMUNITY_DAY_BG_DEX,
+	};
+	for (const pile of sortingPiles) {
+		pile.card = SPECIES_OF_PILE[pile.id] ? cardFor(SPECIES_OF_PILE[pile.id]) : { rows: [] };
+		if (RULE_PARAMS[pile.id]) pile.card.rule = tFn(`app.card.rule.${pile.id}`, { params: RULE_PARAMS[pile.id] });
+	}
+	if (hundoPile) hundoPile.card = { ...cardFor(hundos.map(dexOfName)), rule: tFn('app.card.rule.hundo') };
+	for (const ev of eventFilters) if (ev.pile) ev.pile.card = cardFor(ev.spawnDex);
 
 	return {
 		trash,
@@ -9447,6 +9640,55 @@ function BossCollapsible({
 // tidy-up) holding a three-step triage: ① keepers to favourite, ② what's still
 // unsorted, ③ the trashable rest. Mirrors BossCollapsible's shape so the aux
 // section stays visually consistent.
+// The pile card (spec: "Pile card"): per species in the pile, its class
+// (meta, watchlist, non-meta) with the reasons in words, how many to keep and
+// why; for a category pile, its one keep rule. Never "you have M": the
+// workshop doesn't see the storage.
+const CARD_ROWS_SHOWN = 12;
+const CLASS_COLOUR = { meta: '#27AE60', watchlist: '#F5B82E', non_meta: '#8090A0' };
+function PileCard({ card, t }) {
+	const [all, setAll] = useState(false);
+	if (!card || (!card.rule && !card.rows?.length)) return null;
+	const rows = all ? card.rows : card.rows.slice(0, CARD_ROWS_SHOWN);
+	const classes = [...new Set(card.rows.map((r) => r.cls))];
+	return (
+		<div className='border border-[#2D3A47] rounded-sm p-3 space-y-3 bg-[#0B1015]'>
+			<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>{t('app.card.title')}</div>
+			{card.rule && <p className='mono text-xs text-[#E6EDF3] leading-relaxed'>{card.rule}</p>}
+			{rows.length > 0 && (
+				<ul className='space-y-2'>
+					{rows.map((r) => (
+						<li key={r.dex} className='mono text-xs leading-relaxed'>
+							<span className='text-[#E6EDF3]'>{r.name}</span>{' '}
+							<span className='text-[10px] uppercase tracking-wide' style={{ color: CLASS_COLOUR[r.cls] }}>
+								{t(`app.card.class.${r.cls}`)}
+							</span>
+							{r.reasons.length > 0 && <span className='text-[#8B98A5]'> · {r.reasons.join(' · ')}</span>}
+							<div className='text-[#8B98A5]'>→ {r.keep.join(' · ')}</div>
+						</li>
+					))}
+				</ul>
+			)}
+			{card.rows.length > CARD_ROWS_SHOWN && (
+				<button
+					type='button'
+					onClick={() => setAll((v) => !v)}
+					aria-expanded={all}
+					className='mono text-xs text-[#5EAFC5] hover:text-[#E6EDF3] min-h-[32px]'
+				>
+					{all ? t('app.card.show_fewer') : t('app.card.show_all', { params: { count: card.rows.length } })}
+				</button>
+			)}
+			{classes.map((cls) => (
+				<p key={cls} className='mono text-[10.5px] text-[#8090A0] leading-relaxed'>
+					<span style={{ color: CLASS_COLOUR[cls] }}>{t(`app.card.class.${cls}`)}</span>: {t(`app.card.why.${cls}`)}
+				</p>
+			))}
+			<p className='mono text-[10.5px] text-[#8090A0] italic'>{t('app.card.hint')}</p>
+		</div>
+	);
+}
+
 // The three steps of one sorting pile (see buildPile), rendered the same way
 // for every pile. `text` names each box's label and hint keys:
 //   { overview: [label, hint], keep: { <lensKey>: [label, hint] }, sort, release }
@@ -9507,7 +9749,7 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 			{pile.keep.length > 0 && subHeading('app.pile.group_keep')}
 			{pile.keep.map((lens) => box(lens.key, lensWords(lens), lens.filter))}
 			{subHeading('app.pile.group_sort')}
-			{card}
+			{card ?? <PileCard card={pile.card} t={t} />}
 			{box('sort', words.sort, pile.sort)}
 			{subHeading('app.pile.group_release')}
 			{box('release', words.release, pile.release)}

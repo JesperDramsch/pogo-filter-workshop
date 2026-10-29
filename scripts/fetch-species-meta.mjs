@@ -241,6 +241,32 @@ export function megaFormsFromGameMaster(templates, names, pvpoke) {
   return { forms, unreleased: unreleased.sort() };
 }
 
+// Species with a Mega the game master already carries but players can't use
+// yet: a Mega tempEvoOverride that the name dictionary doesn't name (datamined,
+// e.g. Chandelure in 2026-10), or one it names that PvPoke doesn't list as
+// released. The sorting workflow's watchlist reads this: a species about to
+// get a Mega is worth a few keepers before its raids arrive.
+export function upcomingMegaDexFromGameMaster(templates, names, pvpoke) {
+  const released = new Set((pvpoke?.pokemon || []).filter((p) => p?.released).map((p) => p.speciesId));
+  const idByDex = new Map();
+  for (const { dex, settings } of pokemonTemplates(templates)) {
+    if (settings?.pokemonId && !idByDex.has(dex)) idByDex.set(dex, settings.pokemonId);
+  }
+  const named = new Set(
+    temporaryEvolutionNames(tempEvoOverridesByDex(templates), names).map((e) => `${e.dex}|${e.tempEvoId}`),
+  );
+  const out = new Set();
+  for (const [dex, overrides] of tempEvoOverridesByDex(templates)) {
+    for (const o of overrides || []) {
+      const id = o?.tempEvoId || "";
+      if (!MEGA_TEMP_EVO.test(id)) continue;
+      const speciesId = [String(idByDex.get(dex) || "").toLowerCase(), ...tempEvoWords(id)].join("_");
+      if (!named.has(`${dex}|${id}`) || !released.has(speciesId)) out.add(dex);
+    }
+  }
+  return [...out].sort((a, b) => a - b);
+}
+
 // Best base stat product per dex, across every form template. "Best" rather
 // than "the base form's": the pool this feeds ranks lines by how strong their
 // final stage gets, and a regional form that outclasses the original (Hisuian
@@ -333,6 +359,8 @@ async function main() {
   if (unreleasedMegas.length > 0) {
     console.log(`  not yet released per PvPoke, left out of megaForms: ${unreleasedMegas.join(", ")}`);
   }
+  const upcomingMegaDex = upcomingMegaDexFromGameMaster(templates, names, pvpoke);
+  console.log(`  upcoming Megas (in the game master, not out yet): ${upcomingMegaDex.join(", ") || "none"}`);
 
   // ── starterDex ──
   const starters = starterDexFromGenerations(STARTERS_PER_GENERATION, specialTrade);
@@ -392,6 +420,7 @@ async function main() {
     powerLineDex: [...powerLines].sort((a, b) => a - b),
     megaDex: [...megas].sort((a, b) => a - b),
     megaForms,
+    upcomingMegaDex,
     evoParentByDex,
   };
 

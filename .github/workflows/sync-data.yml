@@ -358,6 +358,7 @@ jobs:
             src/data/community-days.json
             src/data/regional-forms.json
             src/data/game-master-watch.json
+            src/data/watch-moves.json
             skills/pokemon-go-filters/references/pvp-meta.json
             skills/pokemon-go-filters/references/META.md
         run: |

@@ -10,6 +10,9 @@
 //   P4 — ② hides starred and tagged Pokémon and shows the rest
 //   P5 — no step of a pile ever matches a Pokémon outside the pile
 //   P6 — each lens finds what it names (the hundo lens finds hundos only)
+//   P7 — the pile card: meta rows are meta, watchlist rows watchlist, the two
+//        never overlap, every row says how many to keep, and no rendered
+//        string is a raw key or keeps a {placeholder}, in any locale
 //
 // PILE_FAMILIES is the registry: a new pile adds one entry naming where its
 // piles come from and which species is in it, and inherits every check.
@@ -77,6 +80,34 @@ const PILE_FAMILIES = [
       shadow_keep: { dex: KEEPER_DEX, match: { flags: { shadow: true } }, miss: {} },
       max: { dex: MAX_DEX, match: { ...DYNA, ...iv(15, 15, 13) }, miss: iv(15, 15, 13) },
       pvp_great: { dex: GREAT_DEX, match: { ...iv(0, 15, 15), wp: 1400 }, miss: { ...iv(0, 15, 15), wp: 1600 } },
+    }),
+  },
+  {
+    name: "watchlist",
+    piles: (r) => {
+      const pile = r.sortingPiles.find((p) => p.id === "watchlist");
+      return [{ pile, dex: pile?.card?.rows?.[0]?.dex }];
+    },
+    lensCases: () => ({
+      shadow: { match: { flags: { shadow: true } }, miss: {} },
+      high_iv: { match: iv(15, 15, 13), miss: iv(5, 5, 5) },
+    }),
+  },
+  {
+    // Its head is "not any meta or watchlist family", so its member is a
+    // species outside all of them and its outsider is a meta species.
+    name: "non-meta",
+    piles: (r) => {
+      const pile = r.sortingPiles.find((p) => p.id === "non_meta");
+      const listed = new Set([...(r.sortingPiles.find((p) => p.id === "meta")?.card?.rows || []),
+        ...(r.sortingPiles.find((p) => p.id === "watchlist")?.card?.rows || [])].map((row) => row.dex));
+      const dex = [399, 263, 161, 19, 10, 13].find((d) => !listed.has(d));
+      return [{ pile, dex }];
+    },
+    outsider: () => ({ dex: RAID_DEX }),
+    lensCases: () => ({
+      souvenirs: { match: { flags: { shiny: true } }, miss: {} },
+      high_iv: { match: iv(15, 15, 13), miss: iv(5, 5, 5) },
     }),
   },
   {
@@ -192,8 +223,12 @@ for (const fam of PILE_FAMILIES) {
       }
       // P5 — a hundo shiny legendary nobody starred, outside the pile
       const outsider = { families: ["notinthepile"], dex: 0, ivAtk: 15, ivDef: 15, ivHp: 15, flags: { shiny: true } };
+      const own = fam.outsider?.();
+      const outsiderMon = own
+        ? pileMon(loc, { ivAtk: 15, ivDef: 15, ivHp: 15, flags: { shiny: true } }, pokemonNameFor(String(own.dex), "en"), own.dex)
+        : pileMon(loc, outsider, "Magikarp", 0);
       for (const [k, str] of steps) {
-        const v = evalFilterDetailed(str, pileMon(loc, outsider, "Magikarp", 0), loc);
+        const v = evalFilterDetailed(str, outsiderMon, loc);
         if (v.verdict !== false) bad.push(`${where}.${k} matched a Pokémon outside the pile: ${v.verdict}${note(v)}`);
       }
       // P6
@@ -212,6 +247,31 @@ for (const fam of PILE_FAMILIES) {
     }
     check(`${loc}: ${entries.length} pile(s)`, bad.length === 0, bad.slice(0, 4).join(" | "));
   }
+}
+
+console.log("\nP7 — the pile card");
+for (const loc of localeNames) {
+  const r = buildFilters(HUNDOS, [], CFG, [], loc, makeTFn(loc));
+  const bad = [];
+  const card = (id) => r.sortingPiles.find((p) => p.id === id)?.card;
+  const meta = card("meta")?.rows || [];
+  const watch = card("watchlist")?.rows || [];
+  if (meta.length === 0 || watch.length === 0) bad.push(`meta ${meta.length} / watchlist ${watch.length} rows`);
+  if (meta.some((row) => row.cls !== "meta")) bad.push("a meta-pile row is not meta");
+  if (watch.some((row) => row.cls !== "watchlist")) bad.push("a watchlist row is not watchlist");
+  const metaSet = new Set(meta.map((row) => row.dex));
+  const both = watch.filter((row) => metaSet.has(row.dex)).map((row) => row.name);
+  if (both.length) bad.push(`on both lists: ${both.slice(0, 3).join(", ")}`);
+  const cards = [...r.sortingPiles.map((p) => [p.id, p.card]), ["hundo", r.hundoPile?.card], ...r.eventFilters.map((ev) => [ev.id, ev.pile?.card])];
+  for (const [id, c] of cards) {
+    if (!c) { bad.push(`${id}: no card`); continue; }
+    const texts = [c.rule, ...(c.rows || []).flatMap((row) => [row.name, row.why, ...row.reasons, ...row.keep])].filter((x) => x != null);
+    for (const x of texts) if (/\{\w+\}|^app\.|move\./.test(x)) { bad.push(`${id}: "${x}"`); break; }
+    if ((c.rows || []).some((row) => row.keep.length === 0)) bad.push(`${id}: a row with no keep line`);
+  }
+  for (const id of ["shadows", "traded", "luckies", "dynamax", "xxl", "xxs", "costumes", "cd_backgrounds", "non_meta"])
+    if (!card(id)?.rule) bad.push(`${id}: no keep rule`);
+  check(`${loc}: ${meta.length} meta and ${watch.length} watchlist rows, ${cards.length} cards`, bad.length === 0, bad.slice(0, 4).join(" | "));
 }
 
 console.log("\nCommunity Day data (scripts/lib/community-days.mjs → src/data/community-days.json)");

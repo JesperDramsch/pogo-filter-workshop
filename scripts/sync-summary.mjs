@@ -75,7 +75,7 @@ export const PARTS = [
   // The watch's history IS the rebalance notification, so its commit line names
   // each new entry and its stream rather than a generic "move stats".
   { id: "game-master-watch", scope: "game-master", label: "Game-master watch",
-    what: () => "move stats", paths: ["src/data/game-master-watch.json"],
+    what: () => "move stats", paths: ["src/data/game-master-watch.json", "src/data/watch-moves.json"],
     commitLines: (r) => {
       const fresh = newHistory(r.before, r.after);
       return fresh.length ? fresh.map((h) => `${h.stream ?? "pvp"} ${h.summary}`) : null;
