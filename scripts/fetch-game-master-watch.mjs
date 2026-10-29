@@ -162,6 +162,18 @@ function assertNotShrunken(label, count, prevCount, floor) {
   }
 }
 
+// A fetched PvE dump, accepted or refused as a whole: its move stats and its
+// templates come back together only once the shrink guard has passed, so
+// nothing downstream (pveMoves, and the watchlist's learners, which read the
+// templates' movepools) can be built from a dump the guard refused. A
+// truncated mirror would otherwise empty every signature move's learner list
+// and rewrite watch-moves.json without them.
+export function acceptPveDump(templates, mirror, prevPveMoves, floor = MIN_PVE_MOVES) {
+  const pveMoves = extractPveMoves(templates);
+  assertNotShrunken(mirror, Object.keys(pveMoves).length, Object.keys(prevPveMoves || {}).length, floor);
+  return { pveMoves, templates };
+}
+
 // Turns a diff into one history entry, and says what it found out loud. Shared
 // by both streams so a PvE rebalance is reported exactly like a PvP one. The
 // `stream` tag is what lets a consumer tell them apart — see the header.
@@ -281,11 +293,9 @@ async function main() {
       userAgent: UA["User-Agent"],
       minBatchMs: batchMsFromIso(pveSource.batch),
     });
-    const extracted = extractPveMoves(gm.templates);
-    gmTemplates = gm.templates;
-    assertNotShrunken(gm.mirror, Object.keys(extracted).length,
-      Object.keys(pveMoves || {}).length, MIN_PVE_MOVES);
-    pveMoves = extracted;
+    const accepted = acceptPveDump(gm.templates, gm.mirror, pveMoves);
+    pveMoves = accepted.pveMoves;
+    gmTemplates = accepted.templates;
     pveFresh = true;
     const prov = gameMasterProvenance({ mirror: gm.mirror, batchMs: gm.batchMs });
     pveSource = { mirror: prov.mirror, batch: prov.batch };

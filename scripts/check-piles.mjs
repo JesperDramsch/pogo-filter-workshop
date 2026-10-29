@@ -39,6 +39,9 @@ import { pokemonNameFor } from "../src/data/species.js";
 import { FIXTURE_CONFIG, makeTFn } from "./lib/fixture.mjs";
 import { pileCases, pileMon } from "./lib/pile-cases.mjs";
 import { hasCostumedSpawns, signalsFromFeed } from "./fetch-events.mjs";
+import { acceptPveDump, learnersOf, watchMovesFrom } from "./fetch-game-master-watch.mjs";
+import GM_WATCH from "../src/data/game-master-watch.json";
+import WATCH_MOVES from "../src/data/watch-moves.json";
 
 let failures = 0;
 function check(label, cond, detail = "") {
@@ -404,6 +407,25 @@ console.log("\nWhich piles show first (event-driven ordering)");
     signalsFromFeed(feed).map((x) => x.kind).sort().join(",") === "community_day,takeover");
   check("a costumed spawn is spotted, plain ones aren't",
     hasCostumedSpawns([{ name: "Piplup wearing a Halloween Mischief costume" }]) && !hasCostumedSpawns(["Zubat", { name: "Gengar" }]));
+}
+
+console.log("\nwatch-moves.json is never rebuilt from a refused game master");
+{
+  // A dump in the shape extractPveMoves reads, one move template per entry.
+  const dumpOf = (ids) => ids.map((id) => ({ templateId: id, data: { moveSettings: GM_WATCH.pveMoves[id] } }));
+  const allIds = Object.keys(GM_WATCH.pveMoves);
+  let refused = null;
+  try { acceptPveDump(dumpOf(allIds.slice(0, 10)), "truncated mirror", GM_WATCH.pveMoves); } catch (e) { refused = e; }
+  check("a truncated dump is refused, so no templates reach the watchlist", refused && /refusing to overwrite/.test(refused.message), refused?.message);
+  let empty = null;
+  try { acceptPveDump([], "empty mirror", {}); } catch (e) { empty = e; }
+  check("an empty dump is refused even with no previous snapshot", !!empty);
+  const ok = acceptPveDump(dumpOf(allIds), "full mirror", GM_WATCH.pveMoves);
+  check("a full dump is accepted with its templates", Object.keys(ok.pveMoves).length === allIds.length && ok.templates.length === allIds.length);
+  // Why it matters: learners read from an empty movepool drop every signature move.
+  const hollow = watchMovesFrom(GM_WATCH.history, learnersOf([], GM_WATCH.history.flatMap((h) => h.changes.map((c) => c.move))));
+  const lost = WATCH_MOVES.moves.filter((m) => m.change === "changed" && !hollow.some((x) => x.move === m.move && x.at === m.at));
+  check(`a refused dump would have cost ${lost.length} signature move(s)`, lost.length > 0, lost.map((m) => m.move).join(", "));
 }
 
 console.log("\nCommunity Day data (scripts/lib/community-days.mjs → src/data/community-days.json)");
