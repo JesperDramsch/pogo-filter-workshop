@@ -114,9 +114,20 @@ function viewFromHash() {
 }
 function stepFromHash() {
 	if (typeof window === 'undefined') return null;
+	// An area hash (#workshop/sort) is the filter step with that tab open.
+	if (areaFromHash()) return STEP_NUMBER_BY_KEY.filter;
 	const m = window.location.hash.match(/^#workshop\/(\w+)$/);
 	if (!m) return null;
 	return STEP_NUMBER_BY_KEY[m[1]] ?? null;
+}
+
+// The filter step splits by what the user is doing at that moment (see
+// docs/sorting-workflow-spec.md, "Areas"). Keys are deliberately disjoint from
+// the wizard step keys, so #workshop/<key> stays unambiguous.
+export const FILTER_AREAS = ['catch', 'sort', 'battle', 'trade'];
+export function areaFromHash(hash = typeof window === 'undefined' ? '' : window.location.hash) {
+	const m = hash.match(/^#workshop\/(\w+)$/);
+	return m && FILTER_AREAS.includes(m[1]) ? m[1] : null;
 }
 function navigateView(target) {
 	if (typeof window === 'undefined') return;
@@ -5543,6 +5554,7 @@ export default function App() {
 	const [showRawClauses, setShowRawClauses] = useState(false);
 	const [showVerify, setShowVerify] = useState(false);
 	const [currentStep, setCurrentStep] = useState(1);
+	const [filterArea, setFilterArea] = useState(() => areaFromHash() || FILTER_AREAS[0]);
 	const [view, setView] = useState(viewFromHash);
 	useEffect(() => {
 		const onHashChange = () => {
@@ -5550,6 +5562,8 @@ export default function App() {
 			// If the hash points at a specific workshop step, sync currentStep.
 			const step = stepFromHash();
 			if (step !== null) setCurrentStep(step);
+			const area = areaFromHash();
+			if (area) setFilterArea(area);
 		};
 		window.addEventListener('hashchange', onHashChange);
 		// Run once on mount so #workshop/<key> on initial load picks up the step.
@@ -5658,7 +5672,10 @@ export default function App() {
 			setHomeLocation(home);
 			setLastPin(p);
 			setBazaarTags(b);
-			setCurrentStep(step);
+			// A deep link (#workshop/filter, #workshop/sort) beats the stored
+			// wizard position; the stored one is only the fallback for a bare
+			// #workshop.
+			setCurrentStep(stepFromHash() ?? step);
 			setOnboarded(ob);
 			setLoaded(true);
 			// First-run: nudge brand-new visitors into the swipe onboarding instead
@@ -6314,12 +6331,17 @@ export default function App() {
 		{ n: 3, key: 'have', label: t('app.step.have.label'), desc: t('app.step.have.desc') },
 		{ n: 4, key: 'filter', label: t('app.step.filter.label'), desc: t('app.step.filter.desc') },
 	];
+	function selectArea(area) {
+		setFilterArea(area);
+		const desired = `#workshop/${area}`;
+		if (typeof window !== 'undefined' && window.location.hash !== desired) window.location.hash = desired;
+	}
 	function gotoStep(n) {
 		setCurrentStep(n);
 		// When in the workshop view, push the step-specific hash so the URL
 		// is shareable. Other views (e.g. landing) just update internal state.
 		if (view === 'workshop') {
-			const key = STEP_KEY_BY_NUMBER[n];
+			const key = n === STEP_NUMBER_BY_KEY.filter ? filterArea : STEP_KEY_BY_NUMBER[n];
 			if (key) {
 				const desired = `#workshop/${key}`;
 				if (typeof window !== 'undefined' && window.location.hash !== desired) {
@@ -6565,30 +6587,6 @@ export default function App() {
 								onBack={() => gotoStep(3)}
 							>
 								<div className='space-y-6'>
-									<FilterBox
-										label={t('app.filter.trash_label')}
-										accent='#E74C3C'
-										filterStr={trash}
-										copied={copied.trash}
-										onCopy={() => copyToClipboard('trash', trash)}
-										hint={t('app.filter.trash_hint')}
-									/>
-									<FilterBox
-										label={t('app.filter.trade_label')}
-										accent='#5EAFC5'
-										filterStr={trade}
-										copied={copied.trade}
-										onCopy={() => copyToClipboard('trade', trade)}
-										hint={t('app.filter.trade_hint')}
-									/>
-									{buddyCatchFilters.length > 0 && (
-										<BuddyCatchSection
-											buddyCatchFilters={buddyCatchFilters}
-											copied={copied}
-											onCopy={(key, text) => copyToClipboard(key, text)}
-										/>
-									)}
-
 									{/* Summary stats */}
 									<div className='grid grid-cols-2 md:grid-cols-4 gap-2 mono text-xs'>
 										<StatBox
@@ -6603,463 +6601,478 @@ export default function App() {
 										<StatBox label={t('app.filter.trash_label')} value={`${trash.length}c`} />
 										<StatBox label={t('app.filter.trade_label')} value={`${trade.length}c`} />
 									</div>
-
-									{/* Aux pro-tools — task-oriented filters grouped by game aspect.
-                    Order: solo workflows (trades / evos / megas) first, then
-                    PvE encounters grouped by source. Within each PvE group
-                    the more frequently-used surface sits on top. */}
-									<div className='space-y-3 pt-2'>
-										{(sort || luckySort || luckyFamilySort || nundoSort) && (
+									<AreaTabs areas={FILTER_AREAS} current={filterArea} onSelect={selectArea} t={t} />
+									<AreaPanel area='catch' current={filterArea}>
+										<FilterBox
+											label={t('app.filter.trash_label')}
+											accent='#E74C3C'
+											filterStr={trash}
+											copied={copied.trash}
+											onCopy={() => copyToClipboard('trash', trash)}
+											hint={t('app.filter.trash_hint')}
+										/>
+									</AreaPanel>
+									<AreaPanel area='sort' current={filterArea}>
+										<div className='space-y-3'>
+											{(sort || luckySort || luckyFamilySort || nundoSort || tradedTrashSort) && (
+												<Collapsible
+													icon='✨'
+													label={t('app.collapsible.browse_sort')}
+													open={showBrowseSort}
+													onToggle={() => setShowBrowseSort((s) => !s)}
+												>
+													<div className='space-y-4'>
+														{sort && (
+															<FilterBox
+																label={t('app.filter.sort_label')}
+																accent='#F5B82E'
+																filterStr={sort}
+																copied={copied.sort}
+																onCopy={() => copyToClipboard('sort', sort)}
+																hint={t('app.filter.sort_hint')}
+															/>
+														)}
+														{luckySort && (
+															<FilterBox
+																label={t('app.filter.lucky_sort_label')}
+																accent='#F5B82E'
+																filterStr={luckySort}
+																copied={copied.luckySort}
+																onCopy={() => copyToClipboard('luckySort', luckySort)}
+																hint={t('app.filter.lucky_sort_hint')}
+															/>
+														)}
+														{luckyFamilySort && (
+															<FilterBox
+																label={t('app.filter.lucky_family_sort_label')}
+																accent='#F5B82E'
+																filterStr={luckyFamilySort}
+																copied={copied.luckyFamilySort}
+																onCopy={() => copyToClipboard('luckyFamilySort', luckyFamilySort)}
+																hint={t('app.filter.lucky_family_sort_hint')}
+															/>
+														)}
+														{nundoSort && (
+															<FilterBox
+																label={t('app.filter.nundo_sort_label')}
+																accent='#F5B82E'
+																filterStr={nundoSort}
+																copied={copied.nundoSort}
+																onCopy={() => copyToClipboard('nundoSort', nundoSort)}
+																hint={t('app.filter.nundo_sort_hint')}
+															/>
+														)}
+													{tradedTrashSort && (
+														<FilterBox
+															label={t('app.filter.traded_trash_sort_label')}
+															accent='#E67E22'
+															filterStr={tradedTrashSort}
+															copied={copied.tradedTrashSort}
+															onCopy={() =>
+																copyToClipboard('tradedTrashSort', tradedTrashSort)
+															}
+															hint={t('app.filter.traded_trash_sort_hint')}
+														/>
+													)}
+													</div>
+												</Collapsible>
+											)}
+											{/* Wild spawns: current / upcoming / just-ended events (leak-duck). */}
+											<EventSpawnCollapsible
+												icon='🌿'
+												fetchedAt={eventsFetchedAt}
+												events={eventFilters}
+												megaBoostFor={megaBoostFor}
+												typeLabels={rocketTypeLabels}
+												accent='#27AE60'
+												open={showAuxEvents}
+												onToggle={() => setShowAuxEvents((s) => !s)}
+												copied={copied}
+												copyToClipboard={copyToClipboard}
+												t={t}
+												locale={locale}
+											/>
 											<Collapsible
-												icon='✨'
-												label={t('app.collapsible.browse_sort')}
-												open={showBrowseSort}
-												onToggle={() => setShowBrowseSort((s) => !s)}
+												icon='🌑'
+												label={t('app.collapsible.aux_shadows')}
+												open={showAuxShadows}
+												onToggle={() => setShowAuxShadows((s) => !s)}
 											>
 												<div className='space-y-4'>
-													{sort && (
+													<FilterBox
+														label={t('app.filter.shadow_cheap_label')}
+														accent='#9B59B6'
+														filterStr={shadowCheap}
+														copied={copied.shadowCheap}
+														onCopy={() => copyToClipboard('shadowCheap', shadowCheap)}
+														hint={t('app.filter.shadow_cheap_hint')}
+													/>
+													<FilterBox
+														label={t('app.filter.shadow_safe_label')}
+														accent='#9B59B6'
+														filterStr={shadowSafe}
+														copied={copied.shadowSafe}
+														onCopy={() => copyToClipboard('shadowSafe', shadowSafe)}
+														hint={t('app.filter.shadow_safe_hint')}
+													/>
+													<FilterBox
+														label={t('app.filter.shadow_hundo_candidates_label')}
+														accent='#9B59B6'
+														filterStr={shadowHundoCandidates}
+														copied={copied.shadowHundoCandidates}
+														onCopy={() =>
+															copyToClipboard('shadowHundoCandidates', shadowHundoCandidates)
+														}
+														hint={t('app.filter.shadow_hundo_candidates_hint')}
+													/>
+													{shadowFrustration && (
 														<FilterBox
-															label={t('app.filter.sort_label')}
-															accent='#F5B82E'
-															filterStr={sort}
-															copied={copied.sort}
-															onCopy={() => copyToClipboard('sort', sort)}
-															hint={t('app.filter.sort_hint')}
-														/>
-													)}
-													{luckySort && (
-														<FilterBox
-															label={t('app.filter.lucky_sort_label')}
-															accent='#F5B82E'
-															filterStr={luckySort}
-															copied={copied.luckySort}
-															onCopy={() => copyToClipboard('luckySort', luckySort)}
-															hint={t('app.filter.lucky_sort_hint')}
-														/>
-													)}
-													{luckyFamilySort && (
-														<FilterBox
-															label={t('app.filter.lucky_family_sort_label')}
-															accent='#F5B82E'
-															filterStr={luckyFamilySort}
-															copied={copied.luckyFamilySort}
-															onCopy={() => copyToClipboard('luckyFamilySort', luckyFamilySort)}
-															hint={t('app.filter.lucky_family_sort_hint')}
-														/>
-													)}
-													{nundoSort && (
-														<FilterBox
-															label={t('app.filter.nundo_sort_label')}
-															accent='#F5B82E'
-															filterStr={nundoSort}
-															copied={copied.nundoSort}
-															onCopy={() => copyToClipboard('nundoSort', nundoSort)}
-															hint={t('app.filter.nundo_sort_hint')}
+															label={t('app.filter.shadow_frustration_label')}
+															accent='#9B59B6'
+															filterStr={shadowFrustration}
+															copied={copied.shadowFrustration}
+															onCopy={() =>
+																copyToClipboard('shadowFrustration', shadowFrustration)
+															}
+															hint={t('app.filter.shadow_frustration_hint')}
 														/>
 													)}
 												</div>
 											</Collapsible>
-										)}
-										<Collapsible
-											icon='🛬'
-											label={t('app.collapsible.aux_trades')}
-											open={showAuxTrades}
-											onToggle={() => setShowAuxTrades((s) => !s)}
-										>
-											<div className='space-y-4'>
-												{prestaged && (
-													<FilterBox
-														label={t('app.filter.prestaged_label')}
-														accent='#9B59B6'
-														filterStr={prestaged}
-														copied={copied.prestaged}
-														onCopy={() => copyToClipboard('prestaged', prestaged)}
-														hint={t('app.filter.prestaged_hint', {
-															params: {
-																tags: [
-																	effectiveConfig.basarTagName,
-																	effectiveConfig.fernTauschTagName,
-																]
-																	.filter(Boolean)
-																	.map((tag) => `#${tag}`)
-																	.join(', '),
-															},
-														})}
-													/>
-												)}
-												{tradedTrashSort && (
-													<FilterBox
-														label={t('app.filter.traded_trash_sort_label')}
-														accent='#E67E22'
-														filterStr={tradedTrashSort}
-														copied={copied.tradedTrashSort}
-														onCopy={() =>
-															copyToClipboard('tradedTrashSort', tradedTrashSort)
-														}
-														hint={t('app.filter.traded_trash_sort_hint')}
-													/>
-												)}
-												{gift && (
-													<FilterBox
-														label={t('app.filter.gift_label')}
-														accent='#27AE60'
-														filterStr={gift}
-														copied={copied.gift}
-														onCopy={() => copyToClipboard('gift', gift)}
-														hint={t('app.filter.gift_hint')}
-													/>
-												)}
-												<FilterBox
-													label={t('app.filter.pilot_long_label')}
-													accent='#5EAFC5'
-													filterStr={pilotLong}
-													copied={copied.pilotLong}
-													onCopy={() => copyToClipboard('pilotLong', pilotLong)}
-													hint={t('app.filter.pilot_long_hint')}
-												/>
-											</div>
-										</Collapsible>
-
-										<Collapsible
-											icon='🤝'
-											label={t('app.collapsible.friend_wishlist')}
-											open={showFriendWishlist}
-											onToggle={() => setShowFriendWishlist((s) => !s)}
-										>
-											<div className='space-y-4'>
-												{/* Curated "collect for me" string — renders alongside the
-                            fallback wishlists below, since all friend-facing strings
-                            live in this section. Its target list is edited in the
-                            step-2 config panel. */}
-												{friendCollectTargets.length > 0 &&
-													(friendCollectWishlist ? (
-														<div>
-															<FilterBox
-																label={t('app.filter.friend_collect_label')}
-																accent='#27AE60'
-																filterStr={
-																	friendCollectMode === 'lucky' &&
-																	effectiveConfig.friendCollectGuaranteedOnly
-																		? friendCollectWishlistGuaranteed
-																		: friendCollectWishlist
-																}
-																copied={copied.friendCollect}
-																onCopy={() =>
-																	copyToClipboard(
-																		'friendCollect',
-																		friendCollectMode === 'lucky' &&
-																			effectiveConfig.friendCollectGuaranteedOnly
-																			? friendCollectWishlistGuaranteed
-																			: friendCollectWishlist,
-																	)
-																}
-																hint={
-																	friendCollectMode === 'lucky' &&
-																	effectiveConfig.friendCollectGuaranteedOnly
-																		? `${t('app.filter.friend_collect_hint')} (${t('app.filter.friend_guaranteed_label')})`
-																		: t('app.filter.friend_collect_hint')
-																}
-															/>
-															<p className='mono text-[10.5px] text-[#8090A0] mt-1'>
-																{t('app.filter.friend_collect_edit_pointer')}
-															</p>
-														</div>
+											<Collapsible
+												icon='🥚'
+												label={t('app.collapsible.aux_evos')}
+												open={showAuxEvos}
+												onToggle={() => setShowAuxEvos((s) => !s)}
+											>
+												<div className='space-y-4'>
+													{cheapEvolve ? (
+														<FilterBox
+															label={t('app.filter.cheap_evolve_label')}
+															accent='#27AE60'
+															filterStr={cheapEvolve}
+															copied={copied.cheapEvolve}
+															onCopy={() => copyToClipboard('cheapEvolve', cheapEvolve)}
+															hint={t('app.filter.cheap_evolve_hint')}
+														/>
 													) : (
-														<p className='mono text-xs text-[#27AE60]'>
-															{t('app.filter.friend_collect_all_owned')}
+														<p className='text-xs italic text-[#8B98A5]'>
+															{t('app.filter.cheap_evolve_empty')}
 														</p>
-													))}
-
-												{/* Fallback wishlists — blacklist of everything already owned. */}
-												<p
-													className={`mono text-xs text-[#8B98A5] leading-relaxed ${
-														friendCollectTargets.length > 0 ? 'pt-3 border-t border-[#1F2933]' : ''
-													}`}
-												>
-													{t('app.filter.friend_wishlist_intro')}
-												</p>
-												<div>
+													)}
 													<FilterBox
-														label={t('app.filter.friend_lucky_label')}
-														accent='#F5B82E'
-														filterStr={
-															friendGuaranteedLucky
-																? friendLuckyWishlistGuaranteed
-																: friendLuckyWishlist
-														}
-														copied={copied.friendLucky}
-														onCopy={() =>
-															copyToClipboard(
-																'friendLucky',
+														label={t('app.filter.dex_plus_label')}
+														accent='#27AE60'
+														filterStr={dexPlus}
+														copied={copied.dexPlus}
+														onCopy={() => copyToClipboard('dexPlus', dexPlus)}
+														hint={t('app.filter.dex_plus_hint')}
+													/>
+												</div>
+											</Collapsible>
+											<Collapsible
+												icon='⚡'
+												label={t('app.collapsible.aux_megas')}
+												open={showAuxMegas}
+												onToggle={() => setShowAuxMegas((s) => !s)}
+											>
+												<FilterBox
+													label={t('app.filter.mega_evolve_label')}
+													accent='#E91E63'
+													filterStr={megaEvolve}
+													copied={copied.megaEvolve}
+													onCopy={() => copyToClipboard('megaEvolve', megaEvolve)}
+													hint={t('app.filter.mega_evolve_hint')}
+												/>
+											</Collapsible>
+										</div>
+									</AreaPanel>
+									<AreaPanel area='battle' current={filterArea}>
+										{/* Team Rocket section — encounters & their post-fight cleanup */}
+										<div className='space-y-3 pt-4'>
+											<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
+												{t('app.collapsible.aux_section_team_rocket')}
+											</h3>
+											<RocketCollapsible
+												fetchedAt={rocketLineupsFetchedAt}
+												leaders={rocketLeaders}
+												typedGrunts={rocketTypedGrunts}
+												genericGrunts={rocketGenericGrunts}
+												typeLabels={rocketTypeLabels}
+												lenientCounters={effectiveConfig.rocketLenientCounters !== false}
+												open={showAuxRocket}
+												onToggle={() => setShowAuxRocket((s) => !s)}
+												copied={copied}
+												copyToClipboard={copyToClipboard}
+												t={t}
+												outputLocale={effectiveOutputLocale}
+											/>
+										</div>
+										{/* Raids section — current bosses pulled from lily-dex-api;
+	                    run `npm run fetch-raid-bosses` to refresh the snapshot. */}
+										<div className='space-y-3 pt-4'>
+											<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
+												{t('app.collapsible.aux_section_raids')}
+											</h3>
+											<BossCollapsible
+												icon='⚔️'
+												titleKey='app.collapsible.aux_raids'
+												fetchedAt={raidBossesFetchedAt}
+												bossesByTier={raidFilters}
+												eventGroups={eventRaidFilters}
+												tierOrder={[
+													'mega',
+													'lvl5',
+													'shadow_lvl5',
+													'lvl3',
+													'shadow_lvl3',
+													'lvl1',
+													'shadow_lvl1',
+												]}
+												accent='#E74C3C'
+												open={showAuxRaids}
+												onToggle={() => setShowAuxRaids((s) => !s)}
+												copied={copied}
+												copyToClipboard={copyToClipboard}
+												keyPrefix='raid'
+												t={t}
+												locale={locale}
+											/>
+
+											<MaxBattleCollapsible
+												fetchedAt={raidBossesFetchedAt}
+												maxTank={maxTank}
+												bossesByTier={maxBattleFilters}
+												eventGroups={eventMaxBattleFilters}
+												tierOrder={['tier_3', 'tier_2', 'tier_1']}
+												accent='#F39C12'
+												open={showAuxMaxBattles}
+												onToggle={() => setShowAuxMaxBattles((s) => !s)}
+												copied={copied}
+												copyToClipboard={copyToClipboard}
+												t={t}
+												locale={locale}
+											/>
+										</div>
+										{/* PvP section — top-30 meta picks per league with loose
+	                    PvP rank-1 IVs. Rankings pulled from lily-dex-api;
+	                    daily sync via .github/workflows/sync-data.yml. */}
+										<div className='space-y-3 pt-4'>
+											<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
+												{t('app.collapsible.aux_section_pvp')}
+											</h3>
+											<PvpCollapsible
+												fetchedAt={pvpRankingsFetchedAt}
+												leagues={pvpFilters}
+												cupFilters={cupFilters}
+												open={showAuxPvp}
+												onToggle={() => setShowAuxPvp((s) => !s)}
+												copied={copied}
+												copyToClipboard={copyToClipboard}
+												t={t}
+												locale={locale}
+											/>
+										</div>
+									</AreaPanel>
+									<AreaPanel area='trade' current={filterArea}>
+										<FilterBox
+											label={t('app.filter.trade_label')}
+											accent='#5EAFC5'
+											filterStr={trade}
+											copied={copied.trade}
+											onCopy={() => copyToClipboard('trade', trade)}
+											hint={t('app.filter.trade_hint')}
+										/>
+										{buddyCatchFilters.length > 0 && (
+											<BuddyCatchSection
+												buddyCatchFilters={buddyCatchFilters}
+												copied={copied}
+												onCopy={(key, text) => copyToClipboard(key, text)}
+											/>
+										)}
+										<div className='space-y-3'>
+											<Collapsible
+												icon='🛬'
+												label={t('app.collapsible.aux_trades')}
+												open={showAuxTrades}
+												onToggle={() => setShowAuxTrades((s) => !s)}
+											>
+												<div className='space-y-4'>
+													{prestaged && (
+														<FilterBox
+															label={t('app.filter.prestaged_label')}
+															accent='#9B59B6'
+															filterStr={prestaged}
+															copied={copied.prestaged}
+															onCopy={() => copyToClipboard('prestaged', prestaged)}
+															hint={t('app.filter.prestaged_hint', {
+																params: {
+																	tags: [
+																		effectiveConfig.basarTagName,
+																		effectiveConfig.fernTauschTagName,
+																	]
+																		.filter(Boolean)
+																		.map((tag) => `#${tag}`)
+																		.join(', '),
+																},
+															})}
+														/>
+													)}
+													{gift && (
+														<FilterBox
+															label={t('app.filter.gift_label')}
+															accent='#27AE60'
+															filterStr={gift}
+															copied={copied.gift}
+															onCopy={() => copyToClipboard('gift', gift)}
+															hint={t('app.filter.gift_hint')}
+														/>
+													)}
+													<FilterBox
+														label={t('app.filter.pilot_long_label')}
+														accent='#5EAFC5'
+														filterStr={pilotLong}
+														copied={copied.pilotLong}
+														onCopy={() => copyToClipboard('pilotLong', pilotLong)}
+														hint={t('app.filter.pilot_long_hint')}
+													/>
+													{evoSwapCandy && (
+														<FilterBox
+															label={t('app.filter.evo_swap_candy_label')}
+															accent='#9B59B6'
+															filterStr={evoSwapCandy}
+															copied={copied.evoSwapCandy}
+															onCopy={() => copyToClipboard('evoSwapCandy', evoSwapCandy)}
+															hint={t('app.filter.evo_swap_candy_hint', {
+																params: {
+																	tag: effectiveConfig.evoSwapTagName || 'EvoSwap',
+																},
+															})}
+														/>
+													)}
+													{evoSwapItem && (
+														<FilterBox
+															label={t('app.filter.evo_swap_item_label')}
+															accent='#9B59B6'
+															filterStr={evoSwapItem}
+															copied={copied.evoSwapItem}
+															onCopy={() => copyToClipboard('evoSwapItem', evoSwapItem)}
+															hint={t('app.filter.evo_swap_item_hint', {
+																params: {
+																	tag: effectiveConfig.evoSwapTagName || 'EvoSwap',
+																},
+															})}
+														/>
+													)}
+												</div>
+											</Collapsible>
+											<Collapsible
+												icon='🤝'
+												label={t('app.collapsible.friend_wishlist')}
+												open={showFriendWishlist}
+												onToggle={() => setShowFriendWishlist((s) => !s)}
+											>
+												<div className='space-y-4'>
+													{/* Curated "collect for me" string — renders alongside the
+	                            fallback wishlists below, since all friend-facing strings
+	                            live in this section. Its target list is edited in the
+	                            step-2 config panel. */}
+													{friendCollectTargets.length > 0 &&
+														(friendCollectWishlist ? (
+															<div>
+																<FilterBox
+																	label={t('app.filter.friend_collect_label')}
+																	accent='#27AE60'
+																	filterStr={
+																		friendCollectMode === 'lucky' &&
+																		effectiveConfig.friendCollectGuaranteedOnly
+																			? friendCollectWishlistGuaranteed
+																			: friendCollectWishlist
+																	}
+																	copied={copied.friendCollect}
+																	onCopy={() =>
+																		copyToClipboard(
+																			'friendCollect',
+																			friendCollectMode === 'lucky' &&
+																				effectiveConfig.friendCollectGuaranteedOnly
+																				? friendCollectWishlistGuaranteed
+																				: friendCollectWishlist,
+																		)
+																	}
+																	hint={
+																		friendCollectMode === 'lucky' &&
+																		effectiveConfig.friendCollectGuaranteedOnly
+																			? `${t('app.filter.friend_collect_hint')} (${t('app.filter.friend_guaranteed_label')})`
+																			: t('app.filter.friend_collect_hint')
+																	}
+																/>
+																<p className='mono text-[10.5px] text-[#8090A0] mt-1'>
+																	{t('app.filter.friend_collect_edit_pointer')}
+																</p>
+															</div>
+														) : (
+															<p className='mono text-xs text-[#27AE60]'>
+																{t('app.filter.friend_collect_all_owned')}
+															</p>
+														))}
+
+													{/* Fallback wishlists — blacklist of everything already owned. */}
+													<p
+														className={`mono text-xs text-[#8B98A5] leading-relaxed ${
+															friendCollectTargets.length > 0 ? 'pt-3 border-t border-[#1F2933]' : ''
+														}`}
+													>
+														{t('app.filter.friend_wishlist_intro')}
+													</p>
+													<div>
+														<FilterBox
+															label={t('app.filter.friend_lucky_label')}
+															accent='#F5B82E'
+															filterStr={
 																friendGuaranteedLucky
 																	? friendLuckyWishlistGuaranteed
-																	: friendLuckyWishlist,
-															)
-														}
-														hint={t('app.filter.friend_lucky_hint')}
-													/>
-													<label className='flex items-start gap-2 cursor-pointer mono text-xs mt-2'>
-														<input
-															type='checkbox'
-															checked={friendGuaranteedLucky}
-															onChange={(e) => setFriendGuaranteedLucky(e.target.checked)}
-															className='mt-0.5'
+																	: friendLuckyWishlist
+															}
+															copied={copied.friendLucky}
+															onCopy={() =>
+																copyToClipboard(
+																	'friendLucky',
+																	friendGuaranteedLucky
+																		? friendLuckyWishlistGuaranteed
+																		: friendLuckyWishlist,
+																)
+															}
+															hint={t('app.filter.friend_lucky_hint')}
 														/>
-														<div>
-															<span className='text-[#E6EDF3]'>
-																{t('app.filter.friend_guaranteed_label')}
-															</span>
-															<p className='text-[#8B98A5] mt-0.5'>
-																{t('app.filter.friend_guaranteed_help')}
-															</p>
-														</div>
-													</label>
+														<label className='flex items-start gap-2 cursor-pointer mono text-xs mt-2'>
+															<input
+																type='checkbox'
+																checked={friendGuaranteedLucky}
+																onChange={(e) => setFriendGuaranteedLucky(e.target.checked)}
+																className='mt-0.5'
+															/>
+															<div>
+																<span className='text-[#E6EDF3]'>
+																	{t('app.filter.friend_guaranteed_label')}
+																</span>
+																<p className='text-[#8B98A5] mt-0.5'>
+																	{t('app.filter.friend_guaranteed_help')}
+																</p>
+															</div>
+														</label>
+													</div>
+													<FilterBox
+														label={t('app.filter.friend_hundo_label')}
+														accent='#5EAFC5'
+														filterStr={friendHundoWishlist}
+														copied={copied.friendHundo}
+														onCopy={() => copyToClipboard('friendHundo', friendHundoWishlist)}
+														hint={t('app.filter.friend_hundo_hint')}
+													/>
 												</div>
-												<FilterBox
-													label={t('app.filter.friend_hundo_label')}
-													accent='#5EAFC5'
-													filterStr={friendHundoWishlist}
-													copied={copied.friendHundo}
-													onCopy={() => copyToClipboard('friendHundo', friendHundoWishlist)}
-													hint={t('app.filter.friend_hundo_hint')}
-												/>
-											</div>
-										</Collapsible>
-
-										<Collapsible
-											icon='🥚'
-											label={t('app.collapsible.aux_evos')}
-											open={showAuxEvos}
-											onToggle={() => setShowAuxEvos((s) => !s)}
-										>
-											<div className='space-y-4'>
-												{cheapEvolve ? (
-													<FilterBox
-														label={t('app.filter.cheap_evolve_label')}
-														accent='#27AE60'
-														filterStr={cheapEvolve}
-														copied={copied.cheapEvolve}
-														onCopy={() => copyToClipboard('cheapEvolve', cheapEvolve)}
-														hint={t('app.filter.cheap_evolve_hint')}
-													/>
-												) : (
-													<p className='text-xs italic text-[#8B98A5]'>
-														{t('app.filter.cheap_evolve_empty')}
-													</p>
-												)}
-												<FilterBox
-													label={t('app.filter.dex_plus_label')}
-													accent='#27AE60'
-													filterStr={dexPlus}
-													copied={copied.dexPlus}
-													onCopy={() => copyToClipboard('dexPlus', dexPlus)}
-													hint={t('app.filter.dex_plus_hint')}
-												/>
-											</div>
-										</Collapsible>
-
-										<Collapsible
-											icon='⚡'
-											label={t('app.collapsible.aux_megas')}
-											open={showAuxMegas}
-											onToggle={() => setShowAuxMegas((s) => !s)}
-										>
-											<FilterBox
-												label={t('app.filter.mega_evolve_label')}
-												accent='#E91E63'
-												filterStr={megaEvolve}
-												copied={copied.megaEvolve}
-												onCopy={() => copyToClipboard('megaEvolve', megaEvolve)}
-												hint={t('app.filter.mega_evolve_hint')}
-											/>
-										</Collapsible>
-									</div>
-
-									{/* Team Rocket section — encounters & their post-fight cleanup */}
-									<div className='space-y-3 pt-4'>
-										<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-											{t('app.collapsible.aux_section_team_rocket')}
-										</h3>
-										<RocketCollapsible
-											fetchedAt={rocketLineupsFetchedAt}
-											leaders={rocketLeaders}
-											typedGrunts={rocketTypedGrunts}
-											genericGrunts={rocketGenericGrunts}
-											typeLabels={rocketTypeLabels}
-											lenientCounters={effectiveConfig.rocketLenientCounters !== false}
-											open={showAuxRocket}
-											onToggle={() => setShowAuxRocket((s) => !s)}
-											copied={copied}
-											copyToClipboard={copyToClipboard}
-											t={t}
-											outputLocale={effectiveOutputLocale}
-										/>
-										<Collapsible
-											icon='🌑'
-											label={t('app.collapsible.aux_shadows')}
-											open={showAuxShadows}
-											onToggle={() => setShowAuxShadows((s) => !s)}
-										>
-											<div className='space-y-4'>
-												<FilterBox
-													label={t('app.filter.shadow_cheap_label')}
-													accent='#9B59B6'
-													filterStr={shadowCheap}
-													copied={copied.shadowCheap}
-													onCopy={() => copyToClipboard('shadowCheap', shadowCheap)}
-													hint={t('app.filter.shadow_cheap_hint')}
-												/>
-												<FilterBox
-													label={t('app.filter.shadow_safe_label')}
-													accent='#9B59B6'
-													filterStr={shadowSafe}
-													copied={copied.shadowSafe}
-													onCopy={() => copyToClipboard('shadowSafe', shadowSafe)}
-													hint={t('app.filter.shadow_safe_hint')}
-												/>
-												<FilterBox
-													label={t('app.filter.shadow_hundo_candidates_label')}
-													accent='#9B59B6'
-													filterStr={shadowHundoCandidates}
-													copied={copied.shadowHundoCandidates}
-													onCopy={() =>
-														copyToClipboard('shadowHundoCandidates', shadowHundoCandidates)
-													}
-													hint={t('app.filter.shadow_hundo_candidates_hint')}
-												/>
-												{shadowFrustration && (
-													<FilterBox
-														label={t('app.filter.shadow_frustration_label')}
-														accent='#9B59B6'
-														filterStr={shadowFrustration}
-														copied={copied.shadowFrustration}
-														onCopy={() =>
-															copyToClipboard('shadowFrustration', shadowFrustration)
-														}
-														hint={t('app.filter.shadow_frustration_hint')}
-													/>
-												)}
-												{evoSwapCandy && (
-													<FilterBox
-														label={t('app.filter.evo_swap_candy_label')}
-														accent='#9B59B6'
-														filterStr={evoSwapCandy}
-														copied={copied.evoSwapCandy}
-														onCopy={() => copyToClipboard('evoSwapCandy', evoSwapCandy)}
-														hint={t('app.filter.evo_swap_candy_hint', {
-															params: {
-																tag: effectiveConfig.evoSwapTagName || 'EvoSwap',
-															},
-														})}
-													/>
-												)}
-												{evoSwapItem && (
-													<FilterBox
-														label={t('app.filter.evo_swap_item_label')}
-														accent='#9B59B6'
-														filterStr={evoSwapItem}
-														copied={copied.evoSwapItem}
-														onCopy={() => copyToClipboard('evoSwapItem', evoSwapItem)}
-														hint={t('app.filter.evo_swap_item_hint', {
-															params: {
-																tag: effectiveConfig.evoSwapTagName || 'EvoSwap',
-															},
-														})}
-													/>
-												)}
-											</div>
-										</Collapsible>
-									</div>
-
-									{/* Events section — wild spawns during current / upcoming
-                    events, pulled from leak-duck; run `npm run fetch-events`
-                    to refresh the snapshot. */}
-									<div className='space-y-3 pt-4'>
-										<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-											{t('app.collapsible.aux_section_events')}
-										</h3>
-										<EventSpawnCollapsible
-											icon='🌿'
-											fetchedAt={eventsFetchedAt}
-											events={eventFilters}
-											megaBoostFor={megaBoostFor}
-											typeLabels={rocketTypeLabels}
-											accent='#27AE60'
-											open={showAuxEvents}
-											onToggle={() => setShowAuxEvents((s) => !s)}
-											copied={copied}
-											copyToClipboard={copyToClipboard}
-											t={t}
-											locale={locale}
-										/>
-									</div>
-
-									{/* Raids section — current bosses pulled from lily-dex-api;
-                    run `npm run fetch-raid-bosses` to refresh the snapshot. */}
-									<div className='space-y-3 pt-4'>
-										<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-											{t('app.collapsible.aux_section_raids')}
-										</h3>
-										<BossCollapsible
-											icon='⚔️'
-											titleKey='app.collapsible.aux_raids'
-											fetchedAt={raidBossesFetchedAt}
-											bossesByTier={raidFilters}
-											eventGroups={eventRaidFilters}
-											tierOrder={[
-												'mega',
-												'lvl5',
-												'shadow_lvl5',
-												'lvl3',
-												'shadow_lvl3',
-												'lvl1',
-												'shadow_lvl1',
-											]}
-											accent='#E74C3C'
-											open={showAuxRaids}
-											onToggle={() => setShowAuxRaids((s) => !s)}
-											copied={copied}
-											copyToClipboard={copyToClipboard}
-											keyPrefix='raid'
-											t={t}
-											locale={locale}
-										/>
-
-										<MaxBattleCollapsible
-											fetchedAt={raidBossesFetchedAt}
-											maxTank={maxTank}
-											bossesByTier={maxBattleFilters}
-											eventGroups={eventMaxBattleFilters}
-											tierOrder={['tier_3', 'tier_2', 'tier_1']}
-											accent='#F39C12'
-											open={showAuxMaxBattles}
-											onToggle={() => setShowAuxMaxBattles((s) => !s)}
-											copied={copied}
-											copyToClipboard={copyToClipboard}
-											t={t}
-											locale={locale}
-										/>
-									</div>
-
-									{/* PvP section — top-30 meta picks per league with loose
-                    PvP rank-1 IVs. Rankings pulled from lily-dex-api;
-                    daily sync via .github/workflows/sync-data.yml. */}
-									<div className='space-y-3 pt-4'>
-										<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-											{t('app.collapsible.aux_section_pvp')}
-										</h3>
-										<PvpCollapsible
-											fetchedAt={pvpRankingsFetchedAt}
-											leagues={pvpFilters}
-											cupFilters={cupFilters}
-											open={showAuxPvp}
-											onToggle={() => setShowAuxPvp((s) => !s)}
-											copied={copied}
-											copyToClipboard={copyToClipboard}
-											t={t}
-											locale={locale}
-										/>
-									</div>
+											</Collapsible>
+										</div>
+									</AreaPanel>
 
 									{/* Internals — set theory / raw clauses / verify */}
 									<div className='space-y-3 pt-4'>
@@ -8773,6 +8786,72 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 					{filterStr}
 				</code>
 			</div>
+		</div>
+	);
+}
+
+// The four areas of the filter step as an ARIA tab set. Every panel stays
+// mounted (hidden, not unmounted), so each tab's aria-controls points at a
+// real element and switching tabs keeps every collapsible's open state.
+// Arrow keys move between tabs and Home/End jump to the ends, per the APG
+// tabs pattern; only the selected tab is in the Tab order.
+function AreaTabs({ areas, current, onSelect, t }) {
+	const refs = useRef({});
+	const move = (e, i) => {
+		const next =
+			e.key === 'ArrowRight' ? (i + 1) % areas.length
+			: e.key === 'ArrowLeft' ? (i - 1 + areas.length) % areas.length
+			: e.key === 'Home' ? 0
+			: e.key === 'End' ? areas.length - 1
+			: null;
+		if (next === null) return;
+		e.preventDefault();
+		onSelect(areas[next]);
+		refs.current[areas[next]]?.focus();
+	};
+	return (
+		<div className='pb-3 border-b border-[#1F2933]'>
+			<div role='tablist' aria-label={t('app.area.tablist')} className='grid grid-cols-4 gap-1'>
+				{areas.map((area, i) => {
+					const selected = area === current;
+					return (
+						<button
+							key={area}
+							ref={(el) => (refs.current[area] = el)}
+							type='button'
+							role='tab'
+							id={`area-tab-${area}`}
+							aria-selected={selected}
+							aria-controls={`area-panel-${area}`}
+							tabIndex={selected ? 0 : -1}
+							onClick={() => onSelect(area)}
+							onKeyDown={(e) => move(e, i)}
+							className={`mono text-xs min-h-[40px] px-2 rounded-sm border transition ${
+								selected
+									? 'border-[#5EAFC5] text-[#E6EDF3] bg-[#141A21]'
+									: 'border-[#1F2933] text-[#8B98A5] hover:text-[#E6EDF3]'
+							}`}
+						>
+							{t(`app.area.${area}.label`)}
+						</button>
+					);
+				})}
+			</div>
+			<p className='mono text-[10.5px] text-[#8090A0] mt-2'>{t(`app.area.${current}.hint`)}</p>
+		</div>
+	);
+}
+
+function AreaPanel({ area, current, children }) {
+	return (
+		<div
+			role='tabpanel'
+			id={`area-panel-${area}`}
+			aria-labelledby={`area-tab-${area}`}
+			hidden={area !== current}
+			className='space-y-6'
+		>
+			{children}
 		</div>
 	);
 }
