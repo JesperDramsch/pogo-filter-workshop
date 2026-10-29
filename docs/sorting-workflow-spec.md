@@ -1,6 +1,6 @@
 # Sorting workflow: piles and jobs
 
-Status: draft for review, 29 October 2026. Nothing here is implemented yet.
+Status: implemented in PR #110 (milestones 1 to 9), 29 October 2026. Where the build settled a detail differently from this draft, the PR description lists it.
 
 ## Why
 
@@ -57,8 +57,8 @@ Hides everything that is always protected. Built from `src/i18n/pogo-keywords.js
 | Favourites | `!favorit` |
 | Any tag | `!#` |
 | Hundos | `!4*` |
-| Nundos (0/0/0) | `!0angriffs-wert,!0verteidigungs-wert,!0kp` (one clause) |
-| Guaranteed lucky-trade stock (existing year-floor setting, currently caught in 2020 or earlier) | `!jahr-2020` |
+| Nundos (0/0/0) | `1-4angriffs-wert,1-4verteidigungs-wert,1-4kp` (one clause; PoGo ignores `!N` on IV tokens, so the positive form) |
+| Guaranteed lucky-trade stock (existing year-floor setting, currently caught in 2020 or earlier) | `jahr21-,getauscht` (a traded one can't be traded again, so it is no stock) |
 | Invested Dynamax | `!dynaattacke2-&!dynawall1-&!dynakampfgeist1-` |
 | Buddies at Good level or higher | `!kumpel2-` |
 | Mythicals | `!mysteriös` |

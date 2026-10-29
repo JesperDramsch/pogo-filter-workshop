@@ -1848,10 +1848,10 @@ function capFirst(s) {
 // shadows, costumes and the rest are the user's call in ① and ②, and the ones
 // worth keeping are starred or tagged by the time ③ runs.
 //
-// Deliberately independent of the trash toggles (protectNundos, protectBuddies
-// and friends): switching a protection off to clear a category is exactly the
-// habit the piles replace. The one setting it reads is the lucky-trade year
-// floor, whose value is the user's.
+// Deliberately independent of the trash toggles (protectNundos, protectBuddies,
+// protectLuckyEligible and friends): switching a protection off to clear a
+// category is exactly the habit the piles replace. The one setting it reads is
+// the lucky-trade year floor's value, which is the user's.
 //
 // Spelling notes, all checked in scripts/check-data-filters.mjs:
 //   - nundos use the positive contrapositive: PoGo ignores `!N` on IV tokens
@@ -1865,7 +1865,10 @@ export function protectionTail(kw, cfg) {
 		'!4*',
 		`1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`,
 	];
-	if (cfg.protectLuckyEligible && cfg.luckyEligibleYear > 0) {
+	// The year floor's value, not its trash toggle (protectLuckyEligible): the
+	// tail ignores the toggles, and step ③'s hint calls lucky-trade stock
+	// always protected. A year of 0 means the user set no floor at all.
+	if (cfg.luckyEligibleYear > 0) {
 		// Traded ones can't be traded again, so they are no lucky-trade stock.
 		clauses.push(`${kw.numeric.year}${cfg.luckyEligibleYear}-,${kw.flag.traded}`);
 	}

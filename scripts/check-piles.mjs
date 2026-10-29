@@ -255,6 +255,17 @@ for (const fam of PILE_FAMILIES) {
   }
 }
 
+console.log("\nThe tail ignores the trash toggles");
+{
+  const kw = pogoKeywords("en");
+  const on = protectionTail(kw, { ...CFG, protectLuckyEligible: true, protectNundos: false, protectBuddies: false });
+  const off = protectionTail(kw, { ...CFG, protectLuckyEligible: false, protectNundos: true, protectBuddies: true });
+  check("switching trash protections on or off leaves the tail as it is (lucky-trade floor included)",
+    JSON.stringify(on) === JSON.stringify(off) && on.some((c) => c.startsWith(`${kw.numeric.year}`)), off.join("&"));
+  check("only a year floor of 0 drops the lucky-trade clause",
+    !protectionTail(kw, { ...CFG, luckyEligibleYear: 0 }).some((c) => c.startsWith(`${kw.numeric.year}`)));
+}
+
 console.log("\nP7 — the pile card");
 for (const loc of localeNames) {
   const r = buildFilters(HUNDOS, [], CFG, [], loc, makeTFn(loc));
