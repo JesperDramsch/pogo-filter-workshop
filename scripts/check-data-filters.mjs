@@ -66,8 +66,9 @@ import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import META_RANKINGS from "../src/data/meta-rankings.json";
 import { buildDataFilters, buildResult, FIXTURE_CONFIG, makeTFn } from "./lib/fixture.mjs";
 import {
-  bossBoxKeys, bossCounterLabel, candyFamilyNames, evalFilterDetailed, ivToBar, protectionTail, starFromIVs,
+  bossBoxKeys, bossCounterLabel, candyFamilyNames, evalFilterDetailed, protectionTail,
 } from "../src/App.jsx";
+import { PILE_DEX, PILE_SPECIES, pileCases, pileMon } from "./lib/pile-cases.mjs";
 import { LOCALES } from "../src/i18n/index.js";
 import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
 // `resolveSpecies` is D7's; the dictionary and locale list are D6's. D6 no
@@ -1643,43 +1644,7 @@ console.log("D18 — step ③ of a pile is the pile and the protection tail, and
   // A synthetic one-species pile stands in when today's snapshot has no
   // events, so the property cannot pass by having nothing to check. The real
   // event piles are held to the same composition: fams & tail, exactly.
-  const PILE_SPECIES = "Magikarp";
-  const mk = (loc, o = {}) => ({
-    dex: 129, species: "magikarp", families: candyFamilyNames(PILE_SPECIES, loc), types: ["water"],
-    wp: 200, ageDays: 1, year: 2026, distance: 0, tags: [],
-    ...o,
-    flags: { ...(o.flags || {}) },
-    atk: ivToBar(o.ivAtk ?? 3), def: ivToBar(o.ivDef ?? 7), hp: ivToBar(o.ivHp ?? 9),
-    star: starFromIVs(o.ivAtk ?? 3, o.ivDef ?? 7, o.ivHp ?? 9),
-  });
-  const floorYear = 2000 + FIXTURE_CONFIG.luckyEligibleYear - 1;
-  const PROTECTED = [
-    ["starred", { flags: { favorite: true } }],
-    ["tagged", { tags: ["Evolve"] }],
-    ["hundo", { ivAtk: 15, ivDef: 15, ivHp: 15 }],
-    ["nundo", { ivAtk: 0, ivDef: 0, ivHp: 0 }],
-    [`caught ${floorYear}, untraded`, { year: floorYear }],
-    ["Max Attack 2", { dynaAtk: 2, flags: { dynamaxCapable: true } }],
-    ["Max Guard 1", { dynaAtk: 1, dynaWall: 1, flags: { dynamaxCapable: true } }],
-    ["Max Spirit 1", { dynaAtk: 1, dynaSpirit: 1, flags: { dynamaxCapable: true } }],
-    ["Good buddy", { buddyLevel: 2, flags: { buddy: true } }],
-    ["mythical", { flags: { mythical: true } }],
-    ["shiny legendary", { flags: { shiny: true, legendary: true } }],
-    ["legendary with a background", { flags: { background: true, legendary: true } }],
-  ];
-  const RELEASABLE = [
-    ["plain dupe", {}],
-    ["0/0/1, not a nundo", { ivAtk: 0, ivDef: 0, ivHp: 1 }],
-    [`caught ${floorYear}, traded`, { year: floorYear, flags: { traded: true } }],
-    ["fresh Dynamax", { dynaAtk: 1, flags: { dynamaxCapable: true } }],
-    ["level-1 buddy", { buddyLevel: 1, flags: { buddy: true } }],
-    ["shiny", { flags: { shiny: true } }],
-    ["lucky", { flags: { lucky: true } }],
-    ["shadow", { flags: { shadow: true } }],
-    ["XXL", { flags: { xxl: true } }],
-    ["costume", { flags: { costume: true } }],
-    ["plain legendary", { flags: { legendary: true } }],
-  ];
+  const { PROTECTED, RELEASABLE } = pileCases(FIXTURE_CONFIG);
   for (const loc of localeNames) {
     const kw = pogoKeywords(loc);
     const tail = protectionTail(kw, FIXTURE_CONFIG);
@@ -1691,9 +1656,9 @@ console.log("D18 — step ③ of a pile is the pile and the protection tail, and
       if (trash && ev.release.includes(trash)) bad.push(`${ev.id}: release still carries the trash filter`);
     }
     const pile = candyFamilyNames(PILE_SPECIES, loc).length > 0
-      ? `+${pokemonNameFor("129", loc)}&${tail.join("&")}` : "";
+      ? `+${pokemonNameFor(String(PILE_DEX), loc)}&${tail.join("&")}` : "";
     if (!pile) bad.push("no localised pile species");
-    const verdict = (o) => evalFilterDetailed(pile, mk(loc, o), loc);
+    const verdict = (o) => evalFilterDetailed(pile, pileMon(loc, o), loc);
     for (const [label, o] of PROTECTED) {
       const v = verdict(o);
       if (v.verdict !== false) bad.push(`${label}: verdict ${v.verdict}${v.unknown.length ? ` (unknown ${v.unknown.join(" ")})` : ""}`);

@@ -1854,6 +1854,23 @@ export function protectionTail(kw, cfg) {
 	return clauses;
 }
 
+// One sorting pile in the spec's three steps. `head` is the pile itself, a
+// CNF chain (`+a,+b` or `+a&!+a,alola`); each ① lens is ANDed onto it, as are
+// ② (not starred, not tagged) and ③ (the protection tail). Every pile goes
+// through here, so all of them share one shape and scripts/check-piles.mjs can
+// hold them all to it.
+//   lenses: [{ key, filter }] where `filter` is a CNF chain (may hold `&`)
+export function buildPile({ id, head, lenses = [], kw, cfg }) {
+	if (!head) return null;
+	return {
+		id,
+		overview: head,
+		keep: lenses.filter((l) => l.filter).map((l) => ({ key: l.key, filter: `${head}&${l.filter}` })),
+		sort: `${head}&!${kw.flag.favorite}&!#`,
+		release: `${head}&${protectionTail(kw, cfg).join('&')}`,
+	};
+}
+
 export function buildFilters(
 	hundos,
 	luckies,
@@ -2783,6 +2800,7 @@ export function buildFilters(
 
 	// ── HUNDO-SORT ─────────────────────────────────────────────────────────
 	const sortClauses = [];
+	let sortPileHead = '';
 	if (hundos.length > 0) {
 		push(sortClauses, H, tFn('app.clause_why.all_hundo_families'));
 		// Regional form-scoping: when a hundo is annotated to specific form(s),
@@ -2809,12 +2827,23 @@ export function buildFilters(
 					tFn('app.clause_why.sort_gender_scope', { params: { species: capFirst(out) } }),
 				);
 		}
+		sortPileHead = sortClauses.map((c) => c.clause).join('&');
 		if (cfg.protectAnyTag) push(sortClauses, '!#', tFn('app.clause_why.all_tags_protected'));
 		if (cfg.protectFavorites) push(sortClauses, `!${kw.flag.favorite}`, tFn('app.clause_why.favorites_protected'));
 		if (cfg.protectShinies) push(sortClauses, `!${kw.flag.shiny}`, tFn('app.clause_why.shinies_protected'));
 		if (cfg.protectLuckies) push(sortClauses, `!${kw.flag.lucky}`, tFn('app.clause_why.luckies_protected'));
 	}
 	const sort = sortClauses.map((c) => c.clause).join('&');
+	// The same families as a pile: ① the hundos themselves, ② what is not yet
+	// starred or tagged, ③ the rest. Once a hundo exists the family's stand-in
+	// has no job, so ③ releases it; the hundo is in the protection tail.
+	const hundoPile = buildPile({
+		id: 'hundo',
+		head: sortPileHead,
+		lenses: [{ key: 'hundos', filter: '4*' }],
+		kw,
+		cfg,
+	});
 
 	// ── LUCKY-HUNDO-SORT ───────────────────────────────────────────────────
 	// Narrower variant of HUNDO-SORT for the H ∩ L set: species where both
@@ -4205,7 +4234,17 @@ export function buildFilters(
 			const a = `4${kw.iv.atk}`,
 				d = `4${kw.iv.def}`,
 				h = `4${kw.iv.hp}`;
-			const keepIv = `${fams}&${a},${d}&${a},${h}&${d},${h}` + `&3-4${kw.iv.atk}&3-4${kw.iv.def}&3-4${kw.iv.hp}`;
+			const keepIvLens = `${a},${d}&${a},${h}&${d},${h}` + `&3-4${kw.iv.atk}&3-4${kw.iv.def}&3-4${kw.iv.hp}`;
+			const pile = buildPile({
+				id: `event_${ev.id}`,
+				head: fams,
+				lenses: [
+					{ key: 'souvenirs', filter: souvenirTokens.join(',') },
+					{ key: 'keep_iv', filter: keepIvLens },
+				],
+				kw,
+				cfg,
+			});
 			return {
 				id: ev.id,
 				title: ev.title,
@@ -4216,16 +4255,14 @@ export function buildFilters(
 				spawnDex: ev.spawnDex || [],
 				spawnForms: ev.spawnForms || [],
 				megaBoost: megaBoostFor(ev.spawnForms),
-				// overview — every event spawn family, no other constraint
-				overview: fams,
-				// ① keep
-				souvenirs: `${fams}&${souvenirTokens.join(',')}`,
-				keepIv,
-				// ② still to sort — spawns you haven't favourited or tagged yet
-				sort: `${fams}&!${kw.flag.favorite}&!#`,
-				// ③ release — this pile minus everything always protected (see
-				// protectionTail), not the trash filter: ① and ② took the keepers
-				release: `${fams}&${protectionTail(kw, cfg).join('&')}`,
+				// The event's spawn families as a pile (see buildPile): ① souvenirs
+				// and IV keepers, ② not yet starred or tagged, ③ the protection tail.
+				pile,
+				overview: pile.overview,
+				souvenirs: pile.keep[0].filter,
+				keepIv: pile.keep[1].filter,
+				sort: pile.sort,
+				release: pile.release,
 			};
 		})
 		.filter(Boolean);
@@ -4729,6 +4766,7 @@ export function buildFilters(
 		friendCollectSuggestions,
 		trashClauses,
 		tradeClauses,
+		hundoPile,
 		sortClauses,
 		luckySortClauses,
 		luckyFamilySortClauses,
@@ -5882,6 +5920,7 @@ export default function App() {
 		trade,
 		sort,
 		luckySort,
+		hundoPile,
 		luckyFamilySort,
 		nundoSort,
 		prestaged,
@@ -6703,7 +6742,7 @@ export default function App() {
 										) : (
 											<>
 												<div className='space-y-3'>
-													{(sort || luckySort || luckyFamilySort || nundoSort || tradedTrashSort) && (
+													{(hundoPile || luckySort || luckyFamilySort || nundoSort || tradedTrashSort) && (
 														<Collapsible
 															icon='✨'
 															label={t('app.collapsible.browse_sort')}
@@ -6711,15 +6750,17 @@ export default function App() {
 															onToggle={() => setShowBrowseSort((s) => !s)}
 														>
 															<div className='space-y-4'>
-																{sort && (
-																	<FilterBox
-																		label={t('app.filter.sort_label')}
-																		accent='#F5B82E'
-																		filterStr={sort}
-																		copied={copied.sort}
-																		onCopy={() => copyToClipboard('sort', sort)}
-																		hint={t('app.filter.sort_hint')}
-																	/>
+																{hundoPile && (
+																	<TrainerAccordion name={t('app.filter.sort_label')} accent='#F5B82E'>
+																		<PileSteps
+																			pile={hundoPile}
+																			accent='#F5B82E'
+																			copied={copied}
+																			copyToClipboard={copyToClipboard}
+																			t={t}
+																			text={HUNDO_PILE_TEXT}
+																		/>
+																	</TrainerAccordion>
 																)}
 																{luckySort && (
 																	<FilterBox
@@ -9232,6 +9273,64 @@ function BossCollapsible({
 // tidy-up) holding a three-step triage: ① keepers to favourite, ② what's still
 // unsorted, ③ the trashable rest. Mirrors BossCollapsible's shape so the aux
 // section stays visually consistent.
+// The three steps of one sorting pile (see buildPile), rendered the same way
+// for every pile. `text` names each box's label and hint keys:
+//   { overview: [label, hint], keep: { <lensKey>: [label, hint] }, sort, release }
+// sort and release fall back to the generic pile wording. Copy keys are
+// `${pile.id}_${box}`, so two piles that share a species never share state.
+// `card` renders under ②, where the user decides what still has a job.
+const PILE_TEXT_DEFAULTS = {
+	sort: ['app.pile.sort_label', 'app.pile.sort_hint'],
+	release: ['app.pile.release_label', 'app.pile.release_hint'],
+};
+const HUNDO_PILE_TEXT = {
+	overview: ['app.pile.hundo.overview_label', 'app.filter.sort_hint'],
+	keep: { hundos: ['app.pile.lens.hundos_label', 'app.pile.lens.hundos_hint'] },
+};
+const EVENT_PILE_TEXT = {
+	overview: ['app.events.overview_label', 'app.events.overview_hint'],
+	keep: {
+		souvenirs: ['app.events.souvenirs_label', 'app.events.souvenirs_hint'],
+		keep_iv: ['app.events.keep_iv_label', 'app.events.keep_iv_hint'],
+	},
+	sort: ['app.pile.sort_label', 'app.events.sort_hint'],
+	release: ['app.pile.release_label', 'app.events.release_hint'],
+};
+function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
+	if (!pile) return null;
+	const words = { ...PILE_TEXT_DEFAULTS, ...text };
+	const box = (suffix, keys, str) => {
+		if (!str || !keys) return null;
+		const copyKey = `${pile.id}_${suffix}`;
+		return (
+			<FilterBox
+				key={suffix}
+				label={t(keys[0])}
+				accent={accent}
+				filterStr={str}
+				copied={copied[copyKey]}
+				onCopy={() => copyToClipboard(copyKey, str)}
+				hint={t(keys[1])}
+			/>
+		);
+	};
+	const subHeading = (key) => (
+		<h5 className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t(key)}</h5>
+	);
+	return (
+		<>
+			{box('overview', words.overview, pile.overview)}
+			{pile.keep.length > 0 && subHeading('app.pile.group_keep')}
+			{pile.keep.map((lens) => box(lens.key, words.keep?.[lens.key], lens.filter))}
+			{subHeading('app.pile.group_sort')}
+			{card}
+			{box('sort', words.sort, pile.sort)}
+			{subHeading('app.pile.group_release')}
+			{box('release', words.release, pile.release)}
+		</>
+	);
+}
+
 function EventSpawnCollapsible({
 	icon,
 	fetchedAt,
@@ -9302,27 +9401,6 @@ function EventSpawnCollapsible({
 					const teaser = isEnded
 						? t('app.events.window_ended', { params: { dow: fmtDow.format(endMs) } })
 						: formatEventWindow(ev.start, ev.end, t, locale);
-					// One FilterBox per non-null triage string; copy keys namespaced per
-					// event so two events sharing a species don't share copy state.
-					const box = (suffix, labelKey, hintKey, str, params) => {
-						if (!str) return null;
-						const copyKey = `event_${ev.id}_${suffix}`;
-						const opts = params ? { params } : undefined;
-						return (
-							<FilterBox
-								key={suffix}
-								label={t(labelKey, opts)}
-								accent={accent}
-								filterStr={str}
-								copied={copied[copyKey]}
-								onCopy={() => copyToClipboard(copyKey, str)}
-								hint={t(hintKey, opts)}
-							/>
-						);
-					};
-					const subHeading = (key) => (
-						<h5 className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t(key)}</h5>
-					);
 					return (
 						<TrainerAccordion
 							key={ev.id}
@@ -9333,14 +9411,14 @@ function EventSpawnCollapsible({
 						>
 							{ev.megaBoost?.poolSize > 0 &&
 								megaPanel(ev.megaBoost, `event_${ev.id}_mega`, t('app.events.mega_heading'))}
-							{box('overview', 'app.events.overview_label', 'app.events.overview_hint', ev.overview)}
-							{subHeading('app.events.group_keep')}
-							{box('souvenirs', 'app.events.souvenirs_label', 'app.events.souvenirs_hint', ev.souvenirs)}
-							{box('keep_iv', 'app.events.keep_iv_label', 'app.events.keep_iv_hint', ev.keepIv)}
-							{subHeading('app.events.group_sort')}
-							{box('sort', 'app.events.sort_label', 'app.events.sort_hint', ev.sort)}
-							{subHeading('app.events.group_release')}
-							{box('release', 'app.events.release_label', 'app.events.release_hint', ev.release)}
+							<PileSteps
+								pile={ev.pile}
+								accent={accent}
+								copied={copied}
+								copyToClipboard={copyToClipboard}
+								t={t}
+								text={EVENT_PILE_TEXT}
+							/>
 						</TrainerAccordion>
 					);
 				})}
