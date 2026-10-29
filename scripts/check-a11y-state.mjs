@@ -150,6 +150,16 @@ console.log("\nS5 — the filter areas are an ARIA tab set");
   const areas = (app.match(/export const FILTER_AREAS = \[([^\]]*)\]/) || [])[1]?.match(/'(\w+)'/g)?.map((x) => x.slice(1, -1)) || [];
   const missing = areas.filter((a) => !app.includes(`<AreaPanel area='${a}' current={filterArea}>`));
   check(`every area (${areas.join(", ")}) has a panel`, areas.length === 4 && missing.length === 0, missing.join(", "));
+  check("the settings flip is a toggle exposing aria-pressed", /onClick=\{onToggleSettings\}\s*aria-pressed=\{!!settings\}/.test(tabs));
+  const notFlipped = areas.filter((a) => !app.includes(`areaSettingsFor.${a}\n`));
+  check("every area panel flips to its own settings", notFlipped.length === 0, notFlipped.join(", "));
+  // The flip is a URL too, so back/forward and bookmarks reach it.
+  const { areaFromHash, areaSettingsFromHash, areaHash } = await import("../src/App.jsx");
+  const trips = areas.flatMap((a) => [false, true].map((on) => [a, on, areaHash(a, on)]));
+  const badTrips = trips.filter(([a, on, h]) => areaFromHash(h) !== a || areaSettingsFromHash(h) !== on).map(([, , h]) => h);
+  check(`hash round-trips for ${trips.length} area/settings states`, badTrips.length === 0, badTrips.join(", "));
+  check("wizard step hashes are not areas", ["#workshop/where", "#workshop/what", "#workshop/have", "#workshop/filter", "#workshop"]
+    .every((h) => areaFromHash(h) === null && areaSettingsFromHash(h) === false));
 }
 
 console.log(`\n${failures === 0 ? "✓ All ARIA-state checks passed." : `✗ ${failures} failure(s).`}`);

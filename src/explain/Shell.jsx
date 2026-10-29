@@ -252,9 +252,12 @@ export function AppNav({
 // WorkshopNav: same brand mark, but tabs are the workshop steps. Settings
 // gear sits as an extra icon-button before the primary action, which now
 // points BACK to the explainer (landing).
-export function WorkshopNav({ currentStepKey, onStepClick, onSettingsClick, onNavigate }) {
+// `showSteps`: the four wizard chips show only while the first-run wizard is
+// open. Past it, the filter view's area tabs and their settings carry
+// everything the steps did, and the gear modal can start the wizard again.
+export function WorkshopNav({ currentStepKey, onStepClick, onSettingsClick, onNavigate, showSteps = true }) {
   const { t } = useTranslation();
-  const tabs = WORKSHOP_STEPS.map((s) => ({
+  const tabs = (showSteps ? WORKSHOP_STEPS : []).map((s) => ({
     key: s.key,
     icon: s.icon,
     label: t(s.titleKey),
