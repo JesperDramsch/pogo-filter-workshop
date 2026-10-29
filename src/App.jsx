@@ -1792,6 +1792,47 @@ function capFirst(s) {
 	return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+// The protection tail: step ③ ("release") of every sorting pile is the pile
+// ANDed with these clauses, never with the trash filter. The trash filter only
+// matches the lowest common denominator, which steps ① and ② have already
+// handled, so `pile & trash` came up empty and the dupes it was meant to clear
+// stayed. The tail keeps only what is ALWAYS protected; shinies, luckies,
+// shadows, costumes and the rest are the user's call in ① and ②, and the ones
+// worth keeping are starred or tagged by the time ③ runs.
+//
+// Deliberately independent of the trash toggles (protectNundos, protectBuddies
+// and friends): switching a protection off to clear a category is exactly the
+// habit the piles replace. The one setting it reads is the lucky-trade year
+// floor, whose value is the user's.
+//
+// Spelling notes, all checked in scripts/check-data-filters.mjs:
+//   - nundos use the positive contrapositive: PoGo ignores `!N` on IV tokens
+//   - invested Dynamax is three clauses (De Morgan), and negated ranges, so a
+//     fresh Dynamax with no Guard or Spirit value still passes
+//   - shiny / background legendaries are one OR-clause each: ¬(A ∩ L) = ¬A ∪ ¬L
+export function protectionTail(kw, cfg) {
+	const clauses = [
+		`!${kw.flag.favorite}`,
+		'!#',
+		'!4*',
+		`1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`,
+	];
+	if (cfg.protectLuckyEligible && cfg.luckyEligibleYear > 0) {
+		// Traded ones can't be traded again, so they are no lucky-trade stock.
+		clauses.push(`${kw.numeric.year}${cfg.luckyEligibleYear}-,${kw.flag.traded}`);
+	}
+	clauses.push(
+		`!${kw.flag.dynamax_move}2-`,
+		`!${kw.flag.dynamax_wall}1-`,
+		`!${kw.flag.dynamax_spirit}1-`,
+		`!${kw.numeric.buddy}2-`,
+		`!${kw.flag.mythical}`,
+		`!${kw.flag.shiny},!${kw.flag.legendary}`,
+		`!${kw.flag.background},!${kw.flag.legendary}`,
+	);
+	return clauses;
+}
+
 export function buildFilters(
 	hundos,
 	luckies,
@@ -4161,8 +4202,9 @@ export function buildFilters(
 				keepIv,
 				// ② still to sort — spawns you haven't favourited or tagged yet
 				sort: `${fams}&!${kw.flag.favorite}&!#`,
-				// ③ trash — your full trash logic, scoped to this event's spawns
-				trash: `${fams}&${trash}`,
+				// ③ release — this pile minus everything always protected (see
+				// protectionTail), not the trash filter: ① and ② took the keepers
+				release: `${fams}&${protectionTail(kw, cfg).join('&')}`,
 			};
 		})
 		.filter(Boolean);
@@ -4866,10 +4908,28 @@ function evalTerm(t, mon, kw, outputLocale) {
 	if (m) return mon.dex === +m[1];
 
 	// Locale-driven keyword tokens
-	if (t === `${kw.numeric.buddy}1-`) return !!mon.flags?.buddy;
+	// Levelled tokens read `mon.buddyLevel` / `mon.dyna{Atk,Wall,Spirit}` when the
+	// mon carries them, else the boolean flags the older fixtures set: a buddy
+	// counts as level 1, a Dynamax-capable mon has Max Attack 1. Guard and
+	// Spirit have no value until unlocked, so a missing one is level 0.
+	const levelOf = (n, re) => {
+		const lm = t.match(re);
+		return lm ? n >= +lm[1] : undefined;
+	};
+	const buddyLevel = mon.buddyLevel ?? (mon.flags?.buddy ? 1 : 0);
+	const dynaAtk = mon.dynaAtk ?? (mon.flags?.dynamaxCapable ? 1 : 0);
+	for (const [n, word] of [
+		[buddyLevel, kw.numeric.buddy],
+		[dynaAtk, kw.flag.dynamax_move],
+		[mon.dynaWall || 0, kw.flag.dynamax_wall],
+		[mon.dynaSpirit || 0, kw.flag.dynamax_spirit],
+	]) {
+		if (!word) continue;
+		const v = levelOf(n, new RegExp(`^${escapeRegex(word)}([1-5])-$`));
+		if (v !== undefined) return v;
+	}
 	if (t === `${kw.flag.mega}1-`) return !!mon.flags?.megaEvolved;
 	if (t === `${kw.flag.mega}0`) return !mon.flags?.megaEvolved;
-	if (t === `${kw.flag.dynamax_move}1-`) return !!mon.flags?.dynamaxCapable;
 	// `#` = carries ANY tag; `#name` = carries a tag starting with `name`. The
 	// prefix semantics are what buildFilters itself banks on when it emits a
 	// per-buddy `!#<prefix>` guard. Without this branch every named-tag clause
@@ -9071,8 +9131,8 @@ function EventSpawnCollapsible({
 							{box('keep_iv', 'app.events.keep_iv_label', 'app.events.keep_iv_hint', ev.keepIv)}
 							{subHeading('app.events.group_sort')}
 							{box('sort', 'app.events.sort_label', 'app.events.sort_hint', ev.sort)}
-							{subHeading('app.events.group_trash')}
-							{box('trash', 'app.events.trash_label', 'app.events.trash_hint', ev.trash)}
+							{subHeading('app.events.group_release')}
+							{box('release', 'app.events.release_label', 'app.events.release_hint', ev.release)}
 						</TrainerAccordion>
 					);
 				})}
