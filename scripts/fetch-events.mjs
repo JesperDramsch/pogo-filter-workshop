@@ -44,6 +44,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
 import { outsideWindow, carryOver } from "./lib/event-window.mjs";
+import { LEGACY_COMMUNITY_DAYS, communityDaysFromFeed, mergeRollingCommunityDays } from "./lib/community-days.mjs";
 import { fetchGameMaster, mechanicsBatchFloor, warnIfStale } from "./lib/game-master.mjs";
 import { buildNameIndex as buildFormIndex, resolveBossKey } from "./fetch-raid-bosses.mjs";
 
@@ -51,6 +52,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const DATA_DIR = resolve(ROOT, "src/data");
 const OUT_PATH = resolve(DATA_DIR, "events.json");
+const CD_PATH = resolve(DATA_DIR, "community-days.json");
 const NAMES_PATH = resolve(ROOT, "src/locales/pokemon-names.json");
 
 const EVENTS_URL =
@@ -221,6 +223,27 @@ function resolveSpawns(spawns, nameIdx) {
   };
 }
 
+// The Community Day background pile's species (scripts/lib/community-days.mjs):
+// the pinned legacy list plus every Community Day this feed has ever listed.
+// Runs before the wild-spawn guard below, so a day with no spawn events still
+// records a new Community Day. Append-only, and it refuses to write a rolling
+// list shorter than the one on disk.
+function writeCommunityDays(feed, nameIdx) {
+  const previous = readPreviousJson(CD_PATH);
+  const fresh = communityDaysFromFeed(feed, (spawns) => resolveSpawns(spawns, nameIdx));
+  const { rolling, added } = mergeRollingCommunityDays(previous?.rolling || [], fresh);
+  if (rolling.length < (previous?.rolling?.length || 0)) {
+    throw new Error("community days: rolling list would shrink — refusing to overwrite cache");
+  }
+  const content = { legacy: LEGACY_COMMUNITY_DAYS, rolling };
+  const unchanged =
+    previous?.fetchedAt &&
+    canonicalStringify({ legacy: previous.legacy, rolling: previous.rolling || [] }) === canonicalStringify(content);
+  writeJson(CD_PATH, { fetchedAt: unchanged ? previous.fetchedAt : new Date().toISOString(), ...content });
+  for (const cd of added) console.log(`  + Community Day ${cd.date} ${cd.event} (${cd.dex.join(", ")})`);
+  console.log(`✓ wrote ${CD_PATH} (${LEGACY_COMMUNITY_DAYS.length} legacy · ${rolling.length} rolling${unchanged ? ", unchanged" : ""})`);
+}
+
 async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
@@ -244,6 +267,8 @@ async function main() {
 
   const namesDict = JSON.parse(readFileSync(NAMES_PATH, "utf8"));
   const nameIdx = buildNameIndex(namesDict);
+
+  writeCommunityDays(feed, nameIdx);
 
   const now = Date.now();
   const previous = readPreviousJson(OUT_PATH);

@@ -15,9 +15,9 @@ matter — how anyone would notice if one of them stopped moving.
 | [mknepprath/lily-dex-api](https://github.com/mknepprath/lily-dex-api) | Type chart, current raid-boss and Max-Battle rotation | Refreshes every 6h; the rotation itself is the signal. **`maxbattles.json` has been an empty 200 since 2026-06-11**: it answers `{"currentList":[]}` while its `Last-Modified` keeps moving, so the Max Battle panel has had no standing tiers since. Event Max Battles now come from ScrapedDuck instead: the Max Mondays and Max Battle Days (`max-mondays`, `max-battles`) in the 7-day lookahead are listed by date above the tiers, as event raids are, so the tier ScrapedDuck does not give is not needed. The standing power-spot rotation still has no source; nothing else publishes it. `scripts/fetch-raid-bosses.mjs` refuses a raid or Max Battle family that comes back empty after holding bosses, so the next outage like this one turns the sync red instead of shipping the hole. The event lists are exempt: they empty between events by design |
 | [bigfoott/ScrapedDuck](https://github.com/bigfoott/ScrapedDuck) | Events (GBL windows, raid days/hours, spotlight hours, Max Mondays and Max Battle Days), Rocket lineups | Event windows are dated; a stopped feed shows as an empty lookahead. Max Battle events carry no boss metadata, so their bosses are read from the title, and one that does not resolve warns in the sync log rather than being guessed. **Rocket lineups have no signal of their own**: on a failed scrape `pages/rocketLineups.js` re-publishes its previous file, so the `data` branch keeps committing "Data updated" while the lineup stays frozen. Seen 2026-10-02: still the 2026-06-27 lineup on the first day of a takeover. Covered by the takeover read below |
 | [LeekDuck](https://leekduck.com/rocket-lineups/) (direct) | Rocket lineups, **only during a takeover** | Read by `scripts/fetch-rocket-lineups.mjs` at most once per UTC day while a takeover is live (detected from leak-duck's event feed, ScrapedDuck's as fallback; never from `src/data/events.json`, which keeps only events with a spawn pool), and not again for that takeover once it shows a lineup ScrapedDuck does not. A parse missing any trainer ScrapedDuck lists is refused. The snapshot then records `source: "leekduck"` and pins the ScrapedDuck content it replaced, so a still-frozen ScrapedDuck cannot roll it back; the pin lifts when ScrapedDuck changes. Build-time runs pass `--no-leekduck` and never read it |
-| [zhenga8533/leak-duck](https://github.com/zhenga8533/leak-duck) | Event wild-spawn and egg pools for the tidy-up card and its "best Mega" panel (each spawn's form and types are resolved against the game master, a soft dependency: on a mirror outage the previous snapshot's forms are carried by name); takeover detection for the Rocket fetcher (each event's bonus list) | Event windows are dated, and the feed **drops an event the moment it ends** — the just-ended events on the card are carried forward from the previous snapshot by `scripts/lib/event-window.mjs`, never read from the feed |
+| [zhenga8533/leak-duck](https://github.com/zhenga8533/leak-duck) | Event wild-spawn and egg pools for the tidy-up card and its "best Mega" panel; each Community Day it lists, appended to `src/data/community-days.json` (the rolling half, see below) (each spawn's form and types are resolved against the game master, a soft dependency: on a mirror outage the previous snapshot's forms are carried by name); takeover detection for the Rocket fetcher (each event's bonus list) | Event windows are dated, and the feed **drops an event the moment it ends** — the just-ended events on the card are carried forward from the previous snapshot by `scripts/lib/event-window.mjs`, never read from the feed |
 
-Two facts are deliberately **not** fetched at all:
+Three facts are deliberately **not** fetched at all:
 
 - **Generation boundaries** (`scripts/lib/generations.mjs`). A boundary is fixed
   the day a generation ships and never moves again. Pinning it costs one edit per
@@ -25,6 +25,18 @@ Two facts are deliberately **not** fetched at all:
   species falls outside the table, so the edit cannot be forgotten silently.
 - **Trade-evolution and regional-polygon sets**, for the same reason: fixed game
   mechanics and hand-verified geography, neither of which any upstream publishes.
+- **Past Community Days with a special background** (`scripts/lib/community-days.mjs`),
+  the species behind the Community Day background pile. A Community Day that
+  has happened never changes, and no feed lists ended ones: leak-duck drops an
+  event when it ends, and the game master names the background assets
+  (`LC_SPECIALBACKGROUND_2026_COMMUNITYDAY`, `…_2024_DECEMBERCDRECAP`) but not
+  their species. So the list from the first one (December 2024) to 2026-10-29
+  was researched once, each entry confirmed by LeekDuck and Pokémon GO Hub, and
+  pinned. From then on `fetch-events` appends every Community Day the feed lists
+  and never removes one. The feed does not say whether a background came with
+  it, so those entries carry `background: null` and count towards the pile.
+  `scripts/check-piles.mjs` holds the pinned names to their dex numbers and the
+  merge to append-only.
 
 Access to the game master goes through `scripts/lib/game-master.mjs`, which owns
 the mirror preference list, the batch stamp, the staleness warning and

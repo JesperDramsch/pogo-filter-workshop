@@ -69,7 +69,7 @@ export const PARTS = [
   { id: "species-meta", scope: "species-meta", label: "Species meta",
     what: () => "special-trade/starter/power-line/mega pools", paths: ["src/data/species-meta.json"] },
   { id: "events", scope: "events", label: "Events",
-    what: () => "wildspawn snapshot from leak-duck", paths: ["src/data/events.json"] },
+    what: () => "wildspawn snapshot and Community Days from leak-duck", paths: ["src/data/events.json", "src/data/community-days.json"] },
   { id: "regional-forms", scope: "forms", label: "Regional forms",
     what: () => "regional-form catalog from the game master", paths: ["src/data/regional-forms.json"] },
   // The watch's history IS the rebalance notification, so its commit line names

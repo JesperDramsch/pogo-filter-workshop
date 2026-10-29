@@ -34,6 +34,8 @@ export function pogoKeywords(outputLocale) {
       female:       k(messages, "filter_key_gender_female"),
       male:         k(messages, "filter_key_gender_male"),
       background:   k(messages, "filter_key_any_background"),
+      // A special background (Community Day, GO Fest, …), never a location card.
+      special_background: k(messages, "filter_key_special_background"),
       traded:       k(messages, "filter_key_traded"),
       hatched:      k(messages, "filter_key_hatched"),
       baby:         k(messages, "filter_key_baby"),

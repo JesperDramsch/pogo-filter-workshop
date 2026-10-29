@@ -29,6 +29,7 @@ import { liveSpawnPool, rankMegaGroups } from './mega-boost.js';
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from './i18n/pogo-keywords.js';
 import RAID_BOSSES from './data/raid-bosses.json';
 import EVENTS from './data/events.json';
+import COMMUNITY_DAYS from './data/community-days.json';
 import ROCKET_LINEUPS from './data/rocket-lineups.json';
 import ROCKET_GRUNT_QUOTES from './data/rocket-grunt-quotes.json';
 import RocketQuoteLookup from './explain/RocketQuoteLookup.jsx';
@@ -1859,13 +1860,27 @@ export function protectionTail(kw, cfg) {
 // ② (not starred, not tagged) and ③ (the protection tail). Every pile goes
 // through here, so all of them share one shape and scripts/check-piles.mjs can
 // hold them all to it.
-//   lenses: [{ key, filter }] where `filter` is a CNF chain (may hold `&`)
+//   lenses: [{ key, filter, text? }] where `filter` is a CNF chain (may hold
+//   `&`) and `text` ([label, hint, params]) names a lens the pile's wording
+//   table can't know in advance, such as one per active GBL cup
+// Species whose Community Day came with a special background. Same rule as
+// communityDayBackgroundDex in scripts/lib/community-days.mjs (check-piles
+// holds the two equal): legacy entries with a background, every rolling one.
+export const COMMUNITY_DAY_BG_DEX = [
+	...new Set([
+		...(COMMUNITY_DAYS.legacy || []).filter((cd) => cd.background).flatMap((cd) => cd.dex),
+		...(COMMUNITY_DAYS.rolling || []).flatMap((cd) => cd.dex),
+	]),
+].sort((a, b) => a - b);
+
 export function buildPile({ id, head, lenses = [], kw, cfg }) {
 	if (!head) return null;
 	return {
 		id,
 		overview: head,
-		keep: lenses.filter((l) => l.filter).map((l) => ({ key: l.key, filter: `${head}&${l.filter}` })),
+		keep: lenses
+			.filter((l) => l.filter)
+			.map((l) => ({ key: l.key, filter: `${head}&${l.filter}`, ...(l.text ? { text: l.text } : {}) })),
 		sort: `${head}&!${kw.flag.favorite}&!#`,
 		release: `${head}&${protectionTail(kw, cfg).join('&')}`,
 	};
@@ -4737,6 +4752,126 @@ export function buildFilters(
 		}
 	}
 
+	// ── SORTING PILES ──────────────────────────────────────────────────────
+	// docs/sorting-workflow-spec.md, "Piles". Each is a head plus ① lenses,
+	// run through buildPile. Every species list comes from data: the raid, Max
+	// and shadow-keeper rosters are seeded from meta-rankings.json (and editable
+	// under Battle → settings), the PvP pools are pvp-rankings.json's Great
+	// League and today's active cups, exactly as the PvP card reads them.
+	const famOf = (names) => [...new Set(names)].map((n) => `+${n}`).join(',');
+	const pvpNamesOf = (league) =>
+		(league?.species || []).map((sp) => pokemonNameFor(String(sp.dex), outputLocale)).filter(Boolean);
+	const pvpPools = [
+		{ key: 'pvp_great', league: PVP_RANKINGS.leagues?.great, text: ['app.pile.lens.pvp_great_label', 'app.pile.lens.pvp_hint'] },
+		...cupFilters.map((c) => ({
+			key: `pvp_cup_${c.id}`,
+			league: PVP_RANKINGS.cups?.[c.id],
+			text: ['app.pile.lens.pvp_cup_label', 'app.pile.lens.pvp_hint', { cup: c.name }],
+		})),
+	];
+	const highIv = '3*,4*';
+	const atk = kw.iv.atk, def = kw.iv.def, hp = kw.iv.hp;
+	const souvenirLens = [kw.flag.shiny, kw.flag.costume, kw.flag.background, ...eventCollectibles].filter(Boolean).join(',');
+	const sortingPiles = [
+		// Meta: species on any meta list, with one keeper lens per list.
+		buildPile({
+			id: 'meta',
+			head: famOf([
+				...topAttackersList,
+				...topMaxAttackersList,
+				...keeperResolved,
+				...pvpPools.flatMap((pool) => pvpNamesOf(pool.league)),
+			]),
+			lenses: [
+				{ key: 'raid', filter: topAttackersList.length ? `${famOf(topAttackersList)}&${highIv}` : '' },
+				{ key: 'shadow_keep', filter: keeperResolved.length ? `${famOf(keeperResolved)}&${kw.flag.shadow}` : '' },
+				{
+					key: 'max',
+					filter: topMaxAttackersList.length
+						? `${famOf(topMaxAttackersList)}&${kw.flag.dynamax_move}1-&${highIv}`
+						: '',
+				},
+				// The league's own clauses: pool, CP cap, loose rank-1 pattern.
+				...pvpPools.map((pool) => ({ key: pool.key, filter: buildLeagueFilter(pool.league).clause, text: pool.text })),
+			],
+			kw,
+			cfg,
+		}),
+		// Shadows. Never cleared by switching off shadow protection: the keepers
+		// are tagged here and ③ takes the rest.
+		buildPile({
+			id: 'shadows',
+			head: kw.flag.shadow,
+			lenses: [
+				// Default state (still Frustration) and 11+ in every stat: purifying
+				// adds 2 to each, so the best of these purify to a hundo.
+				{ key: 'purify_hundo', filter: `@${kw.flag.frustration}&3-4${atk}&3-4${def}&3-4${hp}&!4*` },
+				// Frustration TM'd away: a real Charge TM investment.
+				{ key: 'tm_done', filter: `!@${kw.flag.frustration}` },
+				// Common 1 km-candy shadows, still default: cheap takeover purify stock.
+				{ key: 'cheap_purify', filter: `${kw.numeric.candy_km}1&!${kw.flag.shiny}&@${kw.flag.frustration}` },
+			],
+			kw,
+			cfg,
+		}),
+		// Received trades can't be traded again, so they are never tradebait.
+		buildPile({
+			id: 'traded',
+			head: kw.flag.traded,
+			lenses: [
+				{ key: 'souvenirs', filter: souvenirLens },
+				{ key: 'luckies', filter: kw.flag.lucky },
+			],
+			kw,
+			cfg,
+		}),
+		buildPile({ id: 'luckies', head: kw.flag.lucky, lenses: [{ key: 'high_iv', filter: highIv }], kw, cfg }),
+		// Dynamax-capable through the levelled Max-move token: bare `dynamax` is
+		// a search shortcut that silently drops the rest of the string.
+		buildPile({
+			id: 'dynamax',
+			head: `${kw.flag.dynamax_move}1-`,
+			lenses: [
+				{ key: 'builds', filter: topMaxAttackersList.length ? `${famOf(topMaxAttackersList)}&${highIv}` : '' },
+				{ key: 'gigantamax', filter: kw.flag.gigantamax },
+				// Nothing invested yet: parking material, IVs don't matter.
+				{
+					key: 'parkers',
+					filter: `!${kw.flag.dynamax_move}2-&!${kw.flag.dynamax_wall}1-&!${kw.flag.dynamax_spirit}1-`,
+				},
+			],
+			kw,
+			cfg,
+		}),
+		buildPile({ id: 'xxl', head: kw.flag.xxl, lenses: [{ key: 'high_iv', filter: highIv }], kw, cfg }),
+		// XXS only matter for Pokédex entries: keep the ones still to evolve.
+		buildPile({ id: 'xxs', head: kw.flag.xxs, lenses: [{ key: 'evolve', filter: kw.flag.evolvable }], kw, cfg }),
+		// Community Day backgrounds: a special background on a species whose
+		// Community Day came with one (src/data/community-days.json: the pinned
+		// legacy list plus every Community Day the event feed has listed since).
+		buildPile({
+			id: 'cd_backgrounds',
+			head: COMMUNITY_DAY_BG_DEX.length
+				? `${kw.flag.special_background}&${famOf(
+						COMMUNITY_DAY_BG_DEX.map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean),
+					)}`
+				: '',
+			lenses: [{ key: 'shiny', filter: kw.flag.shiny }],
+			kw,
+			cfg,
+		}),
+		buildPile({
+			id: 'costumes',
+			head: kw.flag.costume,
+			lenses: [
+				{ key: 'shiny', filter: kw.flag.shiny },
+				{ key: 'evolve', filter: kw.flag.evolvable },
+			],
+			kw,
+			cfg,
+		}),
+	].filter(Boolean);
+
 	return {
 		trash,
 		tradedTrashSort,
@@ -4766,6 +4901,7 @@ export function buildFilters(
 		friendCollectSuggestions,
 		trashClauses,
 		tradeClauses,
+		sortingPiles,
 		hundoPile,
 		sortClauses,
 		luckySortClauses,
@@ -4840,6 +4976,7 @@ const FLAG_TO_MON = {
 	purified: 'purified',
 	costume: 'costume',
 	background: 'background',
+	special_background: 'specialBackground',
 	traded: 'traded',
 	hatched: 'hatched',
 	female: 'female',
@@ -5002,6 +5139,18 @@ function evalTerm(t, mon, kw, outputLocale) {
 	}
 	if (t === '@3move') return !mon.flags?.doubleMoved; // INVERTED per game
 	if (t === `@${kw.flag.special_move}`) return !!mon.flags?.legacyMove;
+	// A named move (`@frustration`), the common-candy tier (`candykm1`) and
+	// "can evolve now" are answered only for a mon that carries the field
+	// (`moves`, `candyKm`, `flags.canEvolve`); otherwise they stay unknown, as
+	// before, so the verify panel never turns "can't tell" into a confident no.
+	if (t.startsWith('@') && Array.isArray(mon.moves)) {
+		const want = t.slice(1).toLowerCase();
+		return mon.moves.some((mv) => String(mv).toLowerCase() === want);
+	}
+	const candyKmRe = new RegExp(`^${escapeRegex(kw.numeric.candy_km)}(\\d+)$`);
+	m = t.match(candyKmRe);
+	if (m) return mon.candyKm == null ? null : mon.candyKm === +m[1];
+	if (t === kw.flag.evolvable) return mon.flags && 'canEvolve' in mon.flags ? !!mon.flags.canEvolve : null;
 
 	// Universal league tags
 	if (t === 'ⓤ') return !!mon.flags?.leagueU;
@@ -5587,6 +5736,7 @@ export default function App() {
 	const [showAuxShadows, setShowAuxShadows] = useState(false);
 	const [showAuxEvos, setShowAuxEvos] = useState(false);
 	const [showBrowseSort, setShowBrowseSort] = useState(false);
+	const [showPiles, setShowPiles] = useState(false);
 	const [showAuxTrades, setShowAuxTrades] = useState(false);
 	const [showFriendWishlist, setShowFriendWishlist] = useState(false);
 	// Friend lucky wishlist: restrict to old catches guaranteed Lucky on trade.
@@ -5920,6 +6070,7 @@ export default function App() {
 		trade,
 		sort,
 		luckySort,
+		sortingPiles,
 		hundoPile,
 		luckyFamilySort,
 		nundoSort,
@@ -6804,6 +6955,29 @@ export default function App() {
 																	hint={t('app.filter.traded_trash_sort_hint')}
 																/>
 															)}
+															</div>
+														</Collapsible>
+													)}
+													{sortingPiles.length > 0 && (
+														<Collapsible
+															icon='🗂️'
+															label={t('app.pile.section_title')}
+															open={showPiles}
+															onToggle={() => setShowPiles((s) => !s)}
+														>
+															<div className='space-y-3'>
+																<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.pile.section_hint')}</p>
+																{sortingPiles.map((pile) => (
+																	<TrainerAccordion key={pile.id} name={t(`app.pile.${pile.id}.title`)} accent='#5EAFC5'>
+																		<PileSteps
+																			pile={pile}
+																			accent='#5EAFC5'
+																			copied={copied}
+																			copyToClipboard={copyToClipboard}
+																			t={t}
+																		/>
+																	</TrainerAccordion>
+																))}
 															</div>
 														</Collapsible>
 													)}
@@ -9298,19 +9472,29 @@ const EVENT_PILE_TEXT = {
 };
 function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 	if (!pile) return null;
-	const words = { ...PILE_TEXT_DEFAULTS, ...text };
+	// Wording by convention unless the pile's table says otherwise:
+	// app.pile.<id>.title/.hint for the overview, app.pile.lens.<key>_label/_hint
+	// for a lens, and a lens's own `text` (with params) for dynamic ones.
+	const words = {
+		...PILE_TEXT_DEFAULTS,
+		overview: [`app.pile.${pile.id}.title`, `app.pile.${pile.id}.hint`],
+		...text,
+	};
+	const lensWords = (lens) =>
+		words.keep?.[lens.key] || lens.text || [`app.pile.lens.${lens.key}_label`, `app.pile.lens.${lens.key}_hint`];
 	const box = (suffix, keys, str) => {
 		if (!str || !keys) return null;
 		const copyKey = `${pile.id}_${suffix}`;
+		const opts = keys[2] ? { params: keys[2] } : undefined;
 		return (
 			<FilterBox
 				key={suffix}
-				label={t(keys[0])}
+				label={t(keys[0], opts)}
 				accent={accent}
 				filterStr={str}
 				copied={copied[copyKey]}
 				onCopy={() => copyToClipboard(copyKey, str)}
-				hint={t(keys[1])}
+				hint={t(keys[1], opts)}
 			/>
 		);
 	};
@@ -9321,7 +9505,7 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 		<>
 			{box('overview', words.overview, pile.overview)}
 			{pile.keep.length > 0 && subHeading('app.pile.group_keep')}
-			{pile.keep.map((lens) => box(lens.key, words.keep?.[lens.key], lens.filter))}
+			{pile.keep.map((lens) => box(lens.key, lensWords(lens), lens.filter))}
 			{subHeading('app.pile.group_sort')}
 			{card}
 			{box('sort', words.sort, pile.sort)}

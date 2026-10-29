@@ -355,6 +355,7 @@ jobs:
             src/data/meta-rankings.json
             src/data/species-meta.json
             src/data/events.json
+            src/data/community-days.json
             src/data/regional-forms.json
             src/data/game-master-watch.json
             skills/pokemon-go-filters/references/pvp-meta.json

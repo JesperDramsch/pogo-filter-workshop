@@ -1,0 +1,511 @@
+{
+  "fetchedAt": "2026-10-29T18:14:42.894Z",
+  "legacy": [
+    {
+      "date": "2024-12-21",
+      "event": "December Community Day 2024",
+      "dex": [
+        69,
+        113,
+        704,
+        722,
+        725,
+        761,
+        56,
+        77,
+        540,
+        602,
+        728,
+        137,
+        371,
+        155,
+        374
+      ],
+      "names": [
+        "Bellsprout",
+        "Chansey",
+        "Goomy",
+        "Rowlet",
+        "Litten",
+        "Bounsweet",
+        "Mankey",
+        "Ponyta",
+        "Sewaddle",
+        "Tynamo",
+        "Popplio",
+        "Porygon",
+        "Bagon",
+        "Cyndaquil",
+        "Beldum"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/december-communityday2024/",
+        "https://pokemongohub.net/post/event/december-community-day-2024/"
+      ]
+    },
+    {
+      "date": "2025-01-05",
+      "event": "Sprigatito Community Day",
+      "dex": [
+        906
+      ],
+      "names": [
+        "Sprigatito"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/january-communityday2025/",
+        "https://pokemongohub.net/post/event/sprigatito-community-day-january-2025/"
+      ]
+    },
+    {
+      "date": "2025-01-25",
+      "event": "Ralts Community Day Classic",
+      "dex": [
+        280
+      ],
+      "names": [
+        "Ralts"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/january-communitydayclassic2025/",
+        "https://pokemongohub.net/post/event/january-2025-cd-classic-ralts/"
+      ]
+    },
+    {
+      "date": "2025-02-09",
+      "event": "Karrablast and Shelmet Community Day",
+      "dex": [
+        588,
+        616
+      ],
+      "names": [
+        "Karrablast",
+        "Shelmet"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/february-communityday2025/",
+        "https://pokemongohub.net/post/event/karrablast-and-shelmet-community-day-february-2025/"
+      ]
+    },
+    {
+      "date": "2025-03-08",
+      "event": "Fuecoco Community Day",
+      "dex": [
+        909
+      ],
+      "names": [
+        "Fuecoco"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/march-communityday2025/",
+        "https://pokemongohub.net/post/event/fuecoco-pokemon-go-community-day-march-2025/"
+      ]
+    },
+    {
+      "date": "2025-03-22",
+      "event": "Totodile Community Day Classic",
+      "dex": [
+        158
+      ],
+      "names": [
+        "Totodile"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/march-communitydayclassic2025/",
+        "https://pokemongohub.net/post/event/march-2025-cd-classic-totodile/"
+      ]
+    },
+    {
+      "date": "2025-04-27",
+      "event": "Vanillite Community Day",
+      "dex": [
+        582
+      ],
+      "names": [
+        "Vanillite"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/april-communityday2025/",
+        "https://pokemongohub.net/post/event/april-2025-community-day-vanillite/"
+      ]
+    },
+    {
+      "date": "2025-05-11",
+      "event": "Pawmi Community Day",
+      "dex": [
+        921
+      ],
+      "names": [
+        "Pawmi"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/may-communityday2025/",
+        "https://pokemongohub.net/post/event/pawmi-community-day-may-2025/"
+      ]
+    },
+    {
+      "date": "2025-05-24",
+      "event": "Machop Community Day Classic",
+      "dex": [
+        66
+      ],
+      "names": [
+        "Machop"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/may-communitydayclassic2025/",
+        "https://pokemongohub.net/post/event/may-community-day-classic-machop/"
+      ]
+    },
+    {
+      "date": "2025-06-21",
+      "event": "Jangmo-o Community Day",
+      "dex": [
+        782
+      ],
+      "names": [
+        "Jangmo-o"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/june-communityday2025/",
+        "https://pokemongohub.net/post/event/jangmo-o-community-day/"
+      ]
+    },
+    {
+      "date": "2025-07-05",
+      "event": "Eevee Community Day Classic",
+      "dex": [
+        133
+      ],
+      "names": [
+        "Eevee"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/july-communitydayclassic2025/",
+        "https://pokemongohub.net/post/event/july-2025-community-day-classic-eevee/"
+      ]
+    },
+    {
+      "date": "2025-07-20",
+      "event": "Quaxly Community Day",
+      "dex": [
+        912
+      ],
+      "names": [
+        "Quaxly"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/july-communityday2025/",
+        "https://pokemongohub.net/post/event/quaxly-community-day-july-2025/"
+      ]
+    },
+    {
+      "date": "2025-08-30",
+      "event": "Rookidee Community Day",
+      "dex": [
+        821
+      ],
+      "names": [
+        "Rookidee"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/august-communityday2025/",
+        "https://pokemongohub.net/post/event/august-2025-rookidee/"
+      ]
+    },
+    {
+      "date": "2025-09-14",
+      "event": "Flabébé Community Day",
+      "dex": [
+        669
+      ],
+      "names": [
+        "Flabébé"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/september-communityday2025/",
+        "https://pokemongohub.net/post/event/pokemon-go-flabebe-community-day-september-2025/"
+      ]
+    },
+    {
+      "date": "2025-10-12",
+      "event": "Solosis Community Day",
+      "dex": [
+        577
+      ],
+      "names": [
+        "Solosis"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/october-communityday2025/",
+        "https://pokemongohub.net/post/event/pokemon-go-solosis-community-day-october-2025/"
+      ]
+    },
+    {
+      "date": "2025-11-30",
+      "event": "Pikipek Community Day",
+      "dex": [
+        731
+      ],
+      "names": [
+        "Pikipek"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/november-communityday2025/",
+        "https://pokemongohub.net/post/event/november-community-day-2025-pikipek/"
+      ]
+    },
+    {
+      "date": "2025-12-06",
+      "event": "December Community Day 2025",
+      "dex": [
+        906,
+        588,
+        616,
+        909,
+        582,
+        921,
+        782,
+        912,
+        821,
+        669,
+        577,
+        731,
+        280,
+        158,
+        66,
+        133
+      ],
+      "names": [
+        "Sprigatito",
+        "Karrablast",
+        "Shelmet",
+        "Fuecoco",
+        "Vanillite",
+        "Pawmi",
+        "Jangmo-o",
+        "Quaxly",
+        "Rookidee",
+        "Flabébé",
+        "Solosis",
+        "Pikipek",
+        "Ralts",
+        "Totodile",
+        "Machop",
+        "Eevee"
+      ],
+      "background": false,
+      "sources": [
+        "https://leekduck.com/events/december-communityday2025/",
+        "https://pokemongohub.net/post/event/pokemon-go-december-2025-community-day/"
+      ]
+    },
+    {
+      "date": "2026-01-04",
+      "event": "Piplup Community Day Classic",
+      "dex": [
+        393
+      ],
+      "names": [
+        "Piplup"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/january-communitydayclassic2026/",
+        "https://pokemongohub.net/post/event/piplup-community-day-classic-january-2026/"
+      ]
+    },
+    {
+      "date": "2026-01-18",
+      "event": "Grookey Community Day",
+      "dex": [
+        810
+      ],
+      "names": [
+        "Grookey"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/january-communityday2026/",
+        "https://pokemongohub.net/post/event/pokemon-go-january-2026-community-day/"
+      ]
+    },
+    {
+      "date": "2026-02-01",
+      "event": "Vulpix Community Day",
+      "dex": [
+        37
+      ],
+      "names": [
+        "Vulpix"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/february-communityday2026/",
+        "https://pokemongohub.net/post/event/vulpix-and-alolan-vulpix-community-day-february-2026/"
+      ]
+    },
+    {
+      "date": "2026-03-14",
+      "event": "Scorbunny Community Day",
+      "dex": [
+        813
+      ],
+      "names": [
+        "Scorbunny"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/march-communityday2026/",
+        "https://pokemongohub.net/post/event/scorbunny-cd-march-2026/"
+      ]
+    },
+    {
+      "date": "2026-04-11",
+      "event": "Tinkatink Community Day",
+      "dex": [
+        957
+      ],
+      "names": [
+        "Tinkatink"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/april-communityday2026/",
+        "https://pokemongohub.net/post/event/tinkatink-community-day-april-2026/"
+      ]
+    },
+    {
+      "date": "2026-05-09",
+      "event": "Lechonk Community Day",
+      "dex": [
+        915
+      ],
+      "names": [
+        "Lechonk"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/may-communityday2026/",
+        "https://pokemongohub.net/post/event/lechonk-community-day-may-2026-shiny-odds-bonuses-mud-slap-oinkologne/"
+      ]
+    },
+    {
+      "date": "2026-05-16",
+      "event": "Deino Community Day Classic",
+      "dex": [
+        633
+      ],
+      "names": [
+        "Deino"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/may-communitydayclassic2026/",
+        "https://pokemongohub.net/post/event/deino-community-day-classic-2026/"
+      ]
+    },
+    {
+      "date": "2026-06-20",
+      "event": "Frigibax Community Day",
+      "dex": [
+        996
+      ],
+      "names": [
+        "Frigibax"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/june-communityday2026/",
+        "https://pokemongohub.net/post/event/frigibax-community-day-june-2026/"
+      ]
+    },
+    {
+      "date": "2026-07-04",
+      "event": "Sobble Community Day",
+      "dex": [
+        816
+      ],
+      "names": [
+        "Sobble"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/july-communityday2026/",
+        "https://pokemongohub.net/post/event/sobble-community-day-july-2026/"
+      ]
+    },
+    {
+      "date": "2026-08-16",
+      "event": "Nickit Community Day",
+      "dex": [
+        827
+      ],
+      "names": [
+        "Nickit"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/august-communityday2026/",
+        "https://pokemongohub.net/post/event/nickit-community-day-august-2026/"
+      ]
+    },
+    {
+      "date": "2026-09-12",
+      "event": "Gible Community Day Classic",
+      "dex": [
+        443
+      ],
+      "names": [
+        "Gible"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/september-communitydayclassic2026/",
+        "https://pokemongohub.net/post/event/gible-community-day-classic-september-2026/"
+      ]
+    },
+    {
+      "date": "2026-10-10",
+      "event": "Zorua Community Day",
+      "dex": [
+        570
+      ],
+      "names": [
+        "Zorua"
+      ],
+      "background": true,
+      "sources": [
+        "https://leekduck.com/events/october-communityday2026/",
+        "https://pokemongohub.net/post/event/zorua-community-day-october-2026/"
+      ]
+    }
+  ],
+  "rolling": [
+    {
+      "date": "2026-11-21",
+      "event": "Pawniard Community Day",
+      "dex": [
+        624
+      ],
+      "background": null,
+      "source": "leak-duck"
+    }
+  ]
+}
