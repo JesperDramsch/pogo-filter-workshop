@@ -1,270 +1,210 @@
 {
-  "fetchedAt": "2026-10-20T11:47:59.410Z",
+  "fetchedAt": "2026-10-29T13:13:55.762Z",
   "raids": {
     "mega": [
       {
-        "id": "DRAGONITE",
-        "form": "DRAGONITE_MEGA",
+        "id": "SABLEYE",
+        "form": "SABLEYE_MEGA",
         "names": {
-          "en": "Mega Dragonite",
-          "de": "Mega-Dragoran",
-          "fr": "Méga-Dracolosse",
-          "it": "MegaDragonite",
-          "ja": "メガカイリュー",
-          "ko": "메가망나뇽",
-          "es": "Mega-Dragonite"
+          "en": "Mega Sableye",
+          "de": "Mega-Zobiris",
+          "fr": "Méga-Ténéfix",
+          "it": "MegaSableye",
+          "ja": "メガヤミラミ",
+          "ko": "메가깜까미",
+          "es": "Mega-Sableye"
         },
         "types": [
-          "dragon",
-          "flying"
+          "dark",
+          "ghost"
         ],
         "resistorTypes": [
-          "rock",
-          "steel",
-          "electric",
+          "normal",
+          "fighting",
+          "dark",
           "fairy"
         ],
         "seMoveTypes": [
-          "ice",
-          "dragon",
-          "fairy",
-          "rock"
+          "fairy"
         ]
       }
     ],
     "lvl5": [
       {
-        "id": "DIALGA",
-        "form": "DIALGA",
+        "id": "GIRATINA",
+        "form": "GIRATINA_ORIGIN",
         "names": {
-          "en": "Dialga",
-          "de": "Dialga",
-          "fr": "Dialga",
-          "it": "Dialga",
-          "ja": "ディアルガ",
-          "ko": "디아루가",
-          "es": "Dialga"
+          "en": "Giratina (Origin Forme)",
+          "de": "Giratina (Urform)",
+          "fr": "Giratina (Forme Originelle)",
+          "it": "Giratina (Forma Originale)",
+          "ja": "ギラティナ (オリジンフォルム)",
+          "ko": "기라티나 (오리진폼)",
+          "es": "Giratina (Forma Origen)"
         },
         "types": [
-          "steel",
+          "ghost",
           "dragon"
         ],
         "resistorTypes": [
+          "normal",
           "steel",
-          "fire",
-          "water",
-          "electric"
+          "dark",
+          "fairy"
         ],
         "seMoveTypes": [
-          "fighting",
-          "ground"
+          "dark",
+          "dragon",
+          "fairy",
+          "ghost",
+          "ice"
         ]
       }
     ],
     "lvl3": [
       {
-        "id": "ARCANINE",
-        "form": "ARCANINE_HISUIAN",
+        "id": "COFAGRIGUS",
+        "form": "COFAGRIGUS",
         "names": {
-          "en": "Hisuian Arcanine",
-          "de": "Hisuian-Arkani",
-          "fr": "Arcanin de Hisuian",
-          "it": "Arcanine di Hisuian",
-          "ja": "ウインディ",
-          "ko": "윈디",
-          "es": "Arcanine de Galar"
+          "en": "Cofagrigus",
+          "de": "Echnatoll",
+          "fr": "Tutankafer",
+          "it": "Cofagrigus",
+          "ja": "デスカーン",
+          "ko": "데스니칸",
+          "es": "Cofagrigus"
         },
         "types": [
-          "fire",
-          "rock"
+          "ghost"
         ],
         "resistorTypes": [
-          "fighting",
-          "ground",
-          "rock",
-          "water",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "ground",
-          "water",
-          "fighting",
-          "rock"
-        ]
-      },
-      {
-        "id": "SNORLAX",
-        "form": "SNORLAX",
-        "names": {
-          "en": "Snorlax",
-          "de": "Relaxo",
-          "fr": "Ronflex",
-          "it": "Snorlax",
-          "ja": "カビゴン",
-          "ko": "잠만보",
-          "es": "Snorlax"
-        },
-        "types": [
-          "normal"
-        ],
-        "resistorTypes": [
-          "rock",
-          "ghost",
-          "steel"
-        ],
-        "seMoveTypes": [
-          "fighting"
-        ]
-      },
-      {
-        "id": "KLEAVOR",
-        "form": "KLEAVOR",
-        "names": {
-          "en": "Kleavor",
-          "de": "Axantor",
-          "fr": "Hachécateur",
-          "it": "Kleavor",
-          "ja": "バサギリ",
-          "ko": "사마자르",
-          "es": "Kleavor"
-        },
-        "types": [
-          "bug",
-          "rock"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "poison",
-          "ground",
-          "ghost",
-          "steel",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "rock",
-          "steel",
-          "water"
-        ]
-      }
-    ],
-    "lvl1": [
-      {
-        "id": "SLOWPOKE",
-        "form": "SLOWPOKE_GALARIAN",
-        "names": {
-          "en": "Galarian Slowpoke",
-          "de": "Galar-Flegmon",
-          "fr": "Ramoloss de Galar",
-          "it": "Slowpoke di Galar",
-          "ja": "ガラル ヤドン",
-          "ko": "가라르 야돈",
-          "es": "Slowpoke de Galar"
-        },
-        "types": [
-          "psychic"
-        ],
-        "resistorTypes": [
-          "steel",
-          "psychic",
+          "normal",
           "dark"
         ],
         "seMoveTypes": [
-          "bug",
           "dark",
           "ghost"
         ]
       },
       {
-        "id": "VOLTORB",
-        "form": "VOLTORB_HISUIAN",
+        "id": "TREVENANT",
+        "form": "TREVENANT",
         "names": {
-          "en": "Hisuian Voltorb",
-          "de": "Hisuian-Voltobal",
-          "fr": "Voltorbe de Hisuian",
-          "it": "Voltorb di Hisuian",
-          "ja": "ビリリダマ",
-          "ko": "찌리리공",
-          "es": "Voltorb de Galar"
+          "en": "Trevenant",
+          "de": "Trombork",
+          "fr": "Desséliande",
+          "it": "Trevenant",
+          "ja": "オーロット",
+          "ko": "대로트",
+          "es": "Trevenant"
         },
         "types": [
-          "electric",
+          "ghost",
           "grass"
         ],
         "resistorTypes": [
+          "normal",
+          "flying",
           "poison",
           "bug",
           "steel",
           "fire",
           "grass",
-          "electric",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "bug",
-          "fire",
-          "ice",
-          "poison"
-        ]
-      },
-      {
-        "id": "NINCADA",
-        "form": "NINCADA",
-        "names": {
-          "en": "Nincada",
-          "de": "Nincada",
-          "fr": "Ningale",
-          "it": "Nincada",
-          "ja": "ツチニン",
-          "ko": "토중몬",
-          "es": "Nincada"
-        },
-        "types": [
-          "bug",
-          "ground"
-        ],
-        "resistorTypes": [
-          "fighting",
-          "flying",
-          "bug",
-          "ghost",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "fire",
-          "flying",
-          "ice",
-          "water"
-        ]
-      },
-      {
-        "id": "BELDUM",
-        "form": "BELDUM",
-        "names": {
-          "en": "Beldum",
-          "de": "Tanhel",
-          "fr": "Terhal",
-          "it": "Beldum",
-          "ja": "ダンバル",
-          "ko": "메탕",
-          "es": "Beldum"
-        },
-        "types": [
-          "steel",
-          "psychic"
-        ],
-        "resistorTypes": [
-          "steel",
-          "fire",
-          "water",
-          "electric",
-          "psychic",
+          "dragon",
           "dark"
         ],
         "seMoveTypes": [
           "dark",
           "fire",
+          "flying",
           "ghost",
+          "ice"
+        ]
+      },
+      {
+        "id": "DHELMISE",
+        "form": "DHELMISE",
+        "names": {
+          "en": "Dhelmise",
+          "de": "Moruda",
+          "fr": "Sinistrail",
+          "it": "Dhelmise",
+          "ja": "ダダリン",
+          "ko": "타타륜",
+          "es": "Dhelmise"
+        },
+        "types": [
+          "ghost",
+          "grass"
+        ],
+        "resistorTypes": [
+          "normal",
+          "flying",
+          "poison",
+          "bug",
+          "steel",
+          "fire",
+          "grass",
+          "dragon",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "fire",
+          "flying",
+          "ghost",
+          "ice"
+        ]
+      }
+    ],
+    "lvl1": [
+      {
+        "id": "PIKACHU",
+        "form": "PIKACHU_HALLOWEEN_2026",
+        "names": {
+          "en": "Pikachu",
+          "de": "Pikachu",
+          "fr": "Pikachu",
+          "it": "Pikachu",
+          "ja": "ピカチュウ",
+          "ko": "피카츄",
+          "es": "Pikachu"
+        },
+        "types": [
+          "electric"
+        ],
+        "resistorTypes": [
+          "ground",
+          "grass",
+          "electric",
+          "dragon"
+        ],
+        "seMoveTypes": [
           "ground"
+        ]
+      },
+      {
+        "id": "SINISTEA",
+        "form": "SINISTEA_P_HALLOWEEN_2026_01",
+        "names": {
+          "en": "Sinistea",
+          "de": "Fatalitee",
+          "fr": "Théffroi",
+          "it": "Sinistea",
+          "ja": "ヤバチャ",
+          "ko": "데인차",
+          "es": "Sinistea"
+        },
+        "types": [
+          "ghost"
+        ],
+        "resistorTypes": [
+          "normal",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "ghost"
         ]
       }
     ],
@@ -499,137 +439,54 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "mega-charizard-x-mega-charizard-y-in-mega-raids-october-2026",
-      "name": "Mega Charizard X and Mega Charizard Y in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-10-21T06:00:00.000",
-      "end": "2026-10-27T22:00:00.000",
+      "eventID": "chandelure-super-mega-raid-day-2026",
+      "name": "Chandelure Super Mega Raid Day",
+      "eventType": "raid-day",
+      "start": "2026-10-31T14:00:00.000",
+      "end": "2026-10-31T17:00:00.000",
       "isShadow": false,
-      "isMega": true,
+      "isMega": false,
       "bosses": [
         {
-          "id": "CHARIZARD",
-          "form": null,
+          "id": "CHANDELURE",
+          "form": "CHANDELURE_NORMAL",
           "names": {
-            "en": "Mega Charizard X"
+            "en": "Chandelure"
           },
           "types": [
-            "fire",
-            "dragon"
+            "ghost",
+            "fire"
           ],
           "resistorTypes": [
+            "normal",
             "rock",
             "fire",
             "water",
-            "fairy"
+            "dragon",
+            "dark"
           ],
           "seMoveTypes": [
             "ground",
             "rock",
-            "dragon"
-          ]
-        },
-        {
-          "id": "CHARIZARD",
-          "form": null,
-          "names": {
-            "en": "Mega Charizard Y"
-          },
-          "types": [
-            "fire",
-            "flying"
-          ],
-          "resistorTypes": [
-            "rock",
-            "fire",
+            "ghost",
             "water",
-            "electric",
-            "dragon"
-          ],
-          "seMoveTypes": [
-            "rock",
-            "water",
-            "electric"
+            "dark"
           ]
         }
       ]
     },
     {
-      "eventID": "palkia-in-5-star-raid-battles-october-2026",
-      "name": "Palkia in 5-star Raid Battles",
+      "eventID": "giratina-altered-forme-in-5-star-raid-battles-november-2026",
+      "name": "Giratina (Altered Forme) in 5-star Raid Battles",
       "eventType": "raid-battles",
-      "start": "2026-10-21T06:00:00.000",
-      "end": "2026-10-27T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "PALKIA",
-          "form": "PALKIA_NORMAL",
-          "names": {
-            "en": "Palkia"
-          },
-          "types": [
-            "water",
-            "dragon"
-          ],
-          "resistorTypes": [
-            "steel",
-            "water",
-            "grass",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "dragon",
-            "fairy"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20261021",
-      "name": "Palkia Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-10-21T18:00:00.000",
-      "end": "2026-10-21T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "PALKIA",
-          "form": "PALKIA_NORMAL",
-          "names": {
-            "en": "Palkia"
-          },
-          "types": [
-            "water",
-            "dragon"
-          ],
-          "resistorTypes": [
-            "steel",
-            "water",
-            "grass",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "dragon",
-            "fairy"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "giratina-origin-forme-in-5-star-raid-battles-october-2026",
-      "name": "Giratina (Origin Forme) in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-10-28T06:00:00.000",
-      "end": "2026-11-03T22:00:00.000",
+      "start": "2026-11-04T06:00:00.000",
+      "end": "2026-11-08T22:00:00.000",
       "isShadow": false,
       "isMega": false,
       "bosses": [
         {
           "id": "GIRATINA",
-          "form": "GIRATINA_ORIGIN",
+          "form": "GIRATINA_ALTERED",
           "names": {
             "en": "Giratina"
           },
@@ -654,31 +511,66 @@
       ]
     },
     {
-      "eventID": "mega-sableye-in-mega-raids-october-2026",
-      "name": "Mega Sableye in Mega Raids",
+      "eventID": "shadow-tornadus-incarnate-forme-in-shadow-raids-november-4-2026",
+      "name": "Shadow Tornadus (Incarnate Forme) in Shadow Raids",
       "eventType": "raid-battles",
-      "start": "2026-10-28T06:00:00.000",
+      "start": "2026-11-04T06:00:00.000",
       "end": "2026-11-08T22:00:00.000",
-      "isShadow": false,
-      "isMega": true,
+      "isShadow": true,
+      "isMega": false,
       "bosses": [
         {
-          "id": "SABLEYE",
-          "form": null,
+          "id": "TORNADUS",
+          "form": "TORNADUS_INCARNATE",
           "names": {
-            "en": "Mega Sableye"
+            "en": "Tornadus"
           },
           "types": [
-            "dark",
-            "ghost"
+            "flying"
+          ],
+          "resistorTypes": [
+            "rock",
+            "steel",
+            "electric"
+          ],
+          "seMoveTypes": [
+            "rock",
+            "electric",
+            "ice"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "raidhour20261104",
+      "name": "Giratina (Altered Forme) Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-11-04T18:00:00.000",
+      "end": "2026-11-04T19:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "GIRATINA",
+          "form": "GIRATINA_ALTERED",
+          "names": {
+            "en": "Giratina"
+          },
+          "types": [
+            "ghost",
+            "dragon"
           ],
           "resistorTypes": [
             "normal",
-            "fighting",
+            "steel",
             "dark",
             "fairy"
           ],
           "seMoveTypes": [
+            "ghost",
+            "ice",
+            "dragon",
+            "dark",
             "fairy"
           ]
         }
@@ -687,98 +579,32 @@
   ],
   "eventMaxBattles": [
     {
-      "eventID": "dynamax-uxie-mesprit-azelf-max-battle-day-2026",
-      "name": "Dynamax Uxie, Mesprit, and Azelf Max Battle Day",
-      "eventType": "max-battles",
-      "start": "2026-10-24T14:00:00.000",
-      "end": "2026-10-24T17:00:00.000",
-      "bosses": [
-        {
-          "id": "UXIE",
-          "form": "UXIE_NORMAL",
-          "names": {
-            "en": "Uxie"
-          },
-          "types": [
-            "psychic"
-          ],
-          "resistorTypes": [
-            "steel",
-            "psychic",
-            "dark"
-          ],
-          "seMoveTypes": [
-            "bug",
-            "ghost",
-            "dark"
-          ]
-        },
-        {
-          "id": "MESPRIT",
-          "form": "MESPRIT_NORMAL",
-          "names": {
-            "en": "Mesprit"
-          },
-          "types": [
-            "psychic"
-          ],
-          "resistorTypes": [
-            "steel",
-            "psychic",
-            "dark"
-          ],
-          "seMoveTypes": [
-            "bug",
-            "ghost",
-            "dark"
-          ]
-        },
-        {
-          "id": "AZELF",
-          "form": "AZELF_NORMAL",
-          "names": {
-            "en": "Azelf"
-          },
-          "types": [
-            "psychic"
-          ],
-          "resistorTypes": [
-            "steel",
-            "psychic",
-            "dark"
-          ],
-          "seMoveTypes": [
-            "bug",
-            "ghost",
-            "dark"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "max-mondays-2026-10-26",
-      "name": "Dynamax Sableye during Max Monday",
+      "eventID": "max-mondays-2026-11-02",
+      "name": "Dynamax Machop during Max Monday",
       "eventType": "max-mondays",
-      "start": "2026-10-26T06:00:00.000",
-      "end": "2026-10-26T21:00:00.000",
+      "start": "2026-11-02T06:00:00.000",
+      "end": "2026-11-02T21:00:00.000",
       "bosses": [
         {
-          "id": "SABLEYE",
-          "form": "SABLEYE_NORMAL",
+          "id": "MACHOP",
+          "form": "MACHOP_NORMAL",
           "names": {
-            "en": "Sableye"
+            "en": "Machop"
           },
           "types": [
-            "dark",
-            "ghost"
+            "fighting"
           ],
           "resistorTypes": [
-            "normal",
-            "fighting",
-            "dark",
+            "flying",
+            "poison",
+            "bug",
+            "ghost",
+            "psychic",
             "fairy"
           ],
           "seMoveTypes": [
+            "flying",
+            "psychic",
             "fairy"
           ]
         }

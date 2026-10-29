@@ -1,11 +1,30 @@
 {
-  "fetchedAt": "2026-10-23T11:47:46.676Z",
+  "fetchedAt": "2026-10-29T13:14:02.606Z",
   "sources": {
     "pvp": "pvpoke-gamemaster",
     "pve": "alexelgt/game_masters",
-    "pveBatch": "2026-10-22T06:27:08.589Z"
+    "pveBatch": "2026-10-25T04:24:17.174Z"
   },
   "history": [
+    {
+      "at": "2026-10-29T13:14:02.606Z",
+      "stream": "pvp",
+      "summary": "2 move(s) changed",
+      "changes": [
+        {
+          "move": "KOWTOW_CLEAVE",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        },
+        {
+          "move": "OMINOUS_WIND_PLUS",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        }
+      ]
+    },
     {
       "at": "2026-10-15T11:39:37.288Z",
       "stream": "pve",
@@ -1852,6 +1871,13 @@
       "cooldown": 1000,
       "turns": 2
     },
+    "KOWTOW_CLEAVE": {
+      "power": 75,
+      "energy": 40,
+      "energyGain": 0,
+      "cooldown": 500,
+      "turns": 1
+    },
     "LAST_RESORT": {
       "power": 90,
       "energy": 55,
@@ -2249,6 +2275,19 @@
     "OMINOUS_WIND": {
       "power": 45,
       "energy": 45,
+      "energyGain": 0,
+      "cooldown": 500,
+      "turns": 1,
+      "buffs": [
+        1,
+        1
+      ],
+      "buffTarget": "self",
+      "buffApplyChance": ".1"
+    },
+    "OMINOUS_WIND_PLUS": {
+      "power": 50,
+      "energy": 40,
       "energyGain": 0,
       "cooldown": 500,
       "turns": 1,
