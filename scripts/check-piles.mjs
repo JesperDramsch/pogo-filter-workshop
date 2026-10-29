@@ -13,6 +13,10 @@
 //   P7 — the pile card: meta rows are meta, watchlist rows watchlist, the two
 //        never overlap, every row says how many to keep, and no rendered
 //        string is a raw key or keeps a {placeholder}, in any locale
+//   P8 — budgets: every budget is reachable through a row of the spec's
+//        table, every row's rule renders in every locale, simple mode uses
+//        the defaults, expert mode the overrides, and the import merge keeps
+//        only whole numbers ≥ 0
 //
 // PILE_FAMILIES is the registry: a new pile adds one entry naming where its
 // piles come from and which species is in it, and inherits every check.
@@ -20,7 +24,7 @@
 // Run with: npx vite-node scripts/check-piles.mjs
 
 import {
-  buildFilters, COMMUNITY_DAY_BG_DEX, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET,
+  BUDGET_DEFAULTS, BUDGET_ROWS, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET,
 } from "../src/App.jsx";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import COMMUNITY_DAYS from "../src/data/community-days.json";
@@ -272,6 +276,38 @@ for (const loc of localeNames) {
   for (const id of ["shadows", "traded", "luckies", "dynamax", "xxl", "xxs", "costumes", "cd_backgrounds", "non_meta"])
     if (!card(id)?.rule) bad.push(`${id}: no keep rule`);
   check(`${loc}: ${meta.length} meta and ${watch.length} watchlist rows, ${cards.length} cards`, bad.length === 0, bad.slice(0, 4).join(" | "));
+}
+
+console.log("\nP8 — budgets");
+{
+  const rowKeys = BUDGET_ROWS.flatMap((row) => row.keys);
+  const unreachable = Object.keys(BUDGET_DEFAULTS).filter((k) => !rowKeys.includes(k));
+  const unknown = rowKeys.filter((k) => !(k in BUDGET_DEFAULTS));
+  check(`${BUDGET_ROWS.length} budget rows cover all ${Object.keys(BUDGET_DEFAULTS).length} budgets`,
+    unreachable.length === 0 && unknown.length === 0, [...unreachable, ...unknown].join(", "));
+  for (const loc of localeNames) {
+    const t = makeTFn(loc);
+    const bad = [];
+    for (const row of BUDGET_ROWS) {
+      const label = t(`app.budget.${row.job}.label`);
+      const rule = t(`app.budget.${row.job}.rule`, { params: BUDGET_DEFAULTS });
+      if (label.startsWith("app.") || rule.startsWith("app.") || /\{\w+\}/.test(rule)) bad.push(`${row.job}: "${rule.slice(0, 50)}"`);
+      // English fallback would hide a missing translation
+      if (loc !== "en" && LOCALES[loc].messages[`app.budget.${row.job}.rule`] === undefined) bad.push(`${row.job}: not translated`);
+    }
+    check(`${loc}: every budget row renders`, bad.length === 0, bad.slice(0, 3).join(" | "));
+  }
+  const keepOf = (cfg) => {
+    const r = buildFilters(HUNDOS, [], cfg, [], "en", makeTFn("en"));
+    return r.sortingPiles.find((p) => p.id === "meta").card.rows.find((row) => row.cls === "meta" && row.keep.length)?.keep[0] || "";
+  };
+  const overridden = { ...CFG, budgets: { raidMeta: 4 } };
+  check("simple mode uses the default budgets", keepOf({ ...overridden, expertMode: false }).includes("6"));
+  check("expert mode uses the overrides", keepOf({ ...overridden, expertMode: true }).includes("4"));
+  const merged = mergeImportedConfig({ budgets: { raidMeta: -1, xxlScore: "a", pvpNormal: 2, futureJob: 5, standIn: 1.5 } }).budgets;
+  check("import keeps whole numbers ≥ 0, unknown keys included, and drops the rest",
+    JSON.stringify(merged) === JSON.stringify({ pvpNormal: 2, futureJob: 5 }), JSON.stringify(merged));
+  check("a config without budgets merges to no overrides", JSON.stringify(mergeImportedConfig({}).budgets) === "{}");
 }
 
 console.log("\nCommunity Day data (scripts/lib/community-days.mjs → src/data/community-days.json)");

@@ -762,6 +762,11 @@ function teDisplay(baseKey, outputLocale = 'de') {
 export const DEFAULT_CONFIG = {
 	// Mode
 	expertMode: false, // hides niche toggles in normal mode
+	// Sorting-pile budgets: only the numbers the user changed in expert mode.
+	// Effective budgets are BUDGET_DEFAULTS overlaid with these, so a budget
+	// added later reaches every saved config without a migration. Simple mode
+	// ignores them and uses the defaults (docs/sorting-workflow-spec.md).
+	budgets: {},
 
 	// PvP
 	pvpMode: 'strict', // "loose" | "intelligent" | "strict" | "none"
@@ -1685,6 +1690,13 @@ export function mergeImportedConfig(raw, notices = []) {
 				});
 			return { rawAppend: '', ...b, targetSpecies };
 		});
+	// Budget overrides: whole numbers ≥ 0 only; anything else falls back to the
+	// default by being dropped. Unknown keys stay (a newer export).
+	merged.budgets = Object.fromEntries(
+		Object.entries(merged.budgets && typeof merged.budgets === 'object' ? merged.budgets : {}).filter(
+			([, v]) => Number.isInteger(v) && v >= 0,
+		),
+	);
 	return merged;
 }
 
@@ -1884,6 +1896,50 @@ export const BUDGET_DEFAULTS = {
 	costumePerStage: 1,
 	costumeTradeable: 3,
 	cdBackground: 3,
+	evolveShadow: 2,
+	pvpOffMeta: 1,
+	shinyPerStage: 1,
+	shinyTradeable: 3,
+	backgroundPerSpecies: 1,
+	backgroundTradeable: 3,
+};
+
+// The budgets in force: the user's overrides in expert mode, the defaults in
+// simple mode.
+export function effectiveBudgets(cfg) {
+	return cfg?.expertMode ? { ...BUDGET_DEFAULTS, ...(cfg.budgets || {}) } : { ...BUDGET_DEFAULTS };
+}
+
+// The spec's budget table, one row per job, in its order. `keys` are the
+// numbers the row's rule reads (and expert mode edits); each key's input is
+// named by `BUDGET_KEY_WORD`. XXS and tradebait have rules but no number.
+export const BUDGET_ROWS = [
+	{ job: 'evolve', keys: ['evolve', 'evolveShadow'] },
+	{ job: 'stand_in', keys: ['standIn'] },
+	{ job: 'shadow_stand_in', keys: ['shadowStandIn'] },
+	{ job: 'raid_meta', keys: ['raidMeta'] },
+	{ job: 'raid_watch', keys: ['watchShadow', 'watchNormal'] },
+	{ job: 'pvp', keys: ['pvpNormal', 'pvpShadow'] },
+	{ job: 'pvp_off_meta', keys: ['pvpOffMeta'] },
+	{ job: 'shinies', keys: ['shinyPerStage', 'shinyTradeable'] },
+	{ job: 'costumes', keys: ['costumePerStage', 'costumeTradeable'] },
+	{ job: 'backgrounds', keys: ['backgroundPerSpecies', 'backgroundTradeable'] },
+	{ job: 'cd_backgrounds', keys: ['cdBackground'] },
+	{ job: 'luckies', keys: ['luckyPerForm'] },
+	{ job: 'xxl', keys: ['xxlScore'] },
+	{ job: 'xxs', keys: [] },
+	{ job: 'dyna_builds', keys: ['dynaBuild', 'dynaBuildTop'] },
+	{ job: 'dyna_parkers', keys: ['dynaParkers'] },
+	{ job: 'cheap_purify', keys: ['cheapPurify'] },
+	{ job: 'tradebait', keys: [] },
+];
+const BUDGET_KEY_WORD = {
+	evolve: 'count', evolveShadow: 'shadow_line', standIn: 'count', shadowStandIn: 'count', raidMeta: 'count',
+	watchShadow: 'shadow', watchNormal: 'normal', pvpNormal: 'normal', pvpShadow: 'shadow', pvpOffMeta: 'count',
+	shinyPerStage: 'per_stage', shinyTradeable: 'tradeable', costumePerStage: 'per_stage', costumeTradeable: 'tradeable',
+	backgroundPerSpecies: 'per_species', backgroundTradeable: 'tradeable', cdBackground: 'per_species',
+	luckyPerForm: 'count', xxlScore: 'score', dynaBuild: 'count', dynaBuildTop: 'top', dynaParkers: 'count',
+	cheapPurify: 'count',
 };
 
 // The watchlist's move tier looks back this far (watch-moves.json has every
@@ -4912,7 +4968,7 @@ export function buildFilters(
 	// (meta-rankings.json), the Max roster, PvP ranks (pvp-rankings.json),
 	// Megas the game master carries ahead of release (species-meta.json), the
 	// move tier (watch-moves.json) and ranks just past the meta cut.
-	const budgets = { ...BUDGET_DEFAULTS, ...(cfg.budgets || {}) };
+	const budgets = effectiveBudgets(cfg);
 	const dexOfName = (n) => resolveSpeciesInfo(n)?.dex;
 	const typeWord = (type) => capFirst(kw.type[type] || type);
 	const reasonsOf = (map, dex) => map.get(dex) || map.set(dex, []).get(dex);
@@ -6912,6 +6968,7 @@ export default function App() {
 			<div className='space-y-10'>
 				{haveListSettings}
 				{shadowKeeperSettings}
+				<BudgetsEditor config={config} setConfig={setConfig} t={t} />
 			</div>
 		),
 		battle: (
@@ -12889,6 +12946,73 @@ function ChangelogModal({ open, onClose }) {
 					))}
 				</div>
 		</Dialog>
+	);
+}
+
+// The spec's budget table under Sorting → settings. Every row is shown in both
+// modes, with its rule filled in from the budgets in force; expert mode adds
+// the numbers. Setting a number back to its default drops the override.
+function BudgetsEditor({ config, setConfig, t }) {
+	const expert = !!config.expertMode;
+	const b = effectiveBudgets(config);
+	const overrides = config.budgets || {};
+	const setBudget = (k, raw) => {
+		const v = Number.parseInt(raw, 10);
+		if (!Number.isInteger(v) || v < 0) return;
+		setConfig((prev) => {
+			const next = { ...(prev.budgets || {}) };
+			if (v === BUDGET_DEFAULTS[k]) delete next[k];
+			else next[k] = v;
+			return { ...prev, budgets: next };
+		});
+	};
+	return (
+		<div>
+			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-2'>
+				{t('app.budget.title')}
+			</h3>
+			<p className='mono text-xs text-[#8B98A5] mb-4 leading-relaxed'>
+				{t(expert ? 'app.budget.hint_expert' : 'app.budget.hint_simple')}
+			</p>
+			<ul className='space-y-3'>
+				{BUDGET_ROWS.map((row) => (
+					<li key={row.job} className='border-l-2 border-[#1F2933] pl-3'>
+						<div className='mono text-sm text-[#E6EDF3]'>{t(`app.budget.${row.job}.label`)}</div>
+						<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
+							{t(`app.budget.${row.job}.rule`, { params: b })}
+						</p>
+						{expert && row.keys.length > 0 && (
+							<div className='flex flex-wrap gap-3 mt-1.5'>
+								{row.keys.map((k) => (
+									<label key={k} className='mono text-[11px] text-[#8090A0] flex items-center gap-1.5'>
+										<input
+											type='number'
+											min={0}
+											step={k === 'xxlScore' ? 10 : 1}
+											value={b[k]}
+											onChange={(e) => setBudget(k, e.target.value)}
+											aria-label={`${t(`app.budget.${row.job}.label`)}: ${t(`app.budget.word.${BUDGET_KEY_WORD[k]}`)}`}
+											className='mono text-sm w-20 min-h-[32px] bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 rounded-sm text-[#E6EDF3]'
+										/>
+										<span>{t(`app.budget.word.${BUDGET_KEY_WORD[k]}`)}</span>
+										{k in overrides && <span className='text-[#F5B82E]'>●</span>}
+									</label>
+								))}
+							</div>
+						)}
+					</li>
+				))}
+			</ul>
+			{expert && Object.keys(overrides).length > 0 && (
+				<button
+					type='button'
+					onClick={() => setConfig((prev) => ({ ...prev, budgets: {} }))}
+					className='mono text-xs mt-4 px-3 py-1.5 rounded-sm bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47]'
+				>
+					{t('app.budget.reset')}
+				</button>
+			)}
+		</div>
 	);
 }
 
