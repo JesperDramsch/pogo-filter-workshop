@@ -116,6 +116,9 @@ import {
   pokemonTemplates,
   releasedDexFromPvpoke,
   tempEvoOverridesByDex,
+  defaultFormByDex,
+  templateNode,
+  templateList,
   tempEvoWords,
   temporaryEvolutionNames,
   warnIfStale,
@@ -267,6 +270,29 @@ export function upcomingMegaDexFromGameMaster(templates, names, pvpoke) {
   return [...out].sort((a, b) => a - b);
 }
 
+// The showcase calculator's inputs (docs/sorting-workflow-spec.md, "XXL score
+// calculator"): each species' mean height and weight, from its default form's
+// template (pokedexHeightM / pokedexWeightKg), and the score coefficients from
+// CONTEST_SETTINGS. The size class (an XXL's maximum: 1.55, 1.75 or 2.00× the
+// mean) is not in the game master, so the app shows the range across classes.
+export function showcaseFromGameMaster(templates) {
+  const defaults = defaultFormByDex(templates);
+  const sizeByDex = {};
+  for (const t of pokemonTemplates(templates)) {
+    if (t.form !== null && t.form !== defaults.get(t.dex)) continue;
+    const { pokedexHeightM: h, pokedexWeightKg: w } = t.settings;
+    if (!(h > 0 && w > 0) || sizeByDex[t.dex]) continue;
+    sizeByDex[t.dex] = [h, w];
+  }
+  let coefficients = null;
+  for (const entry of templateList(templates)) {
+    const node = templateNode(entry);
+    const c = node?.contestSettings?.contestScoreCoefficient?.find((x) => x?.pokemonSize)?.pokemonSize;
+    if (c) coefficients = { height: c.heightCoefficient, weight: c.weightCoefficient, iv: c.ivCoefficient, xxlAdjustmentFactor: c.xxlAdjustmentFactor ?? null };
+  }
+  return { coefficients, sizeByDex };
+}
+
 // Best base stat product per dex, across every form template. "Best" rather
 // than "the base form's": the pool this feeds ranks lines by how strong their
 // final stage gets, and a regional form that outclasses the original (Hisuian
@@ -360,6 +386,7 @@ async function main() {
     console.log(`  not yet released per PvPoke, left out of megaForms: ${unreleasedMegas.join(", ")}`);
   }
   const upcomingMegaDex = upcomingMegaDexFromGameMaster(templates, names, pvpoke);
+  const showcase = showcaseFromGameMaster(templates);
   console.log(`  upcoming Megas (in the game master, not out yet): ${upcomingMegaDex.join(", ") || "none"}`);
 
   // ── starterDex ──
@@ -421,11 +448,18 @@ async function main() {
     megaDex: [...megas].sort((a, b) => a - b),
     megaForms,
     upcomingMegaDex,
+    showcase,
     evoParentByDex,
   };
 
   // Sanity gates — exit 1 turns the sync workflow red, which is the only
   // intervention signal the user wants.
+  assertOrDie(newContent.showcase.coefficients?.height > 0 && newContent.showcase.coefficients?.weight > 0,
+    "showcase coefficients read from CONTEST_SETTINGS");
+  assertOrDie(Object.keys(newContent.showcase.sizeByDex).length >= 900,
+    `showcase sizes for ${Object.keys(newContent.showcase.sizeByDex).length} species (expected ≥ 900)`);
+  assertOrDie(newContent.showcase.sizeByDex[7]?.[0] === 0.5 && newContent.showcase.sizeByDex[7]?.[1] === 9,
+    "Squirtle's mean size is 0.5 m / 9 kg (the Hub's worked example)");
   assertOrDie(newContent.specialTradeDex.includes(150), "Mewtwo (150) ∈ specialTradeDex");
   assertOrDie(newContent.specialTradeDex.includes(151), "Mew (151) ∈ specialTradeDex");
   assertOrDie(newContent.specialTradeDex.includes(793), "Nihilego (793, Ultra Beast) ∈ specialTradeDex");

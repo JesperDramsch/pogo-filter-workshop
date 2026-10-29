@@ -1914,6 +1914,50 @@ export const BUDGET_DEFAULTS = {
 	backgroundTradeable: 3,
 };
 
+// ── Showcase score (spec: "XXL score calculator") ─────────────────────────
+// score = H × scaled height + W × scaled weight + I × (IV sum / 45), with the
+// coefficients from the game master's CONTEST_SETTINGS (800 / 150 / 50) and
+//   scaled height = (height / species mean height) / class height max
+//   scaled weight = (weight / species mean weight) / class weight max
+// (Pokémon GO Hub, July 2023). An XXL scores a further 178 (PokémonDB;
+// confirmed: it is the game's internal calculation), so a single-species
+// showcase tops out at 1,178. The class (the XXL's maximum height, 1.55,
+// 1.75 or 2.00× the mean) is not published per species, so every class the
+// entered size still fits is scored and the result is a range. The game
+// shows height and weight rounded to 0.01, so each class is scored at both
+// ends of that rounding.
+export const SHOWCASE_CLASSES = [
+	{ height: 1.55, weight: 2.05 },
+	{ height: 1.75, weight: 2.25 },
+	{ height: 2.0, weight: 2.5 },
+];
+export const SHOWCASE_XXL_BONUS = 178;
+export function showcaseScoreRange({ dex, heightM, weightKg, ivs = [], xxl = true }, showcase = SPECIES_META.showcase) {
+	const mean = showcase?.sizeByDex?.[dex];
+	const c = showcase?.coefficients;
+	if (!mean || !c || !(heightM > 0) || !(weightKg > 0)) return null;
+	const ivSum = ivs.reduce((a, v) => a + Math.max(0, Math.min(15, Number(v) || 0)), 0);
+	const ivPart = c.iv * (ivSum / 45);
+	const bonus = xxl ? SHOWCASE_XXL_BONUS : 0;
+	const round = 0.005;
+	const scored = [];
+	for (const cls of SHOWCASE_CLASSES) {
+		const hr = heightM / mean[0];
+		const wr = weightKg / mean[1];
+		// The entered size has to fit the class (within the display rounding).
+		if ((heightM - round) / mean[0] > cls.height || (weightKg - round) / mean[1] > cls.weight) continue;
+		const at = (h, w) => c.height * (h / mean[0] / cls.height) + c.weight * (w / mean[1] / cls.weight) + ivPart + bonus;
+		scored.push({ cls: cls.height, low: at(heightM - round, weightKg - round), high: at(heightM + round, weightKg + round), hr, wr });
+	}
+	if (scored.length === 0) return { fits: false };
+	return {
+		fits: true,
+		min: Math.floor(Math.min(...scored.map((x) => x.low))),
+		max: Math.ceil(Math.max(...scored.map((x) => x.high))),
+		classes: scored.map((x) => x.cls),
+	};
+}
+
 // The tagging scheme's suggested job tags. Every tag is a job; Dex-Evolve and
 // Crush are temporary (off once the line is evolved through / emptied on a
 // double transfer candy day). Names avoid the search keywords of every locale:
@@ -7279,6 +7323,7 @@ export default function App() {
 																			copyToClipboard={copyToClipboard}
 																			t={t}
 																		/>
+																		{pile.id === 'xxl' && <XxlCalculator threshold={effectiveBudgets(effectiveConfig).xxlScore} t={t} />}
 																	</TrainerAccordion>
 																))}
 															</div>
@@ -9750,6 +9795,85 @@ function BossCollapsible({
 // tidy-up) holding a three-step triage: ① keepers to favourite, ② what's still
 // unsorted, ③ the trashable rest. Mirrors BossCollapsible's shape so the aux
 // section stays visually consistent.
+// The showcase calculator in the XXL pile. Approximate by design: the size
+// class isn't published and the game rounds height and weight, so it shows a
+// range, and compares it with the XXL budget (keep at or above the threshold).
+function XxlCalculator({ threshold, t }) {
+	const fid = useId();
+	const [species, setSpecies] = useState('');
+	const [height, setHeight] = useState('');
+	const [weight, setWeight] = useState('');
+	const [ivs, setIvs] = useState(['15', '15', '15']);
+	const [xxl, setXxl] = useState(true);
+	const dex = resolveSpeciesInfo(species)?.dex;
+	const result = dex
+		? showcaseScoreRange({ dex, heightM: Number.parseFloat(height), weightKg: Number.parseFloat(weight), ivs: ivs.map(Number), xxl })
+		: null;
+	const field = 'mono text-sm bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 min-h-[32px] rounded-sm text-[#E6EDF3]';
+	const verdict = !result?.fits
+		? null
+		: result.min >= threshold
+			? 'keep'
+			: result.max < threshold
+				? 'below'
+				: 'maybe';
+	return (
+		<div className='border border-[#2D3A47] rounded-sm p-3 space-y-3 bg-[#0B1015]'>
+			<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>{t('app.xxl.title')}</div>
+			<div className='grid grid-cols-2 gap-2'>
+				<label className='col-span-2 mono text-[11px] text-[#8090A0] flex flex-col gap-1'>
+					{t('app.xxl.species')}
+					<SpeciesInput value={species} onChange={setSpecies} onSubmit={() => {}} aria-label={t('app.xxl.species')} className={field} />
+				</label>
+				<label htmlFor={`${fid}-h`} className='mono text-[11px] text-[#8090A0] flex flex-col gap-1'>
+					{t('app.xxl.height')}
+					<input id={`${fid}-h`} type='number' inputMode='decimal' step='0.01' min='0' value={height} onChange={(e) => setHeight(e.target.value)} className={field} />
+				</label>
+				<label htmlFor={`${fid}-w`} className='mono text-[11px] text-[#8090A0] flex flex-col gap-1'>
+					{t('app.xxl.weight')}
+					<input id={`${fid}-w`} type='number' inputMode='decimal' step='0.01' min='0' value={weight} onChange={(e) => setWeight(e.target.value)} className={field} />
+				</label>
+				<div className='col-span-2 grid grid-cols-3 gap-2'>
+					{['atk', 'def', 'hp'].map((k, i) => (
+						<label key={k} htmlFor={`${fid}-${k}`} className='mono text-[11px] text-[#8090A0] flex flex-col gap-1'>
+							{t(`app.xxl.${k}`)}
+							<input
+								id={`${fid}-${k}`}
+								type='number'
+								min='0'
+								max='15'
+								value={ivs[i]}
+								onChange={(e) => setIvs((prev) => prev.map((v, j) => (j === i ? e.target.value : v)))}
+								className={field}
+							/>
+						</label>
+					))}
+				</div>
+				<label className='col-span-2 mono text-xs text-[#E6EDF3] flex items-center gap-2 min-h-[32px]'>
+					<input type='checkbox' checked={xxl} onChange={(e) => setXxl(e.target.checked)} />
+					{t('app.xxl.is_xxl')}
+				</label>
+			</div>
+			<div aria-live='polite' className='mono text-xs leading-relaxed'>
+				{!dex || !result ? (
+					<p className='text-[#8090A0]'>{t('app.xxl.empty')}</p>
+				) : !result.fits ? (
+					<p className='text-[#F5B82E]'>{t('app.xxl.no_fit')}</p>
+				) : (
+					<>
+						<p className='text-[#E6EDF3] text-sm'>{t('app.xxl.result', { params: { min: result.min, max: result.max } })}</p>
+						<p className='text-[#8B98A5]'>{t('app.xxl.classes', { params: { classes: result.classes.map((c) => `${c.toFixed(2)}×`).join(', ') } })}</p>
+						<p style={{ color: verdict === 'keep' ? '#27AE60' : verdict === 'below' ? '#E74C3C' : '#F5B82E' }}>
+							{t(`app.xxl.verdict_${verdict}`, { params: { score: threshold } })}
+						</p>
+					</>
+				)}
+			</div>
+			<p className='mono text-[10.5px] text-[#8090A0] italic leading-relaxed'>{t('app.xxl.hint')}</p>
+		</div>
+	);
+}
+
 // The pile card (spec: "Pile card"): per species in the pile, its class
 // (meta, watchlist, non-meta) with the reasons in words, how many to keep and
 // why; for a category pile, its one keep rule. Never "you have M": the

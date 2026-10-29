@@ -24,10 +24,11 @@
 // Run with: npx vite-node scripts/check-piles.mjs
 
 import {
-  BUDGET_DEFAULTS, BUDGET_ROWS, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET,
+  BUDGET_DEFAULTS, BUDGET_ROWS, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET,
 } from "../src/App.jsx";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import COMMUNITY_DAYS from "../src/data/community-days.json";
+import SPECIES_META from "../src/data/species-meta.json";
 import {
   LEGACY_COMMUNITY_DAYS, LEGACY_THROUGH, communityDayBackgroundDex, mergeRollingCommunityDays,
 } from "./lib/community-days.mjs";
@@ -331,6 +332,33 @@ console.log("\nTagging scheme");
   for (const loc of localeNames) {
     const missing = JOB_TAG_ORDER.filter((j) => loc !== "en" && LOCALES[loc].messages[`app.tags.${j}.label`] === undefined);
     check(`${loc}: every job's tag row is translated`, missing.length === 0, missing.join(", "));
+  }
+}
+
+console.log("\nShowcase score (XXL calculator)");
+{
+  const c = SPECIES_META.showcase?.coefficients;
+  check("coefficients come from the game master's CONTEST_SETTINGS (800 / 150 / 50)",
+    c?.height === 800 && c?.weight === 150 && c?.iv === 50, JSON.stringify(c));
+  // Squirtle, mean 0.5 m / 9 kg: the biggest 1.55-class XXL with a perfect appraisal.
+  const top = showcaseScoreRange({ dex: 7, heightM: 0.775, weightKg: 18.45, ivs: [15, 15, 15] });
+  check("a maximal XXL's range contains the single-species maximum of 1,178", top?.fits && top.min <= 1178 && top.max >= 1178 && top.max <= 1190, JSON.stringify(top));
+  const plain = showcaseScoreRange({ dex: 7, heightM: 0.775, weightKg: 18.45, ivs: [15, 15, 15], xxl: false });
+  check(`the XXL bonus is ${SHOWCASE_XXL_BONUS}, both ends`, top.min - plain.min === SHOWCASE_XXL_BONUS && top.max - plain.max === SHOWCASE_XXL_BONUS);
+  // Within the same classes, taller scores higher. (Across a class boundary the
+  // range's top can drop: a size that outgrows a class loses its higher score.)
+  const tall = showcaseScoreRange({ dex: 7, heightM: 0.9, weightKg: 15, ivs: [10, 10, 10] });
+  const taller = showcaseScoreRange({ dex: 7, heightM: 0.95, weightKg: 15, ivs: [10, 10, 10] });
+  check("taller scores higher within the same size classes",
+    JSON.stringify(tall.classes) === JSON.stringify(taller.classes) && taller.min > tall.min && taller.max > tall.max,
+    `${JSON.stringify(tall)} → ${JSON.stringify(taller)}`);
+  check("a size bigger than every class does not fit", showcaseScoreRange({ dex: 7, heightM: 1.2, weightKg: 9 })?.fits === false);
+  check("a class the size has outgrown is dropped (0.80 m Squirtle: not 1.55)",
+    JSON.stringify(showcaseScoreRange({ dex: 7, heightM: 0.8, weightKg: 16.54 }).classes) === JSON.stringify([1.75, 2]));
+  check("an unknown species or missing size gives no score", showcaseScoreRange({ dex: 99999, heightM: 1, weightKg: 1 }) === null && showcaseScoreRange({ dex: 7, heightM: 0, weightKg: 9 }) === null);
+  for (const loc of localeNames) {
+    const missing = ["title", "result", "verdict_keep", "verdict_below", "verdict_maybe", "hint"].filter((k) => loc !== "en" && LOCALES[loc].messages[`app.xxl.${k}`] === undefined);
+    check(`${loc}: the calculator is translated`, missing.length === 0, missing.join(", "));
   }
 }
 
