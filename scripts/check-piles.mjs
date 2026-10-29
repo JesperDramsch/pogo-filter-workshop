@@ -24,7 +24,7 @@
 // Run with: npx vite-node scripts/check-piles.mjs
 
 import {
-  BUDGET_DEFAULTS, BUDGET_ROWS, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET,
+  BUDGET_DEFAULTS, BUDGET_ROWS, FLOAT_ENDED_DAYS, floatingPiles, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET,
 } from "../src/App.jsx";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import COMMUNITY_DAYS from "../src/data/community-days.json";
@@ -38,6 +38,7 @@ import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
 import { pokemonNameFor } from "../src/data/species.js";
 import { FIXTURE_CONFIG, makeTFn } from "./lib/fixture.mjs";
 import { pileCases, pileMon } from "./lib/pile-cases.mjs";
+import { hasCostumedSpawns, signalsFromFeed } from "./fetch-events.mjs";
 
 let failures = 0;
 function check(label, cond, detail = "") {
@@ -360,6 +361,38 @@ console.log("\nShowcase score (XXL calculator)");
     const missing = ["title", "result", "verdict_keep", "verdict_below", "verdict_maybe", "hint"].filter((k) => loc !== "en" && LOCALES[loc].messages[`app.xxl.${k}`] === undefined);
     check(`${loc}: the calculator is translated`, missing.length === 0, missing.join(", "));
   }
+}
+
+console.log("\nWhich piles show first (event-driven ordering)");
+{
+  const now = Date.parse("2026-11-10T12:00:00Z");
+  const day = 86400000;
+  const iso = (ms) => new Date(ms).toISOString();
+  const span = (startDays, endDays) => ({ start: iso(now + startDays * day), end: iso(now + endDays * day) });
+  const ids = (data) => floatingPiles(data, now).map((f) => f.pile).join(",");
+  check("a running takeover floats shadows", ids({ signals: [{ kind: "takeover", title: "T", ...span(-1, 2) }] }) === "shadows");
+  check("a Community Day ended 3 days ago floats its backgrounds",
+    ids({ signals: [{ kind: "community_day", title: "CD", ...span(-3.2, -3) }] }) === "cd_backgrounds");
+  check(`one ended more than ${FLOAT_ENDED_DAYS} days ago floats nothing`,
+    ids({ signals: [{ kind: "community_day", title: "CD", ...span(-10.2, -10) }] }) === "");
+  check("an upcoming Max Monday floats nothing, a running one floats Dynamax",
+    ids({ eventMaxBattles: [{ name: "Max Monday", ...span(1, 1.5) }] }) === "" &&
+    ids({ eventMaxBattles: [{ name: "Max Monday", ...span(-0.1, 0.4) }] }) === "dynamax");
+  check("a wild-spawn event floats its spawns, plus costumes when it had costumed spawns",
+    ids({ events: [{ title: "E", category: "Event", hasCostumes: true, ...span(-2, -1) }] }) === "event_spawns,costumes" &&
+    ids({ events: [{ title: "E", category: "Event", hasCostumes: false, ...span(-2, -1) }] }) === "event_spawns");
+  check("a pile floats once however many events name it",
+    ids({ signals: [{ kind: "takeover", title: "A", ...span(-1, 1) }, { kind: "takeover", title: "B", ...span(-2, 1) }] }) === "shadows");
+  // The fetcher side: which feed entries become signals, and the costume flag.
+  const feed = {
+    Event: [{ title: "Harvest Festival: Taken Over", start_time: "2026-10-02T00:00:00", end_time: "2026-10-05T00:00:00", details: {} }],
+    "Community Day": [{ title: "Pawniard Community Day", start_time: "2026-11-21T14:00:00", end_time: "2026-11-21T17:00:00", details: {} }],
+    "Raid Hour": [{ title: "Raid Hour", start_time: "2026-11-04T18:00:00", end_time: "2026-11-04T19:00:00", details: {} }],
+  };
+  check("the feed's takeover and Community Day become signals, a raid hour doesn't",
+    signalsFromFeed(feed).map((x) => x.kind).sort().join(",") === "community_day,takeover");
+  check("a costumed spawn is spotted, plain ones aren't",
+    hasCostumedSpawns([{ name: "Piplup wearing a Halloween Mischief costume" }]) && !hasCostumedSpawns(["Zubat", { name: "Gengar" }]));
 }
 
 console.log("\nCommunity Day data (scripts/lib/community-days.mjs → src/data/community-days.json)");

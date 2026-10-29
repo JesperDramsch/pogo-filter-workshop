@@ -771,6 +771,8 @@ export const DEFAULT_CONFIG = {
 	// scheme"); JOB_TAG_DEFAULTS for the rest. Tradebait is basarTagName and
 	// "promised" is each trade buddy's prefix, so neither is in here.
 	jobTags: {},
+	// Sorting piles the user hid (ids); hidden piles sit in a "hidden" list.
+	hiddenPiles: [],
 
 	// PvP
 	pvpMode: 'strict', // "loose" | "intelligent" | "strict" | "none"
@@ -1694,6 +1696,7 @@ export function mergeImportedConfig(raw, notices = []) {
 				});
 			return { rawAppend: '', ...b, targetSpecies };
 		});
+	merged.hiddenPiles = Array.isArray(merged.hiddenPiles) ? merged.hiddenPiles.filter((x) => typeof x === 'string') : [];
 	// Job tag renames: non-empty strings, without a leading #.
 	merged.jobTags = Object.fromEntries(
 		Object.entries(merged.jobTags && typeof merged.jobTags === 'object' ? merged.jobTags : {})
@@ -1956,6 +1959,41 @@ export function showcaseScoreRange({ dex, heightM, weightKg, ivs = [], xxl = tru
 		max: Math.ceil(Math.max(...scored.map((x) => x.high))),
 		classes: scored.map((x) => x.cls),
 	};
+}
+
+// ── Which piles show first (spec: "Which piles show first") ──────────────
+// A pile floats up while an event of its kind is running or ended at most
+// FLOAT_ENDED_DAYS ago (the events snapshot's own carry-over window, see
+// scripts/lib/event-window.mjs). Upcoming events don't float anything.
+//   wild-spawn event → event spawns, and costumes if it had costumed spawns
+//   Community Day   → Community Day backgrounds
+//   takeover        → shadows
+//   Max Battle event (Max Monday, Max Battle Day) → Dynamax
+// A double transfer candy day has no source yet, so its Crush reminder card
+// always shows (agreed deferral).
+export const FLOAT_ENDED_DAYS = 7;
+export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] } = {}, now = Date.now()) {
+	const recent = (start, end) => {
+		const s = Date.parse(start), e = Date.parse(end);
+		return Number.isFinite(s) && Number.isFinite(e) && s <= now && now - e <= FLOAT_ENDED_DAYS * 86400000;
+	};
+	const out = [];
+	const add = (pile, kind, title) => {
+		if (!out.some((f) => f.pile === pile)) out.push({ pile, kind, title });
+	};
+	for (const sg of signals) {
+		if (!recent(sg.start, sg.end)) continue;
+		if (sg.kind === 'takeover') add('shadows', 'takeover', sg.title);
+		if (sg.kind === 'community_day') add('cd_backgrounds', 'community_day', sg.title);
+	}
+	for (const mb of eventMaxBattles) if (recent(mb.start, mb.end)) add('dynamax', 'max', mb.name);
+	for (const ev of events) {
+		if (!recent(ev.start, ev.end)) continue;
+		if (ev.category === 'Community Day') add('cd_backgrounds', 'community_day', ev.title);
+		add('event_spawns', 'wild', ev.title);
+		if (ev.hasCostumes) add('costumes', 'costumes', ev.title);
+	}
+	return out;
 }
 
 // The tagging scheme's suggested job tags. Every tag is a job; Dex-Evolve and
@@ -6078,6 +6116,7 @@ export default function App() {
 	const [showAuxEvos, setShowAuxEvos] = useState(false);
 	const [showBrowseSort, setShowBrowseSort] = useState(false);
 	const [showPiles, setShowPiles] = useState(false);
+	const [showHiddenPiles, setShowHiddenPiles] = useState(false);
 	const [showAuxTrades, setShowAuxTrades] = useState(false);
 	const [showFriendWishlist, setShowFriendWishlist] = useState(false);
 	// Friend lucky wishlist: restrict to old catches guaranteed Lucky on trade.
@@ -6085,7 +6124,13 @@ export default function App() {
 	// `friendCollectGuaranteedOnly` — it's a persisted curation setting.)
 	const [friendGuaranteedLucky, setFriendGuaranteedLucky] = useState(false);
 	const [showAuxMegas, setShowAuxMegas] = useState(false);
-	const [showAuxEvents, setShowAuxEvents] = useState(false);
+	// Open when a running or just-ended event floats the wild spawns up (the
+	// "right now" block says so).
+	const [showAuxEvents, setShowAuxEvents] = useState(() =>
+		floatingPiles({ events: EVENTS.events, signals: EVENTS.signals, eventMaxBattles: RAID_BOSSES.eventMaxBattles }).some(
+			(f) => f.pile === 'event_spawns',
+		),
+	);
 	const [showAuxRaids, setShowAuxRaids] = useState(false);
 	const [showAuxMaxBattles, setShowAuxMaxBattles] = useState(false);
 	const [showAuxRocket, setShowAuxRocket] = useState(false);
@@ -6973,6 +7018,63 @@ export default function App() {
 			/>
 		</div>
 	);
+	// Event-driven ordering: piles of a running or just-ended event's kind float
+	// to a "right now" block; the rest stay in "piles", minus the hidden ones.
+	const floats = useMemo(
+		() => floatingPiles({ events: EVENTS.events, signals: EVENTS.signals, eventMaxBattles: RAID_BOSSES.eventMaxBattles }),
+		[],
+	);
+	const floatIds = new Set(floats.map((f) => f.pile));
+	const hiddenIds = new Set(effectiveConfig.hiddenPiles || []);
+	const floatedPiles = floats
+		.map((float) => ({ float, pile: sortingPiles.find((p) => p.id === float.pile) }))
+		.filter((x) => x.pile);
+	const restPiles = sortingPiles.filter((p) => !floatIds.has(p.id) && !hiddenIds.has(p.id));
+	const hiddenPileList = sortingPiles.filter((p) => !floatIds.has(p.id) && hiddenIds.has(p.id));
+	const toggleHiddenPile = (id) =>
+		setConfig((prev) => {
+			const now = new Set(prev.hiddenPiles || []);
+			if (now.has(id)) now.delete(id);
+			else now.add(id);
+			return { ...prev, hiddenPiles: [...now] };
+		});
+	const pileAccordion = (pile, reason = null) => (
+		<TrainerAccordion
+			key={pile.id}
+			name={t(`app.pile.${pile.id}.title`)}
+			teaser={reason}
+			highlight={!!reason}
+			accent='#5EAFC5'
+		>
+			<PileSteps pile={pile} accent='#5EAFC5' copied={copied} copyToClipboard={copyToClipboard} t={t} />
+			{pile.id === 'xxl' && <XxlCalculator threshold={effectiveBudgets(effectiveConfig).xxlScore} t={t} />}
+			{!reason && (
+				<button
+					type='button'
+					onClick={() => toggleHiddenPile(pile.id)}
+					className='mono text-[11px] text-[#8090A0] hover:text-[#E6EDF3] min-h-[32px]'
+				>
+					{hiddenIds.has(pile.id) ? t('app.pile.unhide') : t('app.pile.hide')}
+				</button>
+			)}
+		</TrainerAccordion>
+	);
+	const wildSpawnsBlock = (
+	<EventSpawnCollapsible
+		icon='🌿'
+		fetchedAt={eventsFetchedAt}
+		events={eventFilters}
+		megaBoostFor={megaBoostFor}
+		typeLabels={rocketTypeLabels}
+		accent='#27AE60'
+		open={showAuxEvents}
+		onToggle={() => setShowAuxEvents((s) => !s)}
+		copied={copied}
+		copyToClipboard={copyToClipboard}
+		t={t}
+		locale={locale}
+	/>
+	);
 	const jobTagSettings = (
 		<JobTagsPanel config={config} setConfig={setConfig} copied={copied} copyToClipboard={copyToClipboard} t={t} />
 	);
@@ -7240,6 +7342,21 @@ export default function App() {
 										) : (
 											<>
 												<div className='space-y-3'>
+													<CrushCard tag={jobTagsOf(effectiveConfig).crush} copied={copied} copyToClipboard={copyToClipboard} t={t} />
+													{floats.length > 0 && (
+														<section aria-labelledby='float-heading' className='border border-[#5EAFC5]/40 rounded-sm p-3 space-y-3'>
+															<h3 id='float-heading' className='mono text-[10.5px] uppercase tracking-wider text-[#5EAFC5]'>
+																{t('app.float.title')}
+															</h3>
+															{floats.filter((f) => f.pile === 'event_spawns').map((f) => (
+																<p key={f.pile} className='mono text-xs text-[#8B98A5]'>{t('app.float.wild', { params: { title: f.title } })}</p>
+															))}
+															{floatIds.has('event_spawns') && wildSpawnsBlock}
+															{floatedPiles.map(({ pile, float }) =>
+																pileAccordion(pile, t(`app.float.${float.kind}`, { params: { title: float.title } })),
+															)}
+														</section>
+													)}
 													{(hundoPile || luckySort || luckyFamilySort || nundoSort || tradedTrashSort) && (
 														<Collapsible
 															icon='✨'
@@ -7314,36 +7431,24 @@ export default function App() {
 														>
 															<div className='space-y-3'>
 																<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.pile.section_hint')}</p>
-																{sortingPiles.map((pile) => (
-																	<TrainerAccordion key={pile.id} name={t(`app.pile.${pile.id}.title`)} accent='#5EAFC5'>
-																		<PileSteps
-																			pile={pile}
-																			accent='#5EAFC5'
-																			copied={copied}
-																			copyToClipboard={copyToClipboard}
-																			t={t}
-																		/>
-																		{pile.id === 'xxl' && <XxlCalculator threshold={effectiveBudgets(effectiveConfig).xxlScore} t={t} />}
-																	</TrainerAccordion>
-																))}
+																{restPiles.map((pile) => pileAccordion(pile))}
+																{hiddenPileList.length > 0 && (
+																	<div className='pt-2 border-t border-[#1F2933] space-y-2'>
+																		<button
+																			type='button'
+																			onClick={() => setShowHiddenPiles((v) => !v)}
+																			aria-expanded={showHiddenPiles}
+																			className='mono text-xs text-[#5EAFC5] hover:text-[#E6EDF3] min-h-[32px]'
+																		>
+																			{t('app.pile.hidden', { params: { count: hiddenPileList.length } })}
+																		</button>
+																		{showHiddenPiles && hiddenPileList.map((pile) => pileAccordion(pile))}
+																	</div>
+																)}
 															</div>
 														</Collapsible>
 													)}
-													{/* Wild spawns: current / upcoming / just-ended events (leak-duck). */}
-													<EventSpawnCollapsible
-														icon='🌿'
-														fetchedAt={eventsFetchedAt}
-														events={eventFilters}
-														megaBoostFor={megaBoostFor}
-														typeLabels={rocketTypeLabels}
-														accent='#27AE60'
-														open={showAuxEvents}
-														onToggle={() => setShowAuxEvents((s) => !s)}
-														copied={copied}
-														copyToClipboard={copyToClipboard}
-														t={t}
-														locale={locale}
-													/>
+													{!floatIds.has('event_spawns') && wildSpawnsBlock}
 													<Collapsible
 														icon='🌑'
 														label={t('app.collapsible.aux_shadows')}
@@ -9795,6 +9900,28 @@ function BossCollapsible({
 // tidy-up) holding a three-step triage: ① keepers to favourite, ② what's still
 // unsorted, ③ the trashable rest. Mirrors BossCollapsible's shape so the aux
 // section stays visually consistent.
+// The double transfer candy day reminder (spec: a card, not a pile). No
+// upstream publishes these days yet, so it always shows: the working tag
+// protects Pokémon until that day, then the #tag search finds them.
+function CrushCard({ tag, copied, copyToClipboard, t }) {
+	return (
+		<div className='border border-[#2D3A47] rounded-sm p-3 flex flex-wrap items-start justify-between gap-2 bg-[#0B1015]'>
+			<div className='min-w-0 flex-1'>
+				<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>{t('app.crush.title')}</div>
+				<p className='mono text-xs text-[#8B98A5] leading-relaxed mt-1'>{t('app.crush.body', { params: { tag } })}</p>
+			</div>
+			<button
+				type='button'
+				onClick={() => copyToClipboard('crush_tag', `#${tag}`)}
+				aria-label={`${t('app.tags.copy')}: #${tag}`}
+				className='mono text-xs min-h-[32px] px-2.5 rounded-sm bg-[#1F2933] text-[#5EAFC5] hover:bg-[#2D3A47] shrink-0'
+			>
+				{copied.crush_tag ? t('app.tags.copied') : `#${tag}`}
+			</button>
+		</div>
+	);
+}
+
 // The showcase calculator in the XXL pile. Approximate by design: the size
 // class isn't published and the game rounds height and weight, so it shows a
 // range, and compares it with the XXL budget (keep at or above the threshold).

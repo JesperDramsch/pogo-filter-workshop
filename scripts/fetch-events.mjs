@@ -45,6 +45,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
 import { outsideWindow, carryOver } from "./lib/event-window.mjs";
 import { LEGACY_COMMUNITY_DAYS, communityDaysFromFeed, mergeRollingCommunityDays } from "./lib/community-days.mjs";
+import { isTakeoverEvent } from "./lib/rocket-takeover.mjs";
 import { fetchGameMaster, mechanicsBatchFloor, warnIfStale } from "./lib/game-master.mjs";
 import { buildNameIndex as buildFormIndex, resolveBossKey } from "./fetch-raid-bosses.mjs";
 
@@ -223,6 +224,31 @@ function resolveSpawns(spawns, nameIdx) {
   };
 }
 
+// Did the feed list any costumed spawn ("Zubat wearing a top hat")?
+export function hasCostumedSpawns(spawns) {
+  return (spawns || []).some((e) => /\s+wearing\b/i.test(typeof e === "string" ? e : e?.name || ""));
+}
+
+// The event kinds that float sorting piles up, as { id, kind, title, start,
+// end }: a Team GO Rocket takeover (the Rocket fetcher's own test) and a
+// Community Day (named as one). Max Battle events come from raid-bosses.json
+// and wild-spawn events are the events list itself.
+export function signalsFromFeed(feed) {
+  const out = [];
+  for (const [category, list] of Object.entries(feed || {})) {
+    if (!Array.isArray(list)) continue;
+    for (const ev of list) {
+      const start = ev?.start_time, end = ev?.end_time;
+      if (!Number.isFinite(Date.parse(start)) || !Number.isFinite(Date.parse(end))) continue;
+      const kinds = [];
+      if (isTakeoverEvent(ev)) kinds.push("takeover");
+      if (/\bcommunity day\b/i.test(ev.title || "")) kinds.push("community_day");
+      for (const kind of kinds) out.push({ id: `${kind}|${slugId(category, ev.title, start)}`, kind, title: ev.title, start, end });
+    }
+  }
+  return out;
+}
+
 // The Community Day background pile's species (scripts/lib/community-days.mjs):
 // the pinned legacy list plus every Community Day this feed has ever listed.
 // Runs before the wild-spawn guard below, so a day with no spawn events still
@@ -369,9 +395,19 @@ async function main() {
         spawns: spawnNames,
         spawnForms: spawnFormsFor(spawns, nameIdx, formIdx, previousForms, missingForms),
         unresolved,
+        // Costumed spawns ("Piplup wearing a …"): the sorting tab floats the
+        // costume pile up after such an event. The names above are stripped.
+        hasCostumes: hasCostumedSpawns(spawns),
       });
     }
   }
+
+  // Event kinds the sorting tab floats piles up for (docs/sorting-workflow-
+  // spec.md, "Which piles show first"), from every category, spawns or not: a
+  // takeover rarely has a spawn list. Same window and carry-over as events.
+  const signalsOut = signalsFromFeed(feed).filter((sg) => !outsideWindow(Date.parse(sg.start), Date.parse(sg.end), now));
+  const signals = carryOver(signalsOut, previous?.signals, now);
+  for (const id of signals.carriedIds) console.log(`  ↩ carried over ended signal ${id}`);
 
   // The guard is on what the FEED produced, before the carry-over: a feed that
   // yields nothing is a broken upstream, and a snapshot made only of carried
@@ -407,11 +443,11 @@ async function main() {
   // Preserve the previous fetchedAt when the resolved event set is unchanged so
   // the daily sync doesn't open a PR just because the timestamp moved. The UI's
   // "last sync · Xh ago" still reflects the last time the content actually moved.
-  const newContent = { events: events.merged, eggPools: eggPools.merged };
+  const newContent = { events: events.merged, eggPools: eggPools.merged, signals: signals.merged };
   let fetchedAt = new Date().toISOString();
   if (
     previous?.fetchedAt &&
-    canonicalStringify({ events: previous.events, eggPools: previous.eggPools || [] }) ===
+    canonicalStringify({ events: previous.events, eggPools: previous.eggPools || [], signals: previous.signals || [] }) ===
       canonicalStringify(newContent)
   ) {
     fetchedAt = previous.fetchedAt;

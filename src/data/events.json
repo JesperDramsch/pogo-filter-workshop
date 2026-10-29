@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-29T13:14:01.200Z",
+  "fetchedAt": "2026-10-29T19:03:56.406Z",
   "events": [
     {
       "id": "event-minior-showers-orionids-2026-2026-10-19t17-00-00",
@@ -410,7 +410,8 @@
           ]
         }
       ],
-      "unresolved": []
+      "unresolved": [],
+      "hasCostumes": true
     },
     {
       "id": "event-pok-mon-go-halloween-2026-part-ii-2026-11-01t10-00-00",
@@ -468,7 +469,8 @@
           ]
         }
       ],
-      "unresolved": []
+      "unresolved": [],
+      "hasCostumes": true
     },
     {
       "id": "event-into-the-wild-2026-11-09t10-00-00",
@@ -516,7 +518,8 @@
           ]
         }
       ],
-      "unresolved": []
+      "unresolved": [],
+      "hasCostumes": false
     }
   ],
   "eggPools": [
@@ -606,5 +609,6 @@
       ],
       "unresolved": []
     }
-  ]
+  ],
+  "signals": []
 }
