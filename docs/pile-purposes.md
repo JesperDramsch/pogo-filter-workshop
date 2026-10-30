@@ -29,7 +29,8 @@ then `3-4` is fine (best first, then wider), but `3-4` then `4*` would be cut.
 | Event | What's worth keeping from this event? | 4\* → 3-4 → 3\* |
 | Costumes that evolve (`costume&evolve`) | Which hats to keep for the whole line? | 4\* → 3-4 → 3\*, one per stage of the line (costume budget: 1 per stage), plus up to 3 untraded ones to trade |
 | Costumes that don't (`costume&!evolve`) | Which hats to keep? | 4\* → 3-4 → 3\*, just one, plus up to 3 untraded ones to trade |
-| CD backgrounds | Which background ones stay (3 per species)? | 4\* → 3-4 → 3\* |
+| Backgrounds that evolve (`background&evolve`) | Which backgrounds to keep for the whole line? | 4\* → 3-4 → 3\*, one per stage of the line, plus up to 3 untraded ones to trade |
+| Backgrounds that don't (`background&!evolve`) | Which backgrounds to keep? | 4\* → 3-4 → 3\*, just one, plus up to 3 untraded ones to trade |
 | XXL | Which one goes to a showcase? | showcase verdict → still to evolve → 4\*,3\* |
 | XXS | Which tiny ones still matter? | still to evolve → 4\*,3\* |
 | Luckies | Which luckies are worth the cheap power-up? | still to evolve → 4\*,3\* |
@@ -50,6 +51,15 @@ Lucky families goes: luckies are luckies.
 These stay as filters you copy, not keep steps:
 - **Shadows:** cheap purify (`candykm1`, not meta), and the Frustration TM on meta shadows.
 - **Ready to evolve:** cheap XP evolves (the trade evolutions are named in it species by species, so it covers `tradeevolve`), and mega-evolve as its own tile.
+
+## Your call
+
+1. **The Community Day list.** With backgrounds covered by the `background`
+   keyword, the pinned and rolling Community Day list
+   (`scripts/lib/community-days.mjs`, `src/data/community-days.json`) has no
+   job left. The "Right now" float after a Community Day reads the event
+   feed, not this list. I'd remove the list and its part of the fetcher. Or
+   keep it?
 
 ## Settled
 
