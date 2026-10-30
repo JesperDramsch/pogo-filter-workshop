@@ -16,9 +16,6 @@ export function pogoKeywords(outputLocale) {
   const messages = LOCALES[outputLocale]?.messages || LOCALES.en.messages;
 
   return {
-    // The locale these keywords are for, so a builder handed only `kw` can
-    // still render species names (protectionTail's custom collectibles).
-    locale: LOCALES[outputLocale] ? outputLocale : "en",
     iv: {
       atk: k(messages, "filter_key_attack"),
       def: k(messages, "filter_key_defense"),

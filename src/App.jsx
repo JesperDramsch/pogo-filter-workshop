@@ -1910,13 +1910,6 @@ export function protectionTail(kw, cfg) {
 		`!${kw.flag.shiny},!${kw.flag.legendary}`,
 		`!${kw.flag.background},!${kw.flag.legendary}`,
 	);
-	// Custom collectibles: species the user protects outright, as the trash
-	// filter does. Unlike there, no regional-collector skip: the tail has no
-	// regional protection that would cover them otherwise.
-	for (const sp of cfg.customCollectibles || []) {
-		const name = speciesForOutput(sp, kw.locale);
-		if (name) clauses.push(`!${capFirst(name)}`);
-	}
 	return clauses;
 }
 
