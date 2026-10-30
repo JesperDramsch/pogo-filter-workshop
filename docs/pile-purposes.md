@@ -48,12 +48,7 @@ Lucky families goes: luckies are luckies.
 
 These stay as filters you copy, not keep steps:
 - **Shadows:** cheap purify (`candykm1`, not meta), and the Frustration TM on meta shadows.
-- **Ready to evolve:** cheap XP evolves, and mega-evolve as its own tile.
-
-One candidate for more. It's in the game's keyword list, but I can't test
-what it matches from here, so check it in the game first:
-- `tradeevolve`: species that evolve for free after a trade. It would go
-  beside Received trades and Ready to evolve: trade them first.
+- **Ready to evolve:** cheap XP evolves (the trade evolutions are named in it species by species, so it covers `tradeevolve`), and mega-evolve as its own tile.
 
 ## Settled
 
