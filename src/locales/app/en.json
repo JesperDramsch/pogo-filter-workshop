@@ -1652,5 +1652,9 @@
   "app.budget.dyna_builds.why": "Max Particles are scarce.",
   "app.budget.dyna_parkers.why": "About 30 out at once at Power Spots, plus spares. IVs don't matter.",
   "app.budget.cheap_purify.why": "Takeover research asks for purifies.",
-  "app.budget.tradebait.why": "None of these can be traded (again)."
+  "app.budget.tradebait.why": "None of these can be traded (again).",
+  "app.xxl.form": "form",
+  "app.xxl.form_pick": "pick a form",
+  "app.xxl.form_normal": "normal",
+  "app.xxl.pick_form": "This species comes in forms of different sizes: pick the form first."
 }

@@ -1652,5 +1652,9 @@
   "app.budget.dyna_builds.why": "Die Ressourcen zum Aufbauen sind knapp.",
   "app.budget.dyna_parkers.why": "Etwa 30 gleichzeitig unterwegs, plus Reserve. IVs sind egal.",
   "app.budget.cheap_purify.why": "Übernahme-Forschungen verlangen Erlösungen.",
-  "app.budget.tradebait.why": "Keins davon lässt sich (erneut) tauschen."
+  "app.budget.tradebait.why": "Keins davon lässt sich (erneut) tauschen.",
+  "app.xxl.form": "Form",
+  "app.xxl.form_pick": "Form wählen",
+  "app.xxl.form_normal": "normal",
+  "app.xxl.pick_form": "Diese Art gibt es in Formen unterschiedlicher Größe: Wähl zuerst die Form."
 }

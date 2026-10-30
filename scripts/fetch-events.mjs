@@ -230,9 +230,9 @@ export function hasCostumedSpawns(spawns) {
 }
 
 // The event kinds that float sorting piles up, as { id, kind, title, start,
-// end }: a Team GO Rocket takeover (the Rocket fetcher's own test) and a
-// Community Day (named as one). Max Battle events come from raid-bosses.json
-// and wild-spawn events are the events list itself.
+// end }: a Team GO Rocket takeover (the Rocket fetcher's own test), a
+// Community Day (named as one), and a Max Monday or Max Battle Day (the feed's
+// own categories). Wild-spawn events are the events list itself.
 export function signalsFromFeed(feed) {
   const out = [];
   for (const [category, list] of Object.entries(feed || {})) {
@@ -243,6 +243,9 @@ export function signalsFromFeed(feed) {
       const kinds = [];
       if (isTakeoverEvent(ev)) kinds.push("takeover");
       if (/\bcommunity day\b/i.test(ev.title || "")) kinds.push("community_day");
+      // Max Mondays and Max Battle Days: raid-bosses.json drops them the moment
+      // they end, so the Dynamax pile needs them here to stay floated afterwards.
+      if (/^max (mondays|battles)$/i.test(category)) kinds.push("max");
       for (const kind of kinds) out.push({ id: `${kind}|${slugId(category, ev.title, start)}`, kind, title: ev.title, start, end });
     }
   }

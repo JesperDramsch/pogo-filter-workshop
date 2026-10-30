@@ -1941,8 +1941,10 @@ export const SHOWCASE_CLASSES = [
 export const SHOWCASE_XXL_BONUS = 178;
 // `ivs` null means unknown: the IV part (at most 50 of the score) then spans
 // its whole range instead of narrowing it.
-export function showcaseScoreRange({ dex, heightM, weightKg, ivs = null, xxl = true }, showcase = SPECIES_META.showcase) {
-	const mean = showcase?.sizeByDex?.[dex];
+// `form` is a form suffix from `sizeByForm` (Pumpkaboo's SUPER, Marowak's
+// ALOLA); a species' forms can differ in mean size a lot.
+export function showcaseScoreRange({ dex, form = null, heightM, weightKg, ivs = null, xxl = true }, showcase = SPECIES_META.showcase) {
+	const mean = (form && showcase?.sizeByForm?.[dex]?.[form]) || showcase?.sizeByDex?.[dex];
 	const c = showcase?.coefficients;
 	if (!mean || !c || !(heightM > 0) || !(weightKg > 0)) return null;
 	const ivSum = ivs ? ivs.reduce((a, v) => a + Math.max(0, Math.min(15, Number(v) || 0)), 0) : null;
@@ -1956,7 +1958,10 @@ export function showcaseScoreRange({ dex, heightM, weightKg, ivs = null, xxl = t
 		const wr = weightKg / mean[1];
 		// The entered size has to fit the class (within the display rounding).
 		if ((heightM - round) / mean[0] > cls.height || (weightKg - round) / mean[1] > cls.weight) continue;
-		const at = (h, w, iv) => c.height * (h / mean[0] / cls.height) + c.weight * (w / mean[1] / cls.weight) + iv + bonus;
+		// Each scaled term tops out at 1: the class maximum is the biggest an XXL
+		// of the class gets, so rounding up can't push past it.
+		const at = (h, w, iv) =>
+			c.height * Math.min(1, h / mean[0] / cls.height) + c.weight * Math.min(1, w / mean[1] / cls.weight) + iv + bonus;
 		scored.push({ cls: cls.height, low: at(heightM - round, weightKg - round, ivLow), high: at(heightM + round, weightKg + round, ivHigh), hr, wr });
 	}
 	if (scored.length === 0) return { fits: false };
@@ -1992,6 +1997,7 @@ export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] 
 		if (!recent(sg.start, sg.end)) continue;
 		if (sg.kind === 'takeover') add('shadows', 'takeover', sg.title);
 		if (sg.kind === 'community_day') add('cd_backgrounds', 'community_day', sg.title);
+		if (sg.kind === 'max') add('dynamax', 'max', sg.title);
 	}
 	for (const mb of eventMaxBattles) if (recent(mb.start, mb.end)) add('dynamax', 'max', mb.name);
 	for (const ev of events) {
@@ -2089,7 +2095,10 @@ export const WATCH_MOVE_DAYS = 90;
 // bash", OMINOUS_WIND_PLUS → "ominous wind+". English title case if unknown.
 function moveLabel(id, tFn) {
 	const en = id.replace(/_FAST$/, '').replace(/_PLUS$/, '+').toLowerCase().replace(/_/g, ' ');
-	return tFn(`move.${en}`, { fallback: en.replace(/\b\w/g, (c) => c.toUpperCase()) });
+	// The dictionary keys some moves hyphenated (V-Create, X-Scissor, Lock-On),
+	// so that spelling goes first, as the charger list does.
+	const fallback = en.replace(/\b\w/g, (c) => c.toUpperCase());
+	return tFn(`move.${en.replace(/ /g, '-')}`, { fallback: tFn(`move.${en}`, { fallback }) });
 }
 
 // Species whose Community Day came with a special background. Same rule as
@@ -5015,7 +5024,14 @@ export function buildFilters(
 						: '',
 				},
 				// The league's own clauses: pool, CP cap, loose rank-1 pattern.
-				...pvpPools.map((pool) => ({ key: pool.key, filter: buildLeagueFilter(pool.league).clause, text: pool.text })),
+				// Only a capped league has a rank-1 keeper pattern; buildLeagueFilter
+				// drops the CP and IV clauses for a capless one (a Master League cup),
+				// which would mark every family member a keeper.
+				...pvpPools.map((pool) => ({
+					key: pool.key,
+					filter: pool.league?.cpCap ? buildLeagueFilter(pool.league).clause : '',
+					text: pool.text,
+				})),
 			],
 			kw,
 			cfg,
@@ -5249,7 +5265,9 @@ export function buildFilters(
 	// Per species in a pile with a species list: class, reasons, keep N, why.
 	// The workshop never sees the storage, so it says "keep up to N".
 	const cardRow = (dex) => {
-		const meta = metaWhy.get(dex);
+		// Class from the same set as the meta pile's head, so a species trimmed
+		// from the roster under Battle → settings stops reading as meta here too.
+		const meta = metaDex.has(dex) ? metaWhy.get(dex) : null;
 		const watch = !meta && watchWhy.get(dex);
 		const cls = meta ? 'meta' : watch ? 'watchlist' : 'non_meta';
 		const keep = [];
@@ -5568,7 +5586,9 @@ function evalTerm(t, mon, kw, outputLocale) {
 	// "can evolve now" are answered only for a mon that carries the field
 	// (`moves`, `candyKm`, `flags.canEvolve`); otherwise they stay unknown, as
 	// before, so the verify panel never turns "can't tell" into a confident no.
-	if (t.startsWith('@') && Array.isArray(mon.moves)) {
+	// Not the slot forms (`@1mudshot`, `@3move`) or a move type (`@ground`): those
+	// mean something else in the game and stay unknown here.
+	if (t.startsWith('@') && Array.isArray(mon.moves) && !/^@\d/.test(t) && !typeKeyFromKeyword(t.slice(1), outputLocale)) {
 		const want = t.slice(1).toLowerCase();
 		return mon.moves.some((mv) => String(mv).toLowerCase() === want);
 	}
@@ -6159,6 +6179,13 @@ export default function App() {
 	const [onboarded, setOnboarded] = useState(false);
 	const [showSetTheory, setShowSetTheory] = useState(false);
 	const [showHiddenPiles, setShowHiddenPiles] = useState(false);
+	// A 5-minute tick, so "right now" and the Mega planner notice an event that
+	// starts or ends while the tab (or the installed app) stays open.
+	const [clockTick, setClockTick] = useState(0);
+	useEffect(() => {
+		const id = setInterval(() => setClockTick((n) => n + 1), 5 * 60 * 1000);
+		return () => clearInterval(id);
+	}, []);
 	const [showAuxTrades, setShowAuxTrades] = useState(false);
 	const [showFriendWishlist, setShowFriendWishlist] = useState(false);
 	// Friend lucky wishlist: restrict to old catches guaranteed Lucky on trade.
@@ -6952,6 +6979,13 @@ export default function App() {
 		{ n: 3, key: 'have', label: t('app.step.have.label'), desc: t('app.step.have.desc') },
 		{ n: 4, key: 'filter', label: t('app.step.filter.label'), desc: t('app.step.filter.desc') },
 	];
+	// On the filter step the hash always names the area (and the settings flip),
+	// so back and forward restore the tab even when the workshop was entered on
+	// #workshop or #workshop/filter.
+	useEffect(() => {
+		if (view !== 'workshop' || currentStep !== STEP_NUMBER_BY_KEY.filter || areaFromHash()) return;
+		if (typeof window !== 'undefined') window.history.replaceState(null, '', areaHash(filterArea, areaSettings));
+	}, [view, currentStep, filterArea, areaSettings]);
 	function goToArea(area, settings) {
 		setFilterArea(area);
 		setAreaSettings(settings);
@@ -6986,7 +7020,7 @@ export default function App() {
 			homeLocation={homeLocation}
 			setHomeLocation={setHomeLocation}
 			homeLocals={homeLocals}
-			tradeTagName={config.basarTagName || 'Trade'}
+			tradeTagName={config.basarTagName || 'Tradebait'}
 		/>
 	);
 	const haveListSettings = (
@@ -7053,18 +7087,22 @@ export default function App() {
 	// to a "right now" block; the rest stay in "piles", minus the hidden ones.
 	const floats = useMemo(
 		() => floatingPiles({ events: EVENTS.events, signals: EVENTS.signals, eventMaxBattles: RAID_BOSSES.eventMaxBattles }),
-		[],
+		[clockTick],
 	);
 	const floatIds = new Set(floats.map((f) => f.pile));
 	const hiddenIds = new Set(effectiveConfig.hiddenPiles || []);
 	const hiddenPileList = [hundoPile, ...sortingPiles].filter((p) => p && !floatIds.has(p.id) && hiddenIds.has(p.id));
-	const toggleHiddenPile = (id) =>
+	const toggleHiddenPile = (id) => {
 		setConfig((prev) => {
 			const now = new Set(prev.hiddenPiles || []);
 			if (now.has(id)) now.delete(id);
 			else now.add(id);
 			return { ...prev, hiddenPiles: [...now] };
 		});
+		// The hidden card is gone from under the keyboard; hand focus to the
+		// "N hidden" toggle instead of letting it fall back to <body>.
+		requestAnimationFrame(() => document.getElementById('hidden-piles-toggle')?.focus());
+	};
 	// Sorting, top to bottom: what's going on right now (each running or
 	// just-ended event as its own pile, plus the piles an event floats up),
 	// then every other pile as a card, grouped, then the Crush strip.
@@ -7145,6 +7183,7 @@ export default function App() {
 				<div className='space-y-2'>
 					<button
 						type='button'
+						id='hidden-piles-toggle'
 						onClick={() => setShowHiddenPiles((v) => !v)}
 						aria-expanded={showHiddenPiles}
 						className='mono text-xs text-[#5EAFC5] hover:text-[#E6EDF3] min-h-[32px]'
@@ -7162,7 +7201,7 @@ export default function App() {
 			megaPlans({ events: EVENTS.events, eventRaids: RAID_BOSSES.eventRaids }, Date.now(), (n) => resolveSpeciesInfo(n)?.dex)
 				.map((p) => ({ ...p, boost: megaBoostFor(p.spawnForms) }))
 				.filter((p) => p.boost.groups.length > 0),
-		[megaBoostFor],
+		[megaBoostFor, clockTick],
 	);
 	const jobTagSettings = (
 		<JobTagsPanel config={config} setConfig={setConfig} copied={copied} copyToClipboard={copyToClipboard} t={t} />
@@ -9829,12 +9868,26 @@ function XxlCalculator({ threshold, t }) {
 	const [weight, setWeight] = useState('');
 	const [ivs, setIvs] = useState(['', '', '']);
 	const [xxl, setXxl] = useState(true);
+	const [form, setForm] = useState('');
 	const dex = resolveSpeciesInfo(species)?.dex;
-	const result = dex
+	// Forms with their own mean size (from the game master); the picker shows
+	// only for those species. Regional forms use the app's region words.
+	const forms = Object.keys(SPECIES_META.showcase?.sizeByForm?.[dex] || {});
+	const formLabel = (suffix) => {
+		const region = { ALOLA: 'alola', GALARIAN: 'galar', HISUIAN: 'hisui', PALDEA: 'paldea' }[suffix.split('_')[0]];
+		if (region) return t(`app.buddy_targets.form_region.${region}`);
+		if (suffix === 'NORMAL') return t('app.xxl.form_normal');
+		return suffix.toLowerCase().replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
+	};
+	const activeForm = forms.includes(form) ? form : null;
+	// A species whose forms differ in size is only scored once a form is picked.
+	const needsForm = forms.length > 0 && !activeForm;
+	const result = dex && !needsForm
 		? showcaseScoreRange({
 				dex,
-				heightM: Number.parseFloat(height),
-				weightKg: Number.parseFloat(weight),
+				form: activeForm,
+				heightM: Number.parseFloat(height.replace(',', '.')),
+				weightKg: Number.parseFloat(weight.replace(',', '.')),
 				// All three filled → exact IV part; otherwise unknown, and the range widens.
 				ivs: ivs.every((v) => v !== '') ? ivs.map(Number) : null,
 				xxl,
@@ -9856,13 +9909,26 @@ function XxlCalculator({ threshold, t }) {
 					{t('app.xxl.species')}
 					<SpeciesInput value={species} onChange={setSpecies} onSubmit={() => {}} aria-label={t('app.xxl.species')} className={field} />
 				</label>
+				{forms.length > 0 && (
+					<label htmlFor={`${fid}-form`} className='col-span-2 mono text-[11px] text-[#8090A0] flex flex-col gap-1'>
+						{t('app.xxl.form')}
+						<select id={`${fid}-form`} value={activeForm || ''} onChange={(e) => setForm(e.target.value)} className={field}>
+							<option value=''>{t('app.xxl.form_pick')}</option>
+							{forms.map((f) => (
+								<option key={f} value={f}>
+									{formLabel(f)}
+								</option>
+							))}
+						</select>
+					</label>
+				)}
 				<label htmlFor={`${fid}-h`} className='mono text-[11px] text-[#8090A0] flex flex-col gap-1'>
 					{t('app.xxl.height')}
-					<input id={`${fid}-h`} type='number' inputMode='decimal' step='0.01' min='0' value={height} onChange={(e) => setHeight(e.target.value)} className={field} />
+					<input id={`${fid}-h`} type='text' inputMode='decimal' autoComplete='off' value={height} onChange={(e) => setHeight(e.target.value)} className={field} />
 				</label>
 				<label htmlFor={`${fid}-w`} className='mono text-[11px] text-[#8090A0] flex flex-col gap-1'>
 					{t('app.xxl.weight')}
-					<input id={`${fid}-w`} type='number' inputMode='decimal' step='0.01' min='0' value={weight} onChange={(e) => setWeight(e.target.value)} className={field} />
+					<input id={`${fid}-w`} type='text' inputMode='decimal' autoComplete='off' value={weight} onChange={(e) => setWeight(e.target.value)} className={field} />
 				</label>
 				<details className='col-span-2'>
 					<summary className='list-none cursor-pointer mono text-[11px] text-[#5EAFC5] hover:text-[#E6EDF3] min-h-[32px] flex items-center'>
@@ -9891,7 +9957,9 @@ function XxlCalculator({ threshold, t }) {
 				</label>
 			</div>
 			<div aria-live='polite' className='mono text-xs leading-relaxed'>
-				{!dex || !result ? (
+				{dex && needsForm ? (
+					<p className='text-[#F5B82E]'>{t('app.xxl.pick_form')}</p>
+				) : !dex || !result ? (
 					<p className='text-[#8090A0]'>{t('app.xxl.empty')}</p>
 				) : !result.fits ? (
 					<p className='text-[#F5B82E]'>{t('app.xxl.no_fit')}</p>
@@ -13199,6 +13267,30 @@ function ChangelogModal({ open, onClose }) {
 	);
 }
 
+// A text or number field that keeps what the user types and commits on blur
+// or Enter, so clearing it to retype doesn't snap the stored value back to its
+// default mid-edit ("6" → clear → "6" → "64").
+// Callers always name it; the label is a named prop so it lands on the input.
+function DraftInput({ value, onCommit, 'aria-label': ariaLabel, ...props }) {
+	const [draft, setDraft] = useState(String(value ?? ''));
+	useEffect(() => setDraft(String(value ?? '')), [value]);
+	const commit = () => {
+		if (draft !== String(value ?? '')) onCommit(draft);
+	};
+	return (
+		<input
+			{...props}
+			aria-label={ariaLabel}
+			value={draft}
+			onChange={(e) => setDraft(e.target.value)}
+			onBlur={commit}
+			onKeyDown={(e) => {
+				if (e.key === 'Enter') e.currentTarget.blur();
+			}}
+		/>
+	);
+}
+
 // The tagging scheme (spec: "Tagging scheme"): one row per job with its tag,
 // renamable, a #tag search to copy, and a warning when the name is a search
 // keyword in the game language or prefix-matches another job's tag.
@@ -13208,9 +13300,10 @@ function JobTagsPanel({ config, setConfig, copied, copyToClipboard, t }) {
 	const buddyPrefixes = (config.buddies || []).filter((b) => b.active !== false && b.tagPrefix).map((b) => b.tagPrefix);
 	const allTags = [...JOB_TAG_ORDER.filter((j) => j !== 'promised').map((j) => tags[j]), ...buddyPrefixes, config.fernTauschTagName].filter(Boolean);
 	const rename = (job, raw) => {
-		const v = raw.replace(/^#+/, '');
+		const v = raw.trim().replace(/^#+/, '');
 		setConfig((prev) => {
-			if (job === 'trade') return { ...prev, basarTagName: v };
+			// Tradebait can't be blank: every trade filter keys off it.
+			if (job === 'trade') return v ? { ...prev, basarTagName: v } : prev;
 			const next = { ...(prev.jobTags || {}) };
 			if (!v.trim() || v === JOB_TAG_DEFAULTS[job]) delete next[job];
 			else next[job] = v;
@@ -13256,10 +13349,10 @@ function JobTagsPanel({ config, setConfig, copied, copyToClipboard, t }) {
 							<div className='flex flex-wrap items-center gap-2 mt-1.5'>
 								<label className='mono text-[11px] text-[#8090A0] flex items-center gap-1'>
 									<span aria-hidden='true'>#</span>
-									<input
+									<DraftInput
 										type='text'
 										value={tag}
-										onChange={(e) => rename(job, e.target.value)}
+										onCommit={(v) => rename(job, v)}
 										aria-label={`${label}: ${t('app.tags.name')}`}
 										className='mono text-sm w-40 min-h-[32px] bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 rounded-sm text-[#E6EDF3]'
 									/>
@@ -13293,10 +13386,10 @@ function JobTagsPanel({ config, setConfig, copied, copyToClipboard, t }) {
 						<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.tags.frustration.hint')}</p>
 						<label className='mono text-[11px] text-[#8090A0] flex items-center gap-1 mt-1.5'>
 							<span aria-hidden='true'>#</span>
-							<input
+							<DraftInput
 								type='text'
 								value={config.removeFrustrationTagName || ''}
-								onChange={(e) => setConfig((prev) => ({ ...prev, removeFrustrationTagName: e.target.value.replace(/^#+/, '') }))}
+								onCommit={(v) => setConfig((prev) => ({ ...prev, removeFrustrationTagName: v.trim().replace(/^#+/, '') }))}
 								placeholder={t('app.modal.tags.frustration_placeholder')}
 								aria-label={`${t('app.tags.frustration.label')}: ${t('app.tags.name')}`}
 								className='mono text-sm w-40 min-h-[32px] bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 rounded-sm text-[#E6EDF3]'
@@ -13338,13 +13431,13 @@ function BudgetsEditor({ config, setConfig, t }) {
 				const k = m[1];
 				if (!expert) return <strong key={i} className='text-[#E6EDF3]'>{b[k]}</strong>;
 				return (
-					<input
+					<DraftInput
 						key={i}
 						type='number'
 						min={0}
 						step={k === 'xxlScore' ? 10 : 1}
 						value={b[k]}
-						onChange={(e) => setBudget(k, e.target.value)}
+						onCommit={(v) => setBudget(k, v)}
 						aria-label={`${label}: ${t(`app.budget.word.${BUDGET_KEY_WORD[k]}`)}`}
 						className={`mono text-sm min-h-[28px] px-1 mx-0.5 rounded-sm bg-[#1F2933] border text-[#E6EDF3] focus:border-[#5EAFC5] outline-hidden ${
 							k === 'xxlScore' ? 'w-20' : 'w-12'

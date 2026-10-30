@@ -1652,5 +1652,9 @@
   "app.budget.dyna_builds.why": "培養資源很稀少。",
   "app.budget.dyna_parkers.why": "同時約 30 隻，加上備用。個體值不重要。",
   "app.budget.cheap_purify.why": "入侵期間的調查會要求淨化。",
-  "app.budget.tradebait.why": "這些都不能（再）交換。"
+  "app.budget.tradebait.why": "這些都不能（再）交換。",
+  "app.xxl.form": "形態",
+  "app.xxl.form_pick": "選擇形態",
+  "app.xxl.form_normal": "一般",
+  "app.xxl.pick_form": "這種寶可夢有不同體型的形態：請先選擇形態。"
 }

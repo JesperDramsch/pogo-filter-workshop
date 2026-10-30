@@ -116,6 +116,7 @@ import {
   pokemonTemplates,
   releasedDexFromPvpoke,
   tempEvoOverridesByDex,
+  formSuffix,
   defaultFormByDex,
   templateNode,
   templateList,
@@ -284,13 +285,32 @@ export function showcaseFromGameMaster(templates) {
     if (!(h > 0 && w > 0) || sizeByDex[t.dex]) continue;
     sizeByDex[t.dex] = [h, w];
   }
+  // Forms whose mean size differs from the default's (Pumpkaboo's four sizes,
+  // Alolan Marowak, Galarian Stunfisk…), keyed by the form's suffix. Costume
+  // forms share the default's size and drop out by that test.
+  const sizeByForm = {};
+  for (const t of pokemonTemplates(templates)) {
+    const base = sizeByDex[t.dex];
+    const suffix = formSuffix(t);
+    if (!base || !suffix || t.form === defaults.get(t.dex)) continue;
+    const { pokedexHeightM: h, pokedexWeightKg: w } = t.settings;
+    if (!(h > 0 && w > 0) || (h === base[0] && w === base[1])) continue;
+    (sizeByForm[t.dex] ||= {})[suffix] = [h, w];
+  }
+  // A species with form sizes also lists its default form, so a picker can
+  // offer every form by name (Pumpkaboo's default is SMALL, not AVERAGE).
+  for (const t of pokemonTemplates(templates)) {
+    if (!sizeByForm[t.dex] || t.form !== defaults.get(t.dex)) continue;
+    const suffix = formSuffix(t);
+    if (suffix && !sizeByForm[t.dex][suffix]) sizeByForm[t.dex][suffix] = sizeByDex[t.dex];
+  }
   let coefficients = null;
   for (const entry of templateList(templates)) {
     const node = templateNode(entry);
     const c = node?.contestSettings?.contestScoreCoefficient?.find((x) => x?.pokemonSize)?.pokemonSize;
     if (c) coefficients = { height: c.heightCoefficient, weight: c.weightCoefficient, iv: c.ivCoefficient, xxlAdjustmentFactor: c.xxlAdjustmentFactor ?? null };
   }
-  return { coefficients, sizeByDex };
+  return { coefficients, sizeByDex, sizeByForm };
 }
 
 // Best base stat product per dex, across every form template. "Best" rather
@@ -460,6 +480,8 @@ async function main() {
     `showcase sizes for ${Object.keys(newContent.showcase.sizeByDex).length} species (expected ≥ 900)`);
   assertOrDie(newContent.showcase.sizeByDex[7]?.[0] === 0.5 && newContent.showcase.sizeByDex[7]?.[1] === 9,
     "Squirtle's mean size is 0.5 m / 9 kg (the Hub's worked example)");
+  assertOrDie(Object.keys(newContent.showcase.sizeByForm[710] || {}).length >= 3,
+    "Pumpkaboo's size forms have their own mean sizes");
   assertOrDie(newContent.specialTradeDex.includes(150), "Mewtwo (150) ∈ specialTradeDex");
   assertOrDie(newContent.specialTradeDex.includes(151), "Mew (151) ∈ specialTradeDex");
   assertOrDie(newContent.specialTradeDex.includes(793), "Nihilego (793, Ultra Beast) ∈ specialTradeDex");

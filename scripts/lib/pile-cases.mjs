@@ -44,6 +44,7 @@ export function pileCases(cfg) {
       ["plain dupe", {}],
       ["0/0/1, not a nundo", { ivAtk: 0, ivDef: 0, ivHp: 1 }],
       [`caught ${floorYear}, traded`, { year: floorYear, flags: { traded: true } }],
+      [`caught ${floorYear + 1}, untraded (just past the floor)`, { year: floorYear + 1 }],
       ["fresh Dynamax", { dynaAtk: 1, flags: { dynamaxCapable: true } }],
       ["level-1 buddy", { buddyLevel: 1, flags: { buddy: true } }],
       ["shiny", { flags: { shiny: true } }],

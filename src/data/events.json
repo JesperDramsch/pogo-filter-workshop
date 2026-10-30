@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-29T19:03:56.406Z",
+  "fetchedAt": "2026-10-30T00:38:43.091Z",
   "events": [
     {
       "id": "event-minior-showers-orionids-2026-2026-10-19t17-00-00",
@@ -610,5 +610,13 @@
       "unresolved": []
     }
   ],
-  "signals": []
+  "signals": [
+    {
+      "id": "max|max-mondays-dynamax-machop-during-max-monday-2026-11-02t06-00-00",
+      "kind": "max",
+      "title": "Dynamax Machop during Max Monday",
+      "start": "2026-11-02T06:00:00",
+      "end": "2026-11-02T21:00:00"
+    }
+  ]
 }

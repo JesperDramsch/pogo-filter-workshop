@@ -24,7 +24,7 @@
 // Run with: npx vite-node scripts/check-piles.mjs
 
 import {
-  BUDGET_DEFAULTS, BUDGET_ROWS, FLOAT_ENDED_DAYS, floatingPiles, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET,
+  BUDGET_DEFAULTS, BUDGET_ROWS, evalFilterDetailed as evalDetailed, FLOAT_ENDED_DAYS, floatingPiles, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET,
 } from "../src/App.jsx";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import COMMUNITY_DAYS from "../src/data/community-days.json";
@@ -273,6 +273,9 @@ for (const fam of PILE_FAMILIES) {
         if (v.verdict !== false) bad.push(`${where}.${k} matched a Pokémon outside the pile: ${v.verdict}${note(v)}`);
       }
       // P6
+      for (const key of Object.keys(cases)) {
+        if (!pile.keep.some((l) => l.key === key)) bad.push(`${where}: the ${key} lens is gone but its oracle is not`);
+      }
       for (const lens of pile.keep) {
         const c = cases[lens.key];
         const chain = lens.filter.slice(head.length + 1).split("&").length;
@@ -389,7 +392,7 @@ console.log("\nShowcase score (XXL calculator)");
     c?.height === 800 && c?.weight === 150 && c?.iv === 50, JSON.stringify(c));
   // Squirtle, mean 0.5 m / 9 kg: the biggest 1.55-class XXL with a perfect appraisal.
   const top = showcaseScoreRange({ dex: 7, heightM: 0.775, weightKg: 18.45, ivs: [15, 15, 15] });
-  check("a maximal XXL's range contains the single-species maximum of 1,178", top?.fits && top.min <= 1178 && top.max >= 1178 && top.max <= 1190, JSON.stringify(top));
+  check("a maximal XXL's range tops out at exactly the single-species maximum of 1,178", top?.fits && top.min <= 1178 && top.max === 1178, JSON.stringify(top));
   const plain = showcaseScoreRange({ dex: 7, heightM: 0.775, weightKg: 18.45, ivs: [15, 15, 15], xxl: false });
   check(`the XXL bonus is ${SHOWCASE_XXL_BONUS}, both ends`, top.min - plain.min === SHOWCASE_XXL_BONUS && top.max - plain.max === SHOWCASE_XXL_BONUS);
   // Within the same classes, taller scores higher. (Across a class boundary the
@@ -458,6 +461,58 @@ console.log("\nwatch-moves.json is never rebuilt from a refused game master");
   const hollow = watchMovesFrom(GM_WATCH.history, learnersOf([], GM_WATCH.history.flatMap((h) => h.changes.map((c) => c.move))));
   const lost = WATCH_MOVES.moves.filter((m) => m.change === "changed" && !hollow.some((x) => x.move === m.move && x.at === m.at));
   check(`a refused dump would have cost ${lost.length} signature move(s)`, lost.length > 0, lost.map((m) => m.move).join(", "));
+}
+
+console.log("\nDeep-review regressions");
+{
+  // 1. A capless league (a Master League cup) gets no PvP keeper lens; every
+  //    capped one carries its CP cap and the loose IV pattern.
+  const realNow = Date.now;
+  Date.now = () => Date.parse("2026-11-05T12:00:00Z");
+  let lenses;
+  try {
+    lenses = buildFilters(HUNDOS, LUCKIES, CFG, [], "en", makeTFn("en")).sortingPiles.find((p) => p.id === "meta").keep;
+  } finally { Date.now = realNow; }
+  const kwEn = pogoKeywords("en");
+  const pvpLenses = lenses.filter((l) => l.key.startsWith("pvp_"));
+  check("no keeper lens for a capless cup (mega-10000 is active on 2026-11-05)", !pvpLenses.some((l) => l.key === "pvp_cup_mega-10000"), pvpLenses.map((l) => l.key).join(", "));
+  check("every PvP lens carries a CP cap and the IV pattern",
+    pvpLenses.length > 1 && pvpLenses.every((l) => l.filter.includes(`${kwEn.numeric.cp}-`) && l.filter.includes(`0-1${kwEn.iv.atk}`)), pvpLenses.map((l) => l.key).join(", "));
+
+  // 2. A PvE-stream move id resolves to its learners.
+  const tpl = (dex, id, moves) => ({ templateId: `V${String(dex).padStart(4, "0")}_POKEMON_${id}`, data: { templateId: `V${String(dex).padStart(4, "0")}_POKEMON_${id}`, pokemonSettings: { pokemonId: id, cinematicMoves: moves } } });
+  const learned = learnersOf([tpl(386, "DEOXYS", ["PSYCHO_BOOST"])], ["V0288_MOVE_PSYCHO_BOOST"]);
+  check("a PvE move id (V0288_MOVE_PSYCHO_BOOST) finds its learners", JSON.stringify(learned.V0288_MOVE_PSYCHO_BOOST) === "[386]", JSON.stringify(learned));
+
+  // 4. A Max Monday floats Dynamax for days after it ends.
+  const maxFeed = { "Max Mondays": [{ title: "Dynamax Machop during Max Monday", start_time: "2026-11-02T06:00:00", end_time: "2026-11-02T21:00:00", details: {} }] };
+  const maxSignal = signalsFromFeed(maxFeed);
+  check("the feed's Max Monday becomes a max signal", maxSignal.length === 1 && maxSignal[0].kind === "max");
+  check("Dynamax still floats two days after the Max Monday",
+    floatingPiles({ signals: maxSignal }, Date.parse("2026-11-04T20:00:00")).some((f) => f.pile === "dynamax"));
+
+  // 3. Form sizes: an average-size Pumpkaboo XXL fits once its form is picked.
+  const avgPumpkaboo = { dex: 710, heightM: 0.75, weightKg: 10, ivs: [10, 10, 10] };
+  check("an average Pumpkaboo XXL (0.75 m) fits as AVERAGE, not against the SMALL default",
+    showcaseScoreRange({ ...avgPumpkaboo, form: "AVERAGE" })?.fits === true && showcaseScoreRange(avgPumpkaboo)?.fits === false);
+  check("Alolan Marowak is scored against its own mean weight",
+    showcaseScoreRange({ dex: 105, form: "ALOLA", heightM: 1.8, weightKg: 60, ivs: [15, 15, 15] }).max >
+    showcaseScoreRange({ dex: 105, heightM: 1.8, weightKg: 60, ivs: [15, 15, 15] }).max);
+
+  // Card class follows the pile: a trimmed raid roster stops reading as meta.
+  const trimmed = { ...CFG, topAttackers: DEFAULT_TOP_ATTACKERS.slice(0, 10) };
+  const dropped = resolveSpeciesInfo(DEFAULT_TOP_ATTACKERS[60])?.dex;
+  const tr = buildFilters(HUNDOS, LUCKIES, trimmed, [], "en", makeTFn("en"));
+  const rows = tr.sortingPiles.flatMap((p) => p.card?.rows || []).concat(tr.eventFilters.flatMap((ev) => ev.pile?.card?.rows || []));
+  const metaRows = new Set(tr.sortingPiles.find((p) => p.id === "meta").card.rows.map((r) => r.dex));
+  check("after trimming the roster, no card calls a species meta unless the meta pile holds it",
+    rows.every((r) => r.cls !== "meta" || metaRows.has(r.dex)) && !rows.some((r) => r.dex === dropped && r.cls === "meta" && !metaRows.has(dropped)));
+
+  // The generic @move branch leaves slot forms and move types unknown.
+  const withMoves = pileMon("en", { moves: ["frustration"] });
+  check("@1mudshot and @ground stay unknown on a Pokémon with moves; a named move answers",
+    evalDetailed("@1mudshot", withMoves, "en").verdict === null && evalDetailed("@ground", withMoves, "en").verdict === null &&
+    evalDetailed("@frustration", withMoves, "en").verdict === true);
 }
 
 console.log("\nCommunity Day data (scripts/lib/community-days.mjs → src/data/community-days.json)");

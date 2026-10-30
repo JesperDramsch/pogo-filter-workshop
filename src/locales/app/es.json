@@ -1652,5 +1652,9 @@
   "app.budget.dyna_builds.why": "Los recursos para montarlos escasean.",
   "app.budget.dyna_parkers.why": "Unos 30 a la vez, más reserva. Los IV no importan.",
   "app.budget.cheap_purify.why": "Las investigaciones de invasión piden purificaciones.",
-  "app.budget.tradebait.why": "Ninguno se puede intercambiar (de nuevo)."
+  "app.budget.tradebait.why": "Ninguno se puede intercambiar (de nuevo).",
+  "app.xxl.form": "forma",
+  "app.xxl.form_pick": "elige una forma",
+  "app.xxl.form_normal": "normal",
+  "app.xxl.pick_form": "Esta especie tiene formas de distinto tamaño: elige primero la forma."
 }

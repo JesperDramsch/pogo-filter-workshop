@@ -1652,5 +1652,9 @@
   "app.budget.dyna_builds.why": "育成の資源は貴重。",
   "app.budget.dyna_parkers.why": "同時に約30匹、予備込み。個体値は関係ない。",
   "app.budget.cheap_purify.why": "テイクオーバーのリサーチでリトレーンを求められる。",
-  "app.budget.tradebait.why": "どれも（再）交換できない。"
+  "app.budget.tradebait.why": "どれも（再）交換できない。",
+  "app.xxl.form": "フォーム",
+  "app.xxl.form_pick": "フォームを選ぶ",
+  "app.xxl.form_normal": "ノーマル",
+  "app.xxl.pick_form": "この種族はサイズの違うフォームがある。先にフォームを選ぼう。"
 }

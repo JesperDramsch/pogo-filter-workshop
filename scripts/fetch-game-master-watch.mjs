@@ -213,7 +213,10 @@ export function learnersOf(templates, moveIds, pvpokePokemon = []) {
   }
   const out = {};
   for (const id of [...new Set(moveIds)].sort()) {
-    const dex = new Set([...(byMove.get(id) || []), ...(byMove.get(`${id}_FAST`) || [])]);
+    // The PvE stream names a move by its template id (V0288_MOVE_PSYCHO_BOOST);
+    // movepools use the bare name.
+    const name = id.replace(/^V\d{4}_MOVE_/, "");
+    const dex = new Set([...(byMove.get(name) || []), ...(byMove.get(`${name}_FAST`) || [])]);
     const temp = /^VM_MOVE_TEMP_EVOLUTION_\w+?_V(\d{4})_POKEMON_/.exec(id);
     if (temp) dex.add(Number(temp[1]));
     if (dex.size > 0) out[id] = [...dex].sort((a, b) => a - b);

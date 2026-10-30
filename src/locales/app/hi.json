@@ -1652,5 +1652,9 @@
   "app.budget.dyna_builds.why": "बिल्ड के संसाधन कम हैं।",
   "app.budget.dyna_parkers.why": "एक साथ लगभग 30, साथ में रिज़र्व। IV मायने नहीं रखते।",
   "app.budget.cheap_purify.why": "take-over रिसर्च शुद्ध करने को कहती है।",
-  "app.budget.tradebait.why": "इनमें से कोई (दोबारा) ट्रेड नहीं हो सकता।"
+  "app.budget.tradebait.why": "इनमें से कोई (दोबारा) ट्रेड नहीं हो सकता।",
+  "app.xxl.form": "रूप",
+  "app.xxl.form_pick": "रूप चुनें",
+  "app.xxl.form_normal": "सामान्य",
+  "app.xxl.pick_form": "इस प्रजाति के अलग-अलग आकार के रूप हैं: पहले रूप चुनें।"
 }

@@ -1652,5 +1652,9 @@
   "app.budget.dyna_builds.why": "Les ressources pour monter sont rares.",
   "app.budget.dyna_parkers.why": "Environ 30 en même temps, plus une réserve. Les IV ne comptent pas.",
   "app.budget.cheap_purify.why": "Les études des invasions demandent des purifications.",
-  "app.budget.tradebait.why": "Aucun ne peut être échangé (de nouveau)."
+  "app.budget.tradebait.why": "Aucun ne peut être échangé (de nouveau).",
+  "app.xxl.form": "forme",
+  "app.xxl.form_pick": "choisis une forme",
+  "app.xxl.form_normal": "normale",
+  "app.xxl.pick_form": "Cette espèce existe en formes de tailles différentes : choisis d'abord la forme."
 }

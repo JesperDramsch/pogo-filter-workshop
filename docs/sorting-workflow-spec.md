@@ -73,7 +73,7 @@ The range-negation forms are deliberate: `!dynawall1-` matches a Pokémon with n
 
 Shown in step ②. Per species in the pile:
 
-- **Class:** meta, watchlist or non-meta, with the reason in words ("top 6 Fire raid attacker", "shadow keeper", "Great League rank 12", "Mega datamined").
+- **Class:** meta, watchlist or non-meta, with the reason in words ("top 7 Fire raid attacker", "shadow keeper", "Great League rank 12", "Mega datamined").
 - **Keep:** the budget per job for that species ("keep up to 6 for raids, 1 normal and 1 shadow for Great League, best 1 until a hundo").
 - **Why:** one line explaining the number.
 
@@ -140,7 +140,7 @@ All numbers are editable in expert mode. Simple mode uses these defaults.
 
 Per the rule in `CLAUDE.md`, every list is derived from data, never written by hand.
 
-- **Meta:** `src/data/meta-rankings.json` (`topAttackers`, top 6 per type; `shadowKeepers`, top 7 per type; `topMaxAttackers`) and `src/data/pvp-rankings.json` (Great League and active cups, top 30).
+- **Meta:** `src/data/meta-rankings.json` (`topAttackers`, top 7 per type; `shadowKeepers`, top 7 per type; `topMaxAttackers`, the same top-7 cut over Dynamax-capable species) and `src/data/pvp-rankings.json` (Great League and active cups, top 30).
 - **Watchlist**, in priority order:
   1. Species with an announced or datamined Mega, including Megas that come with a plus move.
   2. Species that gained a new or changed move (`src/data/game-master-watch.json` history).

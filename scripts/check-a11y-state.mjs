@@ -145,6 +145,7 @@ console.log("\nS5 — the filter areas are an ARIA tab set");
   check("roving tabindex: only the selected tab is tabbable", /tabIndex=\{selected \? 0 : -1\}/.test(tabs));
   for (const key of ["ArrowRight", "ArrowLeft", "Home", "End"])
     check(`${key} moves between tabs`, tabs.includes(`'${key}'`));
+  check("each tab's onKeyDown is wired to the arrow-key handler", /role='tab'[\s\S]{0,600}onKeyDown=\{\(e\) => move\(e, i\)\}/.test(tabs));
   check("panels are labelled by their tab", /role='tabpanel'[\s\S]{0,120}aria-labelledby=\{`area-tab-\$\{area\}`\}/.test(panel));
   check("inactive panels are hidden, not unmounted", /hidden=\{area !== current\}/.test(panel));
   const areas = (app.match(/export const FILTER_AREAS = \[([^\]]*)\]/) || [])[1]?.match(/'(\w+)'/g)?.map((x) => x.slice(1, -1)) || [];
