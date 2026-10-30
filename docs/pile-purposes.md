@@ -27,7 +27,8 @@ then `3-4` is fine (best first, then wider), but `3-4` then `4*` would be cut.
 | Pile | The question | ① keep, top to bottom |
 |---|---|---|
 | Event | What's worth keeping from this event? | 4\* → 3-4 → 3\* |
-| Costumes | Too many hats: which ones stay? | 4\* → 3-4 → 3\* |
+| Costumes that evolve (`costume&evolve`) | Which hats to keep for the whole line? | 4\* → 3-4 → 3\*, one per stage of the line (costume budget: 1 per stage), plus up to 3 untraded ones to trade |
+| Costumes that don't (`costume&!evolve`) | Which hats to keep? | 4\* → 3-4 → 3\*, just one, plus up to 3 untraded ones to trade |
 | CD backgrounds | Which background ones stay (3 per species)? | 4\* → 3-4 → 3\* |
 | XXL | Which one goes to a showcase? | showcase verdict → still to evolve → 4\*,3\* |
 | XXS | Which tiny ones still matter? | still to evolve → 4\*,3\* |
