@@ -52,6 +52,7 @@
   "test:speciessuggest": "vite-node scripts/check-species-suggest.mjs",
   "test:syncsummary": "vite-node scripts/check-sync-summary.mjs",
   "test:megaboost": "vite-node scripts/check-mega-boost.mjs",
+  "test:swipe": "vite-node scripts/check-swipe-areas.mjs",
   "fixtures:update": "vite-node scripts/generate-fixtures.mjs",
   "preview": "vite preview",
   "deploy": "npm run build && gh-pages -d dist"
