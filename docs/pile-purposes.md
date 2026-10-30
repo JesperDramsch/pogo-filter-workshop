@@ -50,14 +50,10 @@ These stay as filters you copy, not keep steps:
 - **Shadows:** cheap purify (`candykm1`, not meta), and the Frustration TM on meta shadows.
 - **Ready to evolve:** cheap XP evolves, and mega-evolve as its own tile.
 
-Candidates for more, from the game's own search keywords. I can't test what
-they match from here, so each one needs a check in the game first:
-- `tradeevolve`: species that evolve for free after a trade. These go beside
-  Received trades and Ready to evolve: trade them first.
-- `raid`: caught in a raid. This would let the Legendaries pile split raid
-  catches from research ones.
-- `duplicate`: species you hold more than one of. If it does what the name
-  says, it could make every pile skip species you only have once.
+One candidate for more. It's in the game's keyword list, but I can't test
+what it matches from here, so check it in the game first:
+- `tradeevolve`: species that evolve for free after a trade. It would go
+  beside Received trades and Ready to evolve: trade them first.
 
 ## Settled
 
@@ -66,6 +62,8 @@ they match from here, so each one needs a check in the game first:
   term is the same `shadow&evolve` as "still to evolve", so the step keeps
   2 of them instead of 1.
 - **4\* then 3-4:** two steps, so the hundos turn up first.
+- **Legendaries:** where one came from doesn't matter (raid, research,
+  GBL). The pile keeps the good ones up to the budget.
 
 ## Not covered here
 
