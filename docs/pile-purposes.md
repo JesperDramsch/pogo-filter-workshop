@@ -19,8 +19,9 @@ the ① keep steps. Read the steps top to bottom and stop once you have enough.
 A row only names a count when it differs. Each count is a budget, so you can
 change it.
 
-Shiny, costume and background are left out of every ladder: the protection
-tail already keeps them out of ③.
+Correction: the protection tail does **not** keep plain shinies, costumes or
+backgrounds out of ③. It only protects shiny legendaries and legendaries with
+a background. A shiny that isn't favourited or tagged shows up in ③.
 
 Rule: a step must be able to find something no earlier step found. A
 narrower copy of an earlier step gets cut. `4*` sits inside `3-4`, so `4*`
