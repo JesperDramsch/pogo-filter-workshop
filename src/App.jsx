@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, useId, Fragment } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useId, Fragment, createContext, useContext } from 'react';
 import { Dialog } from './Dialog.jsx';
 import * as d3 from 'd3';
 import {
@@ -14,6 +14,35 @@ import {
 	ArrowLeft,
 	Download,
 	Upload,
+	Award,
+	Clover,
+	Gift,
+	Shirt,
+	Image,
+	Maximize2,
+	Minimize2,
+	Swords,
+	Telescope,
+	Flame,
+	Zap,
+	Sprout,
+	Dna,
+	Package,
+	Leaf,
+	Rocket,
+	Target,
+	Trophy,
+	ArrowLeftRight,
+	Heart,
+	Handshake,
+	Sigma,
+	List,
+	BadgeCheck,
+	Tag,
+	Egg,
+	Candy,
+	Crown,
+	Medal,
 } from 'lucide-react';
 import {
 	POKEMON_NAMES_DICT,
@@ -7124,7 +7153,7 @@ export default function App() {
 			pile={pile}
 			title={t(`app.pile.${pile.id}.title`)}
 			hook={t(`app.sort.hook.${pile.id}`)}
-			icon={PILE_ICON[pile.id] || '🗂️'}
+			icon={PILE_ICON[pile.id] || Package}
 			accent={accentOf(pile.id)}
 			text={pile.id === 'hundo' ? HUNDO_PILE_TEXT : undefined}
 			copied={copied}
@@ -7172,11 +7201,13 @@ export default function App() {
 				const tools = (group.tools || []).filter((id) => toolFilters[id]);
 				if (piles.length === 0 && tools.length === 0) return null;
 				return (
-					<section key={group.id} aria-labelledby={`sort-group-${group.id}`} className='space-y-2'>
-						<h3 id={`sort-group-${group.id}`} className='mono text-xs uppercase tracking-widest font-semibold' style={{ color: group.accent }}>
-							{t(`app.sort.group.${group.id}`)}
-						</h3>
-						<p className='mono text-[11px] text-[#8090A0] -mt-1'>{t(`app.sort.group_hint.${group.id}`)}</p>
+					<AreaGroup
+						key={group.id}
+						id={`sort-${group.id}`}
+						title={t(`app.sort.group.${group.id}`)}
+						hint={t(`app.sort.group_hint.${group.id}`)}
+						accent={group.accent}
+					>
 						{piles.map((pile) => tile(pile, { onHide: () => toggleHiddenPile(pile.id) }))}
 						{tools.map((id) => (
 							<ToolTile
@@ -7196,7 +7227,7 @@ export default function App() {
 								/>
 							</ToolTile>
 						))}
-					</section>
+					</AreaGroup>
 				);
 			})}
 			{hiddenPileList.length > 0 && (
@@ -7474,6 +7505,7 @@ export default function App() {
 											areaSettingsFor.catch
 										) : (
 											<>
+												<AreaGroup id='clean' title={t('app.group.clean')} hint={t('app.group_hint.clean')} accent='#E74C3C'>
 												<FilterBox
 													label={t('app.filter.trash_label')}
 													accent='#E74C3C'
@@ -7482,6 +7514,8 @@ export default function App() {
 													onCopy={() => copyToClipboard('trash', trash)}
 													hint={t('app.filter.trash_hint')}
 												/>
+												</AreaGroup>
+												<div className='pt-4'>
 												<MegaPlanner
 													plans={megaPlanRows}
 													copied={copied}
@@ -7490,6 +7524,7 @@ export default function App() {
 													t={t}
 													locale={locale}
 												/>
+												</div>
 											</>
 										)}
 									</AreaPanel>
@@ -7508,10 +7543,8 @@ export default function App() {
 										) : (
 											<>
 												{/* Team Rocket section — encounters & their post-fight cleanup */}
-												<div className='space-y-3 pt-4'>
-													<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-														{t('app.collapsible.aux_section_team_rocket')}
-													</h3>
+												<div className='pt-4'>
+													<AreaGroup id='rocket' title={t('app.collapsible.aux_section_team_rocket')} hint={t('app.group_hint.rocket')} accent='#E74C3C'>
 													<RocketCollapsible
 														fetchedAt={rocketLineupsFetchedAt}
 														leaders={rocketLeaders}
@@ -7526,15 +7559,15 @@ export default function App() {
 														t={t}
 														outputLocale={effectiveOutputLocale}
 													/>
+													</AreaGroup>
 												</div>
 												{/* Raids section — current bosses pulled from lily-dex-api;
 			                    run `npm run fetch-raid-bosses` to refresh the snapshot. */}
-												<div className='space-y-3 pt-4'>
-													<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-														{t('app.collapsible.aux_section_raids')}
-													</h3>
+												<div className='pt-4'>
+													<AreaGroup id='raids' title={t('app.collapsible.aux_section_raids')} hint={t('app.group_hint.raids')} accent='#F5B82E'>
 													<BossCollapsible
-														icon='⚔️'
+														icon={Target}
+														hook={t('app.hook.raids')}
 														titleKey='app.collapsible.aux_raids'
 														fetchedAt={raidBossesFetchedAt}
 														bossesByTier={raidFilters}
@@ -7572,14 +7605,13 @@ export default function App() {
 														t={t}
 														locale={locale}
 													/>
+													</AreaGroup>
 												</div>
 												{/* PvP section — top-30 meta picks per league with loose
 			                    PvP rank-1 IVs. Rankings pulled from lily-dex-api;
 			                    daily sync via .github/workflows/sync-data.yml. */}
-												<div className='space-y-3 pt-4'>
-													<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-														{t('app.collapsible.aux_section_pvp')}
-													</h3>
+												<div className='pt-4'>
+													<AreaGroup id='pvp' title={t('app.collapsible.aux_section_pvp')} hint={t('app.group_hint.pvp')} accent='#5EAFC5'>
 													<PvpCollapsible
 														fetchedAt={pvpRankingsFetchedAt}
 														leagues={pvpFilters}
@@ -7591,6 +7623,7 @@ export default function App() {
 														t={t}
 														locale={locale}
 													/>
+													</AreaGroup>
 												</div>
 											</>
 										)}
@@ -7600,6 +7633,7 @@ export default function App() {
 											areaSettingsFor.trade
 										) : (
 											<>
+												<AreaGroup id='trades' title={t('app.group.trades')} hint={t('app.group_hint.trades')} accent='#5EAFC5'>
 												<FilterBox
 													label={t('app.filter.trade_label')}
 													accent='#5EAFC5'
@@ -7608,16 +7642,9 @@ export default function App() {
 													onCopy={() => copyToClipboard('trade', trade)}
 													hint={t('app.filter.trade_hint')}
 												/>
-												{buddyCatchFilters.length > 0 && (
-													<BuddyCatchSection
-														buddyCatchFilters={buddyCatchFilters}
-														copied={copied}
-														onCopy={(key, text) => copyToClipboard(key, text)}
-													/>
-												)}
-												<div className='space-y-3'>
 													<Collapsible
-														icon='🛬'
+														icon={ArrowLeftRight}
+														hook={t('app.hook.trades')}
 														label={t('app.collapsible.aux_trades')}
 														open={showAuxTrades}
 														onToggle={() => setShowAuxTrades((s) => !s)}
@@ -7691,8 +7718,19 @@ export default function App() {
 															)}
 														</div>
 													</Collapsible>
+												</AreaGroup>
+												<div className='pt-4'>
+												<AreaGroup id='friends' title={t('app.group.friends')} hint={t('app.group_hint.friends')} accent='#E91E63'>
+												{buddyCatchFilters.length > 0 && (
+													<BuddyCatchSection
+														buddyCatchFilters={buddyCatchFilters}
+														copied={copied}
+														onCopy={(key, text) => copyToClipboard(key, text)}
+													/>
+												)}
 													<Collapsible
-														icon='🤝'
+														icon={Heart}
+														hook={t('app.hook.friend_wishlist')}
 														label={t('app.collapsible.friend_wishlist')}
 														open={showFriendWishlist}
 														onToggle={() => setShowFriendWishlist((s) => !s)}
@@ -7796,18 +7834,18 @@ export default function App() {
 															/>
 														</div>
 													</Collapsible>
+												</AreaGroup>
 												</div>
 											</>
 										)}
 									</AreaPanel>
 
 									{/* Internals — set theory / raw clauses / verify */}
-									<div className='space-y-3 pt-4'>
-										<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-											{t('app.collapsible.aux_section_nerd_stuff')}
-										</h3>
+									<div className='pt-4'>
+										<AreaGroup id='nerd' title={t('app.collapsible.aux_section_nerd_stuff')} hint={t('app.group_hint.nerd')} accent='#8090A0'>
 										<Collapsible
-											icon='∑'
+											icon={Sigma}
+											hook={t('app.hook.set_theory')}
 											label={t('app.collapsible.set_theory')}
 											open={showSetTheory}
 											onToggle={() => setShowSetTheory((s) => !s)}
@@ -7823,7 +7861,8 @@ export default function App() {
 										</Collapsible>
 
 										<Collapsible
-											icon='≡'
+											icon={List}
+											hook={t('app.hook.raw_clauses')}
 											label={t('app.collapsible.raw_clauses')}
 											open={showRawClauses}
 											onToggle={() => setShowRawClauses((s) => !s)}
@@ -7840,7 +7879,8 @@ export default function App() {
 										</Collapsible>
 
 										<Collapsible
-											icon='✓'
+											icon={BadgeCheck}
+											hook={t('app.hook.verify')}
 											label={t('app.collapsible.verify')}
 											open={showVerify}
 											onToggle={() => setShowVerify((s) => !s)}
@@ -7852,6 +7892,7 @@ export default function App() {
 												outputLocale={effectiveOutputLocale}
 											/>
 										</Collapsible>
+										</AreaGroup>
 									</div>
 								</div>
 							</StepWrapper>
@@ -8990,17 +9031,20 @@ function FriendCollectEditor({
 	}
 
 	const suggestionLabel = (s) => {
-		if (s.kind === 'event') return `✨ ${s.title}`;
-		if (s.kind === 'eggs')
-			return `🥚 ${t('app.filter.friend_collect_suggest_eggs', { params: { title: s.title } })}`;
-		if (s.kind === 'tradeevo') return `🧬 ${t('app.filter.friend_collect_suggest_tradeevo')}`;
-		if (s.kind === 'candy') return `🍬 ${t('app.filter.friend_collect_suggest_candy')}`;
-		if (s.kind === 'powerlines') return `🐲 ${t('app.filter.friend_collect_suggest_powerlines')}`;
-		if (s.kind === 'starters') return `🌱 ${t('app.filter.friend_collect_suggest_starters')}`;
-		if (s.kind === 'mega') return `💠 ${t('app.filter.friend_collect_suggest_mega')}`;
-		if (s.kind === 'raids') return `⚔️ ${t('app.filter.friend_collect_suggest_raid')}`;
-		if (s.kind === 'pvp-great') return `🥇 ${t('app.filter.friend_collect_suggest_pvp_great')}`;
-		return `🥈 ${t('app.filter.friend_collect_suggest_pvp_ultra')}`;
+		if (s.kind === 'event') return s.title;
+		if (s.kind === 'eggs') return t('app.filter.friend_collect_suggest_eggs', { params: { title: s.title } });
+		if (s.kind === 'tradeevo') return t('app.filter.friend_collect_suggest_tradeevo');
+		if (s.kind === 'candy') return t('app.filter.friend_collect_suggest_candy');
+		if (s.kind === 'powerlines') return t('app.filter.friend_collect_suggest_powerlines');
+		if (s.kind === 'starters') return t('app.filter.friend_collect_suggest_starters');
+		if (s.kind === 'mega') return t('app.filter.friend_collect_suggest_mega');
+		if (s.kind === 'raids') return t('app.filter.friend_collect_suggest_raid');
+		if (s.kind === 'pvp-great') return t('app.filter.friend_collect_suggest_pvp_great');
+		return t('app.filter.friend_collect_suggest_pvp_ultra');
+	};
+	const SUGGESTION_ICON = {
+		event: Sparkles, eggs: Egg, tradeevo: Dna, candy: Candy, powerlines: Crown, starters: Sprout, mega: Zap,
+		raids: Target, 'pvp-great': Medal, 'pvp-ultra': Trophy,
 	};
 	// Pack grouping: time-limited feeds first, evergreen collections, then the
 	// meta-driven pools. Groups render only when they have surviving packs.
@@ -9104,7 +9148,13 @@ function FriendCollectEditor({
 											<div key={s.id} className='border border-[#1F2933] rounded-sm px-2.5 py-1.5 bg-[#0B0F14]'>
 												<div className='flex items-center justify-between gap-2'>
 													<div className='mono text-xs text-[#E6EDF3] min-w-0'>
-														<span className='wrap-break-word'>{suggestionLabel(s)}</span>
+														<span className='wrap-break-word inline-flex items-start gap-1.5'>
+															{(() => {
+																const Icon = SUGGESTION_ICON[s.kind] || Trophy;
+																return <Icon size={13} strokeWidth={1.75} className='shrink-0 mt-0.5 text-[#5EAFC5]' aria-hidden='true' />;
+															})()}
+															<span>{suggestionLabel(s)}</span>
+														</span>
 														<span className='text-[#8090A0] ml-1.5 whitespace-nowrap'>
 															{t('app.filter.friend_collect_suggest_count', {
 																params: { count: s.species.length },
@@ -9608,25 +9658,64 @@ function AreaPanel({ area, current, children }) {
 	);
 }
 
-function Collapsible({ icon, label, open, onToggle, children }) {
+// One look for every group and tile across the four areas. A group sets the
+// colour; tiles inside it pick it up from context, so a tile never needs to
+// be told which tab it sits in.
+const AreaAccent = createContext('#5EAFC5');
+function AreaGroup({ id, title, hint, accent = '#5EAFC5', children }) {
 	return (
-		<details open={open} className='border border-[#1F2933] rounded-sm'>
+		<AreaAccent.Provider value={accent}>
+			<section aria-labelledby={`area-group-${id}`} className='space-y-2'>
+				<h3 id={`area-group-${id}`} className='mono text-xs uppercase tracking-widest font-semibold' style={{ color: accent }}>
+					{title}
+				</h3>
+				{hint && <p className='mono text-[11px] text-[#8090A0] -mt-1'>{hint}</p>}
+				{children}
+			</section>
+		</AreaAccent.Provider>
+	);
+}
+// A lucide icon in a tinted square, in the tile's accent.
+function TileIcon({ icon: Icon, accent }) {
+	if (!Icon) return null;
+	return (
+		<span
+			className='shrink-0 w-8 h-8 rounded-md flex items-center justify-center'
+			style={{ color: accent, background: `${accent}1A`, border: `1px solid ${accent}33` }}
+			aria-hidden='true'
+		>
+			<Icon size={16} strokeWidth={1.75} />
+		</span>
+	);
+}
+
+function Collapsible({ icon, label, hook, open, onToggle, children }) {
+	const accent = useContext(AreaAccent);
+	return (
+		<details
+			open={open}
+			className='rounded-md border border-[#1F2933] bg-[#0E141A] overflow-hidden transition hover:border-[#2D3A47]'
+			style={{ borderLeft: `3px solid ${accent}` }}
+		>
 			<summary
 				onClick={(e) => {
 					e.preventDefault();
 					onToggle();
 				}}
-				className='px-4 py-3 flex items-center gap-3 hover:bg-[#141A21] transition'
+				className='list-none cursor-pointer flex items-start gap-3 p-3'
 			>
+				<TileIcon icon={icon} accent={accent} />
+				<span className='min-w-0 flex-1'>
+					<span className='mono text-sm font-semibold text-[#E6EDF3]'>{label}</span>
+					{hook && <span className='block text-xs text-[#8B98A5] mt-1 leading-relaxed'>{hook}</span>}
+				</span>
 				{open ? (
-					<ChevronDown size={14} className='text-[#5EAFC5]' />
+					<ChevronDown size={14} className='text-[#8090A0] shrink-0 mt-1' aria-hidden='true' />
 				) : (
-					<ChevronRight size={14} className='text-[#8090A0]' />
+					<ChevronRight size={14} className='text-[#8090A0] shrink-0 mt-1' aria-hidden='true' />
 				)}
-				<span className='mono text-sm text-[#5EAFC5]'>{icon}</span>
-				<span className='mono text-sm font-medium text-[#E6EDF3]'>{label}</span>
 			</summary>
-			{open && <div className='px-4 pb-4 pt-2 border-t border-[#1F2933]'>{children}</div>}
+			{open && <div className='px-3 pb-3 pt-3 border-t border-[#1F2933]'>{children}</div>}
 		</details>
 	);
 }
@@ -9780,6 +9869,7 @@ function eventBossGroups(events, { accent, t, locale, renderBosses }) {
 // by default, upcoming ones collapse with a window teaser.
 function BossCollapsible({
 	icon,
+	hook,
 	titleKey,
 	fetchedAt,
 	bossesByTier,
@@ -9806,7 +9896,7 @@ function BossCollapsible({
 		: t('app.collapsible.aux_footer_no_age', { params: { count: countLabel } });
 	if (totalBosses === 0) {
 		return (
-			<Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
+			<Collapsible icon={icon} label={headerLabel} hook={hook} open={open} onToggle={onToggle}>
 				<p className='text-xs italic text-[#8B98A5]'>{t('app.filter.aux_bosses_empty')}</p>
 			</Collapsible>
 		);
@@ -9815,7 +9905,7 @@ function BossCollapsible({
 		bossCounterBoxes(bosses, scope, { keyPrefix, accent, copied, copyToClipboard, t });
 	const hasEvents = events.length > 0;
 	return (
-		<Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
+		<Collapsible icon={icon} label={headerLabel} hook={hook} open={open} onToggle={onToggle}>
 			<div className='space-y-5'>
 				{/* tiers below; footer rendered at end */}
 				{hasEvents && (
@@ -10058,9 +10148,9 @@ export const PILE_GROUPS = [
 	{ id: 'big', accent: '#5EAFC5', piles: ['non_meta'] },
 ];
 const PILE_ICON = {
-	hundo: '💯', lucky_families: '✨', luckies: '🍀', traded: '🎁', costumes: '🎃', cd_backgrounds: '🖼️', xxl: '🐘',
-	xxs: '🐜', meta: '⚔️', watchlist: '🔭', shadows: '🌑', dynamax: '🌀', evolve: '🧪', non_meta: '📦', event: '🌿',
-	mega_evolve: '🧬',
+	hundo: Award, lucky_families: Sparkles, luckies: Clover, traded: Gift, costumes: Shirt, cd_backgrounds: Image,
+	xxl: Maximize2, xxs: Minimize2, meta: Swords, watchlist: Telescope, shadows: Flame, dynamax: Zap, evolve: Sprout,
+	non_meta: Package, event: Leaf, mega_evolve: Dna,
 };
 // A single filter in a pile group, styled like a pile tile.
 function ToolTile({ title, hook, icon, accent, children }) {
@@ -10070,9 +10160,7 @@ function ToolTile({ title, hook, icon, accent, children }) {
 			style={{ borderLeft: `3px solid ${accent}` }}
 		>
 			<summary className='list-none cursor-pointer flex items-start gap-3 p-3'>
-				<span className='text-2xl leading-none mt-0.5 select-none' aria-hidden='true'>
-					{icon}
-				</span>
+				<TileIcon icon={icon} accent={accent} />
 				<span className='min-w-0 flex-1'>
 					<span className='mono text-sm font-semibold text-[#E6EDF3]'>{title}</span>
 					<span className='block text-xs text-[#8B98A5] mt-1 leading-relaxed'>{hook}</span>
@@ -10091,9 +10179,7 @@ function PileTile({ pile, title, hook, icon, chip, accent, open, onHide, hidden,
 			style={{ borderLeft: `3px solid ${accent}` }}
 		>
 			<summary className='list-none cursor-pointer flex items-start gap-3 p-3'>
-				<span className='text-2xl leading-none mt-0.5 select-none' aria-hidden='true'>
-					{icon}
-				</span>
+				<TileIcon icon={icon} accent={accent} />
 				<span className='min-w-0 flex-1'>
 					<span className='flex flex-wrap items-center gap-2'>
 						<span className='mono text-sm font-semibold text-[#E6EDF3]'>{title}</span>
@@ -10230,25 +10316,20 @@ function MegaPlanner({ plans, copied, copyToClipboard, typeLabels, t, locale }) 
 		return name.replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toUpperCase());
 	};
 	return (
-		<section aria-labelledby='mega-plan-heading' className='space-y-3'>
-			<div>
-				<h3 id='mega-plan-heading' className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-					{t('app.mega_plan.title')}
-				</h3>
-				<p className='mono text-xs text-[#8B98A5] mt-1 leading-relaxed'>{t('app.mega_plan.hint')}</p>
-			</div>
+		<AreaGroup id='mega-plan' title={t('app.mega_plan.title')} hint={t('app.mega_plan.hint')} accent='#E91E63'>
 			{plans.length === 0 ? (
 				<p className='mono text-xs italic text-[#8B98A5]'>{t('app.mega_plan.empty')}</p>
 			) : (
 				<div className='space-y-2'>
 					{plans.map((p) => {
 						const live = Date.parse(p.start) <= now;
-						const icon = p.kind === 'raid' ? '⚔️' : '🌿';
+						const icon = p.kind === 'raid' ? Target : Leaf;
 						const name = topName(p);
 						return (
 							<TrainerAccordion
 								key={p.id}
-								name={`${icon} ${p.title}`}
+								name={p.title}
+								icon={icon}
 								teaser={name ? `${name} · ${when(p)}` : when(p)}
 								accent='#E91E63'
 								highlight={live}
@@ -10268,7 +10349,7 @@ function MegaPlanner({ plans, copied, copyToClipboard, typeLabels, t, locale }) 
 					})}
 				</div>
 			)}
-		</section>
+		</AreaGroup>
 	);
 }
 
@@ -10356,7 +10437,7 @@ function topHitsHint(topHits, t) {
 // Max Battle tiers. Native <details> handles its own open/close state — no
 // React state plumbing needed, and multiple rows can stay open at once.
 // Mirrors the visual rhythm of the parent Collapsible but a half-step smaller.
-function TrainerAccordion({ name, teaser, accent, highlight, children }) {
+function TrainerAccordion({ name, icon: Icon, teaser, accent, highlight, children }) {
 	// `highlight` (used when the quote-lookup widget locks onto this card):
 	// forces the accordion open and adds a colored ring so the user can see
 	// the match instantly. Re-mounts the <details> via key={highlight} so the
@@ -10373,6 +10454,7 @@ function TrainerAccordion({ name, teaser, accent, highlight, children }) {
 		>
 			<summary className='px-3 py-2 cursor-pointer flex items-center gap-3 hover:bg-[#141A21] transition list-none'>
 				<ChevronRight size={12} className='text-[#8090A0] details-arrow shrink-0' />
+				{Icon && <Icon size={14} strokeWidth={1.75} className='shrink-0' style={{ color: accent || '#8090A0' }} aria-hidden='true' />}
 				<span className='mono text-sm font-medium' style={{ color: accent || '#E6EDF3' }}>
 					{name}
 				</span>
@@ -10439,7 +10521,7 @@ function MaxBattleCollapsible({
 		: t('app.collapsible.aux_footer_no_age', { params: { count: countLabel } });
 	if (filterCount === 0) {
 		return (
-			<Collapsible icon='💥' label={headerLabel} open={open} onToggle={onToggle}>
+			<Collapsible icon={Zap} label={headerLabel} hook={t('app.hook.max_battles')} open={open} onToggle={onToggle}>
 				<p className='text-xs italic text-[#8B98A5]'>{t('app.filter.aux_bosses_empty')}</p>
 			</Collapsible>
 		);
@@ -10448,7 +10530,7 @@ function MaxBattleCollapsible({
 	const renderBosses = (bosses, scope) =>
 		bossCounterBoxes(bosses, scope, { keyPrefix: 'max', accent, copied, copyToClipboard, t });
 	return (
-		<Collapsible icon='💥' label={headerLabel} open={open} onToggle={onToggle}>
+		<Collapsible icon={Zap} label={headerLabel} hook={t('app.hook.max_battles')} open={open} onToggle={onToggle}>
 			<div className='space-y-5'>
 				{hasCharger && (
 					<div className='space-y-3'>
@@ -10523,13 +10605,13 @@ function PvpCollapsible({ fetchedAt, leagues, cupFilters, open, onToggle, copied
 		: t('app.collapsible.aux_footer_no_age', { params: { count: countLabel } });
 	if (totalCount === 0) {
 		return (
-			<Collapsible icon='🥊' label={headerLabel} open={open} onToggle={onToggle}>
+			<Collapsible icon={Trophy} label={headerLabel} hook={t('app.hook.pvp')} open={open} onToggle={onToggle}>
 				<p className='text-xs italic text-[#8B98A5]'>{t('app.filter.aux_pvp_empty')}</p>
 			</Collapsible>
 		);
 	}
 	return (
-		<Collapsible icon='🥊' label={headerLabel} open={open} onToggle={onToggle}>
+		<Collapsible icon={Trophy} label={headerLabel} hook={t('app.hook.pvp')} open={open} onToggle={onToggle}>
 			<div className='space-y-4'>
 				{populated.map((key) => {
 					const league = leagues[key];
@@ -10770,13 +10852,13 @@ function RocketCollapsible({
 		: t('app.collapsible.aux_footer_no_age', { params: { count: countLabel } });
 	if (totalFilters === 0) {
 		return (
-			<Collapsible icon='🚀' label={headerLabel} open={open} onToggle={onToggle}>
+			<Collapsible icon={Rocket} label={headerLabel} hook={t('app.hook.rocket')} open={open} onToggle={onToggle}>
 				<p className='text-xs italic text-[#8B98A5]'>{t('app.filter.aux_rocket_empty')}</p>
 			</Collapsible>
 		);
 	}
 	return (
-		<Collapsible icon='🚀' label={headerLabel} open={open} onToggle={onToggle}>
+		<Collapsible icon={Rocket} label={headerLabel} hook={t('app.hook.rocket')} open={open} onToggle={onToggle}>
 			<div className='space-y-5'>
 				<RocketQuoteLookup
 					data={ROCKET_GRUNT_QUOTES}
@@ -11948,7 +12030,7 @@ function ConfigPanel({
 				    a top-level box in step 4. Collapsible — the pack + target lists
 				    get long. */}
 					<Collapsible
-						icon='🤝'
+						icon={Handshake}
 						label={`${t('app.filter.friend_collect_section')} · ${friendCollectTargets.length}`}
 						open={showFriendCollect}
 						onToggle={() => setShowFriendCollect((s) => !s)}
@@ -13348,7 +13430,7 @@ function JobTagsPanel({ config, setConfig, copied, copyToClipboard, t }) {
 	return (
 		<details className='rounded-md border border-[#1F2933] bg-[#0E141A]'>
 			<summary className='list-none cursor-pointer p-3 flex items-start gap-3'>
-				<span className='text-xl leading-none' aria-hidden='true'>🏷️</span>
+				<TileIcon icon={Tag} accent='#5EAFC5' />
 				<span className='min-w-0 flex-1'>
 					<span className='mono text-sm font-semibold text-[#E6EDF3]'>{t('app.tags.title')}</span>
 					<span className='block mono text-xs text-[#8B98A5] mt-1 leading-relaxed'>{t('app.tags.hint')}</span>
