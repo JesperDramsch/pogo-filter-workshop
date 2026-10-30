@@ -2052,6 +2052,50 @@ export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] 
 	return out;
 }
 
+// Protection toggles hide and show category piles (spec: "Which piles show
+// first"). The Sorting tab is stateful: config.hiddenPiles is the user's own
+// list, and a protect* toggle only edits it on the edge. Turning a category's
+// protection off (swipe deck, ConfigPanel toggle or preset) hides its piles;
+// turning it back on shows them again. Between those edges the user's own
+// hide/unhide under "N hidden" is the truth, and the toggle never gates the
+// render. Piles without a category (meta, watchlist, non_meta, hundo, cday,
+// traded, evolve, the event piles) are never touched; nundos have no pile.
+export const PROTECTION_PILES = {
+	protectXXL: ['xxl'],
+	protectXXS: ['xxs'],
+	protectCostumes: ['costumes_evolve', 'costumes_final'],
+	protectBackgrounds: ['backgrounds'],
+	protectLuckies: ['luckies'],
+	protectShinies: ['shiny'],
+	protectShadows: ['shadows'],
+	protectDynamax: ['dynamax'],
+};
+// The legendaries pile also holds the Ultra Beasts, so it follows the pair:
+// hidden on the edge that leaves both off, shown when either comes back on.
+export function hiddenPileTransitions(prevCfg = {}, nextCfg = {}) {
+	const hide = [], show = [];
+	for (const [key, ids] of Object.entries(PROTECTION_PILES)) {
+		const was = !!prevCfg[key], is = !!nextCfg[key];
+		if (was === is) continue;
+		(is ? show : hide).push(...ids);
+	}
+	const legWas = !!prevCfg.protectLegendaries || !!prevCfg.protectUltraBeasts;
+	const legIs = !!nextCfg.protectLegendaries || !!nextCfg.protectUltraBeasts;
+	if (legWas !== legIs) (legIs ? show : hide).push('legendaries');
+	return { hide, show };
+}
+// nextCfg with its hiddenPiles edited for the protect* edges between prevCfg
+// and nextCfg; the same object back when no protection changed, so a plain
+// config write never rewrites the list.
+export function withPileTransitions(prevCfg, nextCfg) {
+	const { hide, show } = hiddenPileTransitions(prevCfg, nextCfg);
+	if (hide.length === 0 && show.length === 0) return nextCfg;
+	const now = new Set(nextCfg.hiddenPiles || []);
+	for (const id of show) now.delete(id);
+	for (const id of hide) now.add(id);
+	return { ...nextCfg, hiddenPiles: [...now] };
+}
+
 // The tagging scheme's suggested job tags. Every tag is a job; Dex-Evolve and
 // Crush are temporary (off once the line is evolved through / emptied on a
 // double transfer candy day). Names avoid the search keywords of every locale:
@@ -6286,6 +6330,12 @@ export default function App() {
 	const [topAttackers, setTopAttackers] = useState(DEFAULT_TOP_ATTACKERS);
 	const [topMaxAttackers, setTopMaxAttackers] = useState(DEFAULT_TOP_MAX_ATTACKERS);
 	const [config, setConfig] = useState(DEFAULT_CONFIG);
+	// The one setter every protect* change goes through (ConfigPanel toggles
+	// and presets, the swipe deck): it edits hiddenPiles on a protection's
+	// on/off edge, see withPileTransitions. Load, import, the cross-tab echo
+	// and reset write the config as it is, so a saved list is never re-hidden.
+	const setConfigWithPiles = (next) =>
+		setConfig((prev) => withPileTransitions(prev, typeof next === 'function' ? next(prev) : next));
 	const [newHundo, setNewHundo] = useState('');
 	const [newLucky, setNewLucky] = useState('');
 	const [newTopAttacker, setNewTopAttacker] = useState('');
@@ -7073,9 +7123,12 @@ export default function App() {
 	// decisions (a patch of protect* booleans) onto the live config and drops
 	// the user straight on the filter-output step; skip just bails to the
 	// workshop with defaults. Both set the first-run flag so it won't re-show.
+	// The patch goes through setConfigWithPiles, so a category tossed in the
+	// deck hides its Sorting piles (and one kept again shows them); skip
+	// changes no protection and so touches no pile.
 	function completeOnboarding(patch, dest = 'filter') {
 		if (patch && Object.keys(patch).length) {
-			setConfig((prev) => ({ ...prev, ...patch, lastAppliedPreset: null }));
+			setConfigWithPiles((prev) => ({ ...prev, ...patch, lastAppliedPreset: null }));
 		}
 		setOnboarded(true);
 		// Drop into the workshop on the chosen step — "filter" for instant payoff,
@@ -7407,7 +7460,7 @@ export default function App() {
 	);
 	const configPanelProps = {
 		config,
-		setConfig,
+		setConfig: setConfigWithPiles,
 		homeLocals,
 		homeLocalTypeChecks,
 		friendCollectTargets,
@@ -7530,7 +7583,7 @@ export default function App() {
 							>
 								<ConfigPanel
 									config={config}
-									setConfig={setConfig}
+									setConfig={setConfigWithPiles}
 									homeLocals={homeLocals}
 									homeLocalTypeChecks={homeLocalTypeChecks}
 									friendCollectTargets={friendCollectTargets}
@@ -8021,7 +8074,7 @@ export default function App() {
 					setResetArmed(false);
 				}}
 				config={config}
-				setConfig={setConfig}
+				setConfig={setConfigWithPiles}
 				onResetAll={resetAll}
 				resetArmed={resetArmed}
 				onExport={exportState}

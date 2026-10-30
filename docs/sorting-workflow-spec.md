@@ -95,6 +95,22 @@ Piles relevant to recent or running events float to the top. All other piles sit
 | Max Monday or Max Battle event | Dynamax |
 | Double transfer candy day | A reminder card for the `crush` working tag (not a pile) |
 
+Hiding is stateful and edge-triggered. `config.hiddenPiles` is the user's own list, edited under "N hidden" on the Sorting tab. A protection on the Catching tab edits that list once, on its on/off edge, wherever the change comes from (the swipe deck, a ConfigPanel toggle or a preset): turning a category's protection off adds its piles to the list, turning it back on removes them. Between edges the list is the truth: a pile the user brought back stays visible until the protection goes on and then off again, and a toggle never gates the render. Loading, importing, the cross-tab echo and reset write the config as it is and never re-hide. A pile that floats for a running event shows while it floats, hidden or not.
+
+| Protection | Piles it hides and shows |
+| --- | --- |
+| XXL | XXL |
+| XXS | XXS |
+| Costumes | Costumes (both) |
+| Backgrounds | Community Day backgrounds |
+| Luckies | Luckies |
+| Shinies | Shinies |
+| Shadows | Shadows |
+| Dynamax | Dynamax |
+| Legendaries and Ultra Beasts | Legendaries, hidden on the edge that leaves both off, shown when either comes back on |
+
+Piles without a category (Meta, Watchlist, Non-meta, Hundo sort, Received trades, the event piles, Evolve) are never touched by a protection. Nundos have no pile. The rule lives in `hiddenPileTransitions` and `withPileTransitions` (`src/App.jsx`) and is held by `scripts/check-piles.mjs`, "Protection toggles hide and show piles".
+
 ### Piles
 
 | Pile | Pile head | ① Keep lenses | Notes |

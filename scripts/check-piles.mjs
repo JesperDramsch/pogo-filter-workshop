@@ -33,7 +33,7 @@
 // Run with: npx vite-node scripts/check-piles.mjs
 
 import {
-  BUDGET_DEFAULTS, BUDGET_ROWS, evalFilterDetailed as evalDetailed, FLOAT_ENDED_DAYS, floatingPiles, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET, PILE_GROUPS,
+  BUDGET_DEFAULTS, BUDGET_ROWS, evalFilterDetailed as evalDetailed, FLOAT_ENDED_DAYS, floatingPiles, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET, PILE_GROUPS, PROTECTION_PILES, hiddenPileTransitions, withPileTransitions,
 } from "../src/App.jsx";
 import { readFileSync } from "node:fs";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
@@ -619,6 +619,51 @@ console.log("\nWhich piles show first (event-driven ordering)");
     signalsFromFeed(feed).map((x) => x.kind).sort().join(",") === "community_day,takeover");
   check("a costumed spawn is spotted, plain ones aren't",
     hasCostumedSpawns([{ name: "Piplup wearing a Halloween Mischief costume" }]) && !hasCostumedSpawns(["Zubat", { name: "Gengar" }]));
+}
+
+console.log("\nProtection toggles hide and show piles (edge-triggered, stateful)");
+{
+  // A protect* boolean's on/off edge edits config.hiddenPiles once; between
+  // edges the user's own hide/unhide is the truth (withPileTransitions).
+  const ON = Object.fromEntries(["protectXXL", "protectXXS", "protectCostumes", "protectBackgrounds", "protectLuckies", "protectShinies", "protectShadows", "protectDynamax", "protectLegendaries", "protectUltraBeasts"].map((k) => [k, true]));
+  const flip = (patch) => hiddenPileTransitions(ON, { ...ON, ...patch });
+  const same = (t, hide, show) => t.hide.join(",") === hide && t.show.join(",") === show;
+  check("no change touches nothing", same(hiddenPileTransitions(ON, ON), "", "") && same(hiddenPileTransitions(ON, { ...ON }), "", ""));
+  check("XXL on→off hides xxl", same(flip({ protectXXL: false }), "xxl", ""));
+  check("XXL off→on shows xxl", same(hiddenPileTransitions({ ...ON, protectXXL: false }, ON), "", "xxl"));
+  check("legendaries off with Ultra Beasts still on changes nothing", same(flip({ protectLegendaries: false }), "", ""));
+  check("both off hides legendaries", same(flip({ protectLegendaries: false, protectUltraBeasts: false }), "legendaries", ""));
+  const bothOff = { ...ON, protectLegendaries: false, protectUltraBeasts: false };
+  check("either back on shows legendaries",
+    same(hiddenPileTransitions(bothOff, { ...bothOff, protectLegendaries: true }), "", "legendaries") &&
+    same(hiddenPileTransitions(bothOff, { ...bothOff, protectUltraBeasts: true }), "", "legendaries"));
+  check("shadows on→off hides shadows, Dynamax on→off hides dynamax", same(flip({ protectShadows: false }), "shadows", "") && same(flip({ protectDynamax: false }), "dynamax", ""));
+  check("costumes on→off hides both costume piles", same(flip({ protectCostumes: false }), "costumes_evolve,costumes_final", ""));
+  check("a non-protect key change is not an edge", same(hiddenPileTransitions(ON, { ...ON, pvpMode: "loose", hiddenPiles: ["xxl"] }), "", ""));
+  const allOff = Object.fromEntries(Object.keys(ON).map((k) => [k, false]));
+  const everything = hiddenPileTransitions(ON, allOff);
+  const groupIds = PILE_GROUPS.flatMap((g) => g.piles);
+  check("every id returned is in PILE_GROUPS, so it can be un-hidden", everything.hide.length === 10 && everything.hide.every((id) => groupIds.includes(id)) && everything.show.length === 0, everything.hide.join(","));
+  check("no category names a pile without one", !everything.hide.some((id) => /^(meta|watchlist|non_meta|hundo|cday|traded|evolve|event)/.test(id)));
+  check("the mapping covers every protect* key that has a pile, and the pair", Object.keys(PROTECTION_PILES).length === 8 && !("protectLegendaries" in PROTECTION_PILES) && !("protectUltraBeasts" in PROTECTION_PILES));
+  // The config edit: an edge adds to or removes from the persisted list and
+  // keeps what the user hid themselves; no edge hands the same object back.
+  const kept = { ...ON, hiddenPiles: ["meta"] };
+  const hidden = withPileTransitions(kept, { ...kept, protectXXL: false });
+  check("an off edge adds to the user's own list", hidden.hiddenPiles.join(",") === "meta,xxl");
+  const unhidden = withPileTransitions(hidden, { ...hidden, protectXXL: true });
+  check("an on edge removes only its own piles", unhidden.hiddenPiles.join(",") === "meta");
+  const stillOff = { ...hidden, hiddenPiles: ["meta"] };
+  const plain = { ...stillOff, pvpMode: "loose" };
+  check("with no edge the list is the user's, untouched (same object back)", withPileTransitions(stillOff, plain) === plain && plain.hiddenPiles.join(",") === "meta");
+  check("an off edge never doubles an id already hidden", withPileTransitions({ ...ON, hiddenPiles: ["xxl"] }, { ...ON, hiddenPiles: ["xxl"], protectXXL: false }).hiddenPiles.join(",") === "xxl");
+  check("mergeImportedConfig still keeps hiddenPiles as strings", mergeImportedConfig({ ...CFG, hiddenPiles: ["xxl", 3, null] }).hiddenPiles.join(",") === "xxl");
+  // The app routes every protect* write through one setter.
+  const src = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const app = src.slice(src.indexOf("export default function App("), src.indexOf("function ConfigPanel("));
+  check("ConfigPanel and the swipe deck write through setConfigWithPiles",
+    (app.match(/setConfig: setConfigWithPiles|setConfig=\{setConfigWithPiles\}/g) || []).length >= 2 && /setConfigWithPiles\(\(prev\) => \(\{ \.\.\.prev, \.\.\.patch/.test(app));
+  check("no ConfigPanel is handed the raw setter", !/<ConfigPanel[^>]*setConfig=\{setConfig\}/.test(app) && !/setConfig,\n\t\thomeLocals/.test(app));
 }
 
 console.log("\nwatch-moves.json is never rebuilt from a refused game master");
