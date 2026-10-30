@@ -10,6 +10,7 @@ import {
 	ChevronRight,
 	RotateCcw,
 	Sparkles,
+	Sparkle,
 	Settings,
 	ArrowLeft,
 	Download,
@@ -2011,7 +2012,7 @@ export function showcaseScoreRange({ dex, form = null, heightM, weightKg, ivs = 
 // FLOAT_ENDED_DAYS ago (the events snapshot's own carry-over window, see
 // scripts/lib/event-window.mjs). Upcoming events don't float anything.
 //   wild-spawn event → event spawns, and both costume piles if it had costumed spawns
-//   Community Day   → the C-Day pile
+//   Community Day   → the C-Day pile and the shiny pile
 //   takeover        → shadows
 //   Max Battle event (Max Monday, Max Battle Day) → Dynamax
 // A double transfer candy day has no source yet, so its Crush reminder card
@@ -2029,13 +2030,19 @@ export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] 
 	for (const sg of signals) {
 		if (!recent(sg.start, sg.end)) continue;
 		if (sg.kind === 'takeover') add('shadows', 'takeover', sg.title);
-		if (sg.kind === 'community_day') add('cday', 'community_day', sg.title);
+		if (sg.kind === 'community_day') {
+			add('cday', 'community_day', sg.title);
+			add('shiny', 'community_day', sg.title);
+		}
 		if (sg.kind === 'max') add('dynamax', 'max', sg.title);
 	}
 	for (const mb of eventMaxBattles) if (recent(mb.start, mb.end)) add('dynamax', 'max', mb.name);
 	for (const ev of events) {
 		if (!recent(ev.start, ev.end)) continue;
-		if (ev.category === 'Community Day') add('cday', 'community_day', ev.title);
+		if (ev.category === 'Community Day') {
+			add('cday', 'community_day', ev.title);
+			add('shiny', 'community_day', ev.title);
+		}
 		add('event_spawns', 'wild', ev.title);
 		if (ev.hasCostumes) {
 			add('costumes_evolve', 'costumes', ev.title);
@@ -5222,6 +5229,18 @@ export function buildFilters(
 			cfg,
 			tail: pileTail,
 		}),
+		// Shinies: one per evolution stage is the living shiny dex, a few
+		// untraded ones are trades, the rest is a plain stack with a sparkle.
+		// The head is the shiny step, so the ladder has none; the tail holds
+		// shiny legendaries only, so ③ offers every plain shiny left unstarred.
+		buildPile({
+			id: 'shiny',
+			head: kw.flag.shiny,
+			lenses: [hundoStep, strongStep, threeStep, ...pvpLoose, stillToEvolve],
+			kw,
+			cfg,
+			tail: pileTail,
+		}),
 		// Legendaries and Ultra Beasts, wherever one came from (raid, research,
 		// GBL): keep the good ones.
 		buildPile({ id: 'legendaries', head: `${kw.flag.legendary},${kw.flag.ultra_beast}`, lenses: ivLadder(), kw, cfg, tail: pileTail }),
@@ -5399,6 +5418,7 @@ export function buildFilters(
 		costumes_final: { n: budgets.costumePerStage, tradeable: budgets.costumeTradeable },
 		backgrounds: { n: budgets.backgroundPerSpecies, tradeable: budgets.backgroundTradeable },
 		cday: { n: budgets.shinyPerStage, tradeable: budgets.shinyTradeable },
+		shiny: { n: budgets.shinyPerStage, tradeable: budgets.shinyTradeable },
 		legendaries: { meta: budgets.raidMeta, standin: budgets.standIn },
 		non_meta: { standin: budgets.standIn, evolve: budgets.evolve },
 		traded: {},
@@ -10217,7 +10237,7 @@ function PileCard({ card, t }) {
 // hook in plain words ("Cryptos piling up…"), and the three steps when opened.
 // `chip` carries the event window or the reason a pile floated up.
 export const PILE_GROUPS = [
-	{ id: 'collection', accent: '#F5B82E', piles: ['hundo', 'cday', 'luckies', 'traded', 'costumes_evolve', 'costumes_final', 'backgrounds', 'xxl', 'xxs'] },
+	{ id: 'collection', accent: '#F5B82E', piles: ['hundo', 'cday', 'shiny', 'luckies', 'traded', 'costumes_evolve', 'costumes_final', 'backgrounds', 'xxl', 'xxs'] },
 	{ id: 'battle', accent: '#E74C3C', piles: ['meta', 'watchlist', 'legendaries', 'shadows', 'dynamax'] },
 	// `tools` are single filters with their own tile: mega-evolving spends
 	// candy, so it sits here and not with the Mega planner under Catching.
@@ -10225,7 +10245,7 @@ export const PILE_GROUPS = [
 	{ id: 'big', accent: '#5EAFC5', piles: ['non_meta'] },
 ];
 const PILE_ICON = {
-	hundo: Award, luckies: Clover, traded: Gift, costumes_evolve: Shirt, costumes_final: Shirt, backgrounds: Image, legendaries: Crown, cday: Sparkles,
+	hundo: Award, luckies: Clover, traded: Gift, costumes_evolve: Shirt, costumes_final: Shirt, backgrounds: Image, legendaries: Crown, cday: Sparkles, shiny: Sparkle,
 	xxl: Maximize2, xxs: Minimize2, meta: Swords, watchlist: Telescope, shadows: Flame, dynamax: Zap, evolve: Sprout,
 	non_meta: Package, event: Leaf, mega_evolve: Dna,
 };

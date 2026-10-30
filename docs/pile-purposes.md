@@ -58,6 +58,7 @@ then `3-4` is fine (best first, then wider), but `3-4` then `4*` would be cut.
 | Costumes that don't (`costume&!evolve`) | Which hats to keep? | 4\* → shiny → 3-4 → 3\*, one plus up to 3 untraded ones to trade |
 | Backgrounds (`background`) | Which backgrounds stay? | 4\* → shiny → 3-4 → 3\*, default count |
 | Community Days | Hundreds of one species after a Community Day: which stay, which go to trades? | 4\* → shiny → background → 3-4 → 3\* → untraded (tag to trade), over every catch of every Community Day species at once |
+| Shinies (`shiny`) | Which shinies stay for the living shiny dex, which go to trades? | 4\* → 3-4 → 3\* → PvP → still to evolve; no shiny step, the pile is the shinies, and ③ offers every plain shiny left unstarred (the tail holds shiny legendaries only) |
 | XXL | Which one goes to a showcase? | showcase verdict → still to evolve → 4\*,3\* → shiny |
 | XXS | Which tiny ones still matter? | still to evolve → 4\*,3\* → shiny |
 | Luckies | Which luckies are worth the cheap power-up? | still to evolve → 4\*,3\* → shiny |

@@ -112,6 +112,7 @@ Piles relevant to recent or running events float to the top. All other piles sit
 | XXS | XXS | Evolve | XXS only matter for Pokédex entries |
 | Costumes | Costume | One per stage, shinies | |
 | Community Day backgrounds | Background, Community Day species, not location background | 3 per species | |
+| Shinies | Shiny | Hundos, high IV, PvP, still to evolve | One per evolution stage for the living shiny dex, plus untraded ones to trade. Plain shinies are not in the protection tail, so ③ offers them; floats with the Community Day piles |
 
 `crush` is a working tag, not a pile: it marks Pokémon (often legendaries) to transfer on the next double transfer candy day. It protects them until then, like any tag.
 

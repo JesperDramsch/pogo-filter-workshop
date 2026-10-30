@@ -264,6 +264,18 @@ const PILE_FAMILIES = [
       to_trade: { match: {}, miss: { flags: { traded: true } } },
     }),
   },
+  {
+    // Every shiny: the head is the shiny step, so the ladder has none and ③a
+    // shows a plain shiny (P10 keys on the lens, not the pile). A shiny
+    // legendary is protected by the tail; the outsider is a Magikarp with
+    // the flag off, since the default outsider is shiny and in the pile.
+    name: "shinies",
+    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "shiny"), dex: 129 }],
+    base: { flags: { shiny: true } },
+    outsider: () => ({ dex: 129, o: { flags: { shiny: false } } }),
+    skipReleasable: /^plain legendary$/,
+    lensCases: () => ({ hundo: LADDER.hundo, strong: LADDER.strong, three: LADDER.three, ...PVP_LOOSE, evolve: EVOLVE }),
+  },
 ];
 
 const BAD = [/undefined/, /NaN/, /\[object /, /&&|,,/, /^[&,]|[&,]$/, /!!/];
@@ -489,7 +501,7 @@ for (const loc of localeNames) {
     for (const x of texts) if (/\{\w+\}|^app\.|move\./.test(x)) { bad.push(`${id}: "${x}"`); break; }
     if ((c.rows || []).some((row) => row.keep.length === 0)) bad.push(`${id}: a row with no keep line`);
   }
-  for (const id of ["shadows", "traded", "luckies", "dynamax", "xxl", "xxs", "costumes_evolve", "costumes_final", "backgrounds", "legendaries", "cday", "non_meta"])
+  for (const id of ["shadows", "traded", "luckies", "dynamax", "xxl", "xxs", "costumes_evolve", "costumes_final", "backgrounds", "legendaries", "cday", "shiny", "non_meta"])
     if (!card(id)?.rule) bad.push(`${id}: no keep rule`);
   check(`${loc}: ${meta.length} meta and ${watch.length} watchlist rows, ${cards.length} cards`, bad.length === 0, bad.slice(0, 4).join(" | "));
 }
@@ -585,8 +597,8 @@ console.log("\nWhich piles show first (event-driven ordering)");
   const span = (startDays, endDays) => ({ start: iso(now + startDays * day), end: iso(now + endDays * day) });
   const ids = (data) => floatingPiles(data, now).map((f) => f.pile).join(",");
   check("a running takeover floats shadows", ids({ signals: [{ kind: "takeover", title: "T", ...span(-1, 2) }] }) === "shadows");
-  check("a Community Day ended 3 days ago floats its backgrounds",
-    ids({ signals: [{ kind: "community_day", title: "CD", ...span(-3.2, -3) }] }) === "cday");
+  check("a Community Day ended 3 days ago floats its backgrounds and the shinies",
+    ids({ signals: [{ kind: "community_day", title: "CD", ...span(-3.2, -3) }] }) === "cday,shiny");
   check(`one ended more than ${FLOAT_ENDED_DAYS} days ago floats nothing`,
     ids({ signals: [{ kind: "community_day", title: "CD", ...span(-10.2, -10) }] }) === "");
   check("an upcoming Max Monday floats nothing, a running one floats Dynamax",
