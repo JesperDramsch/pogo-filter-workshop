@@ -50,6 +50,8 @@ function check(label, cond, detail = "") {
 }
 
 const HUNDOS = ["Machop"];
+// Machop is both: its family is "done twice" (hundo and lucky). Eevee is lucky only.
+const LUCKIES = ["Machop", "Eevee"];
 // The fixture config carries no rosters (the app passes its own in), so the
 // piles are built with the shipped ones, as a first-run user would see them.
 const CFG = { ...FIXTURE_CONFIG, topAttackers: DEFAULT_TOP_ATTACKERS, topMaxAttackers: DEFAULT_TOP_MAX_ATTACKERS };
@@ -79,7 +81,11 @@ const PILE_FAMILIES = [
   {
     name: "hundo sort",
     piles: (r) => [{ pile: r.hundoPile, dex: 66 }],
-    lensCases: () => ({ hundos: { match: iv(15, 15, 15), miss: iv(15, 15, 14) } }),
+    lensCases: () => ({
+      hundos: { match: iv(15, 15, 15), miss: iv(15, 15, 14) },
+      // Machop's family is done twice; the lens is the family list itself.
+      done_twice: { match: {}, miss: { families: ["notdonetwice"] } },
+    }),
   },
   {
     name: "meta",
@@ -134,7 +140,12 @@ const PILE_FAMILIES = [
     piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "traded"), dex: 129 }],
     base: { flags: { traded: true } },
     skipProtected: YEAR_FLOOR_CASE,
-    lensCases: () => ({ souvenirs: { match: { flags: { costume: true } }, miss: {} }, luckies: { match: { flags: { lucky: true } }, miss: {} } }),
+    lensCases: () => ({
+      souvenirs: { match: { flags: { costume: true } }, miss: {} },
+      luckies: { match: { flags: { lucky: true } }, miss: {} },
+      // The trash filter's own verdict: a traded 1/1/1 dupe is in, a traded hundo is not.
+      trash_review: { match: iv(1, 1, 1), miss: iv(15, 15, 15) },
+    }),
   },
   {
     name: "luckies",
@@ -142,6 +153,21 @@ const PILE_FAMILIES = [
     base: { flags: { lucky: true, traded: true } },
     skipProtected: YEAR_FLOOR_CASE,
     lensCases: () => ({ high_iv: { match: iv(15, 15, 13), miss: iv(5, 5, 5) } }),
+  },
+  {
+    name: "lucky families",
+    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "lucky_families"), dex: 133 }],
+    lensCases: () => ({ luckies: { match: { flags: { lucky: true } }, miss: {} } }),
+  },
+  {
+    name: "ready to evolve",
+    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "evolve"), dex: 129 }],
+    base: { flags: { canEvolve: true } },
+    outsider: () => ({ dex: 129, o: { flags: { canEvolve: false } } }),
+    lensCases: () => ({
+      new_dex: { match: { flags: { newDexEvo: true } }, miss: {} },
+      tagged_evolve: { match: { tags: ["Dex-Evolve"] }, miss: { tags: ["Show"] } },
+    }),
   },
   {
     name: "Dynamax",
@@ -169,6 +195,8 @@ const PILE_FAMILIES = [
     name: "Community Day backgrounds",
     piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "cd_backgrounds"), dex: 906 }],
     base: { flags: { specialBackground: true } },
+    // A special background on a species no Community Day featured (Bidoof).
+    outsider: () => ({ dex: 399, o: { families: ["bidoof"], flags: { specialBackground: true } } }),
     lensCases: () => ({ shiny: { match: { flags: { shiny: true } }, miss: {} } }),
   },
   {
@@ -191,7 +219,7 @@ for (const fam of PILE_FAMILIES) {
   for (const loc of localeNames) {
     const kw = pogoKeywords(loc);
     const tail = protectionTail(kw, CFG).join("&");
-    const result = buildFilters(HUNDOS, [], CFG, [], loc, makeTFn(loc));
+    const result = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc));
     const cases = fam.lensCases?.(kw) || {};
     const entries = fam.piles(result).filter((e) => e.pile);
     const bad = [];
@@ -232,9 +260,13 @@ for (const fam of PILE_FAMILIES) {
       }
       // P5 — a hundo shiny legendary nobody starred, outside the pile
       const outsider = { families: ["notinthepile"], dex: 0, ivAtk: 15, ivDef: 15, ivHp: 15, flags: { shiny: true } };
+      // A family's own outsider when "outside" isn't just another species: a
+      // species-restricted head is tested with a member-like Pokémon of a
+      // species it doesn't list, a flag head with the flag off.
       const own = fam.outsider?.();
       const outsiderMon = own
-        ? pileMon(loc, { ivAtk: 15, ivDef: 15, ivHp: 15, flags: { shiny: true } }, pokemonNameFor(String(own.dex), "en"), own.dex)
+        ? pileMon(loc, { ivAtk: 15, ivDef: 15, ivHp: 15, ...(own.o || {}), flags: { shiny: true, ...(own.o?.flags || {}) } },
+          own.dex ? pokemonNameFor(String(own.dex), "en") : "Magikarp", own.dex ?? 0)
         : pileMon(loc, outsider, "Magikarp", 0);
       for (const [k, str] of steps) {
         const v = evalFilterDetailed(str, outsiderMon, loc);
@@ -271,7 +303,7 @@ console.log("\nThe tail ignores the trash toggles");
 
 console.log("\nP7 — the pile card");
 for (const loc of localeNames) {
-  const r = buildFilters(HUNDOS, [], CFG, [], loc, makeTFn(loc));
+  const r = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc));
   const bad = [];
   const card = (id) => r.sortingPiles.find((p) => p.id === id)?.card;
   const meta = card("meta")?.rows || [];
@@ -314,7 +346,7 @@ console.log("\nP8 — budgets");
     check(`${loc}: every budget row renders`, bad.length === 0, bad.slice(0, 3).join(" | "));
   }
   const keepOf = (cfg) => {
-    const r = buildFilters(HUNDOS, [], cfg, [], "en", makeTFn("en"));
+    const r = buildFilters(HUNDOS, LUCKIES, cfg, [], "en", makeTFn("en"));
     return r.sortingPiles.find((p) => p.id === "meta").card.rows.find((row) => row.cls === "meta" && row.keep.length)?.keep[0] || "";
   };
   const overridden = { ...CFG, budgets: { raidMeta: 4 } };

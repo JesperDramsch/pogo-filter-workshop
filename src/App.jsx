@@ -25,7 +25,7 @@ import {
 } from './data/species.js';
 import { regionForForm } from './data/form-region.js';
 import SpeciesInput from './SpeciesInput.jsx';
-import { liveSpawnPool, rankMegaGroups } from './mega-boost.js';
+import { megaPlans, rankMegaGroups } from './mega-boost.js';
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from './i18n/pogo-keywords.js';
 import RAID_BOSSES from './data/raid-bosses.json';
 import EVENTS from './data/events.json';
@@ -1898,7 +1898,8 @@ export const BUDGET_DEFAULTS = {
 	raidMeta: 6,
 	pvpNormal: 1,
 	pvpShadow: 1,
-	watchShadow: 3,
+	watchMegaNormal: 1,
+	watchShadow: 2,
 	watchNormal: 1,
 	standIn: 1,
 	shadowStandIn: 2,
@@ -1938,12 +1939,15 @@ export const SHOWCASE_CLASSES = [
 	{ height: 2.0, weight: 2.5 },
 ];
 export const SHOWCASE_XXL_BONUS = 178;
-export function showcaseScoreRange({ dex, heightM, weightKg, ivs = [], xxl = true }, showcase = SPECIES_META.showcase) {
+// `ivs` null means unknown: the IV part (at most 50 of the score) then spans
+// its whole range instead of narrowing it.
+export function showcaseScoreRange({ dex, heightM, weightKg, ivs = null, xxl = true }, showcase = SPECIES_META.showcase) {
 	const mean = showcase?.sizeByDex?.[dex];
 	const c = showcase?.coefficients;
 	if (!mean || !c || !(heightM > 0) || !(weightKg > 0)) return null;
-	const ivSum = ivs.reduce((a, v) => a + Math.max(0, Math.min(15, Number(v) || 0)), 0);
-	const ivPart = c.iv * (ivSum / 45);
+	const ivSum = ivs ? ivs.reduce((a, v) => a + Math.max(0, Math.min(15, Number(v) || 0)), 0) : null;
+	const ivLow = ivs ? c.iv * (ivSum / 45) : 0;
+	const ivHigh = ivs ? ivLow : c.iv;
 	const bonus = xxl ? SHOWCASE_XXL_BONUS : 0;
 	const round = 0.005;
 	const scored = [];
@@ -1952,8 +1956,8 @@ export function showcaseScoreRange({ dex, heightM, weightKg, ivs = [], xxl = tru
 		const wr = weightKg / mean[1];
 		// The entered size has to fit the class (within the display rounding).
 		if ((heightM - round) / mean[0] > cls.height || (weightKg - round) / mean[1] > cls.weight) continue;
-		const at = (h, w) => c.height * (h / mean[0] / cls.height) + c.weight * (w / mean[1] / cls.weight) + ivPart + bonus;
-		scored.push({ cls: cls.height, low: at(heightM - round, weightKg - round), high: at(heightM + round, weightKg + round), hr, wr });
+		const at = (h, w, iv) => c.height * (h / mean[0] / cls.height) + c.weight * (w / mean[1] / cls.weight) + iv + bonus;
+		scored.push({ cls: cls.height, low: at(heightM - round, weightKg - round, ivLow), high: at(heightM + round, weightKg + round, ivHigh), hr, wr });
 	}
 	if (scored.length === 0) return { fits: false };
 	return {
@@ -2047,28 +2051,30 @@ export function effectiveBudgets(cfg) {
 // numbers the row's rule reads (and expert mode edits); each key's input is
 // named by `BUDGET_KEY_WORD`. XXS and tradebait have rules but no number.
 export const BUDGET_ROWS = [
-	{ job: 'evolve', keys: ['evolve', 'evolveShadow'] },
-	{ job: 'stand_in', keys: ['standIn'] },
-	{ job: 'shadow_stand_in', keys: ['shadowStandIn'] },
-	{ job: 'raid_meta', keys: ['raidMeta'] },
-	{ job: 'raid_watch', keys: ['watchShadow', 'watchNormal'] },
-	{ job: 'pvp', keys: ['pvpNormal', 'pvpShadow'] },
-	{ job: 'pvp_off_meta', keys: ['pvpOffMeta'] },
-	{ job: 'shinies', keys: ['shinyPerStage', 'shinyTradeable'] },
-	{ job: 'costumes', keys: ['costumePerStage', 'costumeTradeable'] },
-	{ job: 'backgrounds', keys: ['backgroundPerSpecies', 'backgroundTradeable'] },
-	{ job: 'cd_backgrounds', keys: ['cdBackground'] },
-	{ job: 'luckies', keys: ['luckyPerForm'] },
-	{ job: 'xxl', keys: ['xxlScore'] },
-	{ job: 'xxs', keys: [] },
-	{ job: 'dyna_builds', keys: ['dynaBuild', 'dynaBuildTop'] },
-	{ job: 'dyna_parkers', keys: ['dynaParkers'] },
-	{ job: 'cheap_purify', keys: ['cheapPurify'] },
-	{ job: 'tradebait', keys: [] },
+	{ job: 'evolve', group: 'collection', keys: ['evolve', 'evolveShadow'] },
+	{ job: 'stand_in', group: 'collection', keys: ['standIn'] },
+	{ job: 'shadow_stand_in', group: 'collection', keys: ['shadowStandIn'] },
+	{ job: 'shinies', group: 'collection', keys: ['shinyPerStage', 'shinyTradeable'] },
+	{ job: 'costumes', group: 'collection', keys: ['costumePerStage', 'costumeTradeable'] },
+	{ job: 'backgrounds', group: 'collection', keys: ['backgroundPerSpecies', 'backgroundTradeable'] },
+	{ job: 'cd_backgrounds', group: 'collection', keys: ['cdBackground'] },
+	{ job: 'luckies', group: 'collection', keys: ['luckyPerForm'] },
+	{ job: 'xxl', group: 'collection', keys: ['xxlScore'] },
+	{ job: 'xxs', group: 'collection', keys: [] },
+	{ job: 'raid_meta', group: 'battle', keys: ['raidMeta'] },
+	{ job: 'raid_watch_mega', group: 'battle', keys: ['watchMegaNormal'] },
+	{ job: 'raid_watch', group: 'battle', keys: ['watchShadow', 'watchNormal'] },
+	{ job: 'pvp', group: 'battle', keys: ['pvpNormal', 'pvpShadow'] },
+	{ job: 'pvp_off_meta', group: 'battle', keys: ['pvpOffMeta'] },
+	{ job: 'dyna_builds', group: 'battle', keys: ['dynaBuild', 'dynaBuildTop'] },
+	{ job: 'dyna_parkers', group: 'stock', keys: ['dynaParkers'] },
+	{ job: 'cheap_purify', group: 'stock', keys: ['cheapPurify'] },
+	{ job: 'tradebait', group: 'stock', keys: [] },
 ];
+export const BUDGET_GROUPS = ['collection', 'battle', 'stock'];
 const BUDGET_KEY_WORD = {
 	evolve: 'count', evolveShadow: 'shadow_line', standIn: 'count', shadowStandIn: 'count', raidMeta: 'count',
-	watchShadow: 'shadow', watchNormal: 'normal', pvpNormal: 'normal', pvpShadow: 'shadow', pvpOffMeta: 'count',
+	watchMegaNormal: 'normal', watchShadow: 'shadow', watchNormal: 'normal', pvpNormal: 'normal', pvpShadow: 'shadow', pvpOffMeta: 'count',
 	shinyPerStage: 'per_stage', shinyTradeable: 'tradeable', costumePerStage: 'per_stage', costumeTradeable: 'tradeable',
 	backgroundPerSpecies: 'per_species', backgroundTradeable: 'tradeable', cdBackground: 'per_species',
 	luckyPerForm: 'count', xxlScore: 'score', dynaBuild: 'count', dynaBuildTop: 'top', dynaParkers: 'count',
@@ -3072,16 +3078,6 @@ export function buildFilters(
 		if (cfg.protectLuckies) push(sortClauses, `!${kw.flag.lucky}`, tFn('app.clause_why.luckies_protected'));
 	}
 	const sort = sortClauses.map((c) => c.clause).join('&');
-	// The same families as a pile: ① the hundos themselves, ② what is not yet
-	// starred or tagged, ③ the rest. Once a hundo exists the family's stand-in
-	// has no job, so ③ releases it; the hundo is in the protection tail.
-	const hundoPile = buildPile({
-		id: 'hundo',
-		head: sortPileHead,
-		lenses: [{ key: 'hundos', filter: '4*' }],
-		kw,
-		cfg,
-	});
 
 	// ── LUCKY-HUNDO-SORT ───────────────────────────────────────────────────
 	// Narrower variant of HUNDO-SORT for the H ∩ L set: species where both
@@ -3130,6 +3126,20 @@ export function buildFilters(
 		if (cfg.protectLuckies) push(luckySortClauses, `!${kw.flag.lucky}`, tFn('app.clause_why.luckies_protected'));
 	}
 	const luckySort = luckySortClauses.map((c) => c.clause).join('&');
+	// The same families as a pile: ① the hundos themselves, ② what is not yet
+	// starred or tagged, ③ the rest. Once a hundo exists the family's stand-in
+	// has no job, so ③ releases it; the hundo is in the protection tail.
+	const hundoPile = buildPile({
+		id: 'hundo',
+		head: sortPileHead,
+		lenses: [
+			{ key: 'hundos', filter: '4*' },
+			// Hundo AND lucky owned: both chases done, so the family's dupes can go.
+			{ key: 'done_twice', filter: luckySortMembers.map((o) => `+${o}`).join(',') },
+		],
+		kw,
+		cfg,
+	});
 
 	// ── LUCKY-SORT ─────────────────────────────────────────────────────────
 	// Lucky analogue of HUNDO-SORT keyed on the luckies list: surface every member
@@ -3137,6 +3147,7 @@ export function buildFilters(
 	// it emits NO !lucky guard — the whole point is to see the lucky copies. Regional
 	// form-scoped via cfg.luckyForms, exactly like the hundo-sort.
 	const luckyFamilySortClauses = [];
+	let luckyFamilyPileHead = '';
 	if (luckies.length > 0) {
 		const L = luckies.map((l) => `+${speciesForOutput(l, outputLocale)}`).join(',');
 		push(luckyFamilySortClauses, L, tFn('app.clause_why.all_lucky_families'));
@@ -3161,6 +3172,7 @@ export function buildFilters(
 					tFn('app.clause_why.sort_gender_scope', { params: { species: capFirst(out) } }),
 				);
 		}
+		luckyFamilyPileHead = luckyFamilySortClauses.map((c) => c.clause).join('&');
 		if (cfg.protectAnyTag) push(luckyFamilySortClauses, '!#', tFn('app.clause_why.all_tags_protected'));
 		if (cfg.protectFavorites)
 			push(luckyFamilySortClauses, `!${kw.flag.favorite}`, tFn('app.clause_why.favorites_protected'));
@@ -3169,18 +3181,6 @@ export function buildFilters(
 	}
 	const luckyFamilySort = luckyFamilySortClauses.map((c) => c.clause).join('&');
 
-	// ── NUNDO-SORT ─────────────────────────────────────────────────────────
-	// Surface every 0/0/0 IV catch. PoGo's storage UI doesn't expose appraisal
-	// results as a filter, so this is the only way to bulk-browse Nundos for
-	// the collection wall. No favorite/tag exclusions — the whole point is
-	// finding every 0/0/0, including ones already starred or tagged.
-	const nundoSortClauses = [];
-	if (cfg.protectNundos) {
-		push(nundoSortClauses, `0${kw.iv.atk}`, tFn('app.clause_why.nundo_atk_zero'));
-		push(nundoSortClauses, `0${kw.iv.def}`, tFn('app.clause_why.nundo_def_zero'));
-		push(nundoSortClauses, `0${kw.iv.hp}`, tFn('app.clause_why.nundo_hp_zero'));
-	}
-	const nundoSort = nundoSortClauses.map((c) => c.clause).join('&');
 
 	// ── GIFT FILTER ────────────────────────────────────────────────────────
 	const giftClauses = [];
@@ -5044,11 +5044,33 @@ export function buildFilters(
 			lenses: [
 				{ key: 'souvenirs', filter: souvenirLens },
 				{ key: 'luckies', filter: kw.flag.lucky },
+				// What the trash filter would already take (was the traded-trash review).
+				{ key: 'trash_review', filter: trash },
 			],
 			kw,
 			cfg,
 		}),
 		buildPile({ id: 'luckies', head: kw.flag.lucky, lenses: [{ key: 'high_iv', filter: highIv }], kw, cfg }),
+		// Your lucky families (the lucky-sort, as a pile): ① the luckies themselves.
+		buildPile({
+			id: 'lucky_families',
+			head: luckyFamilyPileHead,
+			lenses: [{ key: 'luckies', filter: kw.flag.lucky }],
+			kw,
+			cfg,
+		}),
+		// Everything that can evolve right now: ① new Pokédex entries and the ones
+		// already tagged to evolve through.
+		buildPile({
+			id: 'evolve',
+			head: kw.flag.evolvable,
+			lenses: [
+				{ key: 'new_dex', filter: kw.flag.new_evo },
+				{ key: 'tagged_evolve', filter: `#${jobTagsOf(cfg).evolve}` },
+			],
+			kw,
+			cfg,
+		}),
 		// Dynamax-capable through the levelled Max-move token: bare `dynamax` is
 		// a search shortcut that silently drops the rest of the string.
 		buildPile({
@@ -5094,6 +5116,19 @@ export function buildFilters(
 			cfg,
 		}),
 	].filter(Boolean);
+	// Filters that belong with a pile but aren't keep lenses: what to purify
+	// instead of transfer, which shadows to Charge-TM, cheap XP and dex+ evolves.
+	const PILE_EXTRAS = {
+		shadows: [
+			{ key: 'shadow_safe', label: 'app.filter.shadow_safe_label', hint: 'app.filter.shadow_safe_hint', filter: shadowSafe },
+			{ key: 'shadow_frustration', label: 'app.filter.shadow_frustration_label', hint: 'app.filter.shadow_frustration_hint', filter: shadowFrustration },
+		],
+		evolve: [
+			{ key: 'dex_plus', label: 'app.filter.dex_plus_label', hint: 'app.filter.dex_plus_hint', filter: dexPlus },
+			{ key: 'cheap_evolve', label: 'app.filter.cheap_evolve_label', hint: 'app.filter.cheap_evolve_hint', filter: cheapEvolve },
+		],
+	};
+	for (const pile of sortingPiles) pile.extras = (PILE_EXTRAS[pile.id] || []).filter((x) => x.filter);
 
 	// ── META / WATCHLIST / NON-META ────────────────────────────────────────
 	// Each species' class, with its reasons in words, for the pile card and the
@@ -5148,6 +5183,8 @@ export function buildFilters(
 
 	const watchWhy = new Map();
 	for (const dex of SPECIES_META.upcomingMegaDex || []) reasonsOf(watchWhy, dex).push(tFn('app.card.reason.mega'));
+	// Watchlist species whose only reason is an upcoming Mega (see the card).
+	const watchOtherDex = new Set();
 	const moveCutoff = Date.now() - WATCH_MOVE_DAYS * 86400000;
 	for (const m of WATCH_MOVES.moves || []) {
 		if (Date.parse(m.at) < moveCutoff) continue;
@@ -5157,6 +5194,7 @@ export function buildFilters(
 		const temp = /^VM_MOVE_TEMP_EVOLUTION_/.test(m.move);
 		for (const dex of m.learners || []) {
 			if (temp && (SPECIES_META.upcomingMegaDex || []).includes(dex)) continue;
+			if (!temp) watchOtherDex.add(dex);
 			reasonsOf(watchWhy, dex).push(
 				temp
 					? tFn('app.card.reason.mega_changed')
@@ -5175,8 +5213,11 @@ export function buildFilters(
 	}
 	for (const [type, entries] of Object.entries(META_RANKINGS.watchPerType || {}))
 		for (const e of entries)
-			if (!metaDex.has(e.dex))
+			if (!metaDex.has(e.dex)) {
+				watchOtherDex.add(e.dex);
 				reasonsOf(watchWhy, e.dex).push(tFn('app.card.reason.rank', { params: { type: typeWord(type), rank: e.rank } }));
+			}
+	const watchMegaOnly = new Set([...watchWhy.keys()].filter((dex) => !watchOtherDex.has(dex)));
 
 	const nameOfDex = (dex) => pokemonNameFor(String(dex), outputLocale);
 	const watchNames = [...watchWhy.keys()].sort((a, b) => a - b).map(nameOfDex).filter(Boolean);
@@ -5217,7 +5258,11 @@ export function buildFilters(
 			if (pvpDex.has(dex))
 				keep.push(tFn('app.card.keep.pvp', { params: { normal: budgets.pvpNormal, shadow: budgets.pvpShadow } }));
 		} else if (watch) {
-			keep.push(tFn('app.card.keep.watch', { params: { shadow: budgets.watchShadow, normal: budgets.watchNormal } }));
+			// By tier: a Mega needs one normal copy (shadows can't Mega Evolve); a
+			// move or rank reason makes it a plain attacker, where shadows are the
+			// scarce part.
+			if (watchMegaOnly.has(dex)) keep.push(tFn('app.card.keep.watch_mega', { params: { normal: budgets.watchMegaNormal } }));
+			else keep.push(tFn('app.card.keep.watch', { params: { shadow: budgets.watchShadow, normal: budgets.watchNormal } }));
 		} else {
 			keep.push(tFn('app.card.keep.standin', { params: { n: budgets.standIn } }));
 		}
@@ -5261,7 +5306,6 @@ export function buildFilters(
 		sort,
 		luckySort,
 		luckyFamilySort,
-		nundoSort,
 		prestaged,
 		gift,
 		buddyCatchFilters,
@@ -5288,7 +5332,6 @@ export function buildFilters(
 		sortClauses,
 		luckySortClauses,
 		luckyFamilySortClauses,
-		nundoSortClauses,
 		prestagedClauses,
 		giftClauses,
 		// Aux pro-tools
@@ -6115,10 +6158,6 @@ export default function App() {
 	const [loaded, setLoaded] = useState(false);
 	const [onboarded, setOnboarded] = useState(false);
 	const [showSetTheory, setShowSetTheory] = useState(false);
-	const [showAuxShadows, setShowAuxShadows] = useState(false);
-	const [showAuxEvos, setShowAuxEvos] = useState(false);
-	const [showBrowseSort, setShowBrowseSort] = useState(false);
-	const [showPiles, setShowPiles] = useState(false);
 	const [showHiddenPiles, setShowHiddenPiles] = useState(false);
 	const [showAuxTrades, setShowAuxTrades] = useState(false);
 	const [showFriendWishlist, setShowFriendWishlist] = useState(false);
@@ -6126,14 +6165,6 @@ export default function App() {
 	// (The curated friend-collect list's equivalent toggle lives in config as
 	// `friendCollectGuaranteedOnly` — it's a persisted curation setting.)
 	const [friendGuaranteedLucky, setFriendGuaranteedLucky] = useState(false);
-	const [showAuxMegas, setShowAuxMegas] = useState(false);
-	// Open when a running or just-ended event floats the wild spawns up (the
-	// "right now" block says so).
-	const [showAuxEvents, setShowAuxEvents] = useState(() =>
-		floatingPiles({ events: EVENTS.events, signals: EVENTS.signals, eventMaxBattles: RAID_BOSSES.eventMaxBattles }).some(
-			(f) => f.pile === 'event_spawns',
-		),
-	);
 	const [showAuxRaids, setShowAuxRaids] = useState(false);
 	const [showAuxMaxBattles, setShowAuxMaxBattles] = useState(false);
 	const [showAuxRocket, setShowAuxRocket] = useState(false);
@@ -6194,7 +6225,6 @@ export default function App() {
 		sort: false,
 		luckySort: false,
 		luckyFamilySort: false,
-		nundoSort: false,
 		prestaged: false,
 		gift: false,
 		// Aux pro-tools
@@ -6462,7 +6492,6 @@ export default function App() {
 		sortingPiles,
 		hundoPile,
 		luckyFamilySort,
-		nundoSort,
 		prestaged,
 		gift,
 		buddyCatchFilters,
@@ -6482,7 +6511,6 @@ export default function App() {
 		sortClauses,
 		luckySortClauses,
 		luckyFamilySortClauses,
-		nundoSortClauses,
 		prestagedClauses,
 		giftClauses,
 		shadowCheap,
@@ -7029,11 +7057,7 @@ export default function App() {
 	);
 	const floatIds = new Set(floats.map((f) => f.pile));
 	const hiddenIds = new Set(effectiveConfig.hiddenPiles || []);
-	const floatedPiles = floats
-		.map((float) => ({ float, pile: sortingPiles.find((p) => p.id === float.pile) }))
-		.filter((x) => x.pile);
-	const restPiles = sortingPiles.filter((p) => !floatIds.has(p.id) && !hiddenIds.has(p.id));
-	const hiddenPileList = sortingPiles.filter((p) => !floatIds.has(p.id) && hiddenIds.has(p.id));
+	const hiddenPileList = [hundoPile, ...sortingPiles].filter((p) => p && !floatIds.has(p.id) && hiddenIds.has(p.id));
 	const toggleHiddenPile = (id) =>
 		setConfig((prev) => {
 			const now = new Set(prev.hiddenPiles || []);
@@ -7041,42 +7065,104 @@ export default function App() {
 			else now.add(id);
 			return { ...prev, hiddenPiles: [...now] };
 		});
-	const pileAccordion = (pile, reason = null) => (
-		<TrainerAccordion
+	// Sorting, top to bottom: what's going on right now (each running or
+	// just-ended event as its own pile, plus the piles an event floats up),
+	// then every other pile as a card, grouped, then the Crush strip.
+	const nowMs = Date.now();
+	const recentEvents = eventFilters.filter((ev) => {
+		const s = Date.parse(ev.start), e = Date.parse(ev.end);
+		return ev.pile && s <= nowMs && nowMs - e <= FLOAT_ENDED_DAYS * 86400000;
+	});
+	const fmtWhen = new Intl.DateTimeFormat(locale, { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+	const eventChip = (ev) =>
+		Date.parse(ev.end) >= nowMs
+			? t('app.sort.ends', { params: { when: fmtWhen.format(Date.parse(ev.end)) } })
+			: t('app.sort.ended', { params: { when: fmtWhen.format(Date.parse(ev.end)) } });
+	const pileById = Object.fromEntries([hundoPile, ...sortingPiles].filter(Boolean).map((p) => [p.id, p]));
+	const accentOf = (id) => PILE_GROUPS.find((g) => g.piles.includes(id))?.accent || '#5EAFC5';
+	const tile = (pile, extra = {}) => (
+		<PileTile
 			key={pile.id}
-			name={t(`app.pile.${pile.id}.title`)}
-			teaser={reason}
-			highlight={!!reason}
-			accent='#5EAFC5'
+			pile={pile}
+			title={t(`app.pile.${pile.id}.title`)}
+			hook={t(`app.sort.hook.${pile.id}`)}
+			icon={PILE_ICON[pile.id] || '🗂️'}
+			accent={accentOf(pile.id)}
+			text={pile.id === 'hundo' ? HUNDO_PILE_TEXT : undefined}
+			copied={copied}
+			copyToClipboard={copyToClipboard}
+			t={t}
+			{...extra}
 		>
-			<PileSteps pile={pile} accent='#5EAFC5' copied={copied} copyToClipboard={copyToClipboard} t={t} />
 			{pile.id === 'xxl' && <XxlCalculator threshold={effectiveBudgets(effectiveConfig).xxlScore} t={t} />}
-			{!reason && (
-				<button
-					type='button'
-					onClick={() => toggleHiddenPile(pile.id)}
-					className='mono text-[11px] text-[#8090A0] hover:text-[#E6EDF3] min-h-[32px]'
-				>
-					{hiddenIds.has(pile.id) ? t('app.pile.unhide') : t('app.pile.hide')}
-				</button>
-			)}
-		</TrainerAccordion>
+		</PileTile>
 	);
-	const wildSpawnsBlock = (
-	<EventSpawnCollapsible
-		icon='🌿'
-		fetchedAt={eventsFetchedAt}
-		events={eventFilters}
-		megaBoostFor={megaBoostFor}
-		typeLabels={rocketTypeLabels}
-		accent='#27AE60'
-		open={showAuxEvents}
-		onToggle={() => setShowAuxEvents((s) => !s)}
-		copied={copied}
-		copyToClipboard={copyToClipboard}
-		t={t}
-		locale={locale}
-	/>
+	const floatedHere = floats.filter((f) => pileById[f.pile]);
+	const sortingView = (
+		<div className='space-y-8'>
+			<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.sort.intro')}</p>
+			{(recentEvents.length > 0 || floatedHere.length > 0) && (
+				<section aria-labelledby='sort-now' className='rounded-lg p-3 sm:p-4 space-y-3 border border-[#5EAFC5]/30 bg-gradient-to-br from-[#5EAFC5]/10 via-transparent to-[#27AE60]/10'>
+					<h3 id='sort-now' className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold'>
+						{t('app.float.title')}
+					</h3>
+					{recentEvents.map((ev) => (
+						<PileTile
+							key={ev.id}
+							pile={ev.pile}
+							title={ev.title}
+							hook={t('app.sort.hook.event')}
+							icon={PILE_ICON.event}
+							chip={eventChip(ev)}
+							accent='#27AE60'
+							text={EVENT_PILE_TEXT}
+							copied={copied}
+							copyToClipboard={copyToClipboard}
+							t={t}
+						/>
+					))}
+					{floatedHere.map((f) =>
+						tile(pileById[f.pile], { chip: t(`app.float.${f.kind}`, { params: { title: f.title } }) }),
+					)}
+				</section>
+			)}
+			{PILE_GROUPS.map((group) => {
+				const piles = group.piles
+					.map((id) => pileById[id])
+					.filter((p) => p && !floatIds.has(p.id) && !hiddenIds.has(p.id));
+				if (piles.length === 0) return null;
+				return (
+					<section key={group.id} aria-labelledby={`sort-group-${group.id}`} className='space-y-2'>
+						<h3 id={`sort-group-${group.id}`} className='mono text-xs uppercase tracking-widest font-semibold' style={{ color: group.accent }}>
+							{t(`app.sort.group.${group.id}`)}
+						</h3>
+						<p className='mono text-[11px] text-[#8090A0] -mt-1'>{t(`app.sort.group_hint.${group.id}`)}</p>
+						{piles.map((pile) => tile(pile, { onHide: () => toggleHiddenPile(pile.id) }))}
+					</section>
+				);
+			})}
+			{hiddenPileList.length > 0 && (
+				<div className='space-y-2'>
+					<button
+						type='button'
+						onClick={() => setShowHiddenPiles((v) => !v)}
+						aria-expanded={showHiddenPiles}
+						className='mono text-xs text-[#5EAFC5] hover:text-[#E6EDF3] min-h-[32px]'
+					>
+						{t('app.pile.hidden', { params: { count: hiddenPileList.length } })}
+					</button>
+					{showHiddenPiles && hiddenPileList.map((pile) => tile(pile, { onHide: () => toggleHiddenPile(pile.id), hidden: true }))}
+				</div>
+			)}
+			<CrushCard tag={jobTagsOf(effectiveConfig).crush} copied={copied} copyToClipboard={copyToClipboard} t={t} />
+		</div>
+	);
+	const megaPlanRows = useMemo(
+		() =>
+			megaPlans({ events: EVENTS.events, eventRaids: RAID_BOSSES.eventRaids }, Date.now(), (n) => resolveSpeciesInfo(n)?.dex)
+				.map((p) => ({ ...p, boost: megaBoostFor(p.spawnForms) }))
+				.filter((p) => p.boost.groups.length > 0),
+		[megaBoostFor],
 	);
 	const jobTagSettings = (
 		<JobTagsPanel config={config} setConfig={setConfig} copied={copied} copyToClipboard={copyToClipboard} t={t} />
@@ -7166,16 +7252,17 @@ export default function App() {
 		),
 		sort: (
 			<div className='space-y-10'>
-				{jobTagSettings}
 				{haveListSettings}
-				{shadowKeeperSettings}
+				{jobTagSettings}
 				<BudgetsEditor config={config} setConfig={setConfig} t={t} />
 			</div>
 		),
 		battle: (
 			<div className='space-y-10'>
 				<ConfigPanel {...configPanelProps} sections={['pvp', 'raid', 'rocket']} />
+				<LeagueTagSettings config={config} set={setConfigKey} />
 				{raidRosterSettings}
+				{shadowKeeperSettings}
 			</div>
 		),
 		trade: (
@@ -7336,6 +7423,15 @@ export default function App() {
 													onCopy={() => copyToClipboard('trash', trash)}
 													hint={t('app.filter.trash_hint')}
 												/>
+												<MegaPlanner
+													plans={megaPlanRows}
+													megaEvolve={megaEvolve}
+													copied={copied}
+													copyToClipboard={copyToClipboard}
+													typeLabels={rocketTypeLabels}
+													t={t}
+													locale={locale}
+												/>
 											</>
 										)}
 									</AreaPanel>
@@ -7344,208 +7440,7 @@ export default function App() {
 											areaSettingsFor.sort
 										) : (
 											<>
-												<div className='space-y-3'>
-													<CrushCard tag={jobTagsOf(effectiveConfig).crush} copied={copied} copyToClipboard={copyToClipboard} t={t} />
-													{floats.length > 0 && (
-														<section aria-labelledby='float-heading' className='border border-[#5EAFC5]/40 rounded-sm p-3 space-y-3'>
-															<h3 id='float-heading' className='mono text-[10.5px] uppercase tracking-wider text-[#5EAFC5]'>
-																{t('app.float.title')}
-															</h3>
-															{floats.filter((f) => f.pile === 'event_spawns').map((f) => (
-																<p key={f.pile} className='mono text-xs text-[#8B98A5]'>{t('app.float.wild', { params: { title: f.title } })}</p>
-															))}
-															{floatIds.has('event_spawns') && wildSpawnsBlock}
-															{floatedPiles.map(({ pile, float }) =>
-																pileAccordion(pile, t(`app.float.${float.kind}`, { params: { title: float.title } })),
-															)}
-														</section>
-													)}
-													{(hundoPile || luckySort || luckyFamilySort || nundoSort || tradedTrashSort) && (
-														<Collapsible
-															icon='✨'
-															label={t('app.collapsible.browse_sort')}
-															open={showBrowseSort}
-															onToggle={() => setShowBrowseSort((s) => !s)}
-														>
-															<div className='space-y-4'>
-																{hundoPile && (
-																	<TrainerAccordion name={t('app.filter.sort_label')} accent='#F5B82E'>
-																		<PileSteps
-																			pile={hundoPile}
-																			accent='#F5B82E'
-																			copied={copied}
-																			copyToClipboard={copyToClipboard}
-																			t={t}
-																			text={HUNDO_PILE_TEXT}
-																		/>
-																	</TrainerAccordion>
-																)}
-																{luckySort && (
-																	<FilterBox
-																		label={t('app.filter.lucky_sort_label')}
-																		accent='#F5B82E'
-																		filterStr={luckySort}
-																		copied={copied.luckySort}
-																		onCopy={() => copyToClipboard('luckySort', luckySort)}
-																		hint={t('app.filter.lucky_sort_hint')}
-																	/>
-																)}
-																{luckyFamilySort && (
-																	<FilterBox
-																		label={t('app.filter.lucky_family_sort_label')}
-																		accent='#F5B82E'
-																		filterStr={luckyFamilySort}
-																		copied={copied.luckyFamilySort}
-																		onCopy={() => copyToClipboard('luckyFamilySort', luckyFamilySort)}
-																		hint={t('app.filter.lucky_family_sort_hint')}
-																	/>
-																)}
-																{nundoSort && (
-																	<FilterBox
-																		label={t('app.filter.nundo_sort_label')}
-																		accent='#F5B82E'
-																		filterStr={nundoSort}
-																		copied={copied.nundoSort}
-																		onCopy={() => copyToClipboard('nundoSort', nundoSort)}
-																		hint={t('app.filter.nundo_sort_hint')}
-																	/>
-																)}
-															{tradedTrashSort && (
-																<FilterBox
-																	label={t('app.filter.traded_trash_sort_label')}
-																	accent='#E67E22'
-																	filterStr={tradedTrashSort}
-																	copied={copied.tradedTrashSort}
-																	onCopy={() =>
-																		copyToClipboard('tradedTrashSort', tradedTrashSort)
-																	}
-																	hint={t('app.filter.traded_trash_sort_hint')}
-																/>
-															)}
-															</div>
-														</Collapsible>
-													)}
-													{sortingPiles.length > 0 && (
-														<Collapsible
-															icon='🗂️'
-															label={t('app.pile.section_title')}
-															open={showPiles}
-															onToggle={() => setShowPiles((s) => !s)}
-														>
-															<div className='space-y-3'>
-																<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.pile.section_hint')}</p>
-																{restPiles.map((pile) => pileAccordion(pile))}
-																{hiddenPileList.length > 0 && (
-																	<div className='pt-2 border-t border-[#1F2933] space-y-2'>
-																		<button
-																			type='button'
-																			onClick={() => setShowHiddenPiles((v) => !v)}
-																			aria-expanded={showHiddenPiles}
-																			className='mono text-xs text-[#5EAFC5] hover:text-[#E6EDF3] min-h-[32px]'
-																		>
-																			{t('app.pile.hidden', { params: { count: hiddenPileList.length } })}
-																		</button>
-																		{showHiddenPiles && hiddenPileList.map((pile) => pileAccordion(pile))}
-																	</div>
-																)}
-															</div>
-														</Collapsible>
-													)}
-													{!floatIds.has('event_spawns') && wildSpawnsBlock}
-													<Collapsible
-														icon='🌑'
-														label={t('app.collapsible.aux_shadows')}
-														open={showAuxShadows}
-														onToggle={() => setShowAuxShadows((s) => !s)}
-													>
-														<div className='space-y-4'>
-															<FilterBox
-																label={t('app.filter.shadow_cheap_label')}
-																accent='#9B59B6'
-																filterStr={shadowCheap}
-																copied={copied.shadowCheap}
-																onCopy={() => copyToClipboard('shadowCheap', shadowCheap)}
-																hint={t('app.filter.shadow_cheap_hint')}
-															/>
-															<FilterBox
-																label={t('app.filter.shadow_safe_label')}
-																accent='#9B59B6'
-																filterStr={shadowSafe}
-																copied={copied.shadowSafe}
-																onCopy={() => copyToClipboard('shadowSafe', shadowSafe)}
-																hint={t('app.filter.shadow_safe_hint')}
-															/>
-															<FilterBox
-																label={t('app.filter.shadow_hundo_candidates_label')}
-																accent='#9B59B6'
-																filterStr={shadowHundoCandidates}
-																copied={copied.shadowHundoCandidates}
-																onCopy={() =>
-																	copyToClipboard('shadowHundoCandidates', shadowHundoCandidates)
-																}
-																hint={t('app.filter.shadow_hundo_candidates_hint')}
-															/>
-															{shadowFrustration && (
-																<FilterBox
-																	label={t('app.filter.shadow_frustration_label')}
-																	accent='#9B59B6'
-																	filterStr={shadowFrustration}
-																	copied={copied.shadowFrustration}
-																	onCopy={() =>
-																		copyToClipboard('shadowFrustration', shadowFrustration)
-																	}
-																	hint={t('app.filter.shadow_frustration_hint')}
-																/>
-															)}
-														</div>
-													</Collapsible>
-													<Collapsible
-														icon='🥚'
-														label={t('app.collapsible.aux_evos')}
-														open={showAuxEvos}
-														onToggle={() => setShowAuxEvos((s) => !s)}
-													>
-														<div className='space-y-4'>
-															{cheapEvolve ? (
-																<FilterBox
-																	label={t('app.filter.cheap_evolve_label')}
-																	accent='#27AE60'
-																	filterStr={cheapEvolve}
-																	copied={copied.cheapEvolve}
-																	onCopy={() => copyToClipboard('cheapEvolve', cheapEvolve)}
-																	hint={t('app.filter.cheap_evolve_hint')}
-																/>
-															) : (
-																<p className='text-xs italic text-[#8B98A5]'>
-																	{t('app.filter.cheap_evolve_empty')}
-																</p>
-															)}
-															<FilterBox
-																label={t('app.filter.dex_plus_label')}
-																accent='#27AE60'
-																filterStr={dexPlus}
-																copied={copied.dexPlus}
-																onCopy={() => copyToClipboard('dexPlus', dexPlus)}
-																hint={t('app.filter.dex_plus_hint')}
-															/>
-														</div>
-													</Collapsible>
-													<Collapsible
-														icon='⚡'
-														label={t('app.collapsible.aux_megas')}
-														open={showAuxMegas}
-														onToggle={() => setShowAuxMegas((s) => !s)}
-													>
-														<FilterBox
-															label={t('app.filter.mega_evolve_label')}
-															accent='#E91E63'
-															filterStr={megaEvolve}
-															copied={copied.megaEvolve}
-															onCopy={() => copyToClipboard('megaEvolve', megaEvolve)}
-															hint={t('app.filter.mega_evolve_hint')}
-														/>
-													</Collapsible>
-												</div>
+												{sortingView}
 											</>
 										)}
 									</AreaPanel>
@@ -7880,7 +7775,6 @@ export default function App() {
 												tradeClauses={tradeClauses}
 												sortClauses={sortClauses}
 												luckySortClauses={luckySortClauses}
-												nundoSortClauses={nundoSortClauses}
 												prestagedClauses={prestagedClauses}
 												giftClauses={giftClauses}
 												buddyCatchFilters={buddyCatchFilters}
@@ -9933,11 +9827,18 @@ function XxlCalculator({ threshold, t }) {
 	const [species, setSpecies] = useState('');
 	const [height, setHeight] = useState('');
 	const [weight, setWeight] = useState('');
-	const [ivs, setIvs] = useState(['15', '15', '15']);
+	const [ivs, setIvs] = useState(['', '', '']);
 	const [xxl, setXxl] = useState(true);
 	const dex = resolveSpeciesInfo(species)?.dex;
 	const result = dex
-		? showcaseScoreRange({ dex, heightM: Number.parseFloat(height), weightKg: Number.parseFloat(weight), ivs: ivs.map(Number), xxl })
+		? showcaseScoreRange({
+				dex,
+				heightM: Number.parseFloat(height),
+				weightKg: Number.parseFloat(weight),
+				// All three filled → exact IV part; otherwise unknown, and the range widens.
+				ivs: ivs.every((v) => v !== '') ? ivs.map(Number) : null,
+				xxl,
+			})
 		: null;
 	const field = 'mono text-sm bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 min-h-[32px] rounded-sm text-[#E6EDF3]';
 	const verdict = !result?.fits
@@ -9963,22 +9864,27 @@ function XxlCalculator({ threshold, t }) {
 					{t('app.xxl.weight')}
 					<input id={`${fid}-w`} type='number' inputMode='decimal' step='0.01' min='0' value={weight} onChange={(e) => setWeight(e.target.value)} className={field} />
 				</label>
-				<div className='col-span-2 grid grid-cols-3 gap-2'>
-					{['atk', 'def', 'hp'].map((k, i) => (
-						<label key={k} htmlFor={`${fid}-${k}`} className='mono text-[11px] text-[#8090A0] flex flex-col gap-1'>
-							{t(`app.xxl.${k}`)}
-							<input
-								id={`${fid}-${k}`}
-								type='number'
-								min='0'
-								max='15'
-								value={ivs[i]}
-								onChange={(e) => setIvs((prev) => prev.map((v, j) => (j === i ? e.target.value : v)))}
-								className={field}
-							/>
-						</label>
-					))}
-				</div>
+				<details className='col-span-2'>
+					<summary className='list-none cursor-pointer mono text-[11px] text-[#5EAFC5] hover:text-[#E6EDF3] min-h-[32px] flex items-center'>
+						{t('app.xxl.ivs_toggle')}
+					</summary>
+					<div className='col-span-2 grid grid-cols-3 gap-2'>
+						{['atk', 'def', 'hp'].map((k, i) => (
+							<label key={k} htmlFor={`${fid}-${k}`} className='mono text-[11px] text-[#8090A0] flex flex-col gap-1'>
+								{t(`app.xxl.${k}`)}
+								<input
+									id={`${fid}-${k}`}
+									type='number'
+									min='0'
+									max='15'
+									value={ivs[i]}
+									onChange={(e) => setIvs((prev) => prev.map((v, j) => (j === i ? e.target.value : v)))}
+									className={field}
+								/>
+							</label>
+						))}
+					</div>
+				</details>
 				<label className='col-span-2 mono text-xs text-[#E6EDF3] flex items-center gap-2 min-h-[32px]'>
 					<input type='checkbox' checked={xxl} onChange={(e) => setXxl(e.target.checked)} />
 					{t('app.xxl.is_xxl')}
@@ -10053,6 +9959,72 @@ function PileCard({ card, t }) {
 	);
 }
 
+// Every sorting pile as a card you scroll past: an icon, a title, a one-line
+// hook in plain words ("Cryptos piling up…"), and the three steps when opened.
+// `chip` carries the event window or the reason a pile floated up.
+export const PILE_GROUPS = [
+	{ id: 'collection', accent: '#F5B82E', piles: ['hundo', 'lucky_families', 'luckies', 'traded', 'costumes', 'cd_backgrounds', 'xxl', 'xxs'] },
+	{ id: 'battle', accent: '#E74C3C', piles: ['meta', 'watchlist', 'shadows', 'dynamax'] },
+	{ id: 'evolve', accent: '#27AE60', piles: ['evolve'] },
+	{ id: 'big', accent: '#5EAFC5', piles: ['non_meta'] },
+];
+const PILE_ICON = {
+	hundo: '💯', lucky_families: '✨', luckies: '🍀', traded: '🎁', costumes: '🎃', cd_backgrounds: '🖼️', xxl: '🐘',
+	xxs: '🐜', meta: '⚔️', watchlist: '🔭', shadows: '🌑', dynamax: '🌀', evolve: '🧪', non_meta: '📦', event: '🌿',
+};
+function PileTile({ pile, title, hook, icon, chip, accent, open, onHide, hidden, text, copied, copyToClipboard, t, children }) {
+	return (
+		<details
+			open={open || undefined}
+			className='group rounded-md border border-[#1F2933] bg-[#0E141A] overflow-hidden transition hover:border-[#2D3A47]'
+			style={{ borderLeft: `3px solid ${accent}` }}
+		>
+			<summary className='list-none cursor-pointer flex items-start gap-3 p-3'>
+				<span className='text-2xl leading-none mt-0.5 select-none' aria-hidden='true'>
+					{icon}
+				</span>
+				<span className='min-w-0 flex-1'>
+					<span className='flex flex-wrap items-center gap-2'>
+						<span className='mono text-sm font-semibold text-[#E6EDF3]'>{title}</span>
+						{chip && (
+							<span className='mono text-[10px] px-1.5 py-0.5 rounded-sm' style={{ color: accent, border: `1px solid ${accent}55` }}>
+								{chip}
+							</span>
+						)}
+					</span>
+					<span className='block text-xs text-[#8B98A5] mt-1 leading-relaxed'>{hook}</span>
+				</span>
+				<ChevronRight size={14} className='text-[#8090A0] details-arrow shrink-0 mt-1' aria-hidden='true' />
+			</summary>
+			<div className='px-3 pb-3 pt-3 border-t border-[#1F2933] space-y-3'>
+				<PileSteps pile={pile} accent={accent} copied={copied} copyToClipboard={copyToClipboard} t={t} text={text} />
+				{(pile.extras || []).length > 0 && (
+					<div className='space-y-3 pt-2 border-t border-[#1F2933]'>
+						<h5 className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t('app.sort.also_here')}</h5>
+						{pile.extras.map((x) => (
+							<FilterBox
+								key={x.key}
+								label={t(x.label, x.params ? { params: x.params } : undefined)}
+								accent={accent}
+								filterStr={x.filter}
+								copied={copied[`${pile.id}_${x.key}`]}
+								onCopy={() => copyToClipboard(`${pile.id}_${x.key}`, x.filter)}
+								hint={t(x.hint, x.params ? { params: x.params } : undefined)}
+							/>
+						))}
+					</div>
+				)}
+				{children}
+				{onHide && (
+					<button type='button' onClick={onHide} className='mono text-[11px] text-[#8090A0] hover:text-[#E6EDF3] min-h-[32px]'>
+						{hidden ? t('app.pile.unhide') : t('app.pile.hide')}
+					</button>
+				)}
+			</div>
+		</details>
+	);
+}
+
 // The three steps of one sorting pile (see buildPile), rendered the same way
 // for every pile. `text` names each box's label and hint keys:
 //   { overview: [label, hint], keep: { <lensKey>: [label, hint] }, sort, release }
@@ -10121,107 +10093,82 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 	);
 }
 
-function EventSpawnCollapsible({
-	icon,
-	fetchedAt,
-	events,
-	megaBoostFor,
-	typeLabels,
-	accent,
-	open,
-	onToggle,
-	copied,
-	copyToClipboard,
-	t,
-	locale,
-}) {
-	const list = events || [];
-	const age = formatSyncAge(fetchedAt, t);
-	const headerLabel = t('app.collapsible.aux_events');
-	const countLabel = t('app.collapsible.aux_events_count', { params: { count: list.length } });
-	const footerLabel = age
-		? t('app.collapsible.aux_footer', { params: { count: countLabel, age } })
-		: t('app.collapsible.aux_footer_no_age', { params: { count: countLabel } });
-	if (list.length === 0) {
-		return (
-			<Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
-				<p className='text-xs italic text-[#8B98A5]'>{t('app.events.empty')}</p>
-			</Collapsible>
-		);
-	}
-	const fmtDow = new Intl.DateTimeFormat(locale, { weekday: 'short' });
-	// The current spawn pool: the events running now, decided at render like
-	// each event's active highlight below.
-	const live = liveSpawnPool(list, Date.now());
-	const liveMegaBoost =
-		megaBoostFor && live.spawnForms.length > 0
-			? { eventTitles: live.events.map((ev) => ev.title), ...megaBoostFor(live.spawnForms) }
-			: null;
-	const megaPanel = (boost, copyKey, heading, sub) => (
-		<MegaBoostPanel
-			boost={boost}
-			heading={heading}
-			sub={sub}
-			accent={accent}
-			copied={copied[copyKey]}
-			onCopy={() => copyToClipboard(copyKey, boost.filter)}
-			typeLabels={typeLabels}
-			t={t}
-			locale={locale}
-		/>
-	);
-	return (
-		<Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
-			<div className='space-y-5'>
-				{liveMegaBoost &&
-					megaPanel(
-						liveMegaBoost,
-						'event_mega_live',
-						t('app.events.mega_live_heading'),
-						t('app.events.mega_live_sub', {
-							params: { count: liveMegaBoost.poolSize, events: liveMegaBoost.eventTitles.join(' + ') },
-						}),
-					)}
-				{list.map((ev) => {
-					const startMs = Date.parse(ev.start);
-					const endMs = Date.parse(ev.end);
-					const now = Date.now();
-					const isActive = now >= startMs && now <= endMs;
-					const isEnded = now > endMs;
-					const teaser = isEnded
-						? t('app.events.window_ended', { params: { dow: fmtDow.format(endMs) } })
-						: formatEventWindow(ev.start, ev.end, t, locale);
-					return (
-						<TrainerAccordion
-							key={ev.id}
-							name={ev.title}
-							teaser={teaser}
-							accent={accent}
-							highlight={isActive}
-						>
-							{ev.megaBoost?.poolSize > 0 &&
-								megaPanel(ev.megaBoost, `event_${ev.id}_mega`, t('app.events.mega_heading'))}
-							<PileSteps
-								pile={ev.pile}
-								accent={accent}
-								copied={copied}
-								copyToClipboard={copyToClipboard}
-								t={t}
-								text={EVENT_PILE_TEXT}
-							/>
-						</TrainerAccordion>
-					);
-				})}
-			</div>
-			<p className='mono text-[10.5px] text-[#8090A0] mt-4 pt-3 border-t border-[#1F2933]'>{footerLabel}</p>
-		</Collapsible>
-	);
-}
 
 // "Which Mega is worth it" for one spawn pool: the top groups of
 // interchangeable Megas (src/mega-boost.js), each with how much of the pool it
 // boosts and which spawns, then one filter for the top group's species. Names
 // are shown in the UI locale; the filter is built in the output locale.
+// "Which Mega for my next outing" (Catching): one row per wild-spawn event or
+// raid day / raid hour that is on now or starts within the next days (see
+// megaPlans in mega-boost.js), soonest first, the running ones open. The Mega
+// rank-up filter sits underneath: levelling Megas is out-and-about work too.
+function MegaPlanner({ plans, megaEvolve, copied, copyToClipboard, typeLabels, t, locale }) {
+	const now = Date.now();
+	const fmtDow = new Intl.DateTimeFormat(locale, { weekday: 'short' });
+	const fmtTime = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
+	const when = (p) => {
+		const s = Date.parse(p.start), e = Date.parse(p.end);
+		if (s <= now) return t('app.mega_plan.now_until', { params: { end: `${fmtDow.format(e)} ${fmtTime.format(e)}` } });
+		return t('app.mega_plan.starts', { params: { start: `${fmtDow.format(s)} ${fmtTime.format(s)}` } });
+	};
+	// The top Mega leads the teaser: on a phone the row cuts off, and the Mega
+	// is what the row is for.
+	const topName = (p) => {
+		const key = p.boost.groups[0]?.megaKeys?.[0];
+		const name = key ? pokemonNameFor(key, locale) || '' : '';
+		return name.replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toUpperCase());
+	};
+	return (
+		<section aria-labelledby='mega-plan-heading' className='space-y-3'>
+			<div>
+				<h3 id='mega-plan-heading' className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
+					{t('app.mega_plan.title')}
+				</h3>
+				<p className='mono text-xs text-[#8B98A5] mt-1 leading-relaxed'>{t('app.mega_plan.hint')}</p>
+			</div>
+			{plans.length === 0 ? (
+				<p className='mono text-xs italic text-[#8B98A5]'>{t('app.mega_plan.empty')}</p>
+			) : (
+				<div className='space-y-2'>
+					{plans.map((p) => {
+						const live = Date.parse(p.start) <= now;
+						const icon = p.kind === 'raid' ? '⚔️' : '🌿';
+						const name = topName(p);
+						return (
+							<TrainerAccordion
+								key={p.id}
+								name={`${icon} ${p.title}`}
+								teaser={name ? `${name} · ${when(p)}` : when(p)}
+								accent='#E91E63'
+								highlight={live}
+							>
+								<MegaBoostPanel
+									boost={p.boost}
+									heading={t(p.kind === 'raid' ? 'app.mega_plan.raid_heading' : 'app.mega_plan.wild_heading')}
+									accent='#E91E63'
+									copied={copied[`megaplan_${p.id}`]}
+									onCopy={() => copyToClipboard(`megaplan_${p.id}`, p.boost.filter)}
+									typeLabels={typeLabels}
+									t={t}
+									locale={locale}
+								/>
+							</TrainerAccordion>
+						);
+					})}
+				</div>
+			)}
+			<FilterBox
+				label={t('app.filter.mega_evolve_label')}
+				accent='#E91E63'
+				filterStr={megaEvolve}
+				copied={copied.megaEvolve}
+				onCopy={() => copyToClipboard('megaEvolve', megaEvolve)}
+				hint={t('app.filter.mega_evolve_hint')}
+			/>
+		</section>
+	);
+}
+
 function MegaBoostPanel({ boost, heading, sub, accent, copied, onCopy, typeLabels, t, locale }) {
 	const nameOf = (key) => POKEMON_NAMES_DICT[key]?.[locale] ?? POKEMON_NAMES_DICT[key]?.en ?? key;
 	const spawnName = ({ dex, region }) => {
@@ -10944,7 +10891,6 @@ function RawClausesPanel({
 	tradeClauses,
 	sortClauses,
 	luckySortClauses,
-	nundoSortClauses,
 	prestagedClauses,
 	giftClauses,
 	buddyCatchFilters,
@@ -10961,9 +10907,6 @@ function RawClausesPanel({
 			)}
 			{luckySortClauses && luckySortClauses.length > 0 && (
 				<ClauseList title={t('app.clauses.lucky_sort_title')} accent='#F5B82E' clauses={luckySortClauses} />
-			)}
-			{nundoSortClauses && nundoSortClauses.length > 0 && (
-				<ClauseList title={t('app.clauses.nundo_sort_title')} accent='#F5B82E' clauses={nundoSortClauses} />
 			)}
 			{prestagedClauses && prestagedClauses.length > 0 && (
 				<ClauseList title={t('app.clauses.prestaged_title')} accent='#9B59B6' clauses={prestagedClauses} />
@@ -13275,10 +13218,17 @@ function JobTagsPanel({ config, setConfig, copied, copyToClipboard, t }) {
 		});
 	};
 	return (
-		<div>
-			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-2'>{t('app.tags.title')}</h3>
-			<p className='mono text-xs text-[#8B98A5] mb-4 leading-relaxed'>{t('app.tags.hint')}</p>
-			<ul className='space-y-4'>
+		<details className='rounded-md border border-[#1F2933] bg-[#0E141A]'>
+			<summary className='list-none cursor-pointer p-3 flex items-start gap-3'>
+				<span className='text-xl leading-none' aria-hidden='true'>🏷️</span>
+				<span className='min-w-0 flex-1'>
+					<span className='mono text-sm font-semibold text-[#E6EDF3]'>{t('app.tags.title')}</span>
+					<span className='block mono text-xs text-[#8B98A5] mt-1 leading-relaxed'>{t('app.tags.hint')}</span>
+					<span className='block mono text-[11px] text-[#5EAFC5] mt-1'>{JOB_TAG_ORDER.filter((j) => j !== 'promised').map((j) => `#${tags[j]}`).join(' · ')}</span>
+				</span>
+				<ChevronRight size={14} className='text-[#8090A0] details-arrow shrink-0 mt-1' aria-hidden='true' />
+			</summary>
+			<ul className='space-y-4 px-3 pb-3 pt-3 border-t border-[#1F2933]'>
 				{JOB_TAG_ORDER.map((job) => {
 					const label = t(`app.tags.${job}.label`);
 					if (job === 'promised') {
@@ -13334,14 +13284,35 @@ function JobTagsPanel({ config, setConfig, copied, copyToClipboard, t }) {
 						</li>
 					);
 				})}
+				{config.expertMode && (
+					<li className='border-l-2 border-[#1F2933] pl-3'>
+						<div className='mono text-sm text-[#E6EDF3]'>
+							{t('app.tags.frustration.label')}
+							<span className='ml-2 text-[10px] uppercase tracking-wide text-[#8090A0]'>{t('app.tags.temporary')}</span>
+						</div>
+						<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.tags.frustration.hint')}</p>
+						<label className='mono text-[11px] text-[#8090A0] flex items-center gap-1 mt-1.5'>
+							<span aria-hidden='true'>#</span>
+							<input
+								type='text'
+								value={config.removeFrustrationTagName || ''}
+								onChange={(e) => setConfig((prev) => ({ ...prev, removeFrustrationTagName: e.target.value.replace(/^#+/, '') }))}
+								placeholder={t('app.modal.tags.frustration_placeholder')}
+								aria-label={`${t('app.tags.frustration.label')}: ${t('app.tags.name')}`}
+								className='mono text-sm w-40 min-h-[32px] bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 rounded-sm text-[#E6EDF3]'
+							/>
+						</label>
+					</li>
+				)}
 			</ul>
-		</div>
+		</details>
 	);
 }
 
-// The spec's budget table under Sorting → settings. Every row is shown in both
-// modes, with its rule filled in from the budgets in force; expert mode adds
-// the numbers. Setting a number back to its default drops the override.
+// The spec's budget table under Sorting → settings, as three fold-outs
+// (collection, battle, stock). Each row reads as a sentence with its numbers
+// inline: bold text in simple mode, small inputs in expert mode. The reason
+// sits behind a "why". Setting a number back to its default drops the override.
 function BudgetsEditor({ config, setConfig, t }) {
 	const expert = !!config.expertMode;
 	const b = effectiveBudgets(config);
@@ -13356,48 +13327,73 @@ function BudgetsEditor({ config, setConfig, t }) {
 			return { ...prev, budgets: next };
 		});
 	};
+	// The rule's template with each {key} swapped for its number or its input.
+	const sentence = (row) => {
+		const label = t(`app.budget.${row.job}.label`);
+		return t(`app.budget.${row.job}.rule`)
+			.split(/(\{\w+\})/)
+			.map((part, i) => {
+				const m = part.match(/^\{(\w+)\}$/);
+				if (!m || !(m[1] in b)) return part;
+				const k = m[1];
+				if (!expert) return <strong key={i} className='text-[#E6EDF3]'>{b[k]}</strong>;
+				return (
+					<input
+						key={i}
+						type='number'
+						min={0}
+						step={k === 'xxlScore' ? 10 : 1}
+						value={b[k]}
+						onChange={(e) => setBudget(k, e.target.value)}
+						aria-label={`${label}: ${t(`app.budget.word.${BUDGET_KEY_WORD[k]}`)}`}
+						className={`mono text-sm min-h-[28px] px-1 mx-0.5 rounded-sm bg-[#1F2933] border text-[#E6EDF3] focus:border-[#5EAFC5] outline-hidden ${
+							k === 'xxlScore' ? 'w-20' : 'w-12'
+						} ${k in overrides ? 'border-[#F5B82E]' : 'border-[#2D3A47]'}`}
+					/>
+				);
+			});
+	};
 	return (
-		<div>
-			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-2'>
-				{t('app.budget.title')}
-			</h3>
-			<p className='mono text-xs text-[#8B98A5] mb-4 leading-relaxed'>
+		<div className='space-y-2'>
+			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold'>{t('app.budget.title')}</h3>
+			<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
 				{t(expert ? 'app.budget.hint_expert' : 'app.budget.hint_simple')}
 			</p>
-			<ul className='space-y-3'>
-				{BUDGET_ROWS.map((row) => (
-					<li key={row.job} className='border-l-2 border-[#1F2933] pl-3'>
-						<div className='mono text-sm text-[#E6EDF3]'>{t(`app.budget.${row.job}.label`)}</div>
-						<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
-							{t(`app.budget.${row.job}.rule`, { params: b })}
-						</p>
-						{expert && row.keys.length > 0 && (
-							<div className='flex flex-wrap gap-3 mt-1.5'>
-								{row.keys.map((k) => (
-									<label key={k} className='mono text-[11px] text-[#8090A0] flex items-center gap-1.5'>
-										<input
-											type='number'
-											min={0}
-											step={k === 'xxlScore' ? 10 : 1}
-											value={b[k]}
-											onChange={(e) => setBudget(k, e.target.value)}
-											aria-label={`${t(`app.budget.${row.job}.label`)}: ${t(`app.budget.word.${BUDGET_KEY_WORD[k]}`)}`}
-											className='mono text-sm w-20 min-h-[32px] bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 rounded-sm text-[#E6EDF3]'
-										/>
-										<span>{t(`app.budget.word.${BUDGET_KEY_WORD[k]}`)}</span>
-										{k in overrides && <span className='text-[#F5B82E]'>●</span>}
-									</label>
-								))}
-							</div>
-						)}
-					</li>
-				))}
-			</ul>
+			{BUDGET_GROUPS.map((group) => {
+				const rows = BUDGET_ROWS.filter((r) => r.group === group);
+				const changed = rows.flatMap((r) => r.keys).filter((k) => k in overrides).length;
+				return (
+					<details key={group} className='rounded-md border border-[#1F2933] bg-[#0E141A]'>
+						<summary className='list-none cursor-pointer p-3 flex items-center gap-2'>
+							<span className='mono text-sm font-semibold text-[#E6EDF3] flex-1'>{t(`app.budget.group.${group}`)}</span>
+							{changed > 0 && (
+								<span className='mono text-[10px] text-[#F5B82E]'>{t('app.budget.changed', { params: { count: changed } })}</span>
+							)}
+							<ChevronRight size={14} className='text-[#8090A0] details-arrow' aria-hidden='true' />
+						</summary>
+						<ul className='px-3 pb-3 pt-2 space-y-2.5 border-t border-[#1F2933]'>
+							{rows.map((row) => (
+								<li key={row.job} className='mono text-xs leading-relaxed text-[#8B98A5]'>
+									<span className='text-[#E6EDF3]'>{t(`app.budget.${row.job}.label`)}</span>
+									{': '}
+									{sentence(row)}
+									<details className='inline-block align-top ml-1.5'>
+										<summary className='list-none cursor-pointer inline text-[10.5px] text-[#5EAFC5] hover:text-[#E6EDF3]'>
+											{t('app.budget.why')}
+										</summary>
+										<span className='block text-[11px] text-[#8090A0] mt-1'>{t(`app.budget.${row.job}.why`)}</span>
+									</details>
+								</li>
+							))}
+						</ul>
+					</details>
+				);
+			})}
 			{expert && Object.keys(overrides).length > 0 && (
 				<button
 					type='button'
 					onClick={() => setConfig((prev) => ({ ...prev, budgets: {} }))}
-					className='mono text-xs mt-4 px-3 py-1.5 rounded-sm bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47]'
+					className='mono text-xs mt-2 px-3 py-1.5 rounded-sm bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47]'
 				>
 					{t('app.budget.reset')}
 				</button>
@@ -13454,23 +13450,6 @@ function TradeTagSettings({ config, set }) {
 					</div>
 					{expert && (
 						<div>
-							<label htmlFor={`${fid}-frustration`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
-								{t('app.modal.tags.frustration_label')}
-							</label>
-							<input id={`${fid}-frustration`}
-								type='text'
-								value={config.removeFrustrationTagName || ''}
-								onChange={(e) => set('removeFrustrationTagName', e.target.value)}
-								placeholder={t('app.modal.tags.frustration_placeholder')}
-								className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
-							/>
-							<div className='mono text-[10px] text-[#8090A0] mt-1'>
-								{t('app.modal.tags.frustration_help')}
-							</div>
-						</div>
-					)}
-					{expert && (
-						<div>
 							<label htmlFor={`${fid}-evoswap`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
 								{t('app.modal.tags.evo_swap_label')}
 							</label>
@@ -13492,9 +13471,33 @@ function TradeTagSettings({ config, set }) {
 	);
 }
 
+// League tags (ⓤ ⓖ ⓛ and the like): PvP keepers the trash filter protects. Expert
+// only, under Battle → settings with the rest of PvP.
+function LeagueTagSettings({ config, set }) {
+	const { t } = useTranslation();
+	if (!config.expertMode) return null;
+	return (
+		<div>
+			<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
+				{t('app.modal.league.section_title')}
+			</div>
+			<input
+				type='text'
+				value={config.leagueTags || ''}
+				onChange={(e) => set('leagueTags', e.target.value)}
+				placeholder={t('app.modal.league.placeholder')}
+				aria-label={t('app.modal.league.section_title')}
+				className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
+			/>
+			<div className='mono text-[10px] text-[#8090A0] mt-1'>{t('app.modal.league.help')}</div>
+		</div>
+	);
+}
+
 // Expert-only trash protections that are typed rather than toggled: custom
-// protected tags, league tags and the numeric safety nets. Lived in the global
-// settings modal; now under Catching → settings, next to the toggles.
+// protected tags and the numeric safety nets. Lived in the global settings
+// modal; now under Catching → settings, next to the toggles. (League tags are
+// PvP, under Battle → settings.)
 function ExpertProtectionSettings({ config, set }) {
 	const { t } = useTranslation();
 	const expert = !!config.expertMode;
@@ -13518,22 +13521,6 @@ function ExpertProtectionSettings({ config, set }) {
 						<div className='mono text-[10px] text-[#8090A0] mt-1'>
 							{t('app.modal.custom_tags.help')}
 						</div>
-					</div>
-
-					{/* League tags */}
-					<div>
-						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-							{t('app.modal.league.section_title')}
-						</div>
-						<input
-							type='text'
-							value={config.leagueTags || ''}
-							onChange={(e) => set('leagueTags', e.target.value)}
-							placeholder={t('app.modal.league.placeholder')}
-							aria-label={t('app.modal.league.section_title')}
-							className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
-						/>
-						<div className='mono text-[10px] text-[#8090A0] mt-1'>{t('app.modal.league.help')}</div>
 					</div>
 
 					{/* Safety nets */}

@@ -26,7 +26,7 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createChecker } from "./lib/check.mjs";
-import { liveSpawnPool, mergeSpawnForms, rankMegaGroups } from "../src/mega-boost.js";
+import { liveSpawnPool, megaPlans, MEGA_PLAN_HORIZON_DAYS, mergeSpawnForms, rankMegaGroups } from "../src/mega-boost.js";
 import { megaFormsFromGameMaster, PRIMAL_BOOST_TYPES } from "./fetch-species-meta.mjs";
 import { buildNameIndex as buildSpawnNameIndex, resolveBaseDex, resolveSpawnForm } from "./fetch-events.mjs";
 import { buildNameIndex } from "./fetch-raid-bosses.mjs";
@@ -245,6 +245,35 @@ console.log("M8 — UI strings");
     }).map(([k]) => k);
     check(`${locale}: every Mega-panel string present with exactly its placeholders`, bad.length === 0, bad.join(", "));
   }
+}
+
+console.log("\nM — the Mega planner: what's on now and in the next days, raid days included");
+{
+  const now = Date.parse("2026-10-29T12:00:00");
+  const day = 86400000;
+  const at = (d) => new Date(now + d * day).toISOString().slice(0, 19);
+  const ghost = [{ dex: 94, region: null, types: ["ghost", "poison"] }];
+  const events = [
+    { id: "running", title: "Running", start: at(-1), end: at(2), spawnForms: ghost },
+    { id: "soon", title: "Soon", start: at(2), end: at(3), spawnForms: ghost },
+    { id: "far", title: "Far", start: at(MEGA_PLAN_HORIZON_DAYS + 2), end: at(MEGA_PLAN_HORIZON_DAYS + 3), spawnForms: ghost },
+    { id: "over", title: "Over", start: at(-3), end: at(-1), spawnForms: ghost },
+  ];
+  const boss = (name, types) => ({ names: { en: name }, types });
+  const eventRaids = [
+    { eventID: "rd", name: "Chandelure Raid Day", eventType: "raid-day", start: at(1.5), end: at(1.6), bosses: [boss("Chandelure", ["ghost", "fire"])] },
+    { eventID: "week", name: "Giratina raids", eventType: "raid-battles", start: at(0.5), end: at(5), bosses: [boss("Giratina", ["ghost", "dragon"])] },
+  ];
+  const plans = megaPlans({ events, eventRaids }, now, (n) => ({ Chandelure: 609, Giratina: 487 })[n]);
+  const ids = plans.map((p) => p.id);
+  check("running and starting-soon events are planned, a later or finished one is not",
+    ids.includes("wild:running") && ids.includes("wild:soon") && !ids.includes("wild:far") && !ids.includes("wild:over"), ids.join(", "));
+  const rd = plans.find((p) => p.id === "raid:rd");
+  check("a raid day is planned with its bosses as the pool", rd && rd.spawnForms.length === 1 && rd.spawnForms[0].dex === 609 && rd.spawnForms[0].types.join() === "ghost,fire");
+  check("a week-long standing raid tier is not an outing", !ids.includes("raid:week"));
+  check("soonest first", JSON.stringify(ids) === JSON.stringify(["wild:running", "raid:rd", "wild:soon"]), ids.join(", "));
+  const ranked = rankMegaGroups(rd.spawnForms, JSON.parse(readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../src/data/species-meta.json"), "utf8")).megaForms);
+  check("the raid day's pool ranks Megas that boost Ghost or Fire", ranked.length > 0 && ranked[0].types.some((t) => t === "ghost" || t === "fire"));
 }
 
 done("All Mega-boost checks passed.", (n) => `${n} Mega-boost check(s) failed.`);
