@@ -5133,8 +5133,7 @@ export function buildFilters(
 		}),
 	].filter(Boolean);
 	// Filters that belong with a pile but aren't keep lenses: what to purify
-	// instead of transfer, which shadows to Charge-TM, cheap XP, dex+ evolves
-	// and Mega levels.
+	// instead of transfer, which shadows to Charge-TM, cheap XP and dex+ evolves.
 	const PILE_EXTRAS = {
 		shadows: [
 			{ key: 'shadow_safe', label: 'app.filter.shadow_safe_label', hint: 'app.filter.shadow_safe_hint', filter: shadowSafe },
@@ -5143,7 +5142,6 @@ export function buildFilters(
 		evolve: [
 			{ key: 'dex_plus', label: 'app.filter.dex_plus_label', hint: 'app.filter.dex_plus_hint', filter: dexPlus },
 			{ key: 'cheap_evolve', label: 'app.filter.cheap_evolve_label', hint: 'app.filter.cheap_evolve_hint', filter: cheapEvolve },
-			{ key: 'mega_evolve', label: 'app.filter.mega_evolve_label', hint: 'app.filter.mega_evolve_hint', filter: megaEvolve },
 		],
 	};
 	for (const pile of sortingPiles) pile.extras = (PILE_EXTRAS[pile.id] || []).filter((x) => x.filter);
@@ -7138,6 +7136,7 @@ export default function App() {
 		</PileTile>
 	);
 	const floatedHere = floats.filter((f) => pileById[f.pile]);
+	const toolFilters = { mega_evolve: megaEvolve };
 	const sortingView = (
 		<div className='space-y-8'>
 			<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.sort.intro')}</p>
@@ -7170,7 +7169,8 @@ export default function App() {
 				const piles = group.piles
 					.map((id) => pileById[id])
 					.filter((p) => p && !floatIds.has(p.id) && !hiddenIds.has(p.id));
-				if (piles.length === 0) return null;
+				const tools = (group.tools || []).filter((id) => toolFilters[id]);
+				if (piles.length === 0 && tools.length === 0) return null;
 				return (
 					<section key={group.id} aria-labelledby={`sort-group-${group.id}`} className='space-y-2'>
 						<h3 id={`sort-group-${group.id}`} className='mono text-xs uppercase tracking-widest font-semibold' style={{ color: group.accent }}>
@@ -7178,6 +7178,24 @@ export default function App() {
 						</h3>
 						<p className='mono text-[11px] text-[#8090A0] -mt-1'>{t(`app.sort.group_hint.${group.id}`)}</p>
 						{piles.map((pile) => tile(pile, { onHide: () => toggleHiddenPile(pile.id) }))}
+						{tools.map((id) => (
+							<ToolTile
+								key={id}
+								title={t(`app.filter.${id}_label`)}
+								hook={t(`app.sort.hook.${id}`)}
+								icon={PILE_ICON[id]}
+								accent={group.accent}
+							>
+								<FilterBox
+									label={t(`app.filter.${id}_label`)}
+									accent={group.accent}
+									filterStr={toolFilters[id]}
+									copied={copied[id]}
+									onCopy={() => copyToClipboard(id, toolFilters[id])}
+									hint={t(`app.filter.${id}_hint`)}
+								/>
+							</ToolTile>
+						))}
 					</section>
 				);
 			})}
@@ -10034,13 +10052,37 @@ function PileCard({ card, t }) {
 export const PILE_GROUPS = [
 	{ id: 'collection', accent: '#F5B82E', piles: ['hundo', 'lucky_families', 'luckies', 'traded', 'costumes', 'cd_backgrounds', 'xxl', 'xxs'] },
 	{ id: 'battle', accent: '#E74C3C', piles: ['meta', 'watchlist', 'shadows', 'dynamax'] },
-	{ id: 'evolve', accent: '#27AE60', piles: ['evolve'] },
+	// `tools` are single filters with their own tile: mega-evolving spends
+	// candy, so it sits here and not with the Mega planner under Catching.
+	{ id: 'evolve', accent: '#27AE60', piles: ['evolve'], tools: ['mega_evolve'] },
 	{ id: 'big', accent: '#5EAFC5', piles: ['non_meta'] },
 ];
 const PILE_ICON = {
 	hundo: '💯', lucky_families: '✨', luckies: '🍀', traded: '🎁', costumes: '🎃', cd_backgrounds: '🖼️', xxl: '🐘',
 	xxs: '🐜', meta: '⚔️', watchlist: '🔭', shadows: '🌑', dynamax: '🌀', evolve: '🧪', non_meta: '📦', event: '🌿',
+	mega_evolve: '🧬',
 };
+// A single filter in a pile group, styled like a pile tile.
+function ToolTile({ title, hook, icon, accent, children }) {
+	return (
+		<details
+			className='group rounded-md border border-[#1F2933] bg-[#0E141A] overflow-hidden transition hover:border-[#2D3A47]'
+			style={{ borderLeft: `3px solid ${accent}` }}
+		>
+			<summary className='list-none cursor-pointer flex items-start gap-3 p-3'>
+				<span className='text-2xl leading-none mt-0.5 select-none' aria-hidden='true'>
+					{icon}
+				</span>
+				<span className='min-w-0 flex-1'>
+					<span className='mono text-sm font-semibold text-[#E6EDF3]'>{title}</span>
+					<span className='block text-xs text-[#8B98A5] mt-1 leading-relaxed'>{hook}</span>
+				</span>
+				<ChevronRight size={14} className='text-[#8090A0] details-arrow shrink-0 mt-1' aria-hidden='true' />
+			</summary>
+			<div className='px-3 pb-3 pt-3 border-t border-[#1F2933] space-y-3'>{children}</div>
+		</details>
+	);
+}
 function PileTile({ pile, title, hook, icon, chip, accent, open, onHide, hidden, text, copied, copyToClipboard, t, children }) {
 	return (
 		<details

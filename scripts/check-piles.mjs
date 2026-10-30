@@ -24,8 +24,9 @@
 // Run with: npx vite-node scripts/check-piles.mjs
 
 import {
-  BUDGET_DEFAULTS, BUDGET_ROWS, evalFilterDetailed as evalDetailed, FLOAT_ENDED_DAYS, floatingPiles, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET,
+  BUDGET_DEFAULTS, BUDGET_ROWS, evalFilterDetailed as evalDetailed, FLOAT_ENDED_DAYS, floatingPiles, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET, PILE_GROUPS,
 } from "../src/App.jsx";
+import { readFileSync } from "node:fs";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import COMMUNITY_DAYS from "../src/data/community-days.json";
 import SPECIES_META from "../src/data/species-meta.json";
@@ -545,14 +546,20 @@ console.log("\nCommunity Day data (scripts/lib/community-days.mjs → src/data/c
   check("an empty feed drops nothing", mergeRollingCommunityDays(prev, []).rolling.length === 1);
 }
 
-console.log("\nPile extras");
-for (const loc of localeNames) {
-  const r = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc));
-  const extras = r.sortingPiles.find((p) => p.id === "evolve")?.extras || [];
-  // Mega-evolving is spending candy, so it sits with the evolve pile, not
-  // with the Mega planner under Catching.
-  check(`${loc}: the evolve pile carries the mega-evolve filter`,
-    extras.some((x) => x.key === "mega_evolve" && x.filter === r.megaEvolve && r.megaEvolve));
+console.log("\nMega-evolve placement");
+{
+  // Mega-evolving spends candy, so its filter has its own tile under Sorting's
+  // "Evolve & grind", and the Mega planner under Catching does not carry it.
+  const evolve = PILE_GROUPS.find((g) => g.id === "evolve");
+  check("the evolve group carries the mega-evolve tool", (evolve?.tools || []).includes("mega_evolve"));
+  check("no other group carries it", PILE_GROUPS.filter((g) => (g.tools || []).includes("mega_evolve")).length === 1);
+  for (const loc of localeNames) {
+    const r = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc));
+    check(`${loc}: the mega-evolve filter is built`, !!r.megaEvolve && r.megaEvolve.startsWith(pogoKeywords(loc).flag.mega_evolve));
+  }
+  const src = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const planner = src.slice(src.indexOf("function MegaPlanner("), src.indexOf("function MegaBoostPanel("));
+  check("the Mega planner renders no mega-evolve filter", !/megaEvolve|mega_evolve/.test(planner));
 }
 
 console.log(`\n${failures === 0 ? "✓ All pile checks passed." : `✗ ${failures} failure(s).`}`);

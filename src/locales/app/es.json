@@ -1601,6 +1601,7 @@
   "app.sort.hook.shadows": "¿Se te acumulan los oscuros y no sabes dónde meter a esos cascarrabias?",
   "app.sort.hook.dynamax": "Sobras del Max Monday y aparcados para los Power Spots.",
   "app.sort.hook.evolve": "¿Los caramelos te queman en el bolsillo?",
+  "app.sort.hook.mega_evolve": "¿Niveles Mega por llenar? Cada nivel abarata la siguiente Mega.",
   "app.sort.hook.non_meta": "Todo lo demás. Respira hondo, una especie cada vez.",
   "app.sort.group.collection": "Colección",
   "app.sort.group.battle": "Listos para combatir",
