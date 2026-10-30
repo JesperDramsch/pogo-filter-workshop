@@ -5803,7 +5803,8 @@ const KEY_TOP_MAX_ATTACKERS = 'pogo:topMaxAttackers';
 const KEY_CONFIG = 'pogo:config';
 const KEY_ONBOARDED = 'pogo:onboarded';
 const KEY_CHANGELOG_SEEN = 'pogo:changelogSeen';
-// One flag per filter area: has its help sheet opened on its own yet. Lives
+// One flag per filter area: which area's help sheet opened on its own. Only
+// the first area a user reaches ever does, so at most one is true. Lives
 // beside pogo:onboarded rather than in the config, so an export or a preset
 // never carries it and a reset of the filters leaves it alone.
 const KEY_HELP_SEEN = 'pogo:helpSeen';
@@ -6362,7 +6363,7 @@ export default function App() {
 	// above persist.
 	const [helpArea, setHelpArea] = useState(null);
 	const helpPillRef = useRef(null);
-	// True while the open sheet is one the app opened itself (first visit),
+	// True while the open sheet is the one the app opened itself (first visit),
 	// so closing it knows there is no opener to hand focus back to.
 	const helpAutoOpenedRef = useRef(false);
 	const [showSetTheory, setShowSetTheory] = useState(false);
@@ -7193,8 +7194,8 @@ export default function App() {
 		if (typeof window !== 'undefined' && window.location.hash !== desired) window.location.hash = desired;
 	}
 	const selectArea = (area) => goToArea(area, areaSettings);
-	// The first time an area shows its filters, its help sheet opens on its own
-	// and the area is marked seen; after that only the pill opens it. Nothing
+	// The first area that ever shows its filters opens its help sheet on its
+	// own and is marked seen; from then on only the pill opens one. Nothing
 	// fires before storage has loaded, on another step, on another view or
 	// while the area shows its settings, so the first-run redirect to #onboard
 	// and a shared #workshop/<area>/settings link leave every flag alone.
@@ -7207,8 +7208,13 @@ export default function App() {
 	useEffect(() => {
 		setHelpArea((open) => (open && (!helpCanShow || open !== filterArea) ? null : open));
 	}, [helpCanShow, filterArea]);
+	// Once per user, not once per area: the first area ever reached opens
+	// its sheet; every later area waits for the pill. Four sheets on four
+	// first clicks was the owner's call to drop. The flag is still stored per
+	// area so the record says which one it was.
+	const helpEverShown = Object.values(helpSeen).some(Boolean);
 	useEffect(() => {
-		if (!helpCanShow || helpSeen[filterArea]) return;
+		if (!helpCanShow || helpEverShown) return;
 		// Where focus is now is where the Dialog will hand it back on close. A
 		// real tab stop (the tab the user just arrowed or clicked to) is a good
 		// place to land; the step heading (tabIndex -1) or <body> is not, so
@@ -7217,7 +7223,7 @@ export default function App() {
 		helpAutoOpenedRef.current = !(el && el !== document.body && el.tabIndex >= 0);
 		setHelpArea(filterArea);
 		setHelpSeen((seen) => ({ ...seen, [filterArea]: true }));
-	}, [helpCanShow, filterArea, helpSeen]);
+	}, [helpCanShow, filterArea, helpEverShown]);
 	const openHelp = (area) => {
 		helpAutoOpenedRef.current = false;
 		setHelpArea(area);
@@ -9902,9 +9908,9 @@ function AreaPanel({ area, current, children }) {
 // The per-area help: a title and four short paragraphs, keyed
 // app.help.<area>.{title,p1..p4}, shown as a sheet over the page on the
 // shared Dialog primitive: a bottom sheet on phones, a slide-over from the
-// right from `sm` up. App opens it on its own the first time an area shows
-// its filters (seen flags under pogo:helpSeen) and from the pill in AreaTabs
-// after that; one sheet at a time, closed by Escape, the backdrop, the X or
+// right from `sm` up. App opens it on its own once, for the first area a
+// user reaches (seen flags under pogo:helpSeen), and from the pill in
+// AreaTabs otherwise; one sheet at a time, closed by Escape, the backdrop, the X or
 // "Got it". The dialog's name is the generic label; the h2 names the area.
 function HelpSheet({ area, onClose, t }) {
 	const gotItRef = useRef(null);
