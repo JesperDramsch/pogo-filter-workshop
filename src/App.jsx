@@ -6381,9 +6381,12 @@ export default function App() {
 	// (The curated friend-collect list's equivalent toggle lives in config as
 	// `friendCollectGuaranteedOnly` — it's a persisted curation setting.)
 	const [friendGuaranteedLucky, setFriendGuaranteedLucky] = useState(false);
-	const [showAuxRaids, setShowAuxRaids] = useState(false);
+	const [showAuxRaidsLegendary, setShowAuxRaidsLegendary] = useState(false);
+	const [showAuxRaidsMega, setShowAuxRaidsMega] = useState(false);
+	const [showAuxRaidsOther, setShowAuxRaidsOther] = useState(false);
 	const [showAuxMaxBattles, setShowAuxMaxBattles] = useState(false);
-	const [showAuxRocket, setShowAuxRocket] = useState(false);
+	const [showAuxRocketBosses, setShowAuxRocketBosses] = useState(false);
+	const [showAuxRocketGrunts, setShowAuxRocketGrunts] = useState(false);
 	const [showAuxPvp, setShowAuxPvp] = useState(false);
 	const [showRawClauses, setShowRawClauses] = useState(false);
 	const [showVerify, setShowVerify] = useState(false);
@@ -7766,14 +7769,31 @@ export default function App() {
 												<div className='pt-4'>
 													<AreaGroup id='rocket' title={t('app.collapsible.aux_section_team_rocket')} hint={t('app.group_hint.rocket')} accent='#E74C3C'>
 													<RocketCollapsible
+														part='bosses'
 														fetchedAt={rocketLineupsFetchedAt}
 														leaders={rocketLeaders}
 														typedGrunts={rocketTypedGrunts}
 														genericGrunts={rocketGenericGrunts}
 														typeLabels={rocketTypeLabels}
 														lenientCounters={effectiveConfig.rocketLenientCounters !== false}
-														open={showAuxRocket}
-														onToggle={() => setShowAuxRocket((s) => !s)}
+														open={showAuxRocketBosses}
+														onToggle={() => setShowAuxRocketBosses((s) => !s)}
+														copied={copied}
+														copyToClipboard={copyToClipboard}
+														t={t}
+														outputLocale={effectiveOutputLocale}
+													/>
+
+													<RocketCollapsible
+														part='grunts'
+														fetchedAt={rocketLineupsFetchedAt}
+														leaders={rocketLeaders}
+														typedGrunts={rocketTypedGrunts}
+														genericGrunts={rocketGenericGrunts}
+														typeLabels={rocketTypeLabels}
+														lenientCounters={effectiveConfig.rocketLenientCounters !== false}
+														open={showAuxRocketGrunts}
+														onToggle={() => setShowAuxRocketGrunts((s) => !s)}
 														copied={copied}
 														copyToClipboard={copyToClipboard}
 														t={t}
@@ -7787,23 +7807,48 @@ export default function App() {
 													<AreaGroup id='raids' title={t('app.collapsible.aux_section_raids')} hint={t('app.group_hint.raids')} accent='#F5B82E'>
 													<BossCollapsible
 														icon={Target}
-														hook={t('app.hook.raids')}
-														titleKey='app.collapsible.aux_raids'
+														titleKey='app.collapsible.aux_raids_legendary'
 														fetchedAt={raidBossesFetchedAt}
 														bossesByTier={raidFilters}
-														eventGroups={eventRaidFilters}
-														tierOrder={[
-															'mega',
-															'lvl5',
-															'shadow_lvl5',
-															'lvl3',
-															'shadow_lvl3',
-															'lvl1',
-															'shadow_lvl1',
-														]}
+														eventGroups={eventRaidFilters.filter((e) => raidEventPanel(e) === 'legendary')}
+														tierOrder={RAID_PANEL_TIERS.legendary}
 														accent='#E74C3C'
-														open={showAuxRaids}
-														onToggle={() => setShowAuxRaids((s) => !s)}
+														open={showAuxRaidsLegendary}
+														onToggle={() => setShowAuxRaidsLegendary((s) => !s)}
+														copied={copied}
+														copyToClipboard={copyToClipboard}
+														keyPrefix='raid'
+														t={t}
+														locale={locale}
+													/>
+
+													<BossCollapsible
+														icon={Target}
+														titleKey='app.collapsible.aux_raids_mega'
+														fetchedAt={raidBossesFetchedAt}
+														bossesByTier={raidFilters}
+														eventGroups={eventRaidFilters.filter((e) => raidEventPanel(e) === 'mega')}
+														tierOrder={RAID_PANEL_TIERS.mega}
+														accent='#E74C3C'
+														open={showAuxRaidsMega}
+														onToggle={() => setShowAuxRaidsMega((s) => !s)}
+														copied={copied}
+														copyToClipboard={copyToClipboard}
+														keyPrefix='raid'
+														t={t}
+														locale={locale}
+													/>
+
+													<BossCollapsible
+														icon={Target}
+														titleKey='app.collapsible.aux_raids_other'
+														fetchedAt={raidBossesFetchedAt}
+														bossesByTier={raidFilters}
+														eventGroups={eventRaidFilters.filter((e) => raidEventPanel(e) === 'other')}
+														tierOrder={RAID_PANEL_TIERS.other}
+														accent='#E74C3C'
+														open={showAuxRaidsOther}
+														onToggle={() => setShowAuxRaidsOther((s) => !s)}
 														copied={copied}
 														copyToClipboard={copyToClipboard}
 														keyPrefix='raid'
@@ -10226,6 +10271,31 @@ function liveEventGroups(eventGroups) {
 	return (eventGroups || []).filter((event) => !(Date.parse(event.end) < now));
 }
 
+// The standing raid tiers behind each raid panel. Anything else (3★, 1★ and
+// their shadow tiers) is "other".
+export const RAID_PANEL_TIERS = {
+	legendary: ['lvl5', 'shadow_lvl5'],
+	mega: ['mega'],
+	other: ['lvl3', 'shadow_lvl3', 'lvl1', 'shadow_lvl1'],
+};
+
+// Which raid panel an event raid belongs in. The feed carries no tier, so: a
+// Mega event is Mega; an event whose bosses are all legendary, mythical or
+// Ultra Beast (the game's own classes, via SPECIES_META.specialTradeDex) is
+// Legendary; everything else is Other. An unresolvable boss counts as not
+// legendary, which lands the event in Other rather than hiding it.
+export function raidEventPanel(event) {
+	if (event.isMega) return 'mega';
+	const bosses = event.bosses || [];
+	const legendary =
+		bosses.length > 0 &&
+		bosses.every((b) => {
+			const dex = (resolveSpeciesInfo(b.names?.en || '') || resolveSpeciesInfo(String(b.id || '').replace(/_/g, ' ')))?.dex;
+			return dex != null && SPECIAL_TRADE_DEX.has(dex);
+		});
+	return legendary ? 'legendary' : 'other';
+}
+
 // Short-window events as accordion rows, one per event: a running event opens
 // highlighted, an upcoming one collapses with a window teaser. The raid panel
 // renders its event raids with this, the Max Battle panel its Max Mondays and
@@ -11256,7 +11326,11 @@ function RocketPhaseFilters({ phases, keyPrefix, accent, lenientCounters, copied
 	});
 }
 
+// One Team Rocket panel. `part` picks the half: 'bosses' (the leaders, with
+// per-phase counters) or 'grunts' (the quote lookup, type-themed and generic
+// grunts). The lookup sits with the grunts because it identifies a grunt.
 function RocketCollapsible({
+	part,
 	fetchedAt,
 	leaders,
 	typedGrunts,
@@ -11271,38 +11345,45 @@ function RocketCollapsible({
 	outputLocale,
 }) {
 	const [highlightedType, setHighlightedType] = useState(null);
+	const showBosses = part === 'bosses';
+	const showGrunts = part === 'grunts';
 	const totalFilters =
-		leaders.reduce((a, l) => a + l.phases.filter((p) => !p.skipped).length, 0) +
-		typedGrunts
-			.filter((g) => !g.skipped)
-			.reduce((a, g) => a + g.main.length + (g.backup ? 1 : 0), 0) +
-		genericGrunts
-			.filter((g) => !g.skipped)
-			.reduce((a, g) => a + (g.phased ? g.counters.filter((c) => !c.skipped).length : 1), 0);
+		(showBosses ? leaders.reduce((a, l) => a + l.phases.filter((p) => !p.skipped).length, 0) : 0) +
+		(showGrunts
+			? typedGrunts
+					.filter((g) => !g.skipped)
+					.reduce((a, g) => a + g.main.length + (g.backup ? 1 : 0), 0) +
+				genericGrunts
+					.filter((g) => !g.skipped)
+					.reduce((a, g) => a + (g.phased ? g.counters.filter((c) => !c.skipped).length : 1), 0)
+			: 0);
 	const age = formatSyncAge(fetchedAt, t);
-	const headerLabel = t('app.collapsible.aux_rocket');
+	const headerLabel = t(showBosses ? 'app.collapsible.aux_rocket_bosses' : 'app.collapsible.aux_rocket_grunts');
+	const hook = showGrunts ? t('app.hook.rocket') : undefined;
 	const countLabel = t('app.collapsible.aux_rocket_count', { params: { count: totalFilters } });
 	const footerLabel = age
 		? t('app.collapsible.aux_footer', { params: { count: countLabel, age } })
 		: t('app.collapsible.aux_footer_no_age', { params: { count: countLabel } });
 	if (totalFilters === 0) {
 		return (
-			<Collapsible icon={Rocket} label={headerLabel} hook={t('app.hook.rocket')} open={open} onToggle={onToggle}>
+			<Collapsible icon={Rocket} label={headerLabel} hook={hook} open={open} onToggle={onToggle}>
 				<p className='text-xs italic text-[#8B98A5]'>{t('app.filter.aux_rocket_empty')}</p>
 			</Collapsible>
 		);
 	}
 	return (
-		<Collapsible icon={Rocket} label={headerLabel} hook={t('app.hook.rocket')} open={open} onToggle={onToggle}>
+		<Collapsible icon={Rocket} label={headerLabel} hook={hook} open={open} onToggle={onToggle}>
 			<div className='space-y-5'>
-				<RocketQuoteLookup
-					data={ROCKET_GRUNT_QUOTES}
-					outputLocale={outputLocale}
-					t={t}
-					onTypedMatch={setHighlightedType}
-					localizedTypeDisplay={(k) => (typeLabels && typeLabels[k]) || k}
-				/>
-				{leaders.length > 0 && (
+				{showGrunts && (
+					<RocketQuoteLookup
+						data={ROCKET_GRUNT_QUOTES}
+						outputLocale={outputLocale}
+						t={t}
+						onTypedMatch={setHighlightedType}
+						localizedTypeDisplay={(k) => (typeLabels && typeLabels[k]) || k}
+					/>
+				)}
+				{showBosses && leaders.length > 0 && (
 					<div className='space-y-2'>
 						<h4 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
 							{t('app.collapsible.aux_rocket_leaders')}
@@ -11330,7 +11411,7 @@ function RocketCollapsible({
 					</div>
 				)}
 
-				{typedGrunts.length > 0 && (
+				{showGrunts && typedGrunts.length > 0 && (
 					<div className='space-y-2'>
 						<h4 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
 							{t('app.collapsible.aux_rocket_typed_grunts')}
@@ -11363,7 +11444,7 @@ function RocketCollapsible({
 					</div>
 				)}
 
-				{genericGrunts.length > 0 && (
+				{showGrunts && genericGrunts.length > 0 && (
 					<div className='space-y-2'>
 						<h4 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
 							{t('app.collapsible.aux_rocket_generic_grunts')}

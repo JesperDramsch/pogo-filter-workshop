@@ -69,6 +69,7 @@ import META_RANKINGS from "../src/data/meta-rankings.json";
 import { buildDataFilters, buildResult, FIXTURE_CONFIG, makeTFn } from "./lib/fixture.mjs";
 import {
   bossBoxKeys, bossCounterLabel, buildFilters, candyFamilyNames, DEFAULT_HUNDOS, DEFAULT_LUCKIES, evalFilterDetailed, protectionTail,
+  RAID_PANEL_TIERS, raidEventPanel,
 } from "../src/App.jsx";
 import { PILE_DEX, PILE_SPECIES, pileCases, pileMon, tailOptions } from "./lib/pile-cases.mjs";
 import { LOCALES } from "../src/i18n/index.js";
@@ -1694,6 +1695,33 @@ console.log("D18 — step ③ of a pile is the pile and the protection tail, and
         bad.length === 0, bad.slice(0, 4).join(" | "));
     }
   }
+}
+
+console.log("\nD12 — the raid panels split the standing tiers and the event raids without loss");
+{
+  const panelOf = (tier) => Object.entries(RAID_PANEL_TIERS).filter(([, tiers]) => tiers.includes(tier)).map(([panel]) => panel);
+  const tiers = Object.keys(RAID_BOSSES.raids || {});
+  const unclaimed = tiers.filter((tier) => panelOf(tier).length === 0);
+  const doubled = tiers.filter((tier) => panelOf(tier).length > 1);
+  check(`every standing tier in the snapshot (${tiers.join(", ")}) sits in exactly one panel`,
+    unclaimed.length === 0 && doubled.length === 0, `unclaimed: ${unclaimed.join(", ") || "-"}; doubled: ${doubled.join(", ") || "-"}`);
+  check("mega is its own panel; 5★ and shadow 5★ are legendary",
+    panelOf("mega")[0] === "mega" && panelOf("lvl5")[0] === "legendary" && panelOf("shadow_lvl5")[0] === "legendary");
+  const ev = (over) => ({ eventID: "zz", isMega: false, isShadow: false, bosses: [], ...over });
+  const boss = (id, en) => ({ id, names: en ? { en } : {} });
+  check("a Mega event goes to the Mega panel", raidEventPanel(ev({ isMega: true, bosses: [boss("CHARIZARD", "Mega Charizard")] })) === "mega");
+  check("an all-legendary event goes to the Legendary panel", raidEventPanel(ev({ bosses: [boss("GIRATINA", "Giratina")] })) === "legendary");
+  check("a shadow legendary event goes to the Legendary panel", raidEventPanel(ev({ isShadow: true, bosses: [boss("TORNADUS", "Tornadus")] })) === "legendary");
+  check("a non-legendary event goes to the Other panel", raidEventPanel(ev({ bosses: [boss("CHANDELURE", "Chandelure")] })) === "other");
+  check("a mixed event goes to the Other panel", raidEventPanel(ev({ bosses: [boss("GIRATINA", "Giratina"), boss("CHANDELURE", "Chandelure")] })) === "other");
+  check("an event with no bosses goes to the Other panel, not nowhere", raidEventPanel(ev()) === "other");
+  check("an unresolvable boss falls to Other rather than vanishing", raidEventPanel(ev({ bosses: [boss("ZZ_NOT_A_SPECIES")] })) === "other");
+  check("an id with underscores resolves without a name (HO_OH)", raidEventPanel(ev({ bosses: [boss("HO_OH")] })) === "legendary");
+  const live = RAID_BOSSES.eventRaids || [];
+  const counts = { legendary: 0, mega: 0, other: 0 };
+  for (const e of live) counts[raidEventPanel(e)]++;
+  check(`the ${live.length} event raid(s) in the snapshot all land in a panel`,
+    counts.legendary + counts.mega + counts.other === live.length, JSON.stringify(counts));
 }
 
 console.log(`\n${failures === 0 ? "✓ All data-filter property checks passed." : `✗ ${failures} failure(s).`}`);
