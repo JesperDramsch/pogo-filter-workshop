@@ -33,7 +33,7 @@ then `3-4` is fine (best first, then wider), but `3-4` then `4*` would be cut.
 | XXS | Which tiny ones still matter? | still to evolve → 4\*,3\* |
 | Luckies | Which luckies are worth the cheap power-up? | still to evolve → 4\*,3\* |
 | Received trades | Can't be traded again: which ones stay? | 4\* → lucky → 3-4 → 3\* → PvP → still to evolve |
-| Shadows | Which shadows to keep, purify or TM? | 4\* → meta → 3\* → `3-4attack` → PvP → still to evolve |
+| Shadows | Which shadows to keep, purify or TM? | 4\* → meta → 3\* → `3-4attack` → PvP → still to evolve (one stays shadow) → purify, then evolve (a second one, purified and evolved up the line) |
 | Dynamax | Which Max ones are worth the Max Particles? | G-max → Max attacker roster → 4\* → 3-4 → 3\* |
 | Ready to evolve | What do I evolve now? | new Pokédex entry: 4\* → 3-4 → 3\*, then tagged Dex-Evolve |
 | Meta | Raid and PvP keepers, top 7 per type | 4\* → 3-4 → 3\* → PvP, up to the meta budget |
@@ -47,7 +47,7 @@ Lucky families goes: luckies are luckies.
 ## Utility filters beside their pile
 
 These stay as filters you copy, not keep steps:
-- **Shadows:** purify first, then evolve (shadows worth purifying because the purified one evolves cheaper), and cheap purify (`candykm1`, not meta). Also the Frustration TM on meta shadows.
+- **Shadows:** cheap purify (`candykm1`, not meta), and the Frustration TM on meta shadows.
 - **Ready to evolve:** cheap XP evolves, and mega-evolve as its own tile.
 
 Candidates for more, from the game's own search keywords. I can't test what
@@ -59,13 +59,13 @@ they match from here, so each one needs a check in the game first:
 - `duplicate`: species you hold more than one of. If it does what the name
   says, it could make every pile skip species you only have once.
 
-## Two readings to confirm
+## Settled
 
-1. **Shadows, "purify still evolve":** I read it as the purify-then-evolve
-   utility above, not as a keep step. Right?
-2. **4\* and 3-4 together:** as one step, the pair is just `3-4`, because
-   every hundo already matches it. I kept `4*` as its own first step, as in
-   your list, so the hundos turn up first.
+- **Shadows, purify then evolve:** a keep step. It keeps a second shadow of
+  a line that can still evolve, to purify and evolve up the line. The search
+  term is the same `shadow&evolve` as "still to evolve", so the step keeps
+  2 of them instead of 1.
+- **4\* then 3-4:** two steps, so the hundos turn up first.
 
 ## Not covered here
 
