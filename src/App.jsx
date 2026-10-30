@@ -10,7 +10,9 @@ import {
 	ChevronRight,
 	RotateCcw,
 	Sparkles,
+	Sparkle,
 	Settings,
+	CircleQuestionMark,
 	ArrowLeft,
 	Download,
 	Upload,
@@ -1856,7 +1858,7 @@ function collapseFamilies(speciesList, familyCollapses) {
 // Resolves a species name (in any locale) to its lowercase form in the output
 // locale, ready for filter syntax. Falls back to the input lowercased if no
 // match — keeps user-typed names working even if the dictionary is incomplete.
-function speciesForOutput(name, outputLocale) {
+export function speciesForOutput(name, outputLocale) {
 	const resolved = resolveSpecies(name, outputLocale);
 	if (resolved) return resolved;
 	return String(name).toLowerCase();
@@ -1877,50 +1879,55 @@ function capFirst(s) {
 // shadows, costumes and the rest are the user's call in ① and ②, and the ones
 // worth keeping are starred or tagged by the time ③ runs.
 //
-// Deliberately independent of the trash toggles (protectNundos, protectBuddies,
-// protectLuckyEligible and friends): switching a protection off to clear a
-// category is exactly the habit the piles replace. The one setting it reads is
-// the lucky-trade year floor's value, which is the user's.
+// The tail reads exactly two settings and nothing else: protectNundos (the
+// nundo clause is emitted only when it is on; a nundo is a collectible only to
+// the user who said so) and mythTooManyOf (the species carved out of
+// `!mythical`, as the trash carves them: a listed mythical is a spare). The
+// lucky-trade year floor's VALUE is read too, but not its trash toggle
+// (protectLuckyEligible): the floor is the user's, the toggle is the habit
+// the piles replace. Every other trash toggle (protectBuddies,
+// protectLegacyMoves, protectSmeargleLegacy and friends) leaves the tail as
+// it is: switching a protection off to clear a category is exactly what ①
+// and ② are for.
+//
+// `opts.mythCarve` is the carve already resolved to the output locale
+// (speciesForOutput), `opts.smeargle` the localised Smeargle name for the
+// legacy-move clause; buildFilters resolves both once and passes them to every
+// buildPile call. Without them the tail protects every mythical and every
+// Smeargle, which is the safe direction.
 //
 // Spelling notes, all checked in scripts/check-data-filters.mjs:
 //   - nundos use the positive contrapositive: PoGo ignores `!N` on IV tokens
 //   - invested Dynamax is three clauses (De Morgan), and negated ranges, so a
 //     fresh Dynamax with no Guard or Spirit value still passes
 //   - shiny / background legendaries are one OR-clause each: ¬(A ∩ L) = ¬A ∪ ¬L
-export function protectionTail(kw, cfg) {
-	const clauses = [
-		`!${kw.flag.favorite}`,
-		'!#',
-		'!4*',
-		`1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`,
-	];
+//   - the legacy-move clause is the trash's shape (legacyMovesClause): keep
+//     `@special` unless it is purified Return, a shadow's Frustration or a
+//     Smeargle, whose Sketched moves all carry the flag
+export function protectionTail(kw, cfg, { mythCarve = [], smeargle } = {}) {
+	const clauses = [`!${kw.flag.favorite}`, '!#', '!4*'];
+	if (cfg.protectNundos) clauses.push(`1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`);
 	// The year floor's value, not its trash toggle (protectLuckyEligible): the
-	// tail ignores the toggles, and step ③'s hint calls lucky-trade stock
+	// tail ignores that toggle, and step ③'s hint calls lucky-trade stock
 	// always protected. A year of 0 means the user set no floor at all.
 	if (cfg.luckyEligibleYear > 0) {
 		// Traded ones can't be traded again, so they are no lucky-trade stock.
 		clauses.push(`${kw.numeric.year}${cfg.luckyEligibleYear}-,${kw.flag.traded}`);
 	}
+	const carve = mythCarve.filter(Boolean).join(',');
 	clauses.push(
 		`!${kw.flag.dynamax_move}2-`,
 		`!${kw.flag.dynamax_wall}1-`,
 		`!${kw.flag.dynamax_spirit}1-`,
 		`!${kw.numeric.buddy}2-`,
-		`!${kw.flag.mythical}`,
+		carve ? `!${kw.flag.mythical},${carve}` : `!${kw.flag.mythical}`,
 		`!${kw.flag.shiny},!${kw.flag.legendary}`,
 		`!${kw.flag.background},!${kw.flag.legendary}`,
+		`!@${kw.flag.special_move},@${kw.flag.return},@${kw.flag.frustration}${smeargle ? `,${smeargle}` : ''}`,
 	);
 	return clauses;
 }
 
-// One sorting pile in the spec's three steps. `head` is the pile itself, a
-// CNF chain (`+a,+b` or `+a&!+a,alola`); each ① lens is ANDed onto it, as are
-// ② (not starred, not tagged) and ③ (the protection tail). Every pile goes
-// through here, so all of them share one shape and scripts/check-piles.mjs can
-// hold them all to it.
-//   lenses: [{ key, filter, text? }] where `filter` is a CNF chain (may hold
-//   `&`) and `text` ([label, hint, params]) names a lens the pile's wording
-//   table can't know in advance, such as one per active GBL cup
 // How many Pokémon each job holds per species (docs/sorting-workflow-spec.md,
 // "Budgets (defaults)"). The pile card reads these; expert mode edits them.
 export const BUDGET_DEFAULTS = {
@@ -2006,7 +2013,7 @@ export function showcaseScoreRange({ dex, form = null, heightM, weightKg, ivs = 
 // FLOAT_ENDED_DAYS ago (the events snapshot's own carry-over window, see
 // scripts/lib/event-window.mjs). Upcoming events don't float anything.
 //   wild-spawn event → event spawns, and both costume piles if it had costumed spawns
-//   Community Day   → the C-Day pile
+//   Community Day   → the C-Day pile and the shiny pile
 //   takeover        → shadows
 //   Max Battle event (Max Monday, Max Battle Day) → Dynamax
 // A double transfer candy day has no source yet, so its Crush reminder card
@@ -2024,13 +2031,19 @@ export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] 
 	for (const sg of signals) {
 		if (!recent(sg.start, sg.end)) continue;
 		if (sg.kind === 'takeover') add('shadows', 'takeover', sg.title);
-		if (sg.kind === 'community_day') add('cday', 'community_day', sg.title);
+		if (sg.kind === 'community_day') {
+			add('cday', 'community_day', sg.title);
+			add('shiny', 'community_day', sg.title);
+		}
 		if (sg.kind === 'max') add('dynamax', 'max', sg.title);
 	}
 	for (const mb of eventMaxBattles) if (recent(mb.start, mb.end)) add('dynamax', 'max', mb.name);
 	for (const ev of events) {
 		if (!recent(ev.start, ev.end)) continue;
-		if (ev.category === 'Community Day') add('cday', 'community_day', ev.title);
+		if (ev.category === 'Community Day') {
+			add('cday', 'community_day', ev.title);
+			add('shiny', 'community_day', ev.title);
+		}
 		add('event_spawns', 'wild', ev.title);
 		if (ev.hasCostumes) {
 			add('costumes_evolve', 'costumes', ev.title);
@@ -2038,6 +2051,50 @@ export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] 
 		}
 	}
 	return out;
+}
+
+// Protection toggles hide and show category piles (spec: "Which piles show
+// first"). The Sorting tab is stateful: config.hiddenPiles is the user's own
+// list, and a protect* toggle only edits it on the edge. Turning a category's
+// protection off (swipe deck, ConfigPanel toggle or preset) hides its piles;
+// turning it back on shows them again. Between those edges the user's own
+// hide/unhide under "N hidden" is the truth, and the toggle never gates the
+// render. Piles without a category (meta, watchlist, non_meta, hundo, cday,
+// traded, evolve, the event piles) are never touched; nundos have no pile.
+export const PROTECTION_PILES = {
+	protectXXL: ['xxl'],
+	protectXXS: ['xxs'],
+	protectCostumes: ['costumes_evolve', 'costumes_final'],
+	protectBackgrounds: ['backgrounds'],
+	protectLuckies: ['luckies'],
+	protectShinies: ['shiny'],
+	protectShadows: ['shadows'],
+	protectDynamax: ['dynamax'],
+};
+// The legendaries pile also holds the Ultra Beasts, so it follows the pair:
+// hidden on the edge that leaves both off, shown when either comes back on.
+export function hiddenPileTransitions(prevCfg = {}, nextCfg = {}) {
+	const hide = [], show = [];
+	for (const [key, ids] of Object.entries(PROTECTION_PILES)) {
+		const was = !!prevCfg[key], is = !!nextCfg[key];
+		if (was === is) continue;
+		(is ? show : hide).push(...ids);
+	}
+	const legWas = !!prevCfg.protectLegendaries || !!prevCfg.protectUltraBeasts;
+	const legIs = !!nextCfg.protectLegendaries || !!nextCfg.protectUltraBeasts;
+	if (legWas !== legIs) (legIs ? show : hide).push('legendaries');
+	return { hide, show };
+}
+// nextCfg with its hiddenPiles edited for the protect* edges between prevCfg
+// and nextCfg; the same object back when no protection changed, so a plain
+// config write never rewrites the list.
+export function withPileTransitions(prevCfg, nextCfg) {
+	const { hide, show } = hiddenPileTransitions(prevCfg, nextCfg);
+	if (hide.length === 0 && show.length === 0) return nextCfg;
+	const now = new Set(nextCfg.hiddenPiles || []);
+	for (const id of show) now.delete(id);
+	for (const id of hide) now.add(id);
+	return { ...nextCfg, hiddenPiles: [...now] };
 }
 
 // The tagging scheme's suggested job tags. Every tag is a job; Dex-Evolve and
@@ -2146,17 +2203,43 @@ export const COMMUNITY_DAY_DEX = [
 	...new Set([...(COMMUNITY_DAYS.legacy || []), ...(COMMUNITY_DAYS.rolling || [])].flatMap((cd) => cd.dex)),
 ].sort((a, b) => a - b);
 
-export function buildPile({ id, head, lenses = [], kw, cfg }) {
+// One sorting pile in the spec's three steps. `head` is the pile itself, a
+// CNF chain (`+a,+b` or `+a&!+a,alola`); each ① lens is ANDed onto it, as are
+// ② (not starred, not tagged) and ③ (the protection tail). Every pile goes
+// through here, so all of them share one shape and scripts/check-piles.mjs can
+// hold them all to it.
+//   lenses: [{ key, filter, text?, not? }] where `filter` is a CNF chain (may
+//   hold `&`), `text` ([label, hint, params]) names a lens the pile's wording
+//   table can't know in advance, such as one per active GBL cup, and `not` is
+//   the clause that negates the lens (`!shiny` for the shiny lens); a lens
+//   without one (a species list, a PvP pattern) does not narrow ③a
+//   tail: protectionTail's options ({ mythCarve, smeargle }), resolved once
+//   per buildFilters call so every pile carves the same mythicals
+//   release: false makes a pile with no ③ at all (the evolve pile: what can
+//   still evolve is never a leftover); neither `release` nor `safe` is set
+// ③ comes out twice: `release` (③b) is head & tail, everything not starred
+// or tagged; `safe` (③a) is release & every lens's `not`, the leftovers no ①
+// step would have kept, so it always starts with release&. Identical `not`
+// clauses (the `4*,3*` and `3*` steps both negate to `0*,1*,2*`) are joined once.
+export function buildPile({ id, head, lenses = [], kw, cfg, tail = {}, release = true }) {
 	if (!head) return null;
-	return {
+	const lensesOn = lenses.filter((l) => l.filter);
+	const pile = {
 		id,
 		overview: head,
-		keep: lenses
-			.filter((l) => l.filter)
-			.map((l) => ({ key: l.key, filter: `${head}&${l.filter}`, ...(l.text ? { text: l.text } : {}) })),
+		keep: lensesOn.map((l) => ({
+			key: l.key,
+			filter: `${head}&${l.filter}`,
+			...(l.text ? { text: l.text } : {}),
+			...(l.not ? { not: l.not } : {}),
+		})),
 		sort: `${head}&!${kw.flag.favorite}&!#`,
-		release: `${head}&${protectionTail(kw, cfg).join('&')}`,
 	};
+	if (release) {
+		pile.release = `${head}&${protectionTail(kw, cfg, tail).join('&')}`;
+		pile.safe = [pile.release, ...new Set(lensesOn.map((l) => l.not).filter(Boolean))].join('&');
+	}
+	return pile;
 }
 
 export function buildFilters(
@@ -2435,6 +2518,42 @@ export function buildFilters(
 	// still-Frustration shadows. protectSmeargleLegacy (default false) keeps
 	// regular Smeargles releasable/tradeable.
 	const smeargleName = pokemonNameFor('235', outputLocale)?.toLowerCase() || 'smeargle';
+	// The mythicals carved out of `!mythical`, in the output locale, resolved
+	// once: the trash and every pile's protection tail read this one list.
+	const mythCarve = (cfg.mythTooManyOf || []).map((s) => speciesForOutput(s, outputLocale)).filter(Boolean);
+	// What every buildPile call hands protectionTail (see its comment).
+	const pileTail = { mythCarve, smeargle: smeargleName };
+	// The shared ① steps of docs/pile-purposes.md, for every pile from the
+	// hundo sort and the event piles down to the sorting piles. A pile's ①
+	// reads best first: each step must find something no earlier step found
+	// (check-piles P9). Each step's `not` is what ③a ANDs on so a leftover is
+	// something no step would have kept: a hundo needs none (the tail's `!4*`
+	// holds it), the 3-4 step fails when any stat is below three bars, the
+	// star steps when the star is below their floor.
+	const atk = kw.iv.atk, def = kw.iv.def, hp = kw.iv.hp;
+	const strongIv = `3-4${atk}&3-4${def}&3-4${hp}`;
+	const notStrong = `0-2${atk},0-2${def},0-2${hp}`;
+	const topIv = '4*,3*';
+	const notTop = '0*,1*,2*';
+	const notShiny = `!${kw.flag.shiny}`;
+	// `prefix` narrows every step (the evolve pile's new Pokédex entries); a
+	// narrowed step carries no `not`, since negating it would need the prefix
+	// too, and the one pile that narrows has no ③.
+	const ivLadder = (prefix = '', keyPrefix = '', hint) =>
+		[
+			['hundo', '4*', ''],
+			['shiny', kw.flag.shiny, notShiny],
+			['strong', strongIv, notStrong],
+			['three', '3*', notTop],
+		].map(([key, filter, not]) => ({
+			key: `${keyPrefix}${key}`,
+			filter: `${prefix}${filter}`,
+			...(keyPrefix ? { text: [`app.pile.lens.${key}_label`, hint] } : {}),
+			...(not && !prefix ? { not } : {}),
+		}));
+	const [hundoStep, shinyStep, strongStep, threeStep] = ivLadder();
+	const stillToEvolve = { key: 'evolve', filter: kw.flag.evolvable, not: `!${kw.flag.evolvable}` };
+	const highIvStep = { key: 'high_iv', filter: topIv, not: notTop };
 	const legacyMovesClause = () => {
 		const suffix = `,@${kw.flag.return},@${kw.flag.frustration}`;
 		return cfg.protectSmeargleLegacy
@@ -2517,10 +2636,7 @@ export function buildFilters(
 	if (cfg.protectShinies) push(trashClauses, `!${kw.flag.shiny}`, tFn('app.clause_why.shinies'));
 	if (cfg.protectLegendaries) push(trashClauses, `!${kw.flag.legendary}`, tFn('app.clause_why.legendaries'));
 	if (cfg.protectMythicals) {
-		const carve = (cfg.mythTooManyOf || [])
-			.map((s) => speciesForOutput(s, outputLocale))
-			.filter(Boolean)
-			.join(',');
+		const carve = mythCarve.join(',');
 		push(
 			trashClauses,
 			carve ? `!${kw.flag.mythical},${carve}` : `!${kw.flag.mythical}`,
@@ -3176,15 +3292,12 @@ export function buildFilters(
 	const hundoPile = buildPile({
 		id: 'hundo',
 		head: sortPileHead,
-		// docs/pile-purposes.md: best first, as every pile.
-		lenses: [
-			{ key: 'hundos', filter: '4*' },
-			{ key: 'shiny', filter: kw.flag.shiny },
-			{ key: 'strong', filter: `3-4${kw.iv.atk}&3-4${kw.iv.def}&3-4${kw.iv.hp}` },
-			{ key: 'three', filter: '3*' },
-		],
+		// docs/pile-purposes.md: best first, as every pile. The shared ladder,
+		// with its first step under this pile's own wording key.
+		lenses: [{ ...hundoStep, key: 'hundos' }, shinyStep, strongStep, threeStep],
 		kw,
 		cfg,
+		tail: pileTail,
 	});
 
 	// ── LUCKY-SORT ─────────────────────────────────────────────────────────
@@ -4500,19 +4613,17 @@ export function buildFilters(
 				.map((n) => `+${n}`)
 				.join(',');
 			if (!fams) return null;
-			// Best first, as every pile (docs/pile-purposes.md). Shinies, costumes
-			// and backgrounds need no step: the protection tail keeps them from ③.
+			// The shared ladder, best first (docs/pile-purposes.md). The shiny step
+			// is the only shiny guard: the tail protects shiny legendaries, not
+			// plain shinies, and a costume or background here goes to ③ like any
+			// other catch.
 			const pile = buildPile({
 				id: `event_${ev.id}`,
 				head: fams,
-				lenses: [
-					{ key: 'hundo', filter: '4*' },
-					{ key: 'shiny', filter: kw.flag.shiny },
-					{ key: 'strong', filter: `3-4${kw.iv.atk}&3-4${kw.iv.def}&3-4${kw.iv.hp}` },
-					{ key: 'three', filter: '3*' },
-				],
+				lenses: ivLadder(),
 				kw,
 				cfg,
+				tail: pileTail,
 			});
 			return {
 				id: ev.id,
@@ -4525,11 +4636,13 @@ export function buildFilters(
 				spawnForms: ev.spawnForms || [],
 				megaBoost: megaBoostFor(ev.spawnForms),
 				// The event's spawn families as a pile (see buildPile): ① best IVs
-				// first, ② not yet starred or tagged, ③ the protection tail.
+				// first, ② not yet starred or tagged, ③ the protection tail, as
+				// the leftovers (safe) and everything not starred or tagged (release).
 				pile,
 				overview: pile.overview,
 				sort: pile.sort,
 				release: pile.release,
+				safe: pile.safe,
 			};
 		})
 		.filter(Boolean);
@@ -5021,24 +5134,6 @@ export function buildFilters(
 			text: ['app.pile.lens.pvp_cup_label', 'app.pile.lens.pvp_hint', { cup: c.name }],
 		})),
 	];
-	const atk = kw.iv.atk, def = kw.iv.def, hp = kw.iv.hp;
-	// The shared steps of docs/pile-purposes.md. A pile's ① reads best first:
-	// each step must find something no earlier step found (check-piles P9).
-	const strongIv = `3-4${atk}&3-4${def}&3-4${hp}`;
-	const topIv = '4*,3*';
-	const ivLadder = (prefix = '', keyPrefix = '', hint) =>
-		[
-			['hundo', '4*'],
-			['shiny', kw.flag.shiny],
-			['strong', strongIv],
-			['three', '3*'],
-		].map(([key, filter]) => ({
-			key: `${keyPrefix}${key}`,
-			filter: `${prefix}${filter}`,
-			...(keyPrefix ? { text: [`app.pile.lens.${key}_label`, hint] } : {}),
-		}));
-	const stillToEvolve = { key: 'evolve', filter: kw.flag.evolvable };
-	const shinyStep = { key: 'shiny', filter: kw.flag.shiny };
 	// The loose rank-1 pattern under each capped league, for piles whose
 	// species aren't in a league's top 30 (the meta pile uses those pools).
 	const pvpLoose = ['great', 'ultra']
@@ -5073,6 +5168,7 @@ export function buildFilters(
 			],
 			kw,
 			cfg,
+			tail: pileTail,
 		}),
 		// Shadows. Never cleared by switching off shadow protection: the keepers
 		// are tagged here and ③ takes the rest. Attack matters most on a shadow.
@@ -5082,16 +5178,17 @@ export function buildFilters(
 			id: 'shadows',
 			head: kw.flag.shadow,
 			lenses: [
-				{ key: 'hundo', filter: '4*' },
+				hundoStep,
 				shinyStep,
 				{ key: 'meta', filter: metaHead },
-				{ key: 'three', filter: '3*' },
-				{ key: 'atk34', filter: `3-4${atk}` },
+				threeStep,
+				{ key: 'atk34', filter: `3-4${atk}`, not: `0-2${atk}` },
 				...pvpLoose,
-				{ key: 'evolve_shadow', filter: kw.flag.evolvable },
+				{ ...stillToEvolve, key: 'evolve_shadow' },
 			],
 			kw,
 			cfg,
+			tail: pileTail,
 		}),
 		// Received trades can't be traded again, so they are never tradebait. A
 		// trade re-rolls IVs, which makes the PvP step worth having here.
@@ -5099,26 +5196,29 @@ export function buildFilters(
 			id: 'traded',
 			head: kw.flag.traded,
 			lenses: [
-				{ key: 'hundo', filter: '4*' },
+				hundoStep,
 				shinyStep,
-				{ key: 'luckies', filter: kw.flag.lucky },
-				{ key: 'strong', filter: strongIv },
-				{ key: 'three', filter: '3*' },
+				{ key: 'luckies', filter: kw.flag.lucky, not: `!${kw.flag.lucky}` },
+				strongStep,
+				threeStep,
 				...pvpLoose,
 				stillToEvolve,
 			],
 			kw,
 			cfg,
+			tail: pileTail,
 		}),
 		buildPile({
 			id: 'luckies',
 			head: kw.flag.lucky,
-			lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep],
+			lenses: [stillToEvolve, highIvStep, shinyStep],
 			kw,
 			cfg,
+			tail: pileTail,
 		}),
 		// Everything that can evolve right now: new Pokédex entries best first,
-		// then the ones already tagged to evolve through.
+		// then the ones already tagged to evolve through. No ③: what can still
+		// evolve is never a leftover, so this pile has nothing to transfer.
 		buildPile({
 			id: 'evolve',
 			head: kw.flag.evolvable,
@@ -5128,6 +5228,8 @@ export function buildFilters(
 			],
 			kw,
 			cfg,
+			tail: pileTail,
+			release: false,
 		}),
 		// Dynamax-capable through the levelled Max-move token: bare `dynamax` is
 		// a search shortcut that silently drops the rest of the string.
@@ -5135,21 +5237,22 @@ export function buildFilters(
 			id: 'dynamax',
 			head: `${kw.flag.dynamax_move}1-`,
 			lenses: [
-				{ key: 'gigantamax', filter: kw.flag.gigantamax },
+				{ key: 'gigantamax', filter: kw.flag.gigantamax, not: `!${kw.flag.gigantamax}` },
 				{ key: 'builds', filter: topMaxAttackersList.length ? famOf(topMaxAttackersList) : '' },
 				...ivLadder(),
 			],
 			kw,
 			cfg,
+			tail: pileTail,
 		}),
 		// XXL: the showcase verdict is the calculator under the steps.
-		buildPile({ id: 'xxl', head: kw.flag.xxl, lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep], kw, cfg }),
-		buildPile({ id: 'xxs', head: kw.flag.xxs, lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep], kw, cfg }),
-		buildPile({ id: 'backgrounds', head: kw.flag.background, lenses: ivLadder(), kw, cfg }),
+		buildPile({ id: 'xxl', head: kw.flag.xxl, lenses: [stillToEvolve, highIvStep, shinyStep], kw, cfg, tail: pileTail }),
+		buildPile({ id: 'xxs', head: kw.flag.xxs, lenses: [stillToEvolve, highIvStep, shinyStep], kw, cfg, tail: pileTail }),
+		buildPile({ id: 'backgrounds', head: kw.flag.background, lenses: ivLadder(), kw, cfg, tail: pileTail }),
 		// Costumes split by whether the line can still evolve: one per stage for
 		// those, one for the rest (the costume budget either way).
-		buildPile({ id: 'costumes_evolve', head: `${kw.flag.costume}&${kw.flag.evolvable}`, lenses: ivLadder(), kw, cfg }),
-		buildPile({ id: 'costumes_final', head: `${kw.flag.costume}&!${kw.flag.evolvable}`, lenses: ivLadder(), kw, cfg }),
+		buildPile({ id: 'costumes_evolve', head: `${kw.flag.costume}&${kw.flag.evolvable}`, lenses: ivLadder(), kw, cfg, tail: pileTail }),
+		buildPile({ id: 'costumes_final', head: `${kw.flag.costume}&!${kw.flag.evolvable}`, lenses: ivLadder(), kw, cfg, tail: pileTail }),
 		// Community Days leave hundreds of one species behind, shinies and
 		// backgrounds among them: every Community Day species, all days at once,
 		// so old ones can be gone through too. Backgrounds get their own step
@@ -5160,19 +5263,32 @@ export function buildFilters(
 				? famOf(COMMUNITY_DAY_DEX.map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean))
 				: '',
 			lenses: [
-				{ key: 'hundo', filter: '4*' },
+				hundoStep,
 				shinyStep,
-				{ key: 'background', filter: kw.flag.background },
-				{ key: 'strong', filter: strongIv },
-				{ key: 'three', filter: '3*' },
+				{ key: 'background', filter: kw.flag.background, not: `!${kw.flag.background}` },
+				strongStep,
+				threeStep,
 				{ key: 'to_trade', filter: `!${kw.flag.traded}` },
 			],
 			kw,
 			cfg,
+			tail: pileTail,
+		}),
+		// Shinies: one per evolution stage is the living shiny dex, a few
+		// untraded ones are trades, the rest is a plain stack with a sparkle.
+		// The head is the shiny step, so the ladder has none; the tail holds
+		// shiny legendaries only, so ③ offers every plain shiny left unstarred.
+		buildPile({
+			id: 'shiny',
+			head: kw.flag.shiny,
+			lenses: [hundoStep, strongStep, threeStep, ...pvpLoose, stillToEvolve],
+			kw,
+			cfg,
+			tail: pileTail,
 		}),
 		// Legendaries and Ultra Beasts, wherever one came from (raid, research,
 		// GBL): keep the good ones.
-		buildPile({ id: 'legendaries', head: `${kw.flag.legendary},${kw.flag.ultra_beast}`, lenses: ivLadder(), kw, cfg }),
+		buildPile({ id: 'legendaries', head: `${kw.flag.legendary},${kw.flag.ultra_beast}`, lenses: ivLadder(), kw, cfg, tail: pileTail }),
 	].filter(Boolean);
 	// Filters that belong with a pile but aren't keep steps: cheap purify stock
 	// (common 1 km-candy shadows, never meta), which shadows to Charge-TM, and
@@ -5291,6 +5407,7 @@ export function buildFilters(
 		lenses: [...ivLadder(), ...pvpLoose],
 		kw,
 		cfg,
+		tail: pileTail,
 	});
 	// Everything else, as one De Morgan chain: not any meta or watchlist family.
 	const nonMetaPile = buildPile({
@@ -5299,6 +5416,7 @@ export function buildFilters(
 		lenses: [...ivLadder(), ...pvpLoose],
 		kw,
 		cfg,
+		tail: pileTail,
 	});
 	sortingPiles.splice(1, 0, ...[watchPile, nonMetaPile].filter(Boolean));
 
@@ -5345,6 +5463,7 @@ export function buildFilters(
 		costumes_final: { n: budgets.costumePerStage, tradeable: budgets.costumeTradeable },
 		backgrounds: { n: budgets.backgroundPerSpecies, tradeable: budgets.backgroundTradeable },
 		cday: { n: budgets.shinyPerStage, tradeable: budgets.shinyTradeable },
+		shiny: { n: budgets.shinyPerStage, tradeable: budgets.shinyTradeable },
 		legendaries: { meta: budgets.raidMeta, standin: budgets.standIn },
 		non_meta: { standin: budgets.standIn, evolve: budgets.evolve },
 		traded: {},
@@ -5684,6 +5803,18 @@ const KEY_TOP_MAX_ATTACKERS = 'pogo:topMaxAttackers';
 const KEY_CONFIG = 'pogo:config';
 const KEY_ONBOARDED = 'pogo:onboarded';
 const KEY_CHANGELOG_SEEN = 'pogo:changelogSeen';
+// One flag per filter area: which area's help sheet opened on its own. Only
+// the first area a user reaches ever does, so at most one is true. Lives
+// beside pogo:onboarded rather than in the config, so an export or a preset
+// never carries it and a reset of the filters leaves it alone.
+const KEY_HELP_SEEN = 'pogo:helpSeen';
+const HELP_SEEN_DEFAULT = Object.freeze(Object.fromEntries(FILTER_AREAS.map((area) => [area, false])));
+// Storage may hold anything (an old shape, a foreign write): keep exactly the
+// four area booleans, every other value reads as "not seen".
+export function helpSeenFrom(value) {
+	const src = value && typeof value === 'object' ? value : {};
+	return Object.fromEntries(FILTER_AREAS.map((area) => [area, src[area] === true]));
+}
 
 // iOS Safari (regular tab) refuses Storage API persistence at the WebKit
 // level: navigator.storage.persist() resolves with false immediately, no
@@ -6212,6 +6343,12 @@ export default function App() {
 	const [topAttackers, setTopAttackers] = useState(DEFAULT_TOP_ATTACKERS);
 	const [topMaxAttackers, setTopMaxAttackers] = useState(DEFAULT_TOP_MAX_ATTACKERS);
 	const [config, setConfig] = useState(DEFAULT_CONFIG);
+	// The one setter every protect* change goes through (ConfigPanel toggles
+	// and presets, the swipe deck): it edits hiddenPiles on a protection's
+	// on/off edge, see withPileTransitions. Load, import, the cross-tab echo
+	// and reset write the config as it is, so a saved list is never re-hidden.
+	const setConfigWithPiles = (next) =>
+		setConfig((prev) => withPileTransitions(prev, typeof next === 'function' ? next(prev) : next));
 	const [newHundo, setNewHundo] = useState('');
 	const [newLucky, setNewLucky] = useState('');
 	const [newTopAttacker, setNewTopAttacker] = useState('');
@@ -6220,6 +6357,15 @@ export default function App() {
 	const [newKeeper, setNewKeeper] = useState('');
 	const [loaded, setLoaded] = useState(false);
 	const [onboarded, setOnboarded] = useState(false);
+	const [helpSeen, setHelpSeen] = useState(HELP_SEEN_DEFAULT);
+	// The area whose help sheet is open right now, or null. One sheet at a
+	// time, session-only: a reload starts closed, and only the seen flags
+	// above persist.
+	const [helpArea, setHelpArea] = useState(null);
+	const helpPillRef = useRef(null);
+	// True while the open sheet is the one the app opened itself (first visit),
+	// so closing it knows there is no opener to hand focus back to.
+	const helpAutoOpenedRef = useRef(false);
 	const [showSetTheory, setShowSetTheory] = useState(false);
 	const [showHiddenPiles, setShowHiddenPiles] = useState(false);
 	// A 5-minute tick, so "right now" and the Mega planner notice an event that
@@ -6345,6 +6491,7 @@ export default function App() {
 			const b = await loadJSON(KEY_BAZAARTAGS, []);
 			const step = await loadJSON(KEY_STEP, 1);
 			const ob = await loadJSON(KEY_ONBOARDED, false);
+			const hs = await loadJSON(KEY_HELP_SEEN, HELP_SEEN_DEFAULT);
 			const clSeen = await loadJSON(KEY_CHANGELOG_SEEN, 0);
 			setHundos(h);
 			const catalogNotices = [];
@@ -6368,6 +6515,7 @@ export default function App() {
 			// #workshop.
 			setCurrentStep(stepFromHash() ?? step);
 			setOnboarded(ob);
+			setHelpSeen(helpSeenFrom(hs));
 			setLoaded(true);
 			// First-run: nudge brand-new visitors into the swipe onboarding instead
 			// of the marketing landing. Only when they actually arrived at "" (not a
@@ -6411,6 +6559,9 @@ export default function App() {
 	useEffect(() => {
 		if (loaded) saveJSON(KEY_ONBOARDED, onboarded);
 	}, [onboarded, loaded]);
+	useEffect(() => {
+		if (loaded) saveJSON(KEY_HELP_SEEN, helpSeen);
+	}, [helpSeen, loaded]);
 	useEffect(() => {
 		if (loaded) saveJSON(KEY_CHANGELOG_SEEN, changelogSeen);
 	}, [changelogSeen, loaded]);
@@ -6463,6 +6614,9 @@ export default function App() {
 				case KEY_ONBOARDED:
 					setOnboarded(value === true);
 					break;
+				case KEY_HELP_SEEN:
+					setHelpSeen(helpSeenFrom(value));
+					break;
 				case KEY_CHANGELOG_SEEN:
 					setChangelogSeen(typeof value === 'number' ? value : 0);
 					break;
@@ -6490,6 +6644,7 @@ export default function App() {
 			apply(KEY_LASTPIN, await loadJSON(KEY_LASTPIN, null));
 			apply(KEY_BAZAARTAGS, await loadJSON(KEY_BAZAARTAGS, []));
 			apply(KEY_ONBOARDED, await loadJSON(KEY_ONBOARDED, false));
+			apply(KEY_HELP_SEEN, await loadJSON(KEY_HELP_SEEN, HELP_SEEN_DEFAULT));
 			apply(KEY_CHANGELOG_SEEN, await loadJSON(KEY_CHANGELOG_SEEN, 0));
 		};
 		const onVisibility = () => {
@@ -6999,9 +7154,12 @@ export default function App() {
 	// decisions (a patch of protect* booleans) onto the live config and drops
 	// the user straight on the filter-output step; skip just bails to the
 	// workshop with defaults. Both set the first-run flag so it won't re-show.
+	// The patch goes through setConfigWithPiles, so a category tossed in the
+	// deck hides its Sorting piles (and one kept again shows them); skip
+	// changes no protection and so touches no pile.
 	function completeOnboarding(patch, dest = 'filter') {
 		if (patch && Object.keys(patch).length) {
-			setConfig((prev) => ({ ...prev, ...patch, lastAppliedPreset: null }));
+			setConfigWithPiles((prev) => ({ ...prev, ...patch, lastAppliedPreset: null }));
 		}
 		setOnboarded(true);
 		// Drop into the workshop on the chosen step — "filter" for instant payoff,
@@ -7036,6 +7194,51 @@ export default function App() {
 		if (typeof window !== 'undefined' && window.location.hash !== desired) window.location.hash = desired;
 	}
 	const selectArea = (area) => goToArea(area, areaSettings);
+	// The first area that ever shows its filters opens its help sheet on its
+	// own and is marked seen; from then on only the pill opens one. Nothing
+	// fires before storage has loaded, on another step, on another view or
+	// while the area shows its settings, so the first-run redirect to #onboard
+	// and a shared #workshop/<area>/settings link leave every flag alone.
+	const helpCanShow = loaded && view === 'workshop' && currentStep === STEP_NUMBER_BY_KEY.filter && !areaSettings;
+	// The sheet belongs to the page it opened over. When that page moves under
+	// it (browser Back, a pasted hash, a tab change while another area's sheet
+	// is up) it closes rather than sitting over a page it does not describe.
+	// Declared before the auto-open effect so that, when both fire in one
+	// commit for an unseen area, the auto-open's setHelpArea runs last.
+	useEffect(() => {
+		setHelpArea((open) => (open && (!helpCanShow || open !== filterArea) ? null : open));
+	}, [helpCanShow, filterArea]);
+	// Once per user, not once per area: the first area ever reached opens
+	// its sheet; every later area waits for the pill. Four sheets on four
+	// first clicks was the owner's call to drop. The flag is still stored per
+	// area so the record says which one it was.
+	const helpEverShown = Object.values(helpSeen).some(Boolean);
+	useEffect(() => {
+		if (!helpCanShow || helpEverShown) return;
+		// Where focus is now is where the Dialog will hand it back on close. A
+		// real tab stop (the tab the user just arrowed or clicked to) is a good
+		// place to land; the step heading (tabIndex -1) or <body> is not, so
+		// only then does the close hand focus on to the pill.
+		const el = document.activeElement;
+		helpAutoOpenedRef.current = !(el && el !== document.body && el.tabIndex >= 0);
+		setHelpArea(filterArea);
+		setHelpSeen((seen) => ({ ...seen, [filterArea]: true }));
+	}, [helpCanShow, filterArea, helpEverShown]);
+	const openHelp = (area) => {
+		helpAutoOpenedRef.current = false;
+		setHelpArea(area);
+	};
+	const closeHelp = () => setHelpArea(null);
+	// The Dialog hands focus back to whatever had it when the sheet opened.
+	// That is the pill when the pill opened it. When the app opened the sheet
+	// itself (first visit) over the step heading or nothing in particular,
+	// land on the pill that reopens the help instead. Runs after the Dialog's
+	// cleanup has released #root, which is inert until then.
+	useEffect(() => {
+		if (helpArea || !helpAutoOpenedRef.current) return;
+		helpAutoOpenedRef.current = false;
+		helpPillRef.current?.focus({ preventScroll: true });
+	}, [helpArea]);
 	function gotoStep(n) {
 		setCurrentStep(n);
 		// When in the workshop view, push the step-specific hash so the URL
@@ -7333,7 +7536,7 @@ export default function App() {
 	);
 	const configPanelProps = {
 		config,
-		setConfig,
+		setConfig: setConfigWithPiles,
 		homeLocals,
 		homeLocalTypeChecks,
 		friendCollectTargets,
@@ -7456,7 +7659,7 @@ export default function App() {
 							>
 								<ConfigPanel
 									config={config}
-									setConfig={setConfig}
+									setConfig={setConfigWithPiles}
 									homeLocals={homeLocals}
 									homeLocalTypeChecks={homeLocalTypeChecks}
 									friendCollectTargets={friendCollectTargets}
@@ -7512,6 +7715,8 @@ export default function App() {
 										onSelect={selectArea}
 										settings={areaSettings}
 										onToggleSettings={() => goToArea(filterArea, !areaSettings)}
+										onOpenHelp={() => openHelp(filterArea)}
+										openHelpRef={helpPillRef}
 										t={t}
 									/>
 									<AreaPanel area='catch' current={filterArea}>
@@ -7947,7 +8152,7 @@ export default function App() {
 					setResetArmed(false);
 				}}
 				config={config}
-				setConfig={setConfig}
+				setConfig={setConfigWithPiles}
 				onResetAll={resetAll}
 				resetArmed={resetArmed}
 				onExport={exportState}
@@ -7976,6 +8181,7 @@ export default function App() {
 				}}
 			/>
 			<ChangelogModal open={showChangelog} onClose={() => setShowChangelog(false)} />
+			{helpArea && <HelpSheet area={helpArea} onClose={closeHelp} t={t} />}
 		</div>
 	);
 }
@@ -9476,7 +9682,10 @@ function FriendCollectEditor({
 
 // ─── SUBCOMPONENTS ────────────────────────────────────────────────────────
 
-function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
+// `tone` colours the hint paragraph: 'warn' renders it in amber for a filter
+// that needs a read before it is run (the ③b string under a pile's reveal),
+// distinct from the red over-budget banner, which means the string is broken.
+function FilterBox({ label, accent, filterStr, copied, onCopy, hint, tone }) {
 	const { t } = useTranslation();
 	const len = filterStr.length;
 	// Past the budget the string is silently truncated and the filter quietly
@@ -9552,7 +9761,13 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 				</p>
 			)}
 			{hint && (
-				<p className='px-4 py-2 text-xs italic text-[#8B98A5] leading-snug border-b border-[#1F2933] bg-[#0E141A]'>
+				<p
+					className={
+						tone === 'warn'
+							? 'px-4 py-2 text-xs italic leading-snug border-b border-[#F5B82E]/40 bg-[#F5B82E]/10 text-[#F5B82E]'
+							: 'px-4 py-2 text-xs italic text-[#8B98A5] leading-snug border-b border-[#1F2933] bg-[#0E141A]'
+					}
+				>
 					{hint}
 				</p>
 			)}
@@ -9590,7 +9805,7 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 // real element and switching tabs keeps every collapsible's open state.
 // Arrow keys move between tabs and Home/End jump to the ends, per the APG
 // tabs pattern; only the selected tab is in the Tab order.
-function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, t }) {
+function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, onOpenHelp, openHelpRef, t }) {
 	const refs = useRef({});
 	const move = (e, i) => {
 		const next =
@@ -9633,9 +9848,27 @@ function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, t }) {
 				})}
 			</div>
 			<div className='flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-3 mt-2'>
-				<p className='mono text-[10.5px] text-[#8090A0]'>
-					{settings ? t('app.area.settings_hint') : t(`app.area.${current}.hint`)}
-				</p>
+				<div className='flex flex-col gap-1'>
+					<p className='mono text-[10.5px] text-[#8090A0]'>
+						{settings ? t('app.area.settings_hint') : t(`app.area.${current}.hint`)}
+					</p>
+					{/* The help pill for the current area. It opens the help sheet
+					    (HelpSheet, a modal over the page), so it is not a disclosure:
+					    aria-haspopup says what it opens and the sheet carries its own
+					    state. In settings mode there is no help and no pill. */}
+					{!settings && (
+						<button
+							ref={openHelpRef}
+							type='button'
+							onClick={onOpenHelp}
+							aria-haspopup='dialog'
+							className='mono text-xs self-start inline-flex items-center gap-1.5 min-h-[32px] px-3 rounded-full border border-[#5EAFC5]/40 text-[#5EAFC5] hover:bg-[#5EAFC5]/10 transition'
+						>
+							<CircleQuestionMark size={12} aria-hidden='true' />
+							{t('app.help.toggle_open')}
+						</button>
+					)}
+				</div>
 				{/* The flip: same four tabs, each showing its own settings. A toggle,
 				    so aria-pressed carries the state; the label says where it goes. */}
 				<button
@@ -9669,6 +9902,65 @@ function AreaPanel({ area, current, children }) {
 		>
 			{children}
 		</div>
+	);
+}
+
+// The per-area help: a title and four short paragraphs, keyed
+// app.help.<area>.{title,p1..p4}, shown as a sheet over the page on the
+// shared Dialog primitive: a bottom sheet on phones, a slide-over from the
+// right from `sm` up. App opens it on its own once, for the first area a
+// user reaches (seen flags under pogo:helpSeen), and from the pill in
+// AreaTabs otherwise; one sheet at a time, closed by Escape, the backdrop, the X or
+// "Got it". The dialog's name is the generic label; the h2 names the area.
+function HelpSheet({ area, onClose, t }) {
+	const gotItRef = useRef(null);
+	return (
+		<Dialog
+			onClose={onClose}
+			label={t('app.help.dialog_label')}
+			initialFocusRef={gotItRef}
+			backdropClassName='help-sheet-backdrop fixed inset-0 z-50 backdrop-blur-xs flex items-end justify-center sm:items-stretch sm:justify-end sm:p-0'
+			className='help-sheet w-full max-h-[85vh] overflow-y-auto rounded-t-xl border border-b-0 border-[#2D3A47] shadow-2xl sm:w-[400px] sm:max-w-[90vw] sm:h-full sm:max-h-none sm:rounded-none sm:rounded-l-xl sm:border-b sm:border-r-0 sm:flex sm:flex-col'
+		>
+			<div
+				style={{ backgroundColor: '#0F1419' }}
+				className='sticky top-0 border-b border-[#1F2933] px-5 py-3 flex items-center justify-between gap-3'
+			>
+				<h2 className='mono text-base font-semibold text-[#E6EDF3]'>{t(`app.help.${area}.title`)}</h2>
+				<button
+					type='button'
+					onClick={onClose}
+					aria-label={t('app.help.close_aria')}
+					className='text-[#8090A0] hover:text-[#E6EDF3] transition p-1 shrink-0'
+				>
+					<X size={18} />
+				</button>
+			</div>
+			<div className='px-5 py-4 space-y-3 sm:flex-1'>
+				{['p1', 'p2', 'p3', 'p4'].map((p) => (
+					<p key={p} className='text-sm leading-relaxed text-[#B8C4D0]'>
+						{t(`app.help.${area}.${p}`)}
+					</p>
+				))}
+			</div>
+			{/* An action bar like the header: stuck to the bottom edge of the
+			    panel, so the focused "Got it" is in view on open even when the
+			    paragraphs overflow a short phone, and pinned to the foot of the
+			    slide-over rather than floating wherever the text ends. */}
+			<div
+				style={{ backgroundColor: '#0F1419' }}
+				className='sticky bottom-0 border-t border-[#1F2933] px-5 py-3 flex justify-end sm:mt-auto'
+			>
+				<button
+					ref={gotItRef}
+					type='button'
+					onClick={onClose}
+					className='mono text-xs min-h-[40px] px-4 rounded-sm border border-[#5EAFC5] text-[#5EAFC5] hover:bg-[#5EAFC5]/10 transition'
+				>
+					{t('app.help.got_it')}
+				</button>
+			</div>
+		</Dialog>
 	);
 }
 
@@ -10154,7 +10446,7 @@ function PileCard({ card, t }) {
 // hook in plain words ("Cryptos piling up…"), and the three steps when opened.
 // `chip` carries the event window or the reason a pile floated up.
 export const PILE_GROUPS = [
-	{ id: 'collection', accent: '#F5B82E', piles: ['hundo', 'cday', 'luckies', 'traded', 'costumes_evolve', 'costumes_final', 'backgrounds', 'xxl', 'xxs'] },
+	{ id: 'collection', accent: '#F5B82E', piles: ['hundo', 'cday', 'shiny', 'luckies', 'traded', 'costumes_evolve', 'costumes_final', 'backgrounds', 'xxl', 'xxs'] },
 	{ id: 'battle', accent: '#E74C3C', piles: ['meta', 'watchlist', 'legendaries', 'shadows', 'dynamax'] },
 	// `tools` are single filters with their own tile: mega-evolving spends
 	// candy, so it sits here and not with the Mega planner under Catching.
@@ -10162,7 +10454,7 @@ export const PILE_GROUPS = [
 	{ id: 'big', accent: '#5EAFC5', piles: ['non_meta'] },
 ];
 const PILE_ICON = {
-	hundo: Award, luckies: Clover, traded: Gift, costumes_evolve: Shirt, costumes_final: Shirt, backgrounds: Image, legendaries: Crown, cday: Sparkles,
+	hundo: Award, luckies: Clover, traded: Gift, costumes_evolve: Shirt, costumes_final: Shirt, backgrounds: Image, legendaries: Crown, cday: Sparkles, shiny: Sparkle,
 	xxl: Maximize2, xxs: Minimize2, meta: Swords, watchlist: Telescope, shadows: Flame, dynamax: Zap, evolve: Sprout,
 	non_meta: Package, event: Leaf, mega_evolve: Dna,
 };
@@ -10194,9 +10486,14 @@ function ToolTile({ title, hook, chip, icon, accent, open, children }) {
 	);
 }
 function PileTile({ pile, title, hook, icon, chip, accent, open, onHide, hidden, text, copied, copyToClipboard, t, children }) {
+	// The tile's open state is tracked only to remount PileSteps when the tile
+	// closes, so the ③b reveal inside it is closed again on the next open
+	// instead of surviving a collapse within the same mounted tile.
+	const [isOpen, setIsOpen] = useState(!!open);
 	return (
 		<details
 			open={open || undefined}
+			onToggle={(e) => setIsOpen(e.currentTarget.open)}
 			className='group rounded-md border border-[#1F2933] bg-[#0E141A] overflow-hidden transition hover:border-[#2D3A47]'
 			style={{ borderLeft: `3px solid ${accent}` }}
 		>
@@ -10216,7 +10513,7 @@ function PileTile({ pile, title, hook, icon, chip, accent, open, onHide, hidden,
 				<ChevronRight size={14} className='text-[#8090A0] details-arrow shrink-0 mt-1' aria-hidden='true' />
 			</summary>
 			<div className='px-3 pb-3 pt-3 border-t border-[#1F2933] space-y-3'>
-				<PileSteps pile={pile} accent={accent} copied={copied} copyToClipboard={copyToClipboard} t={t} text={text} />
+				<PileSteps key={isOpen ? 'open' : 'closed'} pile={pile} accent={accent} copied={copied} copyToClipboard={copyToClipboard} t={t} text={text} />
 				{(pile.extras || []).length > 0 && (
 					<div className='space-y-3 pt-2 border-t border-[#1F2933]'>
 						<h5 className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t('app.sort.also_here')}</h5>
@@ -10246,12 +10543,17 @@ function PileTile({ pile, title, hook, icon, chip, accent, open, onHide, hidden,
 
 // The three steps of one sorting pile (see buildPile), rendered the same way
 // for every pile. `text` names each box's label and hint keys:
-//   { overview: [label, hint], keep: { <lensKey>: [label, hint] }, sort, release }
-// sort and release fall back to the generic pile wording. Copy keys are
+//   { overview: [label, hint], keep: { <lensKey>: [label, hint] }, sort, safe, release }
+// sort, safe and release fall back to the generic pile wording. Copy keys are
 // `${pile.id}_${box}`, so two piles that share a species never share state.
 // `card` renders under ②, where the user decides what still has a job.
+// Step ③ is two boxes: ③a `safe` (the leftovers, nothing an IV, shiny, evolve,
+// background or lucky ① step would have kept) is the visible transfer box; ③b `release` (everything not starred or
+// tagged) sits behind a reveal that opens closed on every mount and carries a
+// warning, because it includes what ① would have kept.
 const PILE_TEXT_DEFAULTS = {
 	sort: ['app.pile.sort_label', 'app.pile.sort_hint'],
+	safe: ['app.pile.safe_label', 'app.pile.safe_hint'],
 	release: ['app.pile.release_label', 'app.pile.release_hint'],
 };
 const HUNDO_PILE_TEXT = {
@@ -10261,9 +10563,14 @@ const HUNDO_PILE_TEXT = {
 const EVENT_PILE_TEXT = {
 	overview: ['app.events.overview_label', 'app.events.overview_hint'],
 	sort: ['app.pile.sort_label', 'app.events.sort_hint'],
+	safe: ['app.pile.safe_label', 'app.events.safe_hint'],
 	release: ['app.pile.release_label', 'app.events.release_hint'],
 };
 function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
+	// The ③b reveal is local state: it starts closed on every mount and is
+	// never persisted, so a wide transfer view is always a deliberate click.
+	const [reveal, setReveal] = useState(false);
+	const revealId = useId();
 	if (!pile) return null;
 	// Wording by convention unless the pile's table says otherwise:
 	// app.pile.<id>.title/.hint for the overview, app.pile.lens.<key>_label/_hint
@@ -10275,7 +10582,7 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 	};
 	const lensWords = (lens) =>
 		words.keep?.[lens.key] || lens.text || [`app.pile.lens.${lens.key}_label`, `app.pile.lens.${lens.key}_hint`];
-	const box = (suffix, keys, str) => {
+	const box = (suffix, keys, str, tone) => {
 		if (!str || !keys) return null;
 		const copyKey = `${pile.id}_${suffix}`;
 		const opts = keys[2] ? { params: keys[2] } : undefined;
@@ -10288,6 +10595,7 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 				copied={copied[copyKey]}
 				onCopy={() => copyToClipboard(copyKey, str)}
 				hint={t(keys[1], opts)}
+				tone={tone}
 			/>
 		);
 	};
@@ -10302,8 +10610,32 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 			{subHeading('app.pile.group_sort')}
 			{card ?? <PileCard card={pile.card} t={t} />}
 			{box('sort', words.sort, pile.sort)}
-			{subHeading('app.pile.group_release')}
-			{box('release', words.release, pile.release)}
+			{pile.release && subHeading('app.pile.group_release')}
+			{box('safe', words.safe, pile.safe)}
+			{pile.release && (
+				<div className='space-y-2'>
+					<button
+						type='button'
+						onClick={() => setReveal((v) => !v)}
+						// Custom disclosure, not <details>: the chevron alone conveys
+						// nothing to AT, and the control needs a stated open/closed.
+						aria-expanded={reveal}
+						aria-controls={revealId}
+						className='mono text-xs text-[#F5B82E] hover:text-[#E6EDF3] min-h-[32px] flex items-center gap-1.5'
+					>
+						{reveal ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+						{t('app.pile.release_reveal')}
+					</button>
+					{reveal && (
+						<div id={revealId} className='space-y-2'>
+							<p className='px-4 py-2 text-xs leading-snug border border-[#F5B82E]/40 rounded-sm bg-[#F5B82E]/10 text-[#F5B82E]'>
+								{t('app.pile.release_warning')}
+							</p>
+							{box('release', words.release, pile.release, 'warn')}
+						</div>
+					)}
+				</div>
+			)}
 		</>
 	);
 }

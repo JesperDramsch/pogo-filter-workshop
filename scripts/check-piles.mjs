@@ -3,10 +3,15 @@
 // same contract here, in every locale:
 //
 //   P1 — shape: each ① lens is the pile AND the lens, ② is the pile minus
-//        starred and tagged, ③ is the pile AND the protection tail, exactly
+//        starred and tagged, ③b (release) is the pile AND the protection
+//        tail, exactly, and ③a (safe) starts with ③b; a family marked
+//        noRelease has neither
 //   P2 — every step is well formed and fits the in-game search bar
-//   P3 — ③ gives a definite "no" for every always-protected kind and still
-//        shows what ① and ② leave to the user (scripts/lib/pile-cases.mjs)
+//   P3 — ③b gives a definite "no" for every always-protected kind and still
+//        shows what ① and ② leave to the user (scripts/lib/pile-cases.mjs),
+//        under the default config and under one that protects nundos and
+//        carves a mythical out (the two settings the tail reads); ③a adds the
+//        same clauses under both
 //   P4 — ② hides starred and tagged Pokémon and shows the rest
 //   P5 — no step of a pile ever matches a Pokémon outside the pile
 //   P6 — each lens finds what it names (the hundo lens finds hundos only)
@@ -17,6 +22,10 @@
 //        table, every row's rule renders in every locale, simple mode uses
 //        the defaults, expert mode the overrides, and the import merge keeps
 //        only whole numbers ≥ 0
+//   P9 — every ① step finds something no earlier step found
+//   P10 — ③a (safe) is the leftovers: what any lens with a `not` would have
+//        kept gives a definite "no", a plain dupe that cannot evolve is shown,
+//        a shiny is hidden wherever a shiny lens exists
 //
 // PILE_FAMILIES is the registry: a new pile adds one entry naming where its
 // piles come from and which species is in it, and inherits every check.
@@ -24,7 +33,7 @@
 // Run with: npx vite-node scripts/check-piles.mjs
 
 import {
-  BUDGET_DEFAULTS, BUDGET_ROWS, evalFilterDetailed as evalDetailed, FLOAT_ENDED_DAYS, floatingPiles, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET, PILE_GROUPS,
+  BUDGET_DEFAULTS, BUDGET_ROWS, evalFilterDetailed as evalDetailed, FLOAT_ENDED_DAYS, floatingPiles, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET, PILE_GROUPS, PROTECTION_PILES, hiddenPileTransitions, withPileTransitions,
 } from "../src/App.jsx";
 import { readFileSync } from "node:fs";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
@@ -38,7 +47,7 @@ import { LOCALES } from "../src/i18n/index.js";
 import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
 import { pokemonNameFor } from "../src/data/species.js";
 import { FIXTURE_CONFIG, makeTFn } from "./lib/fixture.mjs";
-import { pileCases, pileMon } from "./lib/pile-cases.mjs";
+import { pileCases, pileMon, tailOptions } from "./lib/pile-cases.mjs";
 import { hasCostumedSpawns, signalsFromFeed } from "./fetch-events.mjs";
 import { acceptPveDump, learnersOf, watchMovesFrom } from "./fetch-game-master-watch.mjs";
 import GM_WATCH from "../src/data/game-master-watch.json";
@@ -178,6 +187,8 @@ const PILE_FAMILIES = [
     piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "evolve"), dex: 129 }],
     base: { flags: { canEvolve: true } },
     outsider: () => ({ dex: 129, o: { flags: { canEvolve: false } } }),
+    // What can still evolve is never a leftover: the pile opts out of ③.
+    noRelease: true,
     lensCases: () => ({
       new_dex_hundo: withFlag(LADDER.hundo, "newDexEvo"),
       new_dex_shiny: withFlag(LADDER.shiny, "newDexEvo"),
@@ -253,31 +264,59 @@ const PILE_FAMILIES = [
       to_trade: { match: {}, miss: { flags: { traded: true } } },
     }),
   },
+  {
+    // Every shiny: the head is the shiny step, so the ladder has none and ③a
+    // shows a plain shiny (P10 keys on the lens, not the pile). A shiny
+    // legendary is protected by the tail; the outsider is a Magikarp with
+    // the flag off, since the default outsider is shiny and in the pile.
+    name: "shinies",
+    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "shiny"), dex: 129 }],
+    base: { flags: { shiny: true } },
+    outsider: () => ({ dex: 129, o: { flags: { shiny: false } } }),
+    skipReleasable: /^plain legendary$/,
+    lensCases: () => ({ hundo: LADDER.hundo, strong: LADDER.strong, three: LADDER.three, ...PVP_LOOSE, evolve: EVOLVE }),
+  },
 ];
 
 const BAD = [/undefined/, /NaN/, /\[object /, /&&|,,/, /^[&,]|[&,]$/, /!!/];
-const { PROTECTED, RELEASABLE } = pileCases(CFG);
+// The lenses ③a must negate (P10): every IV or flag step. A hundo step needs
+// no `not` (the tail's `!4*` holds it); a species list, PvP pattern, roster,
+// tag or "untraded" step narrows nothing. A new IV or flag lens goes here.
+const NEEDS_NOT = /^(shiny|strong|three|high_iv|evolve|evolve_shadow|luckies|background|atk34|gigantamax)$/;
+// The tail reads protectNundos and mythTooManyOf; P3 runs under the default
+// config and under the one that flips both, so a nundo is held on one side
+// and shown on the other, and the carved mythical is shown.
+const ALT_CFG = { ...CFG, protectNundos: true, mythTooManyOf: ["Darkrai"] };
+const P3_CONFIGS = [["default", CFG, pileCases(CFG)], ["nundos protected, Darkrai carved", ALT_CFG, pileCases(ALT_CFG)]];
 const localeNames = Object.keys(LOCALES);
 
 for (const fam of PILE_FAMILIES) {
   console.log(`\n${fam.name}`);
   for (const loc of localeNames) {
     const kw = pogoKeywords(loc);
-    const tail = protectionTail(kw, CFG).join("&");
+    const tail = protectionTail(kw, CFG, tailOptions(CFG, loc)).join("&");
     const result = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc));
     const cases = fam.lensCases?.(kw) || {};
     const entries = fam.piles(result).filter((e) => e.pile);
     const bad = [];
     if (entries.length === 0) bad.push("no pile built");
+    // The same piles under the alternate config, by id, for P3.
+    const altPiles = new Map(fam.piles(buildFilters(HUNDOS, LUCKIES, ALT_CFG, [], loc, makeTFn(loc))).filter((e) => e.pile).map((e) => [e.pile.id, e.pile]));
     for (const { pile, dex } of entries) {
       const where = pile.id;
       const head = pile.overview;
       // P1
       for (const lens of pile.keep) if (!lens.filter.startsWith(`${head}&`)) bad.push(`${where}.${lens.key}: not head & lens`);
       if (pile.sort !== `${head}&!${kw.flag.favorite}&!#`) bad.push(`${where}: ② is not head & !favourite & !#`);
-      if (pile.release !== `${head}&${tail}`) bad.push(`${where}: ③ is not head & tail`);
+      if (fam.noRelease) {
+        if ("release" in pile || "safe" in pile) bad.push(`${where}: opted out of ③ but carries release or safe`);
+      } else {
+        if (pile.release !== `${head}&${tail}`) bad.push(`${where}: ③b is not head & tail`);
+        if (!pile.safe?.startsWith(`${pile.release}&`)) bad.push(`${where}: ③a does not start with ③b &`);
+      }
       // P2
-      const steps = [["overview", head], ...pile.keep.map((l) => [l.key, l.filter]), ["sort", pile.sort], ["release", pile.release]];
+      const steps = [["overview", head], ...pile.keep.map((l) => [l.key, l.filter]), ["sort", pile.sort],
+        ...(fam.noRelease ? [] : [["release", pile.release], ["safe", pile.safe]])];
       for (const [k, str] of steps) {
         for (const re of BAD) if (re.test(str)) bad.push(`${where}.${k}: malformed (${re})`);
         if (str.length > SEARCH_CHAR_BUDGET) bad.push(`${where}.${k}: ${str.length} chars`);
@@ -288,16 +327,24 @@ for (const fam of PILE_FAMILIES) {
       const monOf = (o, d = dex) => pileMon(loc, withBase(o), pokemonNameFor(String(d), "en"), d);
       const verdict = (str, o, d) => evalFilterDetailed(str, monOf(o, d), loc);
       const note = (v) => (v.unknown.length ? ` (unknown ${v.unknown.join(" ")})` : "");
-      // P3
-      for (const [label, o] of PROTECTED) {
-        if (fam.skipProtected?.test(label)) continue;
-        const v = verdict(pile.release, o);
-        if (v.verdict !== false) bad.push(`${where} ③ ${label}: ${v.verdict}${note(v)}`);
-      }
-      for (const [label, o] of RELEASABLE) {
-        if (fam.skipReleasable?.test(label)) continue;
-        const v = verdict(pile.release, o);
-        if (v.verdict !== true) bad.push(`${where} ③ ${label} hidden: ${v.verdict}${note(v)}`);
+      // P3 (a family with no ③ has nothing to hold here)
+      for (const [cfgName, cfg, { PROTECTED, RELEASABLE }] of fam.noRelease ? [] : P3_CONFIGS) {
+        const under = cfg === CFG ? pile : altPiles.get(pile.id);
+        const release = under?.release;
+        if (!release) { bad.push(`${where}: no pile under ${cfgName}`); continue; }
+        if (release !== `${head}&${protectionTail(kw, cfg, tailOptions(cfg, loc)).join("&")}`) bad.push(`${where} (${cfgName}): ③b is not head & tail`);
+        // ③a adds the lenses' `not` clauses, which no setting moves.
+        if (under.safe?.slice(release.length) !== pile.safe.slice(pile.release.length)) bad.push(`${where} (${cfgName}): ③a adds different clauses than under the default config`);
+        for (const [label, o] of PROTECTED) {
+          if (fam.skipProtected?.test(label)) continue;
+          const v = verdict(release, o);
+          if (v.verdict !== false) bad.push(`${where} ③ (${cfgName}) ${label}: ${v.verdict}${note(v)}`);
+        }
+        for (const [label, o] of RELEASABLE) {
+          if (fam.skipReleasable?.test(label)) continue;
+          const v = verdict(release, o);
+          if (v.verdict !== true) bad.push(`${where} ③ (${cfgName}) ${label} hidden: ${v.verdict}${note(v)}`);
+        }
       }
       // P4
       for (const [label, o, want] of [["starred", { flags: { favorite: true } }, false], ["tagged", { tags: ["Trade"] }, false], ["plain", {}, true]]) {
@@ -346,20 +393,85 @@ for (const fam of PILE_FAMILIES) {
           if (v.verdict === true) bad.push(`${where}.${lens.key} adds nothing: ${earlier.key} already takes its case`);
         }
       });
+      // P10 — ③a is the leftovers. Whatever a lens with a `not` keeps gives a
+      // definite "no" (its own oracle match, so the `not` is tested with the
+      // Pokémon the lens is known to take); a plain dupe is shown, and a shiny
+      // is hidden exactly where a shiny lens exists (keyed on the lens, not the
+      // pile: a pile without one leaves its shinies to ③a). `canEvolve: false`
+      // settles the evolve lens's `not` for the plain rows: a Pokémon that
+      // carries no evolve fact leaves it unknown, as the verify panel wants.
+      if (!fam.noRelease) {
+        for (const lens of pile.keep) {
+          if (NEEDS_NOT.test(lens.key) && !lens.not) bad.push(`${where}.${lens.key}: an IV or flag lens with no \`not\`, so ③a would show what it keeps`);
+          if (!lens.not) continue;
+          const c = cases[lens.key];
+          if (!c) { bad.push(`${where}.${lens.key}: a lens with a \`not\` but no oracle`); continue; }
+          const v = verdict(pile.safe, c.match, c.dex ?? dex);
+          if (v.verdict !== false) bad.push(`${where} ③a shows what ${lens.key} keeps: ${v.verdict}${note(v)}`);
+          // On its own, so a wrong `not` cannot hide behind a neighbour's (a
+          // 3-4 match is a 3* too): head & not rejects the lens's match and
+          // admits its near miss, exactly the lens's complement.
+          const alone = `${head}&${lens.not}`;
+          const m = verdict(alone, c.match, c.dex ?? dex);
+          const x = verdict(alone, c.miss, c.dexMatchOnly ? dex : c.dex ?? dex);
+          if (m.verdict !== false) bad.push(`${where}.${lens.key}: its \`not\` still admits what the lens keeps: ${m.verdict}${note(m)}`);
+          if (x.verdict !== true) bad.push(`${where}.${lens.key}: its \`not\` hides the lens's near miss: ${x.verdict}${note(x)}`);
+        }
+        const settle = (o) => ({ ...o, flags: { canEvolve: fam.base?.flags?.canEvolve ?? false, ...(o.flags || {}) } });
+        const row = (label) => P3_CONFIGS[0][2].RELEASABLE.find(([l]) => l === label)[1];
+        const plain = verdict(pile.safe, settle(row("plain dupe")));
+        if (plain.verdict !== true) bad.push(`${where} ③a hides a plain dupe: ${plain.verdict}${note(plain)}`);
+        if (!fam.skipReleasable?.test("shiny")) {
+          const hasShinyLens = pile.keep.some((l) => l.filter === `${head}&${kw.flag.shiny}`);
+          const shiny = verdict(pile.safe, settle(row("shiny")));
+          if (shiny.verdict !== !hasShinyLens) bad.push(`${where} ③a ${hasShinyLens ? "shows a shiny despite its shiny lens" : "hides a shiny with no shiny lens"}: ${shiny.verdict}${note(shiny)}`);
+        }
+      }
     }
     check(`${loc}: ${entries.length} pile(s)`, bad.length === 0, bad.slice(0, 4).join(" | "));
   }
 }
 
-console.log("\nThe tail ignores the trash toggles");
+console.log("\nThe tail reads exactly protectNundos and mythTooManyOf");
 {
   const kw = pogoKeywords("en");
-  const on = protectionTail(kw, { ...CFG, protectLuckyEligible: true, protectNundos: false, protectBuddies: false });
-  const off = protectionTail(kw, { ...CFG, protectLuckyEligible: false, protectNundos: true, protectBuddies: true });
-  check("switching trash protections on or off leaves the tail as it is (lucky-trade floor included)",
-    JSON.stringify(on) === JSON.stringify(off) && on.some((c) => c.startsWith(`${kw.numeric.year}`)), off.join("&"));
+  const tailOf = (cfg, loc = "en") => protectionTail(pogoKeywords(loc), cfg, tailOptions(cfg, loc));
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  const nundoClause = `1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`;
+  const on = tailOf({ ...CFG, protectNundos: true });
+  const off = tailOf({ ...CFG, protectNundos: false });
+  check("protectNundos on adds the nundo clause, off drops it, and nothing else moves",
+    on.includes(nundoClause) && !off.includes(nundoClause) && same(on.filter((c) => c !== nundoClause), off), off.join("&"));
+  check("the shipped default protects no nundo (protectNundos is off)", !CFG.protectNundos && !tailOf(CFG).includes(nundoClause));
+  // The trash toggles still leave the tail as it is (lucky-trade floor included).
+  const toggles = { protectLuckyEligible: true, protectBuddies: false, protectLegacyMoves: false, protectSmeargleLegacy: true, protectMythicals: false, protectShinies: false };
+  const flipped = Object.fromEntries(Object.entries(toggles).map(([k, v]) => [k, !v]));
+  check("switching the other trash protections on or off leaves the tail as it is (lucky-trade floor included)",
+    same(tailOf({ ...CFG, ...toggles }), tailOf({ ...CFG, ...flipped })) && tailOf({ ...CFG, ...toggles }).some((c) => c.startsWith(`${kw.numeric.year}`)));
   // Custom collectibles stay out of the tail (Jesper's call): sorting offers
   // them in ③ like any other species; favourite or tag the ones to keep.
+  check("custom collectibles add nothing to the tail", same(tailOf({ ...CFG, customCollectibles: ["Spinda"] }), tailOf(CFG)));
+  check("only a year floor of 0 drops the lucky-trade clause",
+    !tailOf({ ...CFG, luckyEligibleYear: 0 }).some((c) => c.startsWith(`${kw.numeric.year}`)));
+  // The mythical carve: `!mythical,<name>` in the output locale, as the trash
+  // spells it; an empty carve is the bare `!mythical`.
+  for (const loc of localeNames) {
+    const lkw = pogoKeywords(loc);
+    const name = pokemonNameFor("809", loc)?.toLowerCase();
+    const carved = tailOf({ ...CFG, mythTooManyOf: ["Melmetal"] }, loc);
+    const bare = tailOf({ ...CFG, mythTooManyOf: [] }, loc);
+    check(`${loc}: mythTooManyOf Melmetal carves \`!${lkw.flag.mythical},${name}\` out of the tail, an empty list leaves \`!${lkw.flag.mythical}\``,
+      !!name && carved.includes(`!${lkw.flag.mythical},${name}`) && bare.includes(`!${lkw.flag.mythical}`) && !bare.some((c) => c.startsWith(`!${lkw.flag.mythical},`))
+      && same(carved.filter((c) => !c.startsWith(`!${lkw.flag.mythical}`)), bare.filter((c) => !c.startsWith(`!${lkw.flag.mythical}`))),
+      carved.find((c) => c.startsWith(`!${lkw.flag.mythical}`)));
+    // The legacy-move clause: a Pokémon with a legacy move is held, a Smeargle
+    // (every Sketched move carries the flag) is shown, whatever the trash's
+    // own Smeargle toggle says.
+    const tail = tailOf({ ...CFG, protectSmeargleLegacy: true }, loc).join("&");
+    const held = evalFilterDetailed(tail, pileMon(loc, { moves: [], flags: { legacyMove: true } }), loc);
+    const smeargle = evalFilterDetailed(tail, pileMon(loc, { moves: [], flags: { legacyMove: true } }, "Smeargle", 235), loc);
+    check(`${loc}: the tail holds a legacy move and shows a Smeargle with one`, held.verdict === false && smeargle.verdict === true, `held ${held.verdict}, smeargle ${smeargle.verdict}`);
+  }
   // The legendaries pile takes Ultra Beasts too; a plain species stays out.
   for (const loc of localeNames) {
     const pile = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc)).sortingPiles.find((p) => p.id === "legendaries");
@@ -367,10 +479,6 @@ console.log("\nThe tail ignores the trash toggles");
     const plain = evalFilterDetailed(pile.overview, pileMon(loc, {}, "Magikarp", 129), loc).verdict;
     check(`${loc}: an Ultra Beast is in the legendaries pile, a plain species is not`, ub === true && plain === false, `ub ${ub}, plain ${plain}`);
   }
-  check("custom collectibles add nothing to the tail",
-    JSON.stringify(protectionTail(kw, { ...CFG, customCollectibles: ["Spinda"] })) === JSON.stringify(protectionTail(kw, CFG)));
-  check("only a year floor of 0 drops the lucky-trade clause",
-    !protectionTail(kw, { ...CFG, luckyEligibleYear: 0 }).some((c) => c.startsWith(`${kw.numeric.year}`)));
 }
 
 console.log("\nP7 — the pile card");
@@ -393,7 +501,7 @@ for (const loc of localeNames) {
     for (const x of texts) if (/\{\w+\}|^app\.|move\./.test(x)) { bad.push(`${id}: "${x}"`); break; }
     if ((c.rows || []).some((row) => row.keep.length === 0)) bad.push(`${id}: a row with no keep line`);
   }
-  for (const id of ["shadows", "traded", "luckies", "dynamax", "xxl", "xxs", "costumes_evolve", "costumes_final", "backgrounds", "legendaries", "cday", "non_meta"])
+  for (const id of ["shadows", "traded", "luckies", "dynamax", "xxl", "xxs", "costumes_evolve", "costumes_final", "backgrounds", "legendaries", "cday", "shiny", "non_meta"])
     if (!card(id)?.rule) bad.push(`${id}: no keep rule`);
   check(`${loc}: ${meta.length} meta and ${watch.length} watchlist rows, ${cards.length} cards`, bad.length === 0, bad.slice(0, 4).join(" | "));
 }
@@ -489,8 +597,8 @@ console.log("\nWhich piles show first (event-driven ordering)");
   const span = (startDays, endDays) => ({ start: iso(now + startDays * day), end: iso(now + endDays * day) });
   const ids = (data) => floatingPiles(data, now).map((f) => f.pile).join(",");
   check("a running takeover floats shadows", ids({ signals: [{ kind: "takeover", title: "T", ...span(-1, 2) }] }) === "shadows");
-  check("a Community Day ended 3 days ago floats its backgrounds",
-    ids({ signals: [{ kind: "community_day", title: "CD", ...span(-3.2, -3) }] }) === "cday");
+  check("a Community Day ended 3 days ago floats its backgrounds and the shinies",
+    ids({ signals: [{ kind: "community_day", title: "CD", ...span(-3.2, -3) }] }) === "cday,shiny");
   check(`one ended more than ${FLOAT_ENDED_DAYS} days ago floats nothing`,
     ids({ signals: [{ kind: "community_day", title: "CD", ...span(-10.2, -10) }] }) === "");
   check("an upcoming Max Monday floats nothing, a running one floats Dynamax",
@@ -511,6 +619,51 @@ console.log("\nWhich piles show first (event-driven ordering)");
     signalsFromFeed(feed).map((x) => x.kind).sort().join(",") === "community_day,takeover");
   check("a costumed spawn is spotted, plain ones aren't",
     hasCostumedSpawns([{ name: "Piplup wearing a Halloween Mischief costume" }]) && !hasCostumedSpawns(["Zubat", { name: "Gengar" }]));
+}
+
+console.log("\nProtection toggles hide and show piles (edge-triggered, stateful)");
+{
+  // A protect* boolean's on/off edge edits config.hiddenPiles once; between
+  // edges the user's own hide/unhide is the truth (withPileTransitions).
+  const ON = Object.fromEntries(["protectXXL", "protectXXS", "protectCostumes", "protectBackgrounds", "protectLuckies", "protectShinies", "protectShadows", "protectDynamax", "protectLegendaries", "protectUltraBeasts"].map((k) => [k, true]));
+  const flip = (patch) => hiddenPileTransitions(ON, { ...ON, ...patch });
+  const same = (t, hide, show) => t.hide.join(",") === hide && t.show.join(",") === show;
+  check("no change touches nothing", same(hiddenPileTransitions(ON, ON), "", "") && same(hiddenPileTransitions(ON, { ...ON }), "", ""));
+  check("XXL on→off hides xxl", same(flip({ protectXXL: false }), "xxl", ""));
+  check("XXL off→on shows xxl", same(hiddenPileTransitions({ ...ON, protectXXL: false }, ON), "", "xxl"));
+  check("legendaries off with Ultra Beasts still on changes nothing", same(flip({ protectLegendaries: false }), "", ""));
+  check("both off hides legendaries", same(flip({ protectLegendaries: false, protectUltraBeasts: false }), "legendaries", ""));
+  const bothOff = { ...ON, protectLegendaries: false, protectUltraBeasts: false };
+  check("either back on shows legendaries",
+    same(hiddenPileTransitions(bothOff, { ...bothOff, protectLegendaries: true }), "", "legendaries") &&
+    same(hiddenPileTransitions(bothOff, { ...bothOff, protectUltraBeasts: true }), "", "legendaries"));
+  check("shadows on→off hides shadows, Dynamax on→off hides dynamax", same(flip({ protectShadows: false }), "shadows", "") && same(flip({ protectDynamax: false }), "dynamax", ""));
+  check("costumes on→off hides both costume piles", same(flip({ protectCostumes: false }), "costumes_evolve,costumes_final", ""));
+  check("a non-protect key change is not an edge", same(hiddenPileTransitions(ON, { ...ON, pvpMode: "loose", hiddenPiles: ["xxl"] }), "", ""));
+  const allOff = Object.fromEntries(Object.keys(ON).map((k) => [k, false]));
+  const everything = hiddenPileTransitions(ON, allOff);
+  const groupIds = PILE_GROUPS.flatMap((g) => g.piles);
+  check("every id returned is in PILE_GROUPS, so it can be un-hidden", everything.hide.length === 10 && everything.hide.every((id) => groupIds.includes(id)) && everything.show.length === 0, everything.hide.join(","));
+  check("no category names a pile without one", !everything.hide.some((id) => /^(meta|watchlist|non_meta|hundo|cday|traded|evolve|event)/.test(id)));
+  check("the mapping covers every protect* key that has a pile, and the pair", Object.keys(PROTECTION_PILES).length === 8 && !("protectLegendaries" in PROTECTION_PILES) && !("protectUltraBeasts" in PROTECTION_PILES));
+  // The config edit: an edge adds to or removes from the persisted list and
+  // keeps what the user hid themselves; no edge hands the same object back.
+  const kept = { ...ON, hiddenPiles: ["meta"] };
+  const hidden = withPileTransitions(kept, { ...kept, protectXXL: false });
+  check("an off edge adds to the user's own list", hidden.hiddenPiles.join(",") === "meta,xxl");
+  const unhidden = withPileTransitions(hidden, { ...hidden, protectXXL: true });
+  check("an on edge removes only its own piles", unhidden.hiddenPiles.join(",") === "meta");
+  const stillOff = { ...hidden, hiddenPiles: ["meta"] };
+  const plain = { ...stillOff, pvpMode: "loose" };
+  check("with no edge the list is the user's, untouched (same object back)", withPileTransitions(stillOff, plain) === plain && plain.hiddenPiles.join(",") === "meta");
+  check("an off edge never doubles an id already hidden", withPileTransitions({ ...ON, hiddenPiles: ["xxl"] }, { ...ON, hiddenPiles: ["xxl"], protectXXL: false }).hiddenPiles.join(",") === "xxl");
+  check("mergeImportedConfig still keeps hiddenPiles as strings", mergeImportedConfig({ ...CFG, hiddenPiles: ["xxl", 3, null] }).hiddenPiles.join(",") === "xxl");
+  // The app routes every protect* write through one setter.
+  const src = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const app = src.slice(src.indexOf("export default function App("), src.indexOf("function ConfigPanel("));
+  check("ConfigPanel and the swipe deck write through setConfigWithPiles",
+    (app.match(/setConfig: setConfigWithPiles|setConfig=\{setConfigWithPiles\}/g) || []).length >= 2 && /setConfigWithPiles\(\(prev\) => \(\{ \.\.\.prev, \.\.\.patch/.test(app));
+  check("no ConfigPanel is handed the raw setter", !/<ConfigPanel[^>]*setConfig=\{setConfig\}/.test(app) && !/setConfig,\n\t\thomeLocals/.test(app));
 }
 
 console.log("\nwatch-moves.json is never rebuilt from a refused game master");
@@ -665,8 +818,43 @@ console.log("\nEvery pile's wording exists in every locale");
       need(`app.pile.${pile.id}.hint`);
       need(`app.sort.hook.${pile.id}`);
     }
+    // Step ③'s two boxes and the reveal between them read fixed keys
+    // (PILE_TEXT_DEFAULTS / EVENT_PILE_TEXT), so they are named here rather
+    // than derived from a pile.
+    for (const k of [
+      "app.pile.safe_label", "app.pile.safe_hint", "app.events.safe_hint",
+      "app.pile.release_label", "app.pile.release_hint", "app.events.release_hint",
+      "app.pile.release_reveal", "app.pile.release_warning",
+    ]) need(k);
     check(`${loc}: every step, title, hint and hook has its words`, missing.size === 0, [...missing].slice(0, 5).join(", "));
   }
+}
+
+console.log("\nStep ③ renders the leftovers before the reveal");
+{
+  // ③a (pile.safe) is the visible transfer box; ③b (pile.release) is wider,
+  // so it sits behind a disclosure that states its open/closed state and
+  // carries a warning. Source-level, like the Mega planner check below: the
+  // order and the nesting are what a reader of the screen relies on.
+  const src = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const steps = src.slice(src.indexOf("function PileSteps("), src.indexOf("function MegaPlanner("));
+  const safeAt = steps.indexOf("box('safe', words.safe, pile.safe)");
+  const releaseAt = steps.indexOf("box('release', words.release, pile.release");
+  const toggleAt = steps.search(/aria-expanded=\{reveal\}\s*\n\s*aria-controls=\{revealId\}/);
+  const panelAt = steps.indexOf("id={revealId}");
+  check("PileSteps renders pile.safe", safeAt !== -1);
+  check("PileSteps renders pile.release", releaseAt !== -1);
+  check("pile.safe comes before pile.release", safeAt !== -1 && safeAt < releaseAt);
+  check("the reveal control states aria-expanded and aria-controls", toggleAt !== -1 && toggleAt < releaseAt);
+  check("pile.release sits inside the reveal's panel", panelAt !== -1 && toggleAt < panelAt && panelAt < releaseAt);
+  check("the reveal is named by its own key", steps.indexOf("t('app.pile.release_reveal')") > toggleAt);
+  check("the warning precedes the ③b box", steps.indexOf("t('app.pile.release_warning')") > panelAt
+    && steps.indexOf("t('app.pile.release_warning')") < releaseAt);
+  check("the warning is not a live region", !/role='status'/.test(steps));
+  check("the reveal starts closed on every mount", /useState\(false\)/.test(steps));
+  check("the ③b hint renders in the warn tone", /box\('release', words\.release, pile\.release, 'warn'\)/.test(steps));
+  const fb = src.slice(src.indexOf("function FilterBox("), src.indexOf("function AreaTabs("));
+  check("FilterBox takes a tone and colours the hint amber", /tone === 'warn'/.test(fb) && /#F5B82E/.test(fb));
 }
 
 console.log("\nMega-evolve placement");

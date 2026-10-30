@@ -2,7 +2,25 @@
 
 One row per Sorting pile: the question you're asking when you open it, and
 the ① keep steps. Read the steps top to bottom and stop once you have enough.
-③ (pile & protection tail) stays the same everywhere.
+③ has the same shape everywhere and comes as two strings: ③a, the leftovers
+(pile & protection tail & the negation of every ① step that has one, so
+nothing an IV, shiny, evolve, background or lucky step would have kept is in
+it; a PvP, species or trade step is not subtracted, so read the
+list before the batch), and ③b, everything not starred or tagged (pile &
+protection tail). On the pile card ③a is the visible transfer
+box; ③b sits behind a reveal that starts closed every time and carries an
+amber warning, because it includes what ① would have kept: open it after ①
+and ②, read the list, then transfer. The tail reads two settings, protect
+nundos and the mythicals you have too many of, plus the value of the
+lucky-trade year floor, and nothing else (docs/sorting-workflow-spec.md,
+"Protection tail"). Ready to evolve has no ③:
+what can still evolve is never a leftover.
+
+A step's negation, for ③a: `shiny` → `!shiny`, `3-4` → `0-2attack,0-2defense,0-2hp`
+(one stat below three bars), `3*` and `4*,3*` → `0*,1*,2*`, `evolve` → `!evolve`,
+`background` → `!background`, `lucky` → `!lucky`, `3-4attack` → `0-2attack`. `4*`
+needs none (the tail's `!4*` holds a hundo), and a species list, a PvP
+pattern, a roster, a tag or "untraded" step has none: those don't narrow ③a.
 
 ## Building blocks
 
@@ -24,7 +42,11 @@ Correction: the protection tail does **not** keep plain shinies, costumes or
 backgrounds out of ③. It only protects shiny legendaries and legendaries with
 a background. A shiny that isn't favourited or tagged shows up in ③.
 Your custom collectibles aren't in the tail either: sorting offers them in
-③ like any other species, so favourite or tag the ones you keep.
+③ like any other species, so favourite or tag the ones you keep. Two
+settings do reach the tail: a nundo is protected only while protect nundos
+is on, and a mythical you listed under "too many of" is a spare and shows up
+in ③. Legacy moves are protected in every pile (a Smeargle's Sketched moves
+don't count), whatever the trash's own toggles say.
 
 Rule: a step must be able to find something no earlier step found. A
 narrower copy of an earlier step gets cut. `4*` sits inside `3-4`, so `4*`
@@ -39,13 +61,14 @@ then `3-4` is fine (best first, then wider), but `3-4` then `4*` would be cut.
 | Costumes that don't (`costume&!evolve`) | Which hats to keep? | 4\* → shiny → 3-4 → 3\*, one plus up to 3 untraded ones to trade |
 | Backgrounds (`background`) | Which backgrounds stay? | 4\* → shiny → 3-4 → 3\*, default count |
 | Community Days | Hundreds of one species after a Community Day: which stay, which go to trades? | 4\* → shiny → background → 3-4 → 3\* → untraded (tag to trade), over every catch of every Community Day species at once |
+| Shinies (`shiny`) | Which shinies stay for the living shiny dex, which go to trades? | 4\* → 3-4 → 3\* → PvP → still to evolve; no shiny step, the pile is the shinies, and ③ offers every plain shiny left unstarred (the tail holds shiny legendaries only) |
 | XXL | Which one goes to a showcase? | showcase verdict → still to evolve → 4\*,3\* → shiny |
 | XXS | Which tiny ones still matter? | still to evolve → 4\*,3\* → shiny |
 | Luckies | Which luckies are worth the cheap power-up? | still to evolve → 4\*,3\* → shiny |
 | Received trades | Can't be traded again: which ones stay? | 4\* → shiny → lucky → 3-4 → 3\* → PvP → still to evolve |
 | Shadows | Which shadows to keep, purify or TM? | 4\* → shiny → meta → 3\* → `3-4attack` → PvP → still to evolve, keep 2 (one stays shadow, the second is purified and evolved up the line) |
 | Dynamax | Which Max ones are worth the Max Particles? | G-max → Max attacker roster → 4\* → shiny → 3-4 → 3\* |
-| Ready to evolve | What do I evolve now? | new Pokédex entry: 4\* → shiny → 3-4 → 3\*, then tagged Dex-Evolve |
+| Ready to evolve | What do I evolve now? | new Pokédex entry: 4\* → shiny → 3-4 → 3\*, then tagged Dex-Evolve; no ③ |
 | Meta | Raid and PvP keepers, top 7 per type | 4\* → shiny → 3-4 → 3\* → PvP, up to the meta budget |
 | Watchlist | Not meta yet, something's brewing | same as meta, up to the watchlist budget |
 | Non-meta | Everything else | same as meta, up to the non-meta budget |

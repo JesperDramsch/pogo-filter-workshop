@@ -34,6 +34,16 @@ The workshop splits by what the user is doing at that moment:
 
 Nerd stuff (set theory, raw clauses, check a Pokémon) stays where it is.
 
+### Help sheet
+
+Each area has a help sheet: a title and four short paragraphs (`app.help.<area>.title`, `.p1` to `.p4`) in a modal sheet on the shared `Dialog` primitive (`src/Dialog.jsx`), not a box in the page. On phones it is a bottom sheet; from the `sm` breakpoint up it is a slide-over on the right. A pill next to the area hint (`app.help.toggle_open`, `aria-haspopup="dialog"`) opens it; Escape, the backdrop, the X (`app.help.close_aria`) or the "Got it" button (`app.help.got_it`) closes it, and so does the page moving beneath it (browser Back, a pasted hash, another area's tab) so it never sits over a page it does not describe. The header and the "Got it" footer are both stuck to the panel's edges, so the focused button is in view on open even when the paragraphs overflow a short phone. The help copy names things ("the planner on this tab", "the Catching settings button") rather than pointing above or below, since nothing in the page is above or below a sheet. The dialog's accessible name is the generic `app.help.dialog_label`; the heading inside names the area. One sheet is open at a time, and it is rendered only while open.
+
+The sheet opens on its own once per user: the first area that shows its filters opens its sheet and is marked seen, and every other area waits for the pill (four sheets on a new user's first four tab clicks was too many). The seen flags live in `localStorage` under `pogo:helpSeen` beside `pogo:onboarded`, not in the config, so an export, a preset or a filter reset never carries or clears them. Nothing opens or is marked seen while an area shows its settings, nor once any area is marked seen, on another wizard step, on another view or before storage has loaded, so the first-run redirect to the swipe deck and a shared `#workshop/<area>/settings` link leave the flags alone. Open state itself is per session: a reload starts closed.
+
+The Sorting help carries the hidden-piles rule in one line: piles for categories you tossed sit under "N hidden" and come back when you bring them back there or protect the category again. The Catching help names no candy or XP numbers: what a Mega level pays is game data, not prose.
+
+`scripts/check-locale-parity.mjs` (`npm run test:localeparity`) holds the seven locale files to the same key set under `app.help.`, `app.pile.`, `app.sort.`, `app.area.` and `app.events.`.
+
 ## Sorting area
 
 ### Pile shape
@@ -44,7 +54,8 @@ Every pile has the same three steps. The event wild-spawn card already uses this
 | --- | --- | --- |
 | ① Keep | Lenses for this pile (for example shinies, costumes, backgrounds, high IV) | Tag or star the matches that have a job |
 | ② Still to sort | The pile minus favourites and tagged (`pile & !favourite & !#`), with the pile card | Tag or star the remaining keepers |
-| ③ Release | The pile minus everything tagged, starred or always protected (`pile & protection tail`) | Transfer the whole view |
+| ③a Leftovers | The pile minus everything tagged, starred or always protected, minus the negation of every ① lens that has one (`pile & protection tail & !lens…`), so nothing an IV, shiny, evolve, background or lucky step would have kept is in it; a PvP, species or trade lens is not subtracted | Glance down the list, then transfer the whole view; it is the visible transfer box |
+| ③b Everything not starred or tagged | The pile minus everything tagged, starred or always protected (`pile & protection tail`), including what ① would have kept | Behind a reveal with an amber warning: open it after ① and ②, read the list, then transfer |
 
 **Change from today:** step ③ of the wild-spawn card currently reuses the global trash filter. That filter only matches the lowest common denominator, which steps ① and ② have already handled, so step ③ always comes up empty. Step ③ must be pile-local: the same pile, with the protection tail instead of the trash filter.
 
@@ -52,22 +63,25 @@ Every pile has the same three steps. The event wild-spawn card already uses this
 
 Hides everything that is always protected. Built from `src/i18n/pogo-keywords.js` tokens like every other clause; the German forms below are for reading only.
 
+The tail is one fixed string per pile. It reads exactly two settings, protect nundos and the mythicals you have too many of (`protectNundos`, `mythTooManyOf`), plus the value of the lucky-trade year floor. Every other trash toggle (buddies, legacy moves, the Smeargle exception, shinies and the rest) leaves it as it is: switching a protection off to clear a category is what steps ① and ② replace.
+
 | Protected | German form |
 | --- | --- |
 | Favourites | `!favorit` |
 | Any tag | `!#` |
 | Hundos | `!4*` |
-| Nundos (0/0/0) | `1-4angriffs-wert,1-4verteidigungs-wert,1-4kp` (one clause; PoGo ignores `!N` on IV tokens, so the positive form) |
+| Nundos (0/0/0), only when protect nundos is on | `1-4angriffs-wert,1-4verteidigungs-wert,1-4kp` (one clause; PoGo ignores `!N` on IV tokens, so the positive form) |
 | Guaranteed lucky-trade stock (existing year-floor setting, currently caught in 2020 or earlier) | `jahr21-,getauscht` (a traded one can't be traded again, so it is no stock) |
 | Invested Dynamax | `!dynaattacke2-&!dynawall1-&!dynakampfgeist1-` |
 | Buddies at Good level or higher | `!kumpel2-` |
-| Mythicals | `!mysteriös` |
+| Mythicals, except the ones you have too many of | `!mysteriös`, or `!mysteriös,darkrai` with a carve (the same clause the trash emits; a listed species is a spare and shows in ③) |
 | Shiny legendaries | `!schillernd,!legendär` (one clause) |
 | Legendaries with a background | `!hintergrund,!legendär` (one clause) |
+| Legacy moves | `!@spezial,@rückkehr,@frustration,farbeagle` (one clause, the trash's shape: a purified Return, a shadow's Frustration and a Smeargle, whose Sketched moves all carry the flag, are not legacy; Smeargle via `pokemonNameFor('235')`) |
 
 The range-negation forms are deliberate: `!dynawall1-` matches a Pokémon with no Wall value at all, which is the wanted direction (see the range-versus-negation note in the filter skill).
 
-**Property check to add** (in `scripts/check-*.mjs`): step ③ of every pile never matches a Pokémon that is starred, tagged, a hundo, a nundo, inside the year floor, invested Dynamax, a Good buddy, mythical, a shiny legendary or a legendary with a background.
+**Property check** (`scripts/check-piles.mjs` P3, `scripts/check-data-filters.mjs` D18, cases in `scripts/lib/pile-cases.mjs`): step ③ of every pile never matches a Pokémon that is starred, tagged, a hundo, a nundo (when protected), inside the year floor, invested Dynamax, a Good buddy, mythical (unless carved out), carrying a legacy move, a shiny legendary or a legendary with a background; it runs under the default config and under one with nundos protected and a mythical carved out. A further section holds the tail to those two settings: flipping any other trash toggle changes nothing.
 
 ### Pile card
 
@@ -91,6 +105,22 @@ Piles relevant to recent or running events float to the top. All other piles sit
 | Max Monday or Max Battle event | Dynamax |
 | Double transfer candy day | A reminder card for the `crush` working tag (not a pile) |
 
+Hiding is stateful and edge-triggered. `config.hiddenPiles` is the user's own list, edited under "N hidden" on the Sorting tab. A protection on the Catching tab edits that list once, on its on/off edge, wherever the change comes from (the swipe deck, a ConfigPanel toggle or a preset): turning a category's protection off adds its piles to the list, turning it back on removes them. Between edges the list is the truth: a pile the user brought back stays visible until the protection goes on and then off again, and a toggle never gates the render. Loading, importing, the cross-tab echo and reset write the config as it is and never re-hide. A pile that floats for a running event shows while it floats, hidden or not.
+
+| Protection | Piles it hides and shows |
+| --- | --- |
+| XXL | XXL |
+| XXS | XXS |
+| Costumes | Costumes (both) |
+| Backgrounds | Community Day backgrounds |
+| Luckies | Luckies |
+| Shinies | Shinies |
+| Shadows | Shadows |
+| Dynamax | Dynamax |
+| Legendaries and Ultra Beasts | Legendaries, hidden on the edge that leaves both off, shown when either comes back on |
+
+Piles without a category (Meta, Watchlist, Non-meta, Hundo sort, Received trades, the event piles, Evolve) are never touched by a protection. Nundos have no pile. The rule lives in `hiddenPileTransitions` and `withPileTransitions` (`src/App.jsx`) and is held by `scripts/check-piles.mjs`, "Protection toggles hide and show piles".
+
 ### Piles
 
 | Pile | Pile head | ① Keep lenses | Notes |
@@ -108,6 +138,7 @@ Piles relevant to recent or running events float to the top. All other piles sit
 | XXS | XXS | Evolve | XXS only matter for Pokédex entries |
 | Costumes | Costume | One per stage, shinies | |
 | Community Day backgrounds | Background, Community Day species, not location background | 3 per species | |
+| Shinies | Shiny | Hundos, high IV, PvP, still to evolve | One per evolution stage for the living shiny dex, plus untraded ones to trade. Plain shinies are not in the protection tail, so ③ offers them; floats with the Community Day piles |
 
 `crush` is a working tag, not a pile: it marks Pokémon (often legendaries) to transfer on the next double transfer candy day. It protects them until then, like any tag.
 

@@ -34,6 +34,7 @@
   "test:verify": "vite-node scripts/check-verify.mjs",
   "test:datafilters": "vite-node scripts/check-data-filters.mjs",
   "test:piles": "vite-node scripts/check-piles.mjs",
+  "test:localeparity": "vite-node scripts/check-locale-parity.mjs",
   "test:metaref": "vite-node scripts/check-meta-reference.mjs",
   "test:metarankings": "vite-node scripts/check-meta-rankings.mjs",
   "test:gamemaster": "vite-node scripts/check-game-master.mjs",
