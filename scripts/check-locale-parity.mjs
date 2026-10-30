@@ -25,7 +25,7 @@ function check(label, cond, detail = "") {
 const summarise = (list) => (list.length > 6 ? `${list.slice(0, 6).join(", ")} … (+${list.length - 6})` : list.join(", "));
 
 const bundles = Object.fromEntries(
-  LOCALES.map((loc) => [loc, JSON.parse(readFileSync(`src/locales/app/${loc}.json`, "utf8"))]),
+  LOCALES.map((loc) => [loc, JSON.parse(readFileSync(new URL(`../src/locales/app/${loc}.json`, import.meta.url), "utf8"))]),
 );
 const scoped = (loc) => Object.keys(bundles[loc]).filter((k) => SCOPE.test(k));
 const enKeys = scoped("en");

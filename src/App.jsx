@@ -10418,9 +10418,14 @@ function ToolTile({ title, hook, chip, icon, accent, open, children }) {
 	);
 }
 function PileTile({ pile, title, hook, icon, chip, accent, open, onHide, hidden, text, copied, copyToClipboard, t, children }) {
+	// The tile's open state is tracked only to remount PileSteps when the tile
+	// closes, so the ③b reveal inside it is closed again on the next open
+	// instead of surviving a collapse within the same mounted tile.
+	const [isOpen, setIsOpen] = useState(!!open);
 	return (
 		<details
 			open={open || undefined}
+			onToggle={(e) => setIsOpen(e.currentTarget.open)}
 			className='group rounded-md border border-[#1F2933] bg-[#0E141A] overflow-hidden transition hover:border-[#2D3A47]'
 			style={{ borderLeft: `3px solid ${accent}` }}
 		>
@@ -10440,7 +10445,7 @@ function PileTile({ pile, title, hook, icon, chip, accent, open, onHide, hidden,
 				<ChevronRight size={14} className='text-[#8090A0] details-arrow shrink-0 mt-1' aria-hidden='true' />
 			</summary>
 			<div className='px-3 pb-3 pt-3 border-t border-[#1F2933] space-y-3'>
-				<PileSteps pile={pile} accent={accent} copied={copied} copyToClipboard={copyToClipboard} t={t} text={text} />
+				<PileSteps key={isOpen ? 'open' : 'closed'} pile={pile} accent={accent} copied={copied} copyToClipboard={copyToClipboard} t={t} text={text} />
 				{(pile.extras || []).length > 0 && (
 					<div className='space-y-3 pt-2 border-t border-[#1F2933]'>
 						<h5 className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t('app.sort.also_here')}</h5>
@@ -10474,8 +10479,8 @@ function PileTile({ pile, title, hook, icon, chip, accent, open, onHide, hidden,
 // sort, safe and release fall back to the generic pile wording. Copy keys are
 // `${pile.id}_${box}`, so two piles that share a species never share state.
 // `card` renders under ②, where the user decides what still has a job.
-// Step ③ is two boxes: ③a `safe` (the leftovers, nothing a ① step would have
-// kept) is the visible transfer box; ③b `release` (everything not starred or
+// Step ③ is two boxes: ③a `safe` (the leftovers, nothing an IV, shiny, evolve,
+// background or lucky ① step would have kept) is the visible transfer box; ③b `release` (everything not starred or
 // tagged) sits behind a reveal that opens closed on every mount and carries a
 // warning, because it includes what ① would have kept.
 const PILE_TEXT_DEFAULTS = {
