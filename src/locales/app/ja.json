@@ -1672,5 +1672,6 @@
   "app.card.rule.costumes_evolve": "コスチュームと進化段階ごとに{n}匹、さらに交換用に{tradeable}匹。",
   "app.card.rule.costumes_final": "コスチュームごとに{n}匹、さらに交換用に{tradeable}匹。",
   "app.card.rule.legendaries": "上位を残す：メタの種類なら{meta}匹まで、そうでなければ{standin}匹。",
-  "app.card.rule.cday": "進化段階ごとに色違いを{n}匹、さらに交換用に未交換を{tradeable}匹。"
+  "app.card.rule.cday": "進化段階ごとに色違いを{n}匹、さらに交換用に未交換を{tradeable}匹。",
+  "app.pile.lens.new_dex_ladder_hint": "まだ図鑑登録していない種類だけ：一番いい個体から進化させよう。"
 }

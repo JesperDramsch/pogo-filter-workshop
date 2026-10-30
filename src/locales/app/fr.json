@@ -1672,5 +1672,6 @@
   "app.card.rule.costumes_evolve": "Garde {n} par costume et par stade d'évolution, plus {tradeable} à échanger.",
   "app.card.rule.costumes_final": "Garde {n} par costume, plus {tradeable} à échanger.",
   "app.card.rule.legendaries": "Garde les meilleurs : jusqu'à {meta} si l'espèce est méta, sinon {standin}.",
-  "app.card.rule.cday": "Garde {n} chromatique par stade d'évolution, plus {tradeable} jamais échangés à échanger."
+  "app.card.rule.cday": "Garde {n} chromatique par stade d'évolution, plus {tradeable} jamais échangés à échanger.",
+  "app.pile.lens.new_dex_ladder_hint": "Seulement les espèces pas encore enregistrées : fais d'abord évoluer la meilleure."
 }

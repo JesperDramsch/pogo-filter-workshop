@@ -1672,5 +1672,6 @@
   "app.card.rule.costumes_evolve": "每種裝扮和進化階段留 {n} 隻，另外 {tradeable} 隻交換用。",
   "app.card.rule.costumes_final": "每種裝扮留 {n} 隻，另外 {tradeable} 隻交換用。",
   "app.card.rule.legendaries": "留最好的：meta 種類最多 {meta} 隻，否則 {standin} 隻。",
-  "app.card.rule.cday": "每個進化階段留 {n} 隻異色，另外 {tradeable} 隻未交換的交換用。"
+  "app.card.rule.cday": "每個進化階段留 {n} 隻異色，另外 {tradeable} 隻未交換的交換用。",
+  "app.pile.lens.new_dex_ladder_hint": "只看還沒登錄的種類：先讓最好的那隻進化。"
 }

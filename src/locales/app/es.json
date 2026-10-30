@@ -1672,5 +1672,6 @@
   "app.card.rule.costumes_evolve": "Quédate con {n} por disfraz y fase evolutiva, más {tradeable} para intercambiar.",
   "app.card.rule.costumes_final": "Quédate con {n} por disfraz, más {tradeable} para intercambiar.",
   "app.card.rule.legendaries": "Quédate con los mejores: hasta {meta} si la especie es meta, si no {standin}.",
-  "app.card.rule.cday": "Quédate con {n} variocolor por fase evolutiva, más {tradeable} sin intercambiar para intercambiar."
+  "app.card.rule.cday": "Quédate con {n} variocolor por fase evolutiva, más {tradeable} sin intercambiar para intercambiar.",
+  "app.pile.lens.new_dex_ladder_hint": "Solo especies que aún no has registrado: evoluciona primero la mejor."
 }

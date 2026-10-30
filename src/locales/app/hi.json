@@ -1672,5 +1672,6 @@
   "app.card.rule.costumes_evolve": "हर कॉस्ट्यूम और विकास चरण के {n} रखें, साथ ही ट्रेड के लिए {tradeable}।",
   "app.card.rule.costumes_final": "हर कॉस्ट्यूम के {n} रखें, साथ ही ट्रेड के लिए {tradeable}।",
   "app.card.rule.legendaries": "सबसे अच्छे रखें: प्रजाति मेटा हो तो {meta} तक, नहीं तो {standin}।",
-  "app.card.rule.cday": "हर विकास चरण का {n} शाइनी रखें, साथ ही ट्रेड के लिए {tradeable} बिना ट्रेड वाले।"
+  "app.card.rule.cday": "हर विकास चरण का {n} शाइनी रखें, साथ ही ट्रेड के लिए {tradeable} बिना ट्रेड वाले।",
+  "app.pile.lens.new_dex_ladder_hint": "सिर्फ़ वे प्रजातियाँ जो अभी दर्ज नहीं हुईं: सबसे अच्छे को पहले विकसित करें।"
 }

@@ -598,6 +598,35 @@ console.log("\nCommunity Day data (scripts/lib/community-days.mjs → src/data/c
   check("an empty feed drops nothing", mergeRollingCommunityDays(prev, []).rolling.length === 1);
 }
 
+console.log("\nEvery pile's wording exists in every locale");
+{
+  // PileSteps falls back to app.pile.lens.<key>_label/_hint unless a lens
+  // brings its own `text`; i18n returns the raw key for one that is missing
+  // in both the locale and en, so a missing key shows up on screen as-is.
+  // The hundo and event piles' own tables override their overview words.
+  for (const loc of localeNames) {
+    const r = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc));
+    const msgs = LOCALES[loc].messages;
+    const missing = new Set();
+    const need = (k) => { if (msgs[k] === undefined) missing.add(k); };
+    const piles = [...r.sortingPiles, r.hundoPile, ...r.eventFilters.map((ev) => ev.pile)].filter(Boolean);
+    for (const pile of piles) {
+      for (const lens of pile.keep) {
+        const [label, hint] = lens.text || [`app.pile.lens.${lens.key}_label`, `app.pile.lens.${lens.key}_hint`];
+        need(label);
+        need(hint);
+      }
+      for (const x of pile.extras || []) { need(x.label); need(x.hint); }
+    }
+    for (const pile of r.sortingPiles) {
+      need(`app.pile.${pile.id}.title`);
+      need(`app.pile.${pile.id}.hint`);
+      need(`app.sort.hook.${pile.id}`);
+    }
+    check(`${loc}: every step, title, hint and hook has its words`, missing.size === 0, [...missing].slice(0, 5).join(", "));
+  }
+}
+
 console.log("\nMega-evolve placement");
 {
   // Mega-evolving spends candy, so its filter has its own tile under Sorting's
