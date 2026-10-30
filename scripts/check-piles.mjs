@@ -545,5 +545,15 @@ console.log("\nCommunity Day data (scripts/lib/community-days.mjs → src/data/c
   check("an empty feed drops nothing", mergeRollingCommunityDays(prev, []).rolling.length === 1);
 }
 
+console.log("\nPile extras");
+for (const loc of localeNames) {
+  const r = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc));
+  const extras = r.sortingPiles.find((p) => p.id === "evolve")?.extras || [];
+  // Mega-evolving is spending candy, so it sits with the evolve pile, not
+  // with the Mega planner under Catching.
+  check(`${loc}: the evolve pile carries the mega-evolve filter`,
+    extras.some((x) => x.key === "mega_evolve" && x.filter === r.megaEvolve && r.megaEvolve));
+}
+
 console.log(`\n${failures === 0 ? "✓ All pile checks passed." : `✗ ${failures} failure(s).`}`);
 process.exit(failures === 0 ? 0 : 1);

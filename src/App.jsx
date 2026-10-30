@@ -5133,7 +5133,8 @@ export function buildFilters(
 		}),
 	].filter(Boolean);
 	// Filters that belong with a pile but aren't keep lenses: what to purify
-	// instead of transfer, which shadows to Charge-TM, cheap XP and dex+ evolves.
+	// instead of transfer, which shadows to Charge-TM, cheap XP, dex+ evolves
+	// and Mega levels.
 	const PILE_EXTRAS = {
 		shadows: [
 			{ key: 'shadow_safe', label: 'app.filter.shadow_safe_label', hint: 'app.filter.shadow_safe_hint', filter: shadowSafe },
@@ -5142,6 +5143,7 @@ export function buildFilters(
 		evolve: [
 			{ key: 'dex_plus', label: 'app.filter.dex_plus_label', hint: 'app.filter.dex_plus_hint', filter: dexPlus },
 			{ key: 'cheap_evolve', label: 'app.filter.cheap_evolve_label', hint: 'app.filter.cheap_evolve_hint', filter: cheapEvolve },
+			{ key: 'mega_evolve', label: 'app.filter.mega_evolve_label', hint: 'app.filter.mega_evolve_hint', filter: megaEvolve },
 		],
 	};
 	for (const pile of sortingPiles) pile.extras = (PILE_EXTRAS[pile.id] || []).filter((x) => x.filter);
@@ -7464,7 +7466,6 @@ export default function App() {
 												/>
 												<MegaPlanner
 													plans={megaPlanRows}
-													megaEvolve={megaEvolve}
 													copied={copied}
 													copyToClipboard={copyToClipboard}
 													typeLabels={rocketTypeLabels}
@@ -10170,7 +10171,7 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 // raid day / raid hour that is on now or starts within the next days (see
 // megaPlans in mega-boost.js), soonest first, the running ones open. The Mega
 // rank-up filter sits underneath: levelling Megas is out-and-about work too.
-function MegaPlanner({ plans, megaEvolve, copied, copyToClipboard, typeLabels, t, locale }) {
+function MegaPlanner({ plans, copied, copyToClipboard, typeLabels, t, locale }) {
 	const now = Date.now();
 	const fmtDow = new Intl.DateTimeFormat(locale, { weekday: 'short' });
 	const fmtTime = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
@@ -10225,14 +10226,6 @@ function MegaPlanner({ plans, megaEvolve, copied, copyToClipboard, typeLabels, t
 					})}
 				</div>
 			)}
-			<FilterBox
-				label={t('app.filter.mega_evolve_label')}
-				accent='#E91E63'
-				filterStr={megaEvolve}
-				copied={copied.megaEvolve}
-				onCopy={() => copyToClipboard('megaEvolve', megaEvolve)}
-				hint={t('app.filter.mega_evolve_hint')}
-			/>
 		</section>
 	);
 }
