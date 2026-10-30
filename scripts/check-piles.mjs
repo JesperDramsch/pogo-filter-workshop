@@ -64,37 +64,60 @@ const GREAT_DEX = PVP_RANKINGS.leagues?.great?.species?.[0]?.dex;
 const iv = (a, d, h) => ({ ivAtk: a, ivDef: d, ivHp: h });
 const DYNA = { dynaAtk: 1, flags: { dynamaxCapable: true } };
 const YEAR_FLOOR_CASE = /untraded$/; // meaningless where every member is traded
+// A species on no meta, watchlist or Max list, for piles whose steps single
+// out meta species (the shadow pile's meta step, the Max roster).
+const offMetaDex = (r) => {
+  const listed = new Set([...(r.sortingPiles.find((p) => p.id === "meta")?.card?.rows || []),
+    ...(r.sortingPiles.find((p) => p.id === "watchlist")?.card?.rows || [])].map((row) => row.dex));
+  return [399, 263, 161, 19, 10, 13].find((d) => !listed.has(d));
+};
 
 // name: label · pile(result) → the pile · dex: a member species · base: what
 // makes a test Pokémon a member · skipProtected: PROTECTED rows that cannot
-// apply to this pile · lensCases(kw): { lens: { match, miss[, dex] } }, an
+// apply to this pile · skipReleasable: RELEASABLE rows the base turns into
+// protected ones · lensCases(kw): { lens: { match, miss[, dex] } }, an
 // oracle per lens; every lens chain of three or more clauses has one.
+// The shared ladder of docs/pile-purposes.md, as oracles. Each `match` is
+// built so no earlier step of the ladder takes it: P9 holds every pile to
+// "each step finds something no earlier step found" with exactly these.
+const LADDER = {
+  hundo: { match: iv(15, 15, 15), miss: iv(15, 15, 14) },
+  shiny: { match: { flags: { shiny: true }, ...iv(5, 5, 5) }, miss: iv(5, 5, 5) },
+  strong: { match: iv(13, 13, 13), miss: iv(15, 15, 7) },
+  three: { match: iv(15, 15, 7), miss: iv(12, 12, 12) },
+};
+const PVP_LOOSE = {
+  pvp_great_loose: { match: { ...iv(0, 15, 15), wp: 1400 }, miss: { ...iv(0, 15, 15), wp: 1600 } },
+  pvp_ultra_loose: { match: { ...iv(0, 15, 15), wp: 2000 }, miss: { ...iv(0, 15, 15), wp: 2600 } },
+};
+const EVOLVE = { match: { flags: { canEvolve: true } }, miss: { flags: { canEvolve: false } } };
+const HIGH_IV = { match: iv(15, 15, 7), miss: iv(12, 12, 12) };
+const withFlag = (c, flag) => ({
+  match: { ...c.match, flags: { ...(c.match.flags || {}), [flag]: true } },
+  miss: { ...c.match, flags: { ...(c.match.flags || {}), [flag]: false } },
+});
+
+// name: label · pile(result) → the pile · dex: a member species · base: what
+// makes a test Pokémon a member · skipProtected: PROTECTED rows that cannot
+// apply to this pile · skipReleasable: RELEASABLE rows the base turns into
+// protected ones · lensCases(kw): { lens: { match, miss[, dex] } }, an
+// oracle per lens (P6), each one new against the steps before it (P9).
 const PILE_FAMILIES = [
   {
     name: "event spawns",
     piles: (r) => (r.eventFilters || []).map((ev) => ({ pile: ev.pile, dex: ev.spawnDex?.[0] })),
-    // keep_iv is "hundo, or two 15s and every bar 11+": 15/15/12 in, 15/14/14 out.
-    lensCases: () => ({
-      souvenirs: { match: { flags: { background: true } }, miss: {} },
-      keep_iv: { match: iv(15, 15, 12), miss: iv(15, 14, 14) },
-    }),
+    lensCases: () => LADDER,
   },
   {
     name: "hundo sort",
     piles: (r) => [{ pile: r.hundoPile, dex: 66 }],
-    lensCases: () => ({
-      hundos: { match: iv(15, 15, 15), miss: iv(15, 15, 14) },
-      // Machop's family is done twice; the lens is the family list itself.
-      done_twice: { match: {}, miss: { families: ["notdonetwice"] } },
-    }),
+    lensCases: () => ({ hundos: LADDER.hundo, shiny: LADDER.shiny, strong: LADDER.strong, three: LADDER.three }),
   },
   {
     name: "meta",
     piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "meta"), dex: RAID_DEX }],
     lensCases: () => ({
-      raid: { match: iv(15, 15, 13), miss: iv(5, 5, 5) },
-      shadow_keep: { dex: KEEPER_DEX, match: { flags: { shadow: true } }, miss: {} },
-      max: { dex: MAX_DEX, match: { ...DYNA, ...iv(15, 15, 13) }, miss: iv(15, 15, 13) },
+      ...LADDER,
       pvp_great: { dex: GREAT_DEX, match: { ...iv(0, 15, 15), wp: 1400 }, miss: { ...iv(0, 15, 15), wp: 1600 } },
     }),
   },
@@ -104,36 +127,28 @@ const PILE_FAMILIES = [
       const pile = r.sortingPiles.find((p) => p.id === "watchlist");
       return [{ pile, dex: pile?.card?.rows?.[0]?.dex }];
     },
-    lensCases: () => ({
-      shadow: { match: { flags: { shadow: true } }, miss: {} },
-      high_iv: { match: iv(15, 15, 13), miss: iv(5, 5, 5) },
-    }),
+    lensCases: () => ({ ...LADDER, ...PVP_LOOSE }),
   },
   {
     // Its head is "not any meta or watchlist family", so its member is a
     // species outside all of them and its outsider is a meta species.
     name: "non-meta",
-    piles: (r) => {
-      const pile = r.sortingPiles.find((p) => p.id === "non_meta");
-      const listed = new Set([...(r.sortingPiles.find((p) => p.id === "meta")?.card?.rows || []),
-        ...(r.sortingPiles.find((p) => p.id === "watchlist")?.card?.rows || [])].map((row) => row.dex));
-      const dex = [399, 263, 161, 19, 10, 13].find((d) => !listed.has(d));
-      return [{ pile, dex }];
-    },
+    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "non_meta"), dex: offMetaDex(r) }],
     outsider: () => ({ dex: RAID_DEX }),
-    lensCases: () => ({
-      souvenirs: { match: { flags: { shiny: true } }, miss: {} },
-      high_iv: { match: iv(15, 15, 13), miss: iv(5, 5, 5) },
-    }),
+    lensCases: () => ({ ...LADDER, ...PVP_LOOSE }),
   },
   {
     name: "shadows",
-    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "shadows"), dex: 129 }],
+    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "shadows"), dex: offMetaDex(r) }],
     base: { flags: { shadow: true } },
-    lensCases: (kw) => ({
-      purify_hundo: { match: { moves: [kw.flag.frustration], ...iv(13, 13, 13) }, miss: { moves: [kw.flag.frustration], ...iv(15, 15, 15) } },
-      tm_done: { match: { moves: ["return"] }, miss: { moves: [kw.flag.frustration] } },
-      cheap_purify: { match: { moves: [kw.flag.frustration], candyKm: 1 }, miss: { moves: [kw.flag.frustration], candyKm: 5 } },
+    lensCases: () => ({
+      hundo: LADDER.hundo,
+      shiny: LADDER.shiny,
+      meta: { dex: RAID_DEX, dexMatchOnly: true, match: {}, miss: {} },
+      three: LADDER.three,
+      atk34: { match: iv(12, 0, 0), miss: iv(5, 15, 15) },
+      ...PVP_LOOSE,
+      evolve_shadow: EVOLVE,
     }),
   },
   {
@@ -142,10 +157,13 @@ const PILE_FAMILIES = [
     base: { flags: { traded: true } },
     skipProtected: YEAR_FLOOR_CASE,
     lensCases: () => ({
-      souvenirs: { match: { flags: { costume: true } }, miss: {} },
+      hundo: LADDER.hundo,
+      shiny: LADDER.shiny,
       luckies: { match: { flags: { lucky: true } }, miss: {} },
-      // The trash filter's own verdict: a traded 1/1/1 dupe is in, a traded hundo is not.
-      trash_review: { match: iv(1, 1, 1), miss: iv(15, 15, 15) },
+      strong: LADDER.strong,
+      three: LADDER.three,
+      ...PVP_LOOSE,
+      evolve: EVOLVE,
     }),
   },
   {
@@ -153,12 +171,7 @@ const PILE_FAMILIES = [
     piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "luckies"), dex: 129 }],
     base: { flags: { lucky: true, traded: true } },
     skipProtected: YEAR_FLOOR_CASE,
-    lensCases: () => ({ high_iv: { match: iv(15, 15, 13), miss: iv(5, 5, 5) } }),
-  },
-  {
-    name: "lucky families",
-    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "lucky_families"), dex: 133 }],
-    lensCases: () => ({ luckies: { match: { flags: { lucky: true } }, miss: {} } }),
+    lensCases: () => ({ evolve: EVOLVE, high_iv: HIGH_IV, shiny: LADDER.shiny }),
   },
   {
     name: "ready to evolve",
@@ -166,48 +179,74 @@ const PILE_FAMILIES = [
     base: { flags: { canEvolve: true } },
     outsider: () => ({ dex: 129, o: { flags: { canEvolve: false } } }),
     lensCases: () => ({
-      new_dex: { match: { flags: { newDexEvo: true } }, miss: {} },
+      new_dex_hundo: withFlag(LADDER.hundo, "newDexEvo"),
+      new_dex_shiny: withFlag(LADDER.shiny, "newDexEvo"),
+      new_dex_strong: withFlag(LADDER.strong, "newDexEvo"),
+      new_dex_three: withFlag(LADDER.three, "newDexEvo"),
       tagged_evolve: { match: { tags: ["Dex-Evolve"] }, miss: { tags: ["Show"] } },
     }),
   },
   {
     name: "Dynamax",
-    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "dynamax"), dex: MAX_DEX }],
+    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "dynamax"), dex: offMetaDex(r) }],
     base: DYNA,
     lensCases: () => ({
-      builds: { match: iv(15, 15, 13), miss: iv(5, 5, 5) },
       gigantamax: { match: { flags: { gigantamaxCapable: true } }, miss: {} },
-      parkers: { match: {}, miss: { dynaWall: 1 } },
+      builds: { dex: MAX_DEX, dexMatchOnly: true, match: {}, miss: {} },
+      ...LADDER,
     }),
   },
   {
     name: "XXL",
     piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "xxl"), dex: 129 }],
     base: { flags: { xxl: true } },
-    lensCases: () => ({ high_iv: { match: iv(15, 15, 13), miss: iv(5, 5, 5) } }),
+    lensCases: () => ({ evolve: EVOLVE, high_iv: HIGH_IV, shiny: LADDER.shiny }),
   },
   {
     name: "XXS",
     piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "xxs"), dex: 129 }],
     base: { flags: { xxs: true } },
-    lensCases: () => ({ evolve: { match: { flags: { canEvolve: true } }, miss: { flags: { canEvolve: false } } } }),
+    lensCases: () => ({ evolve: EVOLVE, high_iv: HIGH_IV, shiny: LADDER.shiny }),
   },
   {
-    name: "Community Day backgrounds",
-    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "cd_backgrounds"), dex: 906 }],
-    base: { flags: { specialBackground: true } },
-    // A special background on a species no Community Day featured (Bidoof).
-    outsider: () => ({ dex: 399, o: { families: ["bidoof"], flags: { specialBackground: true } } }),
-    lensCases: () => ({ shiny: { match: { flags: { shiny: true } }, miss: {} } }),
+    name: "backgrounds",
+    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "backgrounds"), dex: 129 }],
+    base: { flags: { background: true } },
+    // With a background, a legendary is protected (legendary with a background).
+    skipReleasable: /^plain legendary$/,
+    lensCases: () => LADDER,
   },
   {
-    name: "costumes",
-    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "costumes"), dex: 129 }],
-    base: { flags: { costume: true } },
-    lensCases: () => ({
-      shiny: { match: { flags: { shiny: true } }, miss: {} },
-      evolve: { match: { flags: { canEvolve: true } }, miss: { flags: { canEvolve: false } } },
-    }),
+    name: "costumes that evolve",
+    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "costumes_evolve"), dex: 129 }],
+    base: { flags: { costume: true, canEvolve: true } },
+    outsider: () => ({ dex: 129, o: { flags: { costume: true, canEvolve: false } } }),
+    lensCases: () => LADDER,
+  },
+  {
+    name: "costumes that don't evolve",
+    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "costumes_final"), dex: 129 }],
+    base: { flags: { costume: true, canEvolve: false } },
+    outsider: () => ({ dex: 129, o: { flags: { costume: true, canEvolve: true } } }),
+    lensCases: () => LADDER,
+  },
+  {
+    name: "legendaries",
+    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "legendaries"), dex: 150 }],
+    base: { flags: { legendary: true } },
+    // Every member is legendary, so a shiny one is protected (shiny legendary).
+    skipReleasable: /^shiny$/,
+    lensCases: () => LADDER,
+  },
+  {
+    // A shiny or background on a Community Day species; the outsider is a
+    // background on a species no Community Day featured (Bidoof).
+    name: "Community Days",
+    piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "cday"), dex: 906 }],
+    base: { flags: { background: true } },
+    skipReleasable: /^plain legendary$/,
+    outsider: () => ({ dex: 399, o: { families: ["bidoof"], flags: { background: true } } }),
+    lensCases: () => ({ ...LADDER, to_trade: { match: {}, miss: { flags: { traded: true } } } }),
   },
 ];
 
@@ -251,6 +290,7 @@ for (const fam of PILE_FAMILIES) {
         if (v.verdict !== false) bad.push(`${where} ③ ${label}: ${v.verdict}${note(v)}`);
       }
       for (const [label, o] of RELEASABLE) {
+        if (fam.skipReleasable?.test(label)) continue;
         const v = verdict(pile.release, o);
         if (v.verdict !== true) bad.push(`${where} ③ ${label} hidden: ${v.verdict}${note(v)}`);
       }
@@ -281,14 +321,26 @@ for (const fam of PILE_FAMILIES) {
         const c = cases[lens.key];
         const chain = lens.filter.slice(head.length + 1).split("&").length;
         if (!c) {
-          if (chain >= 3 && !lens.key.startsWith("pvp_cup_")) bad.push(`${where}.${lens.key}: a ${chain}-clause lens with no oracle`);
+          if (!lens.key.startsWith("pvp_cup_")) bad.push(`${where}.${lens.key}: a lens with no oracle`);
           continue;
         }
         const m = verdict(lens.filter, c.match, c.dex ?? dex);
-        const x = verdict(lens.filter, c.miss, c.dex ?? dex);
+        // `dexMatchOnly`: the oracle's species is the match itself (a roster), so
+        // the near miss is the same Pokémon as the pile's own member.
+        const x = verdict(lens.filter, c.miss, c.dexMatchOnly ? dex : c.dex ?? dex);
         if (m.verdict !== true) bad.push(`${where}.${lens.key} misses its own kind: ${m.verdict}${note(m)}`);
         if (x.verdict !== false) bad.push(`${where}.${lens.key} matches a near miss: ${x.verdict}${note(x)}`);
       }
+      // P9 — every step finds something no earlier step found: its own oracle
+      // match is not taken by any step above it.
+      pile.keep.forEach((lens, i) => {
+        const c = cases[lens.key];
+        if (!c) return;
+        for (const earlier of pile.keep.slice(0, i)) {
+          const v = verdict(earlier.filter, c.match, c.dex ?? dex);
+          if (v.verdict === true) bad.push(`${where}.${lens.key} adds nothing: ${earlier.key} already takes its case`);
+        }
+      });
     }
     check(`${loc}: ${entries.length} pile(s)`, bad.length === 0, bad.slice(0, 4).join(" | "));
   }
@@ -325,7 +377,7 @@ for (const loc of localeNames) {
     for (const x of texts) if (/\{\w+\}|^app\.|move\./.test(x)) { bad.push(`${id}: "${x}"`); break; }
     if ((c.rows || []).some((row) => row.keep.length === 0)) bad.push(`${id}: a row with no keep line`);
   }
-  for (const id of ["shadows", "traded", "luckies", "dynamax", "xxl", "xxs", "costumes", "cd_backgrounds", "non_meta"])
+  for (const id of ["shadows", "traded", "luckies", "dynamax", "xxl", "xxs", "costumes_evolve", "costumes_final", "backgrounds", "legendaries", "cday", "non_meta"])
     if (!card(id)?.rule) bad.push(`${id}: no keep rule`);
   check(`${loc}: ${meta.length} meta and ${watch.length} watchlist rows, ${cards.length} cards`, bad.length === 0, bad.slice(0, 4).join(" | "));
 }
@@ -422,14 +474,14 @@ console.log("\nWhich piles show first (event-driven ordering)");
   const ids = (data) => floatingPiles(data, now).map((f) => f.pile).join(",");
   check("a running takeover floats shadows", ids({ signals: [{ kind: "takeover", title: "T", ...span(-1, 2) }] }) === "shadows");
   check("a Community Day ended 3 days ago floats its backgrounds",
-    ids({ signals: [{ kind: "community_day", title: "CD", ...span(-3.2, -3) }] }) === "cd_backgrounds");
+    ids({ signals: [{ kind: "community_day", title: "CD", ...span(-3.2, -3) }] }) === "cday");
   check(`one ended more than ${FLOAT_ENDED_DAYS} days ago floats nothing`,
     ids({ signals: [{ kind: "community_day", title: "CD", ...span(-10.2, -10) }] }) === "");
   check("an upcoming Max Monday floats nothing, a running one floats Dynamax",
     ids({ eventMaxBattles: [{ name: "Max Monday", ...span(1, 1.5) }] }) === "" &&
     ids({ eventMaxBattles: [{ name: "Max Monday", ...span(-0.1, 0.4) }] }) === "dynamax");
   check("a wild-spawn event floats its spawns, plus costumes when it had costumed spawns",
-    ids({ events: [{ title: "E", category: "Event", hasCostumes: true, ...span(-2, -1) }] }) === "event_spawns,costumes" &&
+    ids({ events: [{ title: "E", category: "Event", hasCostumes: true, ...span(-2, -1) }] }) === "event_spawns,costumes_evolve,costumes_final" &&
     ids({ events: [{ title: "E", category: "Event", hasCostumes: false, ...span(-2, -1) }] }) === "event_spawns");
   check("a pile floats once however many events name it",
     ids({ signals: [{ kind: "takeover", title: "A", ...span(-1, 1) }, { kind: "takeover", title: "B", ...span(-2, 1) }] }) === "shadows");

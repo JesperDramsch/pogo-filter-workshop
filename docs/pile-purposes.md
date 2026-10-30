@@ -9,6 +9,7 @@ the ① keep steps. Read the steps top to bottom and stop once you have enough.
 | Step | Filter | Notes |
 |---|---|---|
 | 4\* | `4*` | hundos |
+| shiny | `shiny` | right after 4\* in every ladder: plain shinies aren't protected in ③ |
 | 3-4 | `3-4attack&3-4defense&3-4hp` | no weak stat (11+ in each) |
 | 3\* | `3*` | 82 % or better |
 | 4\*,3\* | `4*,3*` | one step when the pile has a job that comes first |
@@ -46,6 +47,7 @@ then `3-4` is fine (best first, then wider), but `3-4` then `4*` would be cut.
 | Watchlist | Not meta yet, something's brewing | same as meta, up to the watchlist budget |
 | Non-meta | Everything else | same as meta, up to the non-meta budget |
 | Legendaries | Raided one all weekend: which ones stay? | 4\* → 3-4 → 3\*, up to the meta or non-meta budget of that species |
+| Community Days | Too many C-Day shinies and backgrounds: which stay, which go to trades? | 4\* → shiny → 3-4 → 3\* → untraded (tag to trade), over every Community Day species at once |
 | Hundo sort | Got a hundo: which copies can go? | 4\* → 3-4 → 3\* |
 
 Lucky families goes: luckies are luckies.

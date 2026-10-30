@@ -1941,7 +1941,6 @@ export const BUDGET_DEFAULTS = {
 	cheapPurify: 23,
 	costumePerStage: 1,
 	costumeTradeable: 3,
-	cdBackground: 3,
 	evolveShadow: 2,
 	pvpOffMeta: 1,
 	shinyPerStage: 1,
@@ -2006,8 +2005,8 @@ export function showcaseScoreRange({ dex, form = null, heightM, weightKg, ivs = 
 // A pile floats up while an event of its kind is running or ended at most
 // FLOAT_ENDED_DAYS ago (the events snapshot's own carry-over window, see
 // scripts/lib/event-window.mjs). Upcoming events don't float anything.
-//   wild-spawn event → event spawns, and costumes if it had costumed spawns
-//   Community Day   → Community Day backgrounds
+//   wild-spawn event → event spawns, and both costume piles if it had costumed spawns
+//   Community Day   → the C-Day pile
 //   takeover        → shadows
 //   Max Battle event (Max Monday, Max Battle Day) → Dynamax
 // A double transfer candy day has no source yet, so its Crush reminder card
@@ -2025,15 +2024,18 @@ export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] 
 	for (const sg of signals) {
 		if (!recent(sg.start, sg.end)) continue;
 		if (sg.kind === 'takeover') add('shadows', 'takeover', sg.title);
-		if (sg.kind === 'community_day') add('cd_backgrounds', 'community_day', sg.title);
+		if (sg.kind === 'community_day') add('cday', 'community_day', sg.title);
 		if (sg.kind === 'max') add('dynamax', 'max', sg.title);
 	}
 	for (const mb of eventMaxBattles) if (recent(mb.start, mb.end)) add('dynamax', 'max', mb.name);
 	for (const ev of events) {
 		if (!recent(ev.start, ev.end)) continue;
-		if (ev.category === 'Community Day') add('cd_backgrounds', 'community_day', ev.title);
+		if (ev.category === 'Community Day') add('cday', 'community_day', ev.title);
 		add('event_spawns', 'wild', ev.title);
-		if (ev.hasCostumes) add('costumes', 'costumes', ev.title);
+		if (ev.hasCostumes) {
+			add('costumes_evolve', 'costumes', ev.title);
+			add('costumes_final', 'costumes', ev.title);
+		}
 	}
 	return out;
 }
@@ -2092,7 +2094,6 @@ export const BUDGET_ROWS = [
 	{ job: 'shinies', group: 'collection', keys: ['shinyPerStage', 'shinyTradeable'] },
 	{ job: 'costumes', group: 'collection', keys: ['costumePerStage', 'costumeTradeable'] },
 	{ job: 'backgrounds', group: 'collection', keys: ['backgroundPerSpecies', 'backgroundTradeable'] },
-	{ job: 'cd_backgrounds', group: 'collection', keys: ['cdBackground'] },
 	{ job: 'luckies', group: 'collection', keys: ['luckyPerForm'] },
 	{ job: 'xxl', group: 'collection', keys: ['xxlScore'] },
 	{ job: 'xxs', group: 'collection', keys: [] },
@@ -2111,7 +2112,7 @@ const BUDGET_KEY_WORD = {
 	evolve: 'count', evolveShadow: 'shadow_line', standIn: 'count', shadowStandIn: 'count', raidMeta: 'count',
 	watchMegaNormal: 'normal', watchShadow: 'shadow', watchNormal: 'normal', pvpNormal: 'normal', pvpShadow: 'shadow', pvpOffMeta: 'count',
 	shinyPerStage: 'per_stage', shinyTradeable: 'tradeable', costumePerStage: 'per_stage', costumeTradeable: 'tradeable',
-	backgroundPerSpecies: 'per_species', backgroundTradeable: 'tradeable', cdBackground: 'per_species',
+	backgroundPerSpecies: 'per_stage', backgroundTradeable: 'tradeable',
 	luckyPerForm: 'count', xxlScore: 'score', dynaBuild: 'count', dynaBuildTop: 'top', dynaParkers: 'count',
 	cheapPurify: 'count',
 };
@@ -2138,6 +2139,11 @@ export const COMMUNITY_DAY_BG_DEX = [
 		...(COMMUNITY_DAYS.legacy || []).filter((cd) => cd.background).flatMap((cd) => cd.dex),
 		...(COMMUNITY_DAYS.rolling || []).flatMap((cd) => cd.dex),
 	]),
+].sort((a, b) => a - b);
+
+// Every Community Day species, background or not: the C-Day pile's list.
+export const COMMUNITY_DAY_DEX = [
+	...new Set([...(COMMUNITY_DAYS.legacy || []), ...(COMMUNITY_DAYS.rolling || [])].flatMap((cd) => cd.dex)),
 ].sort((a, b) => a - b);
 
 export function buildPile({ id, head, lenses = [], kw, cfg }) {
@@ -3170,10 +3176,12 @@ export function buildFilters(
 	const hundoPile = buildPile({
 		id: 'hundo',
 		head: sortPileHead,
+		// docs/pile-purposes.md: best first, as every pile.
 		lenses: [
 			{ key: 'hundos', filter: '4*' },
-			// Hundo AND lucky owned: both chases done, so the family's dupes can go.
-			{ key: 'done_twice', filter: luckySortMembers.map((o) => `+${o}`).join(',') },
+			{ key: 'shiny', filter: kw.flag.shiny },
+			{ key: 'strong', filter: `3-4${kw.iv.atk}&3-4${kw.iv.def}&3-4${kw.iv.hp}` },
+			{ key: 'three', filter: '3*' },
 		],
 		kw,
 		cfg,
@@ -4497,26 +4505,16 @@ export function buildFilters(
 				.map((n) => `+${n}`)
 				.join(',');
 			if (!fams) return null;
-			// Souvenirs — single-token collectible flags (shiny / costume / background)
-			// plus the user's custom collectibles. Hundos now live in the IV filter.
-			const souvenirTokens = [kw.flag.shiny, kw.flag.costume, kw.flag.background, ...eventCollectibles].filter(
-				Boolean,
-			);
-			// One exact IV-keeper filter = hundos ∪ "two 15s + one 11-14" keepers.
-			// "≥2 of three stats are 15" is the CNF threshold (a∨b)∧(a∨c)∧(b∨c); the
-			// three 3-4 clauses force every bar ≥11. Together that is exactly hundo ∪
-			// keeper. Nundo (opposite extreme) and PvP (wants low attack) can't share
-			// this flat clause, so by design they get no event box.
-			const a = `4${kw.iv.atk}`,
-				d = `4${kw.iv.def}`,
-				h = `4${kw.iv.hp}`;
-			const keepIvLens = `${a},${d}&${a},${h}&${d},${h}` + `&3-4${kw.iv.atk}&3-4${kw.iv.def}&3-4${kw.iv.hp}`;
+			// Best first, as every pile (docs/pile-purposes.md). Shinies, costumes
+			// and backgrounds need no step: the protection tail keeps them from ③.
 			const pile = buildPile({
 				id: `event_${ev.id}`,
 				head: fams,
 				lenses: [
-					{ key: 'souvenirs', filter: souvenirTokens.join(',') },
-					{ key: 'keep_iv', filter: keepIvLens },
+					{ key: 'hundo', filter: '4*' },
+					{ key: 'shiny', filter: kw.flag.shiny },
+					{ key: 'strong', filter: `3-4${kw.iv.atk}&3-4${kw.iv.def}&3-4${kw.iv.hp}` },
+					{ key: 'three', filter: '3*' },
 				],
 				kw,
 				cfg,
@@ -4531,12 +4529,10 @@ export function buildFilters(
 				spawnDex: ev.spawnDex || [],
 				spawnForms: ev.spawnForms || [],
 				megaBoost: megaBoostFor(ev.spawnForms),
-				// The event's spawn families as a pile (see buildPile): ① souvenirs
-				// and IV keepers, ② not yet starred or tagged, ③ the protection tail.
+				// The event's spawn families as a pile (see buildPile): ① best IVs
+				// first, ② not yet starred or tagged, ③ the protection tail.
 				pile,
 				overview: pile.overview,
-				souvenirs: pile.keep[0].filter,
-				keepIv: pile.keep[1].filter,
 				sort: pile.sort,
 				release: pile.release,
 			};
@@ -5030,32 +5026,50 @@ export function buildFilters(
 			text: ['app.pile.lens.pvp_cup_label', 'app.pile.lens.pvp_hint', { cup: c.name }],
 		})),
 	];
-	const highIv = '3*,4*';
 	const atk = kw.iv.atk, def = kw.iv.def, hp = kw.iv.hp;
-	const souvenirLens = [kw.flag.shiny, kw.flag.costume, kw.flag.background, ...eventCollectibles].filter(Boolean).join(',');
+	// The shared steps of docs/pile-purposes.md. A pile's ① reads best first:
+	// each step must find something no earlier step found (check-piles P9).
+	const strongIv = `3-4${atk}&3-4${def}&3-4${hp}`;
+	const topIv = '4*,3*';
+	const ivLadder = (prefix = '', keyPrefix = '', hint) =>
+		[
+			['hundo', '4*'],
+			['shiny', kw.flag.shiny],
+			['strong', strongIv],
+			['three', '3*'],
+		].map(([key, filter]) => ({
+			key: `${keyPrefix}${key}`,
+			filter: `${prefix}${filter}`,
+			...(keyPrefix ? { text: [`app.pile.lens.${key}_label`, hint] } : {}),
+		}));
+	const stillToEvolve = { key: 'evolve', filter: kw.flag.evolvable };
+	const shinyStep = { key: 'shiny', filter: kw.flag.shiny };
+	// The loose rank-1 pattern under each capped league, for piles whose
+	// species aren't in a league's top 30 (the meta pile uses those pools).
+	const pvpLoose = ['great', 'ultra']
+		.map((id) => [id, PVP_RANKINGS.leagues?.[id]?.cpCap])
+		.filter(([, cap]) => cap)
+		.map(([id, cap]) => ({
+			key: `pvp_${id}_loose`,
+			filter: `${kw.numeric.cp}-${cap}&0-1${atk}&3-4${def}&3-4${hp}`,
+			text: [`app.pile.lens.pvp_${id}_label`, 'app.pile.lens.pvp_loose_hint'],
+		}));
+	const metaHead = famOf([
+		...topAttackersList,
+		...topMaxAttackersList,
+		...keeperResolved,
+		...pvpPools.flatMap((pool) => pvpNamesOf(pool.league)),
+	]);
 	const sortingPiles = [
-		// Meta: species on any meta list, with one keeper lens per list.
+		// Meta: species on any meta list. Best IVs first, then each league's own
+		// clauses: pool, CP cap, loose rank-1 pattern. Only a capped league has
+		// a rank-1 pattern; buildLeagueFilter drops the CP and IV clauses for a
+		// capless one (a Master League cup), which would keep every member.
 		buildPile({
 			id: 'meta',
-			head: famOf([
-				...topAttackersList,
-				...topMaxAttackersList,
-				...keeperResolved,
-				...pvpPools.flatMap((pool) => pvpNamesOf(pool.league)),
-			]),
+			head: metaHead,
 			lenses: [
-				{ key: 'raid', filter: topAttackersList.length ? `${famOf(topAttackersList)}&${highIv}` : '' },
-				{ key: 'shadow_keep', filter: keeperResolved.length ? `${famOf(keeperResolved)}&${kw.flag.shadow}` : '' },
-				{
-					key: 'max',
-					filter: topMaxAttackersList.length
-						? `${famOf(topMaxAttackersList)}&${kw.flag.dynamax_move}1-&${highIv}`
-						: '',
-				},
-				// The league's own clauses: pool, CP cap, loose rank-1 pattern.
-				// Only a capped league has a rank-1 keeper pattern; buildLeagueFilter
-				// drops the CP and IV clauses for a capless one (a Master League cup),
-				// which would mark every family member a keeper.
+				...ivLadder(),
 				...pvpPools.map((pool) => ({
 					key: pool.key,
 					filter: pool.league?.cpCap ? buildLeagueFilter(pool.league).clause : '',
@@ -5066,51 +5080,55 @@ export function buildFilters(
 			cfg,
 		}),
 		// Shadows. Never cleared by switching off shadow protection: the keepers
-		// are tagged here and ③ takes the rest.
+		// are tagged here and ③ takes the rest. Attack matters most on a shadow.
+		// "Still to evolve" keeps two: one stays shadow, the second is purified
+		// and evolved up the line (one filter, so one step with its count).
 		buildPile({
 			id: 'shadows',
 			head: kw.flag.shadow,
 			lenses: [
-				// Default state (still Frustration) and 11+ in every stat: purifying
-				// adds 2 to each, so the best of these purify to a hundo.
-				{ key: 'purify_hundo', filter: `@${kw.flag.frustration}&3-4${atk}&3-4${def}&3-4${hp}&!4*` },
-				// Frustration TM'd away: a real Charge TM investment.
-				{ key: 'tm_done', filter: `!@${kw.flag.frustration}` },
-				// Common 1 km-candy shadows, still default: cheap takeover purify stock.
-				{ key: 'cheap_purify', filter: `${kw.numeric.candy_km}1&!${kw.flag.shiny}&@${kw.flag.frustration}` },
+				{ key: 'hundo', filter: '4*' },
+				shinyStep,
+				{ key: 'meta', filter: metaHead },
+				{ key: 'three', filter: '3*' },
+				{ key: 'atk34', filter: `3-4${atk}` },
+				...pvpLoose,
+				{ key: 'evolve_shadow', filter: kw.flag.evolvable },
 			],
 			kw,
 			cfg,
 		}),
-		// Received trades can't be traded again, so they are never tradebait.
+		// Received trades can't be traded again, so they are never tradebait. A
+		// trade re-rolls IVs, which makes the PvP step worth having here.
 		buildPile({
 			id: 'traded',
 			head: kw.flag.traded,
 			lenses: [
-				{ key: 'souvenirs', filter: souvenirLens },
+				{ key: 'hundo', filter: '4*' },
+				shinyStep,
 				{ key: 'luckies', filter: kw.flag.lucky },
-				// What the trash filter would already take (was the traded-trash review).
-				{ key: 'trash_review', filter: trash },
+				{ key: 'strong', filter: strongIv },
+				{ key: 'three', filter: '3*' },
+				...pvpLoose,
+				stillToEvolve,
 			],
 			kw,
 			cfg,
 		}),
-		buildPile({ id: 'luckies', head: kw.flag.lucky, lenses: [{ key: 'high_iv', filter: highIv }], kw, cfg }),
-		// Your lucky families (the lucky-sort, as a pile): ① the luckies themselves.
 		buildPile({
-			id: 'lucky_families',
-			head: luckyFamilyPileHead,
-			lenses: [{ key: 'luckies', filter: kw.flag.lucky }],
+			id: 'luckies',
+			head: kw.flag.lucky,
+			lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep],
 			kw,
 			cfg,
 		}),
-		// Everything that can evolve right now: ① new Pokédex entries and the ones
-		// already tagged to evolve through.
+		// Everything that can evolve right now: new Pokédex entries best first,
+		// then the ones already tagged to evolve through.
 		buildPile({
 			id: 'evolve',
 			head: kw.flag.evolvable,
 			lenses: [
-				{ key: 'new_dex', filter: kw.flag.new_evo },
+				...ivLadder(`${kw.flag.new_evo}&`, 'new_dex_', 'app.pile.lens.new_dex_ladder_hint'),
 				{ key: 'tagged_evolve', filter: `#${jobTagsOf(cfg).evolve}` },
 			],
 			kw,
@@ -5122,54 +5140,50 @@ export function buildFilters(
 			id: 'dynamax',
 			head: `${kw.flag.dynamax_move}1-`,
 			lenses: [
-				{ key: 'builds', filter: topMaxAttackersList.length ? `${famOf(topMaxAttackersList)}&${highIv}` : '' },
 				{ key: 'gigantamax', filter: kw.flag.gigantamax },
-				// Nothing invested yet: parking material, IVs don't matter.
-				{
-					key: 'parkers',
-					filter: `!${kw.flag.dynamax_move}2-&!${kw.flag.dynamax_wall}1-&!${kw.flag.dynamax_spirit}1-`,
-				},
+				{ key: 'builds', filter: topMaxAttackersList.length ? famOf(topMaxAttackersList) : '' },
+				...ivLadder(),
 			],
 			kw,
 			cfg,
 		}),
-		buildPile({ id: 'xxl', head: kw.flag.xxl, lenses: [{ key: 'high_iv', filter: highIv }], kw, cfg }),
-		// XXS only matter for Pokédex entries: keep the ones still to evolve.
-		buildPile({ id: 'xxs', head: kw.flag.xxs, lenses: [{ key: 'evolve', filter: kw.flag.evolvable }], kw, cfg }),
-		// Community Day backgrounds: a special background on a species whose
-		// Community Day came with one (src/data/community-days.json: the pinned
-		// legacy list plus every Community Day the event feed has listed since).
+		// XXL: the showcase verdict is the calculator under the steps.
+		buildPile({ id: 'xxl', head: kw.flag.xxl, lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep], kw, cfg }),
+		buildPile({ id: 'xxs', head: kw.flag.xxs, lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep], kw, cfg }),
+		buildPile({ id: 'backgrounds', head: kw.flag.background, lenses: ivLadder(), kw, cfg }),
+		// Costumes split by whether the line can still evolve: one per stage for
+		// those, one for the rest (the costume budget either way).
+		buildPile({ id: 'costumes_evolve', head: `${kw.flag.costume}&${kw.flag.evolvable}`, lenses: ivLadder(), kw, cfg }),
+		buildPile({ id: 'costumes_final', head: `${kw.flag.costume}&!${kw.flag.evolvable}`, lenses: ivLadder(), kw, cfg }),
+		// Community Days leave shinies and backgrounds by the dozen: every one on
+		// a Community Day species, all days at once, so old ones can be gone
+		// through too. The last step is the untraded ones, to tag for trades.
 		buildPile({
-			id: 'cd_backgrounds',
-			head: COMMUNITY_DAY_BG_DEX.length
-				? `${kw.flag.special_background}&${famOf(
-						COMMUNITY_DAY_BG_DEX.map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean),
-					)}`
+			id: 'cday',
+			head: COMMUNITY_DAY_DEX.length
+				? `${famOf(COMMUNITY_DAY_DEX.map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean))}&${kw.flag.shiny},${kw.flag.background}`
 				: '',
-			lenses: [{ key: 'shiny', filter: kw.flag.shiny }],
+			lenses: [...ivLadder(), { key: 'to_trade', filter: `!${kw.flag.traded}` }],
 			kw,
 			cfg,
 		}),
-		buildPile({
-			id: 'costumes',
-			head: kw.flag.costume,
-			lenses: [
-				{ key: 'shiny', filter: kw.flag.shiny },
-				{ key: 'evolve', filter: kw.flag.evolvable },
-			],
-			kw,
-			cfg,
-		}),
+		// Wherever one came from (raid, research, GBL): keep the good ones.
+		buildPile({ id: 'legendaries', head: kw.flag.legendary, lenses: ivLadder(), kw, cfg }),
 	].filter(Boolean);
-	// Filters that belong with a pile but aren't keep lenses: what to purify
-	// instead of transfer, which shadows to Charge-TM, cheap XP and dex+ evolves.
+	// Filters that belong with a pile but aren't keep steps: cheap purify stock
+	// (common 1 km-candy shadows, never meta), which shadows to Charge-TM, and
+	// cheap XP evolves (it names the trade evolutions species by species).
 	const PILE_EXTRAS = {
 		shadows: [
-			{ key: 'shadow_safe', label: 'app.filter.shadow_safe_label', hint: 'app.filter.shadow_safe_hint', filter: shadowSafe },
+			{
+				key: 'cheap_purify',
+				label: 'app.pile.lens.cheap_purify_label',
+				hint: 'app.pile.lens.cheap_purify_hint',
+				filter: shadowSafe ? `${shadowSafe}&${kw.numeric.candy_km}1` : '',
+			},
 			{ key: 'shadow_frustration', label: 'app.filter.shadow_frustration_label', hint: 'app.filter.shadow_frustration_hint', filter: shadowFrustration },
 		],
 		evolve: [
-			{ key: 'dex_plus', label: 'app.filter.dex_plus_label', hint: 'app.filter.dex_plus_hint', filter: dexPlus },
 			{ key: 'cheap_evolve', label: 'app.filter.cheap_evolve_label', hint: 'app.filter.cheap_evolve_hint', filter: cheapEvolve },
 		],
 	};
@@ -5270,10 +5284,7 @@ export function buildFilters(
 	const watchPile = buildPile({
 		id: 'watchlist',
 		head: famOf(watchNames),
-		lenses: [
-			{ key: 'shadow', filter: kw.flag.shadow },
-			{ key: 'high_iv', filter: highIv },
-		],
+		lenses: [...ivLadder(), ...pvpLoose],
 		kw,
 		cfg,
 	});
@@ -5281,10 +5292,7 @@ export function buildFilters(
 	const nonMetaPile = buildPile({
 		id: 'non_meta',
 		head: [...new Set(classifiedNames)].map((n) => `!+${n}`).join('&'),
-		lenses: [
-			{ key: 'souvenirs', filter: souvenirLens },
-			{ key: 'high_iv', filter: highIv },
-		],
+		lenses: [...ivLadder(), ...pvpLoose],
 		kw,
 		cfg,
 	});
@@ -5329,15 +5337,17 @@ export function buildFilters(
 		dynamax: { build: budgets.dynaBuild, top: budgets.dynaBuildTop, parkers: budgets.dynaParkers },
 		xxl: { score: budgets.xxlScore },
 		xxs: { n: budgets.evolve },
-		costumes: { n: budgets.costumePerStage, tradeable: budgets.costumeTradeable },
-		cd_backgrounds: { n: budgets.cdBackground },
+		costumes_evolve: { n: budgets.costumePerStage, tradeable: budgets.costumeTradeable },
+		costumes_final: { n: budgets.costumePerStage, tradeable: budgets.costumeTradeable },
+		backgrounds: { n: budgets.backgroundPerSpecies, tradeable: budgets.backgroundTradeable },
+		cday: { n: budgets.shinyPerStage, tradeable: budgets.shinyTradeable },
+		legendaries: { meta: budgets.raidMeta, standin: budgets.standIn },
 		non_meta: { standin: budgets.standIn, evolve: budgets.evolve },
 		traded: {},
 	};
 	const SPECIES_OF_PILE = {
 		meta: [...metaDex],
 		watchlist: [...watchWhy.keys()],
-		cd_backgrounds: COMMUNITY_DAY_BG_DEX,
 	};
 	for (const pile of sortingPiles) {
 		pile.card = SPECIES_OF_PILE[pile.id] ? cardFor(SPECIES_OF_PILE[pile.id]) : { rows: [] };
@@ -10140,15 +10150,15 @@ function PileCard({ card, t }) {
 // hook in plain words ("Cryptos piling up…"), and the three steps when opened.
 // `chip` carries the event window or the reason a pile floated up.
 export const PILE_GROUPS = [
-	{ id: 'collection', accent: '#F5B82E', piles: ['hundo', 'lucky_families', 'luckies', 'traded', 'costumes', 'cd_backgrounds', 'xxl', 'xxs'] },
-	{ id: 'battle', accent: '#E74C3C', piles: ['meta', 'watchlist', 'shadows', 'dynamax'] },
+	{ id: 'collection', accent: '#F5B82E', piles: ['hundo', 'cday', 'luckies', 'traded', 'costumes_evolve', 'costumes_final', 'backgrounds', 'xxl', 'xxs'] },
+	{ id: 'battle', accent: '#E74C3C', piles: ['meta', 'watchlist', 'legendaries', 'shadows', 'dynamax'] },
 	// `tools` are single filters with their own tile: mega-evolving spends
 	// candy, so it sits here and not with the Mega planner under Catching.
 	{ id: 'evolve', accent: '#27AE60', piles: ['evolve'], tools: ['mega_evolve'] },
 	{ id: 'big', accent: '#5EAFC5', piles: ['non_meta'] },
 ];
 const PILE_ICON = {
-	hundo: Award, lucky_families: Sparkles, luckies: Clover, traded: Gift, costumes: Shirt, cd_backgrounds: Image,
+	hundo: Award, luckies: Clover, traded: Gift, costumes_evolve: Shirt, costumes_final: Shirt, backgrounds: Image, legendaries: Crown, cday: Sparkles,
 	xxl: Maximize2, xxs: Minimize2, meta: Swords, watchlist: Telescope, shadows: Flame, dynamax: Zap, evolve: Sprout,
 	non_meta: Package, event: Leaf, mega_evolve: Dna,
 };
@@ -10246,10 +10256,6 @@ const HUNDO_PILE_TEXT = {
 };
 const EVENT_PILE_TEXT = {
 	overview: ['app.events.overview_label', 'app.events.overview_hint'],
-	keep: {
-		souvenirs: ['app.events.souvenirs_label', 'app.events.souvenirs_hint'],
-		keep_iv: ['app.events.keep_iv_label', 'app.events.keep_iv_hint'],
-	},
 	sort: ['app.pile.sort_label', 'app.events.sort_hint'],
 	release: ['app.pile.release_label', 'app.events.release_hint'],
 };

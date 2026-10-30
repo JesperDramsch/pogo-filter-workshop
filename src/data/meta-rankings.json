@@ -1,9 +1,9 @@
 {
-  "fetchedAt": "2026-10-29T18:20:02.874Z",
-  "gameMasterTimestamp": "1792902257174",
+  "fetchedAt": "2026-10-30T02:13:39.486Z",
+  "gameMasterTimestamp": "1793295551876",
   "sources": {
     "mechanics": "alexelgt/game_masters",
-    "mechanicsBatch": "2026-10-25T04:24:17.174Z",
+    "mechanicsBatch": "2026-10-29T17:39:11.876Z",
     "roster": "pvpoke/pvpoke",
     "rosterBatch": "2026-10-29 05:02:09"
   },
@@ -262,6 +262,7 @@
     "inteleon",
     "rillaboom",
     "excadrill",
+    "melmetal",
     "ho-oh",
     "hydreigon",
     "rhyperior",
@@ -325,7 +326,6 @@
     "umbreon",
     "dubwool",
     "eevee",
-    "meowth",
     "sableye",
     "shuckle"
   ],
