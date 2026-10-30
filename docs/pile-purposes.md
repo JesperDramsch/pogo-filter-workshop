@@ -15,6 +15,10 @@ the ① keep steps. Read the steps top to bottom and stop once you have enough.
 | PvP | loose pattern per league, under each CP cap | the same clause the meta pile uses today |
 | still to evolve | `evolve` | keep one to evolve through |
 
+**Default count:** 1 per stage of the line, plus 3 untraded ones to trade.
+A row only names a count when it differs. Each count is a budget, so you can
+change it.
+
 Shiny, costume and background are left out of every ladder: the protection
 tail already keeps them out of ③.
 
@@ -29,7 +33,7 @@ then `3-4` is fine (best first, then wider), but `3-4` then `4*` would be cut.
 | Event | What's worth keeping from this event? | 4\* → 3-4 → 3\* |
 | Costumes that evolve (`costume&evolve`) | Which hats to keep for the whole line? | 4\* → 3-4 → 3\*, one per stage of the line (costume budget: 1 per stage), plus up to 3 untraded ones to trade |
 | Costumes that don't (`costume&!evolve`) | Which hats to keep? | 4\* → 3-4 → 3\*, just one, plus up to 3 untraded ones to trade |
-| Backgrounds (`background`) | Which backgrounds stay? | 4\* → 3-4 → 3\*, a good number per species plus untraded ones to trade (the background budgets, 1 + 3 by default, editable) |
+| Backgrounds (`background`) | Which backgrounds stay? | 4\* → 3-4 → 3\*, default count |
 | XXL | Which one goes to a showcase? | showcase verdict → still to evolve → 4\*,3\* |
 | XXS | Which tiny ones still matter? | still to evolve → 4\*,3\* |
 | Luckies | Which luckies are worth the cheap power-up? | still to evolve → 4\*,3\* |
