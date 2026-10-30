@@ -7514,6 +7514,7 @@ export default function App() {
 										onToggleSettings={() => goToArea(filterArea, !areaSettings)}
 										t={t}
 									/>
+									<SwipeAreas areas={FILTER_AREAS} current={filterArea} onSelect={selectArea}>
 									<AreaPanel area='catch' current={filterArea}>
 										{areaSettings ? (
 											areaSettingsFor.catch
@@ -7853,6 +7854,7 @@ export default function App() {
 											</>
 										)}
 									</AreaPanel>
+									</SwipeAreas>
 
 									{/* Internals — set theory / raw clauses / verify */}
 									<div className='pt-4'>
@@ -9581,6 +9583,88 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 					{filterStr}
 				</code>
 			</div>
+		</div>
+	);
+}
+
+// ─── Swipe between areas ───────────────────────────────────────────────────
+// The touch counterpart to AreaTabs' arrow keys: a horizontal swipe anywhere in
+// the open panel moves to the neighbouring area, in the tabs' visual order and
+// without wrapping — a swipe past the last tab does nothing, as a carousel would.
+// The decision is a pure function of the gesture so scripts/check-swipe-areas.mjs
+// can pin it without a DOM.
+export const SWIPE_MIN_PX = 48; // horizontal travel that commits a switch
+export const SWIPE_AXIS_RATIO = 1.5; // dx must beat dy by this much, or it was a scroll
+export function swipeAreaTarget({ dx, dy, areas, current }) {
+	if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) < Math.abs(dy) * SWIPE_AXIS_RATIO) return null;
+	const i = areas.indexOf(current);
+	if (i < 0) return null;
+	// Finger moves left → the content follows it left → the tab to the right.
+	const next = i + (dx < 0 ? 1 : -1);
+	return next >= 0 && next < areas.length ? areas[next] : null;
+}
+// A touch that starts on one of these never becomes a tab swipe: the map
+// pans and places pins, text fields select, sliders drag, and anything that
+// scrolls sideways scrolls. Vertical scrolling is never affected — nothing
+// here calls preventDefault, so the listeners stay passive and the page
+// behaves exactly as before.
+const SWIPE_IGNORE = '[data-no-swipe], input, textarea, select, [contenteditable]';
+// Once the finger has clearly committed to the vertical axis the gesture is
+// a scroll, and stays one even if it drifts sideways afterwards.
+const SWIPE_SCROLL_LOCK_PX = 10;
+function scrollsSideways(el, stopAt) {
+	for (let node = el; node && node !== stopAt && node.nodeType === 1; node = node.parentElement) {
+		if (node.scrollWidth > node.clientWidth + 1) {
+			const ox = getComputedStyle(node).overflowX;
+			if (ox === 'auto' || ox === 'scroll') return true;
+		}
+	}
+	return false;
+}
+function SwipeAreas({ areas, current, onSelect, children }) {
+	const rootRef = useRef(null);
+	const gesture = useRef(null);
+	const onTouchStart = (e) => {
+		gesture.current = null;
+		if (e.touches.length !== 1) return;
+		const target = e.target;
+		if (target.closest?.(SWIPE_IGNORE) || scrollsSideways(target, rootRef.current)) return;
+		const { clientX: x, clientY: y } = e.touches[0];
+		gesture.current = { x, y, lastX: x, lastY: y, scrolled: false };
+	};
+	const onTouchMove = (e) => {
+		const g = gesture.current;
+		if (!g || e.touches.length !== 1) return;
+		const { clientX, clientY } = e.touches[0];
+		g.lastX = clientX;
+		g.lastY = clientY;
+		const dy = Math.abs(clientY - g.y);
+		if (dy > SWIPE_SCROLL_LOCK_PX && dy > Math.abs(clientX - g.x)) g.scrolled = true;
+	};
+	const onTouchEnd = () => {
+		const g = gesture.current;
+		gesture.current = null;
+		if (!g || g.scrolled) return;
+		const next = swipeAreaTarget({ dx: g.lastX - g.x, dy: g.lastY - g.y, areas, current });
+		if (!next) return;
+		onSelect(next);
+		// The tab strip is the only cue of what just happened. Deep in a long
+		// panel it has scrolled off the top, so bring it back into view.
+		const tab = document.getElementById(`area-tab-${next}`);
+		if (tab && tab.getBoundingClientRect().top < 0) {
+			const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+			tab.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+		}
+	};
+	return (
+		<div
+			ref={rootRef}
+			onTouchStart={onTouchStart}
+			onTouchMove={onTouchMove}
+			onTouchEnd={onTouchEnd}
+			onTouchCancel={() => (gesture.current = null)}
+		>
+			{children}
 		</div>
 	);
 }
@@ -12663,7 +12747,7 @@ function RegionalMap({
 	return (
 		<div className='space-y-4'>
 			{/* MAP — clean, no polygon overlays */}
-			<div className='border border-[#1F2933] rounded-sm bg-[#0B0F14] overflow-hidden relative'>
+			<div data-no-swipe className='border border-[#1F2933] rounded-sm bg-[#0B0F14] overflow-hidden relative'>
 				{/* The map is a POINTER convenience. Everything it can do is also
 				    reachable from the coordinate/region form below it, which is the
 				    keyboard and screen-reader path — so the svg names itself and hides

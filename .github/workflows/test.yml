@@ -74,4 +74,5 @@ jobs:
       - run: npm run test:speciessuggest
       - run: npm run test:syncsummary
       - run: npm run test:megaboost
+      - run: npm run test:swipe
       - run: npm run build
