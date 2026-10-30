@@ -38,7 +38,7 @@ then `3-4` is fine (best first, then wider), but `3-4` then `4*` would be cut.
 | Costumes that evolve (`costume&evolve`) | Which hats to keep for the whole line? | 4\* → shiny → 3-4 → 3\*, default count |
 | Costumes that don't (`costume&!evolve`) | Which hats to keep? | 4\* → shiny → 3-4 → 3\*, one plus up to 3 untraded ones to trade |
 | Backgrounds (`background`) | Which backgrounds stay? | 4\* → shiny → 3-4 → 3\*, default count |
-| Community Days | Too many C-Day shinies and backgrounds: which stay, which go to trades? | 4\* → shiny → 3-4 → 3\* → untraded (tag to trade), over every Community Day species at once |
+| Community Days | Hundreds of one species after a Community Day: which stay, which go to trades? | 4\* → shiny → background → 3-4 → 3\* → untraded (tag to trade), over every catch of every Community Day species at once |
 | XXL | Which one goes to a showcase? | showcase verdict → still to evolve → 4\*,3\* → shiny |
 | XXS | Which tiny ones still matter? | still to evolve → 4\*,3\* → shiny |
 | Luckies | Which luckies are worth the cheap power-up? | still to evolve → 4\*,3\* → shiny |
@@ -49,7 +49,7 @@ then `3-4` is fine (best first, then wider), but `3-4` then `4*` would be cut.
 | Meta | Raid and PvP keepers, top 7 per type | 4\* → shiny → 3-4 → 3\* → PvP, up to the meta budget |
 | Watchlist | Not meta yet, something's brewing | same as meta, up to the watchlist budget |
 | Non-meta | Everything else | same as meta, up to the non-meta budget |
-| Legendaries | Raided one all weekend: which ones stay? | 4\* → shiny → 3-4 → 3\*, up to the meta or non-meta budget of that species |
+| Legendaries & Ultra Beasts (`legendary,ultrabeast`) | Raided one all weekend: which ones stay? | 4\* → shiny → 3-4 → 3\*, up to the meta or non-meta budget of that species |
 | Hundo sort | Got a hundo: which copies can go? | 4\* → shiny → 3-4 → 3\* |
 
 Lucky families goes: luckies are luckies.

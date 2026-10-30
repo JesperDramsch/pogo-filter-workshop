@@ -239,14 +239,19 @@ const PILE_FAMILIES = [
     lensCases: () => LADDER,
   },
   {
-    // A shiny or background on a Community Day species; the outsider is a
-    // background on a species no Community Day featured (Bidoof).
+    // Every Community Day species, shiny or not; the outsider is a species no
+    // Community Day featured (Bidoof).
     name: "Community Days",
     piles: (r) => [{ pile: r.sortingPiles.find((p) => p.id === "cday"), dex: 906 }],
-    base: { flags: { background: true } },
-    skipReleasable: /^plain legendary$/,
-    outsider: () => ({ dex: 399, o: { families: ["bidoof"], flags: { background: true } } }),
-    lensCases: () => ({ ...LADDER, to_trade: { match: {}, miss: { flags: { traded: true } } } }),
+    outsider: () => ({ dex: 399, o: { families: ["bidoof"] } }),
+    lensCases: () => ({
+      hundo: LADDER.hundo,
+      shiny: LADDER.shiny,
+      background: { match: { flags: { background: true } }, miss: {} },
+      strong: LADDER.strong,
+      three: LADDER.three,
+      to_trade: { match: {}, miss: { flags: { traded: true } } },
+    }),
   },
 ];
 
@@ -355,6 +360,13 @@ console.log("\nThe tail ignores the trash toggles");
     JSON.stringify(on) === JSON.stringify(off) && on.some((c) => c.startsWith(`${kw.numeric.year}`)), off.join("&"));
   // Custom collectibles stay out of the tail (Jesper's call): sorting offers
   // them in ③ like any other species; favourite or tag the ones to keep.
+  // The legendaries pile takes Ultra Beasts too; a plain species stays out.
+  for (const loc of localeNames) {
+    const pile = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc)).sortingPiles.find((p) => p.id === "legendaries");
+    const ub = evalFilterDetailed(pile.overview, pileMon(loc, { flags: { ultrabeast: true } }, "Nihilego", 793), loc).verdict;
+    const plain = evalFilterDetailed(pile.overview, pileMon(loc, {}, "Magikarp", 129), loc).verdict;
+    check(`${loc}: an Ultra Beast is in the legendaries pile, a plain species is not`, ub === true && plain === false, `ub ${ub}, plain ${plain}`);
+  }
   check("custom collectibles add nothing to the tail",
     JSON.stringify(protectionTail(kw, { ...CFG, customCollectibles: ["Spinda"] })) === JSON.stringify(protectionTail(kw, CFG)));
   check("only a year floor of 0 drops the lucky-trade clause",
