@@ -10153,17 +10153,25 @@ const PILE_ICON = {
 	non_meta: Package, event: Leaf, mega_evolve: Dna,
 };
 // A single filter in a pile group, styled like a pile tile.
-function ToolTile({ title, hook, icon, accent, children }) {
+function ToolTile({ title, hook, chip, icon, accent, open, children }) {
 	return (
 		<details
+			open={open || undefined}
 			className='group rounded-md border border-[#1F2933] bg-[#0E141A] overflow-hidden transition hover:border-[#2D3A47]'
 			style={{ borderLeft: `3px solid ${accent}` }}
 		>
 			<summary className='list-none cursor-pointer flex items-start gap-3 p-3'>
 				<TileIcon icon={icon} accent={accent} />
 				<span className='min-w-0 flex-1'>
-					<span className='mono text-sm font-semibold text-[#E6EDF3]'>{title}</span>
-					<span className='block text-xs text-[#8B98A5] mt-1 leading-relaxed'>{hook}</span>
+					<span className='flex flex-wrap items-center gap-2'>
+						<span className='mono text-sm font-semibold text-[#E6EDF3]'>{title}</span>
+						{chip && (
+							<span className='mono text-[10px] px-1.5 py-0.5 rounded-sm' style={{ color: accent, border: `1px solid ${accent}55` }}>
+								{chip}
+							</span>
+						)}
+					</span>
+					{hook && <span className='block text-xs text-[#8B98A5] mt-1 leading-relaxed'>{hook}</span>}
 				</span>
 				<ChevronRight size={14} className='text-[#8090A0] details-arrow shrink-0 mt-1' aria-hidden='true' />
 			</summary>
@@ -10326,13 +10334,14 @@ function MegaPlanner({ plans, copied, copyToClipboard, typeLabels, t, locale }) 
 						const icon = p.kind === 'raid' ? Target : Leaf;
 						const name = topName(p);
 						return (
-							<TrainerAccordion
+							<ToolTile
 								key={p.id}
-								name={p.title}
+								title={p.title}
+								chip={when(p)}
+								hook={name}
 								icon={icon}
-								teaser={name ? `${name} · ${when(p)}` : when(p)}
 								accent='#E91E63'
-								highlight={live}
+								open={live}
 							>
 								<MegaBoostPanel
 									boost={p.boost}
@@ -10344,7 +10353,7 @@ function MegaPlanner({ plans, copied, copyToClipboard, typeLabels, t, locale }) 
 									t={t}
 									locale={locale}
 								/>
-							</TrainerAccordion>
+							</ToolTile>
 						);
 					})}
 				</div>
