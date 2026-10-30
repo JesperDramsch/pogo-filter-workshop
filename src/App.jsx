@@ -9530,7 +9530,10 @@ function FriendCollectEditor({
 
 // ─── SUBCOMPONENTS ────────────────────────────────────────────────────────
 
-function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
+// `tone` colours the hint paragraph: 'warn' renders it in amber for a filter
+// that needs a read before it is run (the ③b string under a pile's reveal),
+// distinct from the red over-budget banner, which means the string is broken.
+function FilterBox({ label, accent, filterStr, copied, onCopy, hint, tone }) {
 	const { t } = useTranslation();
 	const len = filterStr.length;
 	// Past the budget the string is silently truncated and the filter quietly
@@ -9606,7 +9609,13 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 				</p>
 			)}
 			{hint && (
-				<p className='px-4 py-2 text-xs italic text-[#8B98A5] leading-snug border-b border-[#1F2933] bg-[#0E141A]'>
+				<p
+					className={
+						tone === 'warn'
+							? 'px-4 py-2 text-xs italic leading-snug border-b border-[#F5B82E]/40 bg-[#F5B82E]/10 text-[#F5B82E]'
+							: 'px-4 py-2 text-xs italic text-[#8B98A5] leading-snug border-b border-[#1F2933] bg-[#0E141A]'
+					}
+				>
 					{hint}
 				</p>
 			)}
@@ -10300,12 +10309,17 @@ function PileTile({ pile, title, hook, icon, chip, accent, open, onHide, hidden,
 
 // The three steps of one sorting pile (see buildPile), rendered the same way
 // for every pile. `text` names each box's label and hint keys:
-//   { overview: [label, hint], keep: { <lensKey>: [label, hint] }, sort, release }
-// sort and release fall back to the generic pile wording. Copy keys are
+//   { overview: [label, hint], keep: { <lensKey>: [label, hint] }, sort, safe, release }
+// sort, safe and release fall back to the generic pile wording. Copy keys are
 // `${pile.id}_${box}`, so two piles that share a species never share state.
 // `card` renders under ②, where the user decides what still has a job.
+// Step ③ is two boxes: ③a `safe` (the leftovers, nothing a ① step would have
+// kept) is the visible transfer box; ③b `release` (everything not starred or
+// tagged) sits behind a reveal that opens closed on every mount and carries a
+// warning, because it includes what ① would have kept.
 const PILE_TEXT_DEFAULTS = {
 	sort: ['app.pile.sort_label', 'app.pile.sort_hint'],
+	safe: ['app.pile.safe_label', 'app.pile.safe_hint'],
 	release: ['app.pile.release_label', 'app.pile.release_hint'],
 };
 const HUNDO_PILE_TEXT = {
@@ -10315,9 +10329,14 @@ const HUNDO_PILE_TEXT = {
 const EVENT_PILE_TEXT = {
 	overview: ['app.events.overview_label', 'app.events.overview_hint'],
 	sort: ['app.pile.sort_label', 'app.events.sort_hint'],
+	safe: ['app.pile.safe_label', 'app.events.safe_hint'],
 	release: ['app.pile.release_label', 'app.events.release_hint'],
 };
 function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
+	// The ③b reveal is local state: it starts closed on every mount and is
+	// never persisted, so a wide transfer view is always a deliberate click.
+	const [reveal, setReveal] = useState(false);
+	const revealId = useId();
 	if (!pile) return null;
 	// Wording by convention unless the pile's table says otherwise:
 	// app.pile.<id>.title/.hint for the overview, app.pile.lens.<key>_label/_hint
@@ -10329,7 +10348,7 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 	};
 	const lensWords = (lens) =>
 		words.keep?.[lens.key] || lens.text || [`app.pile.lens.${lens.key}_label`, `app.pile.lens.${lens.key}_hint`];
-	const box = (suffix, keys, str) => {
+	const box = (suffix, keys, str, tone) => {
 		if (!str || !keys) return null;
 		const copyKey = `${pile.id}_${suffix}`;
 		const opts = keys[2] ? { params: keys[2] } : undefined;
@@ -10342,6 +10361,7 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 				copied={copied[copyKey]}
 				onCopy={() => copyToClipboard(copyKey, str)}
 				hint={t(keys[1], opts)}
+				tone={tone}
 			/>
 		);
 	};
@@ -10357,7 +10377,31 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 			{card ?? <PileCard card={pile.card} t={t} />}
 			{box('sort', words.sort, pile.sort)}
 			{pile.release && subHeading('app.pile.group_release')}
-			{box('release', words.release, pile.release)}
+			{box('safe', words.safe, pile.safe)}
+			{pile.release && (
+				<div className='space-y-2'>
+					<button
+						type='button'
+						onClick={() => setReveal((v) => !v)}
+						// Custom disclosure, not <details>: the chevron alone conveys
+						// nothing to AT, and the control needs a stated open/closed.
+						aria-expanded={reveal}
+						aria-controls={revealId}
+						className='mono text-xs text-[#F5B82E] hover:text-[#E6EDF3] min-h-[32px] flex items-center gap-1.5'
+					>
+						{reveal ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+						{t('app.pile.release_reveal')}
+					</button>
+					{reveal && (
+						<div id={revealId} className='space-y-2'>
+							<p className='px-4 py-2 text-xs leading-snug border border-[#F5B82E]/40 rounded-sm bg-[#F5B82E]/10 text-[#F5B82E]'>
+								{t('app.pile.release_warning')}
+							</p>
+							{box('release', words.release, pile.release, 'warn')}
+						</div>
+					)}
+				</div>
+			)}
 		</>
 	);
 }

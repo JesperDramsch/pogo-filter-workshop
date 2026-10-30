@@ -44,7 +44,8 @@ Every pile has the same three steps. The event wild-spawn card already uses this
 | --- | --- | --- |
 | ① Keep | Lenses for this pile (for example shinies, costumes, backgrounds, high IV) | Tag or star the matches that have a job |
 | ② Still to sort | The pile minus favourites and tagged (`pile & !favourite & !#`), with the pile card | Tag or star the remaining keepers |
-| ③ Release | The pile minus everything tagged, starred or always protected (`pile & protection tail`) | Transfer the whole view |
+| ③a Leftovers | The pile minus everything tagged, starred or always protected, minus the negation of every ① lens that has one (`pile & protection tail & !lens…`), so nothing a ① step would have kept is in it | Transfer the whole view; it is the visible transfer box |
+| ③b Everything not starred or tagged | The pile minus everything tagged, starred or always protected (`pile & protection tail`), including what ① would have kept | Behind a reveal with an amber warning: open it after ① and ②, read the list, then transfer |
 
 **Change from today:** step ③ of the wild-spawn card currently reuses the global trash filter. That filter only matches the lowest common denominator, which steps ① and ② have already handled, so step ③ always comes up empty. Step ③ must be pile-local: the same pile, with the protection tail instead of the trash filter.
 

@@ -5,8 +5,11 @@ the ① keep steps. Read the steps top to bottom and stop once you have enough.
 ③ has the same shape everywhere and comes as two strings: ③a, the leftovers
 (pile & protection tail & the negation of every ① step that has one, so
 nothing a step would have kept is in it), and ③b, everything not starred or
-tagged (pile & protection tail). The tail reads two settings, protect nundos
-and the mythicals you have too many of, and nothing else
+tagged (pile & protection tail). On the pile card ③a is the visible transfer
+box; ③b sits behind a reveal that starts closed every time and carries an
+amber warning, because it includes what ① would have kept: open it after ①
+and ②, read the list, then transfer. The tail reads two settings, protect
+nundos and the mythicals you have too many of, and nothing else
 (docs/sorting-workflow-spec.md, "Protection tail"). Ready to evolve has no ③:
 what can still evolve is never a leftover.
 

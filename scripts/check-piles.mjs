@@ -761,8 +761,43 @@ console.log("\nEvery pile's wording exists in every locale");
       need(`app.pile.${pile.id}.hint`);
       need(`app.sort.hook.${pile.id}`);
     }
+    // Step ③'s two boxes and the reveal between them read fixed keys
+    // (PILE_TEXT_DEFAULTS / EVENT_PILE_TEXT), so they are named here rather
+    // than derived from a pile.
+    for (const k of [
+      "app.pile.safe_label", "app.pile.safe_hint", "app.events.safe_hint",
+      "app.pile.release_label", "app.pile.release_hint", "app.events.release_hint",
+      "app.pile.release_reveal", "app.pile.release_warning",
+    ]) need(k);
     check(`${loc}: every step, title, hint and hook has its words`, missing.size === 0, [...missing].slice(0, 5).join(", "));
   }
+}
+
+console.log("\nStep ③ renders the leftovers before the reveal");
+{
+  // ③a (pile.safe) is the visible transfer box; ③b (pile.release) is wider,
+  // so it sits behind a disclosure that states its open/closed state and
+  // carries a warning. Source-level, like the Mega planner check below: the
+  // order and the nesting are what a reader of the screen relies on.
+  const src = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const steps = src.slice(src.indexOf("function PileSteps("), src.indexOf("function MegaPlanner("));
+  const safeAt = steps.indexOf("box('safe', words.safe, pile.safe)");
+  const releaseAt = steps.indexOf("box('release', words.release, pile.release");
+  const toggleAt = steps.search(/aria-expanded=\{reveal\}\s*\n\s*aria-controls=\{revealId\}/);
+  const panelAt = steps.indexOf("id={revealId}");
+  check("PileSteps renders pile.safe", safeAt !== -1);
+  check("PileSteps renders pile.release", releaseAt !== -1);
+  check("pile.safe comes before pile.release", safeAt !== -1 && safeAt < releaseAt);
+  check("the reveal control states aria-expanded and aria-controls", toggleAt !== -1 && toggleAt < releaseAt);
+  check("pile.release sits inside the reveal's panel", panelAt !== -1 && toggleAt < panelAt && panelAt < releaseAt);
+  check("the reveal is named by its own key", steps.indexOf("t('app.pile.release_reveal')") > toggleAt);
+  check("the warning precedes the ③b box", steps.indexOf("t('app.pile.release_warning')") > panelAt
+    && steps.indexOf("t('app.pile.release_warning')") < releaseAt);
+  check("the warning is not a live region", !/role='status'/.test(steps));
+  check("the reveal starts closed on every mount", /useState\(false\)/.test(steps));
+  check("the ③b hint renders in the warn tone", /box\('release', words\.release, pile\.release, 'warn'\)/.test(steps));
+  const fb = src.slice(src.indexOf("function FilterBox("), src.indexOf("function AreaTabs("));
+  check("FilterBox takes a tone and colours the hint amber", /tone === 'warn'/.test(fb) && /#F5B82E/.test(fb));
 }
 
 console.log("\nMega-evolve placement");
