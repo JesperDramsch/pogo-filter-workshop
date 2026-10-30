@@ -1856,7 +1856,7 @@ function collapseFamilies(speciesList, familyCollapses) {
 // Resolves a species name (in any locale) to its lowercase form in the output
 // locale, ready for filter syntax. Falls back to the input lowercased if no
 // match — keeps user-typed names working even if the dictionary is incomplete.
-function speciesForOutput(name, outputLocale) {
+export function speciesForOutput(name, outputLocale) {
 	const resolved = resolveSpecies(name, outputLocale);
 	if (resolved) return resolved;
 	return String(name).toLowerCase();
@@ -1877,50 +1877,55 @@ function capFirst(s) {
 // shadows, costumes and the rest are the user's call in ① and ②, and the ones
 // worth keeping are starred or tagged by the time ③ runs.
 //
-// Deliberately independent of the trash toggles (protectNundos, protectBuddies,
-// protectLuckyEligible and friends): switching a protection off to clear a
-// category is exactly the habit the piles replace. The one setting it reads is
-// the lucky-trade year floor's value, which is the user's.
+// The tail reads exactly two settings and nothing else: protectNundos (the
+// nundo clause is emitted only when it is on; a nundo is a collectible only to
+// the user who said so) and mythTooManyOf (the species carved out of
+// `!mythical`, as the trash carves them: a listed mythical is a spare). The
+// lucky-trade year floor's VALUE is read too, but not its trash toggle
+// (protectLuckyEligible): the floor is the user's, the toggle is the habit
+// the piles replace. Every other trash toggle (protectBuddies,
+// protectLegacyMoves, protectSmeargleLegacy and friends) leaves the tail as
+// it is: switching a protection off to clear a category is exactly what ①
+// and ② are for.
+//
+// `opts.mythCarve` is the carve already resolved to the output locale
+// (speciesForOutput), `opts.smeargle` the localised Smeargle name for the
+// legacy-move clause; buildFilters resolves both once and passes them to every
+// buildPile call. Without them the tail protects every mythical and every
+// Smeargle, which is the safe direction.
 //
 // Spelling notes, all checked in scripts/check-data-filters.mjs:
 //   - nundos use the positive contrapositive: PoGo ignores `!N` on IV tokens
 //   - invested Dynamax is three clauses (De Morgan), and negated ranges, so a
 //     fresh Dynamax with no Guard or Spirit value still passes
 //   - shiny / background legendaries are one OR-clause each: ¬(A ∩ L) = ¬A ∪ ¬L
-export function protectionTail(kw, cfg) {
-	const clauses = [
-		`!${kw.flag.favorite}`,
-		'!#',
-		'!4*',
-		`1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`,
-	];
+//   - the legacy-move clause is the trash's shape (legacyMovesClause): keep
+//     `@special` unless it is purified Return, a shadow's Frustration or a
+//     Smeargle, whose Sketched moves all carry the flag
+export function protectionTail(kw, cfg, { mythCarve = [], smeargle } = {}) {
+	const clauses = [`!${kw.flag.favorite}`, '!#', '!4*'];
+	if (cfg.protectNundos) clauses.push(`1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`);
 	// The year floor's value, not its trash toggle (protectLuckyEligible): the
-	// tail ignores the toggles, and step ③'s hint calls lucky-trade stock
+	// tail ignores that toggle, and step ③'s hint calls lucky-trade stock
 	// always protected. A year of 0 means the user set no floor at all.
 	if (cfg.luckyEligibleYear > 0) {
 		// Traded ones can't be traded again, so they are no lucky-trade stock.
 		clauses.push(`${kw.numeric.year}${cfg.luckyEligibleYear}-,${kw.flag.traded}`);
 	}
+	const carve = mythCarve.filter(Boolean).join(',');
 	clauses.push(
 		`!${kw.flag.dynamax_move}2-`,
 		`!${kw.flag.dynamax_wall}1-`,
 		`!${kw.flag.dynamax_spirit}1-`,
 		`!${kw.numeric.buddy}2-`,
-		`!${kw.flag.mythical}`,
+		carve ? `!${kw.flag.mythical},${carve}` : `!${kw.flag.mythical}`,
 		`!${kw.flag.shiny},!${kw.flag.legendary}`,
 		`!${kw.flag.background},!${kw.flag.legendary}`,
+		`!@${kw.flag.special_move},@${kw.flag.return},@${kw.flag.frustration}${smeargle ? `,${smeargle}` : ''}`,
 	);
 	return clauses;
 }
 
-// One sorting pile in the spec's three steps. `head` is the pile itself, a
-// CNF chain (`+a,+b` or `+a&!+a,alola`); each ① lens is ANDed onto it, as are
-// ② (not starred, not tagged) and ③ (the protection tail). Every pile goes
-// through here, so all of them share one shape and scripts/check-piles.mjs can
-// hold them all to it.
-//   lenses: [{ key, filter, text? }] where `filter` is a CNF chain (may hold
-//   `&`) and `text` ([label, hint, params]) names a lens the pile's wording
-//   table can't know in advance, such as one per active GBL cup
 // How many Pokémon each job holds per species (docs/sorting-workflow-spec.md,
 // "Budgets (defaults)"). The pile card reads these; expert mode edits them.
 export const BUDGET_DEFAULTS = {
@@ -2146,7 +2151,17 @@ export const COMMUNITY_DAY_DEX = [
 	...new Set([...(COMMUNITY_DAYS.legacy || []), ...(COMMUNITY_DAYS.rolling || [])].flatMap((cd) => cd.dex)),
 ].sort((a, b) => a - b);
 
-export function buildPile({ id, head, lenses = [], kw, cfg }) {
+// One sorting pile in the spec's three steps. `head` is the pile itself, a
+// CNF chain (`+a,+b` or `+a&!+a,alola`); each ① lens is ANDed onto it, as are
+// ② (not starred, not tagged) and ③ (the protection tail). Every pile goes
+// through here, so all of them share one shape and scripts/check-piles.mjs can
+// hold them all to it.
+//   lenses: [{ key, filter, text? }] where `filter` is a CNF chain (may hold
+//   `&`) and `text` ([label, hint, params]) names a lens the pile's wording
+//   table can't know in advance, such as one per active GBL cup
+//   tail: protectionTail's options ({ mythCarve, smeargle }), resolved once
+//   per buildFilters call so every pile carves the same mythicals
+export function buildPile({ id, head, lenses = [], kw, cfg, tail = {} }) {
 	if (!head) return null;
 	return {
 		id,
@@ -2155,7 +2170,7 @@ export function buildPile({ id, head, lenses = [], kw, cfg }) {
 			.filter((l) => l.filter)
 			.map((l) => ({ key: l.key, filter: `${head}&${l.filter}`, ...(l.text ? { text: l.text } : {}) })),
 		sort: `${head}&!${kw.flag.favorite}&!#`,
-		release: `${head}&${protectionTail(kw, cfg).join('&')}`,
+		release: `${head}&${protectionTail(kw, cfg, tail).join('&')}`,
 	};
 }
 
@@ -2435,6 +2450,11 @@ export function buildFilters(
 	// still-Frustration shadows. protectSmeargleLegacy (default false) keeps
 	// regular Smeargles releasable/tradeable.
 	const smeargleName = pokemonNameFor('235', outputLocale)?.toLowerCase() || 'smeargle';
+	// The mythicals carved out of `!mythical`, in the output locale, resolved
+	// once: the trash and every pile's protection tail read this one list.
+	const mythCarve = (cfg.mythTooManyOf || []).map((s) => speciesForOutput(s, outputLocale)).filter(Boolean);
+	// What every buildPile call hands protectionTail (see its comment).
+	const pileTail = { mythCarve, smeargle: smeargleName };
 	const legacyMovesClause = () => {
 		const suffix = `,@${kw.flag.return},@${kw.flag.frustration}`;
 		return cfg.protectSmeargleLegacy
@@ -2517,10 +2537,7 @@ export function buildFilters(
 	if (cfg.protectShinies) push(trashClauses, `!${kw.flag.shiny}`, tFn('app.clause_why.shinies'));
 	if (cfg.protectLegendaries) push(trashClauses, `!${kw.flag.legendary}`, tFn('app.clause_why.legendaries'));
 	if (cfg.protectMythicals) {
-		const carve = (cfg.mythTooManyOf || [])
-			.map((s) => speciesForOutput(s, outputLocale))
-			.filter(Boolean)
-			.join(',');
+		const carve = mythCarve.join(',');
 		push(
 			trashClauses,
 			carve ? `!${kw.flag.mythical},${carve}` : `!${kw.flag.mythical}`,
@@ -3185,6 +3202,7 @@ export function buildFilters(
 		],
 		kw,
 		cfg,
+		tail: pileTail,
 	});
 
 	// ── LUCKY-SORT ─────────────────────────────────────────────────────────
@@ -4513,6 +4531,7 @@ export function buildFilters(
 				],
 				kw,
 				cfg,
+				tail: pileTail,
 			});
 			return {
 				id: ev.id,
@@ -5073,6 +5092,7 @@ export function buildFilters(
 			],
 			kw,
 			cfg,
+			tail: pileTail,
 		}),
 		// Shadows. Never cleared by switching off shadow protection: the keepers
 		// are tagged here and ③ takes the rest. Attack matters most on a shadow.
@@ -5092,6 +5112,7 @@ export function buildFilters(
 			],
 			kw,
 			cfg,
+			tail: pileTail,
 		}),
 		// Received trades can't be traded again, so they are never tradebait. A
 		// trade re-rolls IVs, which makes the PvP step worth having here.
@@ -5109,6 +5130,7 @@ export function buildFilters(
 			],
 			kw,
 			cfg,
+			tail: pileTail,
 		}),
 		buildPile({
 			id: 'luckies',
@@ -5116,6 +5138,7 @@ export function buildFilters(
 			lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep],
 			kw,
 			cfg,
+			tail: pileTail,
 		}),
 		// Everything that can evolve right now: new Pokédex entries best first,
 		// then the ones already tagged to evolve through.
@@ -5128,6 +5151,7 @@ export function buildFilters(
 			],
 			kw,
 			cfg,
+			tail: pileTail,
 		}),
 		// Dynamax-capable through the levelled Max-move token: bare `dynamax` is
 		// a search shortcut that silently drops the rest of the string.
@@ -5141,15 +5165,16 @@ export function buildFilters(
 			],
 			kw,
 			cfg,
+			tail: pileTail,
 		}),
 		// XXL: the showcase verdict is the calculator under the steps.
-		buildPile({ id: 'xxl', head: kw.flag.xxl, lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep], kw, cfg }),
-		buildPile({ id: 'xxs', head: kw.flag.xxs, lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep], kw, cfg }),
-		buildPile({ id: 'backgrounds', head: kw.flag.background, lenses: ivLadder(), kw, cfg }),
+		buildPile({ id: 'xxl', head: kw.flag.xxl, lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep], kw, cfg, tail: pileTail }),
+		buildPile({ id: 'xxs', head: kw.flag.xxs, lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep], kw, cfg, tail: pileTail }),
+		buildPile({ id: 'backgrounds', head: kw.flag.background, lenses: ivLadder(), kw, cfg, tail: pileTail }),
 		// Costumes split by whether the line can still evolve: one per stage for
 		// those, one for the rest (the costume budget either way).
-		buildPile({ id: 'costumes_evolve', head: `${kw.flag.costume}&${kw.flag.evolvable}`, lenses: ivLadder(), kw, cfg }),
-		buildPile({ id: 'costumes_final', head: `${kw.flag.costume}&!${kw.flag.evolvable}`, lenses: ivLadder(), kw, cfg }),
+		buildPile({ id: 'costumes_evolve', head: `${kw.flag.costume}&${kw.flag.evolvable}`, lenses: ivLadder(), kw, cfg, tail: pileTail }),
+		buildPile({ id: 'costumes_final', head: `${kw.flag.costume}&!${kw.flag.evolvable}`, lenses: ivLadder(), kw, cfg, tail: pileTail }),
 		// Community Days leave hundreds of one species behind, shinies and
 		// backgrounds among them: every Community Day species, all days at once,
 		// so old ones can be gone through too. Backgrounds get their own step
@@ -5169,10 +5194,11 @@ export function buildFilters(
 			],
 			kw,
 			cfg,
+			tail: pileTail,
 		}),
 		// Legendaries and Ultra Beasts, wherever one came from (raid, research,
 		// GBL): keep the good ones.
-		buildPile({ id: 'legendaries', head: `${kw.flag.legendary},${kw.flag.ultra_beast}`, lenses: ivLadder(), kw, cfg }),
+		buildPile({ id: 'legendaries', head: `${kw.flag.legendary},${kw.flag.ultra_beast}`, lenses: ivLadder(), kw, cfg, tail: pileTail }),
 	].filter(Boolean);
 	// Filters that belong with a pile but aren't keep steps: cheap purify stock
 	// (common 1 km-candy shadows, never meta), which shadows to Charge-TM, and
@@ -5291,6 +5317,7 @@ export function buildFilters(
 		lenses: [...ivLadder(), ...pvpLoose],
 		kw,
 		cfg,
+		tail: pileTail,
 	});
 	// Everything else, as one De Morgan chain: not any meta or watchlist family.
 	const nonMetaPile = buildPile({
@@ -5299,6 +5326,7 @@ export function buildFilters(
 		lenses: [...ivLadder(), ...pvpLoose],
 		kw,
 		cfg,
+		tail: pileTail,
 	});
 	sortingPiles.splice(1, 0, ...[watchPile, nonMetaPile].filter(Boolean));
 

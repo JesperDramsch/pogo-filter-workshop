@@ -66,9 +66,9 @@ import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import META_RANKINGS from "../src/data/meta-rankings.json";
 import { buildDataFilters, buildResult, FIXTURE_CONFIG, makeTFn } from "./lib/fixture.mjs";
 import {
-  bossBoxKeys, bossCounterLabel, candyFamilyNames, evalFilterDetailed, protectionTail,
+  bossBoxKeys, bossCounterLabel, buildFilters, candyFamilyNames, DEFAULT_HUNDOS, DEFAULT_LUCKIES, evalFilterDetailed, protectionTail,
 } from "../src/App.jsx";
-import { PILE_DEX, PILE_SPECIES, pileCases, pileMon } from "./lib/pile-cases.mjs";
+import { PILE_DEX, PILE_SPECIES, pileCases, pileMon, tailOptions } from "./lib/pile-cases.mjs";
 import { LOCALES } from "../src/i18n/index.js";
 import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
 // `resolveSpecies` is D7's; the dictionary and locale list are D6's. D6 no
@@ -1643,34 +1643,41 @@ console.log("D18 — step ③ of a pile is the pile and the protection tail, and
 {
   // A synthetic one-species pile stands in when today's snapshot has no
   // events, so the property cannot pass by having nothing to check. The real
-  // event piles are held to the same composition: fams & tail, exactly.
-  const { PROTECTED, RELEASABLE } = pileCases(FIXTURE_CONFIG);
-  for (const loc of localeNames) {
-    const kw = pogoKeywords(loc);
-    const tail = protectionTail(kw, FIXTURE_CONFIG);
-    const result = buildResult(loc);
-    const bad = [];
-    const trash = result.trash;
-    for (const ev of result.eventFilters || []) {
-      if (ev.release !== `${ev.overview}&${tail.join("&")}`) bad.push(`${ev.id}: release is not overview & tail`);
-      if (trash && ev.release.includes(trash)) bad.push(`${ev.id}: release still carries the trash filter`);
+  // event piles are held to the same composition: fams & tail, exactly. The
+  // tail reads protectNundos and mythTooManyOf, so the synthetic pile runs
+  // under the fixture config and under one that flips both.
+  const ALT_CONFIG = { ...FIXTURE_CONFIG, protectNundos: true, mythTooManyOf: ["Darkrai"] };
+  for (const [cfgName, cfg] of [["fixture config", FIXTURE_CONFIG], ["nundos protected, Darkrai carved", ALT_CONFIG]]) {
+    const { PROTECTED, RELEASABLE } = pileCases(cfg);
+    for (const loc of localeNames) {
+      const kw = pogoKeywords(loc);
+      const tail = protectionTail(kw, cfg, tailOptions(cfg, loc));
+      const result = cfg === FIXTURE_CONFIG
+        ? buildResult(loc)
+        : buildFilters(DEFAULT_HUNDOS, DEFAULT_LUCKIES, cfg, [], loc, makeTFn(loc));
+      const bad = [];
+      const trash = result.trash;
+      for (const ev of result.eventFilters || []) {
+        if (ev.release !== `${ev.overview}&${tail.join("&")}`) bad.push(`${ev.id}: release is not overview & tail`);
+        if (trash && ev.release.includes(trash)) bad.push(`${ev.id}: release still carries the trash filter`);
+      }
+      const pile = candyFamilyNames(PILE_SPECIES, loc).length > 0
+        ? `+${pokemonNameFor(String(PILE_DEX), loc)}&${tail.join("&")}` : "";
+      if (!pile) bad.push("no localised pile species");
+      const verdict = (o) => evalFilterDetailed(pile, pileMon(loc, o), loc);
+      for (const [label, o] of PROTECTED) {
+        const v = verdict(o);
+        if (v.verdict !== false) bad.push(`${label}: verdict ${v.verdict}${v.unknown.length ? ` (unknown ${v.unknown.join(" ")})` : ""}`);
+      }
+      for (const [label, o] of RELEASABLE) {
+        const v = verdict(o);
+        if (v.verdict !== true) bad.push(`${label} not released: verdict ${v.verdict}${v.unknown.length ? ` (unknown ${v.unknown.join(" ")})` : ""}`);
+      }
+      // A Pokémon outside the pile is never in its step ③.
+      if (verdict({ families: ["notinthepile"] }).verdict !== false) bad.push("a Pokémon outside the pile matched");
+      check(`${loc} (${cfgName}): ${(result.eventFilters || []).length} event pile(s) + 1 synthetic; ${PROTECTED.length} protected kinds held, ${RELEASABLE.length} releasable kinds shown`,
+        bad.length === 0, bad.slice(0, 4).join(" | "));
     }
-    const pile = candyFamilyNames(PILE_SPECIES, loc).length > 0
-      ? `+${pokemonNameFor(String(PILE_DEX), loc)}&${tail.join("&")}` : "";
-    if (!pile) bad.push("no localised pile species");
-    const verdict = (o) => evalFilterDetailed(pile, pileMon(loc, o), loc);
-    for (const [label, o] of PROTECTED) {
-      const v = verdict(o);
-      if (v.verdict !== false) bad.push(`${label}: verdict ${v.verdict}${v.unknown.length ? ` (unknown ${v.unknown.join(" ")})` : ""}`);
-    }
-    for (const [label, o] of RELEASABLE) {
-      const v = verdict(o);
-      if (v.verdict !== true) bad.push(`${label} not released: verdict ${v.verdict}${v.unknown.length ? ` (unknown ${v.unknown.join(" ")})` : ""}`);
-    }
-    // A Pokémon outside the pile is never in its step ③.
-    if (verdict({ families: ["notinthepile"] }).verdict !== false) bad.push("a Pokémon outside the pile matched");
-    check(`${loc}: ${(result.eventFilters || []).length} event pile(s) + 1 synthetic; ${PROTECTED.length} protected kinds held, ${RELEASABLE.length} releasable kinds shown`,
-      bad.length === 0, bad.slice(0, 4).join(" | "));
   }
 }
 

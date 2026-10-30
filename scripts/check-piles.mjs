@@ -6,7 +6,9 @@
 //        starred and tagged, ③ is the pile AND the protection tail, exactly
 //   P2 — every step is well formed and fits the in-game search bar
 //   P3 — ③ gives a definite "no" for every always-protected kind and still
-//        shows what ① and ② leave to the user (scripts/lib/pile-cases.mjs)
+//        shows what ① and ② leave to the user (scripts/lib/pile-cases.mjs),
+//        under the default config and under one that protects nundos and
+//        carves a mythical out (the two settings the tail reads)
 //   P4 — ② hides starred and tagged Pokémon and shows the rest
 //   P5 — no step of a pile ever matches a Pokémon outside the pile
 //   P6 — each lens finds what it names (the hundo lens finds hundos only)
@@ -38,7 +40,7 @@ import { LOCALES } from "../src/i18n/index.js";
 import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
 import { pokemonNameFor } from "../src/data/species.js";
 import { FIXTURE_CONFIG, makeTFn } from "./lib/fixture.mjs";
-import { pileCases, pileMon } from "./lib/pile-cases.mjs";
+import { pileCases, pileMon, tailOptions } from "./lib/pile-cases.mjs";
 import { hasCostumedSpawns, signalsFromFeed } from "./fetch-events.mjs";
 import { acceptPveDump, learnersOf, watchMovesFrom } from "./fetch-game-master-watch.mjs";
 import GM_WATCH from "../src/data/game-master-watch.json";
@@ -256,19 +258,25 @@ const PILE_FAMILIES = [
 ];
 
 const BAD = [/undefined/, /NaN/, /\[object /, /&&|,,/, /^[&,]|[&,]$/, /!!/];
-const { PROTECTED, RELEASABLE } = pileCases(CFG);
+// The tail reads protectNundos and mythTooManyOf; P3 runs under the default
+// config and under the one that flips both, so a nundo is held on one side
+// and shown on the other, and the carved mythical is shown.
+const ALT_CFG = { ...CFG, protectNundos: true, mythTooManyOf: ["Darkrai"] };
+const P3_CONFIGS = [["default", CFG, pileCases(CFG)], ["nundos protected, Darkrai carved", ALT_CFG, pileCases(ALT_CFG)]];
 const localeNames = Object.keys(LOCALES);
 
 for (const fam of PILE_FAMILIES) {
   console.log(`\n${fam.name}`);
   for (const loc of localeNames) {
     const kw = pogoKeywords(loc);
-    const tail = protectionTail(kw, CFG).join("&");
+    const tail = protectionTail(kw, CFG, tailOptions(CFG, loc)).join("&");
     const result = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc));
     const cases = fam.lensCases?.(kw) || {};
     const entries = fam.piles(result).filter((e) => e.pile);
     const bad = [];
     if (entries.length === 0) bad.push("no pile built");
+    // The same piles under the alternate config, by id, for P3.
+    const altPiles = new Map(fam.piles(buildFilters(HUNDOS, LUCKIES, ALT_CFG, [], loc, makeTFn(loc))).filter((e) => e.pile).map((e) => [e.pile.id, e.pile]));
     for (const { pile, dex } of entries) {
       const where = pile.id;
       const head = pile.overview;
@@ -289,15 +297,20 @@ for (const fam of PILE_FAMILIES) {
       const verdict = (str, o, d) => evalFilterDetailed(str, monOf(o, d), loc);
       const note = (v) => (v.unknown.length ? ` (unknown ${v.unknown.join(" ")})` : "");
       // P3
-      for (const [label, o] of PROTECTED) {
-        if (fam.skipProtected?.test(label)) continue;
-        const v = verdict(pile.release, o);
-        if (v.verdict !== false) bad.push(`${where} ③ ${label}: ${v.verdict}${note(v)}`);
-      }
-      for (const [label, o] of RELEASABLE) {
-        if (fam.skipReleasable?.test(label)) continue;
-        const v = verdict(pile.release, o);
-        if (v.verdict !== true) bad.push(`${where} ③ ${label} hidden: ${v.verdict}${note(v)}`);
+      for (const [cfgName, cfg, { PROTECTED, RELEASABLE }] of P3_CONFIGS) {
+        const release = cfg === CFG ? pile.release : altPiles.get(pile.id)?.release;
+        if (!release) { bad.push(`${where}: no pile under ${cfgName}`); continue; }
+        if (release !== `${head}&${protectionTail(kw, cfg, tailOptions(cfg, loc)).join("&")}`) bad.push(`${where} (${cfgName}): ③ is not head & tail`);
+        for (const [label, o] of PROTECTED) {
+          if (fam.skipProtected?.test(label)) continue;
+          const v = verdict(release, o);
+          if (v.verdict !== false) bad.push(`${where} ③ (${cfgName}) ${label}: ${v.verdict}${note(v)}`);
+        }
+        for (const [label, o] of RELEASABLE) {
+          if (fam.skipReleasable?.test(label)) continue;
+          const v = verdict(release, o);
+          if (v.verdict !== true) bad.push(`${where} ③ (${cfgName}) ${label} hidden: ${v.verdict}${note(v)}`);
+        }
       }
       // P4
       for (const [label, o, want] of [["starred", { flags: { favorite: true } }, false], ["tagged", { tags: ["Trade"] }, false], ["plain", {}, true]]) {
@@ -351,15 +364,46 @@ for (const fam of PILE_FAMILIES) {
   }
 }
 
-console.log("\nThe tail ignores the trash toggles");
+console.log("\nThe tail reads exactly protectNundos and mythTooManyOf");
 {
   const kw = pogoKeywords("en");
-  const on = protectionTail(kw, { ...CFG, protectLuckyEligible: true, protectNundos: false, protectBuddies: false });
-  const off = protectionTail(kw, { ...CFG, protectLuckyEligible: false, protectNundos: true, protectBuddies: true });
-  check("switching trash protections on or off leaves the tail as it is (lucky-trade floor included)",
-    JSON.stringify(on) === JSON.stringify(off) && on.some((c) => c.startsWith(`${kw.numeric.year}`)), off.join("&"));
+  const tailOf = (cfg, loc = "en") => protectionTail(pogoKeywords(loc), cfg, tailOptions(cfg, loc));
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  const nundoClause = `1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`;
+  const on = tailOf({ ...CFG, protectNundos: true });
+  const off = tailOf({ ...CFG, protectNundos: false });
+  check("protectNundos on adds the nundo clause, off drops it, and nothing else moves",
+    on.includes(nundoClause) && !off.includes(nundoClause) && same(on.filter((c) => c !== nundoClause), off), off.join("&"));
+  check("the shipped default protects no nundo (protectNundos is off)", !CFG.protectNundos && !tailOf(CFG).includes(nundoClause));
+  // The trash toggles still leave the tail as it is (lucky-trade floor included).
+  const toggles = { protectLuckyEligible: true, protectBuddies: false, protectLegacyMoves: false, protectSmeargleLegacy: true, protectMythicals: false, protectShinies: false };
+  const flipped = Object.fromEntries(Object.entries(toggles).map(([k, v]) => [k, !v]));
+  check("switching the other trash protections on or off leaves the tail as it is (lucky-trade floor included)",
+    same(tailOf({ ...CFG, ...toggles }), tailOf({ ...CFG, ...flipped })) && tailOf({ ...CFG, ...toggles }).some((c) => c.startsWith(`${kw.numeric.year}`)));
   // Custom collectibles stay out of the tail (Jesper's call): sorting offers
   // them in ③ like any other species; favourite or tag the ones to keep.
+  check("custom collectibles add nothing to the tail", same(tailOf({ ...CFG, customCollectibles: ["Spinda"] }), tailOf(CFG)));
+  check("only a year floor of 0 drops the lucky-trade clause",
+    !tailOf({ ...CFG, luckyEligibleYear: 0 }).some((c) => c.startsWith(`${kw.numeric.year}`)));
+  // The mythical carve: `!mythical,<name>` in the output locale, as the trash
+  // spells it; an empty carve is the bare `!mythical`.
+  for (const loc of localeNames) {
+    const lkw = pogoKeywords(loc);
+    const name = pokemonNameFor("809", loc)?.toLowerCase();
+    const carved = tailOf({ ...CFG, mythTooManyOf: ["Melmetal"] }, loc);
+    const bare = tailOf({ ...CFG, mythTooManyOf: [] }, loc);
+    check(`${loc}: mythTooManyOf Melmetal carves \`!${lkw.flag.mythical},${name}\` out of the tail, an empty list leaves \`!${lkw.flag.mythical}\``,
+      !!name && carved.includes(`!${lkw.flag.mythical},${name}`) && bare.includes(`!${lkw.flag.mythical}`) && !bare.some((c) => c.startsWith(`!${lkw.flag.mythical},`))
+      && same(carved.filter((c) => !c.startsWith(`!${lkw.flag.mythical}`)), bare.filter((c) => !c.startsWith(`!${lkw.flag.mythical}`))),
+      carved.find((c) => c.startsWith(`!${lkw.flag.mythical}`)));
+    // The legacy-move clause: a Pokémon with a legacy move is held, a Smeargle
+    // (every Sketched move carries the flag) is shown, whatever the trash's
+    // own Smeargle toggle says.
+    const tail = tailOf({ ...CFG, protectSmeargleLegacy: true }, loc).join("&");
+    const held = evalFilterDetailed(tail, pileMon(loc, { moves: [], flags: { legacyMove: true } }), loc);
+    const smeargle = evalFilterDetailed(tail, pileMon(loc, { moves: [], flags: { legacyMove: true } }, "Smeargle", 235), loc);
+    check(`${loc}: the tail holds a legacy move and shows a Smeargle with one`, held.verdict === false && smeargle.verdict === true, `held ${held.verdict}, smeargle ${smeargle.verdict}`);
+  }
   // The legendaries pile takes Ultra Beasts too; a plain species stays out.
   for (const loc of localeNames) {
     const pile = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc)).sortingPiles.find((p) => p.id === "legendaries");
@@ -367,10 +411,6 @@ console.log("\nThe tail ignores the trash toggles");
     const plain = evalFilterDetailed(pile.overview, pileMon(loc, {}, "Magikarp", 129), loc).verdict;
     check(`${loc}: an Ultra Beast is in the legendaries pile, a plain species is not`, ub === true && plain === false, `ub ${ub}, plain ${plain}`);
   }
-  check("custom collectibles add nothing to the tail",
-    JSON.stringify(protectionTail(kw, { ...CFG, customCollectibles: ["Spinda"] })) === JSON.stringify(protectionTail(kw, CFG)));
-  check("only a year floor of 0 drops the lucky-trade clause",
-    !protectionTail(kw, { ...CFG, luckyEligibleYear: 0 }).some((c) => c.startsWith(`${kw.numeric.year}`)));
 }
 
 console.log("\nP7 — the pile card");

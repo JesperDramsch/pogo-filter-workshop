@@ -2,7 +2,9 @@
 
 One row per Sorting pile: the question you're asking when you open it, and
 the ① keep steps. Read the steps top to bottom and stop once you have enough.
-③ (pile & protection tail) stays the same everywhere.
+③ (pile & protection tail) has the same shape everywhere; the tail reads two
+settings, protect nundos and the mythicals you have too many of, and nothing
+else (docs/sorting-workflow-spec.md, "Protection tail").
 
 ## Building blocks
 
@@ -24,7 +26,11 @@ Correction: the protection tail does **not** keep plain shinies, costumes or
 backgrounds out of ③. It only protects shiny legendaries and legendaries with
 a background. A shiny that isn't favourited or tagged shows up in ③.
 Your custom collectibles aren't in the tail either: sorting offers them in
-③ like any other species, so favourite or tag the ones you keep.
+③ like any other species, so favourite or tag the ones you keep. Two
+settings do reach the tail: a nundo is protected only while protect nundos
+is on, and a mythical you listed under "too many of" is a spare and shows up
+in ③. Legacy moves are protected in every pile (a Smeargle's Sketched moves
+don't count), whatever the trash's own toggles say.
 
 Rule: a step must be able to find something no earlier step found. A
 narrower copy of an earlier step gets cut. `4*` sits inside `3-4`, so `4*`

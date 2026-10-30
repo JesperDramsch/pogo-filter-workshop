@@ -52,22 +52,25 @@ Every pile has the same three steps. The event wild-spawn card already uses this
 
 Hides everything that is always protected. Built from `src/i18n/pogo-keywords.js` tokens like every other clause; the German forms below are for reading only.
 
+The tail is one fixed string per pile. It reads exactly two settings, protect nundos and the mythicals you have too many of (`protectNundos`, `mythTooManyOf`), plus the value of the lucky-trade year floor. Every other trash toggle (buddies, legacy moves, the Smeargle exception, shinies and the rest) leaves it as it is: switching a protection off to clear a category is what steps ① and ② replace.
+
 | Protected | German form |
 | --- | --- |
 | Favourites | `!favorit` |
 | Any tag | `!#` |
 | Hundos | `!4*` |
-| Nundos (0/0/0) | `1-4angriffs-wert,1-4verteidigungs-wert,1-4kp` (one clause; PoGo ignores `!N` on IV tokens, so the positive form) |
+| Nundos (0/0/0), only when protect nundos is on | `1-4angriffs-wert,1-4verteidigungs-wert,1-4kp` (one clause; PoGo ignores `!N` on IV tokens, so the positive form) |
 | Guaranteed lucky-trade stock (existing year-floor setting, currently caught in 2020 or earlier) | `jahr21-,getauscht` (a traded one can't be traded again, so it is no stock) |
 | Invested Dynamax | `!dynaattacke2-&!dynawall1-&!dynakampfgeist1-` |
 | Buddies at Good level or higher | `!kumpel2-` |
-| Mythicals | `!mysteriös` |
+| Mythicals, except the ones you have too many of | `!mysteriös`, or `!mysteriös,darkrai` with a carve (the same clause the trash emits; a listed species is a spare and shows in ③) |
 | Shiny legendaries | `!schillernd,!legendär` (one clause) |
 | Legendaries with a background | `!hintergrund,!legendär` (one clause) |
+| Legacy moves | `!@spezial,@rückkehr,@frustration,farbeagle` (one clause, the trash's shape: a purified Return, a shadow's Frustration and a Smeargle, whose Sketched moves all carry the flag, are not legacy; Smeargle via `pokemonNameFor('235')`) |
 
 The range-negation forms are deliberate: `!dynawall1-` matches a Pokémon with no Wall value at all, which is the wanted direction (see the range-versus-negation note in the filter skill).
 
-**Property check to add** (in `scripts/check-*.mjs`): step ③ of every pile never matches a Pokémon that is starred, tagged, a hundo, a nundo, inside the year floor, invested Dynamax, a Good buddy, mythical, a shiny legendary or a legendary with a background.
+**Property check** (`scripts/check-piles.mjs` P3, `scripts/check-data-filters.mjs` D18, cases in `scripts/lib/pile-cases.mjs`): step ③ of every pile never matches a Pokémon that is starred, tagged, a hundo, a nundo (when protected), inside the year floor, invested Dynamax, a Good buddy, mythical (unless carved out), carrying a legacy move, a shiny legendary or a legendary with a background; it runs under the default config and under one with nundos protected and a mythical carved out. A further section holds the tail to those two settings: flipping any other trash toggle changes nothing.
 
 ### Pile card
 
