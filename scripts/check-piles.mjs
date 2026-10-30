@@ -31,7 +31,7 @@ import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import COMMUNITY_DAYS from "../src/data/community-days.json";
 import SPECIES_META from "../src/data/species-meta.json";
 import {
-  LEGACY_COMMUNITY_DAYS, LEGACY_THROUGH, communityDayBackgroundDex, mergeRollingCommunityDays,
+  LEGACY_COMMUNITY_DAYS, LEGACY_THROUGH, communityDayBackgroundDex, communityDaysFromFeed, mergeRollingCommunityDays,
 } from "./lib/community-days.mjs";
 import { resolveSpeciesInfo } from "../src/data/species.js";
 import { LOCALES } from "../src/i18n/index.js";
@@ -600,6 +600,32 @@ console.log("\nCommunity Day data (scripts/lib/community-days.mjs → src/data/c
   check("merge keeps every previous entry, adds a new one once, skips what legacy already pins",
     rolling.length === 2 && added.length === 1 && added[0].date === "2026-12-12" && rolling[0].event === "Pawniard Community Day");
   check("an empty feed drops nothing", mergeRollingCommunityDays(prev, []).rolling.length === 1);
+  // A day goes in only when every featured name resolves; otherwise it is held
+  // back for the fetcher to fail the sync on, and added in full later.
+  const known = { pawniard: 624, deino: 633, gible: 443 };
+  const resolve = (featured) => {
+    const names = featured.map((f) => (typeof f === "string" ? f : f.name));
+    return {
+      spawnDex: names.map((n) => known[n.toLowerCase()]).filter(Boolean),
+      unresolved: names.filter((n) => !known[n.toLowerCase()]),
+    };
+  };
+  const day = (title, features) => ({ title, start_time: "2026-12-12T14:00:00", details: { features } });
+  const { days, unresolved } = communityDaysFromFeed({
+    "Community Day": [
+      day("Pawniard Community Day", [{ name: "Pawniard" }]),
+      day("December Community Day 2026", [{ name: "Deino" }, { name: "Newmon" }]),
+      day("Mystery Community Day", []),
+    ],
+    Event: [day("Spotlight Hour", [{ name: "Gible" }])],
+  }, resolve);
+  check("a fully resolved Community Day is added", days.length === 1 && days[0].dex[0] === 624);
+  check("a half-resolved day is held back with its unresolved names, not added half",
+    unresolved.some((cd) => cd.event === "December Community Day 2026" && cd.names.join() === "Newmon") &&
+    !days.some((cd) => cd.event === "December Community Day 2026"));
+  check("a day listing no featured Pokémon is held back too",
+    unresolved.some((cd) => cd.event === "Mystery Community Day" && cd.names.length === 0));
+  check("events not named as a Community Day are ignored", !days.concat(unresolved).some((cd) => cd.event === "Spotlight Hour"));
 }
 
 console.log("\nEvery pile's wording exists in every locale");

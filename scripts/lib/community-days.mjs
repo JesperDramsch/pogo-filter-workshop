@@ -80,8 +80,15 @@ const keyOf = (cd) => `${cd.date}|${cd.event.toLowerCase()}`;
 // The Community Days in a leak-duck feed (category-keyed object), each
 // resolved with `resolveSpawns` (the events fetcher's name → dex resolver).
 // A Community Day is named as one; Spotlight Hours and the like are not.
+//
+// Returns { days, unresolved }. A day goes in `days` only when every featured
+// name resolved: the list is append-only by date and title, so a day added
+// half-resolved would stay half-resolved. One with any unresolved name, or
+// none listed, goes in `unresolved` instead, and the fetcher fails the sync
+// on it; the day is added in full once its names resolve.
 export function communityDaysFromFeed(feed, resolveSpawns) {
-  const out = [];
+  const days = [];
+  const unresolved = [];
   for (const list of Object.values(feed || {})) {
     if (!Array.isArray(list)) continue;
     for (const ev of list) {
@@ -89,12 +96,15 @@ export function communityDaysFromFeed(feed, resolveSpawns) {
       const date = String(ev.start_time || "").slice(0, 10);
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
       const featured = ev.details?.features?.length ? ev.details.features : ev.details?.spawns || [];
-      const { spawnDex } = resolveSpawns(featured);
-      if (spawnDex.length === 0) continue;
-      out.push({ date, event: ev.title, dex: spawnDex, background: null, source: "leak-duck" });
+      const { spawnDex, unresolved: names = [] } = resolveSpawns(featured);
+      if (spawnDex.length === 0 || names.length > 0) {
+        unresolved.push({ date, event: ev.title, names: featured.length ? names : [] });
+        continue;
+      }
+      days.push({ date, event: ev.title, dex: spawnDex, background: null, source: "leak-duck" });
     }
   }
-  return out;
+  return { days, unresolved };
 }
 
 // Append-only: every previous rolling entry stays, a fresh one is added once,

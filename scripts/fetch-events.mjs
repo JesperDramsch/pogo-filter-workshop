@@ -44,7 +44,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
 import { outsideWindow, carryOver } from "./lib/event-window.mjs";
-import { LEGACY_COMMUNITY_DAYS, communityDaysFromFeed, mergeRollingCommunityDays } from "./lib/community-days.mjs";
+import { LEGACY_COMMUNITY_DAYS, LEGACY_THROUGH, communityDaysFromFeed, mergeRollingCommunityDays } from "./lib/community-days.mjs";
 import { isTakeoverEvent } from "./lib/rocket-takeover.mjs";
 import { fetchGameMaster, mechanicsBatchFloor, warnIfStale } from "./lib/game-master.mjs";
 import { buildNameIndex as buildFormIndex, resolveBossKey } from "./fetch-raid-bosses.mjs";
@@ -259,7 +259,7 @@ export function signalsFromFeed(feed) {
 // list shorter than the one on disk.
 function writeCommunityDays(feed, nameIdx) {
   const previous = readPreviousJson(CD_PATH);
-  const fresh = communityDaysFromFeed(feed, (spawns) => resolveSpawns(spawns, nameIdx));
+  const { days: fresh, unresolved } = communityDaysFromFeed(feed, (spawns) => resolveSpawns(spawns, nameIdx));
   const { rolling, added } = mergeRollingCommunityDays(previous?.rolling || [], fresh);
   if (rolling.length < (previous?.rolling?.length || 0)) {
     throw new Error("community days: rolling list would shrink — refusing to overwrite cache");
@@ -271,6 +271,10 @@ function writeCommunityDays(feed, nameIdx) {
   writeJson(CD_PATH, { fetchedAt: unchanged ? previous.fetchedAt : new Date().toISOString(), ...content });
   for (const cd of added) console.log(`  + Community Day ${cd.date} ${cd.event} (${cd.dex.join(", ")})`);
   console.log(`✓ wrote ${CD_PATH} (${LEGACY_COMMUNITY_DAYS.length} legacy · ${rolling.length} rolling${unchanged ? ", unchanged" : ""})`);
+  // Only days not already pinned or listed count: the feed keeps showing a
+  // day until it ends, and one already in the list needs nothing more.
+  const known = new Set([...LEGACY_COMMUNITY_DAYS, ...rolling].map((cd) => `${cd.date}|${cd.event.toLowerCase()}`));
+  return unresolved.filter((cd) => cd.date > LEGACY_THROUGH && !known.has(`${cd.date}|${cd.event.toLowerCase()}`));
 }
 
 async function main() {
@@ -297,7 +301,10 @@ async function main() {
   const namesDict = JSON.parse(readFileSync(NAMES_PATH, "utf8"));
   const nameIdx = buildNameIndex(namesDict);
 
-  writeCommunityDays(feed, nameIdx);
+  // A Community Day whose featured names don't all resolve is held back (see
+  // communityDaysFromFeed). The rest of the sync still writes; the run fails
+  // at the end so the gap is seen the same day.
+  const heldBack = writeCommunityDays(feed, nameIdx);
 
   const now = Date.now();
   const previous = readPreviousJson(OUT_PATH);
@@ -418,6 +425,7 @@ async function main() {
   if (eventsOut.length === 0) {
     if (offlineOk && existsSync(OUT_PATH)) {
       console.warn("⚠  No wild-spawn events in window; --offline-ok keeps existing cache.");
+      failOnHeldBack(heldBack);
       return;
     }
     throw new Error("No wild-spawn events resolved — refusing to overwrite cache");
@@ -461,6 +469,16 @@ async function main() {
   console.log(`✓ wrote ${OUT_PATH}`);
   console.log(`  events: ${eventsOut.length} surfaced · ${events.carriedIds.length} carried over · ${skippedNoSpawns} without spawns · ${skippedWindow} outside window · ${skippedCategory} skipped categories · ${totalUnresolved} unresolved spawn names`);
   console.log(`  egg pools: ${eggPoolsOut.length} surfaced · ${eggPools.carriedIds.length} carried over`);
+  failOnHeldBack(heldBack);
+}
+
+function failOnHeldBack(heldBack) {
+  if (heldBack.length === 0) return;
+  for (const cd of heldBack) {
+    const why = cd.names.length ? `unresolved featured names: ${cd.names.join(", ")}` : "no featured Pokémon listed";
+    console.error(`✗ Community Day ${cd.date} ${cd.event} not added to ${CD_PATH} (${why})`);
+  }
+  process.exit(1);
 }
 
 // Only run when executed directly — scripts/check-mega-boost.mjs imports
