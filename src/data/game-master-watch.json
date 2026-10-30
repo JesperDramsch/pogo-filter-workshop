@@ -1,11 +1,24 @@
 {
-  "fetchedAt": "2026-10-29T13:14:02.606Z",
+  "fetchedAt": "2026-10-30T13:06:18.706Z",
   "sources": {
     "pvp": "pvpoke-gamemaster",
     "pve": "alexelgt/game_masters",
-    "pveBatch": "2026-10-25T04:24:17.174Z"
+    "pveBatch": "2026-10-29T17:39:11.876Z"
   },
   "history": [
+    {
+      "at": "2026-10-30T13:06:18.706Z",
+      "stream": "pve",
+      "summary": "1 move(s) changed",
+      "changes": [
+        {
+          "move": "V0615_MOVE_KOWTOW_CLEAVE",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        }
+      ]
+    },
     {
       "at": "2026-10-29T13:14:02.606Z",
       "stream": "pvp",
@@ -5462,6 +5475,12 @@
     "V0595_MOVE_GULP_MISSILE_GORGING": {
       "durationMs": 2500,
       "pokemonType": "POKEMON_TYPE_NORMAL"
+    },
+    "V0615_MOVE_KOWTOW_CLEAVE": {
+      "power": 85,
+      "durationMs": 2000,
+      "energyDelta": -50,
+      "pokemonType": "POKEMON_TYPE_DARK"
     },
     "VM_MOVE_TEMP_EVOLUTION_MEGA_V0015_POKEMON_BEEDRILL": {
       "power": 140,

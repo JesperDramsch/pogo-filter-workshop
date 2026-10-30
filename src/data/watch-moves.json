@@ -1,7 +1,13 @@
 {
-  "fetchedAt": "2026-10-29T18:28:50.622Z",
+  "fetchedAt": "2026-10-30T13:06:18.706Z",
   "signatureLearners": 5,
   "moves": [
+    {
+      "move": "V0615_MOVE_KOWTOW_CLEAVE",
+      "change": "added",
+      "at": "2026-10-30T13:06:18.706Z",
+      "learners": []
+    },
     {
       "move": "KOWTOW_CLEAVE",
       "change": "added",
@@ -120,6 +126,15 @@
       "at": "2026-09-09T13:39:32.814Z",
       "learners": [
         487
+      ]
+    },
+    {
+      "move": "V0288_MOVE_PSYCHO_BOOST",
+      "change": "changed",
+      "at": "2026-09-09T13:39:32.814Z",
+      "learners": [
+        235,
+        386
       ]
     },
     {
