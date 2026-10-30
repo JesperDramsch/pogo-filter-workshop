@@ -282,7 +282,7 @@ const BAD = [/undefined/, /NaN/, /\[object /, /&&|,,/, /^[&,]|[&,]$/, /!!/];
 // The lenses ③a must negate (P10): every IV or flag step. A hundo step needs
 // no `not` (the tail's `!4*` holds it); a species list, PvP pattern, roster,
 // tag or "untraded" step narrows nothing. A new IV or flag lens goes here.
-const NEEDS_NOT = /^(shiny|strong|three|high_iv|evolve|evolve_shadow|luckies|background|atk34)$/;
+const NEEDS_NOT = /^(shiny|strong|three|high_iv|evolve|evolve_shadow|luckies|background|atk34|gigantamax)$/;
 // The tail reads protectNundos and mythTooManyOf; P3 runs under the default
 // config and under the one that flips both, so a nundo is held on one side
 // and shown on the other, and the carved mythical is shown.

@@ -1223,7 +1223,7 @@
   "app.pile.sort_hint": "Pokémon in this pile you haven't favourited or tagged yet: what's left to judge after you've kept the good ones.",
   "app.pile.release_hint": "Pokémon in this pile that aren't favourited, tagged or always protected, including what the ① steps would have kept. Review the list, then transfer. Always protected: hundos, nundos (if you protect them), Pokémon for lucky trades, Dynamax Pokémon you've powered up, buddies at Good level or higher, mythicals (except the ones you have too many of), Pokémon with a legacy move, shiny legendaries and legendaries with a background.",
   "app.pile.safe_label": "leftovers",
-  "app.pile.safe_hint": "Pokémon in this pile that aren't favourited, tagged or always protected, and that no IV, shiny, evolve, background or lucky step above would have kept. A PvP, species, Gigantamax or trade step is not subtracted here, so glance down the list, then transfer the batch.",
+  "app.pile.safe_hint": "Pokémon in this pile that aren't favourited, tagged or always protected, and that no IV, shiny, evolve, background or lucky step above would have kept. A PvP, species or trade step is not subtracted here, so glance down the list, then transfer the batch.",
   "app.events.safe_hint": "Event spawns that no step above would have kept: not favourited, not tagged, not always protected, and matching none of the ① steps. Safe to transfer as a batch.",
   "app.pile.release_reveal": "Show everything not starred or tagged",
   "app.pile.release_warning": "This view includes the shinies, the high-IV ones and everything else the ① steps would have kept. Use it only once you have gone through ① and ②, and read the list before you transfer.",

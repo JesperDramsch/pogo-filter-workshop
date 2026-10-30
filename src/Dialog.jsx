@@ -150,7 +150,12 @@ export function Dialog({
 			// Backdrop click stays a convenience, not the only way out: Escape and
 			// the in-panel close button both work, so this needs no key handler.
 			onMouseDown={(e) => {
-				if (e.target === e.currentTarget) onClose?.();
+				if (e.target !== e.currentTarget) return;
+				// The default mousedown action would move focus to <body> after the
+				// close has already restored it to the opener; stop that so a
+				// backdrop click or tap leaves focus where Escape leaves it.
+				e.preventDefault();
+				onClose?.();
 			}}
 		>
 			<div

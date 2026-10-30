@@ -5237,7 +5237,7 @@ export function buildFilters(
 			id: 'dynamax',
 			head: `${kw.flag.dynamax_move}1-`,
 			lenses: [
-				{ key: 'gigantamax', filter: kw.flag.gigantamax },
+				{ key: 'gigantamax', filter: kw.flag.gigantamax, not: `!${kw.flag.gigantamax}` },
 				{ key: 'builds', filter: topMaxAttackersList.length ? famOf(topMaxAttackersList) : '' },
 				...ivLadder(),
 			],

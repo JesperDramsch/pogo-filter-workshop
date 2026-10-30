@@ -5,7 +5,7 @@ the ① keep steps. Read the steps top to bottom and stop once you have enough.
 ③ has the same shape everywhere and comes as two strings: ③a, the leftovers
 (pile & protection tail & the negation of every ① step that has one, so
 nothing an IV, shiny, evolve, background or lucky step would have kept is in
-it; a PvP, species, Gigantamax or trade step is not subtracted, so read the
+it; a PvP, species or trade step is not subtracted, so read the
 list before the batch), and ③b, everything not starred or tagged (pile &
 protection tail). On the pile card ③a is the visible transfer
 box; ③b sits behind a reveal that starts closed every time and carries an
