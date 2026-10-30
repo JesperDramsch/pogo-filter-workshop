@@ -12,6 +12,7 @@ import {
 	Sparkles,
 	Sparkle,
 	Settings,
+	CircleQuestionMark,
 	ArrowLeft,
 	Download,
 	Upload,
@@ -5802,6 +5803,17 @@ const KEY_TOP_MAX_ATTACKERS = 'pogo:topMaxAttackers';
 const KEY_CONFIG = 'pogo:config';
 const KEY_ONBOARDED = 'pogo:onboarded';
 const KEY_CHANGELOG_SEEN = 'pogo:changelogSeen';
+// One flag per filter area: has its help panel opened on its own yet. Lives
+// beside pogo:onboarded rather than in the config, so an export or a preset
+// never carries it and a reset of the filters leaves it alone.
+const KEY_HELP_SEEN = 'pogo:helpSeen';
+const HELP_SEEN_DEFAULT = Object.freeze(Object.fromEntries(FILTER_AREAS.map((area) => [area, false])));
+// Storage may hold anything (an old shape, a foreign write): keep exactly the
+// four area booleans, every other value reads as "not seen".
+export function helpSeenFrom(value) {
+	const src = value && typeof value === 'object' ? value : {};
+	return Object.fromEntries(FILTER_AREAS.map((area) => [area, src[area] === true]));
+}
 
 // iOS Safari (regular tab) refuses Storage API persistence at the WebKit
 // level: navigator.storage.persist() resolves with false immediately, no
@@ -6344,6 +6356,10 @@ export default function App() {
 	const [newKeeper, setNewKeeper] = useState('');
 	const [loaded, setLoaded] = useState(false);
 	const [onboarded, setOnboarded] = useState(false);
+	const [helpSeen, setHelpSeen] = useState(HELP_SEEN_DEFAULT);
+	// Which areas' help panels are open right now. Session-only: a reload
+	// starts closed, and only the seen flags above persist.
+	const [helpOpen, setHelpOpen] = useState({});
 	const [showSetTheory, setShowSetTheory] = useState(false);
 	const [showHiddenPiles, setShowHiddenPiles] = useState(false);
 	// A 5-minute tick, so "right now" and the Mega planner notice an event that
@@ -6469,6 +6485,7 @@ export default function App() {
 			const b = await loadJSON(KEY_BAZAARTAGS, []);
 			const step = await loadJSON(KEY_STEP, 1);
 			const ob = await loadJSON(KEY_ONBOARDED, false);
+			const hs = await loadJSON(KEY_HELP_SEEN, HELP_SEEN_DEFAULT);
 			const clSeen = await loadJSON(KEY_CHANGELOG_SEEN, 0);
 			setHundos(h);
 			const catalogNotices = [];
@@ -6492,6 +6509,7 @@ export default function App() {
 			// #workshop.
 			setCurrentStep(stepFromHash() ?? step);
 			setOnboarded(ob);
+			setHelpSeen(helpSeenFrom(hs));
 			setLoaded(true);
 			// First-run: nudge brand-new visitors into the swipe onboarding instead
 			// of the marketing landing. Only when they actually arrived at "" (not a
@@ -6535,6 +6553,9 @@ export default function App() {
 	useEffect(() => {
 		if (loaded) saveJSON(KEY_ONBOARDED, onboarded);
 	}, [onboarded, loaded]);
+	useEffect(() => {
+		if (loaded) saveJSON(KEY_HELP_SEEN, helpSeen);
+	}, [helpSeen, loaded]);
 	useEffect(() => {
 		if (loaded) saveJSON(KEY_CHANGELOG_SEEN, changelogSeen);
 	}, [changelogSeen, loaded]);
@@ -6587,6 +6608,9 @@ export default function App() {
 				case KEY_ONBOARDED:
 					setOnboarded(value === true);
 					break;
+				case KEY_HELP_SEEN:
+					setHelpSeen(helpSeenFrom(value));
+					break;
 				case KEY_CHANGELOG_SEEN:
 					setChangelogSeen(typeof value === 'number' ? value : 0);
 					break;
@@ -6614,6 +6638,7 @@ export default function App() {
 			apply(KEY_LASTPIN, await loadJSON(KEY_LASTPIN, null));
 			apply(KEY_BAZAARTAGS, await loadJSON(KEY_BAZAARTAGS, []));
 			apply(KEY_ONBOARDED, await loadJSON(KEY_ONBOARDED, false));
+			apply(KEY_HELP_SEEN, await loadJSON(KEY_HELP_SEEN, HELP_SEEN_DEFAULT));
 			apply(KEY_CHANGELOG_SEEN, await loadJSON(KEY_CHANGELOG_SEEN, 0));
 		};
 		const onVisibility = () => {
@@ -7163,6 +7188,19 @@ export default function App() {
 		if (typeof window !== 'undefined' && window.location.hash !== desired) window.location.hash = desired;
 	}
 	const selectArea = (area) => goToArea(area, areaSettings);
+	// The first time an area shows its filters, its help panel opens on its own
+	// and the area is marked seen; after that only the toggle opens it. Nothing
+	// fires before storage has loaded, on another step, on another view or
+	// while the area shows its settings, so the first-run redirect to #onboard
+	// and a shared #workshop/<area>/settings link leave every flag alone.
+	const helpCanShow = loaded && view === 'workshop' && currentStep === STEP_NUMBER_BY_KEY.filter && !areaSettings;
+	useEffect(() => {
+		if (!helpCanShow || helpSeen[filterArea]) return;
+		setHelpOpen((open) => ({ ...open, [filterArea]: true }));
+		setHelpSeen((seen) => ({ ...seen, [filterArea]: true }));
+	}, [helpCanShow, filterArea, helpSeen]);
+	const toggleHelp = (area) => setHelpOpen((open) => ({ ...open, [area]: !open[area] }));
+	const helpPanel = (area) => <HelpPanel area={area} helpPanelId={`help-panel-${area}`} open={!!helpOpen[area]} t={t} />;
 	function gotoStep(n) {
 		setCurrentStep(n);
 		// When in the workshop view, push the step-specific hash so the URL
@@ -7639,6 +7677,9 @@ export default function App() {
 										onSelect={selectArea}
 										settings={areaSettings}
 										onToggleSettings={() => goToArea(filterArea, !areaSettings)}
+										helpOpen={!!helpOpen[filterArea]}
+										onToggleHelp={() => toggleHelp(filterArea)}
+										helpPanelId={`help-panel-${filterArea}`}
 										t={t}
 									/>
 									<AreaPanel area='catch' current={filterArea}>
@@ -7646,6 +7687,7 @@ export default function App() {
 											areaSettingsFor.catch
 										) : (
 											<>
+												{helpPanel('catch')}
 												<AreaGroup id='clean' title={t('app.group.clean')} hint={t('app.group_hint.clean')} accent='#E74C3C'>
 												<FilterBox
 													label={t('app.filter.trash_label')}
@@ -7674,6 +7716,7 @@ export default function App() {
 											areaSettingsFor.sort
 										) : (
 											<>
+												{helpPanel('sort')}
 												{sortingView}
 											</>
 										)}
@@ -7683,6 +7726,7 @@ export default function App() {
 											areaSettingsFor.battle
 										) : (
 											<>
+												{helpPanel('battle')}
 												{/* Team Rocket section — encounters & their post-fight cleanup */}
 												<div className='pt-4'>
 													<AreaGroup id='rocket' title={t('app.collapsible.aux_section_team_rocket')} hint={t('app.group_hint.rocket')} accent='#E74C3C'>
@@ -7774,6 +7818,7 @@ export default function App() {
 											areaSettingsFor.trade
 										) : (
 											<>
+												{helpPanel('trade')}
 												<AreaGroup id='trades' title={t('app.group.trades')} hint={t('app.group_hint.trades')} accent='#5EAFC5'>
 												<FilterBox
 													label={t('app.filter.trade_label')}
@@ -9726,7 +9771,7 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint, tone }) {
 // real element and switching tabs keeps every collapsible's open state.
 // Arrow keys move between tabs and Home/End jump to the ends, per the APG
 // tabs pattern; only the selected tab is in the Tab order.
-function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, t }) {
+function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, helpOpen, onToggleHelp, helpPanelId, t }) {
 	const refs = useRef({});
 	const move = (e, i) => {
 		const next =
@@ -9769,9 +9814,27 @@ function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, t }) {
 				})}
 			</div>
 			<div className='flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-3 mt-2'>
-				<p className='mono text-[10.5px] text-[#8090A0]'>
-					{settings ? t('app.area.settings_hint') : t(`app.area.${current}.hint`)}
-				</p>
+				<div className='flex flex-col gap-1'>
+					<p className='mono text-[10.5px] text-[#8090A0]'>
+						{settings ? t('app.area.settings_hint') : t(`app.area.${current}.hint`)}
+					</p>
+					{/* The help disclosure for the current area. Its panel sits at the
+					    top of that area's tabpanel (HelpPanel), so the control points
+					    there; in settings mode the panel is not rendered and neither is
+					    this toggle. */}
+					{!settings && (
+						<button
+							type='button'
+							onClick={onToggleHelp}
+							aria-expanded={!!helpOpen}
+							aria-controls={helpPanelId}
+							className='mono text-xs self-start text-[#5EAFC5] hover:text-[#E6EDF3] min-h-[32px] flex items-center gap-1.5'
+						>
+							<CircleQuestionMark size={12} aria-hidden='true' />
+							{helpOpen ? t('app.help.toggle_close') : t('app.help.toggle_open')}
+						</button>
+					)}
+				</div>
 				{/* The flip: same four tabs, each showing its own settings. A toggle,
 				    so aria-pressed carries the state; the label says where it goes. */}
 				<button
@@ -9805,6 +9868,31 @@ function AreaPanel({ area, current, children }) {
 		>
 			{children}
 		</div>
+	);
+}
+
+// The per-area help: a title and four short paragraphs, keyed
+// app.help.<area>.{title,p1..p4}. Opens on its own the first time the area
+// shows its filters (App keeps the seen flags under pogo:helpSeen) and from
+// the toggle in AreaTabs after that. Rendered only while open, so the
+// toggle's aria-expanded is the whole state.
+function HelpPanel({ area, helpPanelId, open, t }) {
+	if (!open) return null;
+	return (
+		<section
+			id={helpPanelId}
+			aria-labelledby={`${helpPanelId}-title`}
+			className='rounded-sm border border-[#5EAFC5]/40 bg-[#5EAFC5]/5 px-3 py-2.5 space-y-1.5'
+		>
+			<h3 id={`${helpPanelId}-title`} className='mono text-xs uppercase tracking-widest font-semibold text-[#5EAFC5]'>
+				{t(`app.help.${area}.title`)}
+			</h3>
+			{['p1', 'p2', 'p3', 'p4'].map((p) => (
+				<p key={p} className='mono text-[11px] text-[#B8C4D0] leading-relaxed'>
+					{t(`app.help.${area}.${p}`)}
+				</p>
+			))}
+		</section>
 	);
 }
 
