@@ -353,6 +353,17 @@ console.log("\nThe tail ignores the trash toggles");
   const off = protectionTail(kw, { ...CFG, protectLuckyEligible: false, protectNundos: true, protectBuddies: true });
   check("switching trash protections on or off leaves the tail as it is (lucky-trade floor included)",
     JSON.stringify(on) === JSON.stringify(off) && on.some((c) => c.startsWith(`${kw.numeric.year}`)), off.join("&"));
+  // Custom collectibles are protected in ③ as in trash: a plain 2/3/4 copy
+  // of one is offered nowhere, any other species still is.
+  for (const loc of localeNames) {
+    const lkw = pogoKeywords(loc);
+    const cfg = { ...CFG, customCollectibles: ["Spinda"] };
+    const release = `${lkw.flag.shadow}&${protectionTail(lkw, cfg).join("&")}`;
+    const mon = (en, dex) => pileMon(loc, { flags: { shadow: true }, ...iv(2, 7, 9) }, en, dex);
+    const spinda = evalFilterDetailed(release, mon("Spinda", 327), loc).verdict;
+    const other = evalFilterDetailed(release, mon("Magikarp", 129), loc).verdict;
+    check(`${loc}: a custom collectible stays out of ③, other species don't`, spinda === false && other === true, `spinda ${spinda}, magikarp ${other}`);
+  }
   check("only a year floor of 0 drops the lucky-trade clause",
     !protectionTail(kw, { ...CFG, luckyEligibleYear: 0 }).some((c) => c.startsWith(`${kw.numeric.year}`)));
 }

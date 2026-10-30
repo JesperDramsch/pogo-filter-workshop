@@ -1910,6 +1910,13 @@ export function protectionTail(kw, cfg) {
 		`!${kw.flag.shiny},!${kw.flag.legendary}`,
 		`!${kw.flag.background},!${kw.flag.legendary}`,
 	);
+	// Custom collectibles: species the user protects outright, as the trash
+	// filter does. Unlike there, no regional-collector skip: the tail has no
+	// regional protection that would cover them otherwise.
+	for (const sp of cfg.customCollectibles || []) {
+		const name = speciesForOutput(sp, kw.locale);
+		if (name) clauses.push(`!${capFirst(name)}`);
+	}
 	return clauses;
 }
 
@@ -4449,15 +4456,10 @@ export function buildFilters(
 	);
 
 	// -- EVENT WILD SPAWNS · per-event curation workflow -----------------
-	// Each event's spawn species render as family-expanded German names
-	// (+taubsi,+habitak,…) and become a comma-OR clause that intersects the
-	// user's collection. We hang a small set of lenses off that intersection:
-	// an overview, souvenirs, one exact IV-keeper filter, what's still unsorted,
-	// and the trashable rest. Reuses the existing IV/flag tokens and the already-
-	// built `trash` string so event filters stay consistent with the main output.
-	const eventCollectibles = (cfg.customCollectibles || [])
-		.map((s) => speciesForOutput(s, outputLocale))
-		.filter(Boolean);
+	// Each event's spawn species render as family-expanded names (+taubsi,
+	// +habitak,…) and become a comma-OR clause that intersects the user's
+	// collection: the head of a pile like every other (see buildPile), with the
+	// ladder of docs/pile-purposes.md as its ① steps.
 	const eventsFetchedAt = EVENTS.fetchedAt || null;
 
 	// -- MEGA BOOST · which Mega to have active for a spawn pool ---------

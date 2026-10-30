@@ -23,6 +23,8 @@ change it.
 Correction: the protection tail does **not** keep plain shinies, costumes or
 backgrounds out of ③. It only protects shiny legendaries and legendaries with
 a background. A shiny that isn't favourited or tagged shows up in ③.
+Your custom collectibles are in the tail too, as in the trash filter: no
+pile offers them for transfer.
 
 Rule: a step must be able to find something no earlier step found. A
 narrower copy of an earlier step gets cut. `4*` sits inside `3-4`, so `4*`
