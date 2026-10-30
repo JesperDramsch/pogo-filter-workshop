@@ -34,9 +34,11 @@ The workshop splits by what the user is doing at that moment:
 
 Nerd stuff (set theory, raw clauses, check a Pokémon) stays where it is.
 
-### Help panels
+### Help sheet
 
-Each area carries a help panel above its body: a title and four short paragraphs (`app.help.<area>.title`, `.p1` to `.p4`), opened and closed by a toggle next to the area hint (`app.help.toggle_open` / `toggle_close`). The panel opens on its own the first time an area shows its filters and the area is then marked seen; after that only the toggle opens it. The seen flags live in `localStorage` under `pogo:helpSeen` beside `pogo:onboarded`, not in the config, so an export, a preset or a filter reset never carries or clears them. Nothing opens or is marked seen while an area shows its settings, on another wizard step, on another view or before storage has loaded, so the first-run redirect to the swipe deck and a shared `#workshop/<area>/settings` link leave the flags alone. Open state itself is per area and per session.
+Each area has a help sheet: a title and four short paragraphs (`app.help.<area>.title`, `.p1` to `.p4`) in a modal sheet on the shared `Dialog` primitive (`src/Dialog.jsx`), not a box in the page. On phones it is a bottom sheet; from the `sm` breakpoint up it is a slide-over on the right. A pill next to the area hint (`app.help.toggle_open`, `aria-haspopup="dialog"`) opens it; Escape, the backdrop, the X (`app.help.close_aria`) or the "Got it" button (`app.help.got_it`) closes it. The dialog's accessible name is the generic `app.help.dialog_label`; the heading inside names the area. One sheet is open at a time, and it is rendered only while open.
+
+The sheet opens on its own the first time an area shows its filters and the area is then marked seen; after that only the pill opens it. The seen flags live in `localStorage` under `pogo:helpSeen` beside `pogo:onboarded`, not in the config, so an export, a preset or a filter reset never carries or clears them. Nothing opens or is marked seen while an area shows its settings, on another wizard step, on another view or before storage has loaded, so the first-run redirect to the swipe deck and a shared `#workshop/<area>/settings` link leave the flags alone. Open state itself is per session: a reload starts closed.
 
 The Sorting help carries the hidden-piles rule in one line: piles for categories you tossed sit under "N hidden" and come back when you bring them back there or protect the category again. The Catching help names no candy or XP numbers: what a Mega level pays is game data, not prose.
 

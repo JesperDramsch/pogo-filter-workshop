@@ -82,6 +82,26 @@ body {
   }
 }
 
+/* The help sheet (HelpSheet in App.jsx) slides in: up from the bottom edge on
+   phones, in from the right from Tailwind's `sm` breakpoint (640px) up, where
+   it is a slide-over. Short and ease-out so it reads as arriving, not as an
+   effect; off entirely for anyone who asked for reduced motion. */
+@keyframes help-sheet-up {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes help-sheet-right {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.help-sheet { animation: help-sheet-up 180ms ease-out; }
+@media (min-width: 640px) {
+  .help-sheet { animation-name: help-sheet-right; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .help-sheet { animation: none; }
+}
+
 /* Hide the default <details> disclosure marker — TrainerAccordion uses its
    own ChevronRight icon and rotates it via .details-arrow when [open]. */
 details > summary { list-style: none; }

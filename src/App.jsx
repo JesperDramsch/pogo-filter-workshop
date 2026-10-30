@@ -6357,9 +6357,14 @@ export default function App() {
 	const [loaded, setLoaded] = useState(false);
 	const [onboarded, setOnboarded] = useState(false);
 	const [helpSeen, setHelpSeen] = useState(HELP_SEEN_DEFAULT);
-	// Which areas' help panels are open right now. Session-only: a reload
-	// starts closed, and only the seen flags above persist.
-	const [helpOpen, setHelpOpen] = useState({});
+	// The area whose help sheet is open right now, or null. One sheet at a
+	// time, session-only: a reload starts closed, and only the seen flags
+	// above persist.
+	const [helpArea, setHelpArea] = useState(null);
+	const helpPillRef = useRef(null);
+	// True while the open sheet is one the app opened itself (first visit),
+	// so closing it knows there is no opener to hand focus back to.
+	const helpAutoOpenedRef = useRef(false);
 	const [showSetTheory, setShowSetTheory] = useState(false);
 	const [showHiddenPiles, setShowHiddenPiles] = useState(false);
 	// A 5-minute tick, so "right now" and the Mega planner notice an event that
@@ -7188,19 +7193,33 @@ export default function App() {
 		if (typeof window !== 'undefined' && window.location.hash !== desired) window.location.hash = desired;
 	}
 	const selectArea = (area) => goToArea(area, areaSettings);
-	// The first time an area shows its filters, its help panel opens on its own
-	// and the area is marked seen; after that only the toggle opens it. Nothing
+	// The first time an area shows its filters, its help sheet opens on its own
+	// and the area is marked seen; after that only the pill opens it. Nothing
 	// fires before storage has loaded, on another step, on another view or
 	// while the area shows its settings, so the first-run redirect to #onboard
 	// and a shared #workshop/<area>/settings link leave every flag alone.
 	const helpCanShow = loaded && view === 'workshop' && currentStep === STEP_NUMBER_BY_KEY.filter && !areaSettings;
 	useEffect(() => {
 		if (!helpCanShow || helpSeen[filterArea]) return;
-		setHelpOpen((open) => ({ ...open, [filterArea]: true }));
+		helpAutoOpenedRef.current = true;
+		setHelpArea(filterArea);
 		setHelpSeen((seen) => ({ ...seen, [filterArea]: true }));
 	}, [helpCanShow, filterArea, helpSeen]);
-	const toggleHelp = (area) => setHelpOpen((open) => ({ ...open, [area]: !open[area] }));
-	const helpPanel = (area) => <HelpPanel area={area} helpPanelId={`help-panel-${area}`} open={!!helpOpen[area]} t={t} />;
+	const openHelp = (area) => {
+		helpAutoOpenedRef.current = false;
+		setHelpArea(area);
+	};
+	const closeHelp = () => setHelpArea(null);
+	// The Dialog hands focus back to whatever had it when the sheet opened.
+	// That is the pill when the pill opened it. When the app opened the sheet
+	// itself (first visit) it is whatever the step change left focused, so land
+	// on the pill that reopens the help instead. Runs after the Dialog's
+	// cleanup has released #root, which is inert until then.
+	useEffect(() => {
+		if (helpArea || !helpAutoOpenedRef.current) return;
+		helpAutoOpenedRef.current = false;
+		helpPillRef.current?.focus({ preventScroll: true });
+	}, [helpArea]);
 	function gotoStep(n) {
 		setCurrentStep(n);
 		// When in the workshop view, push the step-specific hash so the URL
@@ -7677,9 +7696,8 @@ export default function App() {
 										onSelect={selectArea}
 										settings={areaSettings}
 										onToggleSettings={() => goToArea(filterArea, !areaSettings)}
-										helpOpen={!!helpOpen[filterArea]}
-										onToggleHelp={() => toggleHelp(filterArea)}
-										helpPanelId={`help-panel-${filterArea}`}
+										onOpenHelp={() => openHelp(filterArea)}
+										openHelpRef={helpPillRef}
 										t={t}
 									/>
 									<AreaPanel area='catch' current={filterArea}>
@@ -7687,7 +7705,6 @@ export default function App() {
 											areaSettingsFor.catch
 										) : (
 											<>
-												{helpPanel('catch')}
 												<AreaGroup id='clean' title={t('app.group.clean')} hint={t('app.group_hint.clean')} accent='#E74C3C'>
 												<FilterBox
 													label={t('app.filter.trash_label')}
@@ -7716,7 +7733,6 @@ export default function App() {
 											areaSettingsFor.sort
 										) : (
 											<>
-												{helpPanel('sort')}
 												{sortingView}
 											</>
 										)}
@@ -7726,7 +7742,6 @@ export default function App() {
 											areaSettingsFor.battle
 										) : (
 											<>
-												{helpPanel('battle')}
 												{/* Team Rocket section — encounters & their post-fight cleanup */}
 												<div className='pt-4'>
 													<AreaGroup id='rocket' title={t('app.collapsible.aux_section_team_rocket')} hint={t('app.group_hint.rocket')} accent='#E74C3C'>
@@ -7818,7 +7833,6 @@ export default function App() {
 											areaSettingsFor.trade
 										) : (
 											<>
-												{helpPanel('trade')}
 												<AreaGroup id='trades' title={t('app.group.trades')} hint={t('app.group_hint.trades')} accent='#5EAFC5'>
 												<FilterBox
 													label={t('app.filter.trade_label')}
@@ -8148,6 +8162,7 @@ export default function App() {
 				}}
 			/>
 			<ChangelogModal open={showChangelog} onClose={() => setShowChangelog(false)} />
+			{helpArea && <HelpSheet area={helpArea} onClose={closeHelp} t={t} />}
 		</div>
 	);
 }
@@ -9771,7 +9786,7 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint, tone }) {
 // real element and switching tabs keeps every collapsible's open state.
 // Arrow keys move between tabs and Home/End jump to the ends, per the APG
 // tabs pattern; only the selected tab is in the Tab order.
-function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, helpOpen, onToggleHelp, helpPanelId, t }) {
+function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, onOpenHelp, openHelpRef, t }) {
 	const refs = useRef({});
 	const move = (e, i) => {
 		const next =
@@ -9818,20 +9833,20 @@ function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, helpOp
 					<p className='mono text-[10.5px] text-[#8090A0]'>
 						{settings ? t('app.area.settings_hint') : t(`app.area.${current}.hint`)}
 					</p>
-					{/* The help disclosure for the current area. Its panel sits at the
-					    top of that area's tabpanel (HelpPanel), so the control points
-					    there; in settings mode the panel is not rendered and neither is
-					    this toggle. */}
+					{/* The help pill for the current area. It opens the help sheet
+					    (HelpSheet, a modal over the page), so it is not a disclosure:
+					    aria-haspopup says what it opens and the sheet carries its own
+					    state. In settings mode there is no help and no pill. */}
 					{!settings && (
 						<button
+							ref={openHelpRef}
 							type='button'
-							onClick={onToggleHelp}
-							aria-expanded={!!helpOpen}
-							aria-controls={helpPanelId}
-							className='mono text-xs self-start text-[#5EAFC5] hover:text-[#E6EDF3] min-h-[32px] flex items-center gap-1.5'
+							onClick={onOpenHelp}
+							aria-haspopup='dialog'
+							className='mono text-xs self-start inline-flex items-center gap-1.5 min-h-[32px] px-3 rounded-full border border-[#5EAFC5]/40 text-[#5EAFC5] hover:bg-[#5EAFC5]/10 transition'
 						>
 							<CircleQuestionMark size={12} aria-hidden='true' />
-							{helpOpen ? t('app.help.toggle_close') : t('app.help.toggle_open')}
+							{t('app.help.toggle_open')}
 						</button>
 					)}
 				</div>
@@ -9872,27 +9887,54 @@ function AreaPanel({ area, current, children }) {
 }
 
 // The per-area help: a title and four short paragraphs, keyed
-// app.help.<area>.{title,p1..p4}. Opens on its own the first time the area
-// shows its filters (App keeps the seen flags under pogo:helpSeen) and from
-// the toggle in AreaTabs after that. Rendered only while open, so the
-// toggle's aria-expanded is the whole state.
-function HelpPanel({ area, helpPanelId, open, t }) {
-	if (!open) return null;
+// app.help.<area>.{title,p1..p4}, shown as a sheet over the page on the
+// shared Dialog primitive: a bottom sheet on phones, a slide-over from the
+// right from `sm` up. App opens it on its own the first time an area shows
+// its filters (seen flags under pogo:helpSeen) and from the pill in AreaTabs
+// after that; one sheet at a time, closed by Escape, the backdrop, the X or
+// "Got it". The dialog's name is the generic label; the h2 names the area.
+function HelpSheet({ area, onClose, t }) {
+	const gotItRef = useRef(null);
 	return (
-		<section
-			id={helpPanelId}
-			aria-labelledby={`${helpPanelId}-title`}
-			className='rounded-sm border border-[#5EAFC5]/40 bg-[#5EAFC5]/5 px-3 py-2.5 space-y-1.5'
+		<Dialog
+			onClose={onClose}
+			label={t('app.help.dialog_label')}
+			initialFocusRef={gotItRef}
+			backdropClassName='fixed inset-0 z-50 backdrop-blur-xs flex items-end justify-center sm:items-stretch sm:justify-end sm:p-0'
+			className='help-sheet w-full max-h-[85vh] overflow-y-auto rounded-t-xl border border-b-0 border-[#2D3A47] shadow-2xl sm:w-[400px] sm:max-w-[90vw] sm:h-full sm:max-h-none sm:rounded-none sm:rounded-l-xl sm:border-b sm:border-r-0'
 		>
-			<h3 id={`${helpPanelId}-title`} className='mono text-xs uppercase tracking-widest font-semibold text-[#5EAFC5]'>
-				{t(`app.help.${area}.title`)}
-			</h3>
-			{['p1', 'p2', 'p3', 'p4'].map((p) => (
-				<p key={p} className='mono text-[11px] text-[#B8C4D0] leading-relaxed'>
-					{t(`app.help.${area}.${p}`)}
-				</p>
-			))}
-		</section>
+			<div
+				style={{ backgroundColor: '#0F1419' }}
+				className='sticky top-0 border-b border-[#1F2933] px-5 py-3 flex items-center justify-between gap-3'
+			>
+				<h2 className='mono text-base font-semibold text-[#E6EDF3]'>{t(`app.help.${area}.title`)}</h2>
+				<button
+					type='button'
+					onClick={onClose}
+					aria-label={t('app.help.close_aria')}
+					className='text-[#8090A0] hover:text-[#E6EDF3] transition p-1 shrink-0'
+				>
+					<X size={18} />
+				</button>
+			</div>
+			<div className='px-5 py-4 space-y-3'>
+				{['p1', 'p2', 'p3', 'p4'].map((p) => (
+					<p key={p} className='text-sm leading-relaxed text-[#B8C4D0]'>
+						{t(`app.help.${area}.${p}`)}
+					</p>
+				))}
+			</div>
+			<div className='px-5 pb-5 pt-1 flex justify-end'>
+				<button
+					ref={gotItRef}
+					type='button'
+					onClick={onClose}
+					className='mono text-xs min-h-[40px] px-4 rounded-sm border border-[#5EAFC5] text-[#5EAFC5] hover:bg-[#5EAFC5]/10 transition'
+				>
+					{t('app.help.got_it')}
+				</button>
+			</div>
+		</Dialog>
 	);
 }
 
