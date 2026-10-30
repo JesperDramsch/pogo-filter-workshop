@@ -5803,7 +5803,7 @@ const KEY_TOP_MAX_ATTACKERS = 'pogo:topMaxAttackers';
 const KEY_CONFIG = 'pogo:config';
 const KEY_ONBOARDED = 'pogo:onboarded';
 const KEY_CHANGELOG_SEEN = 'pogo:changelogSeen';
-// One flag per filter area: has its help panel opened on its own yet. Lives
+// One flag per filter area: has its help sheet opened on its own yet. Lives
 // beside pogo:onboarded rather than in the config, so an export or a preset
 // never carries it and a reset of the filters leaves it alone.
 const KEY_HELP_SEEN = 'pogo:helpSeen';
@@ -7199,9 +7199,22 @@ export default function App() {
 	// while the area shows its settings, so the first-run redirect to #onboard
 	// and a shared #workshop/<area>/settings link leave every flag alone.
 	const helpCanShow = loaded && view === 'workshop' && currentStep === STEP_NUMBER_BY_KEY.filter && !areaSettings;
+	// The sheet belongs to the page it opened over. When that page moves under
+	// it (browser Back, a pasted hash, a tab change while another area's sheet
+	// is up) it closes rather than sitting over a page it does not describe.
+	// Declared before the auto-open effect so that, when both fire in one
+	// commit for an unseen area, the auto-open's setHelpArea runs last.
+	useEffect(() => {
+		setHelpArea((open) => (open && (!helpCanShow || open !== filterArea) ? null : open));
+	}, [helpCanShow, filterArea]);
 	useEffect(() => {
 		if (!helpCanShow || helpSeen[filterArea]) return;
-		helpAutoOpenedRef.current = true;
+		// Where focus is now is where the Dialog will hand it back on close. A
+		// real tab stop (the tab the user just arrowed or clicked to) is a good
+		// place to land; the step heading (tabIndex -1) or <body> is not, so
+		// only then does the close hand focus on to the pill.
+		const el = document.activeElement;
+		helpAutoOpenedRef.current = !(el && el !== document.body && el.tabIndex >= 0);
 		setHelpArea(filterArea);
 		setHelpSeen((seen) => ({ ...seen, [filterArea]: true }));
 	}, [helpCanShow, filterArea, helpSeen]);
@@ -7212,8 +7225,8 @@ export default function App() {
 	const closeHelp = () => setHelpArea(null);
 	// The Dialog hands focus back to whatever had it when the sheet opened.
 	// That is the pill when the pill opened it. When the app opened the sheet
-	// itself (first visit) it is whatever the step change left focused, so land
-	// on the pill that reopens the help instead. Runs after the Dialog's
+	// itself (first visit) over the step heading or nothing in particular,
+	// land on the pill that reopens the help instead. Runs after the Dialog's
 	// cleanup has released #root, which is inert until then.
 	useEffect(() => {
 		if (helpArea || !helpAutoOpenedRef.current) return;
@@ -9900,8 +9913,8 @@ function HelpSheet({ area, onClose, t }) {
 			onClose={onClose}
 			label={t('app.help.dialog_label')}
 			initialFocusRef={gotItRef}
-			backdropClassName='fixed inset-0 z-50 backdrop-blur-xs flex items-end justify-center sm:items-stretch sm:justify-end sm:p-0'
-			className='help-sheet w-full max-h-[85vh] overflow-y-auto rounded-t-xl border border-b-0 border-[#2D3A47] shadow-2xl sm:w-[400px] sm:max-w-[90vw] sm:h-full sm:max-h-none sm:rounded-none sm:rounded-l-xl sm:border-b sm:border-r-0'
+			backdropClassName='help-sheet-backdrop fixed inset-0 z-50 backdrop-blur-xs flex items-end justify-center sm:items-stretch sm:justify-end sm:p-0'
+			className='help-sheet w-full max-h-[85vh] overflow-y-auto rounded-t-xl border border-b-0 border-[#2D3A47] shadow-2xl sm:w-[400px] sm:max-w-[90vw] sm:h-full sm:max-h-none sm:rounded-none sm:rounded-l-xl sm:border-b sm:border-r-0 sm:flex sm:flex-col'
 		>
 			<div
 				style={{ backgroundColor: '#0F1419' }}
@@ -9917,14 +9930,21 @@ function HelpSheet({ area, onClose, t }) {
 					<X size={18} />
 				</button>
 			</div>
-			<div className='px-5 py-4 space-y-3'>
+			<div className='px-5 py-4 space-y-3 sm:flex-1'>
 				{['p1', 'p2', 'p3', 'p4'].map((p) => (
 					<p key={p} className='text-sm leading-relaxed text-[#B8C4D0]'>
 						{t(`app.help.${area}.${p}`)}
 					</p>
 				))}
 			</div>
-			<div className='px-5 pb-5 pt-1 flex justify-end'>
+			{/* An action bar like the header: stuck to the bottom edge of the
+			    panel, so the focused "Got it" is in view on open even when the
+			    paragraphs overflow a short phone, and pinned to the foot of the
+			    slide-over rather than floating wherever the text ends. */}
+			<div
+				style={{ backgroundColor: '#0F1419' }}
+				className='sticky bottom-0 border-t border-[#1F2933] px-5 py-3 flex justify-end sm:mt-auto'
+			>
 				<button
 					ref={gotItRef}
 					type='button'

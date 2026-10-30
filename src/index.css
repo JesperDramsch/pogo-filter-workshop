@@ -72,6 +72,13 @@ body {
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
   outline: 2px solid #5EAFC5;
   outline-offset: 2px;
+}
+/* The ring follows the control's corners. A square control gets a 2px radius
+   so its ring has soft corners; a control that carries a Tailwind `rounded-*`
+   utility keeps its own shape, because this rule is unlayered and would
+   otherwise flatten a pill (the help opener) to a box the moment it took
+   keyboard focus. */
+:where(a, button, input, select, textarea, summary, [tabindex]):not([class*="rounded"]):focus-visible {
   border-radius: 2px;
 }
 /* Forced-colours / Windows high-contrast: the accent is overridden by the OS
@@ -82,23 +89,31 @@ body {
   }
 }
 
-/* The help sheet (HelpSheet in App.jsx) slides in: up from the bottom edge on
-   phones, in from the right from Tailwind's `sm` breakpoint (640px) up, where
-   it is a slide-over. Short and ease-out so it reads as arriving, not as an
-   effect; off entirely for anyone who asked for reduced motion. */
+/* The help sheet (HelpSheet in App.jsx) arrives as one motion: the backdrop
+   (scrim and blur) fades in and the panel inside it slides, up from the bottom
+   edge on phones and in from the right from Tailwind's `sm` breakpoint (640px)
+   up, where it is a slide-over. The panel fades with its parent, so its own
+   keyframes only translate. Short and ease-out so it reads as arriving, not as
+   an effect; off entirely for anyone who asked for reduced motion. */
+@keyframes help-sheet-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 @keyframes help-sheet-up {
-  from { transform: translateY(24px); opacity: 0; }
-  to { transform: none; opacity: 1; }
+  from { transform: translateY(24px); }
+  to { transform: none; }
 }
 @keyframes help-sheet-right {
-  from { transform: translateX(24px); opacity: 0; }
-  to { transform: none; opacity: 1; }
+  from { transform: translateX(48px); }
+  to { transform: none; }
 }
+.help-sheet-backdrop { animation: help-sheet-fade 180ms ease-out; }
 .help-sheet { animation: help-sheet-up 180ms ease-out; }
 @media (min-width: 640px) {
   .help-sheet { animation-name: help-sheet-right; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .help-sheet-backdrop,
   .help-sheet { animation: none; }
 }
 

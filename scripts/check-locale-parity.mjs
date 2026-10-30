@@ -5,7 +5,7 @@
 // A key added to en.json alone renders as its raw key in the other six
 // locales, and a key left behind in one locale after a rename is dead weight
 // nobody reviews. check-piles already holds the pile wording per locale; this
-// check holds every key under the prefixes that carry the help panels, the
+// check holds every key under the prefixes that carry the help sheets, the
 // pile cards, the sorting intro, the area tabs and the event piles.
 //
 //   L1 — every matching key in en.json exists in each other locale
