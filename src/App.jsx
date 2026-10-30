@@ -5150,20 +5150,29 @@ export function buildFilters(
 		// those, one for the rest (the costume budget either way).
 		buildPile({ id: 'costumes_evolve', head: `${kw.flag.costume}&${kw.flag.evolvable}`, lenses: ivLadder(), kw, cfg }),
 		buildPile({ id: 'costumes_final', head: `${kw.flag.costume}&!${kw.flag.evolvable}`, lenses: ivLadder(), kw, cfg }),
-		// Community Days leave shinies and backgrounds by the dozen: every one on
-		// a Community Day species, all days at once, so old ones can be gone
-		// through too. The last step is the untraded ones, to tag for trades.
+		// Community Days leave hundreds of one species behind, shinies and
+		// backgrounds among them: every Community Day species, all days at once,
+		// so old ones can be gone through too. Backgrounds get their own step
+		// after the shinies; the last step is the untraded ones, to tag for trades.
 		buildPile({
 			id: 'cday',
 			head: COMMUNITY_DAY_DEX.length
-				? `${famOf(COMMUNITY_DAY_DEX.map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean))}&${kw.flag.shiny},${kw.flag.background}`
+				? famOf(COMMUNITY_DAY_DEX.map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean))
 				: '',
-			lenses: [...ivLadder(), { key: 'to_trade', filter: `!${kw.flag.traded}` }],
+			lenses: [
+				{ key: 'hundo', filter: '4*' },
+				shinyStep,
+				{ key: 'background', filter: kw.flag.background },
+				{ key: 'strong', filter: strongIv },
+				{ key: 'three', filter: '3*' },
+				{ key: 'to_trade', filter: `!${kw.flag.traded}` },
+			],
 			kw,
 			cfg,
 		}),
-		// Wherever one came from (raid, research, GBL): keep the good ones.
-		buildPile({ id: 'legendaries', head: kw.flag.legendary, lenses: ivLadder(), kw, cfg }),
+		// Legendaries and Ultra Beasts, wherever one came from (raid, research,
+		// GBL): keep the good ones.
+		buildPile({ id: 'legendaries', head: `${kw.flag.legendary},${kw.flag.ultra_beast}`, lenses: ivLadder(), kw, cfg }),
 	].filter(Boolean);
 	// Filters that belong with a pile but aren't keep steps: cheap purify stock
 	// (common 1 km-candy shadows, never meta), which shadows to Charge-TM, and
