@@ -80,3 +80,38 @@ export function rankMegaGroups(spawnForms, megaForms) {
 				a.megas[0].dex - b.megas[0].dex,
 		);
 }
+
+// What to have Mega-evolved for the next outings: every wild-spawn event and
+// every raid day or raid hour that is running at `now` or starts within
+// `horizonDays`, soonest first, each with its own pool. A raid's pool is its
+// bosses (a caught boss gets the Mega's candy bonus like any catch), so a
+// Super Mega Raid Day for Chandelure ranks the Megas that boost Ghost or Fire.
+// Week-long standing raid tiers are left out: they are the background, not an
+// outing to plan for.
+//   events:     events.json records ({ title, start, end, spawnForms })
+//   eventRaids: raid-bosses.json eventRaids ({ name, start, end, eventType, bosses })
+//   dexOf:      English species name → dex (the app passes resolveSpeciesInfo)
+export const MEGA_PLAN_HORIZON_DAYS = 3;
+const RAID_OUTINGS = new Set(['raid-day', 'raid-hour']);
+export function megaPlans({ events = [], eventRaids = [] } = {}, now = Date.now(), dexOf = () => null, horizonDays = MEGA_PLAN_HORIZON_DAYS) {
+	const until = now + horizonDays * 86400000;
+	const inWindow = (start, end) => {
+		const s = Date.parse(start), e = Date.parse(end);
+		return Number.isFinite(s) && Number.isFinite(e) && e >= now && s <= until;
+	};
+	const plans = [];
+	for (const ev of events) {
+		if (!inWindow(ev.start, ev.end) || !(ev.spawnForms || []).length) continue;
+		plans.push({ id: `wild:${ev.id || ev.title}`, kind: 'wild', title: ev.title, start: ev.start, end: ev.end, spawnForms: ev.spawnForms });
+	}
+	for (const r of eventRaids) {
+		if (!RAID_OUTINGS.has(r.eventType) || !inWindow(r.start, r.end)) continue;
+		const spawnForms = mergeSpawnForms([
+			(r.bosses || [])
+				.map((b) => ({ name: b.names?.en, dex: dexOf(b.names?.en), region: null, types: b.types || [] }))
+				.filter((f) => f.dex && f.types.length),
+		]);
+		if (spawnForms.length) plans.push({ id: `raid:${r.eventID || r.name}`, kind: 'raid', title: r.name, start: r.start, end: r.end, spawnForms });
+	}
+	return plans.sort((a, b) => Date.parse(a.start) - Date.parse(b.start) || a.title.localeCompare(b.title));
+}

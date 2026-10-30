@@ -120,11 +120,12 @@ console.log("\nV4 — the fail-open scenario stays closed end to end");
   // protectAnyTag is a NORMAL-mode toggle; turning it off swaps the blanket
   // `!#` for named `!#Trade` / `!#Fern-Tausch` clauses.
   const named = trashFor({ ...REAL, protectAnyTag: false });
-  check("named-tag clauses are present", /!#Trade/.test(named), named.split("&").filter(c => c.includes("#")).join(" "));
+  const basar = DEFAULT_CONFIG.basarTagName;
+  check("named-tag clauses are present", named.split("&").includes(`!#${basar}`), named.split("&").filter(c => c.includes("#")).join(" "));
   check("junk is STILL definitely in trash (was: false for every mon)",
     evalFilterDetailed(named, junk, "en").verdict === true);
-  check("a #Trade-staged mon is correctly excluded",
-    evalFilterDetailed(named, mk({ tags: ["Trade"] }), "en").verdict === false);
+  check(`a #${basar}-staged mon is correctly excluded`,
+    evalFilterDetailed(named, mk({ tags: [basar] }), "en").verdict === false);
 
   // Custom league tags emit bare literals this evaluator cannot model. The
   // honest answer is "can't tell" — never a green "not in trash".

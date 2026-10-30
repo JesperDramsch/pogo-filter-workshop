@@ -160,8 +160,10 @@ const TYPES = [
 
 // ── Tunables ────────────────────────────────────────────────────────────────
 
-// Per-type cut for each list. 6 per type × 18 types, deduped, lands near the
-// ~70-100 the chip editor was sized for.
+// Per-type cut for each list. 7 per type × 18 types, deduped, lands near the
+// ~80-110 the chip editor was sized for. 7, not 6, since the sorting workflow
+// (docs/sorting-workflow-spec.md): "meta" on a sorting pile and "in your raid
+// filter" are the same cut, and it matches the shadow keepers' depth.
 //
 // shadowKeepers cuts at 7 by explicit choice. Each keeper costs a `!+species`
 // clause in shadowSafe, a `+species` term in shadowFrustration and one more in
@@ -173,8 +175,12 @@ const TYPES = [
 // Machamp sat 6th in Fighting and Shadow Swampert 7th in Water, both within a
 // few percent of the cut — because those are the two deepest Shadow pools.
 // Anyone who disagrees can delete chips; the list is a seed, not a verdict.
-const TOP_PER_TYPE = 6;
+const TOP_PER_TYPE = 7;
 const SHADOW_TOP_PER_TYPE = 7;
+// The watchlist's third tier: ranks just past the cut, TOP_PER_TYPE+1 through
+// WATCH_RANK_TO per type. Close enough that a Mega or a move change can lift
+// them into the meta, which is when the sorting piles want a few kept.
+const WATCH_RANK_TO = 15;
 
 // Attacker level. 40 is the stardust-efficient standard the community builds
 // to, and the ranking is a comparison — every candidate is evaluated at the
@@ -866,9 +872,20 @@ async function main() {
 
   const descendants = evolutionDescendants(formsByDex);
   const byType = topPerType(normalEntries, TOP_PER_TYPE, descendants);
+  // Same ranking, deeper: ranks past the cut for the watchlist, minus any
+  // species already in the meta through another type.
+  const byTypeDeep = topPerType(normalEntries, WATCH_RANK_TO, descendants);
   const shadowByType = topPerType(shadowEntries, SHADOW_TOP_PER_TYPE, descendants);
 
   const topAttackers = unionByBestRating(byType).map(nameFor).filter(Boolean);
+  const metaDex = new Set(Object.values(byType).flat().map((e) => e.dex));
+  const watchPerType = Object.fromEntries(TYPES.map((t) => [
+    t,
+    byTypeDeep[t]
+      .map((e, i) => ({ species: nameFor(e.dex), dex: e.dex, rank: i + 1, rating: Math.round(e.rating * 100) / 100 }))
+      .slice(TOP_PER_TYPE)
+      .filter((e) => e.species && !metaDex.has(e.dex)),
+  ]));
   const shadowKeeperDexes = unionByBestRating(shadowByType).filter(dex => nameFor(dex));
   const shadowKeepers = shadowKeeperDexes.map(nameFor);
   // Keyed by the same species names as shadowKeepers, so the app canonicalizes
@@ -977,6 +994,7 @@ async function main() {
     },
     topPerType: TOP_PER_TYPE,
     shadowTopPerType: SHADOW_TOP_PER_TYPE,
+    watchRankTo: WATCH_RANK_TO,
     maxChargerDurationMs: MAX_CHARGER_DURATION_MS,
     topAttackers,
     shadowKeepers,
@@ -985,6 +1003,7 @@ async function main() {
     gigantamaxSpecies,
     perType,
     shadowPerType,
+    watchPerType,
     chargerMoves,
   };
 

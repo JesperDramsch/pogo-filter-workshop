@@ -34,6 +34,8 @@ export function pogoKeywords(outputLocale) {
       female:       k(messages, "filter_key_gender_female"),
       male:         k(messages, "filter_key_gender_male"),
       background:   k(messages, "filter_key_any_background"),
+      // A special background (Community Day, GO Fest, …), never a location card.
+      special_background: k(messages, "filter_key_special_background"),
       traded:       k(messages, "filter_key_traded"),
       hatched:      k(messages, "filter_key_hatched"),
       baby:         k(messages, "filter_key_baby"),
@@ -44,6 +46,11 @@ export function pogoKeywords(outputLocale) {
       mega:         k(messages, "filter_key_mega_level"),
       mega_evolve:  k(messages, "filter_key_evolve_mega"),
       dynamax_move: k(messages, "filter_key_bread_move_a"),
+      // Max Guard and Max Spirit levels. Unlike dynamax_move these have NO
+      // value until the move is unlocked, so only ever emit them negated
+      // (`!dynawall1-`): the range alone rejects a fresh Dynamax.
+      dynamax_wall:   k(messages, "filter_key_bread_move_b"),
+      dynamax_spirit: k(messages, "filter_key_bread_move_c"),
       // Gigantamax-capable flag (filter_key_dough). A STRICT SUBSET of
       // dynamax_move — only ever emitted as the narrow `!gigadynamax` floor
       // when broad Dynamax protection is off (see maxProtectClause in App).

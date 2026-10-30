@@ -229,6 +229,7 @@ jobs:
         shell: bash
         run: |
           npm run test:datafilters 2>&1 | tee "$RUNNER_TEMP/sync/validate.log"
+          npm run test:piles 2>&1 | tee -a "$RUNNER_TEMP/sync/validate.log"
           npm run test:metaref 2>&1 | tee -a "$RUNNER_TEMP/sync/validate.log"
           npm run test:megaboost 2>&1 | tee -a "$RUNNER_TEMP/sync/validate.log"
 
@@ -354,8 +355,10 @@ jobs:
             src/data/meta-rankings.json
             src/data/species-meta.json
             src/data/events.json
+            src/data/community-days.json
             src/data/regional-forms.json
             src/data/game-master-watch.json
+            src/data/watch-moves.json
             skills/pokemon-go-filters/references/pvp-meta.json
             skills/pokemon-go-filters/references/META.md
         run: |

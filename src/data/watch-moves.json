@@ -1,0 +1,134 @@
+{
+  "fetchedAt": "2026-10-29T18:28:50.622Z",
+  "signatureLearners": 5,
+  "moves": [
+    {
+      "move": "KOWTOW_CLEAVE",
+      "change": "added",
+      "at": "2026-10-29T13:14:02.606Z",
+      "learners": []
+    },
+    {
+      "move": "OMINOUS_WIND_PLUS",
+      "change": "added",
+      "at": "2026-10-29T13:14:02.606Z",
+      "learners": []
+    },
+    {
+      "move": "VM_MOVE_TEMP_EVOLUTION_MEGA_V0609_POKEMON_CHANDELURE",
+      "change": "added",
+      "at": "2026-10-15T11:39:37.288Z",
+      "learners": [
+        609
+      ]
+    },
+    {
+      "move": "VM_MOVE_TEMP_EVOLUTION_MEGA_V0310_POKEMON_MANECTRIC",
+      "change": "added",
+      "at": "2026-10-14T12:02:44.844Z",
+      "learners": [
+        310
+      ]
+    },
+    {
+      "move": "VM_MOVE_TEMP_EVOLUTION_MEGA_V0398_POKEMON_STARAPTOR",
+      "change": "added",
+      "at": "2026-09-18T13:33:21.589Z",
+      "learners": [
+        398
+      ]
+    },
+    {
+      "move": "BRAVE_BIRD_PLUS",
+      "change": "added",
+      "at": "2026-09-17T14:15:17.368Z",
+      "learners": []
+    },
+    {
+      "move": "VM_MOVE_TEMP_EVOLUTION_MEGA_V0229_POKEMON_HOUNDOOM",
+      "change": "added",
+      "at": "2026-09-13T13:46:32.837Z",
+      "learners": [
+        229
+      ]
+    },
+    {
+      "move": "DARK_PULSE_PLUS",
+      "change": "added",
+      "at": "2026-09-11T13:28:49.674Z",
+      "learners": []
+    },
+    {
+      "move": "DOUBLE_IRON_BASH",
+      "change": "changed",
+      "at": "2026-09-09T13:39:32.814Z",
+      "learners": [
+        809
+      ]
+    },
+    {
+      "move": "FELL_STINGER_PLUS",
+      "change": "added",
+      "at": "2026-09-09T13:39:32.814Z",
+      "learners": []
+    },
+    {
+      "move": "HIGH_HORSEPOWER",
+      "change": "changed",
+      "at": "2026-09-09T13:39:32.814Z",
+      "learners": [
+        78,
+        221,
+        241,
+        473,
+        901
+      ]
+    },
+    {
+      "move": "MAGNET_BOMB",
+      "change": "changed",
+      "at": "2026-09-09T13:39:32.814Z",
+      "learners": [
+        81,
+        82,
+        235,
+        476,
+        649
+      ]
+    },
+    {
+      "move": "PSYCHO_BOOST",
+      "change": "changed",
+      "at": "2026-09-09T13:39:32.814Z",
+      "learners": [
+        235,
+        386
+      ]
+    },
+    {
+      "move": "RAGE_FIST",
+      "change": "changed",
+      "at": "2026-09-09T13:39:32.814Z",
+      "learners": [
+        57,
+        979
+      ]
+    },
+    {
+      "move": "SHADOW_FORCE",
+      "change": "changed",
+      "at": "2026-09-09T13:39:32.814Z",
+      "learners": [
+        487
+      ]
+    },
+    {
+      "move": "VM_MOVE_TEMP_EVOLUTION_MEGA_V0015_POKEMON_BEEDRILL",
+      "change": "added",
+      "at": "2026-09-09T13:39:32.814Z",
+      "learners": [
+        15
+      ]
+    }
+  ]
+}

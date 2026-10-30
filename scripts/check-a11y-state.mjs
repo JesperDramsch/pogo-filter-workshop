@@ -11,6 +11,9 @@
 //   S2 — mutually-exclusive groups use radio semantics
 //   S3 — custom disclosures expose aria-expanded, and point at a real panel
 //   S4 — the current nav tab is exposed as aria-current
+//   S5 — the filter areas are a real ARIA tab set: tabs name their panel,
+//        the selected one is exposed and alone in the Tab order, arrow keys
+//        move, and every panel is mounted so aria-controls never dangles
 //
 // Deliberately NOT checked: <details>/<summary>. React sets the `open`
 // attribute and the summary's expanded state derives from it natively, so
@@ -130,6 +133,34 @@ console.log("\nS4 — the current nav tab is exposed");
   // tone is a visual concern and must not be the only signal.
   check("`active` tone is no longer the sole indicator",
     /tone=\{tab\.key === currentKey[\s\S]{0,120}current=\{tab\.key === currentKey\}/.test(shell));
+}
+
+console.log("\nS5 — the filter areas are an ARIA tab set");
+{
+  const tabs = app.slice(app.indexOf("function AreaTabs("), app.indexOf("function AreaPanel("));
+  const panel = app.slice(app.indexOf("function AreaPanel("), app.indexOf("function Collapsible("));
+  check("AreaTabs renders a named tablist", /role='tablist' aria-label=\{t\('app\.area\.tablist'\)\}/.test(tabs));
+  check("each tab exposes aria-selected", /role='tab'[\s\S]{0,200}aria-selected=\{selected\}/.test(tabs));
+  check("each tab points at its panel", /aria-controls=\{`area-panel-\$\{area\}`\}/.test(tabs));
+  check("roving tabindex: only the selected tab is tabbable", /tabIndex=\{selected \? 0 : -1\}/.test(tabs));
+  for (const key of ["ArrowRight", "ArrowLeft", "Home", "End"])
+    check(`${key} moves between tabs`, tabs.includes(`'${key}'`));
+  check("each tab's onKeyDown is wired to the arrow-key handler", /role='tab'[\s\S]{0,600}onKeyDown=\{\(e\) => move\(e, i\)\}/.test(tabs));
+  check("panels are labelled by their tab", /role='tabpanel'[\s\S]{0,120}aria-labelledby=\{`area-tab-\$\{area\}`\}/.test(panel));
+  check("inactive panels are hidden, not unmounted", /hidden=\{area !== current\}/.test(panel));
+  const areas = (app.match(/export const FILTER_AREAS = \[([^\]]*)\]/) || [])[1]?.match(/'(\w+)'/g)?.map((x) => x.slice(1, -1)) || [];
+  const missing = areas.filter((a) => !app.includes(`<AreaPanel area='${a}' current={filterArea}>`));
+  check(`every area (${areas.join(", ")}) has a panel`, areas.length === 4 && missing.length === 0, missing.join(", "));
+  check("the settings flip is a toggle exposing aria-pressed", /onClick=\{onToggleSettings\}\s*aria-pressed=\{!!settings\}/.test(tabs));
+  const notFlipped = areas.filter((a) => !app.includes(`areaSettingsFor.${a}\n`));
+  check("every area panel flips to its own settings", notFlipped.length === 0, notFlipped.join(", "));
+  // The flip is a URL too, so back/forward and bookmarks reach it.
+  const { areaFromHash, areaSettingsFromHash, areaHash } = await import("../src/App.jsx");
+  const trips = areas.flatMap((a) => [false, true].map((on) => [a, on, areaHash(a, on)]));
+  const badTrips = trips.filter(([a, on, h]) => areaFromHash(h) !== a || areaSettingsFromHash(h) !== on).map(([, , h]) => h);
+  check(`hash round-trips for ${trips.length} area/settings states`, badTrips.length === 0, badTrips.join(", "));
+  check("wizard step hashes are not areas", ["#workshop/where", "#workshop/what", "#workshop/have", "#workshop/filter", "#workshop"]
+    .every((h) => areaFromHash(h) === null && areaSettingsFromHash(h) === false));
 }
 
 console.log(`\n${failures === 0 ? "✓ All ARIA-state checks passed." : `✗ ${failures} failure(s).`}`);

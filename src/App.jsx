@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, useId, Fragment } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useId, Fragment, createContext, useContext } from 'react';
 import { Dialog } from './Dialog.jsx';
 import * as d3 from 'd3';
 import {
@@ -14,6 +14,35 @@ import {
 	ArrowLeft,
 	Download,
 	Upload,
+	Award,
+	Clover,
+	Gift,
+	Shirt,
+	Image,
+	Maximize2,
+	Minimize2,
+	Swords,
+	Telescope,
+	Flame,
+	Zap,
+	Sprout,
+	Dna,
+	Package,
+	Leaf,
+	Rocket,
+	Target,
+	Trophy,
+	ArrowLeftRight,
+	Heart,
+	Handshake,
+	Sigma,
+	List,
+	BadgeCheck,
+	Tag,
+	Egg,
+	Candy,
+	Crown,
+	Medal,
 } from 'lucide-react';
 import {
 	POKEMON_NAMES_DICT,
@@ -25,10 +54,12 @@ import {
 } from './data/species.js';
 import { regionForForm } from './data/form-region.js';
 import SpeciesInput from './SpeciesInput.jsx';
-import { liveSpawnPool, rankMegaGroups } from './mega-boost.js';
+import { megaPlans, rankMegaGroups } from './mega-boost.js';
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from './i18n/pogo-keywords.js';
 import RAID_BOSSES from './data/raid-bosses.json';
 import EVENTS from './data/events.json';
+import COMMUNITY_DAYS from './data/community-days.json';
+import WATCH_MOVES from './data/watch-moves.json';
 import ROCKET_LINEUPS from './data/rocket-lineups.json';
 import ROCKET_GRUNT_QUOTES from './data/rocket-grunt-quotes.json';
 import RocketQuoteLookup from './explain/RocketQuoteLookup.jsx';
@@ -114,9 +145,30 @@ function viewFromHash() {
 }
 function stepFromHash() {
 	if (typeof window === 'undefined') return null;
+	// An area hash (#workshop/sort) is the filter step with that tab open.
+	if (areaFromHash()) return STEP_NUMBER_BY_KEY.filter;
 	const m = window.location.hash.match(/^#workshop\/(\w+)$/);
 	if (!m) return null;
 	return STEP_NUMBER_BY_KEY[m[1]] ?? null;
+}
+
+// The filter step splits by what the user is doing at that moment (see
+// docs/sorting-workflow-spec.md, "Areas"). Keys are deliberately disjoint from
+// the wizard step keys, so #workshop/<key> stays unambiguous.
+export const FILTER_AREAS = ['catch', 'sort', 'battle', 'trade'];
+// #workshop/<area>/settings flips that area to its settings; the flip stays
+// on while switching tabs, so all four areas' settings are one view.
+const AREA_HASH = /^#workshop\/(\w+)(\/settings)?$/;
+export function areaFromHash(hash = typeof window === 'undefined' ? '' : window.location.hash) {
+	const m = hash.match(AREA_HASH);
+	return m && FILTER_AREAS.includes(m[1]) ? m[1] : null;
+}
+export function areaSettingsFromHash(hash = typeof window === 'undefined' ? '' : window.location.hash) {
+	const m = hash.match(AREA_HASH);
+	return !!(m && FILTER_AREAS.includes(m[1]) && m[2]);
+}
+export function areaHash(area, settings) {
+	return `#workshop/${area}${settings ? '/settings' : ''}`;
 }
 function navigateView(target) {
 	if (typeof window === 'undefined') return;
@@ -739,6 +791,17 @@ function teDisplay(baseKey, outputLocale = 'de') {
 export const DEFAULT_CONFIG = {
 	// Mode
 	expertMode: false, // hides niche toggles in normal mode
+	// Sorting-pile budgets: only the numbers the user changed in expert mode.
+	// Effective budgets are BUDGET_DEFAULTS overlaid with these, so a budget
+	// added later reaches every saved config without a migration. Simple mode
+	// ignores them and uses the defaults (docs/sorting-workflow-spec.md).
+	budgets: {},
+	// Job tag names the user renamed (docs/sorting-workflow-spec.md, "Tagging
+	// scheme"); JOB_TAG_DEFAULTS for the rest. Tradebait is basarTagName and
+	// "promised" is each trade buddy's prefix, so neither is in here.
+	jobTags: {},
+	// Sorting piles the user hid (ids); hidden piles sit in a "hidden" list.
+	hiddenPiles: [],
 
 	// PvP
 	pvpMode: 'strict', // "loose" | "intelligent" | "strict" | "none"
@@ -810,7 +873,7 @@ export const DEFAULT_CONFIG = {
 	protectBuddies: false,
 
 	// Trade tags (both protected as TAGS in PoGo via #name syntax)
-	basarTagName: 'Trade', // bulk trade tag (was hardcoded #)
+	basarTagName: 'Tradebait', // bulk trade tag; not `Trade`, which would prefix-match the `Trade-<Name>` buddy tags
 	fernTauschTagName: 'Fern-Tausch', // Niantic's official long-distance trade tag (Dec 2025)
 	// EvoSwap tag — used by the trade-buddy purified-dex coordination filter
 	// in the Team Rocket aux section. Renaming lets you run multiple parallel
@@ -1662,6 +1725,20 @@ export function mergeImportedConfig(raw, notices = []) {
 				});
 			return { rawAppend: '', ...b, targetSpecies };
 		});
+	merged.hiddenPiles = Array.isArray(merged.hiddenPiles) ? merged.hiddenPiles.filter((x) => typeof x === 'string') : [];
+	// Job tag renames: non-empty strings, without a leading #.
+	merged.jobTags = Object.fromEntries(
+		Object.entries(merged.jobTags && typeof merged.jobTags === 'object' ? merged.jobTags : {})
+			.map(([k, v]) => [k, typeof v === 'string' ? v.trim().replace(/^#+/, '') : ''])
+			.filter(([, v]) => v),
+	);
+	// Budget overrides: whole numbers ≥ 0 only; anything else falls back to the
+	// default by being dropped. Unknown keys stay (a newer export).
+	merged.budgets = Object.fromEntries(
+		Object.entries(merged.budgets && typeof merged.budgets === 'object' ? merged.budgets : {}).filter(
+			([, v]) => Number.isInteger(v) && v >= 0,
+		),
+	);
 	return merged;
 }
 
@@ -1790,6 +1867,296 @@ function speciesForOutput(name, outputLocale) {
 function capFirst(s) {
 	if (!s) return s;
 	return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// The protection tail: step ③ ("release") of every sorting pile is the pile
+// ANDed with these clauses, never with the trash filter. The trash filter only
+// matches the lowest common denominator, which steps ① and ② have already
+// handled, so `pile & trash` came up empty and the dupes it was meant to clear
+// stayed. The tail keeps only what is ALWAYS protected; shinies, luckies,
+// shadows, costumes and the rest are the user's call in ① and ②, and the ones
+// worth keeping are starred or tagged by the time ③ runs.
+//
+// Deliberately independent of the trash toggles (protectNundos, protectBuddies,
+// protectLuckyEligible and friends): switching a protection off to clear a
+// category is exactly the habit the piles replace. The one setting it reads is
+// the lucky-trade year floor's value, which is the user's.
+//
+// Spelling notes, all checked in scripts/check-data-filters.mjs:
+//   - nundos use the positive contrapositive: PoGo ignores `!N` on IV tokens
+//   - invested Dynamax is three clauses (De Morgan), and negated ranges, so a
+//     fresh Dynamax with no Guard or Spirit value still passes
+//   - shiny / background legendaries are one OR-clause each: ¬(A ∩ L) = ¬A ∪ ¬L
+export function protectionTail(kw, cfg) {
+	const clauses = [
+		`!${kw.flag.favorite}`,
+		'!#',
+		'!4*',
+		`1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`,
+	];
+	// The year floor's value, not its trash toggle (protectLuckyEligible): the
+	// tail ignores the toggles, and step ③'s hint calls lucky-trade stock
+	// always protected. A year of 0 means the user set no floor at all.
+	if (cfg.luckyEligibleYear > 0) {
+		// Traded ones can't be traded again, so they are no lucky-trade stock.
+		clauses.push(`${kw.numeric.year}${cfg.luckyEligibleYear}-,${kw.flag.traded}`);
+	}
+	clauses.push(
+		`!${kw.flag.dynamax_move}2-`,
+		`!${kw.flag.dynamax_wall}1-`,
+		`!${kw.flag.dynamax_spirit}1-`,
+		`!${kw.numeric.buddy}2-`,
+		`!${kw.flag.mythical}`,
+		`!${kw.flag.shiny},!${kw.flag.legendary}`,
+		`!${kw.flag.background},!${kw.flag.legendary}`,
+	);
+	return clauses;
+}
+
+// One sorting pile in the spec's three steps. `head` is the pile itself, a
+// CNF chain (`+a,+b` or `+a&!+a,alola`); each ① lens is ANDed onto it, as are
+// ② (not starred, not tagged) and ③ (the protection tail). Every pile goes
+// through here, so all of them share one shape and scripts/check-piles.mjs can
+// hold them all to it.
+//   lenses: [{ key, filter, text? }] where `filter` is a CNF chain (may hold
+//   `&`) and `text` ([label, hint, params]) names a lens the pile's wording
+//   table can't know in advance, such as one per active GBL cup
+// How many Pokémon each job holds per species (docs/sorting-workflow-spec.md,
+// "Budgets (defaults)"). The pile card reads these; expert mode edits them.
+export const BUDGET_DEFAULTS = {
+	raidMeta: 6,
+	pvpNormal: 1,
+	pvpShadow: 1,
+	watchMegaNormal: 1,
+	watchShadow: 2,
+	watchNormal: 1,
+	standIn: 1,
+	shadowStandIn: 2,
+	evolve: 1,
+	luckyPerForm: 1,
+	xxlScore: 1000,
+	dynaBuild: 1,
+	dynaBuildTop: 3,
+	dynaParkers: 35,
+	cheapPurify: 23,
+	costumePerStage: 1,
+	costumeTradeable: 3,
+	evolveShadow: 2,
+	pvpOffMeta: 1,
+	shinyPerStage: 1,
+	shinyTradeable: 3,
+	backgroundPerSpecies: 1,
+	backgroundTradeable: 3,
+};
+
+// ── Showcase score (spec: "XXL score calculator") ─────────────────────────
+// score = H × scaled height + W × scaled weight + I × (IV sum / 45), with the
+// coefficients from the game master's CONTEST_SETTINGS (800 / 150 / 50) and
+//   scaled height = (height / species mean height) / class height max
+//   scaled weight = (weight / species mean weight) / class weight max
+// (Pokémon GO Hub, July 2023). An XXL scores a further 178 (PokémonDB;
+// confirmed: it is the game's internal calculation), so a single-species
+// showcase tops out at 1,178. The class (the XXL's maximum height, 1.55,
+// 1.75 or 2.00× the mean) is not published per species, so every class the
+// entered size still fits is scored and the result is a range. The game
+// shows height and weight rounded to 0.01, so each class is scored at both
+// ends of that rounding.
+export const SHOWCASE_CLASSES = [
+	{ height: 1.55, weight: 2.05 },
+	{ height: 1.75, weight: 2.25 },
+	{ height: 2.0, weight: 2.5 },
+];
+export const SHOWCASE_XXL_BONUS = 178;
+// `ivs` null means unknown: the IV part (at most 50 of the score) then spans
+// its whole range instead of narrowing it.
+// `form` is a form suffix from `sizeByForm` (Pumpkaboo's SUPER, Marowak's
+// ALOLA); a species' forms can differ in mean size a lot.
+export function showcaseScoreRange({ dex, form = null, heightM, weightKg, ivs = null, xxl = true }, showcase = SPECIES_META.showcase) {
+	const mean = (form && showcase?.sizeByForm?.[dex]?.[form]) || showcase?.sizeByDex?.[dex];
+	const c = showcase?.coefficients;
+	if (!mean || !c || !(heightM > 0) || !(weightKg > 0)) return null;
+	const ivSum = ivs ? ivs.reduce((a, v) => a + Math.max(0, Math.min(15, Number(v) || 0)), 0) : null;
+	const ivLow = ivs ? c.iv * (ivSum / 45) : 0;
+	const ivHigh = ivs ? ivLow : c.iv;
+	const bonus = xxl ? SHOWCASE_XXL_BONUS : 0;
+	const round = 0.005;
+	const scored = [];
+	for (const cls of SHOWCASE_CLASSES) {
+		const hr = heightM / mean[0];
+		const wr = weightKg / mean[1];
+		// The entered size has to fit the class (within the display rounding).
+		if ((heightM - round) / mean[0] > cls.height || (weightKg - round) / mean[1] > cls.weight) continue;
+		// Each scaled term tops out at 1: the class maximum is the biggest an XXL
+		// of the class gets, so rounding up can't push past it.
+		const at = (h, w, iv) =>
+			c.height * Math.min(1, h / mean[0] / cls.height) + c.weight * Math.min(1, w / mean[1] / cls.weight) + iv + bonus;
+		scored.push({ cls: cls.height, low: at(heightM - round, weightKg - round, ivLow), high: at(heightM + round, weightKg + round, ivHigh), hr, wr });
+	}
+	if (scored.length === 0) return { fits: false };
+	return {
+		fits: true,
+		min: Math.floor(Math.min(...scored.map((x) => x.low))),
+		max: Math.ceil(Math.max(...scored.map((x) => x.high))),
+		classes: scored.map((x) => x.cls),
+	};
+}
+
+// ── Which piles show first (spec: "Which piles show first") ──────────────
+// A pile floats up while an event of its kind is running or ended at most
+// FLOAT_ENDED_DAYS ago (the events snapshot's own carry-over window, see
+// scripts/lib/event-window.mjs). Upcoming events don't float anything.
+//   wild-spawn event → event spawns, and both costume piles if it had costumed spawns
+//   Community Day   → the C-Day pile
+//   takeover        → shadows
+//   Max Battle event (Max Monday, Max Battle Day) → Dynamax
+// A double transfer candy day has no source yet, so its Crush reminder card
+// always shows (agreed deferral).
+export const FLOAT_ENDED_DAYS = 7;
+export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] } = {}, now = Date.now()) {
+	const recent = (start, end) => {
+		const s = Date.parse(start), e = Date.parse(end);
+		return Number.isFinite(s) && Number.isFinite(e) && s <= now && now - e <= FLOAT_ENDED_DAYS * 86400000;
+	};
+	const out = [];
+	const add = (pile, kind, title) => {
+		if (!out.some((f) => f.pile === pile)) out.push({ pile, kind, title });
+	};
+	for (const sg of signals) {
+		if (!recent(sg.start, sg.end)) continue;
+		if (sg.kind === 'takeover') add('shadows', 'takeover', sg.title);
+		if (sg.kind === 'community_day') add('cday', 'community_day', sg.title);
+		if (sg.kind === 'max') add('dynamax', 'max', sg.title);
+	}
+	for (const mb of eventMaxBattles) if (recent(mb.start, mb.end)) add('dynamax', 'max', mb.name);
+	for (const ev of events) {
+		if (!recent(ev.start, ev.end)) continue;
+		if (ev.category === 'Community Day') add('cday', 'community_day', ev.title);
+		add('event_spawns', 'wild', ev.title);
+		if (ev.hasCostumes) {
+			add('costumes_evolve', 'costumes', ev.title);
+			add('costumes_final', 'costumes', ev.title);
+		}
+	}
+	return out;
+}
+
+// The tagging scheme's suggested job tags. Every tag is a job; Dex-Evolve and
+// Crush are temporary (off once the line is evolved through / emptied on a
+// double transfer candy day). Names avoid the search keywords of every locale:
+// `Raid` and `Evolve` are keywords in some (en/de/fr, en).
+export const JOB_TAG_DEFAULTS = {
+	evolve: 'Dex-Evolve',
+	pvp: 'PvP',
+	raid: 'PvE-Raid',
+	show: 'Show',
+	souvenir: 'Souvenir',
+	shadow_keep: 'ShadowKeep',
+	parker: 'Parker',
+	crush: 'Crush',
+};
+// The scheme's rows in the spec's order; `trade` edits basarTagName and
+// `promised` shows the trade buddies' prefixes.
+export const JOB_TAG_ORDER = ['evolve', 'trade', 'promised', 'pvp', 'raid', 'show', 'souvenir', 'shadow_keep', 'parker', 'crush'];
+export function jobTagsOf(cfg) {
+	return { ...JOB_TAG_DEFAULTS, ...(cfg?.jobTags || {}), trade: cfg?.basarTagName || 'Tradebait' };
+}
+
+// What goes wrong with a tag name in this game language: `keyword` when the
+// name is a search keyword (searching #shiny also lists every shiny), and
+// `prefixOf`, the other tags it prefix-matches (PoGo matches #tags by prefix,
+// so #Trade would also find #Trade-Julia).
+export function tagClashes(tag, otherTags, outputLocale) {
+	const name = String(tag || '').trim().toLowerCase();
+	if (!name) return { keyword: false, prefixOf: [] };
+	const messages = LOCALES[outputLocale]?.messages || LOCALES.en.messages;
+	const keyword = Object.entries(messages).some(
+		([k, v]) => k.startsWith('ingame.') && String(v).toLowerCase().trim() === name,
+	);
+	const prefixOf = [...new Set(otherTags)].filter(
+		(o) => o && o.toLowerCase() !== name && o.toLowerCase().startsWith(name),
+	);
+	return { keyword, prefixOf };
+}
+
+// The budgets in force: the user's overrides in expert mode, the defaults in
+// simple mode.
+export function effectiveBudgets(cfg) {
+	return cfg?.expertMode ? { ...BUDGET_DEFAULTS, ...(cfg.budgets || {}) } : { ...BUDGET_DEFAULTS };
+}
+
+// The spec's budget table, one row per job, in its order. `keys` are the
+// numbers the row's rule reads (and expert mode edits); each key's input is
+// named by `BUDGET_KEY_WORD`. XXS and tradebait have rules but no number.
+export const BUDGET_ROWS = [
+	{ job: 'evolve', group: 'collection', keys: ['evolve', 'evolveShadow'] },
+	{ job: 'stand_in', group: 'collection', keys: ['standIn'] },
+	{ job: 'shadow_stand_in', group: 'collection', keys: ['shadowStandIn'] },
+	{ job: 'shinies', group: 'collection', keys: ['shinyPerStage', 'shinyTradeable'] },
+	{ job: 'costumes', group: 'collection', keys: ['costumePerStage', 'costumeTradeable'] },
+	{ job: 'backgrounds', group: 'collection', keys: ['backgroundPerSpecies', 'backgroundTradeable'] },
+	{ job: 'luckies', group: 'collection', keys: ['luckyPerForm'] },
+	{ job: 'xxl', group: 'collection', keys: ['xxlScore'] },
+	{ job: 'xxs', group: 'collection', keys: [] },
+	{ job: 'raid_meta', group: 'battle', keys: ['raidMeta'] },
+	{ job: 'raid_watch_mega', group: 'battle', keys: ['watchMegaNormal'] },
+	{ job: 'raid_watch', group: 'battle', keys: ['watchShadow', 'watchNormal'] },
+	{ job: 'pvp', group: 'battle', keys: ['pvpNormal', 'pvpShadow'] },
+	{ job: 'pvp_off_meta', group: 'battle', keys: ['pvpOffMeta'] },
+	{ job: 'dyna_builds', group: 'battle', keys: ['dynaBuild', 'dynaBuildTop'] },
+	{ job: 'dyna_parkers', group: 'stock', keys: ['dynaParkers'] },
+	{ job: 'cheap_purify', group: 'stock', keys: ['cheapPurify'] },
+	{ job: 'tradebait', group: 'stock', keys: [] },
+];
+export const BUDGET_GROUPS = ['collection', 'battle', 'stock'];
+const BUDGET_KEY_WORD = {
+	evolve: 'count', evolveShadow: 'shadow_line', standIn: 'count', shadowStandIn: 'count', raidMeta: 'count',
+	watchMegaNormal: 'normal', watchShadow: 'shadow', watchNormal: 'normal', pvpNormal: 'normal', pvpShadow: 'shadow', pvpOffMeta: 'count',
+	shinyPerStage: 'per_stage', shinyTradeable: 'tradeable', costumePerStage: 'per_stage', costumeTradeable: 'tradeable',
+	backgroundPerSpecies: 'per_stage', backgroundTradeable: 'tradeable',
+	luckyPerForm: 'count', xxlScore: 'score', dynaBuild: 'count', dynaBuildTop: 'top', dynaParkers: 'count',
+	cheapPurify: 'count',
+};
+
+// The watchlist's move tier looks back this far (watch-moves.json has every
+// qualifying entry; see scripts/fetch-game-master-watch.mjs for which qualify).
+export const WATCH_MOVE_DAYS = 90;
+
+// A move id as the move dictionary keys it: DOUBLE_IRON_BASH → "double iron
+// bash", OMINOUS_WIND_PLUS → "ominous wind+". English title case if unknown.
+function moveLabel(id, tFn) {
+	const en = id.replace(/_FAST$/, '').replace(/_PLUS$/, '+').toLowerCase().replace(/_/g, ' ');
+	// The dictionary keys some moves hyphenated (V-Create, X-Scissor, Lock-On),
+	// so that spelling goes first, as the charger list does.
+	const fallback = en.replace(/\b\w/g, (c) => c.toUpperCase());
+	return tFn(`move.${en.replace(/ /g, '-')}`, { fallback: tFn(`move.${en}`, { fallback }) });
+}
+
+// Species whose Community Day came with a special background. Same rule as
+// communityDayBackgroundDex in scripts/lib/community-days.mjs (check-piles
+// holds the two equal): legacy entries with a background, every rolling one.
+export const COMMUNITY_DAY_BG_DEX = [
+	...new Set([
+		...(COMMUNITY_DAYS.legacy || []).filter((cd) => cd.background).flatMap((cd) => cd.dex),
+		...(COMMUNITY_DAYS.rolling || []).flatMap((cd) => cd.dex),
+	]),
+].sort((a, b) => a - b);
+
+// Every Community Day species, background or not: the C-Day pile's list.
+export const COMMUNITY_DAY_DEX = [
+	...new Set([...(COMMUNITY_DAYS.legacy || []), ...(COMMUNITY_DAYS.rolling || [])].flatMap((cd) => cd.dex)),
+].sort((a, b) => a - b);
+
+export function buildPile({ id, head, lenses = [], kw, cfg }) {
+	if (!head) return null;
+	return {
+		id,
+		overview: head,
+		keep: lenses
+			.filter((l) => l.filter)
+			.map((l) => ({ key: l.key, filter: `${head}&${l.filter}`, ...(l.text ? { text: l.text } : {}) })),
+		sort: `${head}&!${kw.flag.favorite}&!#`,
+		release: `${head}&${protectionTail(kw, cfg).join('&')}`,
+	};
 }
 
 export function buildFilters(
@@ -2721,6 +3088,7 @@ export function buildFilters(
 
 	// ── HUNDO-SORT ─────────────────────────────────────────────────────────
 	const sortClauses = [];
+	let sortPileHead = '';
 	if (hundos.length > 0) {
 		push(sortClauses, H, tFn('app.clause_why.all_hundo_families'));
 		// Regional form-scoping: when a hundo is annotated to specific form(s),
@@ -2747,6 +3115,7 @@ export function buildFilters(
 					tFn('app.clause_why.sort_gender_scope', { params: { species: capFirst(out) } }),
 				);
 		}
+		sortPileHead = sortClauses.map((c) => c.clause).join('&');
 		if (cfg.protectAnyTag) push(sortClauses, '!#', tFn('app.clause_why.all_tags_protected'));
 		if (cfg.protectFavorites) push(sortClauses, `!${kw.flag.favorite}`, tFn('app.clause_why.favorites_protected'));
 		if (cfg.protectShinies) push(sortClauses, `!${kw.flag.shiny}`, tFn('app.clause_why.shinies_protected'));
@@ -2801,6 +3170,22 @@ export function buildFilters(
 		if (cfg.protectLuckies) push(luckySortClauses, `!${kw.flag.lucky}`, tFn('app.clause_why.luckies_protected'));
 	}
 	const luckySort = luckySortClauses.map((c) => c.clause).join('&');
+	// The same families as a pile: ① the hundos themselves, ② what is not yet
+	// starred or tagged, ③ the rest. Once a hundo exists the family's stand-in
+	// has no job, so ③ releases it; the hundo is in the protection tail.
+	const hundoPile = buildPile({
+		id: 'hundo',
+		head: sortPileHead,
+		// docs/pile-purposes.md: best first, as every pile.
+		lenses: [
+			{ key: 'hundos', filter: '4*' },
+			{ key: 'shiny', filter: kw.flag.shiny },
+			{ key: 'strong', filter: `3-4${kw.iv.atk}&3-4${kw.iv.def}&3-4${kw.iv.hp}` },
+			{ key: 'three', filter: '3*' },
+		],
+		kw,
+		cfg,
+	});
 
 	// ── LUCKY-SORT ─────────────────────────────────────────────────────────
 	// Lucky analogue of HUNDO-SORT keyed on the luckies list: surface every member
@@ -2808,6 +3193,7 @@ export function buildFilters(
 	// it emits NO !lucky guard — the whole point is to see the lucky copies. Regional
 	// form-scoped via cfg.luckyForms, exactly like the hundo-sort.
 	const luckyFamilySortClauses = [];
+	let luckyFamilyPileHead = '';
 	if (luckies.length > 0) {
 		const L = luckies.map((l) => `+${speciesForOutput(l, outputLocale)}`).join(',');
 		push(luckyFamilySortClauses, L, tFn('app.clause_why.all_lucky_families'));
@@ -2832,6 +3218,7 @@ export function buildFilters(
 					tFn('app.clause_why.sort_gender_scope', { params: { species: capFirst(out) } }),
 				);
 		}
+		luckyFamilyPileHead = luckyFamilySortClauses.map((c) => c.clause).join('&');
 		if (cfg.protectAnyTag) push(luckyFamilySortClauses, '!#', tFn('app.clause_why.all_tags_protected'));
 		if (cfg.protectFavorites)
 			push(luckyFamilySortClauses, `!${kw.flag.favorite}`, tFn('app.clause_why.favorites_protected'));
@@ -2840,18 +3227,6 @@ export function buildFilters(
 	}
 	const luckyFamilySort = luckyFamilySortClauses.map((c) => c.clause).join('&');
 
-	// ── NUNDO-SORT ─────────────────────────────────────────────────────────
-	// Surface every 0/0/0 IV catch. PoGo's storage UI doesn't expose appraisal
-	// results as a filter, so this is the only way to bulk-browse Nundos for
-	// the collection wall. No favorite/tag exclusions — the whole point is
-	// finding every 0/0/0, including ones already starred or tagged.
-	const nundoSortClauses = [];
-	if (cfg.protectNundos) {
-		push(nundoSortClauses, `0${kw.iv.atk}`, tFn('app.clause_why.nundo_atk_zero'));
-		push(nundoSortClauses, `0${kw.iv.def}`, tFn('app.clause_why.nundo_def_zero'));
-		push(nundoSortClauses, `0${kw.iv.hp}`, tFn('app.clause_why.nundo_hp_zero'));
-	}
-	const nundoSort = nundoSortClauses.map((c) => c.clause).join('&');
 
 	// ── GIFT FILTER ────────────────────────────────────────────────────────
 	const giftClauses = [];
@@ -4074,15 +4449,10 @@ export function buildFilters(
 	);
 
 	// -- EVENT WILD SPAWNS · per-event curation workflow -----------------
-	// Each event's spawn species render as family-expanded German names
-	// (+taubsi,+habitak,…) and become a comma-OR clause that intersects the
-	// user's collection. We hang a small set of lenses off that intersection:
-	// an overview, souvenirs, one exact IV-keeper filter, what's still unsorted,
-	// and the trashable rest. Reuses the existing IV/flag tokens and the already-
-	// built `trash` string so event filters stay consistent with the main output.
-	const eventCollectibles = (cfg.customCollectibles || [])
-		.map((s) => speciesForOutput(s, outputLocale))
-		.filter(Boolean);
+	// Each event's spawn species render as family-expanded names (+taubsi,
+	// +habitak,…) and become a comma-OR clause that intersects the user's
+	// collection: the head of a pile like every other (see buildPile), with the
+	// ladder of docs/pile-purposes.md as its ① steps.
 	const eventsFetchedAt = EVENTS.fetchedAt || null;
 
 	// -- MEGA BOOST · which Mega to have active for a spawn pool ---------
@@ -4130,20 +4500,20 @@ export function buildFilters(
 				.map((n) => `+${n}`)
 				.join(',');
 			if (!fams) return null;
-			// Souvenirs — single-token collectible flags (shiny / costume / background)
-			// plus the user's custom collectibles. Hundos now live in the IV filter.
-			const souvenirTokens = [kw.flag.shiny, kw.flag.costume, kw.flag.background, ...eventCollectibles].filter(
-				Boolean,
-			);
-			// One exact IV-keeper filter = hundos ∪ "two 15s + one 11-14" keepers.
-			// "≥2 of three stats are 15" is the CNF threshold (a∨b)∧(a∨c)∧(b∨c); the
-			// three 3-4 clauses force every bar ≥11. Together that is exactly hundo ∪
-			// keeper. Nundo (opposite extreme) and PvP (wants low attack) can't share
-			// this flat clause, so by design they get no event box.
-			const a = `4${kw.iv.atk}`,
-				d = `4${kw.iv.def}`,
-				h = `4${kw.iv.hp}`;
-			const keepIv = `${fams}&${a},${d}&${a},${h}&${d},${h}` + `&3-4${kw.iv.atk}&3-4${kw.iv.def}&3-4${kw.iv.hp}`;
+			// Best first, as every pile (docs/pile-purposes.md). Shinies, costumes
+			// and backgrounds need no step: the protection tail keeps them from ③.
+			const pile = buildPile({
+				id: `event_${ev.id}`,
+				head: fams,
+				lenses: [
+					{ key: 'hundo', filter: '4*' },
+					{ key: 'shiny', filter: kw.flag.shiny },
+					{ key: 'strong', filter: `3-4${kw.iv.atk}&3-4${kw.iv.def}&3-4${kw.iv.hp}` },
+					{ key: 'three', filter: '3*' },
+				],
+				kw,
+				cfg,
+			});
 			return {
 				id: ev.id,
 				title: ev.title,
@@ -4154,15 +4524,12 @@ export function buildFilters(
 				spawnDex: ev.spawnDex || [],
 				spawnForms: ev.spawnForms || [],
 				megaBoost: megaBoostFor(ev.spawnForms),
-				// overview — every event spawn family, no other constraint
-				overview: fams,
-				// ① keep
-				souvenirs: `${fams}&${souvenirTokens.join(',')}`,
-				keepIv,
-				// ② still to sort — spawns you haven't favourited or tagged yet
-				sort: `${fams}&!${kw.flag.favorite}&!#`,
-				// ③ trash — your full trash logic, scoped to this event's spawns
-				trash: `${fams}&${trash}`,
+				// The event's spawn families as a pile (see buildPile): ① best IVs
+				// first, ② not yet starred or tagged, ③ the protection tail.
+				pile,
+				overview: pile.overview,
+				sort: pile.sort,
+				release: pile.release,
 			};
 		})
 		.filter(Boolean);
@@ -4637,6 +5004,353 @@ export function buildFilters(
 		}
 	}
 
+	// ── SORTING PILES ──────────────────────────────────────────────────────
+	// docs/sorting-workflow-spec.md, "Piles". Each is a head plus ① lenses,
+	// run through buildPile. Every species list comes from data: the raid, Max
+	// and shadow-keeper rosters are seeded from meta-rankings.json (and editable
+	// under Battle → settings), the PvP pools are pvp-rankings.json's Great
+	// League and today's active cups, exactly as the PvP card reads them.
+	const famOf = (names) => [...new Set(names)].map((n) => `+${n}`).join(',');
+	const pvpNamesOf = (league) =>
+		(league?.species || []).map((sp) => pokemonNameFor(String(sp.dex), outputLocale)).filter(Boolean);
+	const pvpPools = [
+		{ key: 'pvp_great', league: PVP_RANKINGS.leagues?.great, text: ['app.pile.lens.pvp_great_label', 'app.pile.lens.pvp_hint'] },
+		...cupFilters.map((c) => ({
+			key: `pvp_cup_${c.id}`,
+			league: PVP_RANKINGS.cups?.[c.id],
+			text: ['app.pile.lens.pvp_cup_label', 'app.pile.lens.pvp_hint', { cup: c.name }],
+		})),
+	];
+	const atk = kw.iv.atk, def = kw.iv.def, hp = kw.iv.hp;
+	// The shared steps of docs/pile-purposes.md. A pile's ① reads best first:
+	// each step must find something no earlier step found (check-piles P9).
+	const strongIv = `3-4${atk}&3-4${def}&3-4${hp}`;
+	const topIv = '4*,3*';
+	const ivLadder = (prefix = '', keyPrefix = '', hint) =>
+		[
+			['hundo', '4*'],
+			['shiny', kw.flag.shiny],
+			['strong', strongIv],
+			['three', '3*'],
+		].map(([key, filter]) => ({
+			key: `${keyPrefix}${key}`,
+			filter: `${prefix}${filter}`,
+			...(keyPrefix ? { text: [`app.pile.lens.${key}_label`, hint] } : {}),
+		}));
+	const stillToEvolve = { key: 'evolve', filter: kw.flag.evolvable };
+	const shinyStep = { key: 'shiny', filter: kw.flag.shiny };
+	// The loose rank-1 pattern under each capped league, for piles whose
+	// species aren't in a league's top 30 (the meta pile uses those pools).
+	const pvpLoose = ['great', 'ultra']
+		.map((id) => [id, PVP_RANKINGS.leagues?.[id]?.cpCap])
+		.filter(([, cap]) => cap)
+		.map(([id, cap]) => ({
+			key: `pvp_${id}_loose`,
+			filter: `${kw.numeric.cp}-${cap}&0-1${atk}&3-4${def}&3-4${hp}`,
+			text: [`app.pile.lens.pvp_${id}_label`, 'app.pile.lens.pvp_loose_hint'],
+		}));
+	const metaHead = famOf([
+		...topAttackersList,
+		...topMaxAttackersList,
+		...keeperResolved,
+		...pvpPools.flatMap((pool) => pvpNamesOf(pool.league)),
+	]);
+	const sortingPiles = [
+		// Meta: species on any meta list. Best IVs first, then each league's own
+		// clauses: pool, CP cap, loose rank-1 pattern. Only a capped league has
+		// a rank-1 pattern; buildLeagueFilter drops the CP and IV clauses for a
+		// capless one (a Master League cup), which would keep every member.
+		buildPile({
+			id: 'meta',
+			head: metaHead,
+			lenses: [
+				...ivLadder(),
+				...pvpPools.map((pool) => ({
+					key: pool.key,
+					filter: pool.league?.cpCap ? buildLeagueFilter(pool.league).clause : '',
+					text: pool.text,
+				})),
+			],
+			kw,
+			cfg,
+		}),
+		// Shadows. Never cleared by switching off shadow protection: the keepers
+		// are tagged here and ③ takes the rest. Attack matters most on a shadow.
+		// "Still to evolve" keeps two: one stays shadow, the second is purified
+		// and evolved up the line (one filter, so one step with its count).
+		buildPile({
+			id: 'shadows',
+			head: kw.flag.shadow,
+			lenses: [
+				{ key: 'hundo', filter: '4*' },
+				shinyStep,
+				{ key: 'meta', filter: metaHead },
+				{ key: 'three', filter: '3*' },
+				{ key: 'atk34', filter: `3-4${atk}` },
+				...pvpLoose,
+				{ key: 'evolve_shadow', filter: kw.flag.evolvable },
+			],
+			kw,
+			cfg,
+		}),
+		// Received trades can't be traded again, so they are never tradebait. A
+		// trade re-rolls IVs, which makes the PvP step worth having here.
+		buildPile({
+			id: 'traded',
+			head: kw.flag.traded,
+			lenses: [
+				{ key: 'hundo', filter: '4*' },
+				shinyStep,
+				{ key: 'luckies', filter: kw.flag.lucky },
+				{ key: 'strong', filter: strongIv },
+				{ key: 'three', filter: '3*' },
+				...pvpLoose,
+				stillToEvolve,
+			],
+			kw,
+			cfg,
+		}),
+		buildPile({
+			id: 'luckies',
+			head: kw.flag.lucky,
+			lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep],
+			kw,
+			cfg,
+		}),
+		// Everything that can evolve right now: new Pokédex entries best first,
+		// then the ones already tagged to evolve through.
+		buildPile({
+			id: 'evolve',
+			head: kw.flag.evolvable,
+			lenses: [
+				...ivLadder(`${kw.flag.new_evo}&`, 'new_dex_', 'app.pile.lens.new_dex_ladder_hint'),
+				{ key: 'tagged_evolve', filter: `#${jobTagsOf(cfg).evolve}` },
+			],
+			kw,
+			cfg,
+		}),
+		// Dynamax-capable through the levelled Max-move token: bare `dynamax` is
+		// a search shortcut that silently drops the rest of the string.
+		buildPile({
+			id: 'dynamax',
+			head: `${kw.flag.dynamax_move}1-`,
+			lenses: [
+				{ key: 'gigantamax', filter: kw.flag.gigantamax },
+				{ key: 'builds', filter: topMaxAttackersList.length ? famOf(topMaxAttackersList) : '' },
+				...ivLadder(),
+			],
+			kw,
+			cfg,
+		}),
+		// XXL: the showcase verdict is the calculator under the steps.
+		buildPile({ id: 'xxl', head: kw.flag.xxl, lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep], kw, cfg }),
+		buildPile({ id: 'xxs', head: kw.flag.xxs, lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep], kw, cfg }),
+		buildPile({ id: 'backgrounds', head: kw.flag.background, lenses: ivLadder(), kw, cfg }),
+		// Costumes split by whether the line can still evolve: one per stage for
+		// those, one for the rest (the costume budget either way).
+		buildPile({ id: 'costumes_evolve', head: `${kw.flag.costume}&${kw.flag.evolvable}`, lenses: ivLadder(), kw, cfg }),
+		buildPile({ id: 'costumes_final', head: `${kw.flag.costume}&!${kw.flag.evolvable}`, lenses: ivLadder(), kw, cfg }),
+		// Community Days leave shinies and backgrounds by the dozen: every one on
+		// a Community Day species, all days at once, so old ones can be gone
+		// through too. The last step is the untraded ones, to tag for trades.
+		buildPile({
+			id: 'cday',
+			head: COMMUNITY_DAY_DEX.length
+				? `${famOf(COMMUNITY_DAY_DEX.map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean))}&${kw.flag.shiny},${kw.flag.background}`
+				: '',
+			lenses: [...ivLadder(), { key: 'to_trade', filter: `!${kw.flag.traded}` }],
+			kw,
+			cfg,
+		}),
+		// Wherever one came from (raid, research, GBL): keep the good ones.
+		buildPile({ id: 'legendaries', head: kw.flag.legendary, lenses: ivLadder(), kw, cfg }),
+	].filter(Boolean);
+	// Filters that belong with a pile but aren't keep steps: cheap purify stock
+	// (common 1 km-candy shadows, never meta), which shadows to Charge-TM, and
+	// cheap XP evolves (it names the trade evolutions species by species).
+	const PILE_EXTRAS = {
+		shadows: [
+			{
+				key: 'cheap_purify',
+				label: 'app.pile.lens.cheap_purify_label',
+				hint: 'app.pile.lens.cheap_purify_hint',
+				filter: shadowSafe ? `${shadowSafe}&${kw.numeric.candy_km}1` : '',
+			},
+			{ key: 'shadow_frustration', label: 'app.filter.shadow_frustration_label', hint: 'app.filter.shadow_frustration_hint', filter: shadowFrustration },
+		],
+		evolve: [
+			{ key: 'cheap_evolve', label: 'app.filter.cheap_evolve_label', hint: 'app.filter.cheap_evolve_hint', filter: cheapEvolve },
+		],
+	};
+	for (const pile of sortingPiles) pile.extras = (PILE_EXTRAS[pile.id] || []).filter((x) => x.filter);
+
+	// ── META / WATCHLIST / NON-META ────────────────────────────────────────
+	// Each species' class, with its reasons in words, for the pile card and the
+	// watchlist piles. All from data: raid and shadow-keeper ranks per type
+	// (meta-rankings.json), the Max roster, PvP ranks (pvp-rankings.json),
+	// Megas the game master carries ahead of release (species-meta.json), the
+	// move tier (watch-moves.json) and ranks just past the meta cut.
+	const budgets = effectiveBudgets(cfg);
+	const dexOfName = (n) => resolveSpeciesInfo(n)?.dex;
+	const typeWord = (type) => capFirst(kw.type[type] || type);
+	const reasonsOf = (map, dex) => map.get(dex) || map.set(dex, []).get(dex);
+	const metaWhy = new Map();
+	// Which jobs a meta species holds, for its keep lines: PvE (raid, shadow
+	// keeper, Max, or your own attacker rosters) and PvP (a league or cup pool).
+	const pveDex = new Set();
+	const pvpDex = new Set();
+	for (const [type, entries] of Object.entries(META_RANKINGS.perType || {}))
+		entries.forEach((e, i) => {
+			pveDex.add(e.dex);
+			reasonsOf(metaWhy, e.dex).push(tFn('app.card.reason.raid', { params: { type: typeWord(type), rank: i + 1 } }));
+		});
+	for (const [type, entries] of Object.entries(META_RANKINGS.shadowPerType || {}))
+		entries.forEach((e, i) => {
+			pveDex.add(e.dex);
+			reasonsOf(metaWhy, e.dex).push(tFn('app.card.reason.shadow_keeper', { params: { type: typeWord(type), rank: i + 1 } }));
+		});
+	for (const name of topMaxAttackersList) {
+		const dex = dexOfName(name);
+		if (!dex) continue;
+		pveDex.add(dex);
+		reasonsOf(metaWhy, dex).push(tFn('app.card.reason.max'));
+	}
+	for (const pool of pvpPools) {
+		const league = pool.key === 'pvp_great' ? tFn('app.pile.lens.pvp_great_label') : pool.text[2].cup;
+		const seen = new Set();
+		(pool.league?.species || []).forEach((sp, i) => {
+			if (seen.has(sp.dex)) return;
+			seen.add(sp.dex);
+			pvpDex.add(sp.dex);
+			reasonsOf(metaWhy, sp.dex).push(tFn('app.card.reason.pvp', { params: { league, rank: i + 1 } }));
+		});
+	}
+	const metaDex = new Set(
+		[...topAttackersList, ...topMaxAttackersList, ...keeperResolved].map(dexOfName).filter(Boolean),
+	);
+	for (const pool of pvpPools) for (const sp of pool.league?.species || []) metaDex.add(sp.dex);
+	for (const name of [...topAttackersList, ...keeperResolved]) {
+		const dex = dexOfName(name);
+		if (dex) pveDex.add(dex);
+	}
+	for (const dex of metaDex) if (!metaWhy.has(dex)) reasonsOf(metaWhy, dex).push(tFn('app.card.reason.roster'));
+
+	const watchWhy = new Map();
+	for (const dex of SPECIES_META.upcomingMegaDex || []) reasonsOf(watchWhy, dex).push(tFn('app.card.reason.mega'));
+	// Watchlist species whose only reason is an upcoming Mega (see the card).
+	const watchOtherDex = new Set();
+	const moveCutoff = Date.now() - WATCH_MOVE_DAYS * 86400000;
+	for (const m of WATCH_MOVES.moves || []) {
+		if (Date.parse(m.at) < moveCutoff) continue;
+		// A temporary-evolution entry is the game master touching a species' Mega
+		// (new or existing: Mega Beedrill has been out for years), so it reads as
+		// a Mega change, and only when no upcoming-Mega reason already says more.
+		const temp = /^VM_MOVE_TEMP_EVOLUTION_/.test(m.move);
+		for (const dex of m.learners || []) {
+			if (temp && (SPECIES_META.upcomingMegaDex || []).includes(dex)) continue;
+			if (!temp) watchOtherDex.add(dex);
+			reasonsOf(watchWhy, dex).push(
+				temp
+					? tFn('app.card.reason.mega_changed')
+					: tFn(m.change === 'added' ? 'app.card.reason.move_added' : 'app.card.reason.move_changed', {
+							params: { move: moveLabel(m.move, tFn) },
+						}),
+			);
+		}
+	}
+	// A meta species keeps its class, and its card still says a Mega or a move
+	// change is coming; the rank tier below only means something off the meta.
+	for (const dex of metaDex) {
+		if (!watchWhy.has(dex)) continue;
+		reasonsOf(metaWhy, dex).unshift(...watchWhy.get(dex));
+		watchWhy.delete(dex);
+	}
+	for (const [type, entries] of Object.entries(META_RANKINGS.watchPerType || {}))
+		for (const e of entries)
+			if (!metaDex.has(e.dex)) {
+				watchOtherDex.add(e.dex);
+				reasonsOf(watchWhy, e.dex).push(tFn('app.card.reason.rank', { params: { type: typeWord(type), rank: e.rank } }));
+			}
+	const watchMegaOnly = new Set([...watchWhy.keys()].filter((dex) => !watchOtherDex.has(dex)));
+
+	const nameOfDex = (dex) => pokemonNameFor(String(dex), outputLocale);
+	const watchNames = [...watchWhy.keys()].sort((a, b) => a - b).map(nameOfDex).filter(Boolean);
+	const classifiedNames = [...new Set([...metaDex, ...watchWhy.keys()])].map(nameOfDex).filter(Boolean);
+	const watchPile = buildPile({
+		id: 'watchlist',
+		head: famOf(watchNames),
+		lenses: [...ivLadder(), ...pvpLoose],
+		kw,
+		cfg,
+	});
+	// Everything else, as one De Morgan chain: not any meta or watchlist family.
+	const nonMetaPile = buildPile({
+		id: 'non_meta',
+		head: [...new Set(classifiedNames)].map((n) => `!+${n}`).join('&'),
+		lenses: [...ivLadder(), ...pvpLoose],
+		kw,
+		cfg,
+	});
+	sortingPiles.splice(1, 0, ...[watchPile, nonMetaPile].filter(Boolean));
+
+	// ── PILE CARD ──────────────────────────────────────────────────────────
+	// Per species in a pile with a species list: class, reasons, keep N, why.
+	// The workshop never sees the storage, so it says "keep up to N".
+	const cardRow = (dex) => {
+		// Class from the same set as the meta pile's head, so a species trimmed
+		// from the roster under Battle → settings stops reading as meta here too.
+		const meta = metaDex.has(dex) ? metaWhy.get(dex) : null;
+		const watch = !meta && watchWhy.get(dex);
+		const cls = meta ? 'meta' : watch ? 'watchlist' : 'non_meta';
+		const keep = [];
+		if (meta) {
+			if (pveDex.has(dex)) keep.push(tFn('app.card.keep.raid', { params: { n: budgets.raidMeta } }));
+			if (pvpDex.has(dex))
+				keep.push(tFn('app.card.keep.pvp', { params: { normal: budgets.pvpNormal, shadow: budgets.pvpShadow } }));
+		} else if (watch) {
+			// By tier: a Mega needs one normal copy (shadows can't Mega Evolve); a
+			// move or rank reason makes it a plain attacker, where shadows are the
+			// scarce part.
+			if (watchMegaOnly.has(dex)) keep.push(tFn('app.card.keep.watch_mega', { params: { normal: budgets.watchMegaNormal } }));
+			else keep.push(tFn('app.card.keep.watch', { params: { shadow: budgets.watchShadow, normal: budgets.watchNormal } }));
+		} else {
+			keep.push(tFn('app.card.keep.standin', { params: { n: budgets.standIn } }));
+		}
+		return {
+			dex,
+			name: capFirst(nameOfDex(dex) || String(dex)),
+			cls,
+			reasons: (meta || watch || []).slice(0, 3),
+			keep,
+			why: tFn(`app.card.why.${cls}`),
+		};
+	};
+	const cardFor = (dexList) => ({ rows: [...new Set(dexList)].filter(Boolean).sort((a, b) => a - b).map(cardRow) });
+	const RULE_PARAMS = {
+		shadows: { standin: budgets.shadowStandIn, cheap: budgets.cheapPurify },
+		luckies: { n: budgets.luckyPerForm },
+		dynamax: { build: budgets.dynaBuild, top: budgets.dynaBuildTop, parkers: budgets.dynaParkers },
+		xxl: { score: budgets.xxlScore },
+		xxs: { n: budgets.evolve },
+		costumes_evolve: { n: budgets.costumePerStage, tradeable: budgets.costumeTradeable },
+		costumes_final: { n: budgets.costumePerStage, tradeable: budgets.costumeTradeable },
+		backgrounds: { n: budgets.backgroundPerSpecies, tradeable: budgets.backgroundTradeable },
+		cday: { n: budgets.shinyPerStage, tradeable: budgets.shinyTradeable },
+		legendaries: { meta: budgets.raidMeta, standin: budgets.standIn },
+		non_meta: { standin: budgets.standIn, evolve: budgets.evolve },
+		traded: {},
+	};
+	const SPECIES_OF_PILE = {
+		meta: [...metaDex],
+		watchlist: [...watchWhy.keys()],
+	};
+	for (const pile of sortingPiles) {
+		pile.card = SPECIES_OF_PILE[pile.id] ? cardFor(SPECIES_OF_PILE[pile.id]) : { rows: [] };
+		if (RULE_PARAMS[pile.id]) pile.card.rule = tFn(`app.card.rule.${pile.id}`, { params: RULE_PARAMS[pile.id] });
+	}
+	if (hundoPile) hundoPile.card = { ...cardFor(hundos.map(dexOfName)), rule: tFn('app.card.rule.hundo') };
+	for (const ev of eventFilters) if (ev.pile) ev.pile.card = cardFor(ev.spawnDex);
+
 	return {
 		trash,
 		tradedTrashSort,
@@ -4644,7 +5358,6 @@ export function buildFilters(
 		sort,
 		luckySort,
 		luckyFamilySort,
-		nundoSort,
 		prestaged,
 		gift,
 		buddyCatchFilters,
@@ -4666,10 +5379,11 @@ export function buildFilters(
 		friendCollectSuggestions,
 		trashClauses,
 		tradeClauses,
+		sortingPiles,
+		hundoPile,
 		sortClauses,
 		luckySortClauses,
 		luckyFamilySortClauses,
-		nundoSortClauses,
 		prestagedClauses,
 		giftClauses,
 		// Aux pro-tools
@@ -4739,6 +5453,7 @@ const FLAG_TO_MON = {
 	purified: 'purified',
 	costume: 'costume',
 	background: 'background',
+	special_background: 'specialBackground',
 	traded: 'traded',
 	hatched: 'hatched',
 	female: 'female',
@@ -4866,10 +5581,28 @@ function evalTerm(t, mon, kw, outputLocale) {
 	if (m) return mon.dex === +m[1];
 
 	// Locale-driven keyword tokens
-	if (t === `${kw.numeric.buddy}1-`) return !!mon.flags?.buddy;
+	// Levelled tokens read `mon.buddyLevel` / `mon.dyna{Atk,Wall,Spirit}` when the
+	// mon carries them, else the boolean flags the older fixtures set: a buddy
+	// counts as level 1, a Dynamax-capable mon has Max Attack 1. Guard and
+	// Spirit have no value until unlocked, so a missing one is level 0.
+	const levelOf = (n, re) => {
+		const lm = t.match(re);
+		return lm ? n >= +lm[1] : undefined;
+	};
+	const buddyLevel = mon.buddyLevel ?? (mon.flags?.buddy ? 1 : 0);
+	const dynaAtk = mon.dynaAtk ?? (mon.flags?.dynamaxCapable ? 1 : 0);
+	for (const [n, word] of [
+		[buddyLevel, kw.numeric.buddy],
+		[dynaAtk, kw.flag.dynamax_move],
+		[mon.dynaWall || 0, kw.flag.dynamax_wall],
+		[mon.dynaSpirit || 0, kw.flag.dynamax_spirit],
+	]) {
+		if (!word) continue;
+		const v = levelOf(n, new RegExp(`^${escapeRegex(word)}([1-5])-$`));
+		if (v !== undefined) return v;
+	}
 	if (t === `${kw.flag.mega}1-`) return !!mon.flags?.megaEvolved;
 	if (t === `${kw.flag.mega}0`) return !mon.flags?.megaEvolved;
-	if (t === `${kw.flag.dynamax_move}1-`) return !!mon.flags?.dynamaxCapable;
 	// `#` = carries ANY tag; `#name` = carries a tag starting with `name`. The
 	// prefix semantics are what buildFilters itself banks on when it emits a
 	// per-buddy `!#<prefix>` guard. Without this branch every named-tag clause
@@ -4883,6 +5616,20 @@ function evalTerm(t, mon, kw, outputLocale) {
 	}
 	if (t === '@3move') return !mon.flags?.doubleMoved; // INVERTED per game
 	if (t === `@${kw.flag.special_move}`) return !!mon.flags?.legacyMove;
+	// A named move (`@frustration`), the common-candy tier (`candykm1`) and
+	// "can evolve now" are answered only for a mon that carries the field
+	// (`moves`, `candyKm`, `flags.canEvolve`); otherwise they stay unknown, as
+	// before, so the verify panel never turns "can't tell" into a confident no.
+	// Not the slot forms (`@1mudshot`, `@3move`) or a move type (`@ground`): those
+	// mean something else in the game and stay unknown here.
+	if (t.startsWith('@') && Array.isArray(mon.moves) && !/^@\d/.test(t) && !typeKeyFromKeyword(t.slice(1), outputLocale)) {
+		const want = t.slice(1).toLowerCase();
+		return mon.moves.some((mv) => String(mv).toLowerCase() === want);
+	}
+	const candyKmRe = new RegExp(`^${escapeRegex(kw.numeric.candy_km)}(\\d+)$`);
+	m = t.match(candyKmRe);
+	if (m) return mon.candyKm == null ? null : mon.candyKm === +m[1];
+	if (t === kw.flag.evolvable) return mon.flags && 'canEvolve' in mon.flags ? !!mon.flags.canEvolve : null;
 
 	// Universal league tags
 	if (t === 'ⓤ') return !!mon.flags?.leagueU;
@@ -5465,17 +6212,20 @@ export default function App() {
 	const [loaded, setLoaded] = useState(false);
 	const [onboarded, setOnboarded] = useState(false);
 	const [showSetTheory, setShowSetTheory] = useState(false);
-	const [showAuxShadows, setShowAuxShadows] = useState(false);
-	const [showAuxEvos, setShowAuxEvos] = useState(false);
-	const [showBrowseSort, setShowBrowseSort] = useState(false);
+	const [showHiddenPiles, setShowHiddenPiles] = useState(false);
+	// A 5-minute tick, so "right now" and the Mega planner notice an event that
+	// starts or ends while the tab (or the installed app) stays open.
+	const [clockTick, setClockTick] = useState(0);
+	useEffect(() => {
+		const id = setInterval(() => setClockTick((n) => n + 1), 5 * 60 * 1000);
+		return () => clearInterval(id);
+	}, []);
 	const [showAuxTrades, setShowAuxTrades] = useState(false);
 	const [showFriendWishlist, setShowFriendWishlist] = useState(false);
 	// Friend lucky wishlist: restrict to old catches guaranteed Lucky on trade.
 	// (The curated friend-collect list's equivalent toggle lives in config as
 	// `friendCollectGuaranteedOnly` — it's a persisted curation setting.)
 	const [friendGuaranteedLucky, setFriendGuaranteedLucky] = useState(false);
-	const [showAuxMegas, setShowAuxMegas] = useState(false);
-	const [showAuxEvents, setShowAuxEvents] = useState(false);
 	const [showAuxRaids, setShowAuxRaids] = useState(false);
 	const [showAuxMaxBattles, setShowAuxMaxBattles] = useState(false);
 	const [showAuxRocket, setShowAuxRocket] = useState(false);
@@ -5483,6 +6233,8 @@ export default function App() {
 	const [showRawClauses, setShowRawClauses] = useState(false);
 	const [showVerify, setShowVerify] = useState(false);
 	const [currentStep, setCurrentStep] = useState(1);
+	const [filterArea, setFilterArea] = useState(() => areaFromHash() || FILTER_AREAS[0]);
+	const [areaSettings, setAreaSettings] = useState(areaSettingsFromHash);
 	const [view, setView] = useState(viewFromHash);
 	useEffect(() => {
 		const onHashChange = () => {
@@ -5490,6 +6242,11 @@ export default function App() {
 			// If the hash points at a specific workshop step, sync currentStep.
 			const step = stepFromHash();
 			if (step !== null) setCurrentStep(step);
+			const area = areaFromHash();
+			if (area) {
+				setFilterArea(area);
+				setAreaSettings(areaSettingsFromHash());
+			}
 		};
 		window.addEventListener('hashchange', onHashChange);
 		// Run once on mount so #workshop/<key> on initial load picks up the step.
@@ -5529,7 +6286,6 @@ export default function App() {
 		sort: false,
 		luckySort: false,
 		luckyFamilySort: false,
-		nundoSort: false,
 		prestaged: false,
 		gift: false,
 		// Aux pro-tools
@@ -5598,7 +6354,10 @@ export default function App() {
 			setHomeLocation(home);
 			setLastPin(p);
 			setBazaarTags(b);
-			setCurrentStep(step);
+			// A deep link (#workshop/filter, #workshop/sort) beats the stored
+			// wizard position; the stored one is only the fallback for a bare
+			// #workshop.
+			setCurrentStep(stepFromHash() ?? step);
 			setOnboarded(ob);
 			setLoaded(true);
 			// First-run: nudge brand-new visitors into the swipe onboarding instead
@@ -5791,8 +6550,9 @@ export default function App() {
 		trade,
 		sort,
 		luckySort,
+		sortingPiles,
+		hundoPile,
 		luckyFamilySort,
-		nundoSort,
 		prestaged,
 		gift,
 		buddyCatchFilters,
@@ -5812,7 +6572,6 @@ export default function App() {
 		sortClauses,
 		luckySortClauses,
 		luckyFamilySortClauses,
-		nundoSortClauses,
 		prestagedClauses,
 		giftClauses,
 		shadowCheap,
@@ -6254,12 +7013,27 @@ export default function App() {
 		{ n: 3, key: 'have', label: t('app.step.have.label'), desc: t('app.step.have.desc') },
 		{ n: 4, key: 'filter', label: t('app.step.filter.label'), desc: t('app.step.filter.desc') },
 	];
+	// On the filter step the hash always names the area (and the settings flip),
+	// so back and forward restore the tab even when the workshop was entered on
+	// #workshop or #workshop/filter.
+	useEffect(() => {
+		if (view !== 'workshop' || currentStep !== STEP_NUMBER_BY_KEY.filter || areaFromHash()) return;
+		if (typeof window !== 'undefined') window.history.replaceState(null, '', areaHash(filterArea, areaSettings));
+	}, [view, currentStep, filterArea, areaSettings]);
+	function goToArea(area, settings) {
+		setFilterArea(area);
+		setAreaSettings(settings);
+		const desired = areaHash(area, settings);
+		if (typeof window !== 'undefined' && window.location.hash !== desired) window.location.hash = desired;
+	}
+	const selectArea = (area) => goToArea(area, areaSettings);
 	function gotoStep(n) {
 		setCurrentStep(n);
 		// When in the workshop view, push the step-specific hash so the URL
 		// is shareable. Other views (e.g. landing) just update internal state.
 		if (view === 'workshop') {
-			const key = STEP_KEY_BY_NUMBER[n];
+			const key = n === STEP_NUMBER_BY_KEY.filter ? filterArea : STEP_KEY_BY_NUMBER[n];
+			if (n === STEP_NUMBER_BY_KEY.filter) setAreaSettings(false);
 			if (key) {
 				const desired = `#workshop/${key}`;
 				if (typeof window !== 'undefined' && window.location.hash !== desired) {
@@ -6268,6 +7042,332 @@ export default function App() {
 			}
 		}
 	}
+
+	// Settings pieces shared by the first-run wizard (steps ① and ③) and the
+	// per-area settings flip, so both render the same editors.
+	const homeMapSettings = (
+		<RegionalMap
+			lastPin={lastPin}
+			setLastPin={setLastPin}
+			bazaarTags={bazaarTags}
+			setBazaarTags={setBazaarTags}
+			homeLocation={homeLocation}
+			setHomeLocation={setHomeLocation}
+			homeLocals={homeLocals}
+			tradeTagName={config.basarTagName || 'Tradebait'}
+		/>
+	);
+	const haveListSettings = (
+		<div>
+			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4'>
+				{t('app.step.have.section_completions')}
+			</h3>
+			<QuickHaveAdd onAdd={quickAddHave} />
+			<HundosEditor
+				hundos={hundos}
+				setHundos={setHundos}
+				newHundo={newHundo}
+				setNewHundo={setNewHundo}
+				addHundo={addHundo}
+				removeHundo={removeHundo}
+				formsAnn={config.hundoForms || {}}
+				onFormsAnnChange={(next) => setConfig({ ...config, hundoForms: next })}
+				gendersAnn={config.hundoGenders || {}}
+				onGendersAnnChange={(next) => setConfig({ ...config, hundoGenders: next })}
+				slotsAnn={config.hundoSlots || {}}
+				onSlotsAnnChange={(next) => setConfig({ ...config, hundoSlots: next })}
+				scopeAnn={config.hundoScope || {}}
+				onScopeAnnChange={(next) => setConfig({ ...config, hundoScope: next })}
+				activeSlot={activeSeason}
+			/>
+			<hr className='my-8 border-[#1F2933]' />
+			<SpeciesListEditor
+				items={luckies}
+				newItem={newLucky}
+				setNewItem={setNewLucky}
+				addItem={addLucky}
+				removeItem={removeLucky}
+				titleKey='app.luckies'
+				accent='#F5B82E'
+				formsAnn={config.luckyForms || {}}
+				onFormsAnnChange={(next) => setConfig({ ...config, luckyForms: next })}
+				gendersAnn={config.luckyGenders || {}}
+				onGendersAnnChange={(next) => setConfig({ ...config, luckyGenders: next })}
+				slotsAnn={config.luckySlots || {}}
+				onSlotsAnnChange={(next) => setConfig({ ...config, luckySlots: next })}
+				scopeAnn={config.luckyScope || {}}
+				onScopeAnnChange={(next) => setConfig({ ...config, luckyScope: next })}
+				activeSlot={activeSeason}
+			/>
+			<SeasonNote
+				hemisphere={homeHemisphere}
+				season={activeSeason}
+				window={seasonWindow}
+				auto={config.seasonAuto !== false}
+				overridden={!!config.seasonOverride}
+				relevant={seasonRelevant}
+				onAuto={() => setConfig({ ...config, seasonAuto: true, seasonOverride: null })}
+				onOverride={(sn) =>
+					setConfig({
+						...config,
+						seasonOverride: config.seasonOverride === sn ? null : sn,
+					})
+				}
+				t={t}
+			/>
+		</div>
+	);
+	// Event-driven ordering: piles of a running or just-ended event's kind float
+	// to a "right now" block; the rest stay in "piles", minus the hidden ones.
+	const floats = useMemo(
+		() => floatingPiles({ events: EVENTS.events, signals: EVENTS.signals, eventMaxBattles: RAID_BOSSES.eventMaxBattles }),
+		[clockTick],
+	);
+	const floatIds = new Set(floats.map((f) => f.pile));
+	const hiddenIds = new Set(effectiveConfig.hiddenPiles || []);
+	const hiddenPileList = [hundoPile, ...sortingPiles].filter((p) => p && !floatIds.has(p.id) && hiddenIds.has(p.id));
+	const toggleHiddenPile = (id) => {
+		setConfig((prev) => {
+			const now = new Set(prev.hiddenPiles || []);
+			if (now.has(id)) now.delete(id);
+			else now.add(id);
+			return { ...prev, hiddenPiles: [...now] };
+		});
+		// The hidden card is gone from under the keyboard; hand focus to the
+		// "N hidden" toggle instead of letting it fall back to <body>.
+		requestAnimationFrame(() => document.getElementById('hidden-piles-toggle')?.focus());
+	};
+	// Sorting, top to bottom: what's going on right now (each running or
+	// just-ended event as its own pile, plus the piles an event floats up),
+	// then every other pile as a card, grouped, then the Crush strip.
+	const nowMs = Date.now();
+	const recentEvents = eventFilters.filter((ev) => {
+		const s = Date.parse(ev.start), e = Date.parse(ev.end);
+		return ev.pile && s <= nowMs && nowMs - e <= FLOAT_ENDED_DAYS * 86400000;
+	});
+	const fmtWhen = new Intl.DateTimeFormat(locale, { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+	const eventChip = (ev) =>
+		Date.parse(ev.end) >= nowMs
+			? t('app.sort.ends', { params: { when: fmtWhen.format(Date.parse(ev.end)) } })
+			: t('app.sort.ended', { params: { when: fmtWhen.format(Date.parse(ev.end)) } });
+	const pileById = Object.fromEntries([hundoPile, ...sortingPiles].filter(Boolean).map((p) => [p.id, p]));
+	const accentOf = (id) => PILE_GROUPS.find((g) => g.piles.includes(id))?.accent || '#5EAFC5';
+	const tile = (pile, extra = {}) => (
+		<PileTile
+			key={pile.id}
+			pile={pile}
+			title={t(`app.pile.${pile.id}.title`)}
+			hook={t(`app.sort.hook.${pile.id}`)}
+			icon={PILE_ICON[pile.id] || Package}
+			accent={accentOf(pile.id)}
+			text={pile.id === 'hundo' ? HUNDO_PILE_TEXT : undefined}
+			copied={copied}
+			copyToClipboard={copyToClipboard}
+			t={t}
+			{...extra}
+		>
+			{pile.id === 'xxl' && <XxlCalculator threshold={effectiveBudgets(effectiveConfig).xxlScore} t={t} />}
+		</PileTile>
+	);
+	const floatedHere = floats.filter((f) => pileById[f.pile]);
+	const toolFilters = { mega_evolve: megaEvolve };
+	const sortingView = (
+		<div className='space-y-8'>
+			<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.sort.intro')}</p>
+			{(recentEvents.length > 0 || floatedHere.length > 0) && (
+				<section aria-labelledby='sort-now' className='rounded-lg p-3 sm:p-4 space-y-3 border border-[#5EAFC5]/30 bg-gradient-to-br from-[#5EAFC5]/10 via-transparent to-[#27AE60]/10'>
+					<h3 id='sort-now' className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold'>
+						{t('app.float.title')}
+					</h3>
+					{recentEvents.map((ev) => (
+						<PileTile
+							key={ev.id}
+							pile={ev.pile}
+							title={ev.title}
+							hook={t('app.sort.hook.event')}
+							icon={PILE_ICON.event}
+							chip={eventChip(ev)}
+							accent='#27AE60'
+							text={EVENT_PILE_TEXT}
+							copied={copied}
+							copyToClipboard={copyToClipboard}
+							t={t}
+						/>
+					))}
+					{floatedHere.map((f) =>
+						tile(pileById[f.pile], { chip: t(`app.float.${f.kind}`, { params: { title: f.title } }) }),
+					)}
+				</section>
+			)}
+			{PILE_GROUPS.map((group) => {
+				const piles = group.piles
+					.map((id) => pileById[id])
+					.filter((p) => p && !floatIds.has(p.id) && !hiddenIds.has(p.id));
+				const tools = (group.tools || []).filter((id) => toolFilters[id]);
+				if (piles.length === 0 && tools.length === 0) return null;
+				return (
+					<AreaGroup
+						key={group.id}
+						id={`sort-${group.id}`}
+						title={t(`app.sort.group.${group.id}`)}
+						hint={t(`app.sort.group_hint.${group.id}`)}
+						accent={group.accent}
+					>
+						{piles.map((pile) => tile(pile, { onHide: () => toggleHiddenPile(pile.id) }))}
+						{tools.map((id) => (
+							<ToolTile
+								key={id}
+								title={t(`app.filter.${id}_label`)}
+								hook={t(`app.sort.hook.${id}`)}
+								icon={PILE_ICON[id]}
+								accent={group.accent}
+							>
+								<FilterBox
+									label={t(`app.filter.${id}_label`)}
+									accent={group.accent}
+									filterStr={toolFilters[id]}
+									copied={copied[id]}
+									onCopy={() => copyToClipboard(id, toolFilters[id])}
+									hint={t(`app.filter.${id}_hint`)}
+								/>
+							</ToolTile>
+						))}
+					</AreaGroup>
+				);
+			})}
+			{hiddenPileList.length > 0 && (
+				<div className='space-y-2'>
+					<button
+						type='button'
+						id='hidden-piles-toggle'
+						onClick={() => setShowHiddenPiles((v) => !v)}
+						aria-expanded={showHiddenPiles}
+						className='mono text-xs text-[#5EAFC5] hover:text-[#E6EDF3] min-h-[32px]'
+					>
+						{t('app.pile.hidden', { params: { count: hiddenPileList.length } })}
+					</button>
+					{showHiddenPiles && hiddenPileList.map((pile) => tile(pile, { onHide: () => toggleHiddenPile(pile.id), hidden: true }))}
+				</div>
+			)}
+			<CrushCard tag={jobTagsOf(effectiveConfig).crush} copied={copied} copyToClipboard={copyToClipboard} t={t} />
+		</div>
+	);
+	const megaPlanRows = useMemo(
+		() =>
+			megaPlans({ events: EVENTS.events, eventRaids: RAID_BOSSES.eventRaids }, Date.now(), (n) => resolveSpeciesInfo(n)?.dex)
+				.map((p) => ({ ...p, boost: megaBoostFor(p.spawnForms) }))
+				.filter((p) => p.boost.groups.length > 0),
+		[megaBoostFor, clockTick],
+	);
+	const jobTagSettings = (
+		<JobTagsPanel config={config} setConfig={setConfig} copied={copied} copyToClipboard={copyToClipboard} t={t} />
+	);
+	const mythCarveOutSettings = effectiveConfig.expertMode && effectiveConfig.protectMythicals && (
+		<div>
+			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4'>
+				{t('app.step.have.section_carve_outs')}
+			</h3>
+			<SpeciesListEditor
+				items={config.mythTooManyOf || []}
+				newItem={newMyth}
+				setNewItem={setNewMyth}
+				addItem={() => addToConfigList('mythTooManyOf', newMyth, setNewMyth)}
+				removeItem={(s) => removeFromConfigList('mythTooManyOf', s)}
+				titleKey='app.protect.myth_carve'
+				accent='#E91E63'
+			/>
+		</div>
+	);
+	const shadowKeeperSettings = effectiveConfig.expertMode && (
+		<div>
+			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4'>
+				{t('app.step.have.section_purify_policy')}
+			</h3>
+			<SpeciesListEditor
+				items={config.shadowKeeperSpecies || []}
+				newItem={newKeeper}
+				setNewItem={setNewKeeper}
+				addItem={() =>
+					addToConfigList('shadowKeeperSpecies', newKeeper, setNewKeeper)
+				}
+				removeItem={(s) => removeFromConfigList('shadowKeeperSpecies', s)}
+				titleKey='app.protect.shadow_keepers'
+				accent='#9B59B6'
+			/>
+		</div>
+	);
+	const raidRosterSettings = effectiveConfig.expertMode && (
+		<div>
+			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4'>
+				{t('app.step.have.section_raid_roster')}
+			</h3>
+			<SpeciesListEditor
+				items={topAttackers}
+				newItem={newTopAttacker}
+				setNewItem={setNewTopAttacker}
+				addItem={addTopAttacker}
+				removeItem={removeTopAttacker}
+				titleKey='app.top_attackers'
+				accent='#5EAFC5'
+			/>
+			<hr className='my-8 border-[#1F2933]' />
+			<SpeciesListEditor
+				items={topMaxAttackers}
+				newItem={newTopMaxAttacker}
+				setNewItem={setNewTopMaxAttacker}
+				addItem={addTopMaxAttacker}
+				removeItem={removeTopMaxAttacker}
+				titleKey='app.top_max_attackers'
+				accent='#F39C12'
+			/>
+		</div>
+	);
+	const configPanelProps = {
+		config,
+		setConfig,
+		homeLocals,
+		homeLocalTypeChecks,
+		friendCollectTargets,
+		friendCollectSuggestions,
+		pvpMetaPacks,
+	};
+	// Same setter the settings modal used for the blocks that moved out of it.
+	const setConfigKey = (k, v) => setConfig((prev) => ({ ...prev, [k]: v }));
+	const areaSettingsFor = {
+		catch: (
+			<div className='space-y-10'>
+				{homeMapSettings}
+				<ConfigPanel
+					{...configPanelProps}
+					sections={['locals', 'presets', 'protections', 'regional', 'collectibles', 'tradeEvo']}
+				/>
+				{mythCarveOutSettings}
+				<ExpertProtectionSettings config={config} set={setConfigKey} />
+			</div>
+		),
+		sort: (
+			<div className='space-y-10'>
+				{haveListSettings}
+				{jobTagSettings}
+				<BudgetsEditor config={config} setConfig={setConfig} t={t} />
+			</div>
+		),
+		battle: (
+			<div className='space-y-10'>
+				<ConfigPanel {...configPanelProps} sections={['pvp', 'raid', 'rocket']} />
+				<LeagueTagSettings config={config} set={setConfigKey} />
+				{raidRosterSettings}
+				{shadowKeeperSettings}
+			</div>
+		),
+		trade: (
+			<div className='space-y-10'>
+				<ConfigPanel {...configPanelProps} sections={['buddyEvents', 'friendCollect']} />
+				<TradeTagSettings config={config} set={setConfigKey} />
+				<BuddyManager buddies={config.buddies || []} onChange={(list) => setConfigKey('buddies', list)} />
+			</div>
+		),
+	};
 
 	return (
 		<div
@@ -6317,6 +7417,7 @@ export default function App() {
               explainer landing. */}
 						<WorkshopNav
 							currentStepKey={STEP_KEY_BY_NUMBER[currentStep]}
+							showSteps={currentStep !== STEP_NUMBER_BY_KEY.filter}
 							onStepClick={(key) => gotoStep(STEP_NUMBER_BY_KEY[key])}
 							onSettingsClick={() => setShowSettings(true)}
 							onNavigate={navigateView}
@@ -6331,16 +7432,7 @@ export default function App() {
 								onNext={() => gotoStep(2)}
 								nextLabel={t('app.step.where.next_label')}
 							>
-								<RegionalMap
-									lastPin={lastPin}
-									setLastPin={setLastPin}
-									bazaarTags={bazaarTags}
-									setBazaarTags={setBazaarTags}
-									homeLocation={homeLocation}
-									setHomeLocation={setHomeLocation}
-									homeLocals={homeLocals}
-									tradeTagName={config.basarTagName || 'Trade'}
-								/>
+									{homeMapSettings}
 							</StepWrapper>
 						)}
 
@@ -6375,124 +7467,11 @@ export default function App() {
 								nextLabel={t('app.step.have.next_label')}
 							>
 								<div className='space-y-12'>
-									<div>
-										<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4'>
-											{t('app.step.have.section_completions')}
-										</h3>
-										<QuickHaveAdd onAdd={quickAddHave} />
-										<HundosEditor
-											hundos={hundos}
-											setHundos={setHundos}
-											newHundo={newHundo}
-											setNewHundo={setNewHundo}
-											addHundo={addHundo}
-											removeHundo={removeHundo}
-											formsAnn={config.hundoForms || {}}
-											onFormsAnnChange={(next) => setConfig({ ...config, hundoForms: next })}
-											gendersAnn={config.hundoGenders || {}}
-											onGendersAnnChange={(next) => setConfig({ ...config, hundoGenders: next })}
-											slotsAnn={config.hundoSlots || {}}
-											onSlotsAnnChange={(next) => setConfig({ ...config, hundoSlots: next })}
-											scopeAnn={config.hundoScope || {}}
-											onScopeAnnChange={(next) => setConfig({ ...config, hundoScope: next })}
-											activeSlot={activeSeason}
-										/>
-										<hr className='my-8 border-[#1F2933]' />
-										<SpeciesListEditor
-											items={luckies}
-											newItem={newLucky}
-											setNewItem={setNewLucky}
-											addItem={addLucky}
-											removeItem={removeLucky}
-											titleKey='app.luckies'
-											accent='#F5B82E'
-											formsAnn={config.luckyForms || {}}
-											onFormsAnnChange={(next) => setConfig({ ...config, luckyForms: next })}
-											gendersAnn={config.luckyGenders || {}}
-											onGendersAnnChange={(next) => setConfig({ ...config, luckyGenders: next })}
-											slotsAnn={config.luckySlots || {}}
-											onSlotsAnnChange={(next) => setConfig({ ...config, luckySlots: next })}
-											scopeAnn={config.luckyScope || {}}
-											onScopeAnnChange={(next) => setConfig({ ...config, luckyScope: next })}
-											activeSlot={activeSeason}
-										/>
-										<SeasonNote
-											hemisphere={homeHemisphere}
-											season={activeSeason}
-											window={seasonWindow}
-											auto={config.seasonAuto !== false}
-											overridden={!!config.seasonOverride}
-											relevant={seasonRelevant}
-											onAuto={() => setConfig({ ...config, seasonAuto: true, seasonOverride: null })}
-											onOverride={(sn) =>
-												setConfig({
-													...config,
-													seasonOverride: config.seasonOverride === sn ? null : sn,
-												})
-											}
-											t={t}
-										/>
-									</div>
-									{effectiveConfig.expertMode && effectiveConfig.protectMythicals && (
-										<div>
-											<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4'>
-												{t('app.step.have.section_carve_outs')}
-											</h3>
-											<SpeciesListEditor
-												items={config.mythTooManyOf || []}
-												newItem={newMyth}
-												setNewItem={setNewMyth}
-												addItem={() => addToConfigList('mythTooManyOf', newMyth, setNewMyth)}
-												removeItem={(s) => removeFromConfigList('mythTooManyOf', s)}
-												titleKey='app.protect.myth_carve'
-												accent='#E91E63'
-											/>
-										</div>
-									)}
-									{effectiveConfig.expertMode && (
-										<div>
-											<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4'>
-												{t('app.step.have.section_purify_policy')}
-											</h3>
-											<SpeciesListEditor
-												items={config.shadowKeeperSpecies || []}
-												newItem={newKeeper}
-												setNewItem={setNewKeeper}
-												addItem={() =>
-													addToConfigList('shadowKeeperSpecies', newKeeper, setNewKeeper)
-												}
-												removeItem={(s) => removeFromConfigList('shadowKeeperSpecies', s)}
-												titleKey='app.protect.shadow_keepers'
-												accent='#9B59B6'
-											/>
-										</div>
-									)}
-									{effectiveConfig.expertMode && (
-										<div>
-											<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4'>
-												{t('app.step.have.section_raid_roster')}
-											</h3>
-											<SpeciesListEditor
-												items={topAttackers}
-												newItem={newTopAttacker}
-												setNewItem={setNewTopAttacker}
-												addItem={addTopAttacker}
-												removeItem={removeTopAttacker}
-												titleKey='app.top_attackers'
-												accent='#5EAFC5'
-											/>
-											<hr className='my-8 border-[#1F2933]' />
-											<SpeciesListEditor
-												items={topMaxAttackers}
-												newItem={newTopMaxAttacker}
-												setNewItem={setNewTopMaxAttacker}
-												addItem={addTopMaxAttacker}
-												removeItem={removeTopMaxAttacker}
-												titleKey='app.top_max_attackers'
-												accent='#F39C12'
-											/>
-										</div>
-									)}
+										{haveListSettings}
+										{jobTagSettings}
+										{mythCarveOutSettings}
+										{shadowKeeperSettings}
+										{raidRosterSettings}
 								</div>
 							</StepWrapper>
 						)}
@@ -6502,33 +7481,8 @@ export default function App() {
 							<StepWrapper
 								title={t('app.step.filter.title')}
 								hint={t('app.step.filter.hint')}
-								onBack={() => gotoStep(3)}
 							>
 								<div className='space-y-6'>
-									<FilterBox
-										label={t('app.filter.trash_label')}
-										accent='#E74C3C'
-										filterStr={trash}
-										copied={copied.trash}
-										onCopy={() => copyToClipboard('trash', trash)}
-										hint={t('app.filter.trash_hint')}
-									/>
-									<FilterBox
-										label={t('app.filter.trade_label')}
-										accent='#5EAFC5'
-										filterStr={trade}
-										copied={copied.trade}
-										onCopy={() => copyToClipboard('trade', trade)}
-										hint={t('app.filter.trade_hint')}
-									/>
-									{buddyCatchFilters.length > 0 && (
-										<BuddyCatchSection
-											buddyCatchFilters={buddyCatchFilters}
-											copied={copied}
-											onCopy={(key, text) => copyToClipboard(key, text)}
-										/>
-									)}
-
 									{/* Summary stats */}
 									<div className='grid grid-cols-2 md:grid-cols-4 gap-2 mono text-xs'>
 										<StatBox
@@ -6543,471 +7497,360 @@ export default function App() {
 										<StatBox label={t('app.filter.trash_label')} value={`${trash.length}c`} />
 										<StatBox label={t('app.filter.trade_label')} value={`${trade.length}c`} />
 									</div>
-
-									{/* Aux pro-tools — task-oriented filters grouped by game aspect.
-                    Order: solo workflows (trades / evos / megas) first, then
-                    PvE encounters grouped by source. Within each PvE group
-                    the more frequently-used surface sits on top. */}
-									<div className='space-y-3 pt-2'>
-										{(sort || luckySort || luckyFamilySort || nundoSort) && (
-											<Collapsible
-												icon='✨'
-												label={t('app.collapsible.browse_sort')}
-												open={showBrowseSort}
-												onToggle={() => setShowBrowseSort((s) => !s)}
-											>
-												<div className='space-y-4'>
-													{sort && (
-														<FilterBox
-															label={t('app.filter.sort_label')}
-															accent='#F5B82E'
-															filterStr={sort}
-															copied={copied.sort}
-															onCopy={() => copyToClipboard('sort', sort)}
-															hint={t('app.filter.sort_hint')}
-														/>
-													)}
-													{luckySort && (
-														<FilterBox
-															label={t('app.filter.lucky_sort_label')}
-															accent='#F5B82E'
-															filterStr={luckySort}
-															copied={copied.luckySort}
-															onCopy={() => copyToClipboard('luckySort', luckySort)}
-															hint={t('app.filter.lucky_sort_hint')}
-														/>
-													)}
-													{luckyFamilySort && (
-														<FilterBox
-															label={t('app.filter.lucky_family_sort_label')}
-															accent='#F5B82E'
-															filterStr={luckyFamilySort}
-															copied={copied.luckyFamilySort}
-															onCopy={() => copyToClipboard('luckyFamilySort', luckyFamilySort)}
-															hint={t('app.filter.lucky_family_sort_hint')}
-														/>
-													)}
-													{nundoSort && (
-														<FilterBox
-															label={t('app.filter.nundo_sort_label')}
-															accent='#F5B82E'
-															filterStr={nundoSort}
-															copied={copied.nundoSort}
-															onCopy={() => copyToClipboard('nundoSort', nundoSort)}
-															hint={t('app.filter.nundo_sort_hint')}
-														/>
-													)}
+									<AreaTabs
+										areas={FILTER_AREAS}
+										current={filterArea}
+										onSelect={selectArea}
+										settings={areaSettings}
+										onToggleSettings={() => goToArea(filterArea, !areaSettings)}
+										t={t}
+									/>
+									<AreaPanel area='catch' current={filterArea}>
+										{areaSettings ? (
+											areaSettingsFor.catch
+										) : (
+											<>
+												<AreaGroup id='clean' title={t('app.group.clean')} hint={t('app.group_hint.clean')} accent='#E74C3C'>
+												<FilterBox
+													label={t('app.filter.trash_label')}
+													accent='#E74C3C'
+													filterStr={trash}
+													copied={copied.trash}
+													onCopy={() => copyToClipboard('trash', trash)}
+													hint={t('app.filter.trash_hint')}
+												/>
+												</AreaGroup>
+												<div className='pt-4'>
+												<MegaPlanner
+													plans={megaPlanRows}
+													copied={copied}
+													copyToClipboard={copyToClipboard}
+													typeLabels={rocketTypeLabels}
+													t={t}
+													locale={locale}
+												/>
 												</div>
-											</Collapsible>
+											</>
 										)}
-										<Collapsible
-											icon='🛬'
-											label={t('app.collapsible.aux_trades')}
-											open={showAuxTrades}
-											onToggle={() => setShowAuxTrades((s) => !s)}
-										>
-											<div className='space-y-4'>
-												{prestaged && (
-													<FilterBox
-														label={t('app.filter.prestaged_label')}
-														accent='#9B59B6'
-														filterStr={prestaged}
-														copied={copied.prestaged}
-														onCopy={() => copyToClipboard('prestaged', prestaged)}
-														hint={t('app.filter.prestaged_hint', {
-															params: {
-																tags: [
-																	effectiveConfig.basarTagName,
-																	effectiveConfig.fernTauschTagName,
-																]
-																	.filter(Boolean)
-																	.map((tag) => `#${tag}`)
-																	.join(', '),
-															},
-														})}
+									</AreaPanel>
+									<AreaPanel area='sort' current={filterArea}>
+										{areaSettings ? (
+											areaSettingsFor.sort
+										) : (
+											<>
+												{sortingView}
+											</>
+										)}
+									</AreaPanel>
+									<AreaPanel area='battle' current={filterArea}>
+										{areaSettings ? (
+											areaSettingsFor.battle
+										) : (
+											<>
+												{/* Team Rocket section — encounters & their post-fight cleanup */}
+												<div className='pt-4'>
+													<AreaGroup id='rocket' title={t('app.collapsible.aux_section_team_rocket')} hint={t('app.group_hint.rocket')} accent='#E74C3C'>
+													<RocketCollapsible
+														fetchedAt={rocketLineupsFetchedAt}
+														leaders={rocketLeaders}
+														typedGrunts={rocketTypedGrunts}
+														genericGrunts={rocketGenericGrunts}
+														typeLabels={rocketTypeLabels}
+														lenientCounters={effectiveConfig.rocketLenientCounters !== false}
+														open={showAuxRocket}
+														onToggle={() => setShowAuxRocket((s) => !s)}
+														copied={copied}
+														copyToClipboard={copyToClipboard}
+														t={t}
+														outputLocale={effectiveOutputLocale}
 													/>
-												)}
-												{tradedTrashSort && (
-													<FilterBox
-														label={t('app.filter.traded_trash_sort_label')}
-														accent='#E67E22'
-														filterStr={tradedTrashSort}
-														copied={copied.tradedTrashSort}
-														onCopy={() =>
-															copyToClipboard('tradedTrashSort', tradedTrashSort)
-														}
-														hint={t('app.filter.traded_trash_sort_hint')}
-													/>
-												)}
-												{gift && (
-													<FilterBox
-														label={t('app.filter.gift_label')}
-														accent='#27AE60'
-														filterStr={gift}
-														copied={copied.gift}
-														onCopy={() => copyToClipboard('gift', gift)}
-														hint={t('app.filter.gift_hint')}
-													/>
-												)}
-												<FilterBox
-													label={t('app.filter.pilot_long_label')}
-													accent='#5EAFC5'
-													filterStr={pilotLong}
-													copied={copied.pilotLong}
-													onCopy={() => copyToClipboard('pilotLong', pilotLong)}
-													hint={t('app.filter.pilot_long_hint')}
-												/>
-											</div>
-										</Collapsible>
-
-										<Collapsible
-											icon='🤝'
-											label={t('app.collapsible.friend_wishlist')}
-											open={showFriendWishlist}
-											onToggle={() => setShowFriendWishlist((s) => !s)}
-										>
-											<div className='space-y-4'>
-												{/* Curated "collect for me" string — renders alongside the
-                            fallback wishlists below, since all friend-facing strings
-                            live in this section. Its target list is edited in the
-                            step-2 config panel. */}
-												{friendCollectTargets.length > 0 &&
-													(friendCollectWishlist ? (
-														<div>
-															<FilterBox
-																label={t('app.filter.friend_collect_label')}
-																accent='#27AE60'
-																filterStr={
-																	friendCollectMode === 'lucky' &&
-																	effectiveConfig.friendCollectGuaranteedOnly
-																		? friendCollectWishlistGuaranteed
-																		: friendCollectWishlist
-																}
-																copied={copied.friendCollect}
-																onCopy={() =>
-																	copyToClipboard(
-																		'friendCollect',
-																		friendCollectMode === 'lucky' &&
-																			effectiveConfig.friendCollectGuaranteedOnly
-																			? friendCollectWishlistGuaranteed
-																			: friendCollectWishlist,
-																	)
-																}
-																hint={
-																	friendCollectMode === 'lucky' &&
-																	effectiveConfig.friendCollectGuaranteedOnly
-																		? `${t('app.filter.friend_collect_hint')} (${t('app.filter.friend_guaranteed_label')})`
-																		: t('app.filter.friend_collect_hint')
-																}
-															/>
-															<p className='mono text-[10.5px] text-[#8090A0] mt-1'>
-																{t('app.filter.friend_collect_edit_pointer')}
-															</p>
-														</div>
-													) : (
-														<p className='mono text-xs text-[#27AE60]'>
-															{t('app.filter.friend_collect_all_owned')}
-														</p>
-													))}
-
-												{/* Fallback wishlists — blacklist of everything already owned. */}
-												<p
-													className={`mono text-xs text-[#8B98A5] leading-relaxed ${
-														friendCollectTargets.length > 0 ? 'pt-3 border-t border-[#1F2933]' : ''
-													}`}
-												>
-													{t('app.filter.friend_wishlist_intro')}
-												</p>
-												<div>
-													<FilterBox
-														label={t('app.filter.friend_lucky_label')}
-														accent='#F5B82E'
-														filterStr={
-															friendGuaranteedLucky
-																? friendLuckyWishlistGuaranteed
-																: friendLuckyWishlist
-														}
-														copied={copied.friendLucky}
-														onCopy={() =>
-															copyToClipboard(
-																'friendLucky',
-																friendGuaranteedLucky
-																	? friendLuckyWishlistGuaranteed
-																	: friendLuckyWishlist,
-															)
-														}
-														hint={t('app.filter.friend_lucky_hint')}
-													/>
-													<label className='flex items-start gap-2 cursor-pointer mono text-xs mt-2'>
-														<input
-															type='checkbox'
-															checked={friendGuaranteedLucky}
-															onChange={(e) => setFriendGuaranteedLucky(e.target.checked)}
-															className='mt-0.5'
-														/>
-														<div>
-															<span className='text-[#E6EDF3]'>
-																{t('app.filter.friend_guaranteed_label')}
-															</span>
-															<p className='text-[#8B98A5] mt-0.5'>
-																{t('app.filter.friend_guaranteed_help')}
-															</p>
-														</div>
-													</label>
+													</AreaGroup>
 												</div>
+												{/* Raids section — current bosses pulled from lily-dex-api;
+			                    run `npm run fetch-raid-bosses` to refresh the snapshot. */}
+												<div className='pt-4'>
+													<AreaGroup id='raids' title={t('app.collapsible.aux_section_raids')} hint={t('app.group_hint.raids')} accent='#F5B82E'>
+													<BossCollapsible
+														icon={Target}
+														hook={t('app.hook.raids')}
+														titleKey='app.collapsible.aux_raids'
+														fetchedAt={raidBossesFetchedAt}
+														bossesByTier={raidFilters}
+														eventGroups={eventRaidFilters}
+														tierOrder={[
+															'mega',
+															'lvl5',
+															'shadow_lvl5',
+															'lvl3',
+															'shadow_lvl3',
+															'lvl1',
+															'shadow_lvl1',
+														]}
+														accent='#E74C3C'
+														open={showAuxRaids}
+														onToggle={() => setShowAuxRaids((s) => !s)}
+														copied={copied}
+														copyToClipboard={copyToClipboard}
+														keyPrefix='raid'
+														t={t}
+														locale={locale}
+													/>
+
+													<MaxBattleCollapsible
+														fetchedAt={raidBossesFetchedAt}
+														maxTank={maxTank}
+														bossesByTier={maxBattleFilters}
+														eventGroups={eventMaxBattleFilters}
+														tierOrder={['tier_3', 'tier_2', 'tier_1']}
+														accent='#F39C12'
+														open={showAuxMaxBattles}
+														onToggle={() => setShowAuxMaxBattles((s) => !s)}
+														copied={copied}
+														copyToClipboard={copyToClipboard}
+														t={t}
+														locale={locale}
+													/>
+													</AreaGroup>
+												</div>
+												{/* PvP section — top-30 meta picks per league with loose
+			                    PvP rank-1 IVs. Rankings pulled from lily-dex-api;
+			                    daily sync via .github/workflows/sync-data.yml. */}
+												<div className='pt-4'>
+													<AreaGroup id='pvp' title={t('app.collapsible.aux_section_pvp')} hint={t('app.group_hint.pvp')} accent='#5EAFC5'>
+													<PvpCollapsible
+														fetchedAt={pvpRankingsFetchedAt}
+														leagues={pvpFilters}
+														cupFilters={cupFilters}
+														open={showAuxPvp}
+														onToggle={() => setShowAuxPvp((s) => !s)}
+														copied={copied}
+														copyToClipboard={copyToClipboard}
+														t={t}
+														locale={locale}
+													/>
+													</AreaGroup>
+												</div>
+											</>
+										)}
+									</AreaPanel>
+									<AreaPanel area='trade' current={filterArea}>
+										{areaSettings ? (
+											areaSettingsFor.trade
+										) : (
+											<>
+												<AreaGroup id='trades' title={t('app.group.trades')} hint={t('app.group_hint.trades')} accent='#5EAFC5'>
 												<FilterBox
-													label={t('app.filter.friend_hundo_label')}
+													label={t('app.filter.trade_label')}
 													accent='#5EAFC5'
-													filterStr={friendHundoWishlist}
-													copied={copied.friendHundo}
-													onCopy={() => copyToClipboard('friendHundo', friendHundoWishlist)}
-													hint={t('app.filter.friend_hundo_hint')}
+													filterStr={trade}
+													copied={copied.trade}
+													onCopy={() => copyToClipboard('trade', trade)}
+													hint={t('app.filter.trade_hint')}
 												/>
-											</div>
-										</Collapsible>
-
-										<Collapsible
-											icon='🥚'
-											label={t('app.collapsible.aux_evos')}
-											open={showAuxEvos}
-											onToggle={() => setShowAuxEvos((s) => !s)}
-										>
-											<div className='space-y-4'>
-												{cheapEvolve ? (
-													<FilterBox
-														label={t('app.filter.cheap_evolve_label')}
-														accent='#27AE60'
-														filterStr={cheapEvolve}
-														copied={copied.cheapEvolve}
-														onCopy={() => copyToClipboard('cheapEvolve', cheapEvolve)}
-														hint={t('app.filter.cheap_evolve_hint')}
-													/>
-												) : (
-													<p className='text-xs italic text-[#8B98A5]'>
-														{t('app.filter.cheap_evolve_empty')}
-													</p>
-												)}
-												<FilterBox
-													label={t('app.filter.dex_plus_label')}
-													accent='#27AE60'
-													filterStr={dexPlus}
-													copied={copied.dexPlus}
-													onCopy={() => copyToClipboard('dexPlus', dexPlus)}
-													hint={t('app.filter.dex_plus_hint')}
-												/>
-											</div>
-										</Collapsible>
-
-										<Collapsible
-											icon='⚡'
-											label={t('app.collapsible.aux_megas')}
-											open={showAuxMegas}
-											onToggle={() => setShowAuxMegas((s) => !s)}
-										>
-											<FilterBox
-												label={t('app.filter.mega_evolve_label')}
-												accent='#E91E63'
-												filterStr={megaEvolve}
-												copied={copied.megaEvolve}
-												onCopy={() => copyToClipboard('megaEvolve', megaEvolve)}
-												hint={t('app.filter.mega_evolve_hint')}
-											/>
-										</Collapsible>
-									</div>
-
-									{/* Team Rocket section — encounters & their post-fight cleanup */}
-									<div className='space-y-3 pt-4'>
-										<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-											{t('app.collapsible.aux_section_team_rocket')}
-										</h3>
-										<RocketCollapsible
-											fetchedAt={rocketLineupsFetchedAt}
-											leaders={rocketLeaders}
-											typedGrunts={rocketTypedGrunts}
-											genericGrunts={rocketGenericGrunts}
-											typeLabels={rocketTypeLabels}
-											lenientCounters={effectiveConfig.rocketLenientCounters !== false}
-											open={showAuxRocket}
-											onToggle={() => setShowAuxRocket((s) => !s)}
-											copied={copied}
-											copyToClipboard={copyToClipboard}
-											t={t}
-											outputLocale={effectiveOutputLocale}
-										/>
-										<Collapsible
-											icon='🌑'
-											label={t('app.collapsible.aux_shadows')}
-											open={showAuxShadows}
-											onToggle={() => setShowAuxShadows((s) => !s)}
-										>
-											<div className='space-y-4'>
-												<FilterBox
-													label={t('app.filter.shadow_cheap_label')}
-													accent='#9B59B6'
-													filterStr={shadowCheap}
-													copied={copied.shadowCheap}
-													onCopy={() => copyToClipboard('shadowCheap', shadowCheap)}
-													hint={t('app.filter.shadow_cheap_hint')}
-												/>
-												<FilterBox
-													label={t('app.filter.shadow_safe_label')}
-													accent='#9B59B6'
-													filterStr={shadowSafe}
-													copied={copied.shadowSafe}
-													onCopy={() => copyToClipboard('shadowSafe', shadowSafe)}
-													hint={t('app.filter.shadow_safe_hint')}
-												/>
-												<FilterBox
-													label={t('app.filter.shadow_hundo_candidates_label')}
-													accent='#9B59B6'
-													filterStr={shadowHundoCandidates}
-													copied={copied.shadowHundoCandidates}
-													onCopy={() =>
-														copyToClipboard('shadowHundoCandidates', shadowHundoCandidates)
-													}
-													hint={t('app.filter.shadow_hundo_candidates_hint')}
-												/>
-												{shadowFrustration && (
-													<FilterBox
-														label={t('app.filter.shadow_frustration_label')}
-														accent='#9B59B6'
-														filterStr={shadowFrustration}
-														copied={copied.shadowFrustration}
-														onCopy={() =>
-															copyToClipboard('shadowFrustration', shadowFrustration)
-														}
-														hint={t('app.filter.shadow_frustration_hint')}
+													<Collapsible
+														icon={ArrowLeftRight}
+														hook={t('app.hook.trades')}
+														label={t('app.collapsible.aux_trades')}
+														open={showAuxTrades}
+														onToggle={() => setShowAuxTrades((s) => !s)}
+													>
+														<div className='space-y-4'>
+															{prestaged && (
+																<FilterBox
+																	label={t('app.filter.prestaged_label')}
+																	accent='#9B59B6'
+																	filterStr={prestaged}
+																	copied={copied.prestaged}
+																	onCopy={() => copyToClipboard('prestaged', prestaged)}
+																	hint={t('app.filter.prestaged_hint', {
+																		params: {
+																			tags: [
+																				effectiveConfig.basarTagName,
+																				effectiveConfig.fernTauschTagName,
+																			]
+																				.filter(Boolean)
+																				.map((tag) => `#${tag}`)
+																				.join(', '),
+																		},
+																	})}
+																/>
+															)}
+															{gift && (
+																<FilterBox
+																	label={t('app.filter.gift_label')}
+																	accent='#27AE60'
+																	filterStr={gift}
+																	copied={copied.gift}
+																	onCopy={() => copyToClipboard('gift', gift)}
+																	hint={t('app.filter.gift_hint')}
+																/>
+															)}
+															<FilterBox
+																label={t('app.filter.pilot_long_label')}
+																accent='#5EAFC5'
+																filterStr={pilotLong}
+																copied={copied.pilotLong}
+																onCopy={() => copyToClipboard('pilotLong', pilotLong)}
+																hint={t('app.filter.pilot_long_hint')}
+															/>
+															{evoSwapCandy && (
+																<FilterBox
+																	label={t('app.filter.evo_swap_candy_label')}
+																	accent='#9B59B6'
+																	filterStr={evoSwapCandy}
+																	copied={copied.evoSwapCandy}
+																	onCopy={() => copyToClipboard('evoSwapCandy', evoSwapCandy)}
+																	hint={t('app.filter.evo_swap_candy_hint', {
+																		params: {
+																			tag: effectiveConfig.evoSwapTagName || 'EvoSwap',
+																		},
+																	})}
+																/>
+															)}
+															{evoSwapItem && (
+																<FilterBox
+																	label={t('app.filter.evo_swap_item_label')}
+																	accent='#9B59B6'
+																	filterStr={evoSwapItem}
+																	copied={copied.evoSwapItem}
+																	onCopy={() => copyToClipboard('evoSwapItem', evoSwapItem)}
+																	hint={t('app.filter.evo_swap_item_hint', {
+																		params: {
+																			tag: effectiveConfig.evoSwapTagName || 'EvoSwap',
+																		},
+																	})}
+																/>
+															)}
+														</div>
+													</Collapsible>
+												</AreaGroup>
+												<div className='pt-4'>
+												<AreaGroup id='friends' title={t('app.group.friends')} hint={t('app.group_hint.friends')} accent='#E91E63'>
+												{buddyCatchFilters.length > 0 && (
+													<BuddyCatchSection
+														buddyCatchFilters={buddyCatchFilters}
+														copied={copied}
+														onCopy={(key, text) => copyToClipboard(key, text)}
 													/>
 												)}
-												{evoSwapCandy && (
-													<FilterBox
-														label={t('app.filter.evo_swap_candy_label')}
-														accent='#9B59B6'
-														filterStr={evoSwapCandy}
-														copied={copied.evoSwapCandy}
-														onCopy={() => copyToClipboard('evoSwapCandy', evoSwapCandy)}
-														hint={t('app.filter.evo_swap_candy_hint', {
-															params: {
-																tag: effectiveConfig.evoSwapTagName || 'EvoSwap',
-															},
-														})}
-													/>
-												)}
-												{evoSwapItem && (
-													<FilterBox
-														label={t('app.filter.evo_swap_item_label')}
-														accent='#9B59B6'
-														filterStr={evoSwapItem}
-														copied={copied.evoSwapItem}
-														onCopy={() => copyToClipboard('evoSwapItem', evoSwapItem)}
-														hint={t('app.filter.evo_swap_item_hint', {
-															params: {
-																tag: effectiveConfig.evoSwapTagName || 'EvoSwap',
-															},
-														})}
-													/>
-												)}
-											</div>
-										</Collapsible>
-									</div>
+													<Collapsible
+														icon={Heart}
+														hook={t('app.hook.friend_wishlist')}
+														label={t('app.collapsible.friend_wishlist')}
+														open={showFriendWishlist}
+														onToggle={() => setShowFriendWishlist((s) => !s)}
+													>
+														<div className='space-y-4'>
+															{/* Curated "collect for me" string — renders alongside the
+			                            fallback wishlists below, since all friend-facing strings
+			                            live in this section. Its target list is edited in the
+			                            step-2 config panel. */}
+															{friendCollectTargets.length > 0 &&
+																(friendCollectWishlist ? (
+																	<div>
+																		<FilterBox
+																			label={t('app.filter.friend_collect_label')}
+																			accent='#27AE60'
+																			filterStr={
+																				friendCollectMode === 'lucky' &&
+																				effectiveConfig.friendCollectGuaranteedOnly
+																					? friendCollectWishlistGuaranteed
+																					: friendCollectWishlist
+																			}
+																			copied={copied.friendCollect}
+																			onCopy={() =>
+																				copyToClipboard(
+																					'friendCollect',
+																					friendCollectMode === 'lucky' &&
+																						effectiveConfig.friendCollectGuaranteedOnly
+																						? friendCollectWishlistGuaranteed
+																						: friendCollectWishlist,
+																				)
+																			}
+																			hint={
+																				friendCollectMode === 'lucky' &&
+																				effectiveConfig.friendCollectGuaranteedOnly
+																					? `${t('app.filter.friend_collect_hint')} (${t('app.filter.friend_guaranteed_label')})`
+																					: t('app.filter.friend_collect_hint')
+																			}
+																		/>
+																		<p className='mono text-[10.5px] text-[#8090A0] mt-1'>
+																			{t('app.filter.friend_collect_edit_pointer')}
+																		</p>
+																	</div>
+																) : (
+																	<p className='mono text-xs text-[#27AE60]'>
+																		{t('app.filter.friend_collect_all_owned')}
+																	</p>
+																))}
 
-									{/* Events section — wild spawns during current / upcoming
-                    events, pulled from leak-duck; run `npm run fetch-events`
-                    to refresh the snapshot. */}
-									<div className='space-y-3 pt-4'>
-										<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-											{t('app.collapsible.aux_section_events')}
-										</h3>
-										<EventSpawnCollapsible
-											icon='🌿'
-											fetchedAt={eventsFetchedAt}
-											events={eventFilters}
-											megaBoostFor={megaBoostFor}
-											typeLabels={rocketTypeLabels}
-											accent='#27AE60'
-											open={showAuxEvents}
-											onToggle={() => setShowAuxEvents((s) => !s)}
-											copied={copied}
-											copyToClipboard={copyToClipboard}
-											t={t}
-											locale={locale}
-										/>
-									</div>
-
-									{/* Raids section — current bosses pulled from lily-dex-api;
-                    run `npm run fetch-raid-bosses` to refresh the snapshot. */}
-									<div className='space-y-3 pt-4'>
-										<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-											{t('app.collapsible.aux_section_raids')}
-										</h3>
-										<BossCollapsible
-											icon='⚔️'
-											titleKey='app.collapsible.aux_raids'
-											fetchedAt={raidBossesFetchedAt}
-											bossesByTier={raidFilters}
-											eventGroups={eventRaidFilters}
-											tierOrder={[
-												'mega',
-												'lvl5',
-												'shadow_lvl5',
-												'lvl3',
-												'shadow_lvl3',
-												'lvl1',
-												'shadow_lvl1',
-											]}
-											accent='#E74C3C'
-											open={showAuxRaids}
-											onToggle={() => setShowAuxRaids((s) => !s)}
-											copied={copied}
-											copyToClipboard={copyToClipboard}
-											keyPrefix='raid'
-											t={t}
-											locale={locale}
-										/>
-
-										<MaxBattleCollapsible
-											fetchedAt={raidBossesFetchedAt}
-											maxTank={maxTank}
-											bossesByTier={maxBattleFilters}
-											eventGroups={eventMaxBattleFilters}
-											tierOrder={['tier_3', 'tier_2', 'tier_1']}
-											accent='#F39C12'
-											open={showAuxMaxBattles}
-											onToggle={() => setShowAuxMaxBattles((s) => !s)}
-											copied={copied}
-											copyToClipboard={copyToClipboard}
-											t={t}
-											locale={locale}
-										/>
-									</div>
-
-									{/* PvP section — top-30 meta picks per league with loose
-                    PvP rank-1 IVs. Rankings pulled from lily-dex-api;
-                    daily sync via .github/workflows/sync-data.yml. */}
-									<div className='space-y-3 pt-4'>
-										<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-											{t('app.collapsible.aux_section_pvp')}
-										</h3>
-										<PvpCollapsible
-											fetchedAt={pvpRankingsFetchedAt}
-											leagues={pvpFilters}
-											cupFilters={cupFilters}
-											open={showAuxPvp}
-											onToggle={() => setShowAuxPvp((s) => !s)}
-											copied={copied}
-											copyToClipboard={copyToClipboard}
-											t={t}
-											locale={locale}
-										/>
-									</div>
+															{/* Fallback wishlists — blacklist of everything already owned. */}
+															<p
+																className={`mono text-xs text-[#8B98A5] leading-relaxed ${
+																	friendCollectTargets.length > 0 ? 'pt-3 border-t border-[#1F2933]' : ''
+																}`}
+															>
+																{t('app.filter.friend_wishlist_intro')}
+															</p>
+															<div>
+																<FilterBox
+																	label={t('app.filter.friend_lucky_label')}
+																	accent='#F5B82E'
+																	filterStr={
+																		friendGuaranteedLucky
+																			? friendLuckyWishlistGuaranteed
+																			: friendLuckyWishlist
+																	}
+																	copied={copied.friendLucky}
+																	onCopy={() =>
+																		copyToClipboard(
+																			'friendLucky',
+																			friendGuaranteedLucky
+																				? friendLuckyWishlistGuaranteed
+																				: friendLuckyWishlist,
+																		)
+																	}
+																	hint={t('app.filter.friend_lucky_hint')}
+																/>
+																<label className='flex items-start gap-2 cursor-pointer mono text-xs mt-2'>
+																	<input
+																		type='checkbox'
+																		checked={friendGuaranteedLucky}
+																		onChange={(e) => setFriendGuaranteedLucky(e.target.checked)}
+																		className='mt-0.5'
+																	/>
+																	<div>
+																		<span className='text-[#E6EDF3]'>
+																			{t('app.filter.friend_guaranteed_label')}
+																		</span>
+																		<p className='text-[#8B98A5] mt-0.5'>
+																			{t('app.filter.friend_guaranteed_help')}
+																		</p>
+																	</div>
+																</label>
+															</div>
+															<FilterBox
+																label={t('app.filter.friend_hundo_label')}
+																accent='#5EAFC5'
+																filterStr={friendHundoWishlist}
+																copied={copied.friendHundo}
+																onCopy={() => copyToClipboard('friendHundo', friendHundoWishlist)}
+																hint={t('app.filter.friend_hundo_hint')}
+															/>
+														</div>
+													</Collapsible>
+												</AreaGroup>
+												</div>
+											</>
+										)}
+									</AreaPanel>
 
 									{/* Internals — set theory / raw clauses / verify */}
-									<div className='space-y-3 pt-4'>
-										<h3 className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-											{t('app.collapsible.aux_section_nerd_stuff')}
-										</h3>
+									<div className='pt-4'>
+										<AreaGroup id='nerd' title={t('app.collapsible.aux_section_nerd_stuff')} hint={t('app.group_hint.nerd')} accent='#8090A0'>
 										<Collapsible
-											icon='∑'
+											icon={Sigma}
+											hook={t('app.hook.set_theory')}
 											label={t('app.collapsible.set_theory')}
 											open={showSetTheory}
 											onToggle={() => setShowSetTheory((s) => !s)}
@@ -7023,7 +7866,8 @@ export default function App() {
 										</Collapsible>
 
 										<Collapsible
-											icon='≡'
+											icon={List}
+											hook={t('app.hook.raw_clauses')}
 											label={t('app.collapsible.raw_clauses')}
 											open={showRawClauses}
 											onToggle={() => setShowRawClauses((s) => !s)}
@@ -7033,7 +7877,6 @@ export default function App() {
 												tradeClauses={tradeClauses}
 												sortClauses={sortClauses}
 												luckySortClauses={luckySortClauses}
-												nundoSortClauses={nundoSortClauses}
 												prestagedClauses={prestagedClauses}
 												giftClauses={giftClauses}
 												buddyCatchFilters={buddyCatchFilters}
@@ -7041,7 +7884,8 @@ export default function App() {
 										</Collapsible>
 
 										<Collapsible
-											icon='✓'
+											icon={BadgeCheck}
+											hook={t('app.hook.verify')}
 											label={t('app.collapsible.verify')}
 											open={showVerify}
 											onToggle={() => setShowVerify((s) => !s)}
@@ -7053,6 +7897,7 @@ export default function App() {
 												outputLocale={effectiveOutputLocale}
 											/>
 										</Collapsible>
+										</AreaGroup>
 									</div>
 								</div>
 							</StepWrapper>
@@ -7098,6 +7943,11 @@ export default function App() {
 				resetArmed={resetArmed}
 				onExport={exportState}
 				onImport={applyImportEnvelope}
+				onRunSetup={() => {
+					setShowSettings(false);
+					// The hashchange listener resolves this to view=workshop, step ①.
+					if (typeof window !== 'undefined') window.location.hash = '#workshop/where';
+				}}
 			/>
 			<HundoRegionalNotice notices={hundoRegionalNotice} onClose={() => setHundoRegionalNotice([])} />
 			{/* Sequential, not stacked: the regional notice (if any) shows first. */}
@@ -8186,17 +9036,20 @@ function FriendCollectEditor({
 	}
 
 	const suggestionLabel = (s) => {
-		if (s.kind === 'event') return `✨ ${s.title}`;
-		if (s.kind === 'eggs')
-			return `🥚 ${t('app.filter.friend_collect_suggest_eggs', { params: { title: s.title } })}`;
-		if (s.kind === 'tradeevo') return `🧬 ${t('app.filter.friend_collect_suggest_tradeevo')}`;
-		if (s.kind === 'candy') return `🍬 ${t('app.filter.friend_collect_suggest_candy')}`;
-		if (s.kind === 'powerlines') return `🐲 ${t('app.filter.friend_collect_suggest_powerlines')}`;
-		if (s.kind === 'starters') return `🌱 ${t('app.filter.friend_collect_suggest_starters')}`;
-		if (s.kind === 'mega') return `💠 ${t('app.filter.friend_collect_suggest_mega')}`;
-		if (s.kind === 'raids') return `⚔️ ${t('app.filter.friend_collect_suggest_raid')}`;
-		if (s.kind === 'pvp-great') return `🥇 ${t('app.filter.friend_collect_suggest_pvp_great')}`;
-		return `🥈 ${t('app.filter.friend_collect_suggest_pvp_ultra')}`;
+		if (s.kind === 'event') return s.title;
+		if (s.kind === 'eggs') return t('app.filter.friend_collect_suggest_eggs', { params: { title: s.title } });
+		if (s.kind === 'tradeevo') return t('app.filter.friend_collect_suggest_tradeevo');
+		if (s.kind === 'candy') return t('app.filter.friend_collect_suggest_candy');
+		if (s.kind === 'powerlines') return t('app.filter.friend_collect_suggest_powerlines');
+		if (s.kind === 'starters') return t('app.filter.friend_collect_suggest_starters');
+		if (s.kind === 'mega') return t('app.filter.friend_collect_suggest_mega');
+		if (s.kind === 'raids') return t('app.filter.friend_collect_suggest_raid');
+		if (s.kind === 'pvp-great') return t('app.filter.friend_collect_suggest_pvp_great');
+		return t('app.filter.friend_collect_suggest_pvp_ultra');
+	};
+	const SUGGESTION_ICON = {
+		event: Sparkles, eggs: Egg, tradeevo: Dna, candy: Candy, powerlines: Crown, starters: Sprout, mega: Zap,
+		raids: Target, 'pvp-great': Medal, 'pvp-ultra': Trophy,
 	};
 	// Pack grouping: time-limited feeds first, evergreen collections, then the
 	// meta-driven pools. Groups render only when they have surviving packs.
@@ -8300,7 +9153,13 @@ function FriendCollectEditor({
 											<div key={s.id} className='border border-[#1F2933] rounded-sm px-2.5 py-1.5 bg-[#0B0F14]'>
 												<div className='flex items-center justify-between gap-2'>
 													<div className='mono text-xs text-[#E6EDF3] min-w-0'>
-														<span className='wrap-break-word'>{suggestionLabel(s)}</span>
+														<span className='wrap-break-word inline-flex items-start gap-1.5'>
+															{(() => {
+																const Icon = SUGGESTION_ICON[s.kind] || Trophy;
+																return <Icon size={13} strokeWidth={1.75} className='shrink-0 mt-0.5 text-[#5EAFC5]' aria-hidden='true' />;
+															})()}
+															<span>{suggestionLabel(s)}</span>
+														</span>
 														<span className='text-[#8090A0] ml-1.5 whitespace-nowrap'>
 															{t('app.filter.friend_collect_suggest_count', {
 																params: { count: s.species.length },
@@ -8717,25 +9576,151 @@ function FilterBox({ label, accent, filterStr, copied, onCopy, hint }) {
 	);
 }
 
-function Collapsible({ icon, label, open, onToggle, children }) {
+// The four areas of the filter step as an ARIA tab set. Every panel stays
+// mounted (hidden, not unmounted), so each tab's aria-controls points at a
+// real element and switching tabs keeps every collapsible's open state.
+// Arrow keys move between tabs and Home/End jump to the ends, per the APG
+// tabs pattern; only the selected tab is in the Tab order.
+function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, t }) {
+	const refs = useRef({});
+	const move = (e, i) => {
+		const next =
+			e.key === 'ArrowRight' ? (i + 1) % areas.length
+			: e.key === 'ArrowLeft' ? (i - 1 + areas.length) % areas.length
+			: e.key === 'Home' ? 0
+			: e.key === 'End' ? areas.length - 1
+			: null;
+		if (next === null) return;
+		e.preventDefault();
+		onSelect(areas[next]);
+		refs.current[areas[next]]?.focus();
+	};
 	return (
-		<details open={open} className='border border-[#1F2933] rounded-sm'>
+		<div className='pb-3 border-b border-[#1F2933]'>
+			<div role='tablist' aria-label={t('app.area.tablist')} className='grid grid-cols-4 gap-1'>
+				{areas.map((area, i) => {
+					const selected = area === current;
+					return (
+						<button
+							key={area}
+							ref={(el) => (refs.current[area] = el)}
+							type='button'
+							role='tab'
+							id={`area-tab-${area}`}
+							aria-selected={selected}
+							aria-controls={`area-panel-${area}`}
+							tabIndex={selected ? 0 : -1}
+							onClick={() => onSelect(area)}
+							onKeyDown={(e) => move(e, i)}
+							className={`mono text-xs min-h-[40px] px-2 rounded-sm border transition ${
+								selected
+									? 'border-[#5EAFC5] text-[#E6EDF3] bg-[#141A21]'
+									: 'border-[#1F2933] text-[#8B98A5] hover:text-[#E6EDF3]'
+							}`}
+						>
+							{t(`app.area.${area}.label`)}
+						</button>
+					);
+				})}
+			</div>
+			<div className='flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-3 mt-2'>
+				<p className='mono text-[10.5px] text-[#8090A0]'>
+					{settings ? t('app.area.settings_hint') : t(`app.area.${current}.hint`)}
+				</p>
+				{/* The flip: same four tabs, each showing its own settings. A toggle,
+				    so aria-pressed carries the state; the label says where it goes. */}
+				<button
+					type='button'
+					onClick={onToggleSettings}
+					aria-pressed={!!settings}
+					className={`mono text-xs self-start shrink-0 min-h-[32px] px-3 rounded-sm border flex items-center gap-1.5 transition ${
+						settings
+							? 'border-[#F5B82E] text-[#F5B82E]'
+							: 'border-[#2D3A47] text-[#8B98A5] hover:text-[#E6EDF3]'
+					}`}
+				>
+					{settings ? <ArrowLeft size={12} aria-hidden='true' /> : <Settings size={12} aria-hidden='true' />}
+					{settings
+						? t('app.area.settings_close')
+						: t('app.area.settings_open', { params: { area: t(`app.area.${current}.label`) } })}
+				</button>
+			</div>
+		</div>
+	);
+}
+
+function AreaPanel({ area, current, children }) {
+	return (
+		<div
+			role='tabpanel'
+			id={`area-panel-${area}`}
+			aria-labelledby={`area-tab-${area}`}
+			hidden={area !== current}
+			className='space-y-6'
+		>
+			{children}
+		</div>
+	);
+}
+
+// One look for every group and tile across the four areas. A group sets the
+// colour; tiles inside it pick it up from context, so a tile never needs to
+// be told which tab it sits in.
+const AreaAccent = createContext('#5EAFC5');
+function AreaGroup({ id, title, hint, accent = '#5EAFC5', children }) {
+	return (
+		<AreaAccent.Provider value={accent}>
+			<section aria-labelledby={`area-group-${id}`} className='space-y-2'>
+				<h3 id={`area-group-${id}`} className='mono text-xs uppercase tracking-widest font-semibold' style={{ color: accent }}>
+					{title}
+				</h3>
+				{hint && <p className='mono text-[11px] text-[#8090A0] -mt-1'>{hint}</p>}
+				{children}
+			</section>
+		</AreaAccent.Provider>
+	);
+}
+// A lucide icon in a tinted square, in the tile's accent.
+function TileIcon({ icon: Icon, accent }) {
+	if (!Icon) return null;
+	return (
+		<span
+			className='shrink-0 w-8 h-8 rounded-md flex items-center justify-center'
+			style={{ color: accent, background: `${accent}1A`, border: `1px solid ${accent}33` }}
+			aria-hidden='true'
+		>
+			<Icon size={16} strokeWidth={1.75} />
+		</span>
+	);
+}
+
+function Collapsible({ icon, label, hook, open, onToggle, children }) {
+	const accent = useContext(AreaAccent);
+	return (
+		<details
+			open={open}
+			className='rounded-md border border-[#1F2933] bg-[#0E141A] overflow-hidden transition hover:border-[#2D3A47]'
+			style={{ borderLeft: `3px solid ${accent}` }}
+		>
 			<summary
 				onClick={(e) => {
 					e.preventDefault();
 					onToggle();
 				}}
-				className='px-4 py-3 flex items-center gap-3 hover:bg-[#141A21] transition'
+				className='list-none cursor-pointer flex items-start gap-3 p-3'
 			>
+				<TileIcon icon={icon} accent={accent} />
+				<span className='min-w-0 flex-1'>
+					<span className='mono text-sm font-semibold text-[#E6EDF3]'>{label}</span>
+					{hook && <span className='block text-xs text-[#8B98A5] mt-1 leading-relaxed'>{hook}</span>}
+				</span>
 				{open ? (
-					<ChevronDown size={14} className='text-[#5EAFC5]' />
+					<ChevronDown size={14} className='text-[#8090A0] shrink-0 mt-1' aria-hidden='true' />
 				) : (
-					<ChevronRight size={14} className='text-[#8090A0]' />
+					<ChevronRight size={14} className='text-[#8090A0] shrink-0 mt-1' aria-hidden='true' />
 				)}
-				<span className='mono text-sm text-[#5EAFC5]'>{icon}</span>
-				<span className='mono text-sm font-medium text-[#E6EDF3]'>{label}</span>
 			</summary>
-			{open && <div className='px-4 pb-4 pt-2 border-t border-[#1F2933]'>{children}</div>}
+			{open && <div className='px-3 pb-3 pt-3 border-t border-[#1F2933]'>{children}</div>}
 		</details>
 	);
 }
@@ -8889,6 +9874,7 @@ function eventBossGroups(events, { accent, t, locale, renderBosses }) {
 // by default, upcoming ones collapse with a window teaser.
 function BossCollapsible({
 	icon,
+	hook,
 	titleKey,
 	fetchedAt,
 	bossesByTier,
@@ -8915,7 +9901,7 @@ function BossCollapsible({
 		: t('app.collapsible.aux_footer_no_age', { params: { count: countLabel } });
 	if (totalBosses === 0) {
 		return (
-			<Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
+			<Collapsible icon={icon} label={headerLabel} hook={hook} open={open} onToggle={onToggle}>
 				<p className='text-xs italic text-[#8B98A5]'>{t('app.filter.aux_bosses_empty')}</p>
 			</Collapsible>
 		);
@@ -8924,7 +9910,7 @@ function BossCollapsible({
 		bossCounterBoxes(bosses, scope, { keyPrefix, accent, copied, copyToClipboard, t });
 	const hasEvents = events.length > 0;
 	return (
-		<Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
+		<Collapsible icon={icon} label={headerLabel} hook={hook} open={open} onToggle={onToggle}>
 			<div className='space-y-5'>
 				{/* tiers below; footer rendered at end */}
 				{hasEvents && (
@@ -8964,128 +9950,419 @@ function BossCollapsible({
 // tidy-up) holding a three-step triage: ① keepers to favourite, ② what's still
 // unsorted, ③ the trashable rest. Mirrors BossCollapsible's shape so the aux
 // section stays visually consistent.
-function EventSpawnCollapsible({
-	icon,
-	fetchedAt,
-	events,
-	megaBoostFor,
-	typeLabels,
-	accent,
-	open,
-	onToggle,
-	copied,
-	copyToClipboard,
-	t,
-	locale,
-}) {
-	const list = events || [];
-	const age = formatSyncAge(fetchedAt, t);
-	const headerLabel = t('app.collapsible.aux_events');
-	const countLabel = t('app.collapsible.aux_events_count', { params: { count: list.length } });
-	const footerLabel = age
-		? t('app.collapsible.aux_footer', { params: { count: countLabel, age } })
-		: t('app.collapsible.aux_footer_no_age', { params: { count: countLabel } });
-	if (list.length === 0) {
-		return (
-			<Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
-				<p className='text-xs italic text-[#8B98A5]'>{t('app.events.empty')}</p>
-			</Collapsible>
-		);
-	}
-	const fmtDow = new Intl.DateTimeFormat(locale, { weekday: 'short' });
-	// The current spawn pool: the events running now, decided at render like
-	// each event's active highlight below.
-	const live = liveSpawnPool(list, Date.now());
-	const liveMegaBoost =
-		megaBoostFor && live.spawnForms.length > 0
-			? { eventTitles: live.events.map((ev) => ev.title), ...megaBoostFor(live.spawnForms) }
-			: null;
-	const megaPanel = (boost, copyKey, heading, sub) => (
-		<MegaBoostPanel
-			boost={boost}
-			heading={heading}
-			sub={sub}
-			accent={accent}
-			copied={copied[copyKey]}
-			onCopy={() => copyToClipboard(copyKey, boost.filter)}
-			typeLabels={typeLabels}
-			t={t}
-			locale={locale}
-		/>
-	);
+// The double transfer candy day reminder (spec: a card, not a pile). No
+// upstream publishes these days yet, so it always shows: the working tag
+// protects Pokémon until that day, then the #tag search finds them.
+function CrushCard({ tag, copied, copyToClipboard, t }) {
 	return (
-		<Collapsible icon={icon} label={headerLabel} open={open} onToggle={onToggle}>
-			<div className='space-y-5'>
-				{liveMegaBoost &&
-					megaPanel(
-						liveMegaBoost,
-						'event_mega_live',
-						t('app.events.mega_live_heading'),
-						t('app.events.mega_live_sub', {
-							params: { count: liveMegaBoost.poolSize, events: liveMegaBoost.eventTitles.join(' + ') },
-						}),
-					)}
-				{list.map((ev) => {
-					const startMs = Date.parse(ev.start);
-					const endMs = Date.parse(ev.end);
-					const now = Date.now();
-					const isActive = now >= startMs && now <= endMs;
-					const isEnded = now > endMs;
-					const teaser = isEnded
-						? t('app.events.window_ended', { params: { dow: fmtDow.format(endMs) } })
-						: formatEventWindow(ev.start, ev.end, t, locale);
-					// One FilterBox per non-null triage string; copy keys namespaced per
-					// event so two events sharing a species don't share copy state.
-					const box = (suffix, labelKey, hintKey, str, params) => {
-						if (!str) return null;
-						const copyKey = `event_${ev.id}_${suffix}`;
-						const opts = params ? { params } : undefined;
-						return (
-							<FilterBox
-								key={suffix}
-								label={t(labelKey, opts)}
-								accent={accent}
-								filterStr={str}
-								copied={copied[copyKey]}
-								onCopy={() => copyToClipboard(copyKey, str)}
-								hint={t(hintKey, opts)}
-							/>
-						);
-					};
-					const subHeading = (key) => (
-						<h5 className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t(key)}</h5>
-					);
-					return (
-						<TrainerAccordion
-							key={ev.id}
-							name={ev.title}
-							teaser={teaser}
-							accent={accent}
-							highlight={isActive}
-						>
-							{ev.megaBoost?.poolSize > 0 &&
-								megaPanel(ev.megaBoost, `event_${ev.id}_mega`, t('app.events.mega_heading'))}
-							{box('overview', 'app.events.overview_label', 'app.events.overview_hint', ev.overview)}
-							{subHeading('app.events.group_keep')}
-							{box('souvenirs', 'app.events.souvenirs_label', 'app.events.souvenirs_hint', ev.souvenirs)}
-							{box('keep_iv', 'app.events.keep_iv_label', 'app.events.keep_iv_hint', ev.keepIv)}
-							{subHeading('app.events.group_sort')}
-							{box('sort', 'app.events.sort_label', 'app.events.sort_hint', ev.sort)}
-							{subHeading('app.events.group_trash')}
-							{box('trash', 'app.events.trash_label', 'app.events.trash_hint', ev.trash)}
-						</TrainerAccordion>
-					);
-				})}
+		<div className='border border-[#2D3A47] rounded-sm p-3 flex flex-wrap items-start justify-between gap-2 bg-[#0B1015]'>
+			<div className='min-w-0 flex-1'>
+				<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>{t('app.crush.title')}</div>
+				<p className='mono text-xs text-[#8B98A5] leading-relaxed mt-1'>{t('app.crush.body', { params: { tag } })}</p>
 			</div>
-			<p className='mono text-[10.5px] text-[#8090A0] mt-4 pt-3 border-t border-[#1F2933]'>{footerLabel}</p>
-		</Collapsible>
+			<button
+				type='button'
+				onClick={() => copyToClipboard('crush_tag', `#${tag}`)}
+				aria-label={`${t('app.tags.copy')}: #${tag}`}
+				className='mono text-xs min-h-[32px] px-2.5 rounded-sm bg-[#1F2933] text-[#5EAFC5] hover:bg-[#2D3A47] shrink-0'
+			>
+				{copied.crush_tag ? t('app.tags.copied') : `#${tag}`}
+			</button>
+		</div>
 	);
 }
+
+// The showcase calculator in the XXL pile. Approximate by design: the size
+// class isn't published and the game rounds height and weight, so it shows a
+// range, and compares it with the XXL budget (keep at or above the threshold).
+function XxlCalculator({ threshold, t }) {
+	const fid = useId();
+	const [species, setSpecies] = useState('');
+	const [height, setHeight] = useState('');
+	const [weight, setWeight] = useState('');
+	const [ivs, setIvs] = useState(['', '', '']);
+	const [xxl, setXxl] = useState(true);
+	const [form, setForm] = useState('');
+	const dex = resolveSpeciesInfo(species)?.dex;
+	// Forms with their own mean size (from the game master); the picker shows
+	// only for those species. Regional forms use the app's region words.
+	const forms = Object.keys(SPECIES_META.showcase?.sizeByForm?.[dex] || {});
+	const formLabel = (suffix) => {
+		const region = { ALOLA: 'alola', GALARIAN: 'galar', HISUIAN: 'hisui', PALDEA: 'paldea' }[suffix.split('_')[0]];
+		if (region) return t(`app.buddy_targets.form_region.${region}`);
+		if (suffix === 'NORMAL') return t('app.xxl.form_normal');
+		return suffix.toLowerCase().replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
+	};
+	const activeForm = forms.includes(form) ? form : null;
+	// A species whose forms differ in size is only scored once a form is picked.
+	const needsForm = forms.length > 0 && !activeForm;
+	const result = dex && !needsForm
+		? showcaseScoreRange({
+				dex,
+				form: activeForm,
+				heightM: Number.parseFloat(height.replace(',', '.')),
+				weightKg: Number.parseFloat(weight.replace(',', '.')),
+				// All three filled → exact IV part; otherwise unknown, and the range widens.
+				ivs: ivs.every((v) => v !== '') ? ivs.map(Number) : null,
+				xxl,
+			})
+		: null;
+	const field = 'mono text-sm bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 min-h-[32px] rounded-sm text-[#E6EDF3]';
+	const verdict = !result?.fits
+		? null
+		: result.min >= threshold
+			? 'keep'
+			: result.max < threshold
+				? 'below'
+				: 'maybe';
+	return (
+		<div className='border border-[#2D3A47] rounded-sm p-3 space-y-3 bg-[#0B1015]'>
+			<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>{t('app.xxl.title')}</div>
+			<div className='grid grid-cols-2 gap-2'>
+				<label className='col-span-2 mono text-[11px] text-[#8090A0] flex flex-col gap-1'>
+					{t('app.xxl.species')}
+					<SpeciesInput value={species} onChange={setSpecies} onSubmit={() => {}} aria-label={t('app.xxl.species')} className={field} />
+				</label>
+				{forms.length > 0 && (
+					<label htmlFor={`${fid}-form`} className='col-span-2 mono text-[11px] text-[#8090A0] flex flex-col gap-1'>
+						{t('app.xxl.form')}
+						<select id={`${fid}-form`} value={activeForm || ''} onChange={(e) => setForm(e.target.value)} className={field}>
+							<option value=''>{t('app.xxl.form_pick')}</option>
+							{forms.map((f) => (
+								<option key={f} value={f}>
+									{formLabel(f)}
+								</option>
+							))}
+						</select>
+					</label>
+				)}
+				<label htmlFor={`${fid}-h`} className='mono text-[11px] text-[#8090A0] flex flex-col gap-1'>
+					{t('app.xxl.height')}
+					<input id={`${fid}-h`} type='text' inputMode='decimal' autoComplete='off' value={height} onChange={(e) => setHeight(e.target.value)} className={field} />
+				</label>
+				<label htmlFor={`${fid}-w`} className='mono text-[11px] text-[#8090A0] flex flex-col gap-1'>
+					{t('app.xxl.weight')}
+					<input id={`${fid}-w`} type='text' inputMode='decimal' autoComplete='off' value={weight} onChange={(e) => setWeight(e.target.value)} className={field} />
+				</label>
+				<details className='col-span-2'>
+					<summary className='list-none cursor-pointer mono text-[11px] text-[#5EAFC5] hover:text-[#E6EDF3] min-h-[32px] flex items-center'>
+						{t('app.xxl.ivs_toggle')}
+					</summary>
+					<div className='col-span-2 grid grid-cols-3 gap-2'>
+						{['atk', 'def', 'hp'].map((k, i) => (
+							<label key={k} htmlFor={`${fid}-${k}`} className='mono text-[11px] text-[#8090A0] flex flex-col gap-1'>
+								{t(`app.xxl.${k}`)}
+								<input
+									id={`${fid}-${k}`}
+									type='number'
+									min='0'
+									max='15'
+									value={ivs[i]}
+									onChange={(e) => setIvs((prev) => prev.map((v, j) => (j === i ? e.target.value : v)))}
+									className={field}
+								/>
+							</label>
+						))}
+					</div>
+				</details>
+				<label className='col-span-2 mono text-xs text-[#E6EDF3] flex items-center gap-2 min-h-[32px]'>
+					<input type='checkbox' checked={xxl} onChange={(e) => setXxl(e.target.checked)} />
+					{t('app.xxl.is_xxl')}
+				</label>
+			</div>
+			<div aria-live='polite' className='mono text-xs leading-relaxed'>
+				{dex && needsForm ? (
+					<p className='text-[#F5B82E]'>{t('app.xxl.pick_form')}</p>
+				) : !dex || !result ? (
+					<p className='text-[#8090A0]'>{t('app.xxl.empty')}</p>
+				) : !result.fits ? (
+					<p className='text-[#F5B82E]'>{t('app.xxl.no_fit')}</p>
+				) : (
+					<>
+						<p className='text-[#E6EDF3] text-sm'>{t('app.xxl.result', { params: { min: result.min, max: result.max } })}</p>
+						<p className='text-[#8B98A5]'>{t('app.xxl.classes', { params: { classes: result.classes.map((c) => `${c.toFixed(2)}×`).join(', ') } })}</p>
+						<p style={{ color: verdict === 'keep' ? '#27AE60' : verdict === 'below' ? '#E74C3C' : '#F5B82E' }}>
+							{t(`app.xxl.verdict_${verdict}`, { params: { score: threshold } })}
+						</p>
+					</>
+				)}
+			</div>
+			<p className='mono text-[10.5px] text-[#8090A0] italic leading-relaxed'>{t('app.xxl.hint')}</p>
+		</div>
+	);
+}
+
+// The pile card (spec: "Pile card"): per species in the pile, its class
+// (meta, watchlist, non-meta) with the reasons in words, how many to keep and
+// why; for a category pile, its one keep rule. Never "you have M": the
+// workshop doesn't see the storage.
+const CARD_ROWS_SHOWN = 12;
+const CLASS_COLOUR = { meta: '#27AE60', watchlist: '#F5B82E', non_meta: '#8090A0' };
+function PileCard({ card, t }) {
+	const [all, setAll] = useState(false);
+	if (!card || (!card.rule && !card.rows?.length)) return null;
+	const rows = all ? card.rows : card.rows.slice(0, CARD_ROWS_SHOWN);
+	const classes = [...new Set(card.rows.map((r) => r.cls))];
+	return (
+		<div className='border border-[#2D3A47] rounded-sm p-3 space-y-3 bg-[#0B1015]'>
+			<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>{t('app.card.title')}</div>
+			{card.rule && <p className='mono text-xs text-[#E6EDF3] leading-relaxed'>{card.rule}</p>}
+			{rows.length > 0 && (
+				<ul className='space-y-2'>
+					{rows.map((r) => (
+						<li key={r.dex} className='mono text-xs leading-relaxed'>
+							<span className='text-[#E6EDF3]'>{r.name}</span>{' '}
+							<span className='text-[10px] uppercase tracking-wide' style={{ color: CLASS_COLOUR[r.cls] }}>
+								{t(`app.card.class.${r.cls}`)}
+							</span>
+							{r.reasons.length > 0 && <span className='text-[#8B98A5]'> · {r.reasons.join(' · ')}</span>}
+							<div className='text-[#8B98A5]'>→ {r.keep.join(' · ')}</div>
+						</li>
+					))}
+				</ul>
+			)}
+			{card.rows.length > CARD_ROWS_SHOWN && (
+				<button
+					type='button'
+					onClick={() => setAll((v) => !v)}
+					aria-expanded={all}
+					className='mono text-xs text-[#5EAFC5] hover:text-[#E6EDF3] min-h-[32px]'
+				>
+					{all ? t('app.card.show_fewer') : t('app.card.show_all', { params: { count: card.rows.length } })}
+				</button>
+			)}
+			{classes.map((cls) => (
+				<p key={cls} className='mono text-[10.5px] text-[#8090A0] leading-relaxed'>
+					<span style={{ color: CLASS_COLOUR[cls] }}>{t(`app.card.class.${cls}`)}</span>: {t(`app.card.why.${cls}`)}
+				</p>
+			))}
+			<p className='mono text-[10.5px] text-[#8090A0] italic'>{t('app.card.hint')}</p>
+		</div>
+	);
+}
+
+// Every sorting pile as a card you scroll past: an icon, a title, a one-line
+// hook in plain words ("Cryptos piling up…"), and the three steps when opened.
+// `chip` carries the event window or the reason a pile floated up.
+export const PILE_GROUPS = [
+	{ id: 'collection', accent: '#F5B82E', piles: ['hundo', 'cday', 'luckies', 'traded', 'costumes_evolve', 'costumes_final', 'backgrounds', 'xxl', 'xxs'] },
+	{ id: 'battle', accent: '#E74C3C', piles: ['meta', 'watchlist', 'legendaries', 'shadows', 'dynamax'] },
+	// `tools` are single filters with their own tile: mega-evolving spends
+	// candy, so it sits here and not with the Mega planner under Catching.
+	{ id: 'evolve', accent: '#27AE60', piles: ['evolve'], tools: ['mega_evolve'] },
+	{ id: 'big', accent: '#5EAFC5', piles: ['non_meta'] },
+];
+const PILE_ICON = {
+	hundo: Award, luckies: Clover, traded: Gift, costumes_evolve: Shirt, costumes_final: Shirt, backgrounds: Image, legendaries: Crown, cday: Sparkles,
+	xxl: Maximize2, xxs: Minimize2, meta: Swords, watchlist: Telescope, shadows: Flame, dynamax: Zap, evolve: Sprout,
+	non_meta: Package, event: Leaf, mega_evolve: Dna,
+};
+// A single filter in a pile group, styled like a pile tile.
+function ToolTile({ title, hook, chip, icon, accent, open, children }) {
+	return (
+		<details
+			open={open || undefined}
+			className='group rounded-md border border-[#1F2933] bg-[#0E141A] overflow-hidden transition hover:border-[#2D3A47]'
+			style={{ borderLeft: `3px solid ${accent}` }}
+		>
+			<summary className='list-none cursor-pointer flex items-start gap-3 p-3'>
+				<TileIcon icon={icon} accent={accent} />
+				<span className='min-w-0 flex-1'>
+					<span className='flex flex-wrap items-center gap-2'>
+						<span className='mono text-sm font-semibold text-[#E6EDF3]'>{title}</span>
+						{chip && (
+							<span className='mono text-[10px] px-1.5 py-0.5 rounded-sm' style={{ color: accent, border: `1px solid ${accent}55` }}>
+								{chip}
+							</span>
+						)}
+					</span>
+					{hook && <span className='block text-xs text-[#8B98A5] mt-1 leading-relaxed'>{hook}</span>}
+				</span>
+				<ChevronRight size={14} className='text-[#8090A0] details-arrow shrink-0 mt-1' aria-hidden='true' />
+			</summary>
+			<div className='px-3 pb-3 pt-3 border-t border-[#1F2933] space-y-3'>{children}</div>
+		</details>
+	);
+}
+function PileTile({ pile, title, hook, icon, chip, accent, open, onHide, hidden, text, copied, copyToClipboard, t, children }) {
+	return (
+		<details
+			open={open || undefined}
+			className='group rounded-md border border-[#1F2933] bg-[#0E141A] overflow-hidden transition hover:border-[#2D3A47]'
+			style={{ borderLeft: `3px solid ${accent}` }}
+		>
+			<summary className='list-none cursor-pointer flex items-start gap-3 p-3'>
+				<TileIcon icon={icon} accent={accent} />
+				<span className='min-w-0 flex-1'>
+					<span className='flex flex-wrap items-center gap-2'>
+						<span className='mono text-sm font-semibold text-[#E6EDF3]'>{title}</span>
+						{chip && (
+							<span className='mono text-[10px] px-1.5 py-0.5 rounded-sm' style={{ color: accent, border: `1px solid ${accent}55` }}>
+								{chip}
+							</span>
+						)}
+					</span>
+					<span className='block text-xs text-[#8B98A5] mt-1 leading-relaxed'>{hook}</span>
+				</span>
+				<ChevronRight size={14} className='text-[#8090A0] details-arrow shrink-0 mt-1' aria-hidden='true' />
+			</summary>
+			<div className='px-3 pb-3 pt-3 border-t border-[#1F2933] space-y-3'>
+				<PileSteps pile={pile} accent={accent} copied={copied} copyToClipboard={copyToClipboard} t={t} text={text} />
+				{(pile.extras || []).length > 0 && (
+					<div className='space-y-3 pt-2 border-t border-[#1F2933]'>
+						<h5 className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t('app.sort.also_here')}</h5>
+						{pile.extras.map((x) => (
+							<FilterBox
+								key={x.key}
+								label={t(x.label, x.params ? { params: x.params } : undefined)}
+								accent={accent}
+								filterStr={x.filter}
+								copied={copied[`${pile.id}_${x.key}`]}
+								onCopy={() => copyToClipboard(`${pile.id}_${x.key}`, x.filter)}
+								hint={t(x.hint, x.params ? { params: x.params } : undefined)}
+							/>
+						))}
+					</div>
+				)}
+				{children}
+				{onHide && (
+					<button type='button' onClick={onHide} className='mono text-[11px] text-[#8090A0] hover:text-[#E6EDF3] min-h-[32px]'>
+						{hidden ? t('app.pile.unhide') : t('app.pile.hide')}
+					</button>
+				)}
+			</div>
+		</details>
+	);
+}
+
+// The three steps of one sorting pile (see buildPile), rendered the same way
+// for every pile. `text` names each box's label and hint keys:
+//   { overview: [label, hint], keep: { <lensKey>: [label, hint] }, sort, release }
+// sort and release fall back to the generic pile wording. Copy keys are
+// `${pile.id}_${box}`, so two piles that share a species never share state.
+// `card` renders under ②, where the user decides what still has a job.
+const PILE_TEXT_DEFAULTS = {
+	sort: ['app.pile.sort_label', 'app.pile.sort_hint'],
+	release: ['app.pile.release_label', 'app.pile.release_hint'],
+};
+const HUNDO_PILE_TEXT = {
+	overview: ['app.pile.hundo.overview_label', 'app.filter.sort_hint'],
+	keep: { hundos: ['app.pile.lens.hundos_label', 'app.pile.lens.hundos_hint'] },
+};
+const EVENT_PILE_TEXT = {
+	overview: ['app.events.overview_label', 'app.events.overview_hint'],
+	sort: ['app.pile.sort_label', 'app.events.sort_hint'],
+	release: ['app.pile.release_label', 'app.events.release_hint'],
+};
+function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
+	if (!pile) return null;
+	// Wording by convention unless the pile's table says otherwise:
+	// app.pile.<id>.title/.hint for the overview, app.pile.lens.<key>_label/_hint
+	// for a lens, and a lens's own `text` (with params) for dynamic ones.
+	const words = {
+		...PILE_TEXT_DEFAULTS,
+		overview: [`app.pile.${pile.id}.title`, `app.pile.${pile.id}.hint`],
+		...text,
+	};
+	const lensWords = (lens) =>
+		words.keep?.[lens.key] || lens.text || [`app.pile.lens.${lens.key}_label`, `app.pile.lens.${lens.key}_hint`];
+	const box = (suffix, keys, str) => {
+		if (!str || !keys) return null;
+		const copyKey = `${pile.id}_${suffix}`;
+		const opts = keys[2] ? { params: keys[2] } : undefined;
+		return (
+			<FilterBox
+				key={suffix}
+				label={t(keys[0], opts)}
+				accent={accent}
+				filterStr={str}
+				copied={copied[copyKey]}
+				onCopy={() => copyToClipboard(copyKey, str)}
+				hint={t(keys[1], opts)}
+			/>
+		);
+	};
+	const subHeading = (key) => (
+		<h5 className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t(key)}</h5>
+	);
+	return (
+		<>
+			{box('overview', words.overview, pile.overview)}
+			{pile.keep.length > 0 && subHeading('app.pile.group_keep')}
+			{pile.keep.map((lens) => box(lens.key, lensWords(lens), lens.filter))}
+			{subHeading('app.pile.group_sort')}
+			{card ?? <PileCard card={pile.card} t={t} />}
+			{box('sort', words.sort, pile.sort)}
+			{subHeading('app.pile.group_release')}
+			{box('release', words.release, pile.release)}
+		</>
+	);
+}
+
 
 // "Which Mega is worth it" for one spawn pool: the top groups of
 // interchangeable Megas (src/mega-boost.js), each with how much of the pool it
 // boosts and which spawns, then one filter for the top group's species. Names
 // are shown in the UI locale; the filter is built in the output locale.
+// "Which Mega for my next outing" (Catching): one row per wild-spawn event or
+// raid day / raid hour that is on now or starts within the next days (see
+// megaPlans in mega-boost.js), soonest first, the running ones open. The Mega
+// rank-up filter sits underneath: levelling Megas is out-and-about work too.
+function MegaPlanner({ plans, copied, copyToClipboard, typeLabels, t, locale }) {
+	const now = Date.now();
+	const fmtDow = new Intl.DateTimeFormat(locale, { weekday: 'short' });
+	const fmtTime = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
+	const when = (p) => {
+		const s = Date.parse(p.start), e = Date.parse(p.end);
+		if (s <= now) return t('app.mega_plan.now_until', { params: { end: `${fmtDow.format(e)} ${fmtTime.format(e)}` } });
+		return t('app.mega_plan.starts', { params: { start: `${fmtDow.format(s)} ${fmtTime.format(s)}` } });
+	};
+	// The top Mega leads the teaser: on a phone the row cuts off, and the Mega
+	// is what the row is for.
+	const topName = (p) => {
+		const key = p.boost.groups[0]?.megaKeys?.[0];
+		const name = key ? pokemonNameFor(key, locale) || '' : '';
+		return name.replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toUpperCase());
+	};
+	return (
+		<AreaGroup id='mega-plan' title={t('app.mega_plan.title')} hint={t('app.mega_plan.hint')} accent='#E91E63'>
+			{plans.length === 0 ? (
+				<p className='mono text-xs italic text-[#8B98A5]'>{t('app.mega_plan.empty')}</p>
+			) : (
+				<div className='space-y-2'>
+					{plans.map((p) => {
+						const live = Date.parse(p.start) <= now;
+						const icon = p.kind === 'raid' ? Target : Leaf;
+						const name = topName(p);
+						return (
+							<ToolTile
+								key={p.id}
+								title={p.title}
+								chip={when(p)}
+								hook={name}
+								icon={icon}
+								accent='#E91E63'
+								open={live}
+							>
+								<MegaBoostPanel
+									boost={p.boost}
+									heading={t(p.kind === 'raid' ? 'app.mega_plan.raid_heading' : 'app.mega_plan.wild_heading')}
+									accent='#E91E63'
+									copied={copied[`megaplan_${p.id}`]}
+									onCopy={() => copyToClipboard(`megaplan_${p.id}`, p.boost.filter)}
+									typeLabels={typeLabels}
+									t={t}
+									locale={locale}
+								/>
+							</ToolTile>
+						);
+					})}
+				</div>
+			)}
+		</AreaGroup>
+	);
+}
+
 function MegaBoostPanel({ boost, heading, sub, accent, copied, onCopy, typeLabels, t, locale }) {
 	const nameOf = (key) => POKEMON_NAMES_DICT[key]?.[locale] ?? POKEMON_NAMES_DICT[key]?.en ?? key;
 	const spawnName = ({ dex, region }) => {
@@ -9170,7 +10447,7 @@ function topHitsHint(topHits, t) {
 // Max Battle tiers. Native <details> handles its own open/close state — no
 // React state plumbing needed, and multiple rows can stay open at once.
 // Mirrors the visual rhythm of the parent Collapsible but a half-step smaller.
-function TrainerAccordion({ name, teaser, accent, highlight, children }) {
+function TrainerAccordion({ name, icon: Icon, teaser, accent, highlight, children }) {
 	// `highlight` (used when the quote-lookup widget locks onto this card):
 	// forces the accordion open and adds a colored ring so the user can see
 	// the match instantly. Re-mounts the <details> via key={highlight} so the
@@ -9187,6 +10464,7 @@ function TrainerAccordion({ name, teaser, accent, highlight, children }) {
 		>
 			<summary className='px-3 py-2 cursor-pointer flex items-center gap-3 hover:bg-[#141A21] transition list-none'>
 				<ChevronRight size={12} className='text-[#8090A0] details-arrow shrink-0' />
+				{Icon && <Icon size={14} strokeWidth={1.75} className='shrink-0' style={{ color: accent || '#8090A0' }} aria-hidden='true' />}
 				<span className='mono text-sm font-medium' style={{ color: accent || '#E6EDF3' }}>
 					{name}
 				</span>
@@ -9253,7 +10531,7 @@ function MaxBattleCollapsible({
 		: t('app.collapsible.aux_footer_no_age', { params: { count: countLabel } });
 	if (filterCount === 0) {
 		return (
-			<Collapsible icon='💥' label={headerLabel} open={open} onToggle={onToggle}>
+			<Collapsible icon={Zap} label={headerLabel} hook={t('app.hook.max_battles')} open={open} onToggle={onToggle}>
 				<p className='text-xs italic text-[#8B98A5]'>{t('app.filter.aux_bosses_empty')}</p>
 			</Collapsible>
 		);
@@ -9262,7 +10540,7 @@ function MaxBattleCollapsible({
 	const renderBosses = (bosses, scope) =>
 		bossCounterBoxes(bosses, scope, { keyPrefix: 'max', accent, copied, copyToClipboard, t });
 	return (
-		<Collapsible icon='💥' label={headerLabel} open={open} onToggle={onToggle}>
+		<Collapsible icon={Zap} label={headerLabel} hook={t('app.hook.max_battles')} open={open} onToggle={onToggle}>
 			<div className='space-y-5'>
 				{hasCharger && (
 					<div className='space-y-3'>
@@ -9337,13 +10615,13 @@ function PvpCollapsible({ fetchedAt, leagues, cupFilters, open, onToggle, copied
 		: t('app.collapsible.aux_footer_no_age', { params: { count: countLabel } });
 	if (totalCount === 0) {
 		return (
-			<Collapsible icon='🥊' label={headerLabel} open={open} onToggle={onToggle}>
+			<Collapsible icon={Trophy} label={headerLabel} hook={t('app.hook.pvp')} open={open} onToggle={onToggle}>
 				<p className='text-xs italic text-[#8B98A5]'>{t('app.filter.aux_pvp_empty')}</p>
 			</Collapsible>
 		);
 	}
 	return (
-		<Collapsible icon='🥊' label={headerLabel} open={open} onToggle={onToggle}>
+		<Collapsible icon={Trophy} label={headerLabel} hook={t('app.hook.pvp')} open={open} onToggle={onToggle}>
 			<div className='space-y-4'>
 				{populated.map((key) => {
 					const league = leagues[key];
@@ -9584,13 +10862,13 @@ function RocketCollapsible({
 		: t('app.collapsible.aux_footer_no_age', { params: { count: countLabel } });
 	if (totalFilters === 0) {
 		return (
-			<Collapsible icon='🚀' label={headerLabel} open={open} onToggle={onToggle}>
+			<Collapsible icon={Rocket} label={headerLabel} hook={t('app.hook.rocket')} open={open} onToggle={onToggle}>
 				<p className='text-xs italic text-[#8B98A5]'>{t('app.filter.aux_rocket_empty')}</p>
 			</Collapsible>
 		);
 	}
 	return (
-		<Collapsible icon='🚀' label={headerLabel} open={open} onToggle={onToggle}>
+		<Collapsible icon={Rocket} label={headerLabel} hook={t('app.hook.rocket')} open={open} onToggle={onToggle}>
 			<div className='space-y-5'>
 				<RocketQuoteLookup
 					data={ROCKET_GRUNT_QUOTES}
@@ -9808,7 +11086,6 @@ function RawClausesPanel({
 	tradeClauses,
 	sortClauses,
 	luckySortClauses,
-	nundoSortClauses,
 	prestagedClauses,
 	giftClauses,
 	buddyCatchFilters,
@@ -9825,9 +11102,6 @@ function RawClausesPanel({
 			)}
 			{luckySortClauses && luckySortClauses.length > 0 && (
 				<ClauseList title={t('app.clauses.lucky_sort_title')} accent='#F5B82E' clauses={luckySortClauses} />
-			)}
-			{nundoSortClauses && nundoSortClauses.length > 0 && (
-				<ClauseList title={t('app.clauses.nundo_sort_title')} accent='#F5B82E' clauses={nundoSortClauses} />
 			)}
 			{prestagedClauses && prestagedClauses.length > 0 && (
 				<ClauseList title={t('app.clauses.prestaged_title')} accent='#9B59B6' clauses={prestagedClauses} />
@@ -10430,6 +11704,7 @@ function ConfigPanel({
 	friendCollectTargets = [],
 	friendCollectSuggestions = [],
 	pvpMetaPacks = [],
+	sections = null,
 }) {
 	const { t, outputLocale } = useTranslation();
 	// "Lass Freunde für dich sammeln" — collapsed by default; the target lists
@@ -10455,6 +11730,9 @@ function ConfigPanel({
 	}
 
 	const expert = !!config.expertMode;
+	// The workshop renders this panel whole in wizard step 2, and in parts in
+	// each filter area's settings (`sections` lists the parts; null = all).
+	const show = (key) => !sections || sections.includes(key);
 
 	// Universal protections — shown in all modes (these are the "obviously yes" ones)
 	// [configKey, translationKeyBase, extra?] — labels & whys resolve via t() at
@@ -10495,315 +11773,359 @@ function ConfigPanel({
 
 	return (
 		<div className='space-y-6'>
-			{/* Home-locals banner */}
-			{homeLocals.length > 0 &&
-				(() => {
-					// Find all collector lists across all groups, intersect with homeLocals
-					const allCollectors = Object.values(REGIONAL_GROUPS).flatMap((g) => g.collectors);
-					const autoRemoved = homeLocals.filter((l) => allCollectors.includes(l));
-					const removedNames =
-						autoRemoved.length > 0 ? autoRemoved.join(', ') : t('app.protect.home_locals.none');
-					return (
-						<div className='border border-[#27AE60]/40 bg-[#27AE60]/5 rounded-sm p-3 mono text-xs'>
-							<div className='flex items-baseline gap-2'>
-								<span className='text-[#27AE60]'>⌂</span>
-								<div className='flex-1'>
-									<div className='text-[#E6EDF3]'>
-										{t('app.protect.home_locals.title_prefix')}{' '}
-										<span className='text-[#27AE60]'>{removedNames}</span>
-									</div>
-									<div className='text-[10.5px] text-[#8090A0] mt-1'>
-										{t('app.protect.home_locals.note')}
+			{show('locals') && (
+				<>
+					{/* Home-locals banner */}
+					{homeLocals.length > 0 &&
+						(() => {
+							// Find all collector lists across all groups, intersect with homeLocals
+							const allCollectors = Object.values(REGIONAL_GROUPS).flatMap((g) => g.collectors);
+							const autoRemoved = homeLocals.filter((l) => allCollectors.includes(l));
+							const removedNames =
+								autoRemoved.length > 0 ? autoRemoved.join(', ') : t('app.protect.home_locals.none');
+							return (
+								<div className='border border-[#27AE60]/40 bg-[#27AE60]/5 rounded-sm p-3 mono text-xs'>
+									<div className='flex items-baseline gap-2'>
+										<span className='text-[#27AE60]'>⌂</span>
+										<div className='flex-1'>
+											<div className='text-[#E6EDF3]'>
+												{t('app.protect.home_locals.title_prefix')}{' '}
+												<span className='text-[#27AE60]'>{removedNames}</span>
+											</div>
+											<div className='text-[10.5px] text-[#8090A0] mt-1'>
+												{t('app.protect.home_locals.note')}
+											</div>
+										</div>
 									</div>
 								</div>
-							</div>
-						</div>
-					);
-				})()}
-
-			{/* PRESETS */}
-			<div>
-				<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-					{t('app.preset.section_title')}
-				</div>
-				<div className='flex flex-wrap gap-1.5'>
-					{Object.entries(PRESETS).map(([key, preset]) => {
-						const active = config.lastAppliedPreset === key;
-						return (
-							<button
-								key={key}
-								onClick={() => applyPreset(key)}
-								title={t(preset.descriptionKey)}
-								className={`mono text-xs px-3 py-1.5 rounded-sm transition ${
-									active
-										? 'bg-[#5EAFC5] text-[#0F1419]'
-										: 'bg-[#1F2933] text-[#E6EDF3] hover:bg-[#5EAFC5] hover:text-[#0F1419]'
-								}`}
-							>
-								{t(preset.labelKey)}
-							</button>
-						);
-					})}
-				</div>
-				<div className='mono text-[10.5px] text-[#8090A0] mt-1.5'>{t('app.preset.section_hint')}</div>
-			</div>
-
-			<hr className='border-[#1F2933]' />
-
-			{/* PvP MODE */}
-			<div>
-				<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-					{t('app.pvp.section_title')}
-				</div>
-				{/* Mutually exclusive, so radio semantics rather than aria-pressed:
-				    the selection was conveyed by cyan fill alone, which told a screen
-				    reader neither which option was active nor that these three belong
-				    to one choice. */}
-				<div className='flex flex-wrap gap-1.5' role='radiogroup' aria-label={t('app.pvp.section_title')}>
-					{[
-						['loose', 'app.pvp.loose_label', 'app.pvp.loose_desc'],
-						['intelligent', 'app.pvp.intelligent_label', 'app.pvp.intelligent_desc'],
-						['strict', 'app.pvp.strict_label', 'app.pvp.strict_desc'],
-						['none', 'app.pvp.none_label', 'app.pvp.none_desc'],
-					].map(([m, labelKey, descKey]) => (
-						<button
-							key={m}
-							onClick={() => set('pvpMode', m)}
-							role='radio'
-							aria-checked={config.pvpMode === m}
-							title={t(descKey)}
-							className={`mono text-xs px-3 py-1.5 rounded-sm transition ${
-								config.pvpMode === m
-									? 'bg-[#5EAFC5] text-[#0F1419]'
-									: 'bg-[#1F2933] text-[#8B98A5] hover:bg-[#2D3A47]'
-							}`}
-						>
-							{t(labelKey)}
-						</button>
-					))}
-				</div>
-				<p className='mono text-[11px] text-[#8B98A5] mt-2 leading-snug'>
-					{t(`app.pvp.help_${config.pvpMode}`)}
-				</p>
-				{config.pvpMode === 'intelligent' && (
-					<PvpMetaPanel
-						config={config}
-						set={set}
-						expert={expert}
-						packs={pvpMetaPacks}
-						newItem={newPvpMeta}
-						setNewItem={setNewPvpMeta}
-					/>
-				)}
-			</div>
-
-			<hr className='border-[#1F2933]' />
-
-			{/* PROTECTIONS */}
-			<div>
-				<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-					{t('app.protect.section_title')}
-				</div>
-				<div className='grid grid-cols-1 md:grid-cols-2 gap-1'>
-					{settings.map(([k, keyBase, extra]) => {
-						if (extra?.expertOnly && !expert) return null;
-						const { expertOnly: _eo, ...rowExtra } = extra || {};
-						return (
-							<ToggleRow
-								key={k}
-								k={k}
-								label={t(`${keyBase}.label`)}
-								why={t(`${keyBase}.why`)}
-								expertBadge={!!extra?.expertOnly}
-								checked={!!config[k]}
-								onChange={(v) => set(k, v)}
-								{...rowExtra}
-							/>
-						);
-					})}
-				</div>
-				{!config.protectDynamax && config.protectGigantamax && (
-					<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded-sm p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
-						{t('app.protect.dynamax_off_note')}
-					</div>
-				)}
-				{!config.protectShadows && config.protectShadowPurifyOnly && (
-					<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded-sm p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
-						{t('app.protect.shadows_off_note')}
-					</div>
-				)}
-			</div>
-
-			{/* RAID FILTERS (expert) — narrows per-boss counter filters */}
-			{expert && (
-				<div>
-					<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-						{t('app.raids.section_title')}
-					</div>
-					<label className='flex items-start gap-2 cursor-pointer mono text-xs'>
-						<input
-							type='checkbox'
-							checked={!!config.raidRequireSecondMove}
-							onChange={(e) => set('raidRequireSecondMove', e.target.checked)}
-							className='mt-0.5'
-						/>
-						<div>
-							<span className='text-[#E6EDF3]'>{t('app.protect.raid_require_second_move.label')}</span>
-							<p className='text-[#8B98A5] mt-0.5'>{t('app.protect.raid_require_second_move.help')}</p>
-						</div>
-					</label>
-				</div>
+							);
+						})()}
+				</>
 			)}
 
-			{/* TEAM ROCKET — counter filter options (visible in normal mode) */}
-			<div>
-				<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-					{t('app.collapsible.aux_section_team_rocket')}
-				</div>
-				<label className='flex items-start gap-2 cursor-pointer mono text-xs'>
-					<input
-						type='checkbox'
-						checked={config.rocketLenientCounters !== false}
-						onChange={(e) => set('rocketLenientCounters', e.target.checked)}
-						className='mt-0.5'
-					/>
-					<div>
-						<span className='text-[#E6EDF3]'>{t('app.protect.rocket_lenient_counters.label')}</span>
-						<p className='text-[#8B98A5] mt-0.5'>{t('app.protect.rocket_lenient_counters.help')}</p>
-					</div>
-				</label>
-			</div>
-
-			<hr className='border-[#1F2933]' />
-
-			{/* REGIONAL GROUPS */}
-			<div>
-				<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-					{t('app.protect.regional_section_title')}
-				</div>
-				<div className='space-y-2'>
-					{Object.entries(REGIONAL_GROUPS).map(([key, group]) => (
-						<RegionalGroupEditor
-							key={key}
-							groupKey={key}
-							group={group}
-							state={
-								config.regionalGroups?.[key] || {
-									enabled: true,
-									typeChecksEnabled: null,
-									collectorsEnabled: null,
-								}
-							}
-							setGroup={(partial) => setGroup(key, partial)}
-							homeLocals={homeLocals}
-							homeLocalTypeChecks={homeLocalTypeChecks}
-						/>
-					))}
-				</div>
-			</div>
-
-			<hr className='border-[#1F2933]' />
-
-			{/* BUDDY EVENTS — only shows if buddies are configured */}
-			{(config.buddies || []).filter((b) => b.active !== false).length > 0 && (
+			{show('presets') && (
 				<>
-					<BuddyEventsEditor
-						buddies={(config.buddies || []).filter((b) => b.active !== false)}
-						expertMode={!!config.expertMode}
-						onUpdateBuddy={(id, partial) => {
-							const all = config.buddies || [];
-							set(
-								'buddies',
-								all.map((b) => (b.id === id ? { ...b, ...partial } : b)),
-							);
-						}}
-					/>
+					{/* PRESETS */}
+					<div>
+						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
+							{t('app.preset.section_title')}
+						</div>
+						<div className='flex flex-wrap gap-1.5'>
+							{Object.entries(PRESETS).map(([key, preset]) => {
+								const active = config.lastAppliedPreset === key;
+								return (
+									<button
+										key={key}
+										onClick={() => applyPreset(key)}
+										title={t(preset.descriptionKey)}
+										className={`mono text-xs px-3 py-1.5 rounded-sm transition ${
+											active
+												? 'bg-[#5EAFC5] text-[#0F1419]'
+												: 'bg-[#1F2933] text-[#E6EDF3] hover:bg-[#5EAFC5] hover:text-[#0F1419]'
+										}`}
+									>
+										{t(preset.labelKey)}
+									</button>
+								);
+							})}
+						</div>
+						<div className='mono text-[10.5px] text-[#8090A0] mt-1.5'>{t('app.preset.section_hint')}</div>
+					</div>
+
 					<hr className='border-[#1F2933]' />
 				</>
 			)}
 
-			{/* FRIEND COLLECT — "have friends collect for me": the mirror image of
-		    the buddy wish-species above (what YOU collect for THEM). Curates
-		    config.friendCollectSpecies; the resulting filter string renders as
-		    a top-level box in step 4. Collapsible — the pack + target lists
-		    get long. */}
-			<Collapsible
-				icon='🤝'
-				label={`${t('app.filter.friend_collect_section')} · ${friendCollectTargets.length}`}
-				open={showFriendCollect}
-				onToggle={() => setShowFriendCollect((s) => !s)}
-			>
-				<div className='space-y-4'>
-					<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
-						{t('app.filter.friend_collect_intro')}
-					</p>
-					<FriendCollectEditor
-						list={config.friendCollectSpecies || []}
-						onChange={(next) => set('friendCollectSpecies', next)}
-						mode={['hundo', 'both'].includes(config.friendCollectMode) ? config.friendCollectMode : 'lucky'}
-						onModeChange={(m) => set('friendCollectMode', m)}
-						guaranteedOnly={!!config.friendCollectGuaranteedOnly}
-						onGuaranteedChange={(v) => set('friendCollectGuaranteedOnly', v)}
-						targets={friendCollectTargets}
-						suggestions={friendCollectSuggestions}
-						forced={config.friendCollectForced || []}
-						onForcedChange={(next) => set('friendCollectForced', next)}
-						genders={config.friendCollectGenders || {}}
-						onGendersChange={(next) => set('friendCollectGenders', next)}
-						dropForms={config.friendCollectDropForms || {}}
-						onDropFormsChange={(next) => set('friendCollectDropForms', next)}
-						dropSlots={config.friendCollectDropSlots || {}}
-						onDropSlotsChange={(next) => set('friendCollectDropSlots', next)}
-					/>
-				</div>
-			</Collapsible>
-
-			<hr className='border-[#1F2933]' />
-
-			{/* CUSTOM COLLECTIBLES */}
-			<CustomCollectiblesEditor
-				list={config.customCollectibles || []}
-				onChange={(list) => set('customCollectibles', list)}
-			/>
-
-			{expert && <hr className='border-[#1F2933]' />}
-
-			{/* TRADE-EVO FAMILIES (expert) — fine-tune which families are protected */}
-			{expert && (
-				<div>
-					<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-						{t('app.protect.te_section_title')}
-					</div>
-					<div className='flex flex-wrap gap-1.5'>
-						{Object.keys(TRADE_EVO_FAMILIES).map((b) => {
-							const on = (config.enabledTradeEvos || []).includes(b);
-							return (
+			{show('pvp') && (
+				<>
+					{/* PvP MODE */}
+					<div>
+						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
+							{t('app.pvp.section_title')}
+						</div>
+						{/* Mutually exclusive, so radio semantics rather than aria-pressed:
+						    the selection was conveyed by cyan fill alone, which told a screen
+						    reader neither which option was active nor that these three belong
+						    to one choice. */}
+						<div className='flex flex-wrap gap-1.5' role='radiogroup' aria-label={t('app.pvp.section_title')}>
+							{[
+								['loose', 'app.pvp.loose_label', 'app.pvp.loose_desc'],
+								['intelligent', 'app.pvp.intelligent_label', 'app.pvp.intelligent_desc'],
+								['strict', 'app.pvp.strict_label', 'app.pvp.strict_desc'],
+								['none', 'app.pvp.none_label', 'app.pvp.none_desc'],
+							].map(([m, labelKey, descKey]) => (
 								<button
-									key={b}
-									onClick={() =>
-										set(
-											'enabledTradeEvos',
-											on
-												? (config.enabledTradeEvos || []).filter((x) => x !== b)
-												: [...(config.enabledTradeEvos || []), b],
-										)
-									}
-									aria-pressed={on}
-									title={t('app.protect.te_button_title', {
-										params: { name: teDisplay(b, outputLocale) },
-									})}
-									className={`mono text-xs px-2.5 py-1 rounded-sm transition ${
-										on
+									key={m}
+									onClick={() => set('pvpMode', m)}
+									role='radio'
+									aria-checked={config.pvpMode === m}
+									title={t(descKey)}
+									className={`mono text-xs px-3 py-1.5 rounded-sm transition ${
+										config.pvpMode === m
 											? 'bg-[#5EAFC5] text-[#0F1419]'
-											: 'bg-[#1F2933] text-[#8090A0] hover:bg-[#2D3A47]'
+											: 'bg-[#1F2933] text-[#8B98A5] hover:bg-[#2D3A47]'
 									}`}
 								>
-									+{teDisplay(b, outputLocale)}
+									{t(labelKey)}
 								</button>
-							);
-						})}
+							))}
+						</div>
+						<p className='mono text-[11px] text-[#8B98A5] mt-2 leading-snug'>
+							{t(`app.pvp.help_${config.pvpMode}`)}
+						</p>
+						{config.pvpMode === 'intelligent' && (
+							<PvpMetaPanel
+								config={config}
+								set={set}
+								expert={expert}
+								packs={pvpMetaPacks}
+								newItem={newPvpMeta}
+								setNewItem={setNewPvpMeta}
+							/>
+						)}
 					</div>
-				</div>
+
+					<hr className='border-[#1F2933]' />
+				</>
+			)}
+
+			{show('protections') && (
+				<>
+					{/* PROTECTIONS */}
+					<div>
+						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
+							{t('app.protect.section_title')}
+						</div>
+						<div className='grid grid-cols-1 md:grid-cols-2 gap-1'>
+							{settings.map(([k, keyBase, extra]) => {
+								if (extra?.expertOnly && !expert) return null;
+								const { expertOnly: _eo, ...rowExtra } = extra || {};
+								return (
+									<ToggleRow
+										key={k}
+										k={k}
+										label={t(`${keyBase}.label`)}
+										why={t(`${keyBase}.why`)}
+										expertBadge={!!extra?.expertOnly}
+										checked={!!config[k]}
+										onChange={(v) => set(k, v)}
+										{...rowExtra}
+									/>
+								);
+							})}
+						</div>
+						{!config.protectDynamax && config.protectGigantamax && (
+							<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded-sm p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
+								{t('app.protect.dynamax_off_note')}
+							</div>
+						)}
+						{!config.protectShadows && config.protectShadowPurifyOnly && (
+							<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded-sm p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
+								{t('app.protect.shadows_off_note')}
+							</div>
+						)}
+					</div>
+				</>
+			)}
+
+			{show('raid') && (
+				<>
+					{/* RAID FILTERS (expert) — narrows per-boss counter filters */}
+					{expert && (
+						<div>
+							<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
+								{t('app.raids.section_title')}
+							</div>
+							<label className='flex items-start gap-2 cursor-pointer mono text-xs'>
+								<input
+									type='checkbox'
+									checked={!!config.raidRequireSecondMove}
+									onChange={(e) => set('raidRequireSecondMove', e.target.checked)}
+									className='mt-0.5'
+								/>
+								<div>
+									<span className='text-[#E6EDF3]'>{t('app.protect.raid_require_second_move.label')}</span>
+									<p className='text-[#8B98A5] mt-0.5'>{t('app.protect.raid_require_second_move.help')}</p>
+								</div>
+							</label>
+						</div>
+					)}
+				</>
+			)}
+
+			{show('rocket') && (
+				<>
+					{/* TEAM ROCKET — counter filter options (visible in normal mode) */}
+					<div>
+						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
+							{t('app.collapsible.aux_section_team_rocket')}
+						</div>
+						<label className='flex items-start gap-2 cursor-pointer mono text-xs'>
+							<input
+								type='checkbox'
+								checked={config.rocketLenientCounters !== false}
+								onChange={(e) => set('rocketLenientCounters', e.target.checked)}
+								className='mt-0.5'
+							/>
+							<div>
+								<span className='text-[#E6EDF3]'>{t('app.protect.rocket_lenient_counters.label')}</span>
+								<p className='text-[#8B98A5] mt-0.5'>{t('app.protect.rocket_lenient_counters.help')}</p>
+							</div>
+						</label>
+					</div>
+
+					<hr className='border-[#1F2933]' />
+				</>
+			)}
+
+			{show('regional') && (
+				<>
+					{/* REGIONAL GROUPS */}
+					<div>
+						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
+							{t('app.protect.regional_section_title')}
+						</div>
+						<div className='space-y-2'>
+							{Object.entries(REGIONAL_GROUPS).map(([key, group]) => (
+								<RegionalGroupEditor
+									key={key}
+									groupKey={key}
+									group={group}
+									state={
+										config.regionalGroups?.[key] || {
+											enabled: true,
+											typeChecksEnabled: null,
+											collectorsEnabled: null,
+										}
+									}
+									setGroup={(partial) => setGroup(key, partial)}
+									homeLocals={homeLocals}
+									homeLocalTypeChecks={homeLocalTypeChecks}
+								/>
+							))}
+						</div>
+					</div>
+
+					<hr className='border-[#1F2933]' />
+				</>
+			)}
+
+			{show('buddyEvents') && (
+				<>
+					{/* BUDDY EVENTS — only shows if buddies are configured */}
+					{(config.buddies || []).filter((b) => b.active !== false).length > 0 && (
+						<>
+							<BuddyEventsEditor
+								buddies={(config.buddies || []).filter((b) => b.active !== false)}
+								expertMode={!!config.expertMode}
+								onUpdateBuddy={(id, partial) => {
+									const all = config.buddies || [];
+									set(
+										'buddies',
+										all.map((b) => (b.id === id ? { ...b, ...partial } : b)),
+									);
+								}}
+							/>
+							<hr className='border-[#1F2933]' />
+						</>
+					)}
+				</>
+			)}
+
+			{show('friendCollect') && (
+				<>
+					{/* FRIEND COLLECT — "have friends collect for me": the mirror image of
+				    the buddy wish-species above (what YOU collect for THEM). Curates
+				    config.friendCollectSpecies; the resulting filter string renders as
+				    a top-level box in step 4. Collapsible — the pack + target lists
+				    get long. */}
+					<Collapsible
+						icon={Handshake}
+						label={`${t('app.filter.friend_collect_section')} · ${friendCollectTargets.length}`}
+						open={showFriendCollect}
+						onToggle={() => setShowFriendCollect((s) => !s)}
+					>
+						<div className='space-y-4'>
+							<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
+								{t('app.filter.friend_collect_intro')}
+							</p>
+							<FriendCollectEditor
+								list={config.friendCollectSpecies || []}
+								onChange={(next) => set('friendCollectSpecies', next)}
+								mode={['hundo', 'both'].includes(config.friendCollectMode) ? config.friendCollectMode : 'lucky'}
+								onModeChange={(m) => set('friendCollectMode', m)}
+								guaranteedOnly={!!config.friendCollectGuaranteedOnly}
+								onGuaranteedChange={(v) => set('friendCollectGuaranteedOnly', v)}
+								targets={friendCollectTargets}
+								suggestions={friendCollectSuggestions}
+								forced={config.friendCollectForced || []}
+								onForcedChange={(next) => set('friendCollectForced', next)}
+								genders={config.friendCollectGenders || {}}
+								onGendersChange={(next) => set('friendCollectGenders', next)}
+								dropForms={config.friendCollectDropForms || {}}
+								onDropFormsChange={(next) => set('friendCollectDropForms', next)}
+								dropSlots={config.friendCollectDropSlots || {}}
+								onDropSlotsChange={(next) => set('friendCollectDropSlots', next)}
+							/>
+						</div>
+					</Collapsible>
+
+					<hr className='border-[#1F2933]' />
+				</>
+			)}
+
+			{show('collectibles') && (
+				<>
+					{/* CUSTOM COLLECTIBLES */}
+					<CustomCollectiblesEditor
+						list={config.customCollectibles || []}
+						onChange={(list) => set('customCollectibles', list)}
+					/>
+
+					{expert && <hr className='border-[#1F2933]' />}
+				</>
+			)}
+
+			{show('tradeEvo') && (
+				<>
+					{/* TRADE-EVO FAMILIES (expert) — fine-tune which families are protected */}
+					{expert && (
+						<div>
+							<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
+								{t('app.protect.te_section_title')}
+							</div>
+							<div className='flex flex-wrap gap-1.5'>
+								{Object.keys(TRADE_EVO_FAMILIES).map((b) => {
+									const on = (config.enabledTradeEvos || []).includes(b);
+									return (
+										<button
+											key={b}
+											onClick={() =>
+												set(
+													'enabledTradeEvos',
+													on
+														? (config.enabledTradeEvos || []).filter((x) => x !== b)
+														: [...(config.enabledTradeEvos || []), b],
+												)
+											}
+											aria-pressed={on}
+											title={t('app.protect.te_button_title', {
+												params: { name: teDisplay(b, outputLocale) },
+											})}
+											className={`mono text-xs px-2.5 py-1 rounded-sm transition ${
+												on
+													? 'bg-[#5EAFC5] text-[#0F1419]'
+													: 'bg-[#1F2933] text-[#8090A0] hover:bg-[#2D3A47]'
+											}`}
+										>
+											+{teDisplay(b, outputLocale)}
+										</button>
+									);
+								})}
+							</div>
+						</div>
+					)}
+				</>
 			)}
 		</div>
 	);
@@ -12072,7 +13394,394 @@ function ChangelogModal({ open, onClose }) {
 	);
 }
 
-function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArmed, onExport, onImport }) {
+// A text or number field that keeps what the user types and commits on blur
+// or Enter, so clearing it to retype doesn't snap the stored value back to its
+// default mid-edit ("6" → clear → "6" → "64").
+// Callers always name it; the label is a named prop so it lands on the input.
+function DraftInput({ value, onCommit, 'aria-label': ariaLabel, ...props }) {
+	const [draft, setDraft] = useState(String(value ?? ''));
+	useEffect(() => setDraft(String(value ?? '')), [value]);
+	const commit = () => {
+		if (draft !== String(value ?? '')) onCommit(draft);
+	};
+	return (
+		<input
+			{...props}
+			aria-label={ariaLabel}
+			value={draft}
+			onChange={(e) => setDraft(e.target.value)}
+			onBlur={commit}
+			onKeyDown={(e) => {
+				if (e.key === 'Enter') e.currentTarget.blur();
+			}}
+		/>
+	);
+}
+
+// The tagging scheme (spec: "Tagging scheme"): one row per job with its tag,
+// renamable, a #tag search to copy, and a warning when the name is a search
+// keyword in the game language or prefix-matches another job's tag.
+function JobTagsPanel({ config, setConfig, copied, copyToClipboard, t }) {
+	const { outputLocale } = useTranslation();
+	const tags = jobTagsOf(config);
+	const buddyPrefixes = (config.buddies || []).filter((b) => b.active !== false && b.tagPrefix).map((b) => b.tagPrefix);
+	const allTags = [...JOB_TAG_ORDER.filter((j) => j !== 'promised').map((j) => tags[j]), ...buddyPrefixes, config.fernTauschTagName].filter(Boolean);
+	const rename = (job, raw) => {
+		const v = raw.trim().replace(/^#+/, '');
+		setConfig((prev) => {
+			// Tradebait can't be blank: every trade filter keys off it.
+			if (job === 'trade') return v ? { ...prev, basarTagName: v } : prev;
+			const next = { ...(prev.jobTags || {}) };
+			if (!v.trim() || v === JOB_TAG_DEFAULTS[job]) delete next[job];
+			else next[job] = v;
+			return { ...prev, jobTags: next };
+		});
+	};
+	return (
+		<details className='rounded-md border border-[#1F2933] bg-[#0E141A]'>
+			<summary className='list-none cursor-pointer p-3 flex items-start gap-3'>
+				<TileIcon icon={Tag} accent='#5EAFC5' />
+				<span className='min-w-0 flex-1'>
+					<span className='mono text-sm font-semibold text-[#E6EDF3]'>{t('app.tags.title')}</span>
+					<span className='block mono text-xs text-[#8B98A5] mt-1 leading-relaxed'>{t('app.tags.hint')}</span>
+					<span className='block mono text-[11px] text-[#5EAFC5] mt-1'>{JOB_TAG_ORDER.filter((j) => j !== 'promised').map((j) => `#${tags[j]}`).join(' · ')}</span>
+				</span>
+				<ChevronRight size={14} className='text-[#8090A0] details-arrow shrink-0 mt-1' aria-hidden='true' />
+			</summary>
+			<ul className='space-y-4 px-3 pb-3 pt-3 border-t border-[#1F2933]'>
+				{JOB_TAG_ORDER.map((job) => {
+					const label = t(`app.tags.${job}.label`);
+					if (job === 'promised') {
+						const shown = [...buddyPrefixes, config.fernTauschTagName].filter(Boolean);
+						return (
+							<li key={job} className='border-l-2 border-[#1F2933] pl-3'>
+								<div className='mono text-sm text-[#E6EDF3]'>{label}</div>
+								<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.tags.promised.hint')}</p>
+								<p className='mono text-xs text-[#5EAFC5] mt-1'>{shown.length ? shown.map((x) => `#${x}`).join(' · ') : '#Trade-<Name>'}</p>
+							</li>
+						);
+					}
+					const tag = tags[job];
+					const clash = tagClashes(tag, allTags, outputLocale);
+					const copyKey = `jobtag_${job}`;
+					return (
+						<li key={job} className='border-l-2 border-[#1F2933] pl-3'>
+							<div className='mono text-sm text-[#E6EDF3]'>
+								{label}
+								{(job === 'evolve' || job === 'crush') && (
+									<span className='ml-2 text-[10px] uppercase tracking-wide text-[#8090A0]'>{t('app.tags.temporary')}</span>
+								)}
+							</div>
+							<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t(`app.tags.${job}.hint`)}</p>
+							<div className='flex flex-wrap items-center gap-2 mt-1.5'>
+								<label className='mono text-[11px] text-[#8090A0] flex items-center gap-1'>
+									<span aria-hidden='true'>#</span>
+									<DraftInput
+										type='text'
+										value={tag}
+										onCommit={(v) => rename(job, v)}
+										aria-label={`${label}: ${t('app.tags.name')}`}
+										className='mono text-sm w-40 min-h-[32px] bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 rounded-sm text-[#E6EDF3]'
+									/>
+								</label>
+								<button
+									type='button'
+									onClick={() => copyToClipboard(copyKey, `#${tag}`)}
+									className='mono text-xs min-h-[32px] px-2.5 rounded-sm bg-[#1F2933] text-[#5EAFC5] hover:bg-[#2D3A47]'
+									aria-label={`${t('app.tags.copy')}: #${tag}`}
+								>
+									{copied[copyKey] ? t('app.tags.copied') : t('app.tags.copy')}
+								</button>
+							</div>
+							{clash.keyword && (
+								<p role='alert' className='mono text-[11px] text-[#F5B82E] mt-1'>{t('app.tags.keyword_clash', { params: { tag } })}</p>
+							)}
+							{clash.prefixOf.length > 0 && (
+								<p role='alert' className='mono text-[11px] text-[#F5B82E] mt-1'>
+									{t('app.tags.prefix_clash', { params: { tag, other: clash.prefixOf.join(', #') } })}
+								</p>
+							)}
+						</li>
+					);
+				})}
+				{config.expertMode && (
+					<li className='border-l-2 border-[#1F2933] pl-3'>
+						<div className='mono text-sm text-[#E6EDF3]'>
+							{t('app.tags.frustration.label')}
+							<span className='ml-2 text-[10px] uppercase tracking-wide text-[#8090A0]'>{t('app.tags.temporary')}</span>
+						</div>
+						<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.tags.frustration.hint')}</p>
+						<label className='mono text-[11px] text-[#8090A0] flex items-center gap-1 mt-1.5'>
+							<span aria-hidden='true'>#</span>
+							<DraftInput
+								type='text'
+								value={config.removeFrustrationTagName || ''}
+								onCommit={(v) => setConfig((prev) => ({ ...prev, removeFrustrationTagName: v.trim().replace(/^#+/, '') }))}
+								placeholder={t('app.modal.tags.frustration_placeholder')}
+								aria-label={`${t('app.tags.frustration.label')}: ${t('app.tags.name')}`}
+								className='mono text-sm w-40 min-h-[32px] bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 rounded-sm text-[#E6EDF3]'
+							/>
+						</label>
+					</li>
+				)}
+			</ul>
+		</details>
+	);
+}
+
+// The spec's budget table under Sorting → settings, as three fold-outs
+// (collection, battle, stock). Each row reads as a sentence with its numbers
+// inline: bold text in simple mode, small inputs in expert mode. The reason
+// sits behind a "why". Setting a number back to its default drops the override.
+function BudgetsEditor({ config, setConfig, t }) {
+	const expert = !!config.expertMode;
+	const b = effectiveBudgets(config);
+	const overrides = config.budgets || {};
+	const setBudget = (k, raw) => {
+		const v = Number.parseInt(raw, 10);
+		if (!Number.isInteger(v) || v < 0) return;
+		setConfig((prev) => {
+			const next = { ...(prev.budgets || {}) };
+			if (v === BUDGET_DEFAULTS[k]) delete next[k];
+			else next[k] = v;
+			return { ...prev, budgets: next };
+		});
+	};
+	// The rule's template with each {key} swapped for its number or its input.
+	const sentence = (row) => {
+		const label = t(`app.budget.${row.job}.label`);
+		return t(`app.budget.${row.job}.rule`)
+			.split(/(\{\w+\})/)
+			.map((part, i) => {
+				const m = part.match(/^\{(\w+)\}$/);
+				if (!m || !(m[1] in b)) return part;
+				const k = m[1];
+				if (!expert) return <strong key={i} className='text-[#E6EDF3]'>{b[k]}</strong>;
+				return (
+					<DraftInput
+						key={i}
+						type='number'
+						min={0}
+						step={k === 'xxlScore' ? 10 : 1}
+						value={b[k]}
+						onCommit={(v) => setBudget(k, v)}
+						aria-label={`${label}: ${t(`app.budget.word.${BUDGET_KEY_WORD[k]}`)}`}
+						className={`mono text-sm min-h-[28px] px-1 mx-0.5 rounded-sm bg-[#1F2933] border text-[#E6EDF3] focus:border-[#5EAFC5] outline-hidden ${
+							k === 'xxlScore' ? 'w-20' : 'w-12'
+						} ${k in overrides ? 'border-[#F5B82E]' : 'border-[#2D3A47]'}`}
+					/>
+				);
+			});
+	};
+	return (
+		<div className='space-y-2'>
+			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold'>{t('app.budget.title')}</h3>
+			<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
+				{t(expert ? 'app.budget.hint_expert' : 'app.budget.hint_simple')}
+			</p>
+			{BUDGET_GROUPS.map((group) => {
+				const rows = BUDGET_ROWS.filter((r) => r.group === group);
+				const changed = rows.flatMap((r) => r.keys).filter((k) => k in overrides).length;
+				return (
+					<details key={group} className='rounded-md border border-[#1F2933] bg-[#0E141A]'>
+						<summary className='list-none cursor-pointer p-3 flex items-center gap-2'>
+							<span className='mono text-sm font-semibold text-[#E6EDF3] flex-1'>{t(`app.budget.group.${group}`)}</span>
+							{changed > 0 && (
+								<span className='mono text-[10px] text-[#F5B82E]'>{t('app.budget.changed', { params: { count: changed } })}</span>
+							)}
+							<ChevronRight size={14} className='text-[#8090A0] details-arrow' aria-hidden='true' />
+						</summary>
+						<ul className='px-3 pb-3 pt-2 space-y-2.5 border-t border-[#1F2933]'>
+							{rows.map((row) => (
+								<li key={row.job} className='mono text-xs leading-relaxed text-[#8B98A5]'>
+									<span className='text-[#E6EDF3]'>{t(`app.budget.${row.job}.label`)}</span>
+									{': '}
+									{sentence(row)}
+									<details className='inline-block align-top ml-1.5'>
+										<summary className='list-none cursor-pointer inline text-[10.5px] text-[#5EAFC5] hover:text-[#E6EDF3]'>
+											{t('app.budget.why')}
+										</summary>
+										<span className='block text-[11px] text-[#8090A0] mt-1'>{t(`app.budget.${row.job}.why`)}</span>
+									</details>
+								</li>
+							))}
+						</ul>
+					</details>
+				);
+			})}
+			{expert && Object.keys(overrides).length > 0 && (
+				<button
+					type='button'
+					onClick={() => setConfig((prev) => ({ ...prev, budgets: {} }))}
+					className='mono text-xs mt-2 px-3 py-1.5 rounded-sm bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47]'
+				>
+					{t('app.budget.reset')}
+				</button>
+			)}
+		</div>
+	);
+}
+
+// Tag names the trade filters key off (trade bazaar, distant trades, and in
+// expert mode the Frustration and EvoSwap working tags). Lived in the global
+// settings modal; now under Trade and friends → settings.
+function TradeTagSettings({ config, set }) {
+	const fid = useId();
+	const { t } = useTranslation();
+	const expert = !!config.expertMode;
+	return (
+		<>
+			{/* Trade tags */}
+			<div>
+				<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
+					{t('app.modal.tags.section_title')}
+				</div>
+				<div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+					<div>
+						<label htmlFor={`${fid}-basar`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
+							{t('app.modal.tags.basar_label')}
+						</label>
+						<input id={`${fid}-basar`}
+							type='text'
+							value={config.basarTagName || ''}
+							onChange={(e) => set('basarTagName', e.target.value)}
+							placeholder={t('app.modal.tags.basar_placeholder')}
+							className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
+						/>
+						<div className='mono text-[10px] text-[#8090A0] mt-1'>
+							{t('app.modal.tags.basar_clause')}{' '}
+							<code className='text-[#5EAFC5]'>!#{config.basarTagName || '?'}</code>
+						</div>
+					</div>
+					<div>
+						<label htmlFor={`${fid}-fern`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
+							{t('app.modal.tags.fern_label')}
+						</label>
+						<input id={`${fid}-fern`}
+							type='text'
+							value={config.fernTauschTagName || ''}
+							onChange={(e) => set('fernTauschTagName', e.target.value)}
+							placeholder={t('app.modal.tags.fern_placeholder')}
+							className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
+						/>
+						<div className='mono text-[10px] text-[#8090A0] mt-1'>
+							{t('app.modal.tags.fern_help')}
+						</div>
+					</div>
+					{expert && (
+						<div>
+							<label htmlFor={`${fid}-evoswap`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
+								{t('app.modal.tags.evo_swap_label')}
+							</label>
+							<input id={`${fid}-evoswap`}
+								type='text'
+								value={config.evoSwapTagName || ''}
+								onChange={(e) => set('evoSwapTagName', e.target.value)}
+								placeholder={t('app.modal.tags.evo_swap_placeholder')}
+								className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
+							/>
+							<div className='mono text-[10px] text-[#8090A0] mt-1'>
+								{t('app.modal.tags.evo_swap_help')}
+							</div>
+						</div>
+					)}
+				</div>
+			</div>
+		</>
+	);
+}
+
+// League tags (ⓤ ⓖ ⓛ and the like): PvP keepers the trash filter protects. Expert
+// only, under Battle → settings with the rest of PvP.
+function LeagueTagSettings({ config, set }) {
+	const { t } = useTranslation();
+	if (!config.expertMode) return null;
+	return (
+		<div>
+			<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
+				{t('app.modal.league.section_title')}
+			</div>
+			<input
+				type='text'
+				value={config.leagueTags || ''}
+				onChange={(e) => set('leagueTags', e.target.value)}
+				placeholder={t('app.modal.league.placeholder')}
+				aria-label={t('app.modal.league.section_title')}
+				className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
+			/>
+			<div className='mono text-[10px] text-[#8090A0] mt-1'>{t('app.modal.league.help')}</div>
+		</div>
+	);
+}
+
+// Expert-only trash protections that are typed rather than toggled: custom
+// protected tags and the numeric safety nets. Lived in the global settings
+// modal; now under Catching → settings, next to the toggles. (League tags are
+// PvP, under Battle → settings.)
+function ExpertProtectionSettings({ config, set }) {
+	const { t } = useTranslation();
+	const expert = !!config.expertMode;
+	return (
+		<>
+			{expert && (
+				<>
+					{/* Custom tags */}
+					<div>
+						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
+							{t('app.modal.custom_tags.section_title')}
+						</div>
+						<input
+							type='text'
+							value={config.customProtectedTags || ''}
+							onChange={(e) => set('customProtectedTags', e.target.value)}
+							placeholder={t('app.modal.custom_tags.placeholder')}
+							aria-label={t('app.modal.custom_tags.section_title')}
+							className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
+						/>
+						<div className='mono text-[10px] text-[#8090A0] mt-1'>
+							{t('app.modal.custom_tags.help')}
+						</div>
+					</div>
+
+					{/* Safety nets */}
+					<div>
+						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
+							{t('app.modal.safety.section_title')}
+						</div>
+						<div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+							<NumField
+								label={t('app.modal.safety.cp_label')}
+								value={config.cpCap}
+								onChange={(v) => set('cpCap', +v || 0)}
+								hint={t('app.modal.safety.cp_hint')}
+							/>
+							<NumField
+								label={t('app.modal.safety.age_label')}
+								value={config.ageScopeDays}
+								onChange={(v) => set('ageScopeDays', +v || 0)}
+								hint={t('app.modal.safety.age_hint')}
+							/>
+							<NumField
+								label={t('app.modal.safety.distance_label')}
+								value={config.distanceProtect}
+								onChange={(v) => set('distanceProtect', +v || 0)}
+								hint={t('app.modal.safety.distance_hint')}
+							/>
+							<NumField
+								label={t('app.modal.safety.lucky_year_label')}
+								value={config.luckyEligibleYear}
+								onChange={(v) => set('luckyEligibleYear', +v || 0)}
+								hint={t('app.modal.safety.lucky_year_hint')}
+							/>
+						</div>
+					</div>
+				</>
+			)}
+		</>
+	);
+}
+
+function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArmed, onExport, onImport, onRunSetup }) {
 	// Base for the htmlFor/id pairs below: every label in this modal is a
 	// sibling of its control, so none of them named anything without one.
 	const fid = useId();
@@ -12189,153 +13898,24 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 						</button>
 					</div>
 
-					{/* Trade tags */}
-					<div>
-						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-							{t('app.modal.tags.section_title')}
+
+					{/* Setup wizard — runs once on first visit; every step's editors also
+					    live in the filter areas' settings. This brings the walk-through back. */}
+					{onRunSetup && (
+						<div className='flex items-center justify-between gap-3 border border-[#2D3A47] rounded-sm p-3'>
+							<div>
+								<div className='mono text-sm text-[#E6EDF3]'>{t('app.modal.settings.setup_label')}</div>
+								<div className='mono text-[11px] text-[#8090A0] mt-0.5'>{t('app.modal.settings.setup_help')}</div>
+							</div>
+							<button
+								type='button'
+								onClick={onRunSetup}
+								className='mono text-xs shrink-0 px-3 py-1.5 rounded-sm transition bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47]'
+							>
+								{t('app.modal.settings.setup_button')}
+							</button>
 						</div>
-						<div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
-							<div>
-								<label htmlFor={`${fid}-basar`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
-									{t('app.modal.tags.basar_label')}
-								</label>
-								<input id={`${fid}-basar`}
-									type='text'
-									value={config.basarTagName || ''}
-									onChange={(e) => set('basarTagName', e.target.value)}
-									placeholder={t('app.modal.tags.basar_placeholder')}
-									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
-								/>
-								<div className='mono text-[10px] text-[#8090A0] mt-1'>
-									{t('app.modal.tags.basar_clause')}{' '}
-									<code className='text-[#5EAFC5]'>!#{config.basarTagName || '?'}</code>
-								</div>
-							</div>
-							<div>
-								<label htmlFor={`${fid}-fern`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
-									{t('app.modal.tags.fern_label')}
-								</label>
-								<input id={`${fid}-fern`}
-									type='text'
-									value={config.fernTauschTagName || ''}
-									onChange={(e) => set('fernTauschTagName', e.target.value)}
-									placeholder={t('app.modal.tags.fern_placeholder')}
-									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
-								/>
-								<div className='mono text-[10px] text-[#8090A0] mt-1'>
-									{t('app.modal.tags.fern_help')}
-								</div>
-							</div>
-							{expert && (
-								<div>
-									<label htmlFor={`${fid}-frustration`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
-										{t('app.modal.tags.frustration_label')}
-									</label>
-									<input id={`${fid}-frustration`}
-										type='text'
-										value={config.removeFrustrationTagName || ''}
-										onChange={(e) => set('removeFrustrationTagName', e.target.value)}
-										placeholder={t('app.modal.tags.frustration_placeholder')}
-										className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
-									/>
-									<div className='mono text-[10px] text-[#8090A0] mt-1'>
-										{t('app.modal.tags.frustration_help')}
-									</div>
-								</div>
-							)}
-							{expert && (
-								<div>
-									<label htmlFor={`${fid}-evoswap`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
-										{t('app.modal.tags.evo_swap_label')}
-									</label>
-									<input id={`${fid}-evoswap`}
-										type='text'
-										value={config.evoSwapTagName || ''}
-										onChange={(e) => set('evoSwapTagName', e.target.value)}
-										placeholder={t('app.modal.tags.evo_swap_placeholder')}
-										className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
-									/>
-									<div className='mono text-[10px] text-[#8090A0] mt-1'>
-										{t('app.modal.tags.evo_swap_help')}
-									</div>
-								</div>
-							)}
-						</div>
-					</div>
-
-					{expert && (
-						<>
-							{/* Custom tags */}
-							<div>
-								<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-									{t('app.modal.custom_tags.section_title')}
-								</div>
-								<input
-									type='text'
-									value={config.customProtectedTags || ''}
-									onChange={(e) => set('customProtectedTags', e.target.value)}
-									placeholder={t('app.modal.custom_tags.placeholder')}
-									aria-label={t('app.modal.custom_tags.section_title')}
-									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
-								/>
-								<div className='mono text-[10px] text-[#8090A0] mt-1'>
-									{t('app.modal.custom_tags.help')}
-								</div>
-							</div>
-
-							{/* League tags */}
-							<div>
-								<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-									{t('app.modal.league.section_title')}
-								</div>
-								<input
-									type='text'
-									value={config.leagueTags || ''}
-									onChange={(e) => set('leagueTags', e.target.value)}
-									placeholder={t('app.modal.league.placeholder')}
-									aria-label={t('app.modal.league.section_title')}
-									className='mono text-sm w-full bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1.5 rounded-sm text-[#E6EDF3]'
-								/>
-								<div className='mono text-[10px] text-[#8090A0] mt-1'>{t('app.modal.league.help')}</div>
-							</div>
-
-							{/* Safety nets */}
-							<div>
-								<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-									{t('app.modal.safety.section_title')}
-								</div>
-								<div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
-									<NumField
-										label={t('app.modal.safety.cp_label')}
-										value={config.cpCap}
-										onChange={(v) => set('cpCap', +v || 0)}
-										hint={t('app.modal.safety.cp_hint')}
-									/>
-									<NumField
-										label={t('app.modal.safety.age_label')}
-										value={config.ageScopeDays}
-										onChange={(v) => set('ageScopeDays', +v || 0)}
-										hint={t('app.modal.safety.age_hint')}
-									/>
-									<NumField
-										label={t('app.modal.safety.distance_label')}
-										value={config.distanceProtect}
-										onChange={(v) => set('distanceProtect', +v || 0)}
-										hint={t('app.modal.safety.distance_hint')}
-									/>
-									<NumField
-										label={t('app.modal.safety.lucky_year_label')}
-										value={config.luckyEligibleYear}
-										onChange={(v) => set('luckyEligibleYear', +v || 0)}
-										hint={t('app.modal.safety.lucky_year_hint')}
-									/>
-								</div>
-							</div>
-						</>
 					)}
-
-					{/* Trade buddies */}
-					<BuddyManager buddies={config.buddies || []} onChange={(list) => set('buddies', list)} />
 
 					{/* Storage persistence — request "permanent" storage status so the
               browser doesn't evict our localStorage under pressure or on
@@ -12714,10 +14294,12 @@ function BuddyManager({ buddies, onChange }) {
 	function addBuddy() {
 		const name = newName.trim();
 		if (!name) return;
-		// Generate a default tag prefix from the name (alpha chars, capitalized)
-		const tagPrefix = name.replace(/[^a-zA-ZäöüÄÖÜß0-9]/g, '');
-		if (!tagPrefix) return;
-		const id = tagPrefix.toLowerCase() + '-' + Date.now().toString(36);
+		// Default tag prefix `Trade-<Name>` (the tagging scheme's "promised to a
+		// person" tag): letters and digits of the name. Editable per buddy.
+		const bare = name.replace(/[^a-zA-ZäöüÄÖÜß0-9]/g, '');
+		if (!bare) return;
+		const tagPrefix = `Trade-${bare}`;
+		const id = bare.toLowerCase() + '-' + Date.now().toString(36);
 		onChange([
 			...buddies,
 			{ id, name, tagPrefix, targetSpecies: [], wantsTradeEvos: false, rawAppend: '', active: true },

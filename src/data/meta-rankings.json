@@ -1,9 +1,9 @@
 {
-  "fetchedAt": "2026-10-29T13:14:00.320Z",
-  "gameMasterTimestamp": "1792902257174",
+  "fetchedAt": "2026-10-30T02:13:39.486Z",
+  "gameMasterTimestamp": "1793295551876",
   "sources": {
     "mechanics": "alexelgt/game_masters",
-    "mechanicsBatch": "2026-10-25T04:24:17.174Z",
+    "mechanicsBatch": "2026-10-29T17:39:11.876Z",
     "roster": "pvpoke/pvpoke",
     "rosterBatch": "2026-10-29 05:02:09"
   },
@@ -20,8 +20,9 @@
     "energyPerHpLost": 0.5,
     "constantsFrom": "battleSettings"
   },
-  "topPerType": 6,
+  "topPerType": 7,
   "shadowTopPerType": 7,
+  "watchRankTo": 15,
   "maxChargerDurationMs": 500,
   "topAttackers": [
     "eternatus",
@@ -57,6 +58,7 @@
     "blaziken",
     "moltres",
     "xurkitree",
+    "articuno",
     "tapu lele",
     "kartana",
     "cinderace",
@@ -74,6 +76,7 @@
     "volcarona",
     "emboar",
     "tapu koko",
+    "victini",
     "zarude",
     "necrozma",
     "ursaluna",
@@ -88,9 +91,11 @@
     "rhyperior",
     "quaquaval",
     "meloetta",
+    "urshifu",
     "latios",
     "chandelure",
     "rampardos",
+    "aegislash",
     "tapu bulu",
     "porygon-z",
     "mamoswine",
@@ -100,11 +105,15 @@
     "naganadel",
     "sceptile",
     "raikou",
+    "greninja",
     "meowscarada",
+    "electivire",
+    "exeggutor",
     "kingambit",
     "xerneas",
     "absol",
     "gengar",
+    "dialga",
     "weavile",
     "ursaring",
     "cetitan",
@@ -112,10 +121,15 @@
     "heracross",
     "revavroom",
     "genesect",
+    "overqwil",
     "slaking",
+    "grimmsnarl",
+    "glaceon",
     "vikavolt",
     "escavalier",
-    "snorlax"
+    "snorlax",
+    "unfezant",
+    "kleavor"
   ],
   "shadowKeepers": [
     "regigigas",
@@ -248,6 +262,7 @@
     "inteleon",
     "rillaboom",
     "excadrill",
+    "melmetal",
     "ho-oh",
     "hydreigon",
     "rhyperior",
@@ -269,17 +284,18 @@
     "machamp",
     "venusaur",
     "toxtricity",
+    "gardevoir",
     "tsareena",
     "gyarados",
     "unfezant",
     "grimmsnarl",
     "glaceon",
-    "gardevoir",
     "duraludon",
     "latias",
     "jolteon",
     "leafeon",
     "arcanine",
+    "drampa",
     "snorlax",
     "passimian",
     "hatterene",
@@ -289,24 +305,29 @@
     "raichu",
     "sylveon",
     "starmie",
+    "blastoise",
     "kabutops",
     "hitmonlee",
     "walrein",
+    "corviknight",
     "omastar",
     "cryogonal",
+    "lapras",
     "malamar",
     "blissey",
+    "falinks",
     "regirock",
     "garbodor",
     "whimsicott",
-    "drampa",
-    "corviknight",
     "butterfree",
     "greedent",
     "registeel",
     "vespiquen",
+    "umbreon",
     "dubwool",
-    "sableye"
+    "eevee",
+    "sableye",
+    "shuckle"
   ],
   "gigantamaxSpecies": [
     "venusaur",
@@ -384,6 +405,15 @@
         "tdo": 268.2,
         "fast": "LICK_FAST",
         "charged": "HYPER_BEAM"
+      },
+      {
+        "species": "unfezant",
+        "dex": 521,
+        "rating": 28.33,
+        "dps": 15.76,
+        "tdo": 164.5,
+        "fast": "AIR_SLASH_FAST",
+        "charged": "HYPER_BEAM"
       }
     ],
     "fighting": [
@@ -441,6 +471,15 @@
         "fast": "PSYCHO_CUT_FAST",
         "charged": "AURA_SPHERE",
         "form": "DECIDUEYE_HISUIAN"
+      },
+      {
+        "species": "urshifu",
+        "dex": 892,
+        "rating": 34.92,
+        "dps": 18,
+        "tdo": 255,
+        "fast": "COUNTER_FAST",
+        "charged": "DYNAMIC_PUNCH"
       }
     ],
     "flying": [
@@ -498,6 +537,16 @@
         "tdo": 269.2,
         "fast": "FIRE_SPIN_FAST",
         "charged": "FLY"
+      },
+      {
+        "species": "articuno",
+        "dex": 144,
+        "rating": 38.04,
+        "dps": 19.42,
+        "tdo": 285.6,
+        "fast": "CONFUSION_FAST",
+        "charged": "FLY",
+        "form": "ARTICUNO_GALARIAN"
       }
     ],
     "poison": [
@@ -555,6 +604,15 @@
         "tdo": 191.9,
         "fast": "POISON_JAB_FAST",
         "charged": "GUNK_SHOT"
+      },
+      {
+        "species": "overqwil",
+        "dex": 904,
+        "rating": 29.74,
+        "dps": 15.86,
+        "tdo": 196.1,
+        "fast": "POISON_JAB_FAST",
+        "charged": "SLUDGE_BOMB"
       }
     ],
     "ground": [
@@ -612,6 +670,15 @@
         "tdo": 236.2,
         "fast": "MUD_SLAP_FAST",
         "charged": "HIGH_HORSEPOWER"
+      },
+      {
+        "species": "rhyperior",
+        "dex": 464,
+        "rating": 33.87,
+        "dps": 16.61,
+        "tdo": 287.1,
+        "fast": "MUD_SLAP_FAST",
+        "charged": "EARTHQUAKE"
       }
     ],
     "rock": [
@@ -667,6 +734,15 @@
         "dps": 15.91,
         "tdo": 277.3,
         "fast": "POISON_JAB_FAST",
+        "charged": "ROCK_SLIDE"
+      },
+      {
+        "species": "terrakion",
+        "dex": 639,
+        "rating": 31.92,
+        "dps": 16.3,
+        "tdo": 239.8,
+        "fast": "DOUBLE_KICK_FAST",
         "charged": "ROCK_SLIDE"
       }
     ],
@@ -724,6 +800,15 @@
         "tdo": 185.1,
         "fast": "BUG_BITE_FAST",
         "charged": "MEGAHORN"
+      },
+      {
+        "species": "kleavor",
+        "dex": 900,
+        "rating": 28.31,
+        "dps": 15.57,
+        "tdo": 170,
+        "fast": "FURY_CUTTER_FAST",
+        "charged": "X_SCISSOR"
       }
     ],
     "ghost": [
@@ -781,6 +866,16 @@
         "tdo": 199.5,
         "fast": "FIRE_SPIN_FAST",
         "charged": "SHADOW_BALL"
+      },
+      {
+        "species": "aegislash",
+        "dex": 681,
+        "rating": 34.65,
+        "dps": 22.15,
+        "tdo": 132.7,
+        "fast": "PSYCHO_CUT_FAST",
+        "charged": "SHADOW_BALL",
+        "form": "AEGISLASH_BLADE"
       }
     ],
     "steel": [
@@ -838,6 +933,15 @@
         "fast": "METAL_CLAW_FAST",
         "charged": "IRON_HEAD",
         "form": "NECROZMA_DUSK_MANE"
+      },
+      {
+        "species": "dialga",
+        "dex": 483,
+        "rating": 31.65,
+        "dps": 16.08,
+        "tdo": 241.3,
+        "fast": "METAL_CLAW_FAST",
+        "charged": "IRON_HEAD"
       }
     ],
     "fire": [
@@ -894,6 +998,15 @@
         "tdo": 228.9,
         "fast": "LOW_KICK_FAST",
         "charged": "BLAST_BURN"
+      },
+      {
+        "species": "victini",
+        "dex": 494,
+        "rating": 36.2,
+        "dps": 17.99,
+        "tdo": 294.9,
+        "fast": "QUICK_ATTACK_FAST",
+        "charged": "V_CREATE"
       }
     ],
     "water": [
@@ -950,6 +1063,15 @@
         "dps": 18.3,
         "tdo": 223.5,
         "fast": "FURY_CUTTER_FAST",
+        "charged": "HYDRO_CANNON"
+      },
+      {
+        "species": "greninja",
+        "dex": 658,
+        "rating": 33.21,
+        "dps": 18.72,
+        "tdo": 185.4,
+        "fast": "WATER_SHURIKEN_FAST",
         "charged": "HYDRO_CANNON"
       }
     ],
@@ -1008,6 +1130,16 @@
         "tdo": 190.1,
         "fast": "LEAFAGE_FAST",
         "charged": "FRENZY_PLANT"
+      },
+      {
+        "species": "exeggutor",
+        "dex": 103,
+        "rating": 32.91,
+        "dps": 17.67,
+        "tdo": 212.4,
+        "fast": "DRAGON_TAIL_FAST",
+        "charged": "SOLAR_BEAM",
+        "form": "EXEGGUTOR_ALOLA"
       }
     ],
     "electric": [
@@ -1063,6 +1195,15 @@
         "rating": 33.33,
         "dps": 17.07,
         "tdo": 248.3,
+        "fast": "THUNDER_SHOCK_FAST",
+        "charged": "WILD_CHARGE"
+      },
+      {
+        "species": "electivire",
+        "dex": 466,
+        "rating": 32.98,
+        "dps": 18.09,
+        "tdo": 199.6,
         "fast": "THUNDER_SHOCK_FAST",
         "charged": "WILD_CHARGE"
       }
@@ -1123,6 +1264,15 @@
         "tdo": 255.1,
         "fast": "DRAGON_BREATH_FAST",
         "charged": "PSYCHIC"
+      },
+      {
+        "species": "metagross",
+        "dex": 376,
+        "rating": 34.28,
+        "dps": 17.23,
+        "tdo": 269.9,
+        "fast": "FURY_CUTTER_FAST",
+        "charged": "PSYCHIC"
       }
     ],
     "ice": [
@@ -1180,6 +1330,15 @@
         "dps": 15.34,
         "tdo": 238.6,
         "fast": "POWDER_SNOW_FAST",
+        "charged": "AVALANCHE"
+      },
+      {
+        "species": "glaceon",
+        "dex": 471,
+        "rating": 29.36,
+        "dps": 15.77,
+        "tdo": 189.4,
+        "fast": "FROST_BREATH_FAST",
         "charged": "AVALANCHE"
       }
     ],
@@ -1240,6 +1399,15 @@
         "fast": "DRAGON_TAIL_FAST",
         "charged": "DRACO_METEOR",
         "form": "PALKIA_ORIGIN"
+      },
+      {
+        "species": "reshiram",
+        "dex": 643,
+        "rating": 39,
+        "dps": 19.81,
+        "tdo": 297.3,
+        "fast": "FIRE_FANG_FAST",
+        "charged": "DRACO_METEOR"
       }
     ],
     "dark": [
@@ -1297,6 +1465,16 @@
         "tdo": 145.4,
         "fast": "SNARL_FAST",
         "charged": "BRUTAL_SWING"
+      },
+      {
+        "species": "urshifu",
+        "dex": 892,
+        "rating": 32.03,
+        "dps": 16.51,
+        "tdo": 233.9,
+        "fast": "COUNTER_FAST",
+        "charged": "PAYBACK",
+        "form": "URSHIFU_SINGLE_STRIKE"
       }
     ],
     "fairy": [
@@ -1354,6 +1532,15 @@
         "tdo": 268,
         "fast": "GEOMANCY_FAST",
         "charged": "MOONBLAST"
+      },
+      {
+        "species": "grimmsnarl",
+        "dex": 861,
+        "rating": 29.59,
+        "dps": 16.26,
+        "tdo": 178.5,
+        "fast": "SUCKER_PUNCH_FAST",
+        "charged": "PLAY_ROUGH"
       }
     ]
   },
@@ -2542,6 +2729,680 @@
         "tdo": 94.1,
         "fast": "ASTONISH_FAST",
         "charged": "MOONBLAST"
+      }
+    ]
+  },
+  "watchPerType": {
+    "normal": [
+      {
+        "species": "exploud",
+        "dex": 295,
+        "rank": 8,
+        "rating": 27.65
+      },
+      {
+        "species": "bewear",
+        "dex": 760,
+        "rank": 9,
+        "rating": 26.54
+      },
+      {
+        "species": "ambipom",
+        "dex": 424,
+        "rank": 11,
+        "rating": 26.27
+      },
+      {
+        "species": "cinccino",
+        "dex": 573,
+        "rank": 12,
+        "rating": 26.25
+      },
+      {
+        "species": "obstagoon",
+        "dex": 862,
+        "rank": 13,
+        "rating": 24.93
+      },
+      {
+        "species": "sawsbuck",
+        "dex": 586,
+        "rank": 14,
+        "rating": 24.92
+      },
+      {
+        "species": "bouffalant",
+        "dex": 626,
+        "rank": 15,
+        "rating": 24.82
+      }
+    ],
+    "fighting": [
+      {
+        "species": "conkeldurr",
+        "dex": 534,
+        "rank": 8,
+        "rating": 34.04
+      },
+      {
+        "species": "gallade",
+        "dex": 475,
+        "rank": 9,
+        "rating": 33.4
+      },
+      {
+        "species": "zamazenta",
+        "dex": 889,
+        "rank": 10,
+        "rating": 32.9
+      },
+      {
+        "species": "marshadow",
+        "dex": 802,
+        "rank": 11,
+        "rating": 32.43
+      },
+      {
+        "species": "hawlucha",
+        "dex": 701,
+        "rank": 12,
+        "rating": 32.09
+      },
+      {
+        "species": "hariyama",
+        "dex": 297,
+        "rank": 13,
+        "rating": 31.94
+      }
+    ],
+    "flying": [
+      {
+        "species": "honchkrow",
+        "dex": 430,
+        "rank": 8,
+        "rating": 37.76
+      },
+      {
+        "species": "staraptor",
+        "dex": 398,
+        "rank": 9,
+        "rating": 35.98
+      },
+      {
+        "species": "tornadus",
+        "dex": 641,
+        "rank": 10,
+        "rating": 35.97
+      },
+      {
+        "species": "ho-oh",
+        "dex": 250,
+        "rank": 12,
+        "rating": 35.39
+      },
+      {
+        "species": "braviary",
+        "dex": 628,
+        "rank": 13,
+        "rating": 34.55
+      },
+      {
+        "species": "lugia",
+        "dex": 249,
+        "rank": 14,
+        "rating": 34.03
+      },
+      {
+        "species": "flamigo",
+        "dex": 973,
+        "rank": 15,
+        "rating": 33.71
+      }
+    ],
+    "poison": [
+      {
+        "species": "muk",
+        "dex": 89,
+        "rank": 9,
+        "rating": 27.76
+      },
+      {
+        "species": "toxicroak",
+        "dex": 454,
+        "rank": 10,
+        "rating": 27.75
+      },
+      {
+        "species": "victreebel",
+        "dex": 71,
+        "rank": 11,
+        "rating": 27.42
+      },
+      {
+        "species": "venusaur",
+        "dex": 3,
+        "rank": 12,
+        "rating": 27.16
+      },
+      {
+        "species": "crobat",
+        "dex": 169,
+        "rank": 13,
+        "rating": 26.38
+      },
+      {
+        "species": "vileplume",
+        "dex": 45,
+        "rank": 14,
+        "rating": 26.19
+      },
+      {
+        "species": "skuntank",
+        "dex": 435,
+        "rank": 15,
+        "rating": 25.93
+      }
+    ],
+    "ground": [
+      {
+        "species": "krookodile",
+        "dex": 553,
+        "rank": 8,
+        "rating": 31.77
+      },
+      {
+        "species": "zygarde",
+        "dex": 718,
+        "rank": 9,
+        "rating": 29.94
+      },
+      {
+        "species": "mudsdale",
+        "dex": 750,
+        "rank": 10,
+        "rating": 28.75
+      },
+      {
+        "species": "hippowdon",
+        "dex": 450,
+        "rank": 11,
+        "rating": 28.64
+      },
+      {
+        "species": "golurk",
+        "dex": 623,
+        "rank": 12,
+        "rating": 28.46
+      },
+      {
+        "species": "donphan",
+        "dex": 232,
+        "rank": 13,
+        "rating": 28.35
+      },
+      {
+        "species": "flygon",
+        "dex": 330,
+        "rank": 14,
+        "rating": 27.77
+      },
+      {
+        "species": "torterra",
+        "dex": 389,
+        "rank": 15,
+        "rating": 27.73
+      }
+    ],
+    "rock": [
+      {
+        "species": "aurorus",
+        "dex": 699,
+        "rank": 9,
+        "rating": 31.41
+      },
+      {
+        "species": "aggron",
+        "dex": 306,
+        "rank": 10,
+        "rating": 30.06
+      },
+      {
+        "species": "arcanine",
+        "dex": 59,
+        "rank": 12,
+        "rating": 28.64
+      },
+      {
+        "species": "archeops",
+        "dex": 567,
+        "rank": 13,
+        "rating": 28.19
+      },
+      {
+        "species": "stonjourner",
+        "dex": 874,
+        "rank": 14,
+        "rating": 28.06
+      },
+      {
+        "species": "lycanroc",
+        "dex": 745,
+        "rank": 15,
+        "rating": 27.21
+      }
+    ],
+    "bug": [
+      {
+        "species": "yanmega",
+        "dex": 469,
+        "rank": 8,
+        "rating": 28.25
+      },
+      {
+        "species": "centiskorch",
+        "dex": 851,
+        "rank": 9,
+        "rating": 27.87
+      },
+      {
+        "species": "frosmoth",
+        "dex": 873,
+        "rank": 10,
+        "rating": 27.28
+      },
+      {
+        "species": "pinsir",
+        "dex": 127,
+        "rank": 11,
+        "rating": 26.96
+      },
+      {
+        "species": "scizor",
+        "dex": 212,
+        "rank": 12,
+        "rating": 26.89
+      },
+      {
+        "species": "golisopod",
+        "dex": 768,
+        "rank": 13,
+        "rating": 26.38
+      },
+      {
+        "species": "accelgor",
+        "dex": 617,
+        "rank": 14,
+        "rating": 25.95
+      },
+      {
+        "species": "buzzwole",
+        "dex": 794,
+        "rank": 15,
+        "rating": 25.33
+      }
+    ],
+    "ghost": [
+      {
+        "species": "gholdengo",
+        "dex": 1000,
+        "rank": 8,
+        "rating": 34.04
+      },
+      {
+        "species": "zoroark",
+        "dex": 571,
+        "rank": 10,
+        "rating": 32.76
+      },
+      {
+        "species": "ceruledge",
+        "dex": 937,
+        "rank": 11,
+        "rating": 32.25
+      },
+      {
+        "species": "annihilape",
+        "dex": 979,
+        "rank": 12,
+        "rating": 32.25
+      },
+      {
+        "species": "polteageist",
+        "dex": 855,
+        "rank": 13,
+        "rating": 31.63
+      },
+      {
+        "species": "typhlosion",
+        "dex": 157,
+        "rank": 14,
+        "rating": 31.26
+      },
+      {
+        "species": "sinistcha",
+        "dex": 1013,
+        "rank": 15,
+        "rating": 30.4
+      }
+    ],
+    "steel": [
+      {
+        "species": "zamazenta",
+        "dex": 889,
+        "rank": 9,
+        "rating": 30.39
+      },
+      {
+        "species": "heatran",
+        "dex": 485,
+        "rank": 12,
+        "rating": 29.72
+      },
+      {
+        "species": "solgaleo",
+        "dex": 791,
+        "rank": 14,
+        "rating": 29.31
+      },
+      {
+        "species": "duraludon",
+        "dex": 884,
+        "rank": 15,
+        "rating": 29.17
+      }
+    ],
+    "fire": [
+      {
+        "species": "heatran",
+        "dex": 485,
+        "rank": 9,
+        "rating": 35.1
+      },
+      {
+        "species": "entei",
+        "dex": 244,
+        "rank": 12,
+        "rating": 34.42
+      },
+      {
+        "species": "volcanion",
+        "dex": 721,
+        "rank": 13,
+        "rating": 34.17
+      },
+      {
+        "species": "delphox",
+        "dex": 655,
+        "rank": 14,
+        "rating": 33.56
+      },
+      {
+        "species": "incineroar",
+        "dex": 727,
+        "rank": 15,
+        "rating": 33.03
+      }
+    ],
+    "water": [
+      {
+        "species": "empoleon",
+        "dex": 395,
+        "rank": 8,
+        "rating": 32.63
+      },
+      {
+        "species": "kingler",
+        "dex": 99,
+        "rank": 10,
+        "rating": 32.25
+      },
+      {
+        "species": "crawdaunt",
+        "dex": 342,
+        "rank": 11,
+        "rating": 32.19
+      },
+      {
+        "species": "swampert",
+        "dex": 260,
+        "rank": 12,
+        "rating": 32.19
+      },
+      {
+        "species": "volcanion",
+        "dex": 721,
+        "rank": 13,
+        "rating": 31.84
+      },
+      {
+        "species": "clawitzer",
+        "dex": 693,
+        "rank": 14,
+        "rating": 31.15
+      },
+      {
+        "species": "golisopod",
+        "dex": 768,
+        "rank": 15,
+        "rating": 30.76
+      }
+    ],
+    "grass": [
+      {
+        "species": "breloom",
+        "dex": 286,
+        "rank": 8,
+        "rating": 32.13
+      },
+      {
+        "species": "torterra",
+        "dex": 389,
+        "rank": 12,
+        "rating": 31.51
+      },
+      {
+        "species": "chesnaught",
+        "dex": 652,
+        "rank": 13,
+        "rating": 31.44
+      },
+      {
+        "species": "celebi",
+        "dex": 251,
+        "rank": 14,
+        "rating": 31.02
+      },
+      {
+        "species": "venusaur",
+        "dex": 3,
+        "rank": 15,
+        "rating": 30.85
+      }
+    ],
+    "electric": [
+      {
+        "species": "luxray",
+        "dex": 405,
+        "rank": 9,
+        "rating": 31.83
+      },
+      {
+        "species": "magnezone",
+        "dex": 462,
+        "rank": 10,
+        "rating": 31.67
+      },
+      {
+        "species": "pawmot",
+        "dex": 923,
+        "rank": 11,
+        "rating": 30.73
+      },
+      {
+        "species": "toxtricity",
+        "dex": 849,
+        "rank": 12,
+        "rating": 30.49
+      },
+      {
+        "species": "golem",
+        "dex": 76,
+        "rank": 14,
+        "rating": 29.59
+      }
+    ],
+    "psychic": [
+      {
+        "species": "alakazam",
+        "dex": 65,
+        "rank": 8,
+        "rating": 33.33
+      },
+      {
+        "species": "azelf",
+        "dex": 482,
+        "rank": 9,
+        "rating": 33.27
+      },
+      {
+        "species": "espeon",
+        "dex": 196,
+        "rank": 10,
+        "rating": 33.12
+      },
+      {
+        "species": "gardevoir",
+        "dex": 282,
+        "rank": 14,
+        "rating": 30.45
+      },
+      {
+        "species": "gallade",
+        "dex": 475,
+        "rank": 15,
+        "rating": 30.45
+      }
+    ],
+    "ice": [
+      {
+        "species": "avalugg",
+        "dex": 713,
+        "rank": 8,
+        "rating": 28.63
+      },
+      {
+        "species": "jynx",
+        "dex": 124,
+        "rank": 9,
+        "rating": 28.5
+      },
+      {
+        "species": "aurorus",
+        "dex": 699,
+        "rank": 10,
+        "rating": 27.91
+      },
+      {
+        "species": "frosmoth",
+        "dex": 873,
+        "rank": 11,
+        "rating": 27.28
+      },
+      {
+        "species": "vanilluxe",
+        "dex": 584,
+        "rank": 12,
+        "rating": 27.23
+      },
+      {
+        "species": "mr. rime",
+        "dex": 866,
+        "rank": 13,
+        "rating": 27.09
+      },
+      {
+        "species": "rotom",
+        "dex": 479,
+        "rank": 15,
+        "rating": 25.72
+      }
+    ],
+    "dragon": [
+      {
+        "species": "haxorus",
+        "dex": 612,
+        "rank": 8,
+        "rating": 38.69
+      },
+      {
+        "species": "dragonite",
+        "dex": 149,
+        "rank": 12,
+        "rating": 37.33
+      }
+    ],
+    "dark": [
+      {
+        "species": "guzzlord",
+        "dex": 799,
+        "rank": 8,
+        "rating": 31.69
+      },
+      {
+        "species": "incineroar",
+        "dex": 727,
+        "rank": 9,
+        "rating": 31.34
+      },
+      {
+        "species": "zoroark",
+        "dex": 571,
+        "rank": 14,
+        "rating": 29.5
+      }
+    ],
+    "fairy": [
+      {
+        "species": "gardevoir",
+        "dex": 282,
+        "rank": 8,
+        "rating": 29.18
+      },
+      {
+        "species": "togekiss",
+        "dex": 468,
+        "rank": 9,
+        "rating": 28.7
+      },
+      {
+        "species": "hatterene",
+        "dex": 858,
+        "rank": 10,
+        "rating": 28.17
+      },
+      {
+        "species": "tapu fini",
+        "dex": 788,
+        "rank": 11,
+        "rating": 27.74
+      },
+      {
+        "species": "granbull",
+        "dex": 210,
+        "rank": 13,
+        "rating": 26.94
+      },
+      {
+        "species": "sylveon",
+        "dex": 700,
+        "rank": 14,
+        "rating": 26.82
+      },
+      {
+        "species": "florges",
+        "dex": 671,
+        "rank": 15,
+        "rating": 26.21
       }
     ]
   },
