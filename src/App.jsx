@@ -2156,22 +2156,38 @@ export const COMMUNITY_DAY_DEX = [
 // ② (not starred, not tagged) and ③ (the protection tail). Every pile goes
 // through here, so all of them share one shape and scripts/check-piles.mjs can
 // hold them all to it.
-//   lenses: [{ key, filter, text? }] where `filter` is a CNF chain (may hold
-//   `&`) and `text` ([label, hint, params]) names a lens the pile's wording
-//   table can't know in advance, such as one per active GBL cup
+//   lenses: [{ key, filter, text?, not? }] where `filter` is a CNF chain (may
+//   hold `&`), `text` ([label, hint, params]) names a lens the pile's wording
+//   table can't know in advance, such as one per active GBL cup, and `not` is
+//   the clause that negates the lens (`!shiny` for the shiny lens); a lens
+//   without one (a species list, a PvP pattern) does not narrow ③a
 //   tail: protectionTail's options ({ mythCarve, smeargle }), resolved once
 //   per buildFilters call so every pile carves the same mythicals
-export function buildPile({ id, head, lenses = [], kw, cfg, tail = {} }) {
+//   release: false makes a pile with no ③ at all (the evolve pile: what can
+//   still evolve is never a leftover); neither `release` nor `safe` is set
+// ③ comes out twice: `release` (③b) is head & tail, everything not starred
+// or tagged; `safe` (③a) is release & every lens's `not`, the leftovers no ①
+// step would have kept, so it always starts with release&. Identical `not`
+// clauses (the `4*,3*` and `3*` steps both negate to `0*,1*,2*`) are joined once.
+export function buildPile({ id, head, lenses = [], kw, cfg, tail = {}, release = true }) {
 	if (!head) return null;
-	return {
+	const lensesOn = lenses.filter((l) => l.filter);
+	const pile = {
 		id,
 		overview: head,
-		keep: lenses
-			.filter((l) => l.filter)
-			.map((l) => ({ key: l.key, filter: `${head}&${l.filter}`, ...(l.text ? { text: l.text } : {}) })),
+		keep: lensesOn.map((l) => ({
+			key: l.key,
+			filter: `${head}&${l.filter}`,
+			...(l.text ? { text: l.text } : {}),
+			...(l.not ? { not: l.not } : {}),
+		})),
 		sort: `${head}&!${kw.flag.favorite}&!#`,
-		release: `${head}&${protectionTail(kw, cfg, tail).join('&')}`,
 	};
+	if (release) {
+		pile.release = `${head}&${protectionTail(kw, cfg, tail).join('&')}`;
+		pile.safe = [pile.release, ...new Set(lensesOn.map((l) => l.not).filter(Boolean))].join('&');
+	}
+	return pile;
 }
 
 export function buildFilters(
@@ -2455,6 +2471,37 @@ export function buildFilters(
 	const mythCarve = (cfg.mythTooManyOf || []).map((s) => speciesForOutput(s, outputLocale)).filter(Boolean);
 	// What every buildPile call hands protectionTail (see its comment).
 	const pileTail = { mythCarve, smeargle: smeargleName };
+	// The shared ① steps of docs/pile-purposes.md, for every pile from the
+	// hundo sort and the event piles down to the sorting piles. A pile's ①
+	// reads best first: each step must find something no earlier step found
+	// (check-piles P9). Each step's `not` is what ③a ANDs on so a leftover is
+	// something no step would have kept: a hundo needs none (the tail's `!4*`
+	// holds it), the 3-4 step fails when any stat is below three bars, the
+	// star steps when the star is below their floor.
+	const atk = kw.iv.atk, def = kw.iv.def, hp = kw.iv.hp;
+	const strongIv = `3-4${atk}&3-4${def}&3-4${hp}`;
+	const notStrong = `0-2${atk},0-2${def},0-2${hp}`;
+	const topIv = '4*,3*';
+	const notTop = '0*,1*,2*';
+	const notShiny = `!${kw.flag.shiny}`;
+	// `prefix` narrows every step (the evolve pile's new Pokédex entries); a
+	// narrowed step carries no `not`, since negating it would need the prefix
+	// too, and the one pile that narrows has no ③.
+	const ivLadder = (prefix = '', keyPrefix = '', hint) =>
+		[
+			['hundo', '4*', ''],
+			['shiny', kw.flag.shiny, notShiny],
+			['strong', strongIv, notStrong],
+			['three', '3*', notTop],
+		].map(([key, filter, not]) => ({
+			key: `${keyPrefix}${key}`,
+			filter: `${prefix}${filter}`,
+			...(keyPrefix ? { text: [`app.pile.lens.${key}_label`, hint] } : {}),
+			...(not && !prefix ? { not } : {}),
+		}));
+	const [hundoStep, shinyStep, strongStep, threeStep] = ivLadder();
+	const stillToEvolve = { key: 'evolve', filter: kw.flag.evolvable, not: `!${kw.flag.evolvable}` };
+	const highIvStep = { key: 'high_iv', filter: topIv, not: notTop };
 	const legacyMovesClause = () => {
 		const suffix = `,@${kw.flag.return},@${kw.flag.frustration}`;
 		return cfg.protectSmeargleLegacy
@@ -3193,13 +3240,9 @@ export function buildFilters(
 	const hundoPile = buildPile({
 		id: 'hundo',
 		head: sortPileHead,
-		// docs/pile-purposes.md: best first, as every pile.
-		lenses: [
-			{ key: 'hundos', filter: '4*' },
-			{ key: 'shiny', filter: kw.flag.shiny },
-			{ key: 'strong', filter: `3-4${kw.iv.atk}&3-4${kw.iv.def}&3-4${kw.iv.hp}` },
-			{ key: 'three', filter: '3*' },
-		],
+		// docs/pile-purposes.md: best first, as every pile. The shared ladder,
+		// with its first step under this pile's own wording key.
+		lenses: [{ ...hundoStep, key: 'hundos' }, shinyStep, strongStep, threeStep],
 		kw,
 		cfg,
 		tail: pileTail,
@@ -4518,17 +4561,14 @@ export function buildFilters(
 				.map((n) => `+${n}`)
 				.join(',');
 			if (!fams) return null;
-			// Best first, as every pile (docs/pile-purposes.md). Shinies, costumes
-			// and backgrounds need no step: the protection tail keeps them from ③.
+			// The shared ladder, best first (docs/pile-purposes.md). The shiny step
+			// is the only shiny guard: the tail protects shiny legendaries, not
+			// plain shinies, and a costume or background here goes to ③ like any
+			// other catch.
 			const pile = buildPile({
 				id: `event_${ev.id}`,
 				head: fams,
-				lenses: [
-					{ key: 'hundo', filter: '4*' },
-					{ key: 'shiny', filter: kw.flag.shiny },
-					{ key: 'strong', filter: `3-4${kw.iv.atk}&3-4${kw.iv.def}&3-4${kw.iv.hp}` },
-					{ key: 'three', filter: '3*' },
-				],
+				lenses: ivLadder(),
 				kw,
 				cfg,
 				tail: pileTail,
@@ -4544,11 +4584,13 @@ export function buildFilters(
 				spawnForms: ev.spawnForms || [],
 				megaBoost: megaBoostFor(ev.spawnForms),
 				// The event's spawn families as a pile (see buildPile): ① best IVs
-				// first, ② not yet starred or tagged, ③ the protection tail.
+				// first, ② not yet starred or tagged, ③ the protection tail, as
+				// the leftovers (safe) and everything not starred or tagged (release).
 				pile,
 				overview: pile.overview,
 				sort: pile.sort,
 				release: pile.release,
+				safe: pile.safe,
 			};
 		})
 		.filter(Boolean);
@@ -5040,24 +5082,6 @@ export function buildFilters(
 			text: ['app.pile.lens.pvp_cup_label', 'app.pile.lens.pvp_hint', { cup: c.name }],
 		})),
 	];
-	const atk = kw.iv.atk, def = kw.iv.def, hp = kw.iv.hp;
-	// The shared steps of docs/pile-purposes.md. A pile's ① reads best first:
-	// each step must find something no earlier step found (check-piles P9).
-	const strongIv = `3-4${atk}&3-4${def}&3-4${hp}`;
-	const topIv = '4*,3*';
-	const ivLadder = (prefix = '', keyPrefix = '', hint) =>
-		[
-			['hundo', '4*'],
-			['shiny', kw.flag.shiny],
-			['strong', strongIv],
-			['three', '3*'],
-		].map(([key, filter]) => ({
-			key: `${keyPrefix}${key}`,
-			filter: `${prefix}${filter}`,
-			...(keyPrefix ? { text: [`app.pile.lens.${key}_label`, hint] } : {}),
-		}));
-	const stillToEvolve = { key: 'evolve', filter: kw.flag.evolvable };
-	const shinyStep = { key: 'shiny', filter: kw.flag.shiny };
 	// The loose rank-1 pattern under each capped league, for piles whose
 	// species aren't in a league's top 30 (the meta pile uses those pools).
 	const pvpLoose = ['great', 'ultra']
@@ -5102,13 +5126,13 @@ export function buildFilters(
 			id: 'shadows',
 			head: kw.flag.shadow,
 			lenses: [
-				{ key: 'hundo', filter: '4*' },
+				hundoStep,
 				shinyStep,
 				{ key: 'meta', filter: metaHead },
-				{ key: 'three', filter: '3*' },
-				{ key: 'atk34', filter: `3-4${atk}` },
+				threeStep,
+				{ key: 'atk34', filter: `3-4${atk}`, not: `0-2${atk}` },
 				...pvpLoose,
-				{ key: 'evolve_shadow', filter: kw.flag.evolvable },
+				{ ...stillToEvolve, key: 'evolve_shadow' },
 			],
 			kw,
 			cfg,
@@ -5120,11 +5144,11 @@ export function buildFilters(
 			id: 'traded',
 			head: kw.flag.traded,
 			lenses: [
-				{ key: 'hundo', filter: '4*' },
+				hundoStep,
 				shinyStep,
-				{ key: 'luckies', filter: kw.flag.lucky },
-				{ key: 'strong', filter: strongIv },
-				{ key: 'three', filter: '3*' },
+				{ key: 'luckies', filter: kw.flag.lucky, not: `!${kw.flag.lucky}` },
+				strongStep,
+				threeStep,
 				...pvpLoose,
 				stillToEvolve,
 			],
@@ -5135,13 +5159,14 @@ export function buildFilters(
 		buildPile({
 			id: 'luckies',
 			head: kw.flag.lucky,
-			lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep],
+			lenses: [stillToEvolve, highIvStep, shinyStep],
 			kw,
 			cfg,
 			tail: pileTail,
 		}),
 		// Everything that can evolve right now: new Pokédex entries best first,
-		// then the ones already tagged to evolve through.
+		// then the ones already tagged to evolve through. No ③: what can still
+		// evolve is never a leftover, so this pile has nothing to transfer.
 		buildPile({
 			id: 'evolve',
 			head: kw.flag.evolvable,
@@ -5152,6 +5177,7 @@ export function buildFilters(
 			kw,
 			cfg,
 			tail: pileTail,
+			release: false,
 		}),
 		// Dynamax-capable through the levelled Max-move token: bare `dynamax` is
 		// a search shortcut that silently drops the rest of the string.
@@ -5168,8 +5194,8 @@ export function buildFilters(
 			tail: pileTail,
 		}),
 		// XXL: the showcase verdict is the calculator under the steps.
-		buildPile({ id: 'xxl', head: kw.flag.xxl, lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep], kw, cfg, tail: pileTail }),
-		buildPile({ id: 'xxs', head: kw.flag.xxs, lenses: [stillToEvolve, { key: 'high_iv', filter: topIv }, shinyStep], kw, cfg, tail: pileTail }),
+		buildPile({ id: 'xxl', head: kw.flag.xxl, lenses: [stillToEvolve, highIvStep, shinyStep], kw, cfg, tail: pileTail }),
+		buildPile({ id: 'xxs', head: kw.flag.xxs, lenses: [stillToEvolve, highIvStep, shinyStep], kw, cfg, tail: pileTail }),
 		buildPile({ id: 'backgrounds', head: kw.flag.background, lenses: ivLadder(), kw, cfg, tail: pileTail }),
 		// Costumes split by whether the line can still evolve: one per stage for
 		// those, one for the rest (the costume budget either way).
@@ -5185,11 +5211,11 @@ export function buildFilters(
 				? famOf(COMMUNITY_DAY_DEX.map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean))
 				: '',
 			lenses: [
-				{ key: 'hundo', filter: '4*' },
+				hundoStep,
 				shinyStep,
-				{ key: 'background', filter: kw.flag.background },
-				{ key: 'strong', filter: strongIv },
-				{ key: 'three', filter: '3*' },
+				{ key: 'background', filter: kw.flag.background, not: `!${kw.flag.background}` },
+				strongStep,
+				threeStep,
 				{ key: 'to_trade', filter: `!${kw.flag.traded}` },
 			],
 			kw,
@@ -10330,7 +10356,7 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 			{subHeading('app.pile.group_sort')}
 			{card ?? <PileCard card={pile.card} t={t} />}
 			{box('sort', words.sort, pile.sort)}
-			{subHeading('app.pile.group_release')}
+			{pile.release && subHeading('app.pile.group_release')}
 			{box('release', words.release, pile.release)}
 		</>
 	);

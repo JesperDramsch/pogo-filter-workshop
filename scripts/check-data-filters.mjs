@@ -55,7 +55,9 @@
 //         "no" for every always-protected Pokémon (starred, tagged, hundo,
 //         nundo, inside the lucky-trade year floor, invested Dynamax, Good
 //         buddy, mythical, shiny legendary, legendary with a background)
-//         while plain dupes still match, so the view is never empty by design
+//         while plain dupes still match, so the view is never empty by design;
+//         ③a (safe) is ③ AND the ladder's negations, so it still shows the
+//         plain dupe and hides a shiny
 
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
@@ -1639,19 +1641,22 @@ console.log("\nD17 — a regional adjective resolves to that regional form, and 
   }
 }
 
-console.log("D18 — step ③ of a pile is the pile and the protection tail, and protects what it must");
+console.log("D18 — step ③ of a pile is the pile and the protection tail, and protects what it must; ③a adds the ladder's negations");
 {
   // A synthetic one-species pile stands in when today's snapshot has no
   // events, so the property cannot pass by having nothing to check. The real
-  // event piles are held to the same composition: fams & tail, exactly. The
-  // tail reads protectNundos and mythTooManyOf, so the synthetic pile runs
-  // under the fixture config and under one that flips both.
+  // event piles are held to the same composition: ③b (release) is fams &
+  // tail, exactly, and ③a (safe) is release & the ladder's negations (no
+  // shiny, a stat below three bars, below 3*). The tail reads protectNundos
+  // and mythTooManyOf, so the synthetic pile runs under the fixture config
+  // and under one that flips both.
   const ALT_CONFIG = { ...FIXTURE_CONFIG, protectNundos: true, mythTooManyOf: ["Darkrai"] };
   for (const [cfgName, cfg] of [["fixture config", FIXTURE_CONFIG], ["nundos protected, Darkrai carved", ALT_CONFIG]]) {
     const { PROTECTED, RELEASABLE } = pileCases(cfg);
     for (const loc of localeNames) {
       const kw = pogoKeywords(loc);
       const tail = protectionTail(kw, cfg, tailOptions(cfg, loc));
+      const ladderNots = `!${kw.flag.shiny}&0-2${kw.iv.atk},0-2${kw.iv.def},0-2${kw.iv.hp}&0*,1*,2*`;
       const result = cfg === FIXTURE_CONFIG
         ? buildResult(loc)
         : buildFilters(DEFAULT_HUNDOS, DEFAULT_LUCKIES, cfg, [], loc, makeTFn(loc));
@@ -1659,12 +1664,13 @@ console.log("D18 — step ③ of a pile is the pile and the protection tail, and
       const trash = result.trash;
       for (const ev of result.eventFilters || []) {
         if (ev.release !== `${ev.overview}&${tail.join("&")}`) bad.push(`${ev.id}: release is not overview & tail`);
+        if (ev.safe !== `${ev.release}&${ladderNots}`) bad.push(`${ev.id}: safe is not release & the ladder's negations`);
         if (trash && ev.release.includes(trash)) bad.push(`${ev.id}: release still carries the trash filter`);
       }
       const pile = candyFamilyNames(PILE_SPECIES, loc).length > 0
         ? `+${pokemonNameFor(String(PILE_DEX), loc)}&${tail.join("&")}` : "";
       if (!pile) bad.push("no localised pile species");
-      const verdict = (o) => evalFilterDetailed(pile, pileMon(loc, o), loc);
+      const verdict = (o, str = pile) => evalFilterDetailed(str, pileMon(loc, o), loc);
       for (const [label, o] of PROTECTED) {
         const v = verdict(o);
         if (v.verdict !== false) bad.push(`${label}: verdict ${v.verdict}${v.unknown.length ? ` (unknown ${v.unknown.join(" ")})` : ""}`);
@@ -1675,7 +1681,16 @@ console.log("D18 — step ③ of a pile is the pile and the protection tail, and
       }
       // A Pokémon outside the pile is never in its step ③.
       if (verdict({ families: ["notinthepile"] }).verdict !== false) bad.push("a Pokémon outside the pile matched");
-      check(`${loc} (${cfgName}): ${(result.eventFilters || []).length} event pile(s) + 1 synthetic; ${PROTECTED.length} protected kinds held, ${RELEASABLE.length} releasable kinds shown`,
+      // ③a of the synthetic pile: the plain dupe (3/7/9) is a leftover and
+      // shows; a shiny is what the ladder's shiny step keeps, so it is hidden.
+      const safe = pile && `${pile}&${ladderNots}`;
+      const rowOf = (label) => RELEASABLE.find(([l]) => l === label)[1];
+      const plain = verdict(rowOf("plain dupe"), safe);
+      if (plain.verdict !== true) bad.push(`③a hides the plain dupe: verdict ${plain.verdict}${plain.unknown.length ? ` (unknown ${plain.unknown.join(" ")})` : ""}`);
+      const shiny = verdict(rowOf("shiny"), safe);
+      if (shiny.verdict !== false) bad.push(`③a shows a shiny: verdict ${shiny.verdict}${shiny.unknown.length ? ` (unknown ${shiny.unknown.join(" ")})` : ""}`);
+      if (verdict({ families: ["notinthepile"] }, safe).verdict !== false) bad.push("a Pokémon outside the pile matched ③a");
+      check(`${loc} (${cfgName}): ${(result.eventFilters || []).length} event pile(s) + 1 synthetic; ${PROTECTED.length} protected kinds held, ${RELEASABLE.length} releasable kinds shown, ③a shows the plain dupe and hides a shiny`,
         bad.length === 0, bad.slice(0, 4).join(" | "));
     }
   }

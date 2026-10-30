@@ -2,9 +2,19 @@
 
 One row per Sorting pile: the question you're asking when you open it, and
 the ① keep steps. Read the steps top to bottom and stop once you have enough.
-③ (pile & protection tail) has the same shape everywhere; the tail reads two
-settings, protect nundos and the mythicals you have too many of, and nothing
-else (docs/sorting-workflow-spec.md, "Protection tail").
+③ has the same shape everywhere and comes as two strings: ③a, the leftovers
+(pile & protection tail & the negation of every ① step that has one, so
+nothing a step would have kept is in it), and ③b, everything not starred or
+tagged (pile & protection tail). The tail reads two settings, protect nundos
+and the mythicals you have too many of, and nothing else
+(docs/sorting-workflow-spec.md, "Protection tail"). Ready to evolve has no ③:
+what can still evolve is never a leftover.
+
+A step's negation, for ③a: `shiny` → `!shiny`, `3-4` → `0-2attack,0-2defense,0-2hp`
+(one stat below three bars), `3*` and `4*,3*` → `0*,1*,2*`, `evolve` → `!evolve`,
+`background` → `!background`, `lucky` → `!lucky`, `3-4attack` → `0-2attack`. `4*`
+needs none (the tail's `!4*` holds a hundo), and a species list, a PvP
+pattern, a roster, a tag or "untraded" step has none: those don't narrow ③a.
 
 ## Building blocks
 
@@ -51,7 +61,7 @@ then `3-4` is fine (best first, then wider), but `3-4` then `4*` would be cut.
 | Received trades | Can't be traded again: which ones stay? | 4\* → shiny → lucky → 3-4 → 3\* → PvP → still to evolve |
 | Shadows | Which shadows to keep, purify or TM? | 4\* → shiny → meta → 3\* → `3-4attack` → PvP → still to evolve, keep 2 (one stays shadow, the second is purified and evolved up the line) |
 | Dynamax | Which Max ones are worth the Max Particles? | G-max → Max attacker roster → 4\* → shiny → 3-4 → 3\* |
-| Ready to evolve | What do I evolve now? | new Pokédex entry: 4\* → shiny → 3-4 → 3\*, then tagged Dex-Evolve |
+| Ready to evolve | What do I evolve now? | new Pokédex entry: 4\* → shiny → 3-4 → 3\*, then tagged Dex-Evolve; no ③ |
 | Meta | Raid and PvP keepers, top 7 per type | 4\* → shiny → 3-4 → 3\* → PvP, up to the meta budget |
 | Watchlist | Not meta yet, something's brewing | same as meta, up to the watchlist budget |
 | Non-meta | Everything else | same as meta, up to the non-meta budget |

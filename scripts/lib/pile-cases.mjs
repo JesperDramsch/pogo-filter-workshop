@@ -10,6 +10,11 @@
 // PROTECTED only when cfg.protectNundos, and a mythical named in
 // cfg.mythTooManyOf is a spare and RELEASABLE (the plain "mythical" row is a
 // species the carve does not name, so it stays PROTECTED).
+//
+// Step ③ comes as two strings (buildPile): ③b (release) is held to every row
+// here; ③a (safe, the leftovers) also ANDs each lens's negation, so the
+// "plain dupe" row must still show in it and the "shiny" row is hidden
+// wherever a shiny lens exists (check-piles P10, D18's synthetic pile).
 import { candyFamilyNames, ivToBar, speciesForOutput, starFromIVs } from "../../src/App.jsx";
 import { pokemonNameFor, resolveSpeciesInfo } from "../../src/data/species.js";
 
