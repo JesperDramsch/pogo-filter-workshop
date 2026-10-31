@@ -1865,8 +1865,10 @@ export function speciesForOutput(name, outputLocale) {
 }
 
 // Capitalizes for + filter syntax (PoGo accepts case-insensitive but
-// capitalized reads better in copy-pasted filters).
-function capFirst(s) {
+// capitalized reads better in copy-pasted filters). Also sentence-cases panel,
+// pile and accordion titles: the bundles keep them lowercase mid-phrase ("mega
+// raids", "check a Pokémon"); caseless scripts (ja, zh-TW) pass through.
+export function capFirst(s) {
 	if (!s) return s;
 	return s.charAt(0).toUpperCase() + s.slice(1);
 }
@@ -7807,6 +7809,7 @@ export default function App() {
 													<AreaGroup id='raids' title={t('app.collapsible.aux_section_raids')} hint={t('app.group_hint.raids')} accent='#F5B82E'>
 													<BossCollapsible
 														icon={Target}
+														hook={t('app.hook.raids_legendary')}
 														titleKey='app.collapsible.aux_raids_legendary'
 														fetchedAt={raidBossesFetchedAt}
 														bossesByTier={raidFilters}
@@ -7824,6 +7827,7 @@ export default function App() {
 
 													<BossCollapsible
 														icon={Target}
+														hook={t('app.hook.raids_mega')}
 														titleKey='app.collapsible.aux_raids_mega'
 														fetchedAt={raidBossesFetchedAt}
 														bossesByTier={raidFilters}
@@ -7841,6 +7845,7 @@ export default function App() {
 
 													<BossCollapsible
 														icon={Target}
+														hook={t('app.hook.raids_other')}
 														titleKey='app.collapsible.aux_raids_other'
 														fetchedAt={raidBossesFetchedAt}
 														bossesByTier={raidFilters}
@@ -10141,7 +10146,7 @@ function Collapsible({ icon, label, hook, open, onToggle, children }) {
 			>
 				<TileIcon icon={icon} accent={accent} />
 				<span className='min-w-0 flex-1'>
-					<span className='mono text-sm font-semibold text-[#E6EDF3]'>{label}</span>
+					<span className='mono text-sm font-semibold text-[#E6EDF3]'>{capFirst(label)}</span>
 					{hook && <span className='block text-xs text-[#8B98A5] mt-1 leading-relaxed'>{hook}</span>}
 				</span>
 				{open ? (
@@ -10624,7 +10629,7 @@ function ToolTile({ title, hook, chip, icon, accent, open, children }) {
 				<TileIcon icon={icon} accent={accent} />
 				<span className='min-w-0 flex-1'>
 					<span className='flex flex-wrap items-center gap-2'>
-						<span className='mono text-sm font-semibold text-[#E6EDF3]'>{title}</span>
+						<span className='mono text-sm font-semibold text-[#E6EDF3]'>{capFirst(title)}</span>
 						{chip && (
 							<span className='mono text-[10px] px-1.5 py-0.5 rounded-sm' style={{ color: accent, border: `1px solid ${accent}55` }}>
 								{chip}
@@ -10961,7 +10966,7 @@ function TrainerAccordion({ name, icon: Icon, teaser, accent, highlight, childre
 				<ChevronRight size={12} className='text-[#8090A0] details-arrow shrink-0' />
 				{Icon && <Icon size={14} strokeWidth={1.75} className='shrink-0' style={{ color: accent || '#8090A0' }} aria-hidden='true' />}
 				<span className='mono text-sm font-medium' style={{ color: accent || '#E6EDF3' }}>
-					{name}
+					{capFirst(name)}
 				</span>
 				{teaser && <span className='mono text-[11px] text-[#8090A0] truncate'>· {teaser}</span>}
 			</summary>
@@ -11359,7 +11364,7 @@ function RocketCollapsible({
 			: 0);
 	const age = formatSyncAge(fetchedAt, t);
 	const headerLabel = t(showBosses ? 'app.collapsible.aux_rocket_bosses' : 'app.collapsible.aux_rocket_grunts');
-	const hook = showGrunts ? t('app.hook.rocket') : undefined;
+	const hook = t(showBosses ? 'app.hook.rocket_bosses' : 'app.hook.rocket');
 	const countLabel = t('app.collapsible.aux_rocket_count', { params: { count: totalFilters } });
 	const footerLabel = age
 		? t('app.collapsible.aux_footer', { params: { count: countLabel, age } })

@@ -59,6 +59,7 @@
 //         ③a (safe) is ③ AND the ladder's negations, so it still shows the
 //         plain dupe and hides a shiny
 
+import { readFileSync } from "node:fs";
 import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
 import LILY_TYPES from "./__fixtures__/lily-dex-types.json";
@@ -69,7 +70,7 @@ import META_RANKINGS from "../src/data/meta-rankings.json";
 import { buildDataFilters, buildResult, FIXTURE_CONFIG, makeTFn } from "./lib/fixture.mjs";
 import {
   bossBoxKeys, bossCounterLabel, buildFilters, candyFamilyNames, DEFAULT_HUNDOS, DEFAULT_LUCKIES, evalFilterDetailed, protectionTail,
-  RAID_PANEL_TIERS, raidEventPanel,
+  RAID_PANEL_TIERS, raidEventPanel, capFirst,
 } from "../src/App.jsx";
 import { PILE_DEX, PILE_SPECIES, pileCases, pileMon, tailOptions } from "./lib/pile-cases.mjs";
 import { LOCALES } from "../src/i18n/index.js";
@@ -1722,6 +1723,20 @@ console.log("\nD12 — the raid panels split the standing tiers and the event ra
   for (const e of live) counts[raidEventPanel(e)]++;
   check(`the ${live.length} event raid(s) in the snapshot all land in a panel`,
     counts.legendary + counts.mega + counts.other === live.length, JSON.stringify(counts));
+}
+
+console.log("\nD13 — panel titles are sentence case, panels carry a subtitle");
+{
+  check("capFirst capitalises the first letter and leaves the rest",
+    capFirst("mega raids") === "Mega raids" && capFirst("check a Pokémon") === "Check a Pokémon" && capFirst("XXL") === "XXL");
+  check("capFirst passes caseless scripts, digits and empty input through",
+    capFirst("メガレイド") === "メガレイド" && capFirst("5★ raids") === "5★ raids" && capFirst("") === "");
+  check("capFirst handles an accented first letter (é)", capFirst("égalité") === "Égalité");
+  const panelLocales = Object.keys(LOCALES);
+  const bundles = Object.fromEntries(panelLocales.map((loc) => [loc, JSON.parse(readFileSync(new URL(`../src/locales/app/${loc}.json`, import.meta.url), "utf8"))]));
+  const KEYS = ["app.hook.rocket", "app.hook.rocket_bosses", "app.hook.raids_legendary", "app.hook.raids_mega", "app.hook.raids_other"];
+  const missing = panelLocales.flatMap((loc) => KEYS.filter((k) => !bundles[loc]?.[k]?.trim()).map((k) => `${loc}:${k}`));
+  check(`every Rocket and raid panel has a subtitle in all ${panelLocales.length} locales`, missing.length === 0, missing.slice(0, 5).join(", "));
 }
 
 console.log(`\n${failures === 0 ? "✓ All data-filter property checks passed." : `✗ ${failures} failure(s).`}`);
