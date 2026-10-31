@@ -57,6 +57,7 @@ import {
 import { regionForForm } from './data/form-region.js';
 import SpeciesInput from './SpeciesInput.jsx';
 import { megaPlans, rankMegaGroups } from './mega-boost.js';
+import { bonusNudges } from './bonus-nudges.js';
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from './i18n/pogo-keywords.js';
 import RAID_BOSSES from './data/raid-bosses.json';
 import EVENTS from './data/events.json';
@@ -7474,6 +7475,21 @@ export default function App() {
 				.filter((p) => p.boost.groups.length > 0),
 		[megaBoostFor, clockTick],
 	);
+	// Event bonuses that make an existing filter worth opening now (src/bonus-nudges.js).
+	const bonusNudgeRows = useMemo(() => bonusNudges(EVENTS.bonuses, Date.now()), [clockTick]);
+	// A nudge opens its area and brings its group into view, focus included, so
+	// a keyboard or screen-reader user lands where a sighted user is scrolled to.
+	const openNudge = (nudge) => {
+		goToArea(nudge.area, false);
+		if (typeof window === 'undefined') return;
+		window.requestAnimationFrame(() => {
+			const target = document.getElementById(`area-group-${nudge.group}`) || document.getElementById(`area-panel-${nudge.area}`);
+			if (!target) return;
+			target.setAttribute('tabindex', '-1');
+			target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			target.focus({ preventScroll: true });
+		});
+	};
 	const jobTagSettings = (
 		<JobTagsPanel config={config} setConfig={setConfig} copied={copied} copyToClipboard={copyToClipboard} t={t} />
 	);
@@ -7728,6 +7744,7 @@ export default function App() {
 											areaSettingsFor.catch
 										) : (
 											<>
+												<BonusNudges nudges={bonusNudgeRows} onOpen={openNudge} t={t} locale={locale} />
 												<AreaGroup id='clean' title={t('app.group.clean')} hint={t('app.group_hint.clean')} accent='#E74C3C'>
 												<FilterBox
 													label={t('app.filter.trash_label')}
@@ -10204,6 +10221,58 @@ function formatEventWindow(start, end, t, locale) {
 	return t('app.filter.event_window_upcoming_week', {
 		params: { dow: fmtDow.format(startMs), time: fmtTime.format(startMs) },
 	});
+}
+
+// "Tue 3 Nov, 20:00": an event bonus's end (or start), weekday included, since
+// a bonus window often runs past this week's weekdays. Locale-aware via Intl.
+function formatNudgeDate(ms, locale) {
+	return new Intl.DateTimeFormat(locale, {
+		weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false,
+	}).format(ms);
+}
+
+// The strip at the top of Catching: one row per live (or about to start)
+// event bonus that makes a filter the app already builds worth opening, as
+// "½ Stardust for trades / until Tue 3 Nov, 20:00 → trade filter". The copy is
+// the nudge kind's own translated string, never Leek Duck's English text.
+// Nothing renders when no bonus applies.
+function BonusNudges({ nudges, onOpen, t, locale }) {
+	if (!nudges || nudges.length === 0) return null;
+	const accent = '#F5B82E';
+	return (
+		<section aria-labelledby='bonus-nudges-heading' className='space-y-2'>
+			<h3 id='bonus-nudges-heading' className='mono text-xs uppercase tracking-widest font-semibold' style={{ color: accent }}>
+				{t('app.events.bonus.heading')}
+			</h3>
+			<ul className='space-y-2'>
+				{nudges.map((n) => {
+					const bonus = t(`app.events.bonus.kind.${n.kind}`, { params: { factor: n.factor, count: n.count } });
+					const when = n.live
+						? t('app.events.bonus.until', { params: { date: formatNudgeDate(n.end, locale) } })
+						: t('app.events.bonus.from', { params: { date: formatNudgeDate(n.start, locale) } });
+					const target = t(`app.events.bonus.target.${n.group.replace('-', '_')}`);
+					return (
+						<li key={n.id}>
+							<button
+								type='button'
+								onClick={() => onOpen(n)}
+								aria-label={t('app.events.bonus.go_aria', { params: { bonus, when, target } })}
+								className='w-full min-h-[44px] flex items-center gap-3 px-3 py-2 rounded-md border border-[#1F2933] bg-[#0E141A] text-left transition hover:border-[#2D3A47]'
+								style={{ borderLeft: `3px solid ${accent}` }}
+							>
+								<Sparkles size={14} className='shrink-0' style={{ color: accent }} aria-hidden='true' />
+								<span className='min-w-0 flex-1 text-sm text-[#E6EDF3]'>
+									{bonus}
+									<span className='block mono text-xs text-[#8B98A5] mt-0.5'>{when}</span>
+								</span>
+								<span className='mono text-xs shrink-0' style={{ color: accent }}>→ {target}</span>
+							</button>
+						</li>
+					);
+				})}
+			</ul>
+		</section>
+	);
 }
 
 // A key per boss in one list, for React and for copy state. A boss's id is the

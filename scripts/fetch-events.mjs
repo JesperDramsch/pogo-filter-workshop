@@ -36,6 +36,13 @@
 // here: if every mirror fails, each spawn's form is carried from the previous
 // snapshot by name, so a mirror outage never blocks the event sync.
 //
+// BONUSES: the same pass keeps every event's `details.bonuses` strings in a
+// separate array, `bonuses`, from every category, spawns or not (a Season or a GO
+// Pass has bonuses and no spawn list). Same window and carry-over as the rest.
+// src/bonus-nudges.js reads them into the "use this filter now" strip; any
+// phrasing it does not recognise is logged here, so a wording change on Leek
+// Duck's side shows up in the sync log rather than as a nudge that went quiet.
+//
 // Flags:
 //   --offline-ok   tolerate fetch failures if src/data/events.json exists.
 
@@ -48,6 +55,7 @@ import { LEGACY_COMMUNITY_DAYS, LEGACY_THROUGH, communityDaysFromFeed, mergeRoll
 import { isTakeoverEvent } from "./lib/rocket-takeover.mjs";
 import { fetchGameMaster, mechanicsBatchFloor, warnIfStale } from "./lib/game-master.mjs";
 import { buildNameIndex as buildFormIndex, resolveBossKey } from "./fetch-raid-bosses.mjs";
+import { unrecognisedBonuses } from "../src/bonus-nudges.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -252,6 +260,37 @@ export function signalsFromFeed(feed) {
   return out;
 }
 
+// Every event's bonus strings as { id, title, category, start, end,
+// isLocalTime, bonuses }, from every category, spawns or not. Window-filtered
+// like the rest; an event with no bonuses or no parseable window is left out.
+export function bonusesFromFeed(feed, now) {
+  const out = [];
+  for (const [category, list] of Object.entries(feed || {})) {
+    if (!Array.isArray(list)) continue;
+    for (const ev of list) {
+      const bonuses = (ev?.details?.bonuses || [])
+        .map((b) => (typeof b === "string" ? b : b?.text || b?.name || ""))
+        .map((b) => b.replace(/\s+/g, " ").trim())
+        .filter(Boolean);
+      if (bonuses.length === 0) continue;
+      const startMs = Date.parse(ev.start_time);
+      const endMs = Date.parse(ev.end_time);
+      if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) continue;
+      if (outsideWindow(startMs, endMs, now)) continue;
+      out.push({
+        id: slugId(category, ev.title, ev.start_time),
+        title: ev.title,
+        category,
+        start: ev.start_time,
+        end: ev.end_time,
+        isLocalTime: !!ev.is_local_time,
+        bonuses: [...new Set(bonuses)],
+      });
+    }
+  }
+  return out;
+}
+
 // The Community Day background pile's species (scripts/lib/community-days.mjs):
 // the pinned legacy list plus every Community Day this feed has ever listed.
 // Runs before the wild-spawn guard below, so a day with no spawn events still
@@ -419,6 +458,19 @@ async function main() {
   const signals = carryOver(signalsOut, previous?.signals, now);
   for (const id of signals.carriedIds) console.log(`  ↩ carried over ended signal ${id}`);
 
+  // Event bonuses (see the header), from every category. A feed that lists
+  // events but no bonus at all most likely moved the field; say so loudly.
+  const bonusesOut = bonusesFromFeed(feed, now);
+  const bonuses = carryOver(bonusesOut, previous?.bonuses, now);
+  for (const id of bonuses.carriedIds) console.log(`  ↩ carried over ended bonuses ${id}`);
+  if (bonusesOut.length === 0 && (previous?.bonuses || []).length > 0) {
+    console.warn("  ⚠ the feed carried no event bonuses at all; did details.bonuses move?");
+  }
+  const unknownBonuses = unrecognisedBonuses(bonusesOut);
+  if (unknownBonuses.length > 0) {
+    console.warn(`  ⚠ unrecognised bonus phrasings (no nudge, see src/bonus-nudges.js) — ${unknownBonuses.join(" · ")}`);
+  }
+
   // The guard is on what the FEED produced, before the carry-over: a feed that
   // yields nothing is a broken upstream, and a snapshot made only of carried
   // records would hide that behind a card that still looks populated.
@@ -454,11 +506,16 @@ async function main() {
   // Preserve the previous fetchedAt when the resolved event set is unchanged so
   // the daily sync doesn't open a PR just because the timestamp moved. The UI's
   // "last sync · Xh ago" still reflects the last time the content actually moved.
-  const newContent = { events: events.merged, eggPools: eggPools.merged, signals: signals.merged };
+  const newContent = { events: events.merged, eggPools: eggPools.merged, signals: signals.merged, bonuses: bonuses.merged };
   let fetchedAt = new Date().toISOString();
   if (
     previous?.fetchedAt &&
-    canonicalStringify({ events: previous.events, eggPools: previous.eggPools || [], signals: previous.signals || [] }) ===
+    canonicalStringify({
+      events: previous.events,
+      eggPools: previous.eggPools || [],
+      signals: previous.signals || [],
+      bonuses: previous.bonuses || [],
+    }) ===
       canonicalStringify(newContent)
   ) {
     fetchedAt = previous.fetchedAt;
@@ -469,6 +526,7 @@ async function main() {
   console.log(`✓ wrote ${OUT_PATH}`);
   console.log(`  events: ${eventsOut.length} surfaced · ${events.carriedIds.length} carried over · ${skippedNoSpawns} without spawns · ${skippedWindow} outside window · ${skippedCategory} skipped categories · ${totalUnresolved} unresolved spawn names`);
   console.log(`  egg pools: ${eggPoolsOut.length} surfaced · ${eggPools.carriedIds.length} carried over`);
+  console.log(`  bonuses: ${bonusesOut.length} events surfaced · ${bonuses.carriedIds.length} carried over · ${unknownBonuses.length} unrecognised phrasings`);
   failOnHeldBack(heldBack);
 }
 
