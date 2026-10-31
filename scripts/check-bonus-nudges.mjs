@@ -93,6 +93,8 @@ check("one species' Stardust bonus is not a catch-Stardust nudge", classifyBonus
 check("the Dynamax Cannon's half cost is not a trade-Stardust nudge", classifyBonus("1/2 Candy and Stardust cost to activate the Dynamax Cannon Adventure Effect")?.ignored === true);
 check("a shiny raid boss is not a raid nudge", classifyBonus("Increased chance of encountering Shiny Chandelure from Super Mega Raids")?.ignored === true);
 check("Max Battle catch Candy reads as Max Battles, not catch Candy", classifyBonus("1 additional Candy for catching Pokémon in Max Battles")?.kind === "max_bonus");
+check("2× catch Candy in Max Battles is a Max Battle bonus, not a wild-catch one", classifyBonus("2× Candy for catching Pokémon in Max Battles")?.kind === "max_bonus", JSON.stringify(classifyBonus("2× Candy for catching Pokémon in Max Battles")));
+check("2× catch Stardust in raids is a raid bonus, not a wild-catch one", classifyBonus("2× Stardust for catching Pokémon in raids")?.kind === "raid_bonus", JSON.stringify(classifyBonus("2× Stardust for catching Pokémon in raids")));
 check("empty input is unrecognised, not a crash", classifyBonus("") === null && classifyBonus(undefined) === null);
 
 // ── B3 ──

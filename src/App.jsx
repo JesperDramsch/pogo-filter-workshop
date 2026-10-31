@@ -10227,7 +10227,8 @@ function formatEventWindow(start, end, t, locale) {
 // a bonus window often runs past this week's weekdays. Locale-aware via Intl.
 function formatNudgeDate(ms, locale) {
 	return new Intl.DateTimeFormat(locale, {
-		weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false,
+		// hourCycle, not hour12: false, so midnight reads 00:00 and never 24:00.
+		weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
 	}).format(ms);
 }
 

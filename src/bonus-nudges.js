@@ -74,11 +74,13 @@ const RULES = [
 	{ kind: 'trade_candy', re: /\bCandy(?: XL)? (?:for|when) trading Pokémon\b/i },
 	// "2× Candy for catching Pokémon", "2x Catch Candy". A GO Pass Deluxe line
 	// is a paid tier and is ignored before it gets here.
-	{ kind: 'catch_candy', re: /^(\d)\s*[×x] (?:Candy for catching Pokémon|Catch Candy)\b/i, params: (m) => ({ factor: multiplier(m[1]) }) },
+	// The lookahead keeps a raid or Max Battle catch line out ("… Pokémon in
+	// raids" is a raid bonus, not a wild-catch one).
+	{ kind: 'catch_candy', re: /^(\d)\s*[×x] (?:Candy for catching Pokémon(?! in (?:raids|Max Battles))|Catch Candy)\b/i, params: (m) => ({ factor: multiplier(m[1]) }) },
 	// "2x Chance for Trainers level 31 and up to receive Candy XL from catching Pokémon"
 	{ kind: 'catch_xl', re: /Candy XL from catching Pokémon/i },
 	// "2× Stardust for catching Pokémon", "2× Catch Stardust"
-	{ kind: 'catch_stardust', re: /^(\d)\s*[×x] (?:Stardust for catching Pokémon|Catch Stardust)\b/i, params: (m) => ({ factor: multiplier(m[1]) }) },
+	{ kind: 'catch_stardust', re: /^(\d)\s*[×x] (?:Stardust for catching Pokémon(?! in (?:raids|Max Battles))|Catch Stardust)\b/i, params: (m) => ({ factor: multiplier(m[1]) }) },
 	// "1/2 Hatch Distance for Eggs placed in Incubators during the event", "1/4 Egg Hatch Distance"
 	{ kind: 'hatch_distance', re: /^(1\/2|1\/3|1\/4|3\/4) (?:Egg )?Hatch Distance\b/i, params: (m) => ({ factor: fraction(m[1]) }) },
 	// "3× Hatch Candy", "3× Hatch Stardust", "3× Hatch XP",
@@ -86,7 +88,7 @@ const RULES = [
 	{ kind: 'hatch_rewards', re: /^\d\s*[×x] Hatch (?:Candy|Stardust|XP)\b/i },
 	{ kind: 'hatch_rewards', re: /\bfrom hatching Eggs\b/i },
 	// Max Battles before raids: "Candy for catching Pokémon in Max Battles" must
-	// not read as a raid line, and "+1 Candy XL from Max Battles" as a catch one.
+	// not read as a raid line. The catch rules above exclude both settings.
 	// "1 additional Candy for catching Pokémon in Max Battles", "+1 Candy from Max Battles",
 	// "Additional Candy and Candy XL from Max Battles", "2× XP from completed Max Battles"
 	{ kind: 'max_bonus', re: /\b(?:Candy|XP|Stardust)\b.*\b(?:from|in) (?:completed )?Max Battles\b/i },
