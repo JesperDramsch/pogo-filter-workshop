@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-30T00:39:08.563Z",
+  "fetchedAt": "2026-10-31T12:44:26.629Z",
   "sources": {
     "classes": "game master",
     "released": "pvpoke/pvpoke",
@@ -943,6 +943,19 @@
       ]
     },
     {
+      "key": "609_1",
+      "dex": 609,
+      "kind": "mega",
+      "types": [
+        "ghost",
+        "fire"
+      ],
+      "boostTypes": [
+        "ghost",
+        "fire"
+      ]
+    },
+    {
       "key": "652_1",
       "dex": 652,
       "kind": "mega",
@@ -1019,9 +1032,7 @@
       ]
     }
   ],
-  "upcomingMegaDex": [
-    609
-  ],
+  "upcomingMegaDex": [],
   "showcase": {
     "coefficients": {
       "height": 800,
