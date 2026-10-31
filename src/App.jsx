@@ -57,6 +57,18 @@ import {
 import { regionForForm } from './data/form-region.js';
 import SpeciesInput from './SpeciesInput.jsx';
 import { megaPlans, rankMegaGroups } from './mega-boost.js';
+import {
+	wishTargetsFromConfig,
+	wishLinkFor,
+	newShareId,
+	cleanShareName,
+	isWishHash,
+	parseWishHash,
+	matchSharedBuddy,
+	applyWishToBuddies,
+	buddyTagPrefixFor,
+	WISH_MAX_NAME,
+} from './share-link.js';
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from './i18n/pogo-keywords.js';
 import RAID_BOSSES from './data/raid-bosses.json';
 import EVENTS from './data/events.json';
@@ -980,6 +992,12 @@ export const DEFAULT_CONFIG = {
 	// Trade buddies — list of { id, name, tagPrefix, events: [event-names] }
 	// tagPrefix matches any sub-tag (e.g. #Auri matches #Auri:hat-pika via PoGo prefix match).
 	buddies: [],
+	// Wish-list share links (src/share-link.js): the name a friend's app files
+	// this user's list under, and a per-install id generated on the first share
+	// so a later link updates that friend's buddy instead of adding another.
+	// Empty until the user shares; never part of any filter string.
+	shareName: '',
+	shareId: '',
 
 	// Scope safety
 	cpCap: 2000,
@@ -6393,9 +6411,18 @@ export default function App() {
 	const [currentStep, setCurrentStep] = useState(1);
 	const [filterArea, setFilterArea] = useState(() => areaFromHash() || FILTER_AREAS[0]);
 	const [areaSettings, setAreaSettings] = useState(areaSettingsFromHash);
-	const [view, setView] = useState(viewFromHash);
+	const [view, setView] = useState(() => (isWishHash(typeof window === 'undefined' ? '' : window.location.hash) ? 'workshop' : viewFromHash()));
+	// A #wish/ link (src/share-link.js) parses once, then the hash is swapped
+	// for the Trade area in place: the token leaves the history, a reload does
+	// not reopen the dialog, and the first-run redirect to #onboard (which only
+	// fires on an empty hash) does not swallow the link.
+	const [wishLink, setWishLink] = useState(null);
 	useEffect(() => {
 		const onHashChange = () => {
+			if (isWishHash(window.location.hash)) {
+				setWishLink(parseWishHash(window.location.hash));
+				window.history.replaceState(null, '', areaHash('trade', false));
+			}
 			setView(viewFromHash());
 			// If the hash points at a specific workshop step, sync currentStep.
 			const step = stepFromHash();
@@ -7202,7 +7229,10 @@ export default function App() {
 	// fires before storage has loaded, on another step, on another view or
 	// while the area shows its settings, so the first-run redirect to #onboard
 	// and a shared #workshop/<area>/settings link leave every flag alone.
-	const helpCanShow = loaded && view === 'workshop' && currentStep === STEP_NUMBER_BY_KEY.filter && !areaSettings;
+	// A pending wish-link dialog goes first: a friend's first visit lands on the
+	// Trade area, and its help sheet stacked under the dialog would be two
+	// modals at once. The sheet opens once the dialog is answered.
+	const helpCanShow = loaded && view === 'workshop' && currentStep === STEP_NUMBER_BY_KEY.filter && !areaSettings && !wishLink;
 	// The sheet belongs to the page it opened over. When that page moves under
 	// it (browser Back, a pasted hash, a tab change while another area's sheet
 	// is up) it closes rather than sitting over a page it does not describe.
@@ -8037,6 +8067,11 @@ export default function App() {
 																		<p className='mono text-[10.5px] text-[#8090A0] mt-1'>
 																			{t('app.filter.friend_collect_edit_pointer')}
 																		</p>
+																		<ShareWishLink
+																			config={config}
+																			targets={friendCollectTargets}
+																			onConfigChange={(patch) => setConfig((prev) => ({ ...prev, ...patch }))}
+																		/>
 																	</div>
 																) : (
 																	<p className='mono text-xs text-[#27AE60]'>
@@ -8210,6 +8245,26 @@ export default function App() {
 					if (typeof window !== 'undefined') window.location.hash = '#workshop/where';
 				}}
 			/>
+			{/* Waits for storage: accepting before the saved buddies have loaded
+			    would write over them. */}
+			{loaded && (
+				<WishLinkDialog
+					result={wishLink}
+					buddies={config.buddies || []}
+					outputLocale={effectiveOutputLocale}
+					onClose={() => setWishLink(null)}
+					onAccept={() => {
+						if (wishLink?.ok) {
+							setConfig((prev) => ({
+								...prev,
+								buddies: applyWishToBuddies(prev.buddies || [], wishLink.wish, normalizeBuddyTarget).buddies,
+							}));
+							announce(t('app.share.receive.done', { params: { name: wishLink.wish.name } }));
+						}
+						setWishLink(null);
+					}}
+				/>
+			)}
 			<HundoRegionalNotice notices={hundoRegionalNotice} onClose={() => setHundoRegionalNotice([])} />
 			{/* Sequential, not stacked: the regional notice (if any) shows first. */}
 			{hundoRegionalNotice.length === 0 && (
@@ -13771,6 +13826,169 @@ function HundoRegionalNotice({ notices, onClose }) {
 						{t('app.regional_sync.ok')}
 					</button>
 				</div>
+		</Dialog>
+	);
+}
+
+// Sender half of a wish-list share link (src/share-link.js). Sits under the
+// curated "collect for me" string in the Trade area: the same targets that
+// string still asks for travel in the link, nothing else. The name is what the
+// friend's app files the list under; it is stored so the next share is one tap.
+function ShareWishLink({ config, targets, onConfigChange }) {
+	const { t } = useTranslation();
+	const announce = useAnnounce();
+	const nameId = useId();
+	const [name, setName] = useState(config.shareName || '');
+	const [state, setState] = useState(null); // null | 'copied' | 'shared' | { link }
+	const wire = useMemo(() => wishTargetsFromConfig(config, targets), [config, targets]);
+	const clean = cleanShareName(name);
+	const canShare = wire.length > 0 && clean.length > 0;
+	const nativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+
+	function linkNow() {
+		const id = config.shareId || newShareId();
+		const patch = {};
+		if (id !== config.shareId) patch.shareId = id;
+		if (clean !== config.shareName) patch.shareName = clean;
+		if (Object.keys(patch).length) onConfigChange(patch);
+		const base = `${window.location.origin}${window.location.pathname}${window.location.search}`;
+		return wishLinkFor({ id, name: clean, targets: wire }, base);
+	}
+	function flash(next) {
+		setState(next);
+		if (typeof next === 'string') setTimeout(() => setState(null), 2500);
+	}
+	function copy() {
+		const link = linkNow();
+		const fail = () => {
+			// Clipboard refused (iframe, permissions): show the link to copy by hand.
+			setState({ link });
+			announce(t('app.share.copy_failed'), { assertive: true });
+		};
+		if (navigator.clipboard?.writeText) {
+			navigator.clipboard.writeText(link).then(() => {
+				flash('copied');
+				announce(t('app.share.copied'));
+			}, fail);
+		} else fail();
+	}
+	function share() {
+		const link = linkNow();
+		navigator
+			.share({ title: t('app.share.native_title', { params: { name: clean } }), url: link })
+			.then(() => flash('shared'))
+			.catch(() => {});
+	}
+
+	if (targets.length === 0) return null;
+	return (
+		<div className='pt-3 border-t border-[#1F2933] space-y-2'>
+			<div className='mono text-[10.5px] uppercase tracking-wider text-[#E91E63]'>{t('app.share.title')}</div>
+			<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
+				{t('app.share.intro', { params: { count: wire.length } })}
+			</p>
+			<div className='flex flex-wrap items-end gap-2'>
+				<label htmlFor={nameId} className='mono text-[11px] text-[#8090A0] w-full'>
+					{t('app.share.name_label')}
+				</label>
+				<input
+					id={nameId}
+					type='text'
+					value={name}
+					maxLength={WISH_MAX_NAME}
+					autoComplete='nickname'
+					onChange={(e) => setName(e.target.value)}
+					placeholder={t('app.share.name_placeholder')}
+					className='mono text-sm bg-[#0F1419] border border-[#2D3A47] rounded-sm px-2 py-1.5 text-[#E6EDF3] min-h-[44px] flex-1 min-w-[10rem]'
+				/>
+				<button
+					type='button'
+					onClick={copy}
+					disabled={!canShare}
+					className='mono text-xs bg-[#E91E63]/20 hover:bg-[#E91E63]/30 disabled:opacity-40 disabled:cursor-not-allowed text-[#E91E63] px-3 rounded-sm transition min-h-[44px]'
+				>
+					{state === 'copied' ? t('app.share.copied') : t('app.share.copy')}
+				</button>
+				{nativeShare && (
+					<button
+						type='button'
+						onClick={share}
+						disabled={!canShare}
+						className='mono text-xs border border-[#E91E63]/40 hover:bg-[#E91E63]/10 disabled:opacity-40 disabled:cursor-not-allowed text-[#E91E63] px-3 rounded-sm transition min-h-[44px]'
+					>
+						{t('app.share.native')}
+					</button>
+				)}
+			</div>
+			{wire.length === 0 && <p className='mono text-[11px] text-[#27AE60]'>{t('app.share.nothing_left')}</p>}
+			{wire.length > 0 && !clean && <p className='mono text-[11px] text-[#8090A0]'>{t('app.share.name_needed')}</p>}
+			{state && typeof state === 'object' && (
+				<input
+					readOnly
+					aria-label={t('app.share.manual_label')}
+					value={state.link}
+					onFocus={(e) => e.target.select()}
+					className='mono text-[11px] w-full bg-[#0F1419] border border-[#2D3A47] rounded-sm px-2 py-1.5 text-[#E6EDF3]'
+				/>
+			)}
+			<p className='mono text-[10.5px] text-[#8090A0] leading-relaxed'>{t('app.share.update_note')}</p>
+		</div>
+	);
+}
+
+// Receiver half: opened by a #wish/ link. Says who sent what and whether it
+// adds a trade buddy or updates one, and only writes on an explicit yes. A link
+// that does not parse gets a plain explanation instead of a silent landing page.
+function WishLinkDialog({ result, buddies, outputLocale, onAccept, onClose }) {
+	const { t } = useTranslation();
+	if (!result) return null;
+	if (!result.ok) {
+		return (
+			<Dialog onClose={onClose} label={t('app.share.receive.error_title')} className='border border-[#2D3A47] rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'>
+				<h2 className='mono text-base font-semibold text-[#E6EDF3]'>{t('app.share.receive.error_title')}</h2>
+				<p className='mono text-xs text-[#8090A0] leading-relaxed'>
+					{t(`app.share.receive.error.${result.code}`, { fallback: t('app.share.receive.error.garbled') })}
+				</p>
+				<div className='flex justify-end'>
+					<button type='button' onClick={onClose} className='mono text-xs bg-[#2D3A47] hover:bg-[#3A4A5A] text-[#E6EDF3] px-3 rounded-sm transition min-h-[44px]'>
+						{t('app.regional_sync.ok')}
+					</button>
+				</div>
+			</Dialog>
+		);
+	}
+	const { wish } = result;
+	const hit = matchSharedBuddy(buddies, wish);
+	const title = t('app.share.receive.title', { params: { name: wish.name, count: wish.targets.length } });
+	return (
+		<Dialog onClose={onClose} label={title} className='border border-[#E91E63]/40 rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'>
+			<h2 className='mono text-base font-semibold text-[#E91E63]'>{title}</h2>
+			<ul className='flex flex-wrap gap-1.5' aria-label={t('app.share.receive.list_label')}>
+				{wish.targets.map((tg) => (
+					<li key={tg.species} className='mono text-xs text-[#E6EDF3] border border-[#2D3A47] rounded-sm px-2 py-1'>
+						{capFirst(speciesForOutput(tg.species, outputLocale))}
+						{tg.gender === 'female' && ' ♀'}
+						{tg.gender === 'male' && ' ♂'}
+					</li>
+				))}
+			</ul>
+			{wish.unresolved > 0 && (
+				<p className='mono text-[11px] text-[#F5B82E]'>{t('app.share.receive.unresolved', { params: { count: wish.unresolved } })}</p>
+			)}
+			<p className='mono text-xs text-[#8090A0] leading-relaxed'>
+				{hit
+					? t('app.share.receive.updates', { params: { buddy: hit.name } })
+					: t('app.share.receive.adds', { params: { name: wish.name, tag: `#${buddyTagPrefixFor(wish.name)}` } })}
+			</p>
+			<p className='mono text-[11px] text-[#8090A0] leading-relaxed'>{t('app.share.receive.your_rules')}</p>
+			<div className='flex flex-wrap justify-end gap-2'>
+				<button type='button' onClick={onClose} className='mono text-xs border border-[#2D3A47] hover:bg-[#1F2933] text-[#8B98A5] px-3 rounded-sm transition min-h-[44px]'>
+					{t('app.share.receive.decline')}
+				</button>
+				<button type='button' onClick={onAccept} className='mono text-xs bg-[#E91E63]/20 hover:bg-[#E91E63]/30 text-[#E91E63] px-3 rounded-sm transition min-h-[44px]'>
+					{hit ? t('app.share.receive.accept_update') : t('app.share.receive.accept_add')}
+				</button>
+			</div>
 		</Dialog>
 	);
 }
