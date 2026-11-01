@@ -6,14 +6,19 @@
 //   S1 — the link carries exactly what the sender's own string still asks for
 //   S2 — round trip: species, gender and form refinements survive, by dex key
 //   S3 — locale independence: a German sender, an English receiver
-//   S4 — a second link from the same sender updates, never duplicates
-//   S5 — a hand-made buddy with the same name is adopted, not doubled
+//   S4 — a second link from the same sender is preselected onto their buddy
+//        and updates it, keeping everything the receiver set up
+//   S5 — guesses rank candidates but never merge silently; the receiver can
+//        overrule them
 //   S6 — junk links are refused with a code, never a throw
 //   S7 — the receiver's buddy really emits a catch filter for the wish
+//   S8 — generated tag prefixes never prefix-match another buddy's (the
+//        in-game search matches #tags by prefix)
+//   S9 — an empty list ("I have everything") clears or removes, never errors
 //
 // Run with: npm run test:sharelink  (or npx vite-node scripts/check-share-link.mjs)
 
-import { buildFilters, DEFAULT_CONFIG, normalizeBuddyTarget } from "../src/App.jsx";
+import { buildFilters, DEFAULT_CONFIG, normalizeBuddyTarget, tagClashes } from "../src/App.jsx";
 import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
 import {
   wishTargetsFromConfig,
@@ -21,6 +26,11 @@ import {
   encodeWishToken,
   parseWishHash,
   applyWishToBuddies,
+  rankBuddyCandidates,
+  freeTagPrefix,
+  clashingPrefixes,
+  tagPrefixesClash,
+  buddyTagPrefixFor,
   cleanShareName,
   WISH_HASH_PREFIX,
   WISH_MAX_TOKEN,
@@ -76,11 +86,14 @@ const rawJson = new TextDecoder().decode(Uint8Array.from(atob(rawToken.padEnd(Ma
 check("payload names no species in any locale", !/wadribie|combee|vulpix|pikachu/i.test(rawJson), rawJson);
 
 console.log("S3 + S7 — an English receiver gets a working catch filter");
-const applied = applyWishToBuddies([], wish, normalizeBuddyTarget, 1700000000000);
-check("one buddy created", applied.created && applied.buddies.length === 1);
+const firstRank = rankBuddyCandidates([], wish);
+check("no buddies yet: preselection is 'new'", firstRank.best === null && firstRank.candidates.length === 0);
+const applied = applyWishToBuddies([], wish, normalizeBuddyTarget, { mode: "new" });
+check("one buddy created", applied.action === "added" && applied.buddies.length === 1);
 const buddy = applied.buddies[0];
 check("buddy carries the sender id", buddy.shareId === "sender-1");
-check("buddy tag prefix from the name", buddy.tagPrefix === "Trade-Jürgenユウキ", buddy.tagPrefix);
+check("internal id is opaque, not the name", !/j(ü|u)rgen/i.test(buddy.id), buddy.id);
+check("buddy tag prefix from the name, any script", buddy.tagPrefix === "Trade-Jürgenユウキ", buddy.tagPrefix);
 const receiver = { ...DEFAULT_CONFIG, buddies: applied.buddies };
 const recRes = buildFilters([], [], receiver, [], "en");
 const catchLine = recRes.buddyCatchFilters[0]?.filter || "";
@@ -90,29 +103,76 @@ const en = pogoKeywords("en");
 check("female-only guard rides along", segs(catchLine).includes(`!combee,${en.flag.female}`), catchLine);
 check("Alolan-only Vulpix guard rides along", segs(catchLine).some((s) => s.startsWith("!vulpix,")), catchLine);
 
-console.log("S4 — a second link updates the same buddy");
+console.log("S4 — a second link from the same sender");
 const later = wishTargetsFromConfig(sender, buildFilters([], ["mauzi", "pikachu"], sender, [], "de").friendCollectTargets);
 const second = parseWishHash(hashOf(wishLinkFor({ id: "sender-1", name: "Jürgen", targets: later }, "/")));
 const customised = applied.buddies.map((b) => ({ ...b, tagPrefix: "Trade-J", rawAppend: "cp-1500", wantsTradeEvos: true, active: false }));
-const updated = applyWishToBuddies(customised, second.wish, normalizeBuddyTarget);
-check("no new buddy", !updated.created && updated.buddies.length === 1);
+const secondRank = rankBuddyCandidates(customised, second.wish);
+check("same sender id is preselected as certain, even after a rename",
+  secondRank.best === buddy.id && secondRank.candidates[0].match === "certain");
+const updated = applyWishToBuddies(customised, second.wish, normalizeBuddyTarget, { mode: "update", buddyId: secondRank.best });
+check("no new buddy", updated.action === "updated" && updated.buddies.length === 1);
 check("Pikachu dropped off after the lucky landed", !updated.buddies[0].targetSpecies.some((t) => t.species === "pikachu"),
   updated.buddies[0].targetSpecies.map((t) => t.species).join(","));
 check("receiver's tag prefix, raw append and trade-evo toggle kept",
   updated.buddies[0].tagPrefix === "Trade-J" && updated.buddies[0].rawAppend === "cp-1500" && updated.buddies[0].wantsTradeEvos === true);
 check("the receiver's name for the buddy is kept", updated.buddies[0].name === "Jürgen ユウキ");
 check("an inactive buddy is switched back on", updated.buddies[0].active === true);
-const other = parseWishHash(hashOf(wishLinkFor({ id: "sender-2", name: "Jürgen ユウキ", targets }, "/")));
-const sameName = applyWishToBuddies(applied.buddies, other.wish, normalizeBuddyTarget);
-check("a different sender with the same name gets their own buddy", sameName.created === true && sameName.buddies.length === 2);
-check("and their own tag prefix", sameName.buddies[1].tagPrefix === "Trade-Jürgenユウキ2", sameName.buddies[1].tagPrefix);
 
-console.log("S5 — a hand-made buddy is adopted");
-const handMade = [{ id: "auri-1", name: "Auri", tagPrefix: "Trade-Auri", targetSpecies: [], wantsTradeEvos: false, rawAppend: "", active: true }];
+console.log("S5 — guesses, never silent merges");
+const other = parseWishHash(hashOf(wishLinkFor({ id: "sender-2", name: "Jürgen ユウキ", targets }, "/")));
+const otherRank = rankBuddyCandidates(applied.buddies, other.wish);
+check("a different sender with the same name is not guessed onto a linked buddy", otherRank.best === null && otherRank.candidates[0].match === null);
+const handMade = [
+  { id: "x-1", name: "Someone", tagPrefix: "Trade-Someone", targetSpecies: [], active: true },
+  { id: "auri-1", name: "Auri", tagPrefix: "Trade-Auri", targetSpecies: [], wantsTradeEvos: false, rawAppend: "", active: true },
+];
 const auri = parseWishHash(hashOf(wishLinkFor({ id: "auri-id", name: "auri", targets }, "/")));
-const adopted = applyWishToBuddies(handMade, auri.wish, normalizeBuddyTarget);
-check("same-name buddy updated in place", !adopted.created && adopted.buddies.length === 1 && adopted.buddyId === "auri-1");
-check("and remembers the sender from now on", adopted.buddies[0].shareId === "auri-id");
+const auriRank = rankBuddyCandidates(handMade, auri.wish);
+check("same-name hand-made buddy ranked first as likely", auriRank.best === "auri-1" && auriRank.candidates[0].match === "likely");
+check("the other buddies still offered, unranked", auriRank.candidates.length === 2 && auriRank.candidates[1].match === null);
+const adopted = applyWishToBuddies(handMade, auri.wish, normalizeBuddyTarget, { mode: "update", buddyId: "auri-1" });
+check("chosen buddy updated in place", adopted.action === "updated" && adopted.buddies.length === 2);
+check("and remembers the sender from now on", adopted.buddies[1].shareId === "auri-id");
+check("and is certain next time", rankBuddyCandidates(adopted.buddies, auri.wish).candidates[0].match === "certain");
+const overruled = applyWishToBuddies(handMade, auri.wish, normalizeBuddyTarget, { mode: "new" });
+check("the receiver can overrule the guess and add a new buddy", overruled.action === "added" && overruled.buddies.length === 3);
+
+console.log("S8 — generated tag prefixes never prefix-match each other");
+const twoAlex = (() => {
+  let list = [];
+  for (const id of ["a", "b", "c"]) {
+    const w = parseWishHash(hashOf(wishLinkFor({ id, name: "Alex", targets }, "/"))).wish;
+    list = applyWishToBuddies(list, w, normalizeBuddyTarget, { mode: "new" }).buddies;
+  }
+  return list.map((b) => b.tagPrefix);
+})();
+check("three Alexes get three prefixes", new Set(twoAlex).size === 3, twoAlex.join(", "));
+check("number goes in front", twoAlex[1] === "Trade-2Alex" && twoAlex[2] === "Trade-3Alex", twoAlex.join(", "));
+const pairwise = twoAlex.flatMap((x, i) => twoAlex.filter((_, j) => j !== i).map((y) => [x, y]));
+check("no pair clashes by prefix in either direction", pairwise.every(([x, y]) => !tagPrefixesClash(x, y)));
+check("the app's own clash check agrees", twoAlex.every((x) => tagClashes(x, twoAlex, "en").prefixOf.length === 0));
+const alexander = [{ id: "z", name: "Alexander", tagPrefix: "Trade-Alexander" }];
+check("a new Alex next to Trade-Alexander is numbered too", freeTagPrefix("Alex", alexander) === "Trade-2Alex", freeTagPrefix("Alex", alexander));
+check("clashingPrefixes sees the reverse direction", clashingPrefixes("Trade-Alex", alexander).join() === "Trade-Alexander");
+check("any script: Japanese name keeps its letters", buddyTagPrefixFor("ユウキ") === "Trade-ユウキ");
+check("a typed prefix wins over the suggestion", applyWishToBuddies([], wish, normalizeBuddyTarget, { mode: "new", tagPrefix: "#Trade-JY" }).buddies[0].tagPrefix === "Trade-JY");
+
+console.log("S9 — an empty list clears, never errors");
+const doneLink = wishLinkFor({ id: "sender-1", name: "Jürgen", targets: [] }, "/");
+const doneParsed = parseWishHash(hashOf(doneLink));
+check("empty list parses", doneParsed.ok && doneParsed.wish.targets.length === 0, doneParsed.code);
+const doneRank = rankBuddyCandidates(updated.buddies, doneParsed.wish);
+check("and preselects the sender's buddy", doneRank.best === buddy.id);
+const mixedRank = rankBuddyCandidates([...handMade, { ...handMade[1], id: "auri-2", shareId: "auri-id" }], auri.wish);
+check("a certain match silences same-name guesses elsewhere",
+  mixedRank.candidates[0].buddy.id === "auri-2" && mixedRank.candidates.filter((c) => c.match).length === 1);
+const kept = applyWishToBuddies(updated.buddies, doneParsed.wish, normalizeBuddyTarget, { mode: "update", buddyId: buddy.id });
+check("keep: buddy stays with an empty wish list", kept.buddies.length === 1 && kept.buddies[0].targetSpecies.length === 0);
+const removed = applyWishToBuddies(updated.buddies, doneParsed.wish, normalizeBuddyTarget, { mode: "remove", buddyId: buddy.id });
+check("remove: buddy is gone", removed.action === "removed" && removed.buddies.length === 0);
+const emptySenderTargets = wishTargetsFromConfig(sender, buildFilters([], ["mauzi", "pikachu", "wadribie", "vulpix"], sender, [], "de").friendCollectTargets);
+check("a sender with everything covered sends an empty list", emptySenderTargets.length === 0);
 
 console.log("S6 — junk links are refused");
 const tok = (obj) => `${WISH_HASH_PREFIX}${btoa(JSON.stringify(obj)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")}`;

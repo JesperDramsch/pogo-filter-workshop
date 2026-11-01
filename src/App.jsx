@@ -64,9 +64,10 @@ import {
 	cleanShareName,
 	isWishHash,
 	parseWishHash,
-	matchSharedBuddy,
+	rankBuddyCandidates,
 	applyWishToBuddies,
-	buddyTagPrefixFor,
+	freeTagPrefix,
+	clashingPrefixes,
 	WISH_MAX_NAME,
 } from './share-link.js';
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from './i18n/pogo-keywords.js';
@@ -8067,17 +8068,20 @@ export default function App() {
 																		<p className='mono text-[10.5px] text-[#8090A0] mt-1'>
 																			{t('app.filter.friend_collect_edit_pointer')}
 																		</p>
-																		<ShareWishLink
-																			config={config}
-																			targets={friendCollectTargets}
-																			onConfigChange={(patch) => setConfig((prev) => ({ ...prev, ...patch }))}
-																		/>
 																	</div>
 																) : (
 																	<p className='mono text-xs text-[#27AE60]'>
 																		{t('app.filter.friend_collect_all_owned')}
 																	</p>
 																))}
+															{/* Outside the branch above on purpose: once the last
+			                            target lands, an empty link is what clears the list on
+			                            friends' side. */}
+															<ShareWishLink
+																config={config}
+																targets={friendCollectTargets}
+																onConfigChange={(patch) => setConfig((prev) => ({ ...prev, ...patch }))}
+															/>
 
 															{/* Fallback wishlists — blacklist of everything already owned. */}
 															<p
@@ -8253,13 +8257,17 @@ export default function App() {
 					buddies={config.buddies || []}
 					outputLocale={effectiveOutputLocale}
 					onClose={() => setWishLink(null)}
-					onAccept={() => {
+					onAccept={(choice) => {
 						if (wishLink?.ok) {
 							setConfig((prev) => ({
 								...prev,
-								buddies: applyWishToBuddies(prev.buddies || [], wishLink.wish, normalizeBuddyTarget).buddies,
+								buddies: applyWishToBuddies(prev.buddies || [], wishLink.wish, normalizeBuddyTarget, choice).buddies,
 							}));
-							announce(t('app.share.receive.done', { params: { name: wishLink.wish.name } }));
+							announce(
+								t(choice.mode === 'remove' ? 'app.share.receive.removed' : 'app.share.receive.done', {
+									params: { name: wishLink.wish.name },
+								}),
+							);
 						}
 						setWishLink(null);
 					}}
@@ -13842,7 +13850,8 @@ function ShareWishLink({ config, targets, onConfigChange }) {
 	const [state, setState] = useState(null); // null | 'copied' | 'shared' | { link }
 	const wire = useMemo(() => wishTargetsFromConfig(config, targets), [config, targets]);
 	const clean = cleanShareName(name);
-	const canShare = wire.length > 0 && clean.length > 0;
+	// An empty list is still worth sending: it tells friends' apps you are done.
+	const canShare = clean.length > 0;
 	const nativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
 	function linkNow() {
@@ -13921,7 +13930,7 @@ function ShareWishLink({ config, targets, onConfigChange }) {
 				)}
 			</div>
 			{wire.length === 0 && <p className='mono text-[11px] text-[#27AE60]'>{t('app.share.nothing_left')}</p>}
-			{wire.length > 0 && !clean && <p className='mono text-[11px] text-[#8090A0]'>{t('app.share.name_needed')}</p>}
+			{!clean && <p className='mono text-[11px] text-[#8090A0]'>{t('app.share.name_needed')}</p>}
 			{state && typeof state === 'object' && (
 				<input
 					readOnly
@@ -13936,11 +13945,31 @@ function ShareWishLink({ config, targets, onConfigChange }) {
 	);
 }
 
-// Receiver half: opened by a #wish/ link. Says who sent what and whether it
-// adds a trade buddy or updates one, and only writes on an explicit yes. A link
-// that does not parse gets a plain explanation instead of a silent landing page.
+// Receiver half: opened by a #wish/ link. Says who sent what, and lets the
+// receiver pick where it goes: update one of their buddies (the best guess is
+// preselected: the same sender id is certain, the same name only likely) or
+// add a new one under a tag that clashes with no other buddy's prefix. An empty
+// list means the sender has everything, and offers to remove their buddy.
+// Nothing is written without a press on the confirm button. A link that does
+// not parse gets a plain explanation instead of a silent landing page.
 function WishLinkDialog({ result, buddies, outputLocale, onAccept, onClose }) {
 	const { t } = useTranslation();
+	const wish = result?.ok ? result.wish : null;
+	const ranked = useMemo(() => (wish ? rankBuddyCandidates(buddies, wish) : { candidates: [], best: null }), [wish, buddies]);
+	const done = !!wish && wish.targets.length === 0;
+	const [pick, setPick] = useState(null);
+	const [tag, setTag] = useState('');
+	const pickName = useId();
+	const tagId = useId();
+	const clashId = useId();
+	// Preselect once per incoming link. Keyed on the link alone: re-running when
+	// the buddy list changes would throw away a choice the receiver just made.
+	useEffect(() => {
+		if (!wish) return;
+		setPick(ranked.best ?? (done ? ranked.candidates[0]?.buddy.id ?? null : 'new'));
+		setTag(freeTagPrefix(wish.name, buddies));
+	}, [wish]);
+
 	if (!result) return null;
 	if (!result.ok) {
 		return (
@@ -13957,37 +13986,124 @@ function WishLinkDialog({ result, buddies, outputLocale, onAccept, onClose }) {
 			</Dialog>
 		);
 	}
-	const { wish } = result;
-	const hit = matchSharedBuddy(buddies, wish);
-	const title = t('app.share.receive.title', { params: { name: wish.name, count: wish.targets.length } });
+
+	const title = done
+		? t('app.share.receive.title_done', { params: { name: wish.name } })
+		: t('app.share.receive.title', { params: { name: wish.name, count: wish.targets.length } });
+	const matched = ranked.candidates.filter((c) => c.match);
+	const others = ranked.candidates.filter((c) => !c.match);
+	const cleanTag = tag.trim().replace(/^#/, '');
+	const clashes = pick === 'new' ? clashingPrefixes(cleanTag, buddies) : [];
+	const chosen = ranked.candidates.find((c) => c.buddy.id === pick)?.buddy;
+	const nothingToDo = done && ranked.candidates.length === 0;
+
+	const option = (value, label, note) => (
+		<label key={value} className='flex items-start gap-2 min-h-[44px] py-2 px-2 rounded-sm border border-[#2D3A47] has-[:checked]:border-[#E91E63]/60 has-[:checked]:bg-[#E91E63]/5 cursor-pointer'>
+			<input
+				type='radio'
+				name={pickName}
+				value={value}
+				checked={pick === value}
+				onChange={() => setPick(value)}
+				className='mt-0.5 accent-[#E91E63] w-4 h-4 shrink-0'
+			/>
+			<span className='mono text-xs text-[#E6EDF3] leading-relaxed'>
+				{label}
+				{note && <span className='block text-[11px] text-[#8090A0]'>{note}</span>}
+			</span>
+		</label>
+	);
+	const buddyOption = ({ buddy, match }) =>
+		option(
+			buddy.id,
+			t(done ? 'app.share.receive.option_clear' : 'app.share.receive.option_update', {
+				params: { buddy: buddy.name, tag: `#${buddy.tagPrefix}` },
+			}),
+			match === 'certain'
+				? t('app.share.receive.match_certain')
+				: match === 'likely'
+					? t('app.share.receive.match_likely')
+					: null,
+		);
+
 	return (
-		<Dialog onClose={onClose} label={title} className='border border-[#E91E63]/40 rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl p-5 space-y-4'>
+		<Dialog onClose={onClose} label={title} className='border border-[#E91E63]/40 rounded-lg w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl p-5 space-y-4'>
 			<h2 className='mono text-base font-semibold text-[#E91E63]'>{title}</h2>
-			<ul className='flex flex-wrap gap-1.5' aria-label={t('app.share.receive.list_label')}>
-				{wish.targets.map((tg) => (
-					<li key={tg.species} className='mono text-xs text-[#E6EDF3] border border-[#2D3A47] rounded-sm px-2 py-1'>
-						{capFirst(speciesForOutput(tg.species, outputLocale))}
-						{tg.gender === 'female' && ' ♀'}
-						{tg.gender === 'male' && ' ♂'}
-					</li>
-				))}
-			</ul>
+			{!done && (
+				<ul className='flex flex-wrap gap-1.5' aria-label={t('app.share.receive.list_label')}>
+					{wish.targets.map((tg) => (
+						<li key={tg.species} className='mono text-xs text-[#E6EDF3] border border-[#2D3A47] rounded-sm px-2 py-1'>
+							{capFirst(speciesForOutput(tg.species, outputLocale))}
+							{tg.gender === 'female' && ' ♀'}
+							{tg.gender === 'male' && ' ♂'}
+						</li>
+					))}
+				</ul>
+			)}
 			{wish.unresolved > 0 && (
 				<p className='mono text-[11px] text-[#F5B82E]'>{t('app.share.receive.unresolved', { params: { count: wish.unresolved } })}</p>
 			)}
-			<p className='mono text-xs text-[#8090A0] leading-relaxed'>
-				{hit
-					? t('app.share.receive.updates', { params: { buddy: hit.name } })
-					: t('app.share.receive.adds', { params: { name: wish.name, tag: `#${buddyTagPrefixFor(wish.name)}` } })}
-			</p>
-			<p className='mono text-[11px] text-[#8090A0] leading-relaxed'>{t('app.share.receive.your_rules')}</p>
+
+			{nothingToDo ? (
+				<p className='mono text-xs text-[#8090A0] leading-relaxed'>{t('app.share.receive.done_nothing')}</p>
+			) : (
+				<fieldset className='space-y-1.5'>
+					<legend className='mono text-[11px] uppercase tracking-wider text-[#8090A0] mb-1.5'>
+						{t(done ? 'app.share.receive.legend_done' : 'app.share.receive.legend')}
+					</legend>
+					{matched.map(buddyOption)}
+					{!done && option('new', t('app.share.receive.option_new', { params: { name: wish.name } }))}
+					{others.map(buddyOption)}
+				</fieldset>
+			)}
+
+			{pick === 'new' && !done && (
+				<div className='space-y-1'>
+					<label htmlFor={tagId} className='mono text-[11px] text-[#8090A0]'>
+						{t('app.share.receive.tag_label')}
+					</label>
+					<input
+						id={tagId}
+						type='text'
+						value={tag}
+						onChange={(e) => setTag(e.target.value)}
+						aria-describedby={clashes.length ? clashId : undefined}
+						className='mono text-sm w-full bg-[#0F1419] border border-[#2D3A47] rounded-sm px-2 py-1.5 text-[#E6EDF3] min-h-[44px]'
+					/>
+					{clashes.length > 0 && (
+						<p id={clashId} className='mono text-[11px] text-[#F5B82E] leading-relaxed'>
+							{t('app.share.receive.tag_clash', { params: { tags: clashes.map((c) => `#${c}`).join(', ') } })}
+						</p>
+					)}
+				</div>
+			)}
+
+			{!done && <p className='mono text-[11px] text-[#8090A0] leading-relaxed'>{t('app.share.receive.your_rules')}</p>}
+
 			<div className='flex flex-wrap justify-end gap-2'>
 				<button type='button' onClick={onClose} className='mono text-xs border border-[#2D3A47] hover:bg-[#1F2933] text-[#8B98A5] px-3 rounded-sm transition min-h-[44px]'>
-					{t('app.share.receive.decline')}
+					{nothingToDo ? t('app.regional_sync.ok') : t('app.share.receive.decline')}
 				</button>
-				<button type='button' onClick={onAccept} className='mono text-xs bg-[#E91E63]/20 hover:bg-[#E91E63]/30 text-[#E91E63] px-3 rounded-sm transition min-h-[44px]'>
-					{hit ? t('app.share.receive.accept_update') : t('app.share.receive.accept_add')}
-				</button>
+				{done && chosen && (
+					<>
+						<button type='button' onClick={() => onAccept({ mode: 'update', buddyId: chosen.id })} className='mono text-xs border border-[#E91E63]/40 hover:bg-[#E91E63]/10 text-[#E91E63] px-3 rounded-sm transition min-h-[44px]'>
+							{t('app.share.receive.accept_keep_empty')}
+						</button>
+						<button type='button' onClick={() => onAccept({ mode: 'remove', buddyId: chosen.id })} className='mono text-xs bg-[#E91E63]/20 hover:bg-[#E91E63]/30 text-[#E91E63] px-3 rounded-sm transition min-h-[44px]'>
+							{t('app.share.receive.accept_remove', { params: { buddy: chosen.name } })}
+						</button>
+					</>
+				)}
+				{!done && (
+					<button
+						type='button'
+						disabled={!pick || (pick === 'new' && !cleanTag)}
+						onClick={() => onAccept(pick === 'new' ? { mode: 'new', tagPrefix: cleanTag } : { mode: 'update', buddyId: pick })}
+						className='mono text-xs bg-[#E91E63]/20 hover:bg-[#E91E63]/30 disabled:opacity-40 disabled:cursor-not-allowed text-[#E91E63] px-3 rounded-sm transition min-h-[44px]'
+					>
+						{pick === 'new' ? t('app.share.receive.accept_add') : t('app.share.receive.accept_update')}
+					</button>
+				)}
 			</div>
 		</Dialog>
 	);
@@ -15019,11 +15135,11 @@ function BuddyManager({ buddies, onChange }) {
 		const name = newName.trim();
 		if (!name) return;
 		// Default tag prefix `Trade-<Name>` (the tagging scheme's "promised to a
-		// person" tag): letters and digits of the name. Editable per buddy.
-		const bare = name.replace(/[^a-zA-ZäöüÄÖÜß0-9]/g, '');
-		if (!bare) return;
-		const tagPrefix = `Trade-${bare}`;
-		const id = bare.toLowerCase() + '-' + Date.now().toString(36);
+		// person" tag): letters and digits of the name in any script, numbered in
+		// front (`Trade-2Alex`) when it would prefix-clash with another buddy's.
+		// Same rule as a buddy added from a wish link. Editable per buddy.
+		const tagPrefix = freeTagPrefix(name, buddies);
+		const id = newShareId();
 		onChange([
 			...buddies,
 			{ id, name, tagPrefix, targetSpecies: [], wantsTradeEvos: false, rawAppend: '', active: true },

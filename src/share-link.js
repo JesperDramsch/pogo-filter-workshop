@@ -24,9 +24,11 @@
 // luckies or hundos. How the receiver sorts their own storage (keep old catches
 // back for a lucky trade, or not) is the receiver's call, set in their own app.
 //
-// The sender id is generated once per install and lets a second link from the
-// same friend UPDATE their buddy instead of adding a duplicate. When their lucky
-// lands they send a fresh link and the species drops off the receiver's list.
+// The sender id is generated once per install. The receiver's app uses it to
+// preselect the buddy a second link should update (rankBuddyCandidates), and
+// the receiver confirms or picks another. When the sender's lucky lands they
+// send a fresh link and the species drops off; once nothing is left the link
+// carries an empty list, which offers to remove the buddy.
 
 import { resolveSpecies, resolveSpeciesInfo } from './data/species.js';
 
@@ -162,53 +164,111 @@ export function parseWishHash(hash) {
 			dropSlots: strings(e.l),
 		});
 	}
-	if (targets.length === 0) return { ok: false, code: 'empty' };
+	// An empty list is a valid link: the sender has everything and wants their
+	// buddy cleared. A list whose entries ALL failed to resolve is not; that is
+	// an older app reading a newer roster, and clearing on it would be wrong.
+	if (targets.length === 0 && unresolved > 0) return { ok: false, code: 'empty' };
 	return { ok: true, wish: { id, name, targets, unresolved } };
 }
 
-// Default tag prefix for a new buddy, the same `Trade-<letters>` scheme the
-// buddy manager uses for one typed in by hand.
+// Default tag prefix for a buddy: `Trade-<letters and digits of the name>`.
+// Any script's letters count, so "ユウキ" gives `Trade-ユウキ` rather than an
+// empty tag. The buddy manager uses this too, for buddies typed in by hand.
 export function buddyTagPrefixFor(name) {
-	const bare = String(name).replace(/[^\p{L}\p{N}]/gu, '');
-	return bare ? `Trade-${bare}` : 'Trade-Friend';
+	const bare = String(name ?? '').replace(/[^\p{L}\p{N}]/gu, '');
+	return bare ? `Trade-${bare}` : '';
 }
 
-// Which existing buddy a wish link lands on: the one carrying the sender's id,
-// else a hand-made buddy (no id yet) with the same name, so a friend you already
-// set up by hand is updated rather than doubled. null → a new buddy.
-export function matchSharedBuddy(buddies, wish) {
-	const list = Array.isArray(buddies) ? buddies : [];
-	if (wish.id) {
-		const byId = list.find((b) => b && b.shareId === wish.id);
-		if (byId) return byId;
+// Pokémon GO matches `#tags` by prefix: a search for #Trade-Alex also lists
+// #Trade-Alex2 and #Trade-Alexander. Two buddy prefixes clash when either is a
+// prefix of the other (case-insensitive), because a search for one then finds
+// the other's promised trades.
+export function tagPrefixesClash(a, b) {
+	const x = String(a || '').toLocaleLowerCase();
+	const y = String(b || '').toLocaleLowerCase();
+	if (!x || !y) return false;
+	return x.startsWith(y) || y.startsWith(x);
+}
+
+// Existing prefixes that clash with `prefix`, excluding the buddy `exceptId`
+// (the one being edited or updated).
+export function clashingPrefixes(prefix, buddies, exceptId = null) {
+	return (Array.isArray(buddies) ? buddies : [])
+		.filter((b) => b && b.id !== exceptId && tagPrefixesClash(prefix, b.tagPrefix))
+		.map((b) => b.tagPrefix);
+}
+
+// A tag prefix for a new buddy called `name` that clashes with no existing
+// buddy. The number goes in FRONT of the name (`Trade-2Alex`), because a
+// number at the end (`Trade-Alex2`) still starts with `Trade-Alex` and so
+// clashes by construction. Editable afterwards like any other prefix.
+export function freeTagPrefix(name, buddies) {
+	const base = buddyTagPrefixFor(name) || 'Trade-Friend';
+	if (clashingPrefixes(base, buddies).length === 0) return base;
+	const bare = base.slice('Trade-'.length);
+	for (let n = 2; n < 1000; n++) {
+		const candidate = `Trade-${n}${bare}`;
+		if (clashingPrefixes(candidate, buddies).length === 0) return candidate;
 	}
-	const lower = wish.name.toLocaleLowerCase();
-	return list.find((b) => b && !b.shareId && String(b.name || '').toLocaleLowerCase() === lower) || null;
+	return `Trade-${newShareId().slice(0, 6)}${bare}`;
 }
 
-// Apply a parsed wish to the buddy list. Returns { buddies, buddyId, created }.
-// On an update the wish list REPLACES the buddy's targets (the link is the
-// sender's whole current list, so a species they got drops off) and everything
-// the receiver set up stays: name, tag prefix, trade-evo toggle, raw append.
-// `normalize` is normalizeBuddyTarget, passed in to keep this module free of
-// the App.jsx import graph.
-export function applyWishToBuddies(buddies, wish, normalize, now = Date.now()) {
+// The receiver chooses which buddy a link lands on; this ranks the guesses.
+// Returns [{ buddy, match }] with match 'certain' (same sender id), 'likely'
+// (same name, set up by hand, no sender id yet) or null, best first, then the
+// rest in their own order. `best` is the preselection: the top candidate when
+// it is certain or likely, else null for "add as a new buddy".
+export function rankBuddyCandidates(buddies, wish) {
+	const list = (Array.isArray(buddies) ? buddies : []).filter((b) => b && typeof b === 'object');
+	const lower = wish.name.toLocaleLowerCase();
+	const matchOf = (b) => {
+		if (wish.id && b.shareId === wish.id) return 'certain';
+		if (!b.shareId && String(b.name || '').toLocaleLowerCase() === lower) return 'likely';
+		return null;
+	};
+	const rank = { certain: 0, likely: 1 };
+	// Once the sender id settles it, a same-name guess on another buddy is only
+	// noise: that buddy is offered, just not flagged.
+	const certain = list.some((b) => matchOf(b) === 'certain');
+	const ranked = list
+		.map((buddy, i) => {
+			const match = matchOf(buddy);
+			return { buddy, match: certain && match === 'likely' ? null : match, i };
+		})
+		.sort((a, b) => (rank[a.match] ?? 2) - (rank[b.match] ?? 2) || a.i - b.i)
+		.map(({ buddy, match }) => ({ buddy, match }));
+	const best = ranked[0]?.match ? ranked[0].buddy.id : null;
+	return { candidates: ranked, best };
+}
+
+// Apply a parsed wish to the buddy list as the receiver chose:
+//   choice = { mode: 'update', buddyId }        replace that buddy's wish list
+//   choice = { mode: 'new', tagPrefix? }       add a buddy (prefix defaults to
+//                                               freeTagPrefix)
+//   choice = { mode: 'remove', buddyId }       the sender has everything: drop it
+// Returns { buddies, buddyId, action }. An update keeps everything the receiver
+// set up (name, tag prefix, trade-evo toggle, raw append) and from then on
+// remembers the sender's id. New buddies get a random internal id; the name
+// and tag are only labels. `normalize` is normalizeBuddyTarget, passed in to
+// keep this module free of the App.jsx import graph.
+export function applyWishToBuddies(buddies, wish, normalize, choice) {
 	const list = Array.isArray(buddies) ? buddies : [];
 	const targetSpecies = wish.targets.map(normalize).filter(Boolean);
-	const hit = matchSharedBuddy(list, wish);
-	if (hit) {
-		const next = { ...hit, targetSpecies, active: true };
-		if (wish.id) next.shareId = wish.id;
-		return { buddies: list.map((b) => (b === hit ? next : b)), buddyId: hit.id, created: false };
+	if (choice?.mode === 'remove') {
+		return { buddies: list.filter((b) => b?.id !== choice.buddyId), buddyId: choice.buddyId, action: 'removed' };
 	}
-	// Two friends who both go by "Alex" must not share a tag: a #Trade-Alex
-	// promised to one would read as promised to the other. Number the newcomer.
-	const taken = new Set(list.map((b) => String(b?.tagPrefix || '').toLocaleLowerCase()));
-	const basePrefix = buddyTagPrefixFor(wish.name);
-	let tagPrefix = basePrefix;
-	for (let n = 2; taken.has(tagPrefix.toLocaleLowerCase()); n++) tagPrefix = `${basePrefix}${n}`;
-	const id = `${tagPrefix.slice('Trade-'.length).toLowerCase()}-${now.toString(36)}`;
+	if (choice?.mode === 'update') {
+		const hit = list.find((b) => b?.id === choice.buddyId);
+		if (hit) {
+			const next = { ...hit, targetSpecies, active: true };
+			if (wish.id) next.shareId = wish.id;
+			return { buddies: list.map((b) => (b === hit ? next : b)), buddyId: hit.id, action: 'updated' };
+		}
+	}
+	const typed = String(choice?.tagPrefix ?? '').trim().replace(/^#/, '');
+	const tagPrefix = typed || freeTagPrefix(wish.name, list);
+	const id = newShareId();
 	const buddy = { id, name: wish.name, tagPrefix, targetSpecies, wantsTradeEvos: false, rawAppend: '', active: true };
 	if (wish.id) buddy.shareId = wish.id;
-	return { buddies: [...list, buddy], buddyId: id, created: true };
+	return { buddies: [...list, buddy], buddyId: id, action: 'added' };
 }
