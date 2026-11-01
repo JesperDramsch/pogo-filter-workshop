@@ -417,7 +417,7 @@
   "app.protect.xxs.label": "XXS size",
   "app.protect.xxs.why": "Very small Pokémon (size-record value)",
   "app.protect.irrbis_sizes.label": "Pumpkaboo: release XXL and XXS",
-  "app.protect.irrbis_sizes.why": "A Super Pumpkaboo is always XXL and a Small one always XXS, so the size guards protect nothing for it. On, the trash string releases XXL and XXS Pumpkaboo, including untraded ones, which its trade-evolution guard otherwise keeps. Average and Large Pumpkaboo, Gourgeist, XL, trades and buddies are untouched.",
+  "app.protect.irrbis_sizes.why": "A Super Pumpkaboo is always XXL and a Small one always XXS, so the size guards protect nothing for it. On, the trash string releases XXL and XXS Pumpkaboo, including untraded ones, which its trade-evolution guard otherwise keeps. The trade and buddy strings include them too, since a friend gets the free evolution. Average and Large Pumpkaboo, Gourgeist and XL are untouched.",
   "app.protect.new_evolutions.label": "New evolutions",
   "app.protect.new_evolutions.why": "Pokémon whose evolution would be a new dex entry",
   "app.protect.double_moved.label": "Second charge move",

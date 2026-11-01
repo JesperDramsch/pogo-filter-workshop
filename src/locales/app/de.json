@@ -417,7 +417,7 @@
   "app.protect.xxs.label": "XXS Größe",
   "app.protect.xxs.why": "Sehr kleine Pokémon (Größenrekord-Wert)",
   "app.protect.irrbis_sizes.label": "Irrbis: XXL und XXS freigeben",
-  "app.protect.irrbis_sizes.why": "Ein Super-Irrbis ist immer XXL, ein Mini-Irrbis immer XXS, die Größen-Schutzmaßnahmen schützen hier also nichts. An: Der Trash-String gibt XXL- und XXS-Irrbis frei, auch ungetauschte, die sonst die Tausch-Entwicklungs-Klausel behält. Irrbis in Normal- und Großgröße, Pumpdjinn, XL, Tausch und Kumpel bleiben unberührt.",
+  "app.protect.irrbis_sizes.why": "Ein Super-Irrbis ist immer XXL, ein Mini-Irrbis immer XXS, die Größen-Schutzmaßnahmen schützen hier also nichts. An: Der Trash-String gibt XXL- und XXS-Irrbis frei, auch ungetauschte, die sonst die Tausch-Entwicklungs-Klausel behält. Tausch- und Kumpel-Filter nehmen sie ebenfalls auf, denn ein Freund bekommt die kostenlose Entwicklung. Irrbis in Normal- und Großgröße, Pumpdjinn und XL bleiben unberührt.",
   "app.protect.new_evolutions.label": "Neue Entwicklungen",
   "app.protect.new_evolutions.why": "Pokémon, deren Evolution ein neuer Dex-Eintrag wäre",
   "app.protect.double_moved.label": "Zweiter Charge-Move",

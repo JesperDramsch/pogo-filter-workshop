@@ -417,7 +417,7 @@
   "app.protect.xxs.label": "Tamaño XXS",
   "app.protect.xxs.why": "Pokémon muy pequeños (récord de tamaño)",
   "app.protect.irrbis_sizes.label": "Pumpkaboo: liberar XXL y XXS",
-  "app.protect.irrbis_sizes.why": "Un Pumpkaboo de tamaño súper siempre es XXL y uno pequeño siempre XXS, así que las protecciones de tamaño no protegen nada en su caso. Activado: la cadena de basura libera los Pumpkaboo XXL y XXS, incluidos los no intercambiados que su protección de evolución por intercambio conservaría. Los Pumpkaboo de tamaño normal y grande, Gourgeist, XL, intercambios y amigos no se tocan.",
+  "app.protect.irrbis_sizes.why": "Un Pumpkaboo de tamaño súper siempre es XXL y uno pequeño siempre XXS, así que las protecciones de tamaño no protegen nada en su caso. Activado: la cadena de basura libera los Pumpkaboo XXL y XXS, incluidos los no intercambiados que su protección de evolución por intercambio conservaría. Las cadenas de intercambio y de amigos también los incluyen, ya que un amigo obtiene la evolución gratuita. Los Pumpkaboo de tamaño normal y grande, Gourgeist y XL no se tocan.",
   "app.protect.new_evolutions.label": "Nuevas evoluciones",
   "app.protect.new_evolutions.why": "Pokémon cuya evolución sería una nueva entrada en la Pokédex",
   "app.protect.double_moved.label": "Segundo movimiento cargado",

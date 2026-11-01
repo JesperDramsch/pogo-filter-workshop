@@ -417,7 +417,7 @@
   "app.protect.xxs.label": "Taille XXS",
   "app.protect.xxs.why": "Pokémon très petits (record de taille)",
   "app.protect.irrbis_sizes.label": "Pitrouille : libérer les XXL et XXS",
-  "app.protect.irrbis_sizes.why": "Une Pitrouille de taille super est toujours XXL et une petite toujours XXS, les protections de taille ne protègent donc rien chez elle. Activé : la chaîne poubelle libère les Pitrouille XXL et XXS, y compris les non échangées que sa protection d'évolution par échange garderait sinon. Les Pitrouille de taille normale et grande, Banshitrouye, XL, échanges et copains ne sont pas touchés.",
+  "app.protect.irrbis_sizes.why": "Une Pitrouille de taille super est toujours XXL et une petite toujours XXS, les protections de taille ne protègent donc rien chez elle. Activé : la chaîne poubelle libère les Pitrouille XXL et XXS, y compris les non échangées que sa protection d'évolution par échange garderait sinon. Les chaînes d'échange et de copains les incluent aussi, puisqu'un ami obtient l'évolution gratuite. Les Pitrouille de taille normale et grande, Banshitrouye et XL ne sont pas touchés.",
   "app.protect.new_evolutions.label": "Nouvelles évolutions",
   "app.protect.new_evolutions.why": "Pokémon dont l'évolution serait une nouvelle entrée Pokédex",
   "app.protect.double_moved.label": "Deuxième attaque chargée",

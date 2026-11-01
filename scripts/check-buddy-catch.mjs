@@ -416,6 +416,34 @@ console.log("\nSpare carve-out: annotated hundos only cover what they actually a
     !spared(run([combee({ gender: "female" })], { hundoGenders: { wadribie: ["male"] } }, ["wadribie"])));
   check("hundo annotated ♀ + buddy locked ♀ → carve-out fires",
     spared(run([combee({ gender: "female" })], { hundoGenders: { wadribie: ["female"] } }, ["wadribie"])));
+
+  // Cross-stage. Coverage is asked of the evolution line, the identity the
+  // hundo sort pile's `+family` already uses; an exact-name compare used to
+  // miss every pair where the hundo and the buddy's target sit on different
+  // stages, and the 3★ spares never reached the buddy.
+  const litwick = (over) => ({ species: "lichtel", expand: true, dropForms: [], dropSlots: [], gender: "any", ...over });
+  const chandelure = (over) => ({ species: "skelabra", expand: true, dropForms: [], dropSlots: [], gender: "any", ...over });
+  const widened = (f, sel) => segs(f).includes(`0*,1*,2*,${sel}`);
+  check("hundo Lichtel + buddy wants +Lichtel → carve-out fires (control)",
+    widened(run([litwick({})], {}, ["lichtel"]), "+lichtel"));
+  check("hundo Skelabra + buddy wants +Lichtel → carve-out fires",
+    widened(run([litwick({})], {}, ["skelabra"]), "+lichtel"));
+  check("hundo Lichtel + buddy wants +Skelabra → carve-out fires",
+    widened(run([chandelure({})], {}, ["lichtel"]), "+skelabra"));
+  check("hundo Laternecto + buddy wants bare Lichtel → carve-out fires",
+    widened(run([litwick({ expand: false })], {}, ["laternecto"]), "lichtel"));
+  check("hundo in an unrelated family → no carve-out",
+    !spared(run([litwick({})], {}, ["pikachu"])));
+  // The have-list scope still decides: an 'exact' hundo Skelabra says nothing
+  // about Lichtel, and an 'upward' hundo Lichtel covers what it can become.
+  check("hundo Skelabra scoped 'exact' + buddy wants Lichtel → no carve-out",
+    !spared(run([litwick({})], { hundoScope: { skelabra: "exact" } }, ["skelabra"])));
+  check("hundo Lichtel scoped 'upward' + buddy wants Skelabra → carve-out fires",
+    widened(run([chandelure({})], { hundoScope: { lichtel: "upward" } }, ["lichtel"]), "+skelabra"));
+  // A coin-flip split line is never settled by one specimen: a hundo Papinella
+  // is one branch of Waumpel, so a buddy asking for Pudox gets no spares.
+  check("hundo Papinella + buddy wants Pudox (other Waumpel branch) → no carve-out",
+    !spared(run([{ species: "pudox", expand: false, dropForms: [], dropSlots: [], gender: "any" }], {}, ["papinella"])));
 }
 
 // ─────────────────────────────────────────────────────────────────────────
