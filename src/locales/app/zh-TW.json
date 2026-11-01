@@ -417,7 +417,7 @@
   "app.protect.xxs.label": "XXS 尺寸",
   "app.protect.xxs.why": "非常小的寶可夢(尺寸紀錄值)",
   "app.protect.irrbis_sizes.label": "南瓜精：放行 XXL 和 XXS",
-  "app.protect.irrbis_sizes.why": "超大體型的南瓜精永遠是 XXL，小體型的永遠是 XXS，所以體型保護對牠什麼都保護不到。開啟：垃圾字串會放行 XXL 和 XXS 的南瓜精，包括交換進化保護原本會留下的未交換個體。普通和大體型的南瓜精、南瓜怪人、XL、交換和夥伴都不受影響。",
+  "app.protect.irrbis_sizes.why": "超大體型的南瓜精永遠是 XXL，小體型的永遠是 XXS，所以體型保護對牠什麼都保護不到。開啟：垃圾字串會放行 XXL 和 XXS 的南瓜精，包括交換進化保護原本會留下的未交換個體。交換和夥伴字串也會包含牠們，因為朋友可以免費進化。普通和大體型的南瓜精、南瓜怪人和 XL 都不受影響。",
   "app.protect.new_evolutions.label": "新進化",
   "app.protect.new_evolutions.why": "進化後會成為新圖鑑條目的寶可夢",
   "app.protect.double_moved.label": "第二招特殊招式",

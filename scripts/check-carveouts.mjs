@@ -650,7 +650,7 @@ console.log("\nS6 — blanket-covered keepers are dropped from the keeper rule, 
     all.every(sp => safeTerms.includes(resolveSpecies(sp, "de"))), `${safeTerms.length} of ${all.length}`);
 }
 
-console.log("\nI1 — Irrbis sizes toggle: the trash's size and trade-evo guards carve Irrbis out, nothing else moves");
+console.log("\nI1 — Irrbis sizes toggle: trash, trade and buddy size guards carve Irrbis out, the trade-evo guard only in trash");
 {
   // Irrbis (710) is always XXL (Super) or always XXS (Small), so `!xxl` and
   // `!xxs` protect nothing for it; with the toggle on they read `!xxl,irrbis`
@@ -658,8 +658,11 @@ console.log("\nI1 — Irrbis sizes toggle: the trash's size and trade-evo guards
   // guard gets the same carve or every untraded Irrbis would stay protected.
   // The name comes from pokemonNameFor in the output locale, never typed.
   const IRRBIS = "710", PIKACHU = "25";
-  const off = mergeImportedConfig({});
-  const on = mergeImportedConfig({ irrbisSizes: true });
+  // One buddy who wants trade evos, Irrbis among them, so the buddy catch
+  // filter exists and selects the family. The toggle is the only difference.
+  const julia = { id: "j", name: "Julia", tagPrefix: "Julia", active: true, rawAppend: "", wantsTradeEvos: true, targetSpecies: [] };
+  const off = mergeImportedConfig({ enabledTradeEvos: ["irrbis"], buddies: [julia] });
+  const on = mergeImportedConfig({ enabledTradeEvos: ["irrbis"], buddies: [julia], irrbisSizes: true });
   check("the toggle is expert-only, default off, in the size group",
     DEFAULT_CONFIG.irrbisSizes === false && SETTINGS_GROUPS.find((g) => g.id === "size").rows.some(([k, , x]) => k === "irrbisSizes" && x?.expertOnly));
   for (const loc of ["en", "de", "es", "fr", "zh-TW", "hi", "ja"]) {
@@ -679,8 +682,20 @@ console.log("\nI1 — Irrbis sizes toggle: the trash's size and trade-evo guards
       && hasClauseMatching(rOn.trash, new RegExp(`^!\\+${esc(teDisplay("irrbis", loc))},${esc(kw.flag.traded)},${esc(kw.flag.xxl)},${esc(kw.flag.xxs)}$`)), rOn.trash);
     const onlyThose = clauses(rOn.trash).filter((c) => !clauses(rOff.trash).includes(c));
     check(`${loc}: exactly three clauses change, !xl stays bare`, onlyThose.length === 3 && hasClauseMatching(rOn.trash, new RegExp(`^!${esc(kw.flag.xl)}$`)), onlyThose.join(" | "));
-    check(`${loc}: trade, gift and buddy filters are untouched`,
-      rOn.trade === rOff.trade && rOn.gift === rOff.gift && rOn.prestaged === rOff.prestaged && JSON.stringify(rOn.buddyCatchFilters) === JSON.stringify(rOff.buddyCatchFilters));
+    check(`${loc}: gift and pre-staged filters are untouched`, rOn.gift === rOff.gift && rOn.prestaged === rOff.prestaged);
+    // Trade and buddy catch take the same `,irrbis` carve on both size
+    // guards and nothing else: an Irrbis the trash would release is better
+    // handed to someone who gets the free evolution. The family's trade-evo
+    // guard is a trash clause only, so it has no counterpart here.
+    const buddyOff = rOff.buddyCatchFilters[0]?.filter || "", buddyOn = rOn.buddyCatchFilters[0]?.filter || "";
+    for (const [name, a, b] of [["trade", rOff.trade, rOn.trade], ["buddy catch", buddyOff, buddyOn]]) {
+      const gone = clauses(a).filter((c) => !clauses(b).includes(c)).sort();
+      const added = clauses(b).filter((c) => !clauses(a).includes(c)).sort();
+      check(`${loc}: ${name} swaps exactly !xxl and !xxs for their ${irrbis} carves`,
+        JSON.stringify(gone) === JSON.stringify([`!${kw.flag.xxl}`, `!${kw.flag.xxs}`].sort())
+        && JSON.stringify(added) === JSON.stringify([`!${kw.flag.xxl},${irrbis}`, `!${kw.flag.xxs},${irrbis}`].sort()),
+        `gone ${gone.join(" | ")}; added ${added.join(" | ")}`);
+    }
     // Fixtures: a definite verdict needs every term answered, so the mon
     // carries a move list, a candy tier and the evolvable flag.
     const mon = (dex, family, flags = {}) => ({
@@ -716,9 +731,15 @@ console.log("\nI1 — Irrbis sizes toggle: the trash's size and trade-evo guards
     check(`${loc}: a traded plain Irrbis is released either way (the guard never covered it)`,
       verdict(rOff.trash, tradedPlainIrrbis).verdict === true && verdict(rOn.trash, tradedPlainIrrbis).verdict === true,
       `off ${say(verdict(rOff.trash, tradedPlainIrrbis))}, on ${say(verdict(rOn.trash, tradedPlainIrrbis))}`);
-    check(`${loc}: an XXL Irrbis stays out of the trade filter either way`,
-      verdict(rOn.trade, xxlIrrbis).verdict === false && verdict(rOff.trade, xxlIrrbis).verdict === false,
-      `on ${say(verdict(rOn.trade, xxlIrrbis))}`);
+    check(`${loc}: an XXL Irrbis reaches the trade filter only with the toggle on`,
+      verdict(rOn.trade, xxlIrrbis).verdict === true && verdict(rOff.trade, xxlIrrbis).verdict === false,
+      `off ${say(verdict(rOff.trade, xxlIrrbis))}, on ${say(verdict(rOn.trade, xxlIrrbis))}`);
+    check(`${loc}: an XXL Irrbis reaches the buddy catch filter only with the toggle on`,
+      verdict(buddyOn, xxlIrrbis).verdict === true && verdict(buddyOff, xxlIrrbis).verdict === false,
+      `off ${say(verdict(buddyOff, xxlIrrbis))}, on ${say(verdict(buddyOn, xxlIrrbis))}`);
+    check(`${loc}: an XXL Pikachu stays out of trade and buddy catch with the toggle on`,
+      verdict(rOn.trade, xxlPikachu).verdict === false && verdict(buddyOn, xxlPikachu).verdict === false,
+      `trade ${say(verdict(rOn.trade, xxlPikachu))}, buddy ${say(verdict(buddyOn, xxlPikachu))}`);
   }
 }
 

@@ -417,7 +417,7 @@
   "app.protect.xxs.label": "XXS サイズ",
   "app.protect.xxs.why": "とても小さなポケモン (サイズ記録値)",
   "app.protect.irrbis_sizes.label": "バケッチャ：XXLとXXSを手放せるようにする",
-  "app.protect.irrbis_sizes.why": "とくだいサイズのバケッチャは常にXXL、ちいさいサイズは常にXXSなので、サイズのプロテクションはこの種には何も守らない。オン：ゴミ箱の文字列がXXLとXXSのバケッチャを手放せるようにする（交換進化プロテクションが本来守る未交換の個体も含む）。ふつうサイズとおおきいサイズのバケッチャ、パンプジン、XL、交換、相棒はそのまま。",
+  "app.protect.irrbis_sizes.why": "とくだいサイズのバケッチャは常にXXL、ちいさいサイズは常にXXSなので、サイズのプロテクションはこの種には何も守らない。オン：ゴミ箱の文字列がXXLとXXSのバケッチャを手放せるようにする（交換進化プロテクションが本来守る未交換の個体も含む）。交換用と相棒用の文字列にも含まれる（フレンドが無料で進化させられるため）。ふつうサイズとおおきいサイズのバケッチャ、パンプジン、XLはそのまま。",
   "app.protect.new_evolutions.label": "新しい進化",
   "app.protect.new_evolutions.why": "進化させると新しい図鑑エントリーになるポケモン",
   "app.protect.double_moved.label": "2 つ目のスペシャルアタック",

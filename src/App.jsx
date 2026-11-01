@@ -905,11 +905,13 @@ export const DEFAULT_CONFIG = {
 	// Irrbis (Pumpkaboo, 710) spawns in four sizes, and two of them fix the
 	// size flag: a Super Irrbis is always XXL and a Small one always XXS, so
 	// the two size guards protect nothing for that species and a costume week
-	// leaves hundreds of "XXL" Irrbis nobody can release. On, the TRASH filter
-	// alone carves Irrbis out of `!xxl` and `!xxs` and lets an XXL or XXS
-	// Irrbis past the family's untraded trade-evo guard
-	// (`!+Irrbis,traded,xxl,xxs`); an Average or Large Irrbis keeps that
-	// guard, and trade and buddy filters, `!xl` and Pumpdjinn are untouched.
+	// leaves hundreds of "XXL" Irrbis nobody can release. On, the trash, trade
+	// and buddy catch filters carve Irrbis out of `!xxl` and `!xxs` (an Irrbis
+	// the trash would release is better handed to a friend who gets the free
+	// evolution), and the trash alone lets an XXL or XXS Irrbis past the
+	// family's untraded trade-evo guard (`!+Irrbis,traded,xxl,xxs`); an
+	// Average or Large Irrbis keeps that guard, and `!xl` and Pumpdjinn are
+	// untouched.
 	// Hardcoded to the one species whose size flags carry no rarity;
 	// expert-only, default off so the default output stays byte-identical
 	// (docs/sorting-workflow-spec.md, "Areas").
@@ -2656,7 +2658,8 @@ export function buildFilters(
 	// regular Smeargles releasable/tradeable.
 	const smeargleName = pokemonNameFor('235', outputLocale)?.toLowerCase() || 'smeargle';
 	// Irrbis in the output locale, for the size carve-out (cfg.irrbisSizes):
-	// appended as `,irrbis` to the trash's `!xxl` and `!xxs`. Comma binds
+	// appended as `,irrbis` to `!xxl` and `!xxs` in the trash, trade and buddy
+	// catch filters, so the three never disagree on it. Comma binds
 	// tighter than `&`, so each clause reads "keep unless it is an Irrbis",
 	// the shape of the Smeargle carve above. The family's trade-evo guard gets
 	// the size terms instead (`,xxl,xxs`): only an XXL or XXS Irrbis loses it,
@@ -2955,7 +2958,6 @@ export function buildFilters(
 
 	// Regional groups
 	const groups = cfg.regionalGroups || {};
-	const hundoOutSet = new Set(hundosOut);
 	for (const [key, group] of Object.entries(REGIONAL_GROUPS)) {
 		const state = groups[key];
 		if (!state || !state.enabled) continue;
@@ -3189,11 +3191,11 @@ export function buildFilters(
 	// the trash protection (L738) so it isn't bulk-traded.
 	if (cfg.protectNewEvolutions)
 		push(tradeClauses, `!${kw.flag.new_evo},${kw.flag.mega}0`, tFn('app.clause_why.new_evolutions'));
-	if (cfg.protectXXL) push(tradeClauses, `!${kw.flag.xxl}`, tFn('app.clause_why.xxl_trade'));
+	if (cfg.protectXXL) push(tradeClauses, `!${kw.flag.xxl}${irrbisCarve}`, tFn('app.clause_why.xxl_trade'));
 	if (cfg.protectXL) push(tradeClauses, `!${kw.flag.xl}`, tFn('app.clause_why.xl_trade'));
 	// XXS completes the size-medal triplet — trash (L760) and buddyCatch already
 	// protect it; trade protected only XXL/XL. Reuses the shared `xxs` why-key.
-	if (cfg.protectXXS) push(tradeClauses, `!${kw.flag.xxs}`, tFn('app.clause_why.xxs'));
+	if (cfg.protectXXS) push(tradeClauses, `!${kw.flag.xxs}${irrbisCarve}`, tFn('app.clause_why.xxs'));
 	if (cfg.protectLegacyMoves) push(tradeClauses, legacyMovesClause(), tFn('app.clause_why.legacy_moves'));
 	pushSmeargleMovesetClauses(tradeClauses);
 	if (cfg.ageScopeDays && cfg.ageScopeDays > 0)
@@ -3268,9 +3270,9 @@ export function buildFilters(
 			const mp = maxProtectClause();
 			if (mp) push(clauses, mp[0], mp[1]);
 		}
-		if (cfg.protectXXL) push(clauses, `!${kw.flag.xxl}`, tFn('app.clause_why.xxl_trade'));
+		if (cfg.protectXXL) push(clauses, `!${kw.flag.xxl}${irrbisCarve}`, tFn('app.clause_why.xxl_trade'));
 		if (cfg.protectXL) push(clauses, `!${kw.flag.xl}`, tFn('app.clause_why.xl_trade'));
-		if (cfg.protectXXS) push(clauses, `!${kw.flag.xxs}`, tFn('app.clause_why.xxs'));
+		if (cfg.protectXXS) push(clauses, `!${kw.flag.xxs}${irrbisCarve}`, tFn('app.clause_why.xxs'));
 		if (cfg.protectLegacyMoves) push(clauses, legacyMovesClause(), tFn('app.clause_why.legacy_moves'));
 		pushSmeargleMovesetClauses(clauses);
 		// Guaranteed-lucky floor. Old untraded stock is the pool that makes a
@@ -3311,7 +3313,7 @@ export function buildFilters(
 	};
 	// Does the hundo I already own actually cover what this buddy asked for?
 	//
-	// `hundoOutSet` alone answers at species level, and that is the same
+	// Owning the species alone answers at species level, and that is the same
 	// whole-species-counts-as-done assumption the friend wishlist carried until
 	// its coverage gate learned to read the have-list annotations. It is worse
 	// on this side, because this branch hands Pokémon OVER: a hundo Kanto
@@ -3324,10 +3326,21 @@ export function buildFilters(
 	// everywhere else: an unannotated hundo covers the species exactly as it did
 	// before, so this only ever narrows the carve-out for someone who clicked a
 	// badge in step 3.
+	//
+	// Ownership is asked of the evolution line, not the exact name. A raw
+	// exact-name compare against the hundo list missed every cross-stage pair: a hundo
+	// Lichtel never released the 3★ Lichtel to a buddy asking for +Skelabra,
+	// nor a hundo Skelabra the ones for +Lichtel, although the hundo sort
+	// pile has always treated the whole `+family` as covered. lineCoverageOwner
+	// is the friend-collect side's answer to the same question: it honours the
+	// per-hundo scope (cfg.hundoScope), never lets one specimen settle a
+	// coin-flip split line, and names the MEMBER that fills the slot, so the
+	// form / gender / slot gates read that member's annotations.
+	const buddyHundoLine = buildOwnedLine(hundos, cfg.hundoSlots, cfg.hundoScope);
 	const hundoCoversTarget = (t) => {
-		if (!hundoOutSet.has(t.display)) return false;
 		const canon = canonKey(t.species);
-		return annotationCovers(canon, hundoAnn, {
+		const owner = lineCoverageOwner(resolveSpeciesInfo(canon)?.dex, buddyHundoLine);
+		return lineOwnerCovers(owner, hundoAnn, {
 			gender: t.gender === 'any' ? null : t.gender,
 			forms: keptOptions(
 				(regionalFormsFor(canon) || []).map((f) => f.key),
