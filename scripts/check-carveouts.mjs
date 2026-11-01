@@ -12,11 +12,15 @@
 //         hand-off pile has an output filter at all.
 
 import {
-  buildFilters, evalFilter, mergeImportedConfig, DEFAULT_CONFIG,
-  regionalProtectionsFor, ivToBar, starFromIVs,
+  buildFilters, evalFilter, evalFilterDetailed, mergeImportedConfig, DEFAULT_CONFIG,
+  regionalProtectionsFor, ivToBar, starFromIVs, protectionTail, SMEARGLE_FAST_MOVE,
 } from "../src/App.jsx";
-import { resolveSpecies } from "../src/data/species.js";
+import { pokemonNameFor, resolveSpecies } from "../src/data/species.js";
 import META_RANKINGS from "../src/data/meta-rankings.json";
+import { LOCALES } from "../src/i18n/index.js";
+import { moveKeyFromKeyword, moveKeywordFor, pogoKeywords } from "../src/i18n/pogo-keywords.js";
+import { makeTFn } from "./lib/fixture.mjs";
+import { pileMon, smeargleMovesetClauses, tailOptions } from "./lib/pile-cases.mjs";
 
 const tFn = (k) => k;
 let failures = 0;
@@ -166,6 +170,91 @@ console.log("\nSmeargle carve-out parity (trash = trade = buddy-catch)");
   const r2 = buildFilters([], [], mergeImportedConfig({ protectSmeargleLegacy: true }), [], "en", tFn);
   check("protectSmeargleLegacy=true: carve drops from trade too",
     !legacyOf(r2.trade).includes("smeargle") && legacyOf(r2.trade) === legacyOf(r2.trash));
+}
+
+console.log("\nSmeargle moveset protection (docs/smeargle-pvp-movesets.md)");
+{
+  // The seed and its storage form: canonical lowercase EN move names, the
+  // fast move fixed and never in the charged list.
+  check("the seed is Flying Press and Techno Blast, as canonical EN names",
+    JSON.stringify(DEFAULT_CONFIG.smeargleChargedMoves) === JSON.stringify(["flying press", "techno blast"]) && SMEARGLE_FAST_MOVE === "lock-on");
+  check("the toggle ships on", DEFAULT_CONFIG.protectSmeargleMovesets === true);
+  for (const loc of Object.keys(LOCALES)) {
+    for (const key of ["lock-on", "flying press", "techno blast"]) {
+      const spelled = LOCALES[loc].messages[`move.${key}`];
+      check(`${loc}: "${spelled}" resolves to ${key}`, !!spelled && moveKeyFromKeyword(spelled) === key && moveKeyFromKeyword(spelled.toUpperCase()) === key);
+    }
+  }
+  check("a hyphen-less or capitalised EN spelling resolves too", moveKeyFromKeyword("Lock On") === "lock-on" && moveKeyFromKeyword("FLYING PRESS") === "flying press");
+  check("a non-move resolves to null", moveKeyFromKeyword("nonsense") === null && moveKeyFromKeyword("") === null);
+  const imported = mergeImportedConfig({ smeargleChargedMoves: ["Techblaster", "Flying Press", "Zielschuss", "flying press"] });
+  check("an imported list is canonicalised, deduplicated and loses the fast move",
+    JSON.stringify(imported.smeargleChargedMoves) === JSON.stringify(["techno blast", "flying press"]), imported.smeargleChargedMoves.join(", "));
+  check("a config without the field gets the seed and the toggle",
+    JSON.stringify(mergeImportedConfig({}).smeargleChargedMoves) === JSON.stringify(DEFAULT_CONFIG.smeargleChargedMoves) && mergeImportedConfig({}).protectSmeargleMovesets === true);
+
+  // Clause shape per locale: one clause per charged move, right after the
+  // legacy clause, Smeargle via pokemonNameFor('235'), moves in the output
+  // locale lowercased with whitespace collapsed and hyphens kept, no slot
+  // prefix; the same clauses in trash, trade and buddy-catch, in the tail and
+  // the finder.
+  for (const loc of Object.keys(LOCALES)) {
+    const cfg = mergeImportedConfig({ buddies: [BUDDY] });
+    const r = buildFilters([], [], cfg, [], loc, makeTFn(loc));
+    const smeargle = pokemonNameFor("235", loc).toLowerCase();
+    const lockOn = moveKeywordFor("lock-on", loc);
+    const expected = cfg.smeargleChargedMoves.map((m) => `!${smeargle},!@${lockOn},!@${moveKeywordFor(m, loc)}`);
+    const movesetOf = (f) => clauses(f).filter((c) => c.startsWith(`!${smeargle},!@`));
+    const kw = pogoKeywords(loc);
+    const trashMoveset = movesetOf(r.trash);
+    check(`${loc}: trash carries ${expected.join(" ")}`, JSON.stringify(trashMoveset) === JSON.stringify(expected), trashMoveset.join(" "));
+    check(`${loc}: no clause carries a space or a slot prefix`, expected.every((c) => !/\s/.test(c) && !/@\d/.test(c)));
+    const trashAll = clauses(r.trash);
+    const legacyAt = trashAll.findIndex((c) => c.startsWith(`!@${kw.flag.special_move}`));
+    check(`${loc}: the clauses follow the legacy clause`, legacyAt >= 0 && JSON.stringify(trashAll.slice(legacyAt + 1, legacyAt + 3)) === JSON.stringify(expected));
+    check(`${loc}: trade == trash == buddy-catch`,
+      JSON.stringify(movesetOf(r.trade)) === JSON.stringify(expected) && JSON.stringify(movesetOf(r.buddyCatchFilters[0]?.filter || "")) === JSON.stringify(expected));
+    check(`${loc}: the why names the set`, r.trashClauses.filter((c) => expected.includes(c.clause)).every((c) => c.why && !c.why.includes("app.clause_why")));
+    // The tail: the same clauses, as a value, in every sorting pile's ③b.
+    const tail = protectionTail(kw, cfg, tailOptions(cfg, loc));
+    check(`${loc}: the protection tail carries the clauses, and pile-cases mirrors buildFilters`,
+      JSON.stringify(smeargleMovesetClauses(cfg, loc)) === JSON.stringify(expected) && expected.every((c) => tail.includes(c))
+      && r.sortingPiles.filter((p) => p.release).every((p) => expected.every((c) => p.release.includes(c))));
+    // The finder: Smeargle & Lock-On & (c1 | c2).
+    const chargers = cfg.smeargleChargedMoves.map((m) => moveKeywordFor(m, loc));
+    check(`${loc}: finder is ${smeargle}&@${lockOn}&${chargers.map((c) => `@${c}`).join(",")}`,
+      r.smeargleFinder.clause === `${smeargle}&@${lockOn}&${chargers.map((c) => `@${c}`).join(",")}` && r.smeargleFinder.moveCount === 2);
+    // The evaluator agrees: a Smeargle with Lock-On and a listed charged move
+    // is held by trash and found by the finder; one with Lock-On and another
+    // charged move, or without Lock-On, is trashable and not found.
+    const mon = (moves) => pileMon(loc, { dex: 235, species: smeargle, moves, flags: { legacyMove: true } }, "Smeargle", 235);
+    const kept = mon([lockOn, chargers[1]]);
+    const other = mon([lockOn, kw.flag.return]);
+    const noLockOn = mon([kw.flag.frustration, chargers[0]]);
+    const v = (str, m) => evalFilterDetailed(str, m, loc).verdict;
+    check(`${loc}: trash holds the moveset Smeargle and offers the other two`,
+      v(r.trash, kept) === false && v(r.trash, other) === true && v(r.trash, noLockOn) === true);
+    check(`${loc}: the finder finds only the moveset Smeargle`,
+      v(r.smeargleFinder.clause, kept) === true && v(r.smeargleFinder.clause, other) === false && v(r.smeargleFinder.clause, noLockOn) === false);
+  }
+  // The toggle gates the three filters, not the tail; an empty list emits
+  // nothing anywhere, which keeps the default byte-identical for a user who
+  // clears it.
+  const off = buildFilters([], [], mergeImportedConfig({ protectSmeargleMovesets: false, buddies: [BUDDY] }), [], "en", makeTFn("en"));
+  const on = buildFilters([], [], mergeImportedConfig({ buddies: [BUDDY] }), [], "en", makeTFn("en"));
+  const movesetOfEn = (f) => clauses(f).filter((c) => c.startsWith("!smeargle,!@"));
+  check("protectSmeargleMovesets off: trash, trade and buddy-catch drop the clauses and nothing else moves",
+    movesetOfEn(off.trash).length === 0 && movesetOfEn(off.trade).length === 0 && movesetOfEn(off.buddyCatchFilters[0].filter).length === 0
+    && clauses(off.trash).join("&") === clauses(on.trash).filter((c) => !c.startsWith("!smeargle,!@")).join("&")
+    && clauses(off.trade).join("&") === clauses(on.trade).filter((c) => !c.startsWith("!smeargle,!@")).join("&"));
+  check("protectSmeargleMovesets off: the sorting piles' ③ still holds the moveset Smeargle",
+    off.sortingPiles.filter((p) => p.release).every((p) => movesetOfEn(p.release).length === 2));
+  const empty = buildFilters([], [], mergeImportedConfig({ smeargleChargedMoves: [], buddies: [BUDDY] }), [], "en", makeTFn("en"));
+  check("an empty list emits nothing: trash, trade, buddy-catch, piles and finder",
+    movesetOfEn(empty.trash).length === 0 && movesetOfEn(empty.trade).length === 0 && movesetOfEn(empty.buddyCatchFilters[0].filter).length === 0
+    && empty.sortingPiles.every((p) => !p.release || movesetOfEn(p.release).length === 0) && empty.smeargleFinder.clause === "" && empty.smeargleFinder.moveCount === 0);
+  const one = buildFilters([], [], mergeImportedConfig({ smeargleChargedMoves: ["flying press"] }), [], "en", makeTFn("en"));
+  check("one charged move: one clause, finder without a comma", movesetOfEn(one.trash).length === 1 && one.smeargleFinder.clause === "smeargle&@lock-on&@flyingpress");
 }
 
 console.log("\nprotectBuddies (was-ever-a-buddy) mirrored into trade");
