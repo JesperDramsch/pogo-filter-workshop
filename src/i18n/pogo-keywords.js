@@ -126,3 +126,52 @@ export function flagKeyFromKeyword(value, outputLocale) {
   }
   return null;
 }
+
+// ── Move names ────────────────────────────────────────────────────────────
+//
+// The `move.*` keys of every locale file come from holoholo-text via
+// scripts/fetch-translations.mjs; the key is the move's canonical lowercase
+// EN name ("move.lock-on", "move.flying press"). Config stores a move as that
+// canonical EN name, the way species lists store canonical species names, and
+// output renders it in the OUTPUT locale.
+
+// The EN canonical name (the part after `move.`) for a localized or EN move
+// name typed in any locale, or null. Case-insensitive; hyphens and spaces are
+// compared loosely ("lock on", "Lock-On" and "Zielschuss" all give "lock-on"),
+// so a user who drops the hyphen still lands on the key.
+const MOVE_PREFIX = "move.";
+const looseMove = (s) => String(s).toLowerCase().replace(/[\s-]+/g, " ").trim();
+export function moveKeyFromKeyword(value) {
+  const want = looseMove(value);
+  if (!want) return null;
+  // EN first, so an EN canonical name round-trips to itself even when another
+  // locale happens to spell a different move the same way.
+  const order = ["en", ...Object.keys(LOCALES).filter((l) => l !== "en")];
+  for (const loc of order) {
+    const messages = LOCALES[loc]?.messages || {};
+    for (const [key, name] of Object.entries(messages)) {
+      if (!key.startsWith(MOVE_PREFIX)) continue;
+      const canonical = key.slice(MOVE_PREFIX.length);
+      if (looseMove(canonical) === want || looseMove(name) === want) return canonical;
+    }
+  }
+  return null;
+}
+
+// The move's name in the output locale as PoGo's `@move` search wants it:
+// lowercased, whitespace collapsed, hyphens kept, exactly as the Max-tank
+// charger clause spells `@1mudshot` and `@1lock-on`. Falls back to EN, then to
+// the canonical name itself, so a missing translation never drops a clause.
+export function moveKeywordFor(canonical, outputLocale) {
+  const key = `${MOVE_PREFIX}${String(canonical).toLowerCase()}`;
+  const messages = LOCALES[outputLocale]?.messages || LOCALES.en.messages;
+  const name = messages[key] ?? LOCALES.en.messages[key] ?? canonical;
+  return String(name).toLowerCase().replace(/\s+/g, "");
+}
+
+// The move's display name in a UI locale (for chips and hints), untouched.
+export function moveDisplayName(canonical, locale) {
+  const key = `${MOVE_PREFIX}${String(canonical).toLowerCase()}`;
+  const messages = LOCALES[locale]?.messages || LOCALES.en.messages;
+  return messages[key] ?? LOCALES.en.messages[key] ?? canonical;
+}

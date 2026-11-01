@@ -71,7 +71,7 @@ import {
 	clashingPrefixes,
 	WISH_MAX_NAME,
 } from './share-link.js';
-import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from './i18n/pogo-keywords.js';
+import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword, moveKeyFromKeyword, moveKeywordFor, moveDisplayName } from './i18n/pogo-keywords.js';
 import RAID_BOSSES from './data/raid-bosses.json';
 import EVENTS from './data/events.json';
 import COMMUNITY_DAYS from './data/community-days.json';
@@ -208,6 +208,11 @@ function navigateView(target) {
 // carve-out against it — a filter is over budget for reasons that are decided
 // several screens away from where the number is shown.
 export const SEARCH_CHAR_BUDGET = 5000;
+// The one fast move of the Smeargle moveset protection, as a canonical EN move
+// name (`move.lock-on`). Lock-On is the max-energy Smeargle set and the only
+// fast move in scope; a fast-move list times a charged list would match
+// crosses nobody asked for (docs/smeargle-pvp-movesets.md).
+export const SMEARGLE_FAST_MOVE = 'lock-on';
 // Share of that budget at which the PvP meta carve-out is worth warning about.
 // 20% is ~18 species: past there the list is the single biggest thing in the
 // filter and every further tap costs another ~56 characters.
@@ -874,6 +879,18 @@ export const DEFAULT_CONFIG = {
 	// adds `,smeargle` to the legacy-moves trash clause so regular Smeargles
 	// still go in the bin. Expert users can flip this on to revert.
 	protectSmeargleLegacy: false,
+	// Smeargle with a PvP moveset (docs/smeargle-pvp-movesets.md). Smeargle
+	// copies the fast move and the FIRST charged move of the Pokémon it
+	// photobombs and never holds a second charged move, so a set is one fast
+	// move and one charged move. The fast move is fixed to Lock-On
+	// (SMEARGLE_FAST_MOVE, the max-energy set); the charged list is the user's,
+	// stored as canonical lowercase EN move names (the `move.*` keys, the way
+	// species lists store canonical names) and rendered in the output locale.
+	// A Smeargle with Lock-On AND any listed charged move stays out of trash,
+	// trade and buddy-catch; the Sorting piles' ③ reads the list as a value.
+	// Emits nothing while the list is empty.
+	protectSmeargleMovesets: true,
+	smeargleChargedMoves: ['flying press', 'techno blast'], // (canonicalized on load)
 	protectBabies: true,
 	protectXXL: true,
 	protectXL: true,
@@ -1605,6 +1622,16 @@ export function mergeImportedConfig(raw, notices = []) {
 	// consistently. Idempotent on already-canonical user input.
 	const canonicalize = (arr) => (arr || []).map((s) => resolveSpecies(s) || s);
 	merged.mythTooManyOf = canonicalize(merged.mythTooManyOf);
+	// Charged moves are stored as canonical EN move names; a list typed or
+	// imported in another locale's spelling resolves here, once. The fast move
+	// is fixed, so it never sits in the list.
+	merged.smeargleChargedMoves = [
+		...new Set(
+			(Array.isArray(merged.smeargleChargedMoves) ? merged.smeargleChargedMoves : [])
+				.map((m) => moveKeyFromKeyword(m) || String(m).toLowerCase().trim())
+				.filter((m) => m && m !== SMEARGLE_FAST_MOVE),
+		),
+	];
 	// Seeded roster, not user data — see reconcileSeededList. `raw` is consulted
 	// rather than `merged` so a config that never carried the field reads as
 	// never-saved (take the feed) instead of as "saved, identical to default".
@@ -1911,9 +1938,13 @@ export function capFirst(s) {
 //
 // `opts.mythCarve` is the carve already resolved to the output locale
 // (speciesForOutput), `opts.smeargle` the localised Smeargle name for the
-// legacy-move clause; buildFilters resolves both once and passes them to every
-// buildPile call. Without them the tail protects every mythical and every
-// Smeargle, which is the safe direction.
+// legacy-move clause and `opts.smeargleMovesets` the Smeargle moveset clauses
+// (one per charged move in smeargleChargedMoves, spelled as the trash spells
+// them); buildFilters resolves all three once and passes them to every
+// buildPile call. The moveset list is read as a value, like the carve: its
+// trash toggle (protectSmeargleMovesets) does not reach the tail. Without the
+// options the tail protects every mythical and every Smeargle, which is the
+// safe direction, and no moveset Smeargle, which is not: pass them.
 //
 // Spelling notes, all checked in scripts/check-data-filters.mjs:
 //   - nundos use the positive contrapositive: PoGo ignores `!N` on IV tokens
@@ -1923,7 +1954,7 @@ export function capFirst(s) {
 //   - the legacy-move clause is the trash's shape (legacyMovesClause): keep
 //     `@special` unless it is purified Return, a shadow's Frustration or a
 //     Smeargle, whose Sketched moves all carry the flag
-export function protectionTail(kw, cfg, { mythCarve = [], smeargle } = {}) {
+export function protectionTail(kw, cfg, { mythCarve = [], smeargle, smeargleMovesets = [] } = {}) {
 	const clauses = [`!${kw.flag.favorite}`, '!#', '!4*'];
 	if (cfg.protectNundos) clauses.push(`1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`);
 	// The year floor's value, not its trash toggle (protectLuckyEligible): the
@@ -1943,6 +1974,10 @@ export function protectionTail(kw, cfg, { mythCarve = [], smeargle } = {}) {
 		`!${kw.flag.shiny},!${kw.flag.legendary}`,
 		`!${kw.flag.background},!${kw.flag.legendary}`,
 		`!@${kw.flag.special_move},@${kw.flag.return},@${kw.flag.frustration}${smeargle ? `,${smeargle}` : ''}`,
+		// A Smeargle with Lock-On and a listed charged move is a keeper the
+		// legacy clause just showed; one clause per charged move, the trash's
+		// shape (smeargleMovesetClause in buildFilters).
+		...smeargleMovesets.filter(Boolean),
 	);
 	return clauses;
 }
@@ -2232,8 +2267,9 @@ export const COMMUNITY_DAY_DEX = [
 //   table can't know in advance, such as one per active GBL cup, and `not` is
 //   the clause that negates the lens (`!shiny` for the shiny lens); a lens
 //   without one (a species list, a PvP pattern) does not narrow ③a
-//   tail: protectionTail's options ({ mythCarve, smeargle }), resolved once
-//   per buildFilters call so every pile carves the same mythicals
+//   tail: protectionTail's options ({ mythCarve, smeargle, smeargleMovesets }),
+//   resolved once per buildFilters call so every pile carves the same
+//   mythicals and keeps the same moveset Smeargle
 //   release: false makes a pile with no ③ at all (the evolve pile: what can
 //   still evolve is never a leftover); neither `release` nor `safe` is set
 // ③ comes out twice: `release` (③b) is head & tail, everything not starred
@@ -2540,8 +2576,39 @@ export function buildFilters(
 	// The mythicals carved out of `!mythical`, in the output locale, resolved
 	// once: the trash and every pile's protection tail read this one list.
 	const mythCarve = (cfg.mythTooManyOf || []).map((s) => speciesForOutput(s, outputLocale)).filter(Boolean);
+	// Smeargle with a PvP moveset (docs/smeargle-pvp-movesets.md): Lock-On plus
+	// any ONE listed charged move. One clause per charged move,
+	// `!smeargle,!@lock-on,!@<move>` = keep unless (Smeargle ∧ Lock-On ∧ move),
+	// OR binding tighter than `&` as in legacyMovesClause. A single clause
+	// naming every charged move would demand all of them, which a Smeargle can
+	// never carry (it has one charged slot). Move names in the output locale,
+	// spelled as the Max-tank charger clause spells `@1mudshot`: lowercased,
+	// whitespace collapsed, hyphen kept. No slot prefix: Lock-On is only ever
+	// a fast move and the listed moves only charged, and the app already ships
+	// bare `@frustration` / `@return`. Resolved once: the trash, trade and
+	// buddy-catch sites, every pile's protection tail and the finder tile in
+	// the Battle area read this one list. An empty list emits nothing.
+	const smeargleLockOn = moveKeywordFor(SMEARGLE_FAST_MOVE, outputLocale);
+	// [{ canonical, keyword, clause }] per charged move, deduplicated on the
+	// output spelling; the fast move never sits in the charged list.
+	const smeargleSets = [];
+	for (const m of cfg.smeargleChargedMoves || []) {
+		const canonical = String(m || '').toLowerCase().trim();
+		if (!canonical || canonical === SMEARGLE_FAST_MOVE) continue;
+		const keyword = moveKeywordFor(canonical, outputLocale);
+		if (!keyword || smeargleSets.some((s) => s.keyword === keyword)) continue;
+		smeargleSets.push({ canonical, keyword, clause: `!${smeargleName},!@${smeargleLockOn},!@${keyword}` });
+	}
+	const smeargleChargers = smeargleSets.map((s) => s.keyword);
+	const smeargleMovesets = smeargleSets.map((s) => s.clause);
 	// What every buildPile call hands protectionTail (see its comment).
-	const pileTail = { mythCarve, smeargle: smeargleName };
+	const pileTail = { mythCarve, smeargle: smeargleName, smeargleMovesets };
+	// The finder: every Smeargle that already carries one of the sets
+	// (comma-OR inside the charged clause). Expert-only in the UI.
+	const smeargleFinder = {
+		clause: smeargleChargers.length > 0 ? `${smeargleName}&@${smeargleLockOn}&${smeargleChargers.map((c) => `@${c}`).join(',')}` : '',
+		moveCount: smeargleChargers.length,
+	};
 	// The shared ① steps of docs/pile-purposes.md, for every pile from the
 	// hundo sort and the event piles down to the sorting piles. A pile's ①
 	// reads best first: each step must find something no earlier step found
@@ -2578,6 +2645,23 @@ export function buildFilters(
 		return cfg.protectSmeargleLegacy
 			? `!@${kw.flag.special_move}${suffix}`
 			: `!@${kw.flag.special_move}${suffix},${smeargleName}`;
+	};
+	// The Smeargle moveset clauses, pushed right after the legacy clause at
+	// its three sites (trash, trade, buddy-catch; check-carveouts pins the
+	// parity). The why names the set in the UI locale, as the Max-tank hint
+	// names its chargers.
+	const pushSmeargleMovesetClauses = (arr) => {
+		if (!cfg.protectSmeargleMovesets) return;
+		const fast = tFn(`move.${SMEARGLE_FAST_MOVE}`, { fallback: SMEARGLE_FAST_MOVE });
+		for (const s of smeargleSets) {
+			push(
+				arr,
+				s.clause,
+				tFn('app.clause_why.smeargle_moveset', {
+					params: { fast, charged: tFn(`move.${s.canonical}`, { fallback: s.canonical }) },
+				}),
+			);
+		}
 	};
 
 	// Single source of truth for the Max-protection clause shared by trash /
@@ -2743,6 +2827,7 @@ export function buildFilters(
 	if (cfg.protectNewEvolutions)
 		push(trashClauses, `!${kw.flag.new_evo},${kw.flag.mega}0`, tFn('app.clause_why.new_evolutions'));
 	if (cfg.protectLegacyMoves) push(trashClauses, legacyMovesClause(), tFn('app.clause_why.legacy_moves'));
+	pushSmeargleMovesetClauses(trashClauses);
 	if (cfg.protectBabies) push(trashClauses, `!${kw.flag.baby}`, tFn('app.clause_why.babies'));
 	if (cfg.distanceProtect && cfg.distanceProtect > 0)
 		push(
@@ -2958,6 +3043,7 @@ export function buildFilters(
 	// protect it; trade protected only XXL/XL. Reuses the shared `xxs` why-key.
 	if (cfg.protectXXS) push(tradeClauses, `!${kw.flag.xxs}`, tFn('app.clause_why.xxs'));
 	if (cfg.protectLegacyMoves) push(tradeClauses, legacyMovesClause(), tFn('app.clause_why.legacy_moves'));
+	pushSmeargleMovesetClauses(tradeClauses);
 	if (cfg.ageScopeDays && cfg.ageScopeDays > 0)
 		push(
 			tradeClauses,
@@ -3034,6 +3120,7 @@ export function buildFilters(
 		if (cfg.protectXL) push(clauses, `!${kw.flag.xl}`, tFn('app.clause_why.xl_trade'));
 		if (cfg.protectXXS) push(clauses, `!${kw.flag.xxs}`, tFn('app.clause_why.xxs'));
 		if (cfg.protectLegacyMoves) push(clauses, legacyMovesClause(), tFn('app.clause_why.legacy_moves'));
+		pushSmeargleMovesetClauses(clauses);
 		// Guaranteed-lucky floor. Old untraded stock is the pool that makes a
 		// lucky trade a certainty, and this filter stages a REGULAR trade —
 		// handing one of those over burns it for nothing. trash, trade, gift and
@@ -5576,6 +5663,8 @@ export function buildFilters(
 		pvpRankingsFetchedAt,
 		pvpMetaPacks,
 		cupFilters,
+		// Smeargle moveset finder (Battle area, expert)
+		smeargleFinder,
 	};
 }
 
@@ -6807,6 +6896,7 @@ export default function App() {
 		pvpRankingsFetchedAt,
 		pvpMetaPacks,
 		cupFilters,
+		smeargleFinder,
 	} = useMemo(
 		() =>
 			buildFilters(
@@ -7539,6 +7629,14 @@ export default function App() {
 			/>
 		</div>
 	);
+	const smeargleMovesetSettings = effectiveConfig.expertMode && (
+		<div>
+			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4'>
+				{t('app.step.have.section_smeargle_movesets')}
+			</h3>
+			<SmeargleMovesetEditor config={config} setConfig={setConfig} />
+		</div>
+	);
 	const shadowKeeperSettings = effectiveConfig.expertMode && (
 		<div>
 			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-4'>
@@ -7737,6 +7835,7 @@ export default function App() {
 										{haveListSettings}
 										{jobTagSettings}
 										{mythCarveOutSettings}
+										{smeargleMovesetSettings}
 										{shadowKeeperSettings}
 										{raidRosterSettings}
 								</div>
@@ -7944,6 +8043,23 @@ export default function App() {
 														t={t}
 														locale={locale}
 													/>
+													{/* Smeargle moveset finder (expert): the Smeargle the
+													    protection keeps, as one search. The hint says the
+													    photographed Pokémon decides the moves. */}
+													{effectiveConfig.expertMode && smeargleFinder?.clause && (
+														<div className='mt-4'>
+															<FilterBox
+																label={t('app.filter.smeargle_finder_label')}
+																accent='#5EAFC5'
+																filterStr={smeargleFinder.clause}
+																copied={copied.smeargle_finder}
+																onCopy={() => copyToClipboard('smeargle_finder', smeargleFinder.clause)}
+																hint={t('app.filter.smeargle_finder_hint', {
+																	params: { fast: moveDisplayName(SMEARGLE_FAST_MOVE, locale) },
+																})}
+															/>
+														</div>
+													)}
 													</AreaGroup>
 												</div>
 											</>
@@ -8902,6 +9018,141 @@ function PackAddButtons({ packs, items, onAddPack, accent }) {
 					</button>
 				);
 			})}
+		</div>
+	);
+}
+
+// The charged moves of the Smeargle moveset protection (smeargleChargedMoves).
+// Not SpeciesListEditor: that resolves species names, this resolves MOVE names
+// typed in any of the seven locales to their canonical EN name
+// (moveKeyFromKeyword) and shows each chip in the UI locale. The fast move is
+// fixed (SMEARGLE_FAST_MOVE) and shown as a chip without a remove button.
+// Input splits on commas, semicolons and newlines only: move names have
+// spaces ("Flying Press").
+function SmeargleMovesetEditor({ config, setConfig, accent = '#5EAFC5' }) {
+	const { t, locale } = useTranslation();
+	const [raw, setRaw] = useState('');
+	const items = config.smeargleChargedMoves || [];
+	const fastName = moveDisplayName(SMEARGLE_FAST_MOVE, locale);
+	const tokens = useMemo(
+		() =>
+			String(raw)
+				.split(/[,;\n]+/)
+				.map((s) => s.trim())
+				.filter(Boolean)
+				.map((input) => {
+					const key = moveKeyFromKeyword(input);
+					return { input, key: key === SMEARGLE_FAST_MOVE ? null : key };
+				}),
+		[raw],
+	);
+	const resolved = tokens.filter((x) => x.key);
+	const unresolved = tokens.filter((x) => !x.key);
+	const fresh = resolved.filter((x) => !items.includes(x.key));
+	const dupes = resolved.filter((x) => items.includes(x.key));
+	const add = () => {
+		if (fresh.length === 0) return;
+		const keys = fresh.map((x) => x.key);
+		setConfig((prev) => ({
+			...prev,
+			smeargleChargedMoves: [...new Set([...(prev.smeargleChargedMoves || []), ...keys])],
+		}));
+		setRaw(unresolved.map((x) => x.input).join(', '));
+	};
+	const remove = (m) =>
+		setConfig((prev) => ({ ...prev, smeargleChargedMoves: (prev.smeargleChargedMoves || []).filter((x) => x !== m) }));
+	return (
+		<div className='space-y-4'>
+			<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
+				{t('app.protect.smeargle_moves.count', { params: { count: items.length } })}
+			</div>
+			<div className='flex flex-wrap gap-1.5'>
+				<span className='mono text-xs bg-[#1F2933] text-[#E6EDF3] px-2.5 py-1 rounded-sm flex items-center gap-1.5'>
+					<span style={{ color: accent }}>@</span>
+					{fastName}
+					<span className='text-[10px] text-[#8090A0]'>{t('app.protect.smeargle_moves.fast_fixed')}</span>
+				</span>
+				{items.map((m) => {
+					const name = moveDisplayName(m, locale);
+					return (
+						<span
+							key={m}
+							className='chip-enter mono text-xs bg-[#1F2933] hover:bg-[#2D3A47] text-[#E6EDF3] pl-2.5 pr-1.5 py-1 rounded-sm flex items-center gap-1.5 transition group'
+						>
+							<span style={{ color: accent }}>@</span>
+							{name}
+							<button
+								onClick={() => remove(m)}
+								aria-label={t('app.a11y.remove_move', { params: { name } })}
+								className={`${CHIP_REMOVE_TARGET} opacity-40 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 hover:text-[#E74C3C] transition`}
+							>
+								<X size={12} />
+							</button>
+						</span>
+					);
+				})}
+				{items.length === 0 && (
+					<span className='mono text-xs text-[#8B98A5] italic'>{t('app.protect.smeargle_moves.empty')}</span>
+				)}
+			</div>
+			<div className='flex gap-2'>
+				<input
+					type='text'
+					value={raw}
+					onChange={(e) => setRaw(e.target.value)}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter') {
+							e.preventDefault();
+							add();
+						}
+					}}
+					aria-label={t('app.a11y.move_input')}
+					placeholder={t('app.protect.smeargle_moves.input_placeholder')}
+					className='mono text-sm flex-1 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-3 py-2 rounded-sm text-[#E6EDF3] placeholder:text-[#8090A0]'
+				/>
+				<button
+					onClick={add}
+					disabled={fresh.length === 0}
+					style={{ backgroundColor: fresh.length === 0 ? undefined : accent }}
+					className='mono text-sm hover:brightness-110 disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-4 py-2 rounded-sm transition flex items-center gap-1.5'
+				>
+					<Plus size={14} /> {t('app.protect.smeargle_moves.add_button')}
+				</button>
+			</div>
+			{tokens.length > 0 && (
+				<div className='border border-[#1F2933] rounded-sm p-2.5 bg-[#0B0F14] space-y-1.5'>
+					<div className='mono text-[10px] uppercase tracking-wider text-[#8090A0]'>
+						{t('app.protect.smeargle_moves.preview_summary', {
+							params: { new: fresh.length, dupes: dupes.length, unresolved: unresolved.length },
+						})}
+					</div>
+					<div className='flex flex-wrap gap-1.5'>
+						{tokens.map((tok, i) =>
+							tok.key ? (
+								<span
+									key={i}
+									className={`mono text-[11px] px-2 py-0.5 rounded-sm flex items-center gap-1 ${
+										items.includes(tok.key) ? 'bg-[#8090A0]/15 text-[#8B98A5]' : 'bg-[#27AE60]/15 text-[#27AE60]'
+									}`}
+									title={`EN: ${moveDisplayName(tok.key, 'en')}${items.includes(tok.key) ? ` (${t('app.protect.smeargle_moves.dupe_marker')})` : ''}`}
+								>
+									{moveDisplayName(tok.key, locale)}
+									{items.includes(tok.key) && <span className='opacity-60'>✓</span>}
+								</span>
+							) : (
+								<span
+									key={i}
+									className='mono text-[11px] bg-[#E74C3C]/15 text-[#E74C3C] px-2 py-0.5 rounded-sm'
+									title={t('app.protect.smeargle_moves.unresolved_title')}
+								>
+									✗ {tok.input}
+								</span>
+							),
+						)}
+					</div>
+				</div>
+			)}
+			<p className='mono text-xs text-[#8090A0]'>{t('app.protect.smeargle_moves.input_help', { params: { fast: fastName } })}</p>
 		</div>
 	);
 }
@@ -12128,6 +12379,7 @@ export const SETTINGS_GROUPS = [
 		rows: [
 			['protectLegacyMoves', 'app.protect.legacy_moves', { expertOnly: true }],
 			['protectSmeargleLegacy', 'app.protect.smeargle_legacy', { expertOnly: true }],
+			['protectSmeargleMovesets', 'app.protect.smeargle_movesets', { expertOnly: true }],
 			['protectDoubleMoved', 'app.protect.double_moved', { expertOnly: true }],
 			['protectDynamax', 'app.protect.dynamax', { requireConfirmOff: true }],
 			['protectGigantamax', 'app.protect.gigantamax', { expertOnly: true, requireConfirmOff: true }],
@@ -12527,6 +12779,14 @@ function ConfigPanel({
 										{group.id === 'battle' && !config.protectDynamax && config.protectGigantamax && (
 											<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded-sm p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
 												{t('app.protect.dynamax_off_note')}
+											</div>
+										)}
+										{/* The charged-move list the Smeargle moveset row reads, next to
+										    its row (expert, like the row). The wizard's have step mounts
+										    the same editor under its own heading. */}
+										{group.id === 'battle' && expert && (
+											<div className='mt-3'>
+												<SmeargleMovesetEditor config={config} setConfig={setConfig} />
 											</div>
 										)}
 									</fieldset>
