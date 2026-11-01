@@ -20,6 +20,15 @@
 //
 // The patterns are pinned to the phrasings the feed carried on 2026-10-31 in
 // scripts/check-bonus-nudges.mjs. Pure functions, no React.
+//
+// IN-PERSON EVENTS: a record may carry `venue: { name, lat, lng }` (the city
+// of a Wild Area, GO Tour, Night Out or City Safari, from the fetcher's pinned
+// table in scripts/lib/event-venues.mjs). Its bonuses hold in that city only,
+// so such a record nudges when the home pin (App.jsx `homeLocation`, a
+// [lng, lat] pair) lies within VENUE_RADIUS_KM of the venue, and is hidden
+// without a pin. A record spelt as a fixed instant (`isLocalTime: false`) with
+// no venue is an in-person event nobody has placed yet, and is hidden too; the
+// fetcher writes no bonus record for one, this is the belt to its braces.
 
 // Each kind's target: the area tab and the AreaGroup (`area-group-<id>`) the
 // nudge opens. Only groups the app already renders; nothing new is built.
@@ -47,6 +56,55 @@ export const NUDGE_MAX_SPAN_DAYS = 14;
 // How far ahead an upcoming bonus is shown ("from Fri 6 Nov").
 export const NUDGE_LOOKAHEAD_DAYS = 2;
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+// How close the home pin must be to an in-person event's city for its bonuses
+// to nudge. Wide enough for a day trip (Cologne to Bonn is 26 km, Yamagata to
+// Sendai 46 km) and for a city-centre pin against a venue in the suburbs,
+// narrow enough that London (511 km from Bonn) stays out.
+export const VENUE_RADIUS_KM = 150;
+const EARTH_RADIUS_KM = 6371;
+const rad = (deg) => (deg * Math.PI) / 180;
+
+// Great-circle distance in km between the home pin ([lng, lat], the map's
+// order) and a venue ({ lat, lng }, the table's order). Haversine; good to a
+// fraction of a percent, which is plenty for a 150 km question.
+export function distanceKm(homeLngLat, venue) {
+	const [lng1, lat1] = homeLngLat;
+	const dLat = rad(venue.lat - lat1);
+	const dLng = rad(venue.lng - lng1);
+	const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(venue.lat)) * Math.sin(dLng / 2) ** 2;
+	return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
+}
+
+// A distance as the card shows it, "9,100 km" rather than "9,140.36 km": the
+// nearest 100 km from 1,000 km, the nearest 10 km from 100 km, whole km below.
+export function roundDistanceKm(km) {
+	if (!Number.isFinite(km)) return null;
+	const step = km >= 1000 ? 100 : km >= 100 ? 10 : 1;
+	return Math.round(km / step) * step;
+}
+
+const hasPin = (home) => Array.isArray(home) && home.length === 2 && home.every(Number.isFinite);
+const isVenue = (v) => !!v && Number.isFinite(v.lat) && Number.isFinite(v.lng) && Math.abs(v.lat) <= 90 && Math.abs(v.lng) <= 180;
+
+// How an in-person event's venue stands to the home pin, or null for a record
+// with no venue (a global event). `distanceKm` is null without a pin, and
+// `near` is then false: an event whose distance nobody can tell is far.
+export function venueReach(venue, homeLocation, radiusKm = VENUE_RADIUS_KM) {
+	if (!isVenue(venue)) return null;
+	const km = hasPin(homeLocation) ? distanceKm(homeLocation, venue) : null;
+	return { name: venue.name, distanceKm: km, near: km !== null && km <= radiusKm };
+}
+
+// Does this record's bonus apply where the user plays? A record with a venue
+// applies within VENUE_RADIUS_KM of it; a fixed-time record without one is an
+// in-person event nobody has placed and never applies; anything else is a
+// global event and always does.
+export function bonusAppliesAtHome(rec, homeLocation, radiusKm = VENUE_RADIUS_KM) {
+	if (isVenue(rec?.venue)) return venueReach(rec.venue, homeLocation, radiusKm).near;
+	if (rec?.isLocalTime === false) return false;
+	return true;
+}
 
 const FRACTIONS = { '1/2': '½', '1/3': '⅓', '1/4': '¼', '3/4': '¾' };
 const fraction = (s) => FRACTIONS[s] || null;
@@ -172,14 +230,19 @@ const paramKey = (n) => `${n.kind}|${n.factor ?? ''}|${n.count ?? ''}`;
 //     same bonus (Halloween Part I then Part II) merge into one, so the strip
 //     says "until" the real end and not the first part's,
 //   - when one kind carries two values at once (2× and 3×), the one ending
-//     last is kept and the other dropped, so the strip names a kind once.
+//     last is kept and the other dropped, so the strip names a kind once,
+//   - an in-person event's record (see IN-PERSON EVENTS above) only when
+//     `homeLocation` ([lng, lat]) is within `venueRadiusKm` of its venue.
 // `end`/`start` come back as epoch ms; sorted live first, then by KIND_ORDER.
 export function bonusNudges(records, now = Date.now(), {
 	maxSpanDays = NUDGE_MAX_SPAN_DAYS,
 	lookaheadDays = NUDGE_LOOKAHEAD_DAYS,
+	homeLocation = null,
+	venueRadiusKm = VENUE_RADIUS_KM,
 } = {}) {
 	const windows = new Map();
 	for (const rec of records || []) {
+		if (!bonusAppliesAtHome(rec, homeLocation, venueRadiusKm)) continue;
 		const start = Date.parse(rec?.start);
 		const end = Date.parse(rec?.end);
 		if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) continue;

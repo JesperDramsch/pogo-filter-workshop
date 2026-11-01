@@ -102,7 +102,9 @@ export function megaPlans({ events = [], eventRaids = [] } = {}, now = Date.now(
 	const plans = [];
 	for (const ev of events) {
 		if (!inWindow(ev.start, ev.end) || !(ev.spawnForms || []).length) continue;
-		plans.push({ id: `wild:${ev.id || ev.title}`, kind: 'wild', title: ev.title, start: ev.start, end: ev.end, spawnForms: ev.spawnForms });
+		// `venue` rides along for the planner's row: an in-person event far from
+		// the home pin is folded with its distance (src/bonus-nudges.js venueReach).
+		plans.push({ id: `wild:${ev.id || ev.title}`, kind: 'wild', title: ev.title, start: ev.start, end: ev.end, spawnForms: ev.spawnForms, venue: ev.venue || null });
 	}
 	for (const r of eventRaids) {
 		if (!RAID_OUTINGS.has(r.eventType) || !inWindow(r.start, r.end)) continue;
@@ -111,7 +113,7 @@ export function megaPlans({ events = [], eventRaids = [] } = {}, now = Date.now(
 				.map((b) => ({ name: b.names?.en, dex: dexOf(b.names?.en), region: null, types: b.types || [] }))
 				.filter((f) => f.dex && f.types.length),
 		]);
-		if (spawnForms.length) plans.push({ id: `raid:${r.eventID || r.name}`, kind: 'raid', title: r.name, start: r.start, end: r.end, spawnForms });
+		if (spawnForms.length) plans.push({ id: `raid:${r.eventID || r.name}`, kind: 'raid', title: r.name, start: r.start, end: r.end, spawnForms, venue: null });
 	}
 	return plans.sort((a, b) => Date.parse(a.start) - Date.parse(b.start) || a.title.localeCompare(b.title));
 }

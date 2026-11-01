@@ -15,9 +15,10 @@
 // Covers:
 //   T1 — parseFeedTime: numbers are UTC epoch seconds, strings parse as before
 //   T2 — normaliseFeedTime / feedWindow: the string an id and a record carry
-//   T3 — the fetcher's passes keep a numeric event, keep ids stable, keep a
-//        fixed-time (in-person) event's bonuses out of the nudge strip, and
-//        report rather than skip an event whose window still cannot be read
+//   T3 — the fetcher's passes keep a numeric event, keep ids stable, give a
+//        fixed-time (in-person) event's bonuses a record only with a venue
+//        (scripts/check-event-venues.mjs has the rest), and report rather
+//        than skip an event whose window still cannot be read
 //   T4 — a Community Day with a numeric start gets its date
 //   T5 — a fixed-time takeover is exact, never widened, same id as ScrapedDuck's
 
@@ -126,21 +127,29 @@ console.log("\nT3 — the fetcher's passes");
   check("the same instant as a zoned string gives the identical id and record",
     stamped && stamped.id === t?.id && stamped.start === t?.start && stamped.end === t?.end);
 
-  // Bonuses: a fixed-time event's hold in one city, so they stay out of the
-  // strip that speaks to every user; a local-time event's are byte-for-byte
+  // Bonuses: a fixed-time event's hold in one city. With a venue (Sendai has
+  // a row in scripts/lib/event-venues.mjs) the record carries it and the app
+  // gates the nudge by distance; without one (the takeover) no record is
+  // written and the event is reported. A local-time event's are byte-for-byte
   // what they were.
   const reported = [];
-  const bonuses = bonusesFromFeed(feed, NOW, (e, category) => reported.push(`${category}|${e.title}`));
+  const venueless = [];
+  const bonuses = bonusesFromFeed(feed, NOW, (e, category) => reported.push(`${category}|${e.title}`), (e, category) => venueless.push(`${category}|${e.title}`));
   const byTitle = Object.fromEntries(bonuses.map((b) => [b.title, b]));
-  check("a fixed-time (in-person) event's bonuses make no bonus record",
-    !byTitle[sendai.title] && !byTitle[takeover.title], Object.keys(byTitle).join());
-  check("a local-time Wild Area with the same bonuses does (the global edition)",
-    bonusesFromFeed({ "Wild Area": [{ ...sendai, title: "Pokémon GO Wild Area 2026: Global", start_time: "2026-11-14T10:00:00", end_time: "2026-11-15T18:00:00", is_local_time: true }] }, NOW).length === 1);
+  check("a fixed-time (in-person) event with a venue makes a bonus record carrying it",
+    byTitle[sendai.title]?.venue?.name === "Sendai" && byTitle[sendai.title].isLocalTime === false, JSON.stringify(byTitle[sendai.title]?.venue));
+  check("a fixed-time event with no venue makes no bonus record, and is reported",
+    !byTitle[takeover.title] && venueless.join() === "Event|Twilight Trails: Taken Over", venueless.join());
+  const global = bonusesFromFeed({ "Wild Area": [{ ...sendai, title: "Pokémon GO Wild Area 2026: Global", start_time: "2026-11-14T10:00:00", end_time: "2026-11-15T18:00:00", is_local_time: true }] }, NOW);
+  check("a local-time Wild Area with the same bonuses does (the global edition), with venue null",
+    global.length === 1 && global[0].venue === null, JSON.stringify(global[0]?.venue));
   const h = byTitle[halloween.title];
   check("a local-time event's id and record are byte-for-byte what they were",
     h && h.id === "event-pok-mon-go-halloween-2026-part-ii-2026-11-01t10-00-00" && h.start === "2026-11-01T10:00:00" && h.end === "2026-11-05T20:00:00" && h.isLocalTime === true, h?.id);
-  check("the unparseable events are left out of bonuses too, and the local-time one reported",
-    !byTitle[broken.title] && !byTitle[noEnd.title] && reported.join() === "Event|Something new", reported.join());
+  // Both unparseable events are reported here too (the window is read before
+  // the venue is looked up); the fetcher notes each once across its passes.
+  check("the unparseable events are left out of bonuses too, and reported",
+    !byTitle[broken.title] && !byTitle[noEnd.title] && reported.sort().join() === "Event|Half a window,Event|Something new", reported.join());
 }
 
 console.log("\nT4 — Community Days");
