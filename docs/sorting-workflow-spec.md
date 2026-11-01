@@ -65,7 +65,7 @@ Every pile has the same three steps. The event wild-spawn card already uses this
 
 Hides everything that is always protected. Built from `src/i18n/pogo-keywords.js` tokens like every other clause; the German forms below are for reading only.
 
-The tail is one fixed string per pile. It reads exactly two settings, protect nundos and the mythicals you have too many of (`protectNundos`, `mythTooManyOf`), plus the value of the lucky-trade year floor. Every other trash toggle (buddies, legacy moves, the Smeargle exception, shinies and the rest) leaves it as it is: switching a protection off to clear a category is what steps ① and ② replace.
+The tail is one fixed string per pile. It reads exactly two settings, protect nundos and the mythicals you have too many of (`protectNundos`, `mythTooManyOf`), plus two values: the lucky-trade year floor and the Smeargle moveset list (`smeargleChargedMoves`, the charged moves worth keeping next to Lock-On). Every other trash toggle (buddies, legacy moves, the Smeargle exception, the Smeargle moveset toggle, shinies and the rest) leaves it as it is: switching a protection off to clear a category is what steps ① and ② replace.
 
 | Protected | German form |
 | --- | --- |
@@ -80,10 +80,11 @@ The tail is one fixed string per pile. It reads exactly two settings, protect nu
 | Shiny legendaries | `!schillernd,!legendär` (one clause) |
 | Legendaries with a background | `!hintergrund,!legendär` (one clause) |
 | Legacy moves | `!@spezial,@rückkehr,@frustration,farbeagle` (one clause, the trash's shape: a purified Return, a shadow's Frustration and a Smeargle, whose Sketched moves all carry the flag, are not legacy; Smeargle via `pokemonNameFor('235')`) |
+| Smeargle with a PvP moveset, one clause per charged move in the list | `!farbeagle,!@zielschuss,!@flyingpress` and `!farbeagle,!@zielschuss,!@techblaster` with the seed (the trash's shape: keep unless Smeargle with Lock-On and that charged move; a Smeargle holds one charged move, so one clause naming them all would never match; moves from `move.*` in the output locale, lowercased, whitespace collapsed, no slot prefix; an empty list adds nothing; [docs/smeargle-pvp-movesets.md](smeargle-pvp-movesets.md)) |
 
 The range-negation forms are deliberate: `!dynawall1-` matches a Pokémon with no Wall value at all, which is the wanted direction (see the range-versus-negation note in the filter skill).
 
-**Property check** (`scripts/check-piles.mjs` P3, `scripts/check-data-filters.mjs` D18, cases in `scripts/lib/pile-cases.mjs`): step ③ of every pile never matches a Pokémon that is starred, tagged, a hundo, a nundo (when protected), inside the year floor, invested Dynamax, a Good buddy, mythical (unless carved out), carrying a legacy move, a shiny legendary or a legendary with a background; it runs under the default config and under one with nundos protected and a mythical carved out. A further section holds the tail to those two settings: flipping any other trash toggle changes nothing.
+**Property check** (`scripts/check-piles.mjs` P3, `scripts/check-data-filters.mjs` D18, cases in `scripts/lib/pile-cases.mjs`): step ③ of every pile never matches a Pokémon that is starred, tagged, a hundo, a nundo (when protected), inside the year floor, invested Dynamax, a Good buddy, mythical (unless carved out), carrying a legacy move, a shiny legendary, a legendary with a background or a Smeargle with Lock-On and a listed charged move; it runs under the default config and under one with nundos protected, a mythical carved out and the Smeargle list emptied. A further section holds the tail to those two settings and two values: flipping any other trash toggle, the Smeargle moveset toggle included, changes nothing.
 
 ### Pile card
 

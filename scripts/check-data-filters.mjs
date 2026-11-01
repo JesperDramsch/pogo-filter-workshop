@@ -1650,12 +1650,13 @@ console.log("D18 — step ③ of a pile is the pile and the protection tail, and
   // event piles are held to the same composition: ③b (release) is fams &
   // tail, exactly, and ③a (safe) is release & the ladder's negations (no
   // shiny, a stat below three bars, below 3*). The tail reads protectNundos
-  // and mythTooManyOf, so the synthetic pile runs under the fixture config
-  // and under one that flips both.
-  const ALT_CONFIG = { ...FIXTURE_CONFIG, protectNundos: true, mythTooManyOf: ["Darkrai"] };
-  for (const [cfgName, cfg] of [["fixture config", FIXTURE_CONFIG], ["nundos protected, Darkrai carved", ALT_CONFIG]]) {
-    const { PROTECTED, RELEASABLE } = pileCases(cfg);
+  // and mythTooManyOf, plus the Smeargle moveset list as a value, so the
+  // synthetic pile runs under the fixture config and under one that flips
+  // the two settings and empties the list.
+  const ALT_CONFIG = { ...FIXTURE_CONFIG, protectNundos: true, mythTooManyOf: ["Darkrai"], smeargleChargedMoves: [] };
+  for (const [cfgName, cfg] of [["fixture config", FIXTURE_CONFIG], ["nundos protected, Darkrai carved, no Smeargle moveset", ALT_CONFIG]]) {
     for (const loc of localeNames) {
+      const { PROTECTED, RELEASABLE } = pileCases(cfg, loc);
       const kw = pogoKeywords(loc);
       const tail = protectionTail(kw, cfg, tailOptions(cfg, loc));
       const ladderNots = `!${kw.flag.shiny}&0-2${kw.iv.atk},0-2${kw.iv.def},0-2${kw.iv.hp}&0*,1*,2*`;
