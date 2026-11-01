@@ -7,8 +7,8 @@
 // nobody reviews. check-piles already holds the pile wording per locale; this
 // check holds every key under the prefixes that carry the help sheets, the
 // pile cards, the sorting intro, the area tabs, the event piles, the
-// protection toggles and their settings page, the modals, the changelog and
-// the swipe deck.
+// protection toggles and their settings page, the modals, the changelog,
+// the swipe deck, the trade-buddy manager and the tagging scheme.
 //
 //   L1 — every matching key in en.json exists in each other locale
 //   L2 — no other locale has a matching key that en.json lacks
@@ -17,7 +17,7 @@
 import { readFileSync } from "node:fs";
 
 const LOCALES = ["en", "de", "es", "fr", "zh-TW", "hi", "ja"];
-const SCOPE = /^app\.(help|pile|sort|area|events|share|protect|modal|changelog|onboarding)\./;
+const SCOPE = /^app\.(help|pile|sort|area|events|share|protect|modal|changelog|onboarding|buddy|tags)\./;
 
 let failures = 0;
 function check(label, cond, detail = "") {
