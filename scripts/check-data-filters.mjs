@@ -340,15 +340,15 @@ console.log("\nD7 — shadow keeper filters project the whole keeper list");
       frustrationTerms === keepers.length, `found ${frustrationTerms}`);
   }
 
-  // The trash crypto floor is the other keeper consumer, but it only fires when
-  // protectShadows is off — the fixture config leaves it on, so the pinned
-  // `trash` string is deliberately unaffected and stays exact-pinned. Assert
-  // that invariant here so a change to the default cannot quietly start
-  // churning the fixture.
-  check("default config keeps the trash crypto floor dormant",
+  // The trash shadow gradient's keeper rule (protectShadowKeepers) is the other
+  // keeper consumer, but it only fires when protectShadows is off — the fixture
+  // config leaves it on, so the pinned `trash` string is deliberately
+  // unaffected and stays exact-pinned. Assert that invariant here so a change
+  // to the default cannot quietly start churning the fixture.
+  check("default config keeps the trash shadow gradient dormant",
     FIXTURE_CONFIG.protectShadows === true,
     FIXTURE_CONFIG.protectShadows === true ? ""
-      : "protectShadows default flipped — the keeper floor now lands in `trash`, which IS exact-pinned");
+      : "protectShadows default flipped — the keeper clauses now land in `trash`, which IS exact-pinned");
 }
 
 console.log("\nD8 — every Rocket lineup Pokémon resolves in every locale");
