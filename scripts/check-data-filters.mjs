@@ -69,7 +69,7 @@ import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import META_RANKINGS from "../src/data/meta-rankings.json";
 import { buildDataFilters, buildResult, FIXTURE_CONFIG, makeTFn } from "./lib/fixture.mjs";
 import {
-  bossBoxKeys, bossCounterLabel, buildFilters, candyFamilyNames, DEFAULT_HUNDOS, DEFAULT_LUCKIES, evalFilterDetailed, protectionTail,
+  bossBoxKeys, bossCounterLabel, buildFilters, candyFamilyNames, costumeEventFor, DEFAULT_HUNDOS, DEFAULT_LUCKIES, evalFilterDetailed, FLOAT_ENDED_DAYS, protectionTail,
   RAID_PANEL_TIERS, raidEventPanel, capFirst,
 } from "../src/App.jsx";
 import { PILE_DEX, PILE_SPECIES, pileCases, pileMon, tailOptions } from "./lib/pile-cases.mjs";
@@ -1724,6 +1724,79 @@ console.log("\nD12 — the raid panels split the standing tiers and the event ra
   for (const e of live) counts[raidEventPanel(e)]++;
   check(`the ${live.length} event raid(s) in the snapshot all land in a panel`,
     counts.legendary + counts.mega + counts.other === live.length, JSON.stringify(counts));
+}
+
+console.log("\nD19 — the event costume string: the trash string with exactly two clauses changed, scoped to the event's species and days, never pinned");
+{
+  // The second named exception to "a guard never comes out of a trash
+  // string" (docs/sorting-workflow-spec.md, "Areas"). Event-dependent, so it
+  // is never in the fixture: a synthetic costume event and a pinned clock
+  // stand in, in every locale. costumeEventFor is the clock-resolving half
+  // (the component's job); the builder takes its result as a parameter.
+  const now = Date.parse("2026-11-04T12:00:00Z");
+  const day = 86400000;
+  const iso = (ms) => new Date(ms).toISOString();
+  const EVENTS = [
+    { id: "hw1", title: "Halloween Part 1", category: "Event", hasCostumes: true, spawnDex: [25, 710], start: iso(now - 3.2 * day), end: iso(now - 1 * day) },
+    { id: "hw2", title: "Halloween Part 2", category: "Event", hasCostumes: true, spawnDex: [92, 25], start: iso(now - 1 * day), end: iso(now + 4 * day) },
+    { id: "plain", title: "No costumes", category: "Event", hasCostumes: false, spawnDex: [1], start: iso(now - 1 * day), end: iso(now + 1 * day) },
+    { id: "old", title: "Long over", category: "Event", hasCostumes: true, spawnDex: [4], start: iso(now - 20 * day), end: iso(now - (FLOAT_ENDED_DAYS + 1) * day) },
+    { id: "soon", title: "Upcoming", category: "Event", hasCostumes: true, spawnDex: [7], start: iso(now + 1 * day), end: iso(now + 3 * day) },
+  ];
+  const ev = costumeEventFor(EVENTS, now);
+  check("running and just-ended costume events merge; plain, long-over and upcoming ones are skipped",
+    ev && ev.ids.join(",") === "hw1,hw2" && ev.spawnDex.join(",") === "25,710,92" && ev.daysSinceStart === 3 && ev.title === "Halloween Part 1 · Halloween Part 2", JSON.stringify(ev));
+  check("no costume event resolves to null", costumeEventFor([EVENTS[2], EVENTS[3], EVENTS[4]], now) === null && costumeEventFor([], now) === null);
+  const fixtureText = readFileSync(new URL("../src/__fixtures__/default-filter-output.json", import.meta.url), "utf8");
+  check("the event costume string is not pinned in the fixture", !fixtureText.includes("eventCostumeTrash") && !fixtureText.includes("costume_relief"));
+  const mon = (loc, dex, o = {}) => ({
+    dex, species: pokemonNameFor(String(dex), loc).toLowerCase(), families: [pokemonNameFor(String(dex), loc).toLowerCase()], types: [],
+    year: 2026, ageDays: 2, distance: 0, wp: 300, atk: 1, def: 1, hp: 1, star: 1, tags: [], moves: [], candyKm: 3, ...o,
+    flags: { costume: false, canEvolve: false, ...(o.flags || {}) },
+  });
+  for (const loc of localeNames) {
+    const kw = pogoKeywords(loc);
+    const base = buildResult(loc);
+    const r = buildFilters(DEFAULT_HUNDOS, DEFAULT_LUCKIES, FIXTURE_CONFIG, [], loc, makeTFn(loc), undefined, undefined, undefined, ev);
+    const bad = [];
+    if (r.trash !== base.trash) bad.push("the saved trash string changed");
+    const costume = `!${kw.flag.costume}`;
+    const names = ev.spawnDex.map((d) => pokemonNameFor(String(d), loc).toLowerCase());
+    const want = r.trash.split("&").flatMap((c) => (c === costume ? [`${costume},${names.join(",")}`, `${costume},${kw.numeric.age}-3`] : [c]));
+    if (r.eventCostumeTrash !== want.join("&")) bad.push(`string is not trash with the costume clause replaced by two: ${r.eventCostumeTrash.slice(0, 120)}`);
+    if (names.some((n) => !n) || r.eventCostumeTrash.includes("+" + names[0])) bad.push("species are not exact bare names");
+    if (!names.every((n) => n === n.toLowerCase())) bad.push("a species name is not lowercase");
+    const whys = r.eventCostumeClauses.filter((c) => c.clause.startsWith(`${costume},`)).map((c) => c.why);
+    if (whys.length !== 2 || whys.some((w) => /^app\./.test(w) || /\{days\}/.test(w))) bad.push(`the two clauses' whys do not render: ${whys.join(" | ")}`);
+    const v = (str, m) => evalFilterDetailed(str, m, loc);
+    const say = (x) => `${x.verdict}${x.unknown.length ? ` (unknown ${x.unknown.join(" ")})` : ""}`;
+    const cases = [
+      ["a costumed Pikachu caught 2 days ago is releasable", r.eventCostumeTrash, mon(loc, 25, { flags: { costume: true } }), true],
+      // Irrbis is a trade-evo family: its untraded guard (`!+Irrbis,traded`) is
+      // one of the guards the string keeps, so even a costumed event Irrbis stays.
+      ["a costumed untraded Irrbis stays: the trade-evo guard still holds", r.eventCostumeTrash, mon(loc, 710, { flags: { costume: true } }), false],
+      ["a costumed traded Irrbis caught 2 days ago is releasable", r.eventCostumeTrash, mon(loc, 710, { flags: { costume: true, traded: true } }), true],
+      ["a costumed Pikachu caught 10 days ago (before the event) stays", r.eventCostumeTrash, mon(loc, 25, { ageDays: 10, flags: { costume: true } }), false],
+      ["a costumed Raichu (not an event spawn, same family) stays", r.eventCostumeTrash, mon(loc, 26, { flags: { costume: true } }), false],
+      ["a costumed Pikachu is never in the saved trash string", r.trash, mon(loc, 25, { flags: { costume: true } }), false],
+      ["a plain low-IV Pikachu is in both strings", r.eventCostumeTrash, mon(loc, 25), true],
+      ["a plain low-IV Pikachu is in the saved trash string", r.trash, mon(loc, 25), true],
+      ["a costumed Pikachu that is a favourite stays (every other guard holds)", r.eventCostumeTrash, mon(loc, 25, { flags: { costume: true, favorite: true } }), false],
+    ];
+    for (const [label, str, m, expect] of cases) {
+      const x = v(str, m);
+      if (x.verdict !== expect) bad.push(`${label}: ${say(x)}`);
+    }
+    const noProtect = buildFilters(DEFAULT_HUNDOS, DEFAULT_LUCKIES, { ...FIXTURE_CONFIG, protectCostumes: false }, [], loc, makeTFn(loc), undefined, undefined, undefined, ev);
+    if (noProtect.eventCostumeTrash !== "") bad.push("with costumes unprotected there is nothing to carve, but a string was built");
+    if (base.eventCostumeTrash !== "") bad.push("without an event a string was built");
+    const strings = ["title", "reveal", "warning", "label", "hint", "why_species", "why_age"].map((k) => `app.events.costume_relief.${k}`);
+    const missing = strings.filter((k) => typeof LOCALES[loc].messages[k] !== "string" || !LOCALES[loc].messages[k].trim());
+    if (missing.length) bad.push(`missing copy: ${missing.join(", ")}`);
+    if (!/\{days\}/.test(LOCALES[loc].messages["app.events.costume_relief.hint"] || "")) bad.push("the hint has no {days}");
+    if (!/\{title\}/.test(LOCALES[loc].messages["app.events.costume_relief.title"] || "")) bad.push("the title has no {title}");
+    check(`${loc}: trash unchanged, string differs in the two scoped clauses, verdicts hold, copy present`, bad.length === 0, bad.slice(0, 4).join(" | "));
+  }
 }
 
 console.log("\nD13 — panel titles are sentence case, panels carry a subtitle");

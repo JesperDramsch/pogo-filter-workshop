@@ -624,6 +624,15 @@ console.log("\nWhich piles show first (event-driven ordering)");
   check("a wild-spawn event floats its spawns, plus costumes when it had costumed spawns",
     ids({ events: [{ title: "E", category: "Event", hasCostumes: true, ...span(-2, -1) }] }) === "event_spawns,costumes_evolve,costumes_final" &&
     ids({ events: [{ title: "E", category: "Event", hasCostumes: false, ...span(-2, -1) }] }) === "event_spawns");
+  // Irrbis (710) only spawns as always-XXL Super or always-XXS Small, so an
+  // event that spawns it floats both size piles. The float is about the
+  // spawn, not the irrbisSizes setting (floatingPiles reads no config).
+  check("a wild-spawn event with Irrbis floats the XXL and XXS piles, one without doesn't",
+    ids({ events: [{ title: "I", category: "Event", hasCostumes: false, spawnDex: [25, 710], ...span(-2, -1) }] }) === "event_spawns,xxl,xxs" &&
+    ids({ events: [{ title: "I", category: "Event", hasCostumes: false, spawnDex: [25, 711], ...span(-2, -1) }] }) === "event_spawns");
+  check("the Irrbis float has its own kind, and every locale has its chip string",
+    floatingPiles({ events: [{ title: "I", category: "Event", spawnDex: [710], ...span(-2, -1) }] }, now).filter((f) => f.kind === "irrbis").map((f) => f.pile).join(",") === "xxl,xxs" &&
+    localeNames.every((loc) => typeof LOCALES[loc].messages["app.float.irrbis"] === "string" && LOCALES[loc].messages["app.float.irrbis"].includes("{title}")));
   check("a pile floats once however many events name it",
     ids({ signals: [{ kind: "takeover", title: "A", ...span(-1, 1) }, { kind: "takeover", title: "B", ...span(-2, 1) }] }) === "shadows");
   // The fetcher side: which feed entries become signals, and the costume flag.
