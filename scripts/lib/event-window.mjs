@@ -71,3 +71,46 @@ export function carryOver(fresh, previous, now, opts) {
   );
   return { merged, carriedIds: carried.map((r) => r.id) };
 }
+
+// The shrink guard's measurement (scripts/fetch-events.mjs decides what to do
+// with it). `previous` is the cached snapshot's list, `merged` what the sync is
+// about to write in its place, i.e. carryOver's output.
+//
+// The question is "did the feed lose events it should still list?", and the
+// carry-over narrows it: a cached event that has started is in `merged`
+// whether the feed lists it or not, and one past retention is meant to go. So
+// a cached record still inside the window that is missing from `merged` can
+// only be an UPCOMING event upstream no longer lists. One is a correction (a
+// cancelled or rescheduled event; a reschedule changes the title and so the
+// id). Most of them at once, with nothing taking their place, is what a broken
+// or half-written scrape looks like: Leek Duck publishes events.json straight
+// out of a scraper, and a run that saw a partial page lists a handful of
+// events where it listed thirty the day before.
+//
+// Refused when both hold:
+//   - `merged` is SHORTER than the cached list still inside the window (a
+//     feed-wide retitle loses every id and keeps the length: not a shrink), and
+//   - more of those cached events were lost than kept.
+// An event that aged past retention is not "still inside the window" and does
+// not count: the 2026-11-01 18:35 sync that dropped City Safari Boston, ended
+// a week and 35 minutes earlier, is the shape this must accept. A feed that
+// yields nothing at all is the fetcher's own, earlier refusal; here it reads
+// as "every upcoming event lost".
+export function shrunkEvents(previous, merged, now, opts) {
+  const { pastEdge, futureEdge } = windowEdges(now, opts);
+  const kept = new Set((merged || []).map((r) => r?.id).filter(Boolean));
+  const lost = [];
+  let expected = 0;
+  for (const rec of previous || []) {
+    if (!rec || !rec.id) continue;
+    const startMs = Date.parse(rec.start);
+    const endMs = Date.parse(rec.end);
+    if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) continue;
+    if (endMs < pastEdge || startMs > futureEdge) continue;   // aged out, or beyond the horizon
+    expected++;
+    if (!kept.has(rec.id)) lost.push(rec.id);
+  }
+  const retained = expected - lost.length;
+  const refused = (merged || []).length < expected && lost.length > retained;
+  return { expected, retained, lost, refused };
+}
