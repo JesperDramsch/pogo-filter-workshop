@@ -69,6 +69,7 @@ import {
 	applyWishToBuddies,
 	freeTagPrefix,
 	clashingPrefixes,
+	buddyPrefixClashPairs,
 	WISH_MAX_NAME,
 } from './share-link.js';
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from './i18n/pogo-keywords.js';
@@ -14296,7 +14297,11 @@ function DraftInput({ value, onCommit, 'aria-label': ariaLabel, ...props }) {
 function JobTagsPanel({ config, setConfig, copied, copyToClipboard, t }) {
 	const { outputLocale } = useTranslation();
 	const tags = jobTagsOf(config);
-	const buddyPrefixes = (config.buddies || []).filter((b) => b.active !== false && b.tagPrefix).map((b) => b.tagPrefix);
+	const activeBuddies = (config.buddies || []).filter((b) => b.active !== false && b.tagPrefix);
+	const buddyPrefixes = activeBuddies.map((b) => b.tagPrefix);
+	// tagClashes on the job rows covers a job tag prefix-matching a buddy's;
+	// buddy against buddy is only checked here.
+	const buddyClashes = buddyPrefixClashPairs(activeBuddies);
 	const allTags = [...JOB_TAG_ORDER.filter((j) => j !== 'promised').map((j) => tags[j]), ...buddyPrefixes, config.fernTauschTagName].filter(Boolean);
 	const rename = (job, raw) => {
 		const v = raw.trim().replace(/^#+/, '');
@@ -14330,6 +14335,11 @@ function JobTagsPanel({ config, setConfig, copied, copyToClipboard, t }) {
 								<div className='mono text-sm text-[#E6EDF3]'>{label}</div>
 								<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.tags.promised.hint')}</p>
 								<p className='mono text-xs text-[#5EAFC5] mt-1'>{shown.length ? shown.map((x) => `#${x}`).join(' · ') : '#Trade-<Name>'}</p>
+								{buddyClashes.map(([a, b]) => (
+									<p key={`${a}|${b}`} role='alert' className='mono text-[11px] text-[#F5B82E] mt-1'>
+										{t('app.tags.promised.buddy_clash', { params: { a, b } })}
+									</p>
+								))}
 							</li>
 						);
 					}
@@ -15154,6 +15164,7 @@ function BackupRestoreSection({ onExport, onImport }) {
 function BuddyManager({ buddies, onChange }) {
 	const { t } = useTranslation();
 	const [newName, setNewName] = useState('');
+	const clashIdBase = useId();
 
 	function addBuddy() {
 		const name = newName.trim();
@@ -15198,7 +15209,13 @@ function BuddyManager({ buddies, onChange }) {
 
 			{buddies.length > 0 && (
 				<div className='space-y-2 mb-3'>
-					{buddies.map((b) => (
+					{buddies.map((b) => {
+						// A hand-edited prefix is never renumbered: warn when it
+						// prefix-matches another buddy's, but leave it (some share
+						// one tag between buddies on purpose).
+						const clashes = clashingPrefixes(String(b.tagPrefix || '').trim().replace(/^#+/, ''), buddies, b.id);
+						const clashId = `${clashIdBase}-${b.id}-clash`;
+						return (
 						<div key={b.id} className='border border-[#2D3A47] rounded-sm p-2.5 space-y-2'>
 							<div className='flex items-center gap-2'>
 								<input
@@ -15225,6 +15242,7 @@ function BuddyManager({ buddies, onChange }) {
 									value={b.tagPrefix}
 									onChange={(e) => update(b.id, { tagPrefix: e.target.value })}
 									aria-label={t('app.a11y.buddy_prefix')}
+									aria-describedby={clashes.length ? clashId : undefined}
 									placeholder={t('app.buddy.prefix_placeholder')}
 									className='mono text-sm w-32 bg-[#1F2933] border border-[#2D3A47] focus:border-[#5EAFC5] outline-hidden px-2 py-1 rounded-sm text-[#E6EDF3]'
 								/>
@@ -15237,6 +15255,11 @@ function BuddyManager({ buddies, onChange }) {
 									<X size={14} />
 								</button>
 							</div>
+							{clashes.length > 0 && (
+								<p id={clashId} className='mono text-[11px] text-[#F5B82E] leading-relaxed'>
+									{t('app.buddy.prefix_clash', { params: { tags: clashes.map((c) => `#${c}`).join(', ') } })}
+								</p>
+							)}
 							<div className='mono text-[10px] text-[#8090A0]'>
 								{t('app.buddy.clause_label')} <code className='text-[#E67E22]'>!#{b.tagPrefix}</code>{' '}
 								{t('app.buddy.clause_match', {
@@ -15254,7 +15277,8 @@ function BuddyManager({ buddies, onChange }) {
 									)}
 							</div>
 						</div>
-					))}
+						);
+					})}
 				</div>
 			)}
 

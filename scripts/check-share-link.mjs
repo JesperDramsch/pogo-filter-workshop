@@ -15,6 +15,10 @@
 //   S8 — generated tag prefixes never prefix-match another buddy's (the
 //        in-game search matches #tags by prefix)
 //   S9 — an empty list ("I have everything") clears or removes, never errors
+//   S10 — hand-edited prefixes: clashes between existing buddies are found
+//         (the buddy manager's inline warning and the tagging scheme's
+//         "promised" row), in both directions, and job-tag clashes stay with
+//         tagClashes so nothing is warned twice
 //
 // Run with: npm run test:sharelink  (or npx vite-node scripts/check-share-link.mjs)
 
@@ -31,6 +35,7 @@ import {
   freeTagPrefix,
   clashingPrefixes,
   tagPrefixesClash,
+  buddyPrefixClashPairs,
   buddyTagPrefixFor,
   cleanShareName,
   WISH_HASH_PREFIX,
@@ -215,6 +220,37 @@ check("form keys the catalog lacks are dropped by normalizeBuddyTarget",
 check("control and bidi characters stripped from names", cleanShareName("A‮b\u0007c\n d") === "Abc d");
 check("oversized id ignored, link still works", parseWishHash(tok({ v: 1, id: "x".repeat(200), n: "A", t: [{ s: "25" }] })).wish.id === null);
 check("encoder is deterministic", encodeWishToken({ id: "a", name: "B", targets }) === encodeWishToken({ id: "a", name: "B", targets }));
+
+console.log("S10 — hand-edited prefixes are checked against the other buddies");
+const edited = [
+  { id: "a", name: "Alex", tagPrefix: "Trade-Alex" },
+  { id: "b", name: "Alexa", tagPrefix: "Trade-Alexa" },
+  { id: "c", name: "Bea", tagPrefix: "Trade-Bea" },
+  { id: "d", name: "Alexander", tagPrefix: "trade-ALEXANDER" },
+];
+check("editing Alex's prefix names both clashing buddies, case-insensitive",
+  clashingPrefixes("Trade-Alex", edited, "a").join() === "Trade-Alexa,trade-ALEXANDER", clashingPrefixes("Trade-Alex", edited, "a").join());
+check("the buddy being edited never clashes with itself", clashingPrefixes("Trade-Bea", edited, "c").length === 0);
+check("a shorter typed prefix clashes with the longer ones it starts",
+  clashingPrefixes("Trade-A", edited, "c").join() === "Trade-Alex,Trade-Alexa,trade-ALEXANDER");
+check("an empty prefix clashes with nothing", clashingPrefixes("", edited, "c").length === 0);
+const pairs = buddyPrefixClashPairs(edited);
+check("every clashing pair is reported once, in buddy order",
+  JSON.stringify(pairs) === JSON.stringify([["Trade-Alex", "Trade-Alexa"], ["Trade-Alex", "trade-ALEXANDER"], ["Trade-Alexa", "trade-ALEXANDER"]]),
+  JSON.stringify(pairs));
+check("Alexander starts with Alexa, so those two clash as well",
+  tagPrefixesClash("Trade-Alexa", "trade-ALEXANDER"));
+check("two buddies sharing one prefix clash",
+  buddyPrefixClashPairs([{ id: "x", tagPrefix: "Trade-Jo" }, { id: "y", tagPrefix: "Trade-Jo" }]).length === 1);
+check("buddies without a prefix are skipped",
+  buddyPrefixClashPairs([{ id: "x", tagPrefix: "" }, { id: "y", tagPrefix: "Trade-Jo" }, null]).length === 0);
+check("generated prefixes produce no pairs", buddyPrefixClashPairs(twoAlex.map((p, i) => ({ id: i, tagPrefix: p }))).length === 0);
+// The job rows' tagClashes reports a job tag that starts a buddy prefix
+// (#Trade starts #Trade-Alex); buddy against buddy only shows on the promised
+// row. A buddy-only clash must not surface on a job row, or it warns twice.
+const jobTags = ["Dex-Evolve", "Tradebait", "PvP"];
+check("a buddy-only clash does not show on any job row",
+  jobTags.every((tag) => tagClashes(tag, [...jobTags, ...edited.map((b) => b.tagPrefix)], "en").prefixOf.length === 0));
 
 console.log(`\n${failures === 0 ? "✓ All share-link tests passed." : `✗ ${failures} test(s) failed.`}`);
 process.exit(failures === 0 ? 0 : 1);

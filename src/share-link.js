@@ -198,6 +198,21 @@ export function clashingPrefixes(prefix, buddies, exceptId = null) {
 		.map((b) => b.tagPrefix);
 }
 
+// Every pair of buddies whose prefixes clash, as [prefixA, prefixB] in buddy
+// order. The tagging scheme's "promised" row lists these: a hand-edited
+// prefix can collide with another buddy's even though a generated one never
+// does. Two buddies with the same prefix clash too (they share every tag).
+export function buddyPrefixClashPairs(buddies) {
+	const list = (Array.isArray(buddies) ? buddies : []).filter((b) => b && b.tagPrefix);
+	const pairs = [];
+	for (let i = 0; i < list.length; i++) {
+		for (let j = i + 1; j < list.length; j++) {
+			if (tagPrefixesClash(list[i].tagPrefix, list[j].tagPrefix)) pairs.push([list[i].tagPrefix, list[j].tagPrefix]);
+		}
+	}
+	return pairs;
+}
+
 // A tag prefix for a new buddy called `name` that clashes with no existing
 // buddy. The number goes in FRONT of the name (`Trade-2Alex`), because a
 // number at the end (`Trade-Alex2`) still starts with `Trade-Alex` and so
