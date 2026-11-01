@@ -66,10 +66,14 @@ const CORE_GROUPS = [
   { id: "size",       cards: [CARDS.xxl, CARDS.xxs] },
 ];
 
+// Group ids are shared with the settings page (SETTINGS_GROUPS in App.jsx):
+// a card's group is the heading its toggle sits under there, held by
+// scripts/check-settings-groups.mjs.
 const ADVANCED_GROUPS = [
   { id: "iv",     cards: [CARDS.four_star, CARDS.nundos] },
   { id: "battle", cards: [CARDS.legacy_moves, CARDS.double_moved, CARDS.dynamax] },
-  { id: "niche",  cards: [CARDS.ultra_beasts, CARDS.new_evolutions, CARDS.xl, CARDS.buddies, CARDS.lucky_eligible] },
+  { id: "size",   cards: [CARDS.xl] },
+  { id: "niche",  cards: [CARDS.ultra_beasts, CARDS.new_evolutions, CARDS.buddies, CARDS.lucky_eligible] },
 ];
 
 // Flatten to ordered decks, stamping each card with its group id for the header.
@@ -110,7 +114,12 @@ function CardFace({ card, t }) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────
 
-export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
+// `expert`: the fine-tuning deck is offered only in expert mode. Every card
+// in the essentials deck is a toggle normal mode shows, so a user is never
+// asked about a setting they cannot find afterwards; the reverse (a toggle
+// normal mode shows whose card sits in the fine-tuning deck, XL and Dynamax)
+// is harmless and left as is.
+export default function SwipeOnboarding({ onComplete, onSkip, onNavigate, expert = false }) {
   const { t } = useTranslation();
   const reduced = useReducedMotion();
 
@@ -136,6 +145,14 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
   const busyRef = useRef(false);
   const hintPlayedRef = useRef(false);
   const hintControlsRef = useRef(null);
+  // Arriving here swaps the whole view (first run, or "Run again" from the
+  // Catching settings), so the control that was activated is gone and focus
+  // fell to <body>. Land it on the deck's heading, as the wizard's StepWrapper
+  // does, so a screen reader hears where it is.
+  const titleRef = useRef(null);
+  useEffect(() => {
+    titleRef.current?.focus();
+  }, []);
 
   const deck = phase === "advanced" ? ADVANCED : CORE;
   const card = deck[index] || null;
@@ -164,12 +181,12 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
       if (!card) return;
       setDecisions((d) => ({ ...d, [card.key]: value }));
       if (index + 1 >= deck.length) {
-        setPhase(phase === "core" ? "offer" : "done");
+        setPhase(phase === "core" && expert ? "offer" : "done");
       } else {
         setIndex((i) => i + 1);
       }
     },
-    [card, index, deck.length, phase, x]
+    [card, index, deck.length, phase, expert, x]
   );
 
   // Fling the card off-screen, then commit (or commit instantly when the user
@@ -316,7 +333,7 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate }) {
                   <div className="mono text-[11px] uppercase tracking-wider" style={{ color: C.cyan }}>
                     {t("app.onboarding.swipe.eyebrow")}
                   </div>
-                  <h1 className="mono text-2xl font-bold mt-1" style={{ color: C.text }}>
+                  <h1 ref={titleRef} tabIndex={-1} className="mono text-2xl font-bold mt-1 outline-hidden" style={{ color: C.text }}>
                     {t("app.onboarding.swipe.title")}
                   </h1>
                   <p className="text-xs mt-2 max-w-xs mx-auto leading-relaxed" style={{ color: C.dim }}>

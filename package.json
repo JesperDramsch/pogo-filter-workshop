@@ -55,6 +55,7 @@
   "test:swipe": "vite-node scripts/check-swipe-areas.mjs",
   "test:bonusnudges": "vite-node scripts/check-bonus-nudges.mjs",
   "test:sharelink": "vite-node scripts/check-share-link.mjs",
+  "test:settingsgroups": "vite-node scripts/check-settings-groups.mjs",
   "fixtures:update": "vite-node scripts/generate-fixtures.mjs",
   "preview": "vite preview",
   "deploy": "npm run build && gh-pages -d dist"

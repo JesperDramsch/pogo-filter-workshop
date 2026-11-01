@@ -38,7 +38,7 @@ Nerd stuff (set theory, raw clauses, check a Pokémon) stays where it is.
 
 Each area has a help sheet: a title and four short paragraphs (`app.help.<area>.title`, `.p1` to `.p4`) in a modal sheet on the shared `Dialog` primitive (`src/Dialog.jsx`), not a box in the page. On phones it is a bottom sheet; from the `sm` breakpoint up it is a slide-over on the right. A pill next to the area hint (`app.help.toggle_open`, `aria-haspopup="dialog"`) opens it; Escape, the backdrop, the X (`app.help.close_aria`) or the "Got it" button (`app.help.got_it`) closes it, and so does the page moving beneath it (browser Back, a pasted hash, another area's tab) so it never sits over a page it does not describe. The header and the "Got it" footer are both stuck to the panel's edges, so the focused button is in view on open even when the paragraphs overflow a short phone. The help copy names things ("the planner on this tab", "the Catching settings button") rather than pointing above or below, since nothing in the page is above or below a sheet. The dialog's accessible name is the generic `app.help.dialog_label`; the heading inside names the area. One sheet is open at a time, and it is rendered only while open.
 
-The sheet opens on its own once per user: the first area that shows its filters opens its sheet and is marked seen, and every other area waits for the pill (four sheets on a new user's first four tab clicks was too many). The seen flags live in `localStorage` under `pogo:helpSeen` beside `pogo:onboarded`, not in the config, so an export, a preset or a filter reset never carries or clears them. Nothing opens or is marked seen while an area shows its settings, nor once any area is marked seen, on another wizard step, on another view or before storage has loaded, so the first-run redirect to the swipe deck and a shared `#workshop/<area>/settings` link leave the flags alone. Open state itself is per session: a reload starts closed.
+The sheet opens on its own once per user: the first area that shows its filters opens its sheet and is marked seen, and every other area waits for the pill (four sheets on a new user's first four tab clicks was too many). The seen flags live in `localStorage` under `pogo:helpSeen` beside `pogo:onboarded`, not in the config, so an export or a filter reset never carries or clears them. Nothing opens or is marked seen while an area shows its settings, nor once any area is marked seen, on another wizard step, on another view or before storage has loaded, so the first-run redirect to the swipe deck and a shared `#workshop/<area>/settings` link leave the flags alone. Open state itself is per session: a reload starts closed.
 
 The Sorting help carries the hidden-piles rule in one line: piles for categories you tossed sit under "N hidden" and come back when you bring them back there or protect the category again. The Catching help names no candy or XP numbers: what a Mega level pays is game data, not prose.
 
@@ -105,7 +105,7 @@ Piles relevant to recent or running events float to the top. All other piles sit
 | Max Monday or Max Battle event | Dynamax |
 | Double transfer candy day | A reminder card for the `crush` working tag (not a pile) |
 
-Hiding is stateful and edge-triggered. `config.hiddenPiles` is the user's own list, edited under "N hidden" on the Sorting tab. A protection on the Catching tab edits that list once, on its on/off edge, wherever the change comes from (the swipe deck, a ConfigPanel toggle or a preset): turning a category's protection off adds its piles to the list, turning it back on removes them. Between edges the list is the truth: a pile the user brought back stays visible until the protection goes on and then off again, and a toggle never gates the render. Loading, importing, the cross-tab echo and reset write the config as it is and never re-hide. A pile that floats for a running event shows while it floats, hidden or not.
+Hiding is stateful and edge-triggered. `config.hiddenPiles` is the user's own list, edited under "N hidden" on the Sorting tab. A protection on the Catching tab edits that list once, on its on/off edge, wherever the change comes from (the swipe deck or a ConfigPanel toggle): turning a category's protection off adds its piles to the list, turning it back on removes them. Between edges the list is the truth: a pile the user brought back stays visible until the protection goes on and then off again, and a toggle never gates the render. Loading, importing, the cross-tab echo and reset write the config as it is and never re-hide. A pile that floats for a running event shows while it floats, hidden or not.
 
 | Protection | Piles it hides and shows |
 | --- | --- |
@@ -213,7 +213,25 @@ Every tag is a job. `Evolve` and `Crush` are temporary: `Evolve` comes off once 
 
 ### Expert mode
 
-The existing `expertMode` flag decides visibility. Simple mode shows the piles with default budgets and no budget editing. Expert mode shows the budget table as editable numbers and the protection toggles. The swipe onboarding stays as it is.
+The existing `expertMode` flag decides visibility. Simple mode shows the piles with default budgets and no budget editing, and hides the expert-only protection toggles; their values still apply, so simple mode says how many differ from the defaults and offers a reset behind a confirm (`expertSettingsDiffering`, `src/App.jsx`). Expert mode shows the budget table as editable numbers and every toggle. The swipe deck offers its fine-tuning cards only in expert mode, and every card in its essentials deck is a toggle normal mode shows; `scripts/check-settings-groups.mjs` holds both.
+
+### Settings groups
+
+The protection toggles under Catching → settings sit in the nine groups the swipe deck (`src/SwipeOnboarding.jsx`) walks a new user through, under the deck's own headings (`app.onboarding.swipe.group.<id>`). `SETTINGS_GROUPS` in `src/App.jsx` is the one list behind the page, the deck's group ids and `scripts/check-settings-groups.mjs` (`npm run test:settingsgroups`). The deck replaced the presets; "Run again" in the presets' old spot starts it over.
+
+| Group | Heading (en) | Toggles | Piles hidden on the off edge |
+| --- | --- | --- | --- |
+| marked | Marked by you | favourites, any tag | none |
+| rare | Shiny, lucky & rare | shinies, luckies, legendaries, mythicals | Shinies, Luckies, Legendaries (once Ultra Beasts are off too) |
+| shadow | Shadow & Purified | shadows, purify-only floor, purified | Shadows |
+| looks | Looks | costumes, backgrounds | Costumes (both), Community Day backgrounds |
+| collection | Babies & evolutions | babies, trade evolutions, traded regionals | none |
+| size | Size records | XXL, XL, XXS | XXL, XXS |
+| iv | IV extremes | 4★, nundos | none |
+| battle | Battle-ready | legacy moves, Smeargle carve-out, double-moved, Dynamax, Gigantamax | Dynamax |
+| niche | Niche keepers | Ultra Beasts, new evolutions, buddies, lucky-eligible | Legendaries (once legendaries are off too) |
+
+Expert-only toggles carry the EXPERT badge and are hidden in simple mode. The Sorting piles keep their own four groups (collection, battle, evolve, big): a deck of 17 pile cards reads better in four than in nine, and the table above is what ties a toggle to its pile.
 
 ## Unchanged
 

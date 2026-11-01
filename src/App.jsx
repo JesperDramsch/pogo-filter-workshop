@@ -1066,10 +1066,6 @@ export const DEFAULT_CONFIG = {
 	// normal mode too.
 	rocketLenientCounters: true,
 
-	// The preset key the user last clicked, if they haven't tweaked anything
-	// in ConfigPanel since. Cleared by any individual toggle change so the
-	// marker reflects "what's currently in effect" rather than just history.
-	lastAppliedPreset: null,
 };
 
 // ─── REGIONAL FORM CHECKS ───────────────────────────────────────────────────
@@ -1580,6 +1576,7 @@ export function mergeImportedConfig(raw, notices = []) {
 	delete merged.protectLeagueTags; // replaced with leagueTags string
 	delete merged.protectMegaConditional; // renamed to protectNewEvolutions
 	delete merged.yearMin;
+	delete merged.lastAppliedPreset; // presets are gone; the swipe deck replaced them
 	// Migrate old field names (read from raw, write to merged)
 	if (raw?.mythCarveOuts && !raw.mythTooManyOf) merged.mythTooManyOf = raw.mythCarveOuts;
 	if (raw?.protectMegaConditional !== undefined && raw.protectNewEvolutions === undefined) {
@@ -2078,7 +2075,7 @@ export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] 
 // Protection toggles hide and show category piles (spec: "Which piles show
 // first"). The Sorting tab is stateful: config.hiddenPiles is the user's own
 // list, and a protect* toggle only edits it on the edge. Turning a category's
-// protection off (swipe deck, ConfigPanel toggle or preset) hides its piles;
+// protection off (swipe deck or ConfigPanel toggle) hides its piles;
 // turning it back on shows them again. Between those edges the user's own
 // hide/unhide under "N hidden" is the truth, and the toggle never gates the
 // render. Piles without a category (meta, watchlist, non_meta, hundo, cday,
@@ -5827,7 +5824,7 @@ const KEY_ONBOARDED = 'pogo:onboarded';
 const KEY_CHANGELOG_SEEN = 'pogo:changelogSeen';
 // One flag per filter area: which area's help sheet opened on its own. Only
 // the first area a user reaches ever does, so at most one is true. Lives
-// beside pogo:onboarded rather than in the config, so an export or a preset
+// beside pogo:onboarded rather than in the config, so an export
 // never carries it and a reset of the filters leaves it alone.
 const KEY_HELP_SEEN = 'pogo:helpSeen';
 const HELP_SEEN_DEFAULT = Object.freeze(Object.fromEntries(FILTER_AREAS.map((area) => [area, false])));
@@ -6366,7 +6363,7 @@ export default function App() {
 	const [topMaxAttackers, setTopMaxAttackers] = useState(DEFAULT_TOP_MAX_ATTACKERS);
 	const [config, setConfig] = useState(DEFAULT_CONFIG);
 	// The one setter every protect* change goes through (ConfigPanel toggles
-	// and presets, the swipe deck): it edits hiddenPiles on a protection's
+	// and the swipe deck): it edits hiddenPiles on a protection's
 	// on/off edge, see withPileTransitions. Load, import, the cross-tab echo
 	// and reset write the config as it is, so a saved list is never re-hidden.
 	const setConfigWithPiles = (next) =>
@@ -7193,7 +7190,7 @@ export default function App() {
 	// changes no protection and so touches no pile.
 	function completeOnboarding(patch, dest = 'filter') {
 		if (patch && Object.keys(patch).length) {
-			setConfigWithPiles((prev) => ({ ...prev, ...patch, lastAppliedPreset: null }));
+			setConfigWithPiles((prev) => ({ ...prev, ...patch }));
 		}
 		setOnboarded(true);
 		// Drop into the workshop on the chosen step — "filter" for instant payoff,
@@ -7603,7 +7600,8 @@ export default function App() {
 				{homeMapSettings}
 				<ConfigPanel
 					{...configPanelProps}
-					sections={['locals', 'presets', 'protections', 'regional', 'collectibles', 'tradeEvo']}
+					onRunCards={() => navigateView('onboard')}
+					sections={['locals', 'cards', 'protections', 'regional', 'collectibles', 'tradeEvo']}
 				/>
 				{mythCarveOutSettings}
 				<ExpertProtectionSettings config={config} set={setConfigKey} />
@@ -7662,7 +7660,12 @@ export default function App() {
 
 			{view === 'landing' && <Landing onNavigate={navigateView} />}
 			{view === 'onboard' && (
-				<SwipeOnboarding onComplete={completeOnboarding} onSkip={skipOnboarding} onNavigate={navigateView} />
+				<SwipeOnboarding
+					onComplete={completeOnboarding}
+					onSkip={skipOnboarding}
+					onNavigate={navigateView}
+					expert={!!config.expertMode}
+				/>
 			)}
 			{view === 'general' && <General onNavigate={navigateView} />}
 			{view === 'regional' && <Regional onNavigate={navigateView} />}
@@ -9100,9 +9103,7 @@ function CustomCollectiblesEditor({ list, onChange }) {
 
 	return (
 		<div>
-			<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-				{t('app.collectibles.title')}
-			</div>
+			<SettingsTitle>{t('app.collectibles.title')}</SettingsTitle>
 			<p className='mono text-xs text-[#8090A0] mb-3 leading-relaxed'>{t('app.collectibles.description')}</p>
 
 			{list.length > 0 && (
@@ -12053,155 +12054,123 @@ function FieldNum({ label, value, onChange, min, max }) {
 	);
 }
 
-// ─── PRESETS ────────────────────────────────────────────────────────────────
+// ─── PROTECTION TOGGLES ─────────────────────────────────────────────────────
 
-const PRESETS = {
-	casual: {
-		labelKey: 'app.preset.casual.label',
-		descriptionKey: 'app.preset.casual.description',
-		apply: (cfg) => ({
-			...cfg,
-			pvpMode: 'strict',
-			protectFavorites: true,
-			protectShinies: true,
-			protectLuckies: true,
-			protectLegendaries: true,
-			protectMythicals: true,
-			protectUltraBeasts: true,
-			protectShadows: true,
-			protectPurified: true,
-			protectCostumes: true,
-			protectBackgrounds: true,
-			protectLegacyMoves: true,
-			protectBabies: true,
-			protectXXL: true,
-			protectXL: true,
-			protectXXS: true,
-			protectDoubleMoved: true,
-			protectDynamax: true,
-			protectGigantamax: true,
-			protectNewEvolutions: true,
-			protectBuddies: true,
-			protectLuckyEligible: true,
-			luckyEligibleYear: 21,
-			regionalGroups: defaultRegionalToggles(),
-		}),
+// The protection toggles of the Catching settings, in the nine groups the
+// "Toss or Keep?" deck (src/SwipeOnboarding.jsx) walks a new user through, so
+// a setting sits where the cards taught them to expect it. Each row is
+// [configKey, i18nBase, flags]: label and why resolve via t() at render time
+// from `${i18nBase}.label` / `.why`, the group heading from
+// `app.onboarding.swipe.group.<id>`. `expertOnly` rows are hidden in normal
+// mode (their values still apply, see expertSettingsDiffering); every card in
+// the deck's essentials set is a row normal mode shows, since the deck asks
+// every user about it. `requireConfirmOff` arms a two-click confirm before a
+// safety net goes off.
+// This list is the one source of truth for the page, for the deck's group ids
+// and for scripts/check-settings-groups.mjs (spec: "Settings groups").
+export const SETTINGS_GROUPS = [
+	{
+		id: 'marked',
+		rows: [
+			['protectFavorites', 'app.protect.favorites'],
+			['protectAnyTag', 'app.protect.any_tag'],
+		],
 	},
-	collector: {
-		labelKey: 'app.preset.collector.label',
-		descriptionKey: 'app.preset.collector.description',
-		apply: (cfg) => {
-			// Maximalist preset: every regional form on, including C-tier base
-			// Alolan/Galarian junk that the recommended default skips.
-			const groups = defaultRegionalToggles();
-			for (const k of Object.keys(groups)) {
-				groups[k].enabled = true;
-				groups[k].typeChecksEnabled = null;
-				groups[k].collectorsEnabled = null;
-			}
-			return {
-				...cfg,
-				pvpMode: 'none',
-				protectFavorites: true,
-				protectShinies: true,
-				protectLuckies: true,
-				protectLegendaries: true,
-				protectMythicals: true,
-				protectUltraBeasts: true,
-				protectShadows: true,
-				protectPurified: true,
-				protectCostumes: true,
-				protectBackgrounds: true,
-				protectLegacyMoves: true,
-				protectBabies: true,
-				protectXXL: true,
-				protectXL: true,
-				protectXXS: true,
-				protectDoubleMoved: true,
-				protectDynamax: true,
-				protectGigantamax: true,
-				protectNewEvolutions: true,
-				protectBuddies: true,
-				protectLuckyEligible: true,
-				luckyEligibleYear: 21,
-				regionalGroups: groups,
-			};
-		},
+	{
+		id: 'rare',
+		rows: [
+			['protectShinies', 'app.protect.shinies'],
+			['protectLuckies', 'app.protect.luckies'],
+			['protectLegendaries', 'app.protect.legendaries'],
+			['protectMythicals', 'app.protect.mythicals'],
+		],
 	},
-	aggressive: {
-		labelKey: 'app.preset.aggressive.label',
-		descriptionKey: 'app.preset.aggressive.description',
-		apply: (cfg) => {
-			const groups = defaultRegionalToggles();
-			for (const k of Object.keys(groups)) groups[k].enabled = false;
-			return {
-				...cfg,
-				pvpMode: 'strict',
-				protectFavorites: true,
-				protectShinies: true,
-				protectLuckies: true,
-				protectLegendaries: true,
-				protectMythicals: true,
-				protectUltraBeasts: true,
-				protectShadows: true,
-				protectPurified: true,
-				protectCostumes: true,
-				protectBackgrounds: true,
-				protectLegacyMoves: true,
-				protectBabies: false,
-				protectXXL: false,
-				protectXL: false,
-				protectXXS: false,
-				protectDoubleMoved: true,
-				protectDynamax: true,
-				protectGigantamax: true,
-				protectNewEvolutions: false,
-				protectBuddies: false,
-				protectLuckyEligible: true,
-				luckyEligibleYear: 21,
-				regionalGroups: groups,
-			};
-		},
+	{
+		id: 'shadow',
+		rows: [
+			['protectShadows', 'app.protect.shadows'],
+			['protectShadowPurifyOnly', 'app.protect.shadow_purify_only', { expertOnly: true }],
+			['protectPurified', 'app.protect.purified'],
+		],
 	},
-	pvpFocus: {
-		labelKey: 'app.preset.pvpFocus.label',
-		descriptionKey: 'app.preset.pvpFocus.description',
-		apply: (cfg) => {
-			const groups = defaultRegionalToggles();
-			groups.alolan.enabled = false;
-			groups.galarian.enabled = false;
-			groups.hisuian.enabled = false;
-			groups.paldean.enabled = false;
-			return {
-				...cfg,
-				pvpMode: 'loose',
-				protectFavorites: true,
-				protectShinies: true,
-				protectLuckies: true,
-				protectLegendaries: true,
-				protectMythicals: true,
-				protectUltraBeasts: true,
-				protectShadows: true,
-				protectPurified: true,
-				protectCostumes: false,
-				protectBackgrounds: false,
-				protectLegacyMoves: true,
-				protectBabies: false,
-				protectXXL: false,
-				protectXL: false,
-				protectXXS: false,
-				protectDoubleMoved: true,
-				protectDynamax: false,
-				protectGigantamax: false,
-				protectNewEvolutions: false,
-				protectBuddies: false,
-				protectLuckyEligible: true,
-				luckyEligibleYear: 21,
-				regionalGroups: groups,
-			};
-		},
+	{
+		id: 'looks',
+		rows: [
+			['protectCostumes', 'app.protect.costumes'],
+			['protectBackgrounds', 'app.protect.backgrounds'],
+		],
 	},
-};
+	{
+		id: 'collection',
+		rows: [
+			['protectBabies', 'app.protect.babies'],
+			['protectTradeEvos', 'app.protect.trade_evos'],
+			['trashTradedRegionals', 'app.protect.trash_traded_regionals', { expertOnly: true }],
+		],
+	},
+	{
+		id: 'size',
+		rows: [
+			['protectXXL', 'app.protect.xxl'],
+			['protectXL', 'app.protect.xl'],
+			['protectXXS', 'app.protect.xxs'],
+		],
+	},
+	{
+		id: 'iv',
+		rows: [
+			['protectFourStar', 'app.protect.four_star', { expertOnly: true, requireConfirmOff: true }],
+			['protectNundos', 'app.protect.nundos', { expertOnly: true, requireConfirmOff: true }],
+		],
+	},
+	{
+		id: 'battle',
+		rows: [
+			['protectLegacyMoves', 'app.protect.legacy_moves', { expertOnly: true }],
+			['protectSmeargleLegacy', 'app.protect.smeargle_legacy', { expertOnly: true }],
+			['protectDoubleMoved', 'app.protect.double_moved', { expertOnly: true }],
+			['protectDynamax', 'app.protect.dynamax', { requireConfirmOff: true }],
+			['protectGigantamax', 'app.protect.gigantamax', { expertOnly: true, requireConfirmOff: true }],
+		],
+	},
+	{
+		id: 'niche',
+		rows: [
+			['protectUltraBeasts', 'app.protect.ultra_beasts', { expertOnly: true }],
+			['protectNewEvolutions', 'app.protect.new_evolutions', { expertOnly: true }],
+			['protectBuddies', 'app.protect.buddies_protect', { expertOnly: true }],
+			['protectLuckyEligible', 'app.protect.lucky_eligible', { expertOnly: true }],
+		],
+	},
+];
+export const PROTECTION_ROWS = SETTINGS_GROUPS.flatMap((g) => g.rows);
+
+// Expert gating is visibility only: a toggle flipped in expert mode keeps
+// shaping the strings after the user returns to normal mode, with its row
+// hidden. These are the expert-only rows whose value differs from the
+// default, so normal mode can say so and offer a reset.
+export function expertSettingsDiffering(config) {
+	if (!config) return [];
+	return PROTECTION_ROWS.filter(([k, , extra]) => extra?.expertOnly && !!config[k] !== !!DEFAULT_CONFIG[k]).map(
+		([k]) => k,
+	);
+}
+
+// One heading style across the settings areas: a cyan section title (the
+// style the carve-out, keeper and budget blocks already use) over grey group
+// captions. The caption is a fieldset's legend, so a screen reader names the
+// group with every checkbox in it and the regrouping is navigable, not just
+// visible. Extra props (an id, tabIndex) reach the title so it can take focus.
+function SettingsTitle({ children, ...rest }) {
+	return (
+		<h3 {...rest} className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-3'>
+			{children}
+		</h3>
+	);
+}
+function SettingsCaption({ children }) {
+	return <legend className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] pb-1'>{children}</legend>;
+}
 
 // Intelligent-PvP controls, rendered under the mode radio when that mode is
 // active. Two audiences share it: a normal user gets the one-tap league packs
@@ -12348,9 +12317,11 @@ function ConfigPanel({
 	friendCollectTargets = [],
 	friendCollectSuggestions = [],
 	pvpMetaPacks = [],
+	onRunCards = null,
 	sections = null,
 }) {
 	const { t, outputLocale } = useTranslation();
+	const announce = useAnnounce();
 	// "Lass Freunde für dich sammeln" — collapsed by default; the target lists
 	// get long, and the section is a sibling of the buddy wish-species cards.
 	const [showFriendCollect, setShowFriendCollect] = useState(false);
@@ -12358,19 +12329,13 @@ function ConfigPanel({
 	// raw string lives here so unresolved tokens survive a failed add, same as
 	// the other SpeciesListEditor call sites in App.
 	const [newPvpMeta, setNewPvpMeta] = useState('');
-	// Any individual change in ConfigPanel clears the preset marker — the
-	// marker means "this preset is currently in effect"; the moment the
-	// user tweaks anything, that's no longer literally true.
 	function set(k, v) {
-		setConfig({ ...config, [k]: v, lastAppliedPreset: null });
+		setConfig({ ...config, [k]: v });
 	}
 	function setGroup(groupKey, partial) {
 		const groups = { ...(config.regionalGroups || {}) };
 		groups[groupKey] = { ...groups[groupKey], ...partial };
 		set('regionalGroups', groups);
-	}
-	function applyPreset(presetKey) {
-		setConfig({ ...PRESETS[presetKey].apply(config), lastAppliedPreset: presetKey });
 	}
 
 	const expert = !!config.expertMode;
@@ -12378,42 +12343,32 @@ function ConfigPanel({
 	// each filter area's settings (`sections` lists the parts; null = all).
 	const show = (key) => !sections || sections.includes(key);
 
-	// Universal protections — shown in all modes (these are the "obviously yes" ones)
-	// [configKey, translationKeyBase, extra?] — labels & whys resolve via t() at
-	// render time. Translation keys live in src/locales/app/{locale}.json.
-	// Single ordered list: simple-mode shows non-expert rows; expert mode adds
-	// the `{ expertOnly: true }` rows in-place so related toggles stay
-	// visually adjacent (e.g. Smeargle carve-out next to Legacy Moves).
-	const settings = [
-		['protectFavorites', 'app.protect.favorites'],
-		['protectFourStar', 'app.protect.four_star', { expertOnly: true, requireConfirmOff: true }],
-		['protectNundos', 'app.protect.nundos', { expertOnly: true, requireConfirmOff: true }],
-		['protectAnyTag', 'app.protect.any_tag'],
-		['protectTradeEvos', 'app.protect.trade_evos'],
-		['trashTradedRegionals', 'app.protect.trash_traded_regionals', { expertOnly: true }],
-		['protectShinies', 'app.protect.shinies', { expertOnly: true }],
-		['protectLuckies', 'app.protect.luckies', { expertOnly: true }],
-		['protectLegendaries', 'app.protect.legendaries'],
-		['protectMythicals', 'app.protect.mythicals', { expertOnly: true }],
-		['protectUltraBeasts', 'app.protect.ultra_beasts', { expertOnly: true }],
-		['protectShadows', 'app.protect.shadows', { expertOnly: true }],
-		['protectShadowPurifyOnly', 'app.protect.shadow_purify_only', { expertOnly: true }],
-		['protectPurified', 'app.protect.purified', { expertOnly: true }],
-		['protectCostumes', 'app.protect.costumes'],
-		['protectBackgrounds', 'app.protect.backgrounds'],
-		['protectLegacyMoves', 'app.protect.legacy_moves', { expertOnly: true }],
-		['protectSmeargleLegacy', 'app.protect.smeargle_legacy', { expertOnly: true }],
-		['protectBabies', 'app.protect.babies'],
-		['protectXXL', 'app.protect.xxl'],
-		['protectXL', 'app.protect.xl'],
-		['protectXXS', 'app.protect.xxs'],
-		['protectNewEvolutions', 'app.protect.new_evolutions', { expertOnly: true }],
-		['protectDoubleMoved', 'app.protect.double_moved', { expertOnly: true }],
-		['protectDynamax', 'app.protect.dynamax', { requireConfirmOff: true }],
-		['protectGigantamax', 'app.protect.gigantamax', { expertOnly: true, requireConfirmOff: true }],
-		['protectBuddies', 'app.protect.buddies_protect', { expertOnly: true }],
-		['protectLuckyEligible', 'app.protect.lucky_eligible', { expertOnly: true }],
-	];
+	// Normal mode hides the expert-only rows but their values still apply:
+	// say how many differ from the defaults and offer a two-click reset
+	// (armed for 3 s, like a ToggleRow's confirm). The reset routes through
+	// the same setter as a toggle, so a protection coming back on also brings
+	// its Sorting pile back.
+	const differing = expertSettingsDiffering(config);
+	const protectionsTitleId = useId();
+	const [resetArmed, setResetArmed] = useState(false);
+	useEffect(() => {
+		if (!resetArmed) return;
+		const timer = setTimeout(() => setResetArmed(false), 3000);
+		return () => clearTimeout(timer);
+	}, [resetArmed]);
+	function resetExpertSettings() {
+		if (!resetArmed) {
+			setResetArmed(true);
+			announce(`${t('app.protect.expert_diff.reset')} — ${t('app.protect.confirm_off')}`, { assertive: true });
+			return;
+		}
+		setResetArmed(false);
+		setConfig({ ...config, ...Object.fromEntries(differing.map((k) => [k, DEFAULT_CONFIG[k]])) });
+		// The write empties `differing`, which unmounts the note and the button
+		// that had focus: say what happened and land focus on the section title.
+		announce(t('app.protect.expert_diff.done'));
+		requestAnimationFrame(() => document.getElementById(protectionsTitleId)?.focus());
+	}
 
 	return (
 		<div className='space-y-6'>
@@ -12447,33 +12402,21 @@ function ConfigPanel({
 				</>
 			)}
 
-			{show('presets') && (
+			{show('cards') && onRunCards && (
 				<>
-					{/* PRESETS */}
-					<div>
-						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-							{t('app.preset.section_title')}
+					{/* TOSS OR KEEP? — the swipe deck, runnable again; it replaced the presets */}
+					<div className='flex items-center justify-between gap-3 border border-[#2D3A47] rounded-sm p-3'>
+						<div>
+							<div className='mono text-sm text-[#E6EDF3]'>{t('app.protect.cards.label')}</div>
+							<div className='mono text-[11px] text-[#8090A0] mt-0.5'>{t('app.protect.cards.help')}</div>
 						</div>
-						<div className='flex flex-wrap gap-1.5'>
-							{Object.entries(PRESETS).map(([key, preset]) => {
-								const active = config.lastAppliedPreset === key;
-								return (
-									<button
-										key={key}
-										onClick={() => applyPreset(key)}
-										title={t(preset.descriptionKey)}
-										className={`mono text-xs px-3 py-1.5 rounded-sm transition ${
-											active
-												? 'bg-[#5EAFC5] text-[#0F1419]'
-												: 'bg-[#1F2933] text-[#E6EDF3] hover:bg-[#5EAFC5] hover:text-[#0F1419]'
-										}`}
-									>
-										{t(preset.labelKey)}
-									</button>
-								);
-							})}
-						</div>
-						<div className='mono text-[10.5px] text-[#8090A0] mt-1.5'>{t('app.preset.section_hint')}</div>
+						<button
+							type='button'
+							onClick={onRunCards}
+							className='mono text-xs shrink-0 px-3 py-1.5 rounded-sm transition bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47]'
+						>
+							{t('app.protect.cards.button')}
+						</button>
 					</div>
 
 					<hr className='border-[#1F2933]' />
@@ -12484,9 +12427,7 @@ function ConfigPanel({
 				<>
 					{/* PvP MODE */}
 					<div>
-						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-							{t('app.pvp.section_title')}
-						</div>
+						<SettingsTitle>{t('app.pvp.section_title')}</SettingsTitle>
 						{/* Mutually exclusive, so radio semantics rather than aria-pressed:
 						    the selection was conveyed by cyan fill alone, which told a screen
 						    reader neither which option was active nor that these three belong
@@ -12535,39 +12476,63 @@ function ConfigPanel({
 
 			{show('protections') && (
 				<>
-					{/* PROTECTIONS */}
+					{/* PROTECTIONS — the toggles in the deck's nine groups (SETTINGS_GROUPS) */}
 					<div>
-						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
+						<SettingsTitle id={protectionsTitleId} tabIndex={-1}>
 							{t('app.protect.section_title')}
-						</div>
-						<div className='grid grid-cols-1 md:grid-cols-2 gap-1'>
-							{settings.map(([k, keyBase, extra]) => {
-								if (extra?.expertOnly && !expert) return null;
-								const { expertOnly: _eo, ...rowExtra } = extra || {};
+						</SettingsTitle>
+						{!expert && differing.length > 0 && (
+							<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded-sm p-3 mono text-[10.5px] mb-3 leading-tight text-[#E6EDF3] flex items-center justify-between gap-3 flex-wrap'>
+								<span>{t('app.protect.expert_diff.note', { params: { count: differing.length } })}</span>
+								<button
+									type='button'
+									onClick={resetExpertSettings}
+									className={`mono text-xs shrink-0 px-3 py-1.5 rounded-sm transition ${
+										resetArmed ? 'bg-[#E74C3C] text-white' : 'bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47]'
+									}`}
+								>
+									{resetArmed ? t('app.protect.confirm_off') : t('app.protect.expert_diff.reset')}
+								</button>
+							</div>
+						)}
+						<div className='space-y-4'>
+							{SETTINGS_GROUPS.map((group) => {
+								const rows = group.rows.filter(([, , extra]) => expert || !extra?.expertOnly);
+								if (rows.length === 0) return null;
 								return (
-									<ToggleRow
-										key={k}
-										k={k}
-										label={t(`${keyBase}.label`)}
-										why={t(`${keyBase}.why`)}
-										expertBadge={!!extra?.expertOnly}
-										checked={!!config[k]}
-										onChange={(v) => set(k, v)}
-										{...rowExtra}
-									/>
+									<fieldset key={group.id} className='min-w-0'>
+										<SettingsCaption>{t(`app.onboarding.swipe.group.${group.id}`)}</SettingsCaption>
+										<div className='grid grid-cols-1 md:grid-cols-2 gap-1'>
+											{rows.map(([k, keyBase, extra]) => {
+												const { expertOnly: _eo, ...rowExtra } = extra || {};
+												return (
+													<ToggleRow
+														key={k}
+														k={k}
+														label={t(`${keyBase}.label`)}
+														why={t(`${keyBase}.why`)}
+														expertBadge={!!extra?.expertOnly}
+														checked={!!config[k]}
+														onChange={(v) => set(k, v)}
+														{...rowExtra}
+													/>
+												);
+											})}
+										</div>
+										{group.id === 'shadow' && !config.protectShadows && config.protectShadowPurifyOnly && (
+											<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded-sm p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
+												{t('app.protect.shadows_off_note')}
+											</div>
+										)}
+										{group.id === 'battle' && !config.protectDynamax && config.protectGigantamax && (
+											<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded-sm p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
+												{t('app.protect.dynamax_off_note')}
+											</div>
+										)}
+									</fieldset>
 								);
 							})}
 						</div>
-						{!config.protectDynamax && config.protectGigantamax && (
-							<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded-sm p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
-								{t('app.protect.dynamax_off_note')}
-							</div>
-						)}
-						{!config.protectShadows && config.protectShadowPurifyOnly && (
-							<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded-sm p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
-								{t('app.protect.shadows_off_note')}
-							</div>
-						)}
 					</div>
 				</>
 			)}
@@ -12577,9 +12542,7 @@ function ConfigPanel({
 					{/* RAID FILTERS (expert) — narrows per-boss counter filters */}
 					{expert && (
 						<div>
-							<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-								{t('app.raids.section_title')}
-							</div>
+							<SettingsTitle>{t('app.raids.section_title')}</SettingsTitle>
 							<label className='flex items-start gap-2 cursor-pointer mono text-xs'>
 								<input
 									type='checkbox'
@@ -12601,9 +12564,7 @@ function ConfigPanel({
 				<>
 					{/* TEAM ROCKET — counter filter options (visible in normal mode) */}
 					<div>
-						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-							{t('app.collapsible.aux_section_team_rocket')}
-						</div>
+						<SettingsTitle>{t('app.collapsible.aux_section_team_rocket')}</SettingsTitle>
 						<label className='flex items-start gap-2 cursor-pointer mono text-xs'>
 							<input
 								type='checkbox'
@@ -12626,9 +12587,7 @@ function ConfigPanel({
 				<>
 					{/* REGIONAL GROUPS */}
 					<div>
-						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-							{t('app.protect.regional_section_title')}
-						</div>
+						<SettingsTitle>{t('app.protect.regional_section_title')}</SettingsTitle>
 						<div className='space-y-2'>
 							{Object.entries(REGIONAL_GROUPS).map(([key, group]) => (
 								<RegionalGroupEditor
@@ -12735,9 +12694,7 @@ function ConfigPanel({
 					{/* TRADE-EVO FAMILIES (expert) — fine-tune which families are protected */}
 					{expert && (
 						<div>
-							<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-								{t('app.protect.te_section_title')}
-							</div>
+							<SettingsTitle>{t('app.protect.te_section_title')}</SettingsTitle>
 							<div className='flex flex-wrap gap-1.5'>
 								{Object.keys(TRADE_EVO_FAMILIES).map((b) => {
 									const on = (config.enabledTradeEvos || []).includes(b);
@@ -14548,9 +14505,7 @@ function TradeTagSettings({ config, set }) {
 		<>
 			{/* Trade tags */}
 			<div>
-				<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-					{t('app.modal.tags.section_title')}
-				</div>
+				<SettingsTitle>{t('app.modal.tags.section_title')}</SettingsTitle>
 				<div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
 					<div>
 						<label htmlFor={`${fid}-basar`} className='mono text-[10.5px] text-[#8090A0] block mb-1'>
@@ -14613,9 +14568,7 @@ function LeagueTagSettings({ config, set }) {
 	if (!config.expertMode) return null;
 	return (
 		<div>
-			<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-				{t('app.modal.league.section_title')}
-			</div>
+			<SettingsTitle>{t('app.modal.league.section_title')}</SettingsTitle>
 			<input
 				type='text'
 				value={config.leagueTags || ''}
@@ -14642,9 +14595,7 @@ function ExpertProtectionSettings({ config, set }) {
 				<>
 					{/* Custom tags */}
 					<div>
-						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-							{t('app.modal.custom_tags.section_title')}
-						</div>
+						<SettingsTitle>{t('app.modal.custom_tags.section_title')}</SettingsTitle>
 						<input
 							type='text'
 							value={config.customProtectedTags || ''}
@@ -14660,9 +14611,7 @@ function ExpertProtectionSettings({ config, set }) {
 
 					{/* Safety nets */}
 					<div>
-						<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>
-							{t('app.modal.safety.section_title')}
-						</div>
+						<SettingsTitle>{t('app.modal.safety.section_title')}</SettingsTitle>
 						<div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
 							<NumField
 								label={t('app.modal.safety.cp_label')}
