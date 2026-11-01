@@ -795,7 +795,7 @@ const TRADE_EVO_FAMILIES = {
 // Capitalized base species name in the user's PoGo *output* language —
 // used in `+Family` filter syntax. Falls back to the German config key if
 // the locale dictionary is missing the entry.
-function teDisplay(baseKey, outputLocale = 'de') {
+export function teDisplay(baseKey, outputLocale = 'de') {
 	const family = TRADE_EVO_FAMILIES[baseKey];
 	const fallback = baseKey.charAt(0).toUpperCase() + baseKey.slice(1);
 	if (!family) return fallback;
@@ -878,6 +878,15 @@ export const DEFAULT_CONFIG = {
 	protectXXL: true,
 	protectXL: true,
 	protectXXS: true,
+	// Irrbis (Pumpkaboo, 710) only comes as Super (always XXL) or Small (always
+	// XXS), so the two size guards protect nothing for that one species and a
+	// costume week leaves hundreds of "XXL" Irrbis nobody can release. On, the
+	// TRASH filter alone carves Irrbis out of `!xxl`, `!xxs` and the family's
+	// untraded trade-evo guard (`!+Irrbis,traded,irrbis`); trade and buddy
+	// filters, `!xl` and Pumpdjinn are untouched. Hardcoded to the one species
+	// whose size flags carry no rarity; expert-only, default off so the default
+	// output stays byte-identical (docs/sorting-workflow-spec.md, "Areas").
+	irrbisSizes: false,
 	protectDoubleMoved: true,
 	protectDynamax: true,
 	// Gigantamax floor. Default ON but suppressed (never emitted) whenever
@@ -2038,6 +2047,9 @@ export function showcaseScoreRange({ dex, form = null, heightM, weightKg, ivs = 
 // A double transfer candy day has no source yet, so its Crush reminder card
 // always shows (agreed deferral).
 export const FLOAT_ENDED_DAYS = 7;
+// Irrbis (Pumpkaboo): the species whose size flags carry no rarity, see
+// DEFAULT_CONFIG.irrbisSizes.
+export const IRRBIS_DEX = 710;
 export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] } = {}, now = Date.now()) {
 	const recent = (start, end) => {
 		const s = Date.parse(start), e = Date.parse(end);
@@ -2068,8 +2080,42 @@ export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] 
 			add('costumes_evolve', 'costumes', ev.title);
 			add('costumes_final', 'costumes', ev.title);
 		}
+		// Irrbis (710) only spawns as always-XXL Super or always-XXS Small, so an
+		// event that spawns it fills both size piles with Pokémon whose size flag
+		// means nothing. The float is about the spawn, not the irrbisSizes
+		// setting: the piles surface whether or not the trash carve is on.
+		if ((ev.spawnDex || []).map(Number).includes(IRRBIS_DEX)) {
+			add('xxl', 'irrbis', ev.title);
+			add('xxs', 'irrbis', ev.title);
+		}
 	}
 	return out;
+}
+
+// The event the costume string (buildFilters, "EVENT COSTUME STRING") is
+// scoped to: every wild-spawn event with costumed spawns that is running or
+// ended at most FLOAT_ENDED_DAYS ago, merged into one — the union of their
+// spawn species and the days since the earliest start, so two overlapping
+// costume events (a two-part Halloween) share one box and nothing is missed.
+// Null when there is none. Pure in (events, now): the component resolves it
+// on the 5-minute clock tick, like floatingPiles, and hands the result to the
+// builder, which never reads the clock itself.
+export function costumeEventFor(events = [], now = Date.now()) {
+	const live = (events || []).filter((ev) => {
+		if (!ev.hasCostumes) return false;
+		const s = Date.parse(ev.start), e = Date.parse(ev.end);
+		return Number.isFinite(s) && Number.isFinite(e) && s <= now && now - e <= FLOAT_ENDED_DAYS * 86400000;
+	});
+	if (live.length === 0) return null;
+	const start = Math.min(...live.map((ev) => Date.parse(ev.start)));
+	const spawnDex = [...new Set(live.flatMap((ev) => (ev.spawnDex || []).map(Number)).filter(Number.isFinite))];
+	return {
+		ids: live.map((ev) => ev.id),
+		title: live.map((ev) => ev.title).join(' · '),
+		spawnDex,
+		start: new Date(start).toISOString(),
+		daysSinceStart: Math.max(0, Math.floor((now - start) / 86400000)),
+	};
 }
 
 // Protection toggles hide and show category piles (spec: "Which piles show
@@ -2274,6 +2320,11 @@ export function buildFilters(
 	// run synthetic event Max Battles through this builder on a day the
 	// committed snapshot has none.
 	raidBosses = RAID_BOSSES,
+	// The wild-spawn event with costumed spawns that is running or just ended,
+	// already resolved against the clock by the caller (costumeEventFor): this
+	// builder never reads Date.now(). `{ title, spawnDex, daysSinceStart }` or
+	// null; see the event costume string under TRASH.
+	costumeEvent = null,
 ) {
 	const kw = pogoKeywords(outputLocale);
 
@@ -2537,6 +2588,12 @@ export function buildFilters(
 	// still-Frustration shadows. protectSmeargleLegacy (default false) keeps
 	// regular Smeargles releasable/tradeable.
 	const smeargleName = pokemonNameFor('235', outputLocale)?.toLowerCase() || 'smeargle';
+	// Irrbis in the output locale, for the size carve-out (cfg.irrbisSizes):
+	// appended as `,irrbis` to the trash's `!xxl`, `!xxs` and the family's
+	// trade-evo guard. Comma binds tighter than `&`, so each clause reads
+	// "keep unless it is an Irrbis", the shape of the Smeargle carve above.
+	const irrbisName = pokemonNameFor('710', outputLocale)?.toLowerCase() || 'irrbis';
+	const irrbisCarve = cfg.irrbisSizes ? `,${irrbisName}` : '';
 	// The mythicals carved out of `!mythical`, in the output locale, resolved
 	// once: the trash and every pile's protection tail read this one list.
 	const mythCarve = (cfg.mythTooManyOf || []).map((s) => speciesForOutput(s, outputLocale)).filter(Boolean);
@@ -2607,9 +2664,13 @@ export function buildFilters(
 	if (cfg.protectTradeEvos && TE_full.length > 0) {
 		for (const base of TE_full) {
 			const display = teDisplay(base, outputLocale);
+			// The Irrbis size carve-out has to reach this guard too: `!+Irrbis,
+			// traded` keeps every untraded Irrbis, so without `,irrbis` the size
+			// carve below would free nothing. Pumpdjinn (711) stays under `+Irrbis`.
+			const carve = base === 'irrbis' ? irrbisCarve : '';
 			push(
 				trashClauses,
-				`!+${display},${kw.flag.traded}`,
+				`!+${display},${kw.flag.traded}${carve}`,
 				tFn('app.clause_why.trade_evo_family', { params: { name: display } }),
 			);
 		}
@@ -2750,9 +2811,9 @@ export function buildFilters(
 			`!${kw.numeric.distance}${cfg.distanceProtect}-,${kw.flag.traded}`,
 			tFn('app.clause_why.distance', { params: { km: cfg.distanceProtect } }),
 		);
-	if (cfg.protectXXL) push(trashClauses, `!${kw.flag.xxl}`, tFn('app.clause_why.xxl'));
+	if (cfg.protectXXL) push(trashClauses, `!${kw.flag.xxl}${irrbisCarve}`, tFn('app.clause_why.xxl'));
 	if (cfg.protectXL) push(trashClauses, `!${kw.flag.xl}`, tFn('app.clause_why.xl'));
-	if (cfg.protectXXS) push(trashClauses, `!${kw.flag.xxs}`, tFn('app.clause_why.xxs'));
+	if (cfg.protectXXS) push(trashClauses, `!${kw.flag.xxs}${irrbisCarve}`, tFn('app.clause_why.xxs'));
 	for (const t of leagueTags) push(trashClauses, `!${t}`, tFn('app.clause_why.league_tag', { params: { tag: t } }));
 	if (cfg.protectBuddies) push(trashClauses, `!${kw.numeric.buddy}1-`, tFn('app.clause_why.buddies_were'));
 	if (cfg.protectDoubleMoved) push(trashClauses, '@3move', tFn('app.clause_why.double_moved_trash'));
@@ -2872,6 +2933,47 @@ export function buildFilters(
 		);
 
 	const trash = trashClauses.map((c) => c.clause).join('&');
+
+	// ── EVENT COSTUME STRING ──────────────────────────────────────────────
+	// The second named exception to "a guard never comes out of a trash
+	// string" (docs/sorting-workflow-spec.md, "Areas"): while a wild-spawn
+	// event with costumed spawns runs or has just ended, the Catching area
+	// shows a second, scoped, time-boxed copy of the trash string. It differs
+	// in exactly two clauses: `!costume` becomes `!costume,<species…>` with the
+	// event's spawn species as EXACT bare names (no `+` family prefix: a
+	// costumed Pikachu is not a costumed Raichu), and a second clause
+	// `!costume,age-N` (N = whole days since the event started) ANDed after it.
+	// Comma is OR and `&` is AND, so a costume is released only if it is one of
+	// the event's species AND was caught during the event; every other guard
+	// is the saved trash string's own. Nothing is persisted: the caller
+	// resolves the event against the clock and this builder stays clock-free.
+	// Empty when there is no such event, or when costumes are not protected
+	// (then the trash string already releases them and there is nothing to
+	// carve).
+	const eventCostumeClauses = [];
+	let eventCostumeTrash = '';
+	if (costumeEvent && cfg.protectCostumes) {
+		const costumeClause = `!${kw.flag.costume}`;
+		const species = [...new Set((costumeEvent.spawnDex || []).map(String))]
+			.map((d) => pokemonNameFor(d, outputLocale)?.toLowerCase())
+			.filter(Boolean);
+		const days = Math.max(0, Math.floor(Number(costumeEvent.daysSinceStart) || 0));
+		if (species.length > 0 && trashClauses.some((c) => c.clause === costumeClause)) {
+			for (const c of trashClauses) {
+				if (c.clause !== costumeClause) {
+					push(eventCostumeClauses, c.clause, c.why);
+					continue;
+				}
+				push(eventCostumeClauses, `${costumeClause},${species.join(',')}`, tFn('app.events.costume_relief.why_species'));
+				push(
+					eventCostumeClauses,
+					`${costumeClause},${kw.numeric.age}-${days}`,
+					tFn('app.events.costume_relief.why_age', { params: { days } }),
+				);
+			}
+			eventCostumeTrash = eventCostumeClauses.map((c) => c.clause).join('&');
+		}
+	}
 
 	// "Traded trash review" — narrows the trash filter to traded mons only,
 	// so the user can flip through traded candidates before bulk-trashing
@@ -5501,6 +5603,8 @@ export function buildFilters(
 	return {
 		trash,
 		tradedTrashSort,
+		eventCostumeTrash,
+		eventCostumeClauses,
 		trade,
 		sort,
 		luckySort,
@@ -6394,6 +6498,9 @@ export default function App() {
 		const id = setInterval(() => setClockTick((n) => n + 1), 5 * 60 * 1000);
 		return () => clearInterval(id);
 	}, []);
+	// The costume event the Catching area's event costume string is scoped
+	// to, resolved here against the clock (buildFilters stays clock-free).
+	const costumeEvent = useMemo(() => costumeEventFor(EVENTS.events, Date.now()), [clockTick]);
 	const [showAuxTrades, setShowAuxTrades] = useState(false);
 	const [showFriendWishlist, setShowFriendWishlist] = useState(false);
 	// Friend lucky wishlist: restrict to old catches guaranteed Lucky on trade.
@@ -6742,6 +6849,7 @@ export default function App() {
 	const {
 		trash,
 		tradedTrashSort,
+		eventCostumeTrash,
 		trade,
 		sort,
 		luckySort,
@@ -6818,6 +6926,8 @@ export default function App() {
 				t,
 				homeLocalTypeChecks,
 				bazaarTags,
+				RAID_BOSSES,
+				costumeEvent,
 			),
 		[
 			hundos,
@@ -6829,6 +6939,7 @@ export default function App() {
 			topAttackers,
 			topMaxAttackers,
 			bazaarTags,
+			costumeEvent,
 			t,
 		],
 	);
@@ -7791,6 +7902,21 @@ export default function App() {
 													hint={t('app.filter.trash_hint')}
 												/>
 												</AreaGroup>
+												{eventCostumeTrash && costumeEvent && (
+													<AreaGroup
+														id='event-costumes'
+														title={t('app.events.costume_relief.title', { params: { title: costumeEvent.title } })}
+														accent='#FF6B5B'
+													>
+														<EventCostumeRelief
+															filterStr={eventCostumeTrash}
+															days={costumeEvent.daysSinceStart}
+															copied={copied.event_costumes}
+															onCopy={() => copyToClipboard('event_costumes', eventCostumeTrash)}
+															t={t}
+														/>
+													</AreaGroup>
+												)}
 												<div className='pt-4'>
 												<MegaPlanner
 													plans={megaPlanRows}
@@ -10345,6 +10471,50 @@ function BonusNudges({ nudges, onOpen, t, locale }) {
 	);
 }
 
+// The event costume string's box under the trash box (Catching): the danger
+// styling of the settings modal's Danger zone, and the string itself behind a
+// reveal with the amber warning the ③b box uses, because this is the one
+// string in the area that lets a guard go. The reveal is local state and
+// starts closed on every mount, so copying it is always a deliberate click.
+// Pure render: the string and the day count come from the builder and the
+// clock-resolved event; nothing here is persisted.
+function EventCostumeRelief({ filterStr, days, copied, onCopy, t }) {
+	const [reveal, setReveal] = useState(false);
+	const revealId = useId();
+	const danger = '#FF6B5B';
+	return (
+		<div className='pt-3 border-t border-[#1F2933] space-y-2'>
+			<button
+				type='button'
+				onClick={() => setReveal((v) => !v)}
+				aria-expanded={reveal}
+				aria-controls={revealId}
+				className='mono text-xs min-h-[32px] px-3 py-1.5 rounded-sm transition flex items-center gap-1.5 bg-[#1F2933] text-[#FF6B5B] hover:bg-[#2D3A47]'
+			>
+				{reveal ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+				<Shirt size={11} aria-hidden='true' />
+				{t('app.events.costume_relief.reveal')}
+			</button>
+			{reveal && (
+				<div id={revealId} className='space-y-2'>
+					<p className='px-4 py-2 text-xs leading-snug border border-[#F5B82E]/40 rounded-sm bg-[#F5B82E]/10 text-[#F5B82E]'>
+						{t('app.events.costume_relief.warning')}
+					</p>
+					<FilterBox
+						label={t('app.events.costume_relief.label')}
+						accent={danger}
+						filterStr={filterStr}
+						copied={copied}
+						onCopy={onCopy}
+						hint={t('app.events.costume_relief.hint', { params: { days } })}
+						tone='warn'
+					/>
+				</div>
+			)}
+		</div>
+	);
+}
+
 // A key per boss in one list, for React and for copy state. A boss's id is the
 // species enum, and two bosses in one list can share it: Mega Charizard X and
 // Mega Charizard Y in one event are both CHARIZARD. The first keeps the bare
@@ -12114,6 +12284,7 @@ export const SETTINGS_GROUPS = [
 			['protectXXL', 'app.protect.xxl'],
 			['protectXL', 'app.protect.xl'],
 			['protectXXS', 'app.protect.xxs'],
+			['irrbisSizes', 'app.protect.irrbis_sizes', { expertOnly: true }],
 		],
 	},
 	{

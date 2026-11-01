@@ -28,6 +28,8 @@ The workshop already has strong filters for all of this, but as a collection: so
 The workshop splits by what the user is doing at that moment:
 
 1. **Catching (out and about):** the field trash filter, unchanged. It is the lowest common denominator: safe to run on recent catches without thinking.
+
+   Two named exceptions to "a guard never comes out of a trash string", both decided on 1 November 2026, and nothing else about the trash filter changes. The first is the **Irrbis sizes toggle** (`irrbisSizes`, expert-only, default off, in the `size` group): Irrbis (Pumpkaboo, 710) only comes as Super, which is always XXL, or Small, which is always XXS, so its size flags carry no rarity and the two size guards protect nothing for it. On, the trash filter alone carves the species out of `!xxl`, `!xxs` and the family's untraded trade-evolution guard (`!+Irrbis,traded,irrbis`, via `pokemonNameFor('710')`); the trade and buddy filters, `!xl` and Pumpdjinn are untouched, and an event that spawns Irrbis floats the XXL and XXS piles whether or not the toggle is on. The second is the **event costume string**: while a wild-spawn event with costumed spawns is running or ended within `FLOAT_ENDED_DAYS`, the Catching area shows a second, scoped, time-boxed string in a danger box under the trash box, behind a reveal and the amber warning of ③b. It is the trash string with exactly two clauses changed: `!costume` becomes `!costume,<species…>` with the event's spawn species as exact bare names (no `+` family prefix), and `!costume,age-N` follows it, N being the whole days since the event started, so only costumes of those species caught during the event are releasable. The saved trash string keeps every guard and never changes; the box has no config key and no expiry state, it is a pure function of the events snapshot and the 5-minute clock, resolved in the component (`costumeEventFor`) and handed to the clock-free builder as a parameter. Event-dependent output is never pinned in the fixture; `scripts/check-data-filters.mjs` D19 covers it with a synthetic event and a pinned clock in every locale, and `scripts/check-carveouts.mjs` holds the Irrbis carve.
 2. **Sorting (on the couch):** the guided piles described below.
 3. **Battle:** raids, Max Battles, Team Rocket and PvP counters, unchanged in logic, moved out of the sorting area.
 4. **Trade and friends:** wishlists, trade piles, buddy collecting, distant friends, unchanged in logic.
@@ -226,7 +228,7 @@ The protection toggles under Catching → settings sit in the nine groups the sw
 | shadow | Shadow & Purified | shadows, purify-only floor, purified | Shadows |
 | looks | Looks | costumes, backgrounds | Costumes (both), Community Day backgrounds |
 | collection | Babies & evolutions | babies, trade evolutions, traded regionals | none |
-| size | Size records | XXL, XL, XXS | XXL, XXS |
+| size | Size records | XXL, XL, XXS; expert: Irrbis sizes (carves Irrbis out of the trash's `!xxl`, `!xxs` and its trade-evo guard; a species whose size flags carry no rarity) | XXL, XXS |
 | iv | IV extremes | 4★, nundos | none |
 | battle | Battle-ready | legacy moves, Smeargle carve-out, double-moved, Dynamax, Gigantamax | Dynamax |
 | niche | Niche keepers | Ultra Beasts, new evolutions, buddies, lucky-eligible | Legendaries (once legendaries are off too) |
