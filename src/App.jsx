@@ -878,14 +878,17 @@ export const DEFAULT_CONFIG = {
 	protectXXL: true,
 	protectXL: true,
 	protectXXS: true,
-	// Irrbis (Pumpkaboo, 710) only comes as Super (always XXL) or Small (always
-	// XXS), so the two size guards protect nothing for that one species and a
-	// costume week leaves hundreds of "XXL" Irrbis nobody can release. On, the
-	// TRASH filter alone carves Irrbis out of `!xxl`, `!xxs` and the family's
-	// untraded trade-evo guard (`!+Irrbis,traded,irrbis`); trade and buddy
-	// filters, `!xl` and Pumpdjinn are untouched. Hardcoded to the one species
-	// whose size flags carry no rarity; expert-only, default off so the default
-	// output stays byte-identical (docs/sorting-workflow-spec.md, "Areas").
+	// Irrbis (Pumpkaboo, 710) spawns in four sizes, and two of them fix the
+	// size flag: a Super Irrbis is always XXL and a Small one always XXS, so
+	// the two size guards protect nothing for that species and a costume week
+	// leaves hundreds of "XXL" Irrbis nobody can release. On, the TRASH filter
+	// alone carves Irrbis out of `!xxl` and `!xxs` and lets an XXL or XXS
+	// Irrbis past the family's untraded trade-evo guard
+	// (`!+Irrbis,traded,xxl,xxs`); an Average or Large Irrbis keeps that
+	// guard, and trade and buddy filters, `!xl` and Pumpdjinn are untouched.
+	// Hardcoded to the one species whose size flags carry no rarity;
+	// expert-only, default off so the default output stays byte-identical
+	// (docs/sorting-workflow-spec.md, "Areas").
 	irrbisSizes: false,
 	protectDoubleMoved: true,
 	protectDynamax: true,
@@ -2080,7 +2083,7 @@ export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] 
 			add('costumes_evolve', 'costumes', ev.title);
 			add('costumes_final', 'costumes', ev.title);
 		}
-		// Irrbis (710) only spawns as always-XXL Super or always-XXS Small, so an
+		// A Super Irrbis (710) is always XXL and a Small one always XXS, so an
 		// event that spawns it fills both size piles with Pokémon whose size flag
 		// means nothing. The float is about the spawn, not the irrbisSizes
 		// setting: the piles surface whether or not the trash carve is on.
@@ -2589,11 +2592,14 @@ export function buildFilters(
 	// regular Smeargles releasable/tradeable.
 	const smeargleName = pokemonNameFor('235', outputLocale)?.toLowerCase() || 'smeargle';
 	// Irrbis in the output locale, for the size carve-out (cfg.irrbisSizes):
-	// appended as `,irrbis` to the trash's `!xxl`, `!xxs` and the family's
-	// trade-evo guard. Comma binds tighter than `&`, so each clause reads
-	// "keep unless it is an Irrbis", the shape of the Smeargle carve above.
+	// appended as `,irrbis` to the trash's `!xxl` and `!xxs`. Comma binds
+	// tighter than `&`, so each clause reads "keep unless it is an Irrbis",
+	// the shape of the Smeargle carve above. The family's trade-evo guard gets
+	// the size terms instead (`,xxl,xxs`): only an XXL or XXS Irrbis loses it,
+	// an Average or Large one is still untraded stock for the free evolution.
 	const irrbisName = pokemonNameFor('710', outputLocale)?.toLowerCase() || 'irrbis';
 	const irrbisCarve = cfg.irrbisSizes ? `,${irrbisName}` : '';
+	const irrbisSizeCarve = cfg.irrbisSizes ? `,${kw.flag.xxl},${kw.flag.xxs}` : '';
 	// The mythicals carved out of `!mythical`, in the output locale, resolved
 	// once: the trash and every pile's protection tail read this one list.
 	const mythCarve = (cfg.mythTooManyOf || []).map((s) => speciesForOutput(s, outputLocale)).filter(Boolean);
@@ -2665,9 +2671,12 @@ export function buildFilters(
 		for (const base of TE_full) {
 			const display = teDisplay(base, outputLocale);
 			// The Irrbis size carve-out has to reach this guard too: `!+Irrbis,
-			// traded` keeps every untraded Irrbis, so without `,irrbis` the size
-			// carve below would free nothing. Pumpdjinn (711) stays under `+Irrbis`.
-			const carve = base === 'irrbis' ? irrbisCarve : '';
+			// traded` keeps every untraded Irrbis, so without a carve the size
+			// carve below would free nothing. It carves by size, not by species:
+			// `!+Irrbis,traded,xxl,xxs` frees an untraded XXL or XXS Irrbis and
+			// still keeps an Average or Large one. An XXL Pumpdjinn (711) passes
+			// this clause but stays protected by the bare `!xxl,irrbis` below.
+			const carve = base === 'irrbis' ? irrbisSizeCarve : '';
 			push(
 				trashClauses,
 				`!+${display},${kw.flag.traded}${carve}`,

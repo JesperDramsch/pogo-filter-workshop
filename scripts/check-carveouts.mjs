@@ -490,7 +490,7 @@ console.log("\nI1 — Irrbis sizes toggle: the trash's size and trade-evo guards
   const on = mergeImportedConfig({ irrbisSizes: true });
   check("the toggle is expert-only, default off, in the size group",
     DEFAULT_CONFIG.irrbisSizes === false && SETTINGS_GROUPS.find((g) => g.id === "size").rows.some(([k, , x]) => k === "irrbisSizes" && x?.expertOnly));
-  for (const loc of ["de", "en", "ja"]) {
+  for (const loc of ["en", "de", "es", "fr", "zh-TW", "hi", "ja"]) {
     const irrbis = pokemonNameFor(IRRBIS, loc).toLowerCase();
     const kw = pogoKeywords(loc);
     const rOff = buildFilters([], [], off, [], loc, tFn);
@@ -499,9 +499,12 @@ console.log("\nI1 — Irrbis sizes toggle: the trash's size and trade-evo guards
     check(`${loc}: off keeps the bare size guards and trade-evo guard`,
       hasClauseMatching(rOff.trash, new RegExp(`^!${esc(kw.flag.xxl)}$`)) && hasClauseMatching(rOff.trash, new RegExp(`^!${esc(kw.flag.xxs)}$`))
       && hasClauseMatching(rOff.trash, new RegExp(`^!\\+${esc(teDisplay("irrbis", loc))},${esc(kw.flag.traded)}$`)));
-    check(`${loc}: on carves ${irrbis} out of !xxl, !xxs and the family guard`,
+    // The family guard carves by SIZE, not by species: `!+Irrbis,traded,xxl,
+    // xxs` frees an untraded XXL or XXS Irrbis and keeps an Average or Large
+    // one, which is still untraded stock for the free evolution.
+    check(`${loc}: on carves ${irrbis} out of !xxl and !xxs, and xxl/xxs out of the family guard`,
       hasClauseMatching(rOn.trash, new RegExp(`^!${esc(kw.flag.xxl)},${esc(irrbis)}$`)) && hasClauseMatching(rOn.trash, new RegExp(`^!${esc(kw.flag.xxs)},${esc(irrbis)}$`))
-      && hasClauseMatching(rOn.trash, new RegExp(`^!\\+${esc(teDisplay("irrbis", loc))},${esc(kw.flag.traded)},${esc(irrbis)}$`)), rOn.trash);
+      && hasClauseMatching(rOn.trash, new RegExp(`^!\\+${esc(teDisplay("irrbis", loc))},${esc(kw.flag.traded)},${esc(kw.flag.xxl)},${esc(kw.flag.xxs)}$`)), rOn.trash);
     const onlyThose = clauses(rOn.trash).filter((c) => !clauses(rOff.trash).includes(c));
     check(`${loc}: exactly three clauses change, !xl stays bare`, onlyThose.length === 3 && hasClauseMatching(rOn.trash, new RegExp(`^!${esc(kw.flag.xl)}$`)), onlyThose.join(" | "));
     check(`${loc}: trade, gift and buddy filters are untouched`,
@@ -534,9 +537,13 @@ console.log("\nI1 — Irrbis sizes toggle: the trash's size and trade-evo guards
       `off ${say(verdict(rOff.trash, xxlPikachu))}, on ${say(verdict(rOn.trash, xxlPikachu))}`);
     check(`${loc}: an XXL Pumpdjinn keeps its size and trade-evo protection with the toggle on`,
       verdict(rOn.trash, xxlPumpdjinn).verdict === false, say(verdict(rOn.trash, xxlPumpdjinn)));
-    check(`${loc}: an untraded plain Irrbis is released with the toggle on (the family guard carve), protected off`,
-      verdict(rOff.trash, plainIrrbis).verdict === false && verdict(rOn.trash, plainIrrbis).verdict === true,
+    check(`${loc}: an untraded Irrbis that is neither XXL nor XXS (Average or Large) keeps the trade-evo guard either way`,
+      verdict(rOff.trash, plainIrrbis).verdict === false && verdict(rOn.trash, plainIrrbis).verdict === false,
       `off ${say(verdict(rOff.trash, plainIrrbis))}, on ${say(verdict(rOn.trash, plainIrrbis))}`);
+    const tradedPlainIrrbis = mon(710, fam, { traded: true });
+    check(`${loc}: a traded plain Irrbis is released either way (the guard never covered it)`,
+      verdict(rOff.trash, tradedPlainIrrbis).verdict === true && verdict(rOn.trash, tradedPlainIrrbis).verdict === true,
+      `off ${say(verdict(rOff.trash, tradedPlainIrrbis))}, on ${say(verdict(rOn.trash, tradedPlainIrrbis))}`);
     check(`${loc}: an XXL Irrbis stays out of the trade filter either way`,
       verdict(rOn.trade, xxlIrrbis).verdict === false && verdict(rOff.trade, xxlIrrbis).verdict === false,
       `on ${say(verdict(rOn.trade, xxlIrrbis))}`);
