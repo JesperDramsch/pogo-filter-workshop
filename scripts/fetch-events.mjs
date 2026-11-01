@@ -58,12 +58,21 @@
 //
 // Fixed-time events are, on every feed seen so far, the in-person ones: a city
 // Wild Area, a GO Tour host city, a Night Out, and the GBL rotations (which
-// carry no bonus). Their spawn and egg pools go on the card like City Safari's
-// always have (a traveller wants them, everyone else folds the row), but their
-// BONUSES stay out of `bonuses`: the nudge strip speaks to every user, and
-// "½ Stardust for trades" that holds for ticket holders in Sendai is wrong for
-// a player in Bonn. The global editions of those events are local-time strings
-// and keep their bonuses.
+// carry no bonus, spawn or egg list and never reach a record).
+//
+// VENUES: the feed does not say where an in-person event is held, only the
+// title does ("… Wild Area 2026: Sendai • Tohoku"). scripts/lib/event-venues.mjs
+// is a short pinned table of those cities, keyed by a title pattern, and every
+// record written here (events, eggPools, bonuses) carries `venue`: the city as
+// { name, lat, lng }, or null. The app (src/bonus-nudges.js) shows a venue's
+// bonuses only to a home pin within 150 km of it and folds a far venue's row
+// on the card with its distance, so "½ Stardust for trades" that holds for
+// ticket holders in Sendai never reaches a player in Bonn, while a traveller
+// still has the spawn list for the tidy-up. A fixed-time event that no row
+// matches is logged (⚠ in-person event with no venue …) and its bonuses stay
+// out of `bonuses` until a row is added: the safe failure mode. A local-time
+// event is global and keeps its bonuses with `venue: null`, unless a row
+// matches it: City Safari is spelt as local time and is in-person all the same.
 //
 // SHRINK GUARD: the fetcher used to refuse only a feed that yielded no event at
 // all. A scrape that comes back half-written passes that test with one event
@@ -88,6 +97,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
 import { outsideWindow, carryOver, shrunkEvents } from "./lib/event-window.mjs";
 import { parseFeedTime, feedWindow, describeUnparseableWindow } from "./lib/feed-time.mjs";
+import { venueOf, isFixedTimeEvent } from "./lib/event-venues.mjs";
 import { LEGACY_COMMUNITY_DAYS, LEGACY_THROUGH, communityDaysFromFeed, mergeRollingCommunityDays } from "./lib/community-days.mjs";
 import { isTakeoverEvent } from "./lib/rocket-takeover.mjs";
 import { fetchGameMaster, mechanicsBatchFloor, warnIfStale } from "./lib/game-master.mjs";
@@ -310,13 +320,14 @@ export function signalsFromFeed(feed, report = () => {}) {
 }
 
 // Every event's bonus strings as { id, title, category, start, end,
-// isLocalTime, bonuses }, from every category, spawns or not. Window-filtered
-// like the rest; an event with no bonuses or no parseable window is left out,
-// and `report(ev, category)` is told about the latter. A fixed-time event
-// (`is_local_time: false`) is left out too: see TIME FORMS in the header, its
-// bonuses hold in one city and the strip speaks to everyone. The signals pass
-// still reads every event, so an unparseable window is reported regardless.
-export function bonusesFromFeed(feed, now, report = () => {}) {
+// isLocalTime, venue, bonuses }, from every category, spawns or not.
+// Window-filtered like the rest; an event with no bonuses or no parseable
+// window is left out, and `report(ev, category)` is told about the latter. A
+// fixed-time event (`is_local_time: false`) with no venue is left out too and
+// `reportVenue(ev, category)` told: see VENUES in the header, its bonuses hold
+// in one city nobody has placed yet. The signals pass still reads every event,
+// so an unparseable window is reported regardless.
+export function bonusesFromFeed(feed, now, report = () => {}, reportVenue = () => {}) {
   const out = [];
   for (const [category, list] of Object.entries(feed || {})) {
     if (!Array.isArray(list)) continue;
@@ -326,10 +337,11 @@ export function bonusesFromFeed(feed, now, report = () => {}) {
         .map((b) => b.replace(/\s+/g, " ").trim())
         .filter(Boolean);
       if (bonuses.length === 0) continue;
-      if (ev.is_local_time === false) continue;
       const window = feedWindow(ev);
       if (!window) { report(ev, category); continue; }
       if (outsideWindow(window.startMs, window.endMs, now)) continue;
+      const venue = venueOf(ev, category, reportVenue);
+      if (!venue && isFixedTimeEvent(ev)) continue;
       out.push({
         id: slugId(category, ev.title, window.start),
         title: ev.title,
@@ -337,11 +349,114 @@ export function bonusesFromFeed(feed, now, report = () => {}) {
         start: window.start,
         end: window.end,
         isLocalTime: !!ev.is_local_time,
+        venue,
         bonuses: [...new Set(bonuses)],
       });
     }
   }
   return out;
+}
+
+// EGG POOLS, collected from EVERY category (a Season has eggs but no spawns
+// and would otherwise never be visited; SKIP_CATEGORIES only mutes wild-spawn
+// noise, not eggs). Feed items are { name, ... } objects. Returns the records
+// as { eggPools, unresolvedCount }; `report` and `reportVenue` are told about
+// an unparseable window and an in-person event with no venue (see VENUES).
+export function eggPoolsFromFeed(feed, now, nameIdx, { report = () => {}, reportVenue = () => {} } = {}) {
+  const eggPools = [];
+  let unresolvedCount = 0;
+  for (const [category, list] of Object.entries(feed || {})) {
+    if (!Array.isArray(list)) continue;
+    for (const event of list) {
+      const eggs = event?.details?.eggs;
+      if (!Array.isArray(eggs) || eggs.length === 0) continue;
+
+      const window = feedWindow(event);
+      if (!window) { report(event, category); continue; }
+      if (outsideWindow(window.startMs, window.endMs, now)) continue;
+
+      const { spawnDex: eggDex, spawns: eggNames, unresolved } = resolveSpawns(eggs, nameIdx);
+      if (eggDex.length === 0) continue;
+      if (unresolved.length > 0) {
+        unresolvedCount += unresolved.length;
+        console.warn(`  ⚠ "${event.title}" eggs: unresolved names — ${unresolved.join(", ")}`);
+      }
+
+      eggPools.push({
+        id: `${slugId(category, event.title, window.start)}-eggs`,
+        title: event.title,
+        category,
+        start: window.start,
+        end: window.end,
+        isLocalTime: !!event.is_local_time,
+        venue: venueOf(event, category, reportVenue),
+        eggDex,
+        eggs: eggNames,
+        unresolved,
+      });
+    }
+  }
+  return { eggPools, unresolvedCount };
+}
+
+// WILD-SPAWN EVENTS: one record per event with a spawn list inside the window,
+// minus SKIP_CATEGORIES. `formIdx`, `previousForms` and `missingForms` are the
+// spawn-form inputs (see the header): the game-master name index when a mirror
+// answered, else the previous snapshot's forms by name, and the set every name
+// with no form is added to. Returns { events, skippedNoSpawns, skippedWindow,
+// skippedCategory, unresolvedCount } for the summary line.
+export function eventsFromFeed(feed, now, nameIdx, {
+  formIdx = null,
+  previousForms = new Map(),
+  missingForms = new Set(),
+  report = () => {},
+  reportVenue = () => {},
+} = {}) {
+  const events = [];
+  let skippedNoSpawns = 0;
+  let skippedWindow = 0;
+  let skippedCategory = 0;
+  let unresolvedCount = 0;
+  for (const [category, list] of Object.entries(feed || {})) {
+    if (SKIP_CATEGORIES.has(category)) { skippedCategory += (Array.isArray(list) ? list.length : 0); continue; }
+    if (!Array.isArray(list)) continue;
+    for (const event of list) {
+      const spawns = event?.details?.spawns;
+      if (!Array.isArray(spawns) || spawns.length === 0) { skippedNoSpawns++; continue; }
+
+      const window = feedWindow(event);
+      if (!window) { report(event, category); continue; }
+      if (outsideWindow(window.startMs, window.endMs, now)) { skippedWindow++; continue; }
+
+      const { spawnDex, spawns: spawnNames, unresolved } = resolveSpawns(spawns, nameIdx);
+      if (spawnDex.length === 0) {
+        console.warn(`  ⚠ "${event.title}": no spawns resolved (${unresolved.join(", ")}) — skipped`);
+        continue;
+      }
+      if (unresolved.length > 0) {
+        unresolvedCount += unresolved.length;
+        console.warn(`  ⚠ "${event.title}": unresolved spawns — ${unresolved.join(", ")}`);
+      }
+
+      events.push({
+        id: slugId(category, event.title, window.start),
+        title: event.title,
+        category,
+        start: window.start,
+        end: window.end,
+        isLocalTime: !!event.is_local_time,
+        venue: venueOf(event, category, reportVenue),
+        spawnDex,
+        spawns: spawnNames,
+        spawnForms: spawnFormsFor(spawns, nameIdx, formIdx, previousForms, missingForms),
+        unresolved,
+        // Costumed spawns ("Piplup wearing a …"): the sorting tab floats the
+        // costume pile up after such an event. The names above are stripped.
+        hasCostumes: hasCostumedSpawns(spawns),
+      });
+    }
+  }
+  return { events, skippedNoSpawns, skippedWindow, skippedCategory, unresolvedCount };
 }
 
 // The Community Day background pile's species (scripts/lib/community-days.mjs):
@@ -414,6 +529,14 @@ async function main() {
     const key = `${category}|${ev?.title}`;
     if (!unparseable.has(key)) unparseable.set(key, `"${ev?.title}" (${category}): ${describeUnparseableWindow(ev)}`);
   };
+  // An in-person event with no row in scripts/lib/event-venues.mjs (see VENUES
+  // in the header): noted once across the passes, logged after them, counted
+  // in the summary line. Its bonuses are left out until a row is added.
+  const unmappedVenues = new Map();
+  const reportUnmappedVenue = (ev, category) => {
+    const key = `${category}|${ev?.title}`;
+    if (!unmappedVenues.has(key)) unmappedVenues.set(key, `"${ev?.title}" (${category})`);
+  };
 
   // A Community Day whose featured names don't all resolve is held back (see
   // communityDaysFromFeed). The rest of the sync still writes; the run fails
@@ -443,86 +566,15 @@ async function main() {
   }
   const missingForms = new Set();
 
-  const eventsOut = [];
-  const eggPoolsOut = [];
-  let skippedNoSpawns = 0;
-  let skippedWindow = 0;
-  let skippedCategory = 0;
-  let totalUnresolved = 0;
-
-  // Egg pools first — collected from EVERY category (a Season has eggs but no
-  // spawns and would otherwise never be visited; SKIP_CATEGORIES only mutes
-  // wild-spawn noise, not eggs). Feed items are { name, ... } objects.
-  for (const [category, list] of Object.entries(feed)) {
-    if (!Array.isArray(list)) continue;
-    for (const event of list) {
-      const eggs = event?.details?.eggs;
-      if (!Array.isArray(eggs) || eggs.length === 0) continue;
-
-      const window = feedWindow(event);
-      if (!window) { reportUnparseable(event, category); continue; }
-      if (outsideWindow(window.startMs, window.endMs, now)) continue;
-
-      const { spawnDex: eggDex, spawns: eggNames, unresolved } = resolveSpawns(eggs, nameIdx);
-      if (eggDex.length === 0) continue;
-      if (unresolved.length > 0) {
-        totalUnresolved += unresolved.length;
-        console.warn(`  ⚠ "${event.title}" eggs: unresolved names — ${unresolved.join(", ")}`);
-      }
-
-      eggPoolsOut.push({
-        id: `${slugId(category, event.title, window.start)}-eggs`,
-        title: event.title,
-        category,
-        start: window.start,
-        end: window.end,
-        isLocalTime: !!event.is_local_time,
-        eggDex,
-        eggs: eggNames,
-        unresolved,
-      });
-    }
-  }
+  // The egg and wild-spawn passes (eggPoolsFromFeed, eventsFromFeed below).
+  const eggsPass = eggPoolsFromFeed(feed, now, nameIdx, { report: reportUnparseable, reportVenue: reportUnmappedVenue });
+  const eggPoolsOut = eggsPass.eggPools;
   const eggPools = carryOver(eggPoolsOut, previous?.eggPools, now);
 
-  for (const [category, list] of Object.entries(feed)) {
-    if (SKIP_CATEGORIES.has(category)) { skippedCategory += (Array.isArray(list) ? list.length : 0); continue; }
-    if (!Array.isArray(list)) continue;
-    for (const event of list) {
-      const spawns = event?.details?.spawns;
-      if (!Array.isArray(spawns) || spawns.length === 0) { skippedNoSpawns++; continue; }
-
-      const window = feedWindow(event);
-      if (!window) { reportUnparseable(event, category); continue; }
-      if (outsideWindow(window.startMs, window.endMs, now)) { skippedWindow++; continue; }
-
-      const { spawnDex, spawns: spawnNames, unresolved } = resolveSpawns(spawns, nameIdx);
-      if (spawnDex.length === 0) {
-        console.warn(`  ⚠ "${event.title}": no spawns resolved (${unresolved.join(", ")}) — skipped`);
-        continue;
-      }
-      if (unresolved.length > 0) {
-        totalUnresolved += unresolved.length;
-        console.warn(`  ⚠ "${event.title}": unresolved spawns — ${unresolved.join(", ")}`);
-      }
-
-      eventsOut.push({
-        id: slugId(category, event.title, window.start),
-        title: event.title,
-        category,
-        start: window.start,
-        end: window.end,
-        isLocalTime: !!event.is_local_time,
-        spawnDex,
-        spawns: spawnNames,
-        spawnForms: spawnFormsFor(spawns, nameIdx, formIdx, previousForms, missingForms),
-        unresolved,
-        // Costumed spawns ("Piplup wearing a …"): the sorting tab floats the
-        // costume pile up after such an event. The names above are stripped.
-        hasCostumes: hasCostumedSpawns(spawns),
-      });
-    }
-  }
+  const eventsPass = eventsFromFeed(feed, now, nameIdx, { formIdx, previousForms, missingForms, report: reportUnparseable, reportVenue: reportUnmappedVenue });
+  const eventsOut = eventsPass.events;
+  const { skippedNoSpawns, skippedWindow, skippedCategory } = eventsPass;
+  const totalUnresolved = eggsPass.unresolvedCount + eventsPass.unresolvedCount;
 
   // Event kinds the sorting tab floats piles up for (docs/sorting-workflow-
   // spec.md, "Which piles show first"), from every category, spawns or not: a
@@ -533,7 +585,7 @@ async function main() {
 
   // Event bonuses (see the header), from every category. A feed that lists
   // events but no bonus at all most likely moved the field; say so loudly.
-  const bonusesOut = bonusesFromFeed(feed, now, reportUnparseable);
+  const bonusesOut = bonusesFromFeed(feed, now, reportUnparseable, reportUnmappedVenue);
   const bonuses = carryOver(bonusesOut, previous?.bonuses, now);
   for (const id of bonuses.carriedIds) console.log(`  ↩ carried over ended bonuses ${id}`);
   if (bonusesOut.length === 0 && (previous?.bonuses || []).length > 0) {
@@ -549,6 +601,9 @@ async function main() {
   // numeric one did (see TIME FORMS in the header).
   for (const line of unparseable.values()) {
     console.warn(`  ⚠ unparseable event window, skipped by every pass — ${line}`);
+  }
+  for (const line of unmappedVenues.values()) {
+    console.warn(`  ⚠ in-person event with no venue in scripts/lib/event-venues.mjs — ${line}: its bonuses stay out of the nudge strip until a row is added`);
   }
 
   // A refused result takes the raid fetcher's route (keepCacheOrExit there):
@@ -626,7 +681,7 @@ async function main() {
 
   writeJson(OUT_PATH, { fetchedAt, ...newContent });
   console.log(`✓ wrote ${OUT_PATH}`);
-  console.log(`  events: ${eventsOut.length} surfaced · ${events.carriedIds.length} carried over · ${skippedNoSpawns} without spawns · ${skippedWindow} outside window · ${skippedCategory} skipped categories · ${unparseable.size} unparseable windows · ${totalUnresolved} unresolved spawn names`);
+  console.log(`  events: ${eventsOut.length} surfaced · ${events.carriedIds.length} carried over · ${skippedNoSpawns} without spawns · ${skippedWindow} outside window · ${skippedCategory} skipped categories · ${unparseable.size} unparseable windows · ${unmappedVenues.size} without venue · ${totalUnresolved} unresolved spawn names`);
   console.log(`  egg pools: ${eggPoolsOut.length} surfaced · ${eggPools.carriedIds.length} carried over`);
   console.log(`  bonuses: ${bonusesOut.length} events surfaced · ${bonuses.carriedIds.length} carried over · ${unknownBonuses.length} unrecognised phrasings`);
   failOnHeldBack(heldBack);

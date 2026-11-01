@@ -57,7 +57,7 @@ import {
 import { regionForForm } from './data/form-region.js';
 import SpeciesInput from './SpeciesInput.jsx';
 import { megaPlans, rankMegaGroups } from './mega-boost.js';
-import { bonusNudges } from './bonus-nudges.js';
+import { bonusNudges, roundDistanceKm, venueReach } from './bonus-nudges.js';
 import {
 	wishTargetsFromConfig,
 	wishLinkFor,
@@ -4890,6 +4890,8 @@ export function buildFilters(
 				start: ev.start,
 				end: ev.end,
 				isLocalTime: !!ev.isLocalTime,
+				// The city of an in-person event, or null (scripts/lib/event-venues.mjs).
+				venue: ev.venue || null,
 				spawnDex: ev.spawnDex || [],
 				spawnForms: ev.spawnForms || [],
 				megaBoost: megaBoostFor(ev.spawnForms),
@@ -7649,6 +7651,7 @@ export default function App() {
 		Date.parse(ev.end) >= nowMs
 			? t('app.sort.ends', { params: { when: fmtWhen.format(Date.parse(ev.end)) } })
 			: t('app.sort.ended', { params: { when: fmtWhen.format(Date.parse(ev.end)) } });
+	const venueNote = (venue) => venueNoteFor(venue, homeLocation, t, locale);
 	const pileById = Object.fromEntries([hundoPile, ...sortingPiles].filter(Boolean).map((p) => [p.id, p]));
 	const accentOf = (id) => PILE_GROUPS.find((g) => g.piles.includes(id))?.accent || '#5EAFC5';
 	const tile = (pile, extra = {}) => (
@@ -7678,21 +7681,26 @@ export default function App() {
 					<h3 id='sort-now' className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold'>
 						{t('app.float.title')}
 					</h3>
-					{recentEvents.map((ev) => (
-						<PileTile
-							key={ev.id}
-							pile={ev.pile}
-							title={ev.title}
-							hook={t('app.sort.hook.event')}
-							icon={PILE_ICON.event}
-							chip={eventChip(ev)}
-							accent='#27AE60'
-							text={EVENT_PILE_TEXT}
-							copied={copied}
-							copyToClipboard={copyToClipboard}
-							t={t}
-						/>
-					))}
+					{recentEvents.map((ev) => {
+						// An in-person event far from the home pin (or with no pin) keeps
+						// its row for the traveller, folded, with the city and distance.
+						const where = venueNote(ev.venue);
+						return (
+							<PileTile
+								key={ev.id}
+								pile={ev.pile}
+								title={ev.title}
+								hook={where?.hook || t('app.sort.hook.event')}
+								icon={PILE_ICON.event}
+								chip={where ? `${eventChip(ev)} · ${where.chip}` : eventChip(ev)}
+								accent='#27AE60'
+								text={EVENT_PILE_TEXT}
+								copied={copied}
+								copyToClipboard={copyToClipboard}
+								t={t}
+							/>
+						);
+					})}
 					{floatedHere.map((f) =>
 						tile(pileById[f.pile], { chip: t(`app.float.${f.kind}`, { params: { title: f.title } }) }),
 					)}
@@ -7759,7 +7767,8 @@ export default function App() {
 		[megaBoostFor, clockTick],
 	);
 	// Event bonuses that make an existing filter worth opening now (src/bonus-nudges.js).
-	const bonusNudgeRows = useMemo(() => bonusNudges(EVENTS.bonuses, Date.now()), [clockTick]);
+	// An in-person event's bonuses nudge only a home pin within reach of its venue.
+	const bonusNudgeRows = useMemo(() => bonusNudges(EVENTS.bonuses, Date.now(), { homeLocation }), [clockTick, homeLocation]);
 	// A nudge opens its area and brings its group into view, focus included, so
 	// a keyboard or screen-reader user lands where a sighted user is scrolled to.
 	const openNudge = (nudge) => {
@@ -8071,6 +8080,7 @@ export default function App() {
 												<div className='pt-4'>
 												<MegaPlanner
 													plans={megaPlanRows}
+													homeLocation={homeLocation}
 													copied={copied}
 													copyToClipboard={copyToClipboard}
 													typeLabels={rocketTypeLabels}
@@ -10735,6 +10745,25 @@ function formatNudgeDate(ms, locale) {
 // "½ Stardust for trades / until Tue 3 Nov, 20:00 → trade filter". The copy is
 // the nudge kind's own translated string, never Leek Duck's English text.
 // Nothing renders when no bonus applies.
+// What the event card says about an in-person event's venue, against the home
+// pin (src/bonus-nudges.js venueReach): a chip with the city and its distance
+// ("Sendai, 9,100 km"), or the city alone without a pin; `far` when the pin is
+// outside VENUE_RADIUS_KM or there is none, with the hook that says why the row
+// is folded. Null for a global event, so the card reads exactly as before.
+function venueNoteFor(venue, homeLocation, t, locale) {
+	const reach = venueReach(venue, homeLocation);
+	if (!reach) return null;
+	const km = roundDistanceKm(reach.distanceKm);
+	const name = reach.name;
+	const chip =
+		km === null
+			? t('app.events.venue_no_home', { params: { name } })
+			: t('app.events.venue_distance', { params: { name, distance: new Intl.NumberFormat(locale).format(km) } });
+	const far = !reach.near;
+	const hook = !far ? null : km === null ? t('app.events.venue_no_home_hook', { params: { name } }) : t('app.events.venue_far_hook', { params: { name } });
+	return { chip, hook, far };
+}
+
 function BonusNudges({ nudges, onOpen, t, locale }) {
 	if (!nudges || nudges.length === 0) return null;
 	const accent = '#F5B82E';
@@ -11415,7 +11444,7 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 // raid day / raid hour that is on now or starts within the next days (see
 // megaPlans in mega-boost.js), soonest first, the running ones open. The Mega
 // rank-up filter sits underneath: levelling Megas is out-and-about work too.
-function MegaPlanner({ plans, copied, copyToClipboard, typeLabels, t, locale }) {
+function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels, t, locale }) {
 	const now = Date.now();
 	const fmtDow = new Intl.DateTimeFormat(locale, { weekday: 'short' });
 	const fmtTime = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
@@ -11441,15 +11470,18 @@ function MegaPlanner({ plans, copied, copyToClipboard, typeLabels, t, locale }) 
 						const live = Date.parse(p.start) <= now;
 						const icon = p.kind === 'raid' ? Target : Leaf;
 						const name = topName(p);
+						// An in-person event far from the home pin stays folded even while
+						// it runs; its chip carries the city and the distance.
+						const where = venueNoteFor(p.venue, homeLocation, t, locale);
 						return (
 							<ToolTile
 								key={p.id}
 								title={p.title}
-								chip={when(p)}
+								chip={where ? `${when(p)} · ${where.chip}` : when(p)}
 								hook={name}
 								icon={icon}
 								accent='#E91E63'
-								open={live}
+								open={live && !where?.far}
 							>
 								<MegaBoostPanel
 									boost={p.boost}
