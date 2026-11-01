@@ -866,12 +866,17 @@ export const DEFAULT_CONFIG = {
 	mythTooManyOf: [], // (canonicalized on load)
 	protectUltraBeasts: true,
 	protectShadows: true, // Crypto in trash; trade ALWAYS excludes (untradeable)
-	// Narrow floor for the shadow carve-out (mirrors protectGigantamax under
-	// protectDynamax): only bites when protectShadows is OFF. Keeps purify-worthy
-	// shadows (purify-hundo IVs / cheap-to-purify / TM'd) out of trash and lets
-	// expensive low-IV junk go. Default true but suppressed while the broad flag
-	// is on, so default output stays byte-identical.
-	protectShadowPurifyOnly: true,
+	// The shadow gradient: five independent rules that decide what still stays
+	// out of the trash once protectShadows is OFF. Each is its own scoped clause
+	// (or clause set) in the trash builder, so any combination is valid; all on
+	// by default, and all suppressed while the broad flag is on, so default
+	// output stays byte-identical. They replaced the bundled
+	// `protectShadowPurifyOnly` floor (dropped on import, see mergeImportedConfig).
+	protectShadowThreeStar: true, // keep 3★ and better
+	protectShadowAttack: true, // keep attack IV 11+ (bucket 3-4)
+	protectShadowCheapPurify: true, // keep candy-km < 3 (cheap event-task purify)
+	protectShadowChargeTm: true, // keep Charge-TM'd (no Frustration any more)
+	protectShadowKeepers: true, // keep the shadowKeeperSpecies families
 	protectPurified: true,
 	protectCostumes: true,
 	protectBackgrounds: true,
@@ -1519,6 +1524,18 @@ export function reconcileAttackerLists(config, savedTop, savedMax) {
 	};
 }
 
+// The shadow gradient's five rows, in the order the shadow group lists them.
+// They only shape the trash filter while protectShadows is off, so the page
+// dims them while the blanket toggle is on (their values still apply the
+// moment it goes off, same as any expert-only row in normal mode).
+export const SHADOW_GRADIENT_KEYS = Object.freeze([
+	'protectShadowThreeStar',
+	'protectShadowAttack',
+	'protectShadowCheapPurify',
+	'protectShadowChargeTm',
+	'protectShadowKeepers',
+]);
+
 export function mergeImportedConfig(raw, notices = []) {
 	const merged = { ...DEFAULT_CONFIG, ...(raw || {}) };
 	if (!merged.regionalGroups || Object.keys(merged.regionalGroups).length === 0) {
@@ -1613,12 +1630,21 @@ export function mergeImportedConfig(raw, notices = []) {
 	if (raw?.protectGigantamax === undefined && raw?.protectDynamax === false) {
 		merged.protectGigantamax = false;
 	}
-	// Same story for the shadow purify-floor: a config predating it back-fills the
-	// default (true). For users who explicitly saved protectShadows:false (release
-	// ALL shadows), the floor would newly keep purify-worthy shadows — pin it off to
-	// preserve their output until they opt in.
-	if (raw?.protectShadowPurifyOnly === undefined && raw?.protectShadows === false) {
-		merged.protectShadowPurifyOnly = false;
+	// The shadow gradient replaced the bundled purify floor. A saved
+	// `protectShadowPurifyOnly: false` meant "release every shadow", and so did
+	// the legacy pin that set it false for a saved protectShadows:false from
+	// before the floor existed: both map to all five gradient rules off, so the
+	// output those users had stays byte-identical until they opt back in. A
+	// config that never carried any gradient key otherwise back-fills the
+	// defaults (all on), and the retired key is dropped — never reuse its name.
+	{
+		const floorOff =
+			raw?.protectShadowPurifyOnly === false ||
+			(raw?.protectShadowPurifyOnly === undefined && raw?.protectShadows === false);
+		if (floorOff && SHADOW_GRADIENT_KEYS.every((k) => raw?.[k] === undefined)) {
+			for (const k of SHADOW_GRADIENT_KEYS) merged[k] = false;
+		}
+		delete merged.protectShadowPurifyOnly;
 	}
 	// Canonicalize seeded defaults to the storage locale so chips render
 	// consistently. Idempotent on already-canonical user input.
@@ -1657,7 +1683,7 @@ export function mergeImportedConfig(raw, notices = []) {
 	merged.pvpMetaSpecies = [...new Set(canonicalize(merged.pvpMetaSpecies))];
 	// PvP knobs: coerce junk (and hand-edited imports) to the defaults. A config
 	// predating `intelligent` simply never selects it, so the two tier fields stay
-	// inert — no back-fill pin needed the way protectShadowPurifyOnly needed one.
+	// inert — no back-fill pin needed the way the shadow gradient needed one.
 	if (!['loose', 'intelligent', 'strict', 'none'].includes(merged.pvpMode)) merged.pvpMode = 'strict';
 	if (!['loose', 'strict'].includes(merged.pvpMetaTier)) merged.pvpMetaTier = 'loose';
 	if (!['loose', 'strict', 'none'].includes(merged.pvpBaseTier)) merged.pvpBaseTier = 'strict';
@@ -2749,44 +2775,56 @@ export function buildFilters(
 		);
 	}
 	if (cfg.protectUltraBeasts) push(trashClauses, `!${kw.flag.ultra_beast}`, tFn('app.clause_why.ultra_beasts'));
-	// Shadow carve-out (trash-only; trade always excludes crypto). Broad-wins /
-	// narrow-floor split, mirroring maxProtectClause: protectShadows keeps ALL
-	// shadows out of trash; when it's off, the protectShadowPurifyOnly floor keeps
-	// only the purify-worthy ones and lets expensive low-IV junk go. Each floor
-	// clause is a scoped implication `!crypto,X` = keep unless X (OR binds tighter
-	// than `&`, same trick as legacyMovesClause): a shadow is releasable only if it
-	// has a low IV somewhere (not a purify-hundo candidate) AND costs ≥3km-candy to
-	// purify (not a cheap event-task purify) AND still has Frustration (not a
-	// Charge-TM'd investment).
+	// Shadow carve-out (trash-only; trade always excludes crypto). protectShadows
+	// keeps ALL shadows out of trash. When it is off, the shadow gradient takes
+	// over: five independent rules, each its own clause (or clause set), any
+	// combination valid, so switching the blanket off is a gradient and not "all
+	// your crypto are trash now". Each clause is a scoped implication
+	// `!crypto,X` = keep unless X (OR binds tighter than `&`, same trick as
+	// legacyMovesClause), and the game ignores `!N` on IV and star tokens, so
+	// X is always the positive contrapositive: a shadow is releasable only if it
+	// is 0-2★ AND its attack bucket is 0-2 AND it costs ≥3km-candy to purify AND
+	// it still has Frustration AND it is not a keeper family — for whichever of
+	// the five rules are on. With all five off, no `!crypto` clause is emitted
+	// and every shadow is releasable.
 	if (cfg.protectShadows) {
 		push(trashClauses, `!${kw.flag.shadow}`, tFn('app.clause_why.shadows'));
-	} else if (cfg.protectShadowPurifyOnly) {
-		push(
-			trashClauses,
-			`!${kw.flag.shadow},0-2${kw.iv.atk},0-2${kw.iv.def},0-2${kw.iv.hp}`,
-			tFn('app.clause_why.shadow_purify_hundo'),
-		);
-		push(
-			trashClauses,
-			`!${kw.flag.shadow},${kw.numeric.candy_km}3-`,
-			tFn('app.clause_why.shadow_purify_cheap'),
-		);
-		if (kw.flag.frustration)
+	} else {
+		// Keep 3★ and better: the same `0*,1*,2*` tokens as the Shadows pile's
+		// three-star step (notTop).
+		if (cfg.protectShadowThreeStar)
+			push(trashClauses, `!${kw.flag.shadow},${notTop}`, tFn('app.clause_why.shadow_keep_three_star'));
+		// Keep attack 11+: bucket 3-4 on attack alone. `3-4` rather than `4` on
+		// purpose — the gradient's job is to lose less, and attack 11+ keeps
+		// more. This subsumes the old "no weak stat" floor clause (every
+		// all-3-bar shadow has attack 3+), so that clause is gone.
+		if (cfg.protectShadowAttack)
+			push(trashClauses, `!${kw.flag.shadow},0-2${kw.iv.atk}`, tFn('app.clause_why.shadow_keep_attack'));
+		// Keep cheap purifies: candy-km below 3, i.e. the 1km tier, which the
+		// purify tasks of a takeover are cleared with.
+		if (cfg.protectShadowCheapPurify)
+			push(
+				trashClauses,
+				`!${kw.flag.shadow},${kw.numeric.candy_km}3-`,
+				tFn('app.clause_why.shadow_keep_cheap_purify'),
+			);
+		// Keep Charge-TM'd: a shadow that no longer knows Frustration had a
+		// Charge TM spent on it during a takeover; releasing it wastes that.
+		if (cfg.protectShadowChargeTm && kw.flag.frustration)
 			push(
 				trashClauses,
 				`!${kw.flag.shadow},@${kw.flag.frustration}`,
-				tFn('app.clause_why.shadow_purify_frustration'),
+				tFn('app.clause_why.shadow_keep_charge_tm'),
 			);
-		// Fourth floor: the meta shadow attackers themselves. The three above are
-		// all about the PURIFY decision — a shadow worth purifying is worth not
-		// releasing. That says nothing about a shadow whose whole value is
-		// staying a shadow, and those are exactly the ones this list names.
-		// Without it a keeper that is cheap-to-purify, has no low IV and has
-		// already been Charge-TM'd passes all three and gets released: a
-		// Charge-TM'd Shadow Metagross is the single most expensive Pokémon in
-		// the box to have thrown away.
+		// Keep keeper families: the meta shadow attackers themselves. The four
+		// rules above all reason about IVs and the PURIFY decision, which says
+		// nothing about a shadow whose whole value is staying a shadow, and those
+		// are exactly the ones this list names. Without it a keeper that is
+		// cheap-to-purify, 0-2★ with a low attack and already Charge-TM'd passes
+		// all four and gets released: a Charge-TM'd Shadow Metagross is the
+		// single most expensive Pokémon in the box to have thrown away.
 		//
-		// ONE CLAUSE PER KEEPER, not one clause listing them all. The floor asks
+		// ONE CLAUSE PER KEEPER, not one clause listing them all. The rule asks
 		// for "releasable only if this is NOT a keeper family", i.e. `!crypto ∨
 		// ¬(k₁ ∨ … ∨ kₙ)` — and De Morgan turns that negated union into an AND
 		// of negations, which in this grammar is separate clauses:
@@ -2804,13 +2842,14 @@ export function buildFilters(
 		// keeper. The levers are the length of shadowKeeperSpecies
 		// (user-editable, seeded from the daily feed) and dropping the keepers a
 		// blanket clause already covers — see floorKeeperResolved above.
-		for (const sp of floorKeeperResolved) {
-			push(
-				trashClauses,
-				`!${kw.flag.shadow},!+${sp}`,
-				tFn('app.clause_why.shadow_purify_keeper', { params: { name: sp } }),
-			);
-		}
+		if (cfg.protectShadowKeepers)
+			for (const sp of floorKeeperResolved) {
+				push(
+					trashClauses,
+					`!${kw.flag.shadow},!+${sp}`,
+					tFn('app.clause_why.shadow_keep_keepers', { params: { name: sp } }),
+				);
+			}
 	}
 	if (cfg.protectCostumes) push(trashClauses, `!${kw.flag.costume}`, tFn('app.clause_why.costumes'));
 	if (cfg.protectLuckies) push(trashClauses, `!${kw.flag.lucky}`, tFn('app.clause_why.luckies'));
@@ -5864,9 +5903,11 @@ function evalTerm(t, mon, kw, outputLocale) {
 		const want = t.slice(1).toLowerCase();
 		return mon.moves.some((mv) => String(mv).toLowerCase() === want);
 	}
-	const candyKmRe = new RegExp(`^${escapeRegex(kw.numeric.candy_km)}(\\d+)$`);
+	// `candykm1` is the exact tier; `candykm3-` (trailing dash) is "3 km or
+	// more", the shape the shadow gradient's cheap-purify clause emits.
+	const candyKmRe = new RegExp(`^${escapeRegex(kw.numeric.candy_km)}(\\d+)(-)?$`);
 	m = t.match(candyKmRe);
-	if (m) return mon.candyKm == null ? null : mon.candyKm === +m[1];
+	if (m) return mon.candyKm == null ? null : m[2] ? mon.candyKm >= +m[1] : mon.candyKm === +m[1];
 	if (t === kw.flag.evolvable) return mon.flags && 'canEvolve' in mon.flags ? !!mon.flags.canEvolve : null;
 
 	// Universal league tags
@@ -12342,7 +12383,11 @@ export const SETTINGS_GROUPS = [
 		id: 'shadow',
 		rows: [
 			['protectShadows', 'app.protect.shadows'],
-			['protectShadowPurifyOnly', 'app.protect.shadow_purify_only', { expertOnly: true }],
+			['protectShadowThreeStar', 'app.protect.shadow_keep_three_star', { expertOnly: true }],
+			['protectShadowAttack', 'app.protect.shadow_keep_attack', { expertOnly: true }],
+			['protectShadowCheapPurify', 'app.protect.shadow_keep_cheap_purify', { expertOnly: true }],
+			['protectShadowChargeTm', 'app.protect.shadow_keep_charge_tm', { expertOnly: true }],
+			['protectShadowKeepers', 'app.protect.shadow_keep_keepers', { expertOnly: true }],
 			['protectPurified', 'app.protect.purified'],
 		],
 	},
@@ -12768,12 +12813,13 @@ function ConfigPanel({
 														expertBadge={!!extra?.expertOnly}
 														checked={!!config[k]}
 														onChange={(v) => set(k, v)}
+														inert={SHADOW_GRADIENT_KEYS.includes(k) && !!config.protectShadows}
 														{...rowExtra}
 													/>
 												);
 											})}
 										</div>
-										{group.id === 'shadow' && !config.protectShadows && config.protectShadowPurifyOnly && (
+										{group.id === 'shadow' && !config.protectShadows && (
 											<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded-sm p-3 mono text-[10.5px] mt-2 leading-tight text-[#E6EDF3]'>
 												{t('app.protect.shadows_off_note')}
 											</div>
@@ -12994,7 +13040,10 @@ function ConfigPanel({
 	);
 }
 
-function ToggleRow({ k, label, why, checked, onChange, expertBadge, requireConfirmOff }) {
+// `inert` dims a row whose value has no effect right now (the shadow gradient
+// while the blanket shadow toggle is on). It stays operable: the value applies
+// the moment the toggle above goes off.
+function ToggleRow({ k, label, why, checked, onChange, expertBadge, requireConfirmOff, inert = false }) {
 	const { t } = useTranslation();
 	const announce = useAnnounce();
 	// For dangerous toggles (e.g. "always protect 4★"), turning them OFF requires
@@ -13034,7 +13083,7 @@ function ToggleRow({ k, label, why, checked, onChange, expertBadge, requireConfi
 		<label
 			className={`mono text-xs flex items-start gap-2 cursor-pointer rounded-sm px-2 py-1.5 transition ${
 				armed ? 'bg-[#E74C3C]/15 border border-[#E74C3C]/40' : 'hover:bg-[#141A21] border border-transparent'
-			}`}
+			}${inert ? ' opacity-60' : ''}`}
 			title={why}
 		>
 			<input type='checkbox' checked={!!checked} onChange={handleChange} className='accent-[#E74C3C] mt-0.5' />

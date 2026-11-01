@@ -224,7 +224,7 @@ The protection toggles under Catching → settings sit in the nine groups the sw
 | --- | --- | --- | --- |
 | marked | Marked by you | favourites, any tag | none |
 | rare | Shiny, lucky & rare | shinies, luckies, legendaries, mythicals | Shinies, Luckies, Legendaries (once Ultra Beasts are off too) |
-| shadow | Shadow & Purified | shadows, purify-only floor, purified | Shadows |
+| shadow | Shadow & Purified | shadows, the five shadow-gradient rules (expert), purified | Shadows |
 | looks | Looks | costumes, backgrounds | Costumes (both), Community Day backgrounds |
 | collection | Babies & evolutions | babies, trade evolutions, traded regionals | none |
 | size | Size records | XXL, XL, XXS | XXL, XXS |
@@ -236,7 +236,7 @@ Expert-only toggles carry the EXPERT badge and are hidden in simple mode. The So
 
 ## Unchanged
 
-- The field trash filter and its protections, including the shadow, XXL and XXS toggles.
+- The field trash filter and its protections, including the shadow, XXL and XXS toggles. Switching shadow protection off is a gradient, not a blanket release: five expert rules (keep 3★ and better, keep attack 11+, keep cheap purifies, keep Charge-TM'd, keep keeper families, `SHADOW_GRADIENT_KEYS` in `src/App.jsx`) each add their own scoped `!crypto,…` clause to the trash filter and combine freely.
 - The logic of the battle, Rocket, PvP and trade filters (they only move to their area).
 
 ## Open items for implementation

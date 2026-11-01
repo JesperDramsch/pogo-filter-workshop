@@ -10,6 +10,7 @@
 //     2. Stale rename keys (protectTagged → protectAnyTag)
 //     3. Stale rename keys (mythCarveOuts → mythTooManyOf)
 //     4. Dropped legacy keys (protectRegionals, yearMin, ...)
+//     4b. protectShadowPurifyOnly → the five shadow-gradient toggles, then dropped
 //     5. Forward-compat preservation of unknown keys
 //     6. Default-fill / null input
 //     7. User values win over defaults
@@ -78,6 +79,38 @@ console.log("\nMigration test 4: dropped legacy keys");
   check("protectLeagueTags dropped", !("protectLeagueTags" in out));
   check("yearMin dropped", !("yearMin" in out));
   check("lastAppliedPreset dropped (presets are gone)", !("lastAppliedPreset" in out));
+}
+
+console.log("\nMigration test 4b: protectShadowPurifyOnly → the five shadow-gradient toggles");
+{
+  const GRADIENT = ["protectShadowThreeStar", "protectShadowAttack", "protectShadowCheapPurify",
+    "protectShadowChargeTm", "protectShadowKeepers"];
+  const allOff = (out) => GRADIENT.every(k => out[k] === false);
+  const allOn = (out) => GRADIENT.every(k => out[k] === true);
+  // The retired floor said "release every shadow" when saved off; so did the
+  // pin that set it off for a protectShadows:false saved before the floor
+  // existed. Both land on all five toggles off; the key itself is dropped.
+  const floorOff = mergeImportedConfig({ protectShadows: false, protectShadowPurifyOnly: false });
+  check("saved floor off → all five gradient toggles false", allOff(floorOff));
+  check("protectShadowPurifyOnly dropped", !("protectShadowPurifyOnly" in floorOff));
+  const legacyPin = mergeImportedConfig({ protectShadows: false });
+  check("legacy protectShadows:false without the floor key → all five false", allOff(legacyPin));
+  check("protectShadowPurifyOnly absent after the legacy pin", !("protectShadowPurifyOnly" in legacyPin));
+  const floorOn = mergeImportedConfig({ protectShadows: false, protectShadowPurifyOnly: true });
+  check("saved floor on → all five back-fill to the default true", allOn(floorOn));
+  check("protectShadowPurifyOnly dropped even when it was true", !("protectShadowPurifyOnly" in floorOn));
+  // A saved floor off is the user's choice even while the blanket toggle made
+  // it inert: the moment they switch the blanket off again they expect what
+  // they had, every shadow releasable, not five rules they never saw.
+  const blanketOn = mergeImportedConfig({ protectShadows: true, protectShadowPurifyOnly: false });
+  check("saved floor off under blanket protection on → still all five false", allOff(blanketOn));
+  const carries = mergeImportedConfig({ protectShadows: false, protectShadowPurifyOnly: false, protectShadowCheapPurify: true });
+  check("a config already carrying a gradient key keeps it and back-fills the rest",
+    carries.protectShadowCheapPurify === true && carries.protectShadowThreeStar === true);
+  const fresh = mergeImportedConfig({});
+  check("a fresh config has all five on", allOn(fresh));
+  check("idempotent: merging the migrated config again changes nothing",
+    JSON.stringify(GRADIENT.map(k => mergeImportedConfig(floorOff)[k])) === JSON.stringify(GRADIENT.map(k => floorOff[k])));
 }
 
 console.log("\nForward-compat test: unknown keys preserved");
