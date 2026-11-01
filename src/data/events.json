@@ -1,32 +1,6 @@
 {
-  "fetchedAt": "2026-10-31T23:32:47.089Z",
+  "fetchedAt": "2026-11-01T13:34:38.944Z",
   "events": [
-    {
-      "id": "event-minior-showers-orionids-2026-2026-10-19t17-00-00",
-      "title": "Minior Showers: Orionids 2026",
-      "category": "Event",
-      "start": "2026-10-19T17:00:00",
-      "end": "2026-10-24T23:59:00",
-      "isLocalTime": true,
-      "spawnDex": [
-        774
-      ],
-      "spawns": [
-        "Minior"
-      ],
-      "spawnForms": [
-        {
-          "name": "Minior (Meteor Form)",
-          "dex": 774,
-          "region": null,
-          "types": [
-            "rock",
-            "flying"
-          ]
-        }
-      ],
-      "unresolved": []
-    },
     {
       "id": "city-safari-pok-mon-go-city-safari-boston-rescheduled-2026-10-24t10-00-00",
       "title": "Pokémon GO City Safari: Boston (Rescheduled)",
@@ -422,15 +396,21 @@
       "isLocalTime": true,
       "spawnDex": [
         94,
+        353,
         607,
+        656,
         722,
+        769,
         971
       ],
       "spawns": [
+        "Froakie",
         "Gengar",
         "Greavard",
         "Litwick",
-        "Rowlet"
+        "Rowlet",
+        "Sandygast",
+        "Shuppet"
       ],
       "spawnForms": [
         {
@@ -443,6 +423,14 @@
           ]
         },
         {
+          "name": "Shuppet",
+          "dex": 353,
+          "region": null,
+          "types": [
+            "ghost"
+          ]
+        },
+        {
           "name": "Litwick",
           "dex": 607,
           "region": null,
@@ -452,12 +440,29 @@
           ]
         },
         {
+          "name": "Froakie",
+          "dex": 656,
+          "region": null,
+          "types": [
+            "water"
+          ]
+        },
+        {
           "name": "Rowlet",
           "dex": 722,
           "region": null,
           "types": [
             "grass",
             "flying"
+          ]
+        },
+        {
+          "name": "Sandygast",
+          "dex": 769,
+          "region": null,
+          "types": [
+            "ghost",
+            "ground"
           ]
         },
         {

@@ -439,43 +439,6 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "chandelure-super-mega-raid-day-2026",
-      "name": "Chandelure Super Mega Raid Day",
-      "eventType": "raid-day",
-      "start": "2026-10-31T14:00:00.000",
-      "end": "2026-10-31T17:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "CHANDELURE",
-          "form": "CHANDELURE_NORMAL",
-          "names": {
-            "en": "Chandelure"
-          },
-          "types": [
-            "ghost",
-            "fire"
-          ],
-          "resistorTypes": [
-            "normal",
-            "rock",
-            "fire",
-            "water",
-            "dragon",
-            "dark"
-          ],
-          "seMoveTypes": [
-            "ground",
-            "rock",
-            "ghost",
-            "water",
-            "dark"
-          ]
-        }
-      ]
-    },
-    {
       "eventID": "giratina-altered-forme-in-5-star-raid-battles-november-2026",
       "name": "Giratina (Altered Forme) in 5-star Raid Battles",
       "eventType": "raid-battles",
