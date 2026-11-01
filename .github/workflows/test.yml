@@ -77,4 +77,5 @@ jobs:
       - run: npm run test:megaboost
       - run: npm run test:swipe
       - run: npm run test:bonusnudges
+      - run: npm run test:sharelink
       - run: npm run build
