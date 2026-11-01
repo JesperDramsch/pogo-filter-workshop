@@ -9064,7 +9064,7 @@ function SmeargleMovesetEditor({ config, setConfig, accent = '#5EAFC5' }) {
 	return (
 		<div className='space-y-4'>
 			<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0]'>
-				{t('app.protect.smeargle_moves.count', { params: { count: items.length } })}
+				{t('app.protect.smeargle_moves.count', { params: { count: items.length, fast: fastName } })}
 			</div>
 			<div className='flex flex-wrap gap-1.5'>
 				<span className='mono text-xs bg-[#1F2933] text-[#E6EDF3] px-2.5 py-1 rounded-sm flex items-center gap-1.5'>

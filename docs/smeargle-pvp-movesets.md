@@ -19,7 +19,7 @@ Smeargle reaches 487 CP at level 50, which keeps it out of every open league. It
 evolve, so it is not eligible for Little Cup, and it has been banned intermittently from
 Little Jungle Cup and from the Holiday Cup Little Edition. The format it is ranked for is
 the open 500 CP cup. This is a collector and tournament feature, not a ladder one, and
-the help copy says so.
+the help copy says so ("500 CP cups", never "Little Cup").
 
 ## Ranking in the open 500 CP format
 
@@ -37,9 +37,15 @@ Special cases:
 
 - Lock-On + Techno Blast (Normal) when Fighting-type moves are banned.
 - Thunder Shock + Flying Press, learnt from Pikachu Libre.
-- Lock-On or Shadow Claw + Shadow Ball against Wobbuffet.
+- Lock-On or Shadow Claw + Shadow Ball as the Ghost-type option.
 
 ## What the app models
+
+The seed (Flying Press, Techno Blast) is a dated snapshot of the ranking above, written
+down on 2026-11-01. No fetcher refreshes it: `src/data/pvp-rankings.json` carries no
+500 CP cup and no Smeargle, so there is nothing to derive it from. It is user-editable
+data, not a meta list the app maintains; when the ranking moves, edit the list in the app
+or update this seed and its date here.
 
 Only the Lock-On family is in scope: one fixed fast move, Lock-On, and a user-editable
 list of charged moves seeded with Flying Press and Techno Blast. A Smeargle matches when
