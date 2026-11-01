@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-31T12:44:27.244Z",
+  "fetchedAt": "2026-10-31T23:32:47.089Z",
   "events": [
     {
       "id": "event-minior-showers-orionids-2026-2026-10-19t17-00-00",
@@ -1230,6 +1230,33 @@
       ],
       "unresolved": [],
       "hasCostumes": false
+    },
+    {
+      "id": "event-minior-showers-leonids-2026-2026-11-14t17-00-00",
+      "title": "Minior Showers: Leonids 2026",
+      "category": "Event",
+      "start": "2026-11-14T17:00:00",
+      "end": "2026-11-19T23:59:00",
+      "isLocalTime": true,
+      "spawnDex": [
+        774
+      ],
+      "spawns": [
+        "Minior"
+      ],
+      "spawnForms": [
+        {
+          "name": "Minior (Meteor Form)",
+          "dex": 774,
+          "region": null,
+          "types": [
+            "rock",
+            "flying"
+          ]
+        }
+      ],
+      "unresolved": [],
+      "hasCostumes": false
     }
   ],
   "eggPools": [
@@ -1348,6 +1375,172 @@
       "title": "Dynamax Machop during Max Monday",
       "start": "2026-11-02T06:00:00",
       "end": "2026-11-02T21:00:00"
+    }
+  ],
+  "bonuses": [
+    {
+      "id": "season-twilight-trails-2026-09-08t10-00-00",
+      "title": "Twilight Trails",
+      "category": "Season",
+      "start": "2026-09-08T10:00:00",
+      "end": "2026-12-01T10:00:00",
+      "isLocalTime": true,
+      "bonuses": [
+        "2× Daily Adventure Incense duration",
+        "Increased XP and Stardust from hatching Eggs",
+        "Increased limits on opening Gifts, receiving Gifts from PokéStop and Gym Photo Discs, and storing Gifts",
+        "One additional Candy for trading Pokémon",
+        "One guaranteed Candy XL when trading Pokémon for Trainers level 31 and above"
+      ]
+    },
+    {
+      "id": "go-pass-go-pass-october-2026-10-06t10-00-00",
+      "title": "GO Pass: October",
+      "category": "GO Pass",
+      "start": "2026-10-06T10:00:00",
+      "end": "2026-11-03T10:00:00",
+      "isLocalTime": true,
+      "bonuses": [
+        "2× Daily Adventure Incense duration",
+        "Hold 10 more Gifts in your Item Bag",
+        "Hold up to 20 more Gifts in your Item Bag",
+        "Increased XP and Stardust from hatching Eggs",
+        "One additional Candy for trading Pokémon",
+        "Open up to 40 Gifts per day",
+        "Open up to 50 Gifts per day",
+        "Receive up to 125 Gifts per day from spinning PokéStop and Gym Photo Discs",
+        "Receive up to 150 Gifts per day from spinning PokéStop and Gym Photo Discs",
+        "Trainers level 31 and above will receive one guaranteed Candy XL when trading Pokémon"
+      ]
+    },
+    {
+      "id": "event-pok-mon-go-halloween-2026-part-i-2026-10-27t10-00-00",
+      "title": "Pokémon GO Halloween 2026 Part I",
+      "category": "Event",
+      "start": "2026-10-27T10:00:00",
+      "end": "2026-11-01T10:00:00",
+      "isLocalTime": true,
+      "bonuses": [
+        "2× Candy for catching Pokémon",
+        "2× Stardust for catching Pokémon",
+        "GO Pass Deluxe: 3× Candy for catching Pokémon",
+        "GO Pass Deluxe: 3× Stardust for catching Pokémon"
+      ]
+    },
+    {
+      "id": "raid-day-chandelure-super-mega-raid-day-2026-10-31t14-00-00",
+      "title": "Chandelure Super Mega Raid Day",
+      "category": "Raid Day",
+      "start": "2026-10-31T14:00:00",
+      "end": "2026-10-31T17:00:00",
+      "isLocalTime": true,
+      "bonuses": [
+        "An additional 5,000 Stardust from Super Mega Raid Battles",
+        "An additional 5,000 XP from Super Mega Raid Battles",
+        "Chandelure caught from Super Mega Raids will have Mega Level 1 unlocked",
+        "Increased chance of encountering Shiny Chandelure from Super Mega Raids",
+        "Increased chance to get Rare Candy XL from Raid Battles",
+        "Receive up to 14 Raid Passes from spinning Gym Photo Discs",
+        "Receive up to six free Raid Passes from spinning Gym Photo Discs",
+        "Remote Raid limit increased to 20 from Friday, October 30, at 5:00 p.m. to Saturday, October 31, 2026, at 8:00 p.m. PDT"
+      ]
+    },
+    {
+      "id": "event-pok-mon-go-halloween-2026-part-ii-2026-11-01t10-00-00",
+      "title": "Pokémon GO Halloween 2026 Part II",
+      "category": "Event",
+      "start": "2026-11-01T10:00:00",
+      "end": "2026-11-05T20:00:00",
+      "isLocalTime": true,
+      "bonuses": [
+        "2× Candy for catching Pokémon",
+        "2× Stardust for catching Pokémon",
+        "GO Pass Deluxe: 3× Candy for catching Pokémon",
+        "GO Pass Deluxe: 3× Stardust for catching Pokémon"
+      ]
+    },
+    {
+      "id": "go-pass-go-pass-november-2026-11-03t10-00-00",
+      "title": "GO Pass: November",
+      "category": "GO Pass",
+      "start": "2026-11-03T10:00:00",
+      "end": "2026-12-01T10:00:00",
+      "isLocalTime": true,
+      "bonuses": [
+        "2× Daily Adventure Incense duration",
+        "Hold 10 more Gifts in your Item Bag",
+        "Hold up to 20 more Gifts in your Item Bag",
+        "Increased XP and Stardust from hatching Eggs",
+        "One additional Candy for trading Pokémon",
+        "Open up to 40 Gifts per day",
+        "Open up to 50 Gifts per day",
+        "Receive up to 125 Gifts per day from spinning PokéStop and Gym Photo Discs",
+        "Receive up to 150 Gifts per day from spinning PokéStop and Gym Photo Discs",
+        "Trainers level 31 and above will receive one guaranteed Candy XL when trading Pokémon"
+      ]
+    },
+    {
+      "id": "event-into-the-wild-2026-11-09t10-00-00",
+      "title": "Into the Wild",
+      "category": "Event",
+      "start": "2026-11-09T10:00:00",
+      "end": "2026-11-13T20:00:00",
+      "isLocalTime": true,
+      "bonuses": [
+        "+1 Candy XL from Max Battles (Trainers level 31+)",
+        "+1 Candy XL from raids (Trainers level 31+)",
+        "+1 Candy from Max Battles",
+        "+1 Candy from raids",
+        "1/2 Hatch Distance for Eggs placed in Incubators during the event",
+        "3/4 Max Particle cost for unlocking and powering up Max Moves",
+        "5,000 additional XP from completed Max Battles",
+        "5,000 additional XP from completed raids",
+        "Chance to encounter Shiny Gimmighoul when using a Coin Bag*",
+        "Chance to encounter Shiny Meltan when opening the Mystery Box*",
+        "No Remote Raid limit from Saturday, November 14, to Sunday, November 15, 2026",
+        "Reduced wait time before you can open the Mystery Box again*",
+        "Remote Raid limit increased to 30 from Monday, November 9, to Friday, November 13, 2026",
+        "Trainers can receive special event stickers from PokéStops and Gifts"
+      ]
+    },
+    {
+      "id": "wild-area-pok-mon-go-wild-area-2026-global-2026-11-14t10-00-00",
+      "title": "Pokémon GO Wild Area 2026: Global",
+      "category": "Wild Area",
+      "start": "2026-11-14T10:00:00",
+      "end": "2026-11-15T18:00:00",
+      "isLocalTime": true,
+      "bonuses": [
+        "1/2 Stardust cost for trades",
+        "2× Candy for catching Pokémon",
+        "2× Incense duration",
+        "3 GO Snapshot surprise encounters per day",
+        "6 GO Snapshot surprise encounters per day",
+        "Chance to encounter mighty Pokémon on Routes",
+        "Chance to get GO Safari Balls from PokéStops and Gyms",
+        "Daily Max Particle collection limit increased to 1,600",
+        "Daily Max Particle collection limit increased to 3,200",
+        "Increased Max Particles from Power Spots and exploration",
+        "Increased chance of 10 km Eggs from PokéStops and Gyms",
+        "Increased chance to encounter Shiny Pokémon",
+        "Lure Modules last for 2 hours",
+        "Party Play lasts for 8 hours",
+        "Up to 3 free Raid Passes per day from Gyms",
+        "Up to 6 Special Trades per day",
+        "Up to 6 free Raid Passes per day from Gyms"
+      ]
+    },
+    {
+      "id": "event-minior-showers-leonids-2026-2026-11-14t17-00-00",
+      "title": "Minior Showers: Leonids 2026",
+      "category": "Event",
+      "start": "2026-11-14T17:00:00",
+      "end": "2026-11-19T23:59:00",
+      "isLocalTime": true,
+      "bonuses": [
+        "Increased Stardust for catching Minior",
+        "Increased chance to encounter Minior from 5:00 p.m. to 9:00 p.m. local time each day"
+      ]
     }
   ]
 }
