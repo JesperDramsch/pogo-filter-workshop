@@ -26,6 +26,8 @@
 // them, and also any other event's special background on these species, which
 // no search term can tell apart.
 
+import { normaliseFeedTime } from "./feed-time.mjs";
+
 const LD = "https://leekduck.com/events/";
 const HUB = "https://pokemongohub.net/post/event/";
 
@@ -86,15 +88,23 @@ const keyOf = (cd) => `${cd.date}|${cd.event.toLowerCase()}`;
 // half-resolved would stay half-resolved. One with any unresolved name, or
 // none listed, goes in `unresolved` instead, and the fetcher fails the sync
 // on it; the day is added in full once its names resolve.
-export function communityDaysFromFeed(feed, resolveSpawns) {
+//
+// The date is the start's calendar day in the feed's own spelling (scripts/lib/
+// feed-time.mjs): the local date for the naive string every Community Day has
+// carried so far, the UTC date should one ever come as epoch seconds. Note the
+// caveat in the latter: a 14:00 start east of UTC+10 is still the day before
+// in UTC, so such a day could land a date early; none has come that way, and
+// the pinned legacy list is what the pile reads for the past anyway. A start
+// that is neither is reported to `report(ev, category)` and the day skipped.
+export function communityDaysFromFeed(feed, resolveSpawns, report = () => {}) {
   const days = [];
   const unresolved = [];
-  for (const list of Object.values(feed || {})) {
+  for (const [category, list] of Object.entries(feed || {})) {
     if (!Array.isArray(list)) continue;
     for (const ev of list) {
       if (!/\bcommunity day\b/i.test(ev?.title || "")) continue;
-      const date = String(ev.start_time || "").slice(0, 10);
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+      const date = String(normaliseFeedTime(ev.start_time) ?? "").slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { report(ev, category); continue; }
       const featured = ev.details?.features?.length ? ev.details.features : ev.details?.spawns || [];
       const { spawnDex, unresolved: names = [] } = resolveSpawns(featured);
       if (spawnDex.length === 0 || names.length > 0) {

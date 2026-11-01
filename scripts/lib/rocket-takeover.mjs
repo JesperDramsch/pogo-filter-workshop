@@ -15,6 +15,8 @@
 // does not. Everything here is pure so scripts/check-rocket-takeover.mjs can pin
 // it; the fetching lives in scripts/fetch-rocket-lineups.mjs.
 
+import { parseFeedTime, normaliseFeedTime } from "./feed-time.mjs";
+
 export const LEEKDUCK_ROCKET_URL = "https://leekduck.com/rocket-lineups/";
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -35,11 +37,15 @@ export function isTakeoverEvent(ev) {
 }
 
 // Naive timestamps (no zone) are local-time events: read as UTC and widened
-// by the edge offset so the window covers every timezone. Zoned ones are exact.
+// by the edge offset so the window covers every timezone. Zoned ones are exact,
+// and so is leak-duck's other spelling of a fixed-time event, epoch seconds as
+// a number (scripts/lib/feed-time.mjs): normalised to its zoned ISO stamp first,
+// it takes the exact branch and is never widened.
 function parseEdge(stamp, offsetMs) {
-  if (!stamp) return NaN;
-  const hasZone = /(Z|[+-]\d\d:?\d\d)$/.test(stamp);
-  const ms = Date.parse(hasZone ? stamp : `${stamp}Z`);
+  const s = normaliseFeedTime(stamp);
+  if (typeof s !== "string" || !s) return NaN;
+  const hasZone = /(Z|[+-]\d\d:?\d\d)$/.test(s);
+  const ms = parseFeedTime(hasZone ? s : `${s}Z`);
   if (!Number.isFinite(ms)) return NaN;
   return hasZone ? ms : ms + offsetMs;
 }
@@ -66,12 +72,14 @@ export function sameTakeover(takeover, state) {
 // with bonus lines) and ScrapedDuck's flat array ([{ name, start, end }],
 // titles only), the fallback when leak-duck is unreachable. Both list every
 // dated event, unlike src/data/events.json, which keeps only events with a
-// wild-spawn pool and would miss a takeover without one.
+// wild-spawn pool and would miss a takeover without one. Times come out as
+// strings whichever way the feed spelt them (normaliseFeedTime), so the
+// takeover record the Rocket snapshot keeps never carries a bare epoch.
 export function normaliseEvents(source) {
   if (Array.isArray(source)) {
     return source
       .filter((e) => e?.name)
-      .map((e) => ({ title: e.name, start: e.start, end: e.end, details: e.details, description: e.description }));
+      .map((e) => ({ title: e.name, start: normaliseFeedTime(e.start), end: normaliseFeedTime(e.end), details: e.details, description: e.description }));
   }
   if (!source || typeof source !== "object") return [];
   const out = [];
@@ -79,7 +87,7 @@ export function normaliseEvents(source) {
     if (!Array.isArray(list)) continue;
     for (const e of list) {
       if (!e?.title) continue;
-      out.push({ title: e.title, start: e.start_time, end: e.end_time, details: e.details, description: e.description });
+      out.push({ title: e.title, start: normaliseFeedTime(e.start_time), end: normaliseFeedTime(e.end_time), details: e.details, description: e.description });
     }
   }
   return out;

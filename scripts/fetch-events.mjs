@@ -43,6 +43,28 @@
 // phrasing it does not recognise is logged here, so a wording change on Leek
 // Duck's side shows up in the sync log rather than as a nudge that went quiet.
 //
+// TIME FORMS: the feed spells a time two ways, and `is_local_time` says which.
+// A local-time event carries a naive wall-clock string ("2026-11-14T10:00:00");
+// a fixed-time one (GO Battle League rotations, the city Wild Area / GO Tour /
+// Night Out events) carries epoch SECONDS as a number. Date.parse on a number
+// is NaN, and until scripts/lib/feed-time.mjs every pass here `continue`d on
+// that without a count or a line, so every fixed-time event was dropped in
+// silence; the feed's visible history (May 2026 on) has always spelt them so.
+// Every window now goes through feedWindow there, which reads both forms and
+// hands back the string the id and the snapshot record carry: the feed's own
+// string, or the number's UTC ISO stamp ("2026-11-06T01:00:00Z"). An event
+// whose window still cannot be read is logged once and counted in the summary
+// line, never skipped quietly again.
+//
+// Fixed-time events are, on every feed seen so far, the in-person ones: a city
+// Wild Area, a GO Tour host city, a Night Out, and the GBL rotations (which
+// carry no bonus). Their spawn and egg pools go on the card like City Safari's
+// always have (a traveller wants them, everyone else folds the row), but their
+// BONUSES stay out of `bonuses`: the nudge strip speaks to every user, and
+// "½ Stardust for trades" that holds for ticket holders in Sendai is wrong for
+// a player in Bonn. The global editions of those events are local-time strings
+// and keep their bonuses.
+//
 // SHRINK GUARD: the fetcher used to refuse only a feed that yielded no event at
 // all. A scrape that comes back half-written passes that test with one event
 // in hand, and the carry-over cannot fill the gap: it keeps events that have
@@ -65,6 +87,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
 import { outsideWindow, carryOver, shrunkEvents } from "./lib/event-window.mjs";
+import { parseFeedTime, feedWindow, describeUnparseableWindow } from "./lib/feed-time.mjs";
 import { LEGACY_COMMUNITY_DAYS, LEGACY_THROUGH, communityDaysFromFeed, mergeRollingCommunityDays } from "./lib/community-days.mjs";
 import { isTakeoverEvent } from "./lib/rocket-takeover.mjs";
 import { fetchGameMaster, mechanicsBatchFloor, warnIfStale } from "./lib/game-master.mjs";
@@ -132,6 +155,16 @@ function stripCostumeTail(name) {
 // Deterministic, stable id (the feed carries no eventID). Same category+title+
 // start always slugs to the same key, so React keys and copy-state stay stable
 // across syncs while the event is live.
+//
+// `start` is the NORMALISED start (feedWindow's `start`): the feed's own string
+// for a local-time event, so every id that exists today is unchanged, and the
+// UTC ISO stamp for a fixed-time one, "…-2026-11-06t01-00-00z" rather than the
+// bare epoch digits. The stamp is the instant ScrapedDuck's scrape of the same
+// page carries (it writes ".000Z"; the minute prefix takeoverId keys on agrees),
+// and should upstream ever flip such an event to that zoned spelling without
+// the milliseconds, the id survives it. A flip to a NAIVE string cannot be
+// caught here: that spelling would be a different claim about the event (local
+// time), and a new id is the honest outcome of it.
 function slugId(category, title, start) {
   return `${category}|${title}|${start}`
     .toLowerCase()
@@ -255,13 +288,15 @@ export function hasCostumedSpawns(spawns) {
 // end }: a Team GO Rocket takeover (the Rocket fetcher's own test), a
 // Community Day (named as one), and a Max Monday or Max Battle Day (the feed's
 // own categories). Wild-spawn events are the events list itself.
-export function signalsFromFeed(feed) {
+// `report(ev, category)` is told about every event whose window did not parse.
+export function signalsFromFeed(feed, report = () => {}) {
   const out = [];
   for (const [category, list] of Object.entries(feed || {})) {
     if (!Array.isArray(list)) continue;
     for (const ev of list) {
-      const start = ev?.start_time, end = ev?.end_time;
-      if (!Number.isFinite(Date.parse(start)) || !Number.isFinite(Date.parse(end))) continue;
+      const window = feedWindow(ev);
+      if (!window) { report(ev, category); continue; }
+      const { start, end } = window;
       const kinds = [];
       if (isTakeoverEvent(ev)) kinds.push("takeover");
       if (/\bcommunity day\b/i.test(ev.title || "")) kinds.push("community_day");
@@ -276,8 +311,12 @@ export function signalsFromFeed(feed) {
 
 // Every event's bonus strings as { id, title, category, start, end,
 // isLocalTime, bonuses }, from every category, spawns or not. Window-filtered
-// like the rest; an event with no bonuses or no parseable window is left out.
-export function bonusesFromFeed(feed, now) {
+// like the rest; an event with no bonuses or no parseable window is left out,
+// and `report(ev, category)` is told about the latter. A fixed-time event
+// (`is_local_time: false`) is left out too: see TIME FORMS in the header, its
+// bonuses hold in one city and the strip speaks to everyone. The signals pass
+// still reads every event, so an unparseable window is reported regardless.
+export function bonusesFromFeed(feed, now, report = () => {}) {
   const out = [];
   for (const [category, list] of Object.entries(feed || {})) {
     if (!Array.isArray(list)) continue;
@@ -287,16 +326,16 @@ export function bonusesFromFeed(feed, now) {
         .map((b) => b.replace(/\s+/g, " ").trim())
         .filter(Boolean);
       if (bonuses.length === 0) continue;
-      const startMs = Date.parse(ev.start_time);
-      const endMs = Date.parse(ev.end_time);
-      if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) continue;
-      if (outsideWindow(startMs, endMs, now)) continue;
+      if (ev.is_local_time === false) continue;
+      const window = feedWindow(ev);
+      if (!window) { report(ev, category); continue; }
+      if (outsideWindow(window.startMs, window.endMs, now)) continue;
       out.push({
-        id: slugId(category, ev.title, ev.start_time),
+        id: slugId(category, ev.title, window.start),
         title: ev.title,
         category,
-        start: ev.start_time,
-        end: ev.end_time,
+        start: window.start,
+        end: window.end,
         isLocalTime: !!ev.is_local_time,
         bonuses: [...new Set(bonuses)],
       });
@@ -310,9 +349,9 @@ export function bonusesFromFeed(feed, now) {
 // Runs before the wild-spawn guard below, so a day with no spawn events still
 // records a new Community Day. Append-only, and it refuses to write a rolling
 // list shorter than the one on disk.
-function writeCommunityDays(feed, nameIdx) {
+function writeCommunityDays(feed, nameIdx, reportUnparseable) {
   const previous = readPreviousJson(CD_PATH);
-  const { days: fresh, unresolved } = communityDaysFromFeed(feed, (spawns) => resolveSpawns(spawns, nameIdx));
+  const { days: fresh, unresolved } = communityDaysFromFeed(feed, (spawns) => resolveSpawns(spawns, nameIdx), reportUnparseable);
   const { rolling, added } = mergeRollingCommunityDays(previous?.rolling || [], fresh);
   if (rolling.length < (previous?.rolling?.length || 0)) {
     throw new Error("community days: rolling list would shrink — refusing to overwrite cache");
@@ -366,10 +405,20 @@ async function main() {
   const namesDict = JSON.parse(readFileSync(NAMES_PATH, "utf8"));
   const nameIdx = buildNameIndex(namesDict);
 
+  // An event whose window cannot be read (see TIME FORMS in the header) is
+  // noted once, by whichever pass meets it first, logged after the passes and
+  // counted in the summary line. Each pass skips it, as before; the silence is
+  // what goes.
+  const unparseable = new Map();
+  const reportUnparseable = (ev, category) => {
+    const key = `${category}|${ev?.title}`;
+    if (!unparseable.has(key)) unparseable.set(key, `"${ev?.title}" (${category}): ${describeUnparseableWindow(ev)}`);
+  };
+
   // A Community Day whose featured names don't all resolve is held back (see
   // communityDaysFromFeed). The rest of the sync still writes; the run fails
   // at the end so the gap is seen the same day.
-  const heldBack = writeCommunityDays(feed, nameIdx);
+  const heldBack = writeCommunityDays(feed, nameIdx, reportUnparseable);
 
   const now = Date.now();
   const previous = readPreviousJson(OUT_PATH);
@@ -410,10 +459,9 @@ async function main() {
       const eggs = event?.details?.eggs;
       if (!Array.isArray(eggs) || eggs.length === 0) continue;
 
-      const startMs = Date.parse(event.start_time);
-      const endMs = Date.parse(event.end_time);
-      if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) continue;
-      if (outsideWindow(startMs, endMs, now)) continue;
+      const window = feedWindow(event);
+      if (!window) { reportUnparseable(event, category); continue; }
+      if (outsideWindow(window.startMs, window.endMs, now)) continue;
 
       const { spawnDex: eggDex, spawns: eggNames, unresolved } = resolveSpawns(eggs, nameIdx);
       if (eggDex.length === 0) continue;
@@ -423,11 +471,11 @@ async function main() {
       }
 
       eggPoolsOut.push({
-        id: `${slugId(category, event.title, event.start_time)}-eggs`,
+        id: `${slugId(category, event.title, window.start)}-eggs`,
         title: event.title,
         category,
-        start: event.start_time,
-        end: event.end_time,
+        start: window.start,
+        end: window.end,
         isLocalTime: !!event.is_local_time,
         eggDex,
         eggs: eggNames,
@@ -444,10 +492,9 @@ async function main() {
       const spawns = event?.details?.spawns;
       if (!Array.isArray(spawns) || spawns.length === 0) { skippedNoSpawns++; continue; }
 
-      const startMs = Date.parse(event.start_time);
-      const endMs = Date.parse(event.end_time);
-      if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) continue;
-      if (outsideWindow(startMs, endMs, now)) { skippedWindow++; continue; }
+      const window = feedWindow(event);
+      if (!window) { reportUnparseable(event, category); continue; }
+      if (outsideWindow(window.startMs, window.endMs, now)) { skippedWindow++; continue; }
 
       const { spawnDex, spawns: spawnNames, unresolved } = resolveSpawns(spawns, nameIdx);
       if (spawnDex.length === 0) {
@@ -460,11 +507,11 @@ async function main() {
       }
 
       eventsOut.push({
-        id: slugId(category, event.title, event.start_time),
+        id: slugId(category, event.title, window.start),
         title: event.title,
         category,
-        start: event.start_time,
-        end: event.end_time,
+        start: window.start,
+        end: window.end,
         isLocalTime: !!event.is_local_time,
         spawnDex,
         spawns: spawnNames,
@@ -480,13 +527,13 @@ async function main() {
   // Event kinds the sorting tab floats piles up for (docs/sorting-workflow-
   // spec.md, "Which piles show first"), from every category, spawns or not: a
   // takeover rarely has a spawn list. Same window and carry-over as events.
-  const signalsOut = signalsFromFeed(feed).filter((sg) => !outsideWindow(Date.parse(sg.start), Date.parse(sg.end), now));
+  const signalsOut = signalsFromFeed(feed, reportUnparseable).filter((sg) => !outsideWindow(parseFeedTime(sg.start), parseFeedTime(sg.end), now));
   const signals = carryOver(signalsOut, previous?.signals, now);
   for (const id of signals.carriedIds) console.log(`  ↩ carried over ended signal ${id}`);
 
   // Event bonuses (see the header), from every category. A feed that lists
   // events but no bonus at all most likely moved the field; say so loudly.
-  const bonusesOut = bonusesFromFeed(feed, now);
+  const bonusesOut = bonusesFromFeed(feed, now, reportUnparseable);
   const bonuses = carryOver(bonusesOut, previous?.bonuses, now);
   for (const id of bonuses.carriedIds) console.log(`  ↩ carried over ended bonuses ${id}`);
   if (bonusesOut.length === 0 && (previous?.bonuses || []).length > 0) {
@@ -495,6 +542,13 @@ async function main() {
   const unknownBonuses = unrecognisedBonuses(bonusesOut);
   if (unknownBonuses.length > 0) {
     console.warn(`  ⚠ unrecognised bonus phrasings (no nudge, see src/bonus-nudges.js) — ${unknownBonuses.join(" · ")}`);
+  }
+
+  // Every pass is done; say which events none of them could place in time. A
+  // third spelling of a time upstream would otherwise vanish exactly the way the
+  // numeric one did (see TIME FORMS in the header).
+  for (const line of unparseable.values()) {
+    console.warn(`  ⚠ unparseable event window, skipped by every pass — ${line}`);
   }
 
   // A refused result takes the raid fetcher's route (keepCacheOrExit there):
@@ -572,7 +626,7 @@ async function main() {
 
   writeJson(OUT_PATH, { fetchedAt, ...newContent });
   console.log(`✓ wrote ${OUT_PATH}`);
-  console.log(`  events: ${eventsOut.length} surfaced · ${events.carriedIds.length} carried over · ${skippedNoSpawns} without spawns · ${skippedWindow} outside window · ${skippedCategory} skipped categories · ${totalUnresolved} unresolved spawn names`);
+  console.log(`  events: ${eventsOut.length} surfaced · ${events.carriedIds.length} carried over · ${skippedNoSpawns} without spawns · ${skippedWindow} outside window · ${skippedCategory} skipped categories · ${unparseable.size} unparseable windows · ${totalUnresolved} unresolved spawn names`);
   console.log(`  egg pools: ${eggPoolsOut.length} surfaced · ${eggPools.carriedIds.length} carried over`);
   console.log(`  bonuses: ${bonusesOut.length} events surfaced · ${bonuses.carriedIds.length} carried over · ${unknownBonuses.length} unrecognised phrasings`);
   failOnHeldBack(heldBack);

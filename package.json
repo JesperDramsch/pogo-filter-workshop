@@ -40,6 +40,7 @@
   "test:gamemaster": "vite-node scripts/check-game-master.mjs",
   "test:gblslots": "vite-node scripts/check-gbl-slots.mjs",
   "test:eventwindow": "vite-node scripts/check-event-window.mjs",
+  "test:feedtime": "vite-node scripts/check-feed-time.mjs",
   "test:rockettakeover": "vite-node scripts/check-rocket-takeover.mjs",
   "test:rocketcounters": "vite-node scripts/check-rocket-counters.mjs",
   "test:rocketcover": "vite-node scripts/check-rocket-cover.mjs",
