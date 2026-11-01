@@ -142,6 +142,14 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate, expert
   const busyRef = useRef(false);
   const hintPlayedRef = useRef(false);
   const hintControlsRef = useRef(null);
+  // Arriving here swaps the whole view (first run, or "Run again" from the
+  // Catching settings), so the control that was activated is gone and focus
+  // fell to <body>. Land it on the deck's heading, as the wizard's StepWrapper
+  // does, so a screen reader hears where it is.
+  const titleRef = useRef(null);
+  useEffect(() => {
+    titleRef.current?.focus();
+  }, []);
 
   const deck = phase === "advanced" ? ADVANCED : CORE;
   const card = deck[index] || null;
@@ -322,7 +330,7 @@ export default function SwipeOnboarding({ onComplete, onSkip, onNavigate, expert
                   <div className="mono text-[11px] uppercase tracking-wider" style={{ color: C.cyan }}>
                     {t("app.onboarding.swipe.eyebrow")}
                   </div>
-                  <h1 className="mono text-2xl font-bold mt-1" style={{ color: C.text }}>
+                  <h1 ref={titleRef} tabIndex={-1} className="mono text-2xl font-bold mt-1 outline-hidden" style={{ color: C.text }}>
                     {t("app.onboarding.swipe.title")}
                   </h1>
                   <p className="text-xs mt-2 max-w-xs mx-auto leading-relaxed" style={{ color: C.dim }}>

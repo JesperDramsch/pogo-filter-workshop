@@ -70,6 +70,13 @@ console.log("\nG2 — the deck's cards sit under the same headings");
   const deckIds = new Set(deckGroups.map((m) => m[1]));
   const absent = SETTINGS_GROUPS.map((g) => g.id).filter((id) => !deckIds.has(id));
   check("every settings group is a deck group", absent.length === 0, absent.join(", "));
+  // The essentials deck asks every user, so each of its cards is a row normal
+  // mode shows; only the fine-tuning deck (expert mode) may carry expert rows.
+  const expertOnly = new Set(PROTECTION_ROWS.filter(([, , extra]) => extra?.expertOnly).map(([k]) => k));
+  const core = deck.slice(deck.indexOf("const CORE_GROUPS"), deck.indexOf("const ADVANCED_GROUPS"));
+  const coreCards = [...core.matchAll(/CARDS\.(\w+)/g)].map((m) => m[1]);
+  const hidden = coreCards.filter((id) => expertOnly.has(cards[id]));
+  check(`${coreCards.length} essentials cards, none expert-only on the settings page`, coreCards.length >= 10 && hidden.length === 0, hidden.join(", "));
 }
 
 console.log("\nG3 — headings, labels and whys in every locale");
@@ -88,7 +95,7 @@ console.log("\nG3 — headings, labels and whys in every locale");
     }
     for (const k of ["app.protect.section_title", "app.protect.expert_badge", "app.protect.confirm_off",
       "app.protect.cards.label", "app.protect.cards.help", "app.protect.cards.button",
-      "app.protect.expert_diff.note", "app.protect.expert_diff.reset",
+      "app.protect.expert_diff.note", "app.protect.expert_diff.reset", "app.protect.expert_diff.done",
       "app.changelog.entry.settings_groups.title", "app.changelog.entry.settings_groups.body"]) {
       if (!b[k]) missing.push(k);
       else if (loc !== "en" && b[k] === en[k] && !/^app\.protect\.(expert_badge|cards\.label)$/.test(k)) missing.push(`${k} (== en)`);
@@ -134,6 +141,10 @@ console.log("\nG6 — the page and the deck");
   check("normal mode shows the expert-differ note with a reset", /!expert && differing\.length > 0/.test(panel) && /onClick=\{resetExpertSettings\}/.test(panel));
   check("the reset is a two-click confirm that announces", /function resetExpertSettings\(\) \{\s*if \(!resetArmed\) \{\s*setResetArmed\(true\);\s*announce\(/.test(panel));
   check("the reset writes the rows' defaults through the panel's setter", /setConfig\(\{ \.\.\.config, \.\.\.Object\.fromEntries\(differing\.map\(\(k\) => \[k, DEFAULT_CONFIG\[k\]\]\)\) \}\)/.test(panel));
+  check("the confirm says what happened and lands focus on the section title",
+    /announce\(t\('app\.protect\.expert_diff\.done'\)\)/.test(panel) && /getElementById\(protectionsTitleId\)\?\.focus\(\)/.test(panel) && /<SettingsTitle id=\{protectionsTitleId\} tabIndex=\{-1\}>/.test(panel));
+  check("each group is a fieldset whose legend is the deck's heading", /<fieldset key=\{group\.id\}/.test(panel) && /function SettingsCaption[\s\S]{0,200}<legend /.test(app));
+  check("the deck lands focus on its heading when it mounts", /<h1 ref=\{titleRef\} tabIndex=\{-1\}/.test(deck) && /titleRef\.current\?\.focus\(\)/.test(deck));
   check("the cards block replaces the presets and needs a way to run them", /show\('cards'\) && onRunCards &&/.test(panel) && !/show\('presets'\)/.test(panel));
   const main = app.slice(app.indexOf("export default function App("), app.indexOf("function ConfigPanel("));
   check("the Catching settings offer the cards", /onRunCards=\{\(\) => navigateView\('onboard'\)\}/.test(main) && /sections=\{\['locals', 'cards', 'protections'/.test(main));

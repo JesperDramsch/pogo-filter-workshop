@@ -12062,8 +12062,10 @@ function FieldNum({ label, value, onChange, min, max }) {
 // [configKey, i18nBase, flags]: label and why resolve via t() at render time
 // from `${i18nBase}.label` / `.why`, the group heading from
 // `app.onboarding.swipe.group.<id>`. `expertOnly` rows are hidden in normal
-// mode (their values still apply, see expertSettingsDiffering);
-// `requireConfirmOff` arms a two-click confirm before a safety net goes off.
+// mode (their values still apply, see expertSettingsDiffering); every card in
+// the deck's essentials set is a row normal mode shows, since the deck asks
+// every user about it. `requireConfirmOff` arms a two-click confirm before a
+// safety net goes off.
 // This list is the one source of truth for the page, for the deck's group ids
 // and for scripts/check-settings-groups.mjs (spec: "Settings groups").
 export const SETTINGS_GROUPS = [
@@ -12077,18 +12079,18 @@ export const SETTINGS_GROUPS = [
 	{
 		id: 'rare',
 		rows: [
-			['protectShinies', 'app.protect.shinies', { expertOnly: true }],
-			['protectLuckies', 'app.protect.luckies', { expertOnly: true }],
+			['protectShinies', 'app.protect.shinies'],
+			['protectLuckies', 'app.protect.luckies'],
 			['protectLegendaries', 'app.protect.legendaries'],
-			['protectMythicals', 'app.protect.mythicals', { expertOnly: true }],
+			['protectMythicals', 'app.protect.mythicals'],
 		],
 	},
 	{
 		id: 'shadow',
 		rows: [
-			['protectShadows', 'app.protect.shadows', { expertOnly: true }],
+			['protectShadows', 'app.protect.shadows'],
 			['protectShadowPurifyOnly', 'app.protect.shadow_purify_only', { expertOnly: true }],
-			['protectPurified', 'app.protect.purified', { expertOnly: true }],
+			['protectPurified', 'app.protect.purified'],
 		],
 	},
 	{
@@ -12156,14 +12158,18 @@ export function expertSettingsDiffering(config) {
 
 // One heading style across the settings areas: a cyan section title (the
 // style the carve-out, keeper and budget blocks already use) over grey group
-// captions.
-function SettingsTitle({ children }) {
+// captions. The caption is a fieldset's legend, so a screen reader names the
+// group with every checkbox in it and the regrouping is navigable, not just
+// visible. Extra props (an id, tabIndex) reach the title so it can take focus.
+function SettingsTitle({ children, ...rest }) {
 	return (
-		<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-3'>{children}</h3>
+		<h3 {...rest} className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-3'>
+			{children}
+		</h3>
 	);
 }
 function SettingsCaption({ children }) {
-	return <div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-1'>{children}</div>;
+	return <legend className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] pb-1'>{children}</legend>;
 }
 
 // Intelligent-PvP controls, rendered under the mode radio when that mode is
@@ -12343,6 +12349,7 @@ function ConfigPanel({
 	// the same setter as a toggle, so a protection coming back on also brings
 	// its Sorting pile back.
 	const differing = expertSettingsDiffering(config);
+	const protectionsTitleId = useId();
 	const [resetArmed, setResetArmed] = useState(false);
 	useEffect(() => {
 		if (!resetArmed) return;
@@ -12357,6 +12364,10 @@ function ConfigPanel({
 		}
 		setResetArmed(false);
 		setConfig({ ...config, ...Object.fromEntries(differing.map((k) => [k, DEFAULT_CONFIG[k]])) });
+		// The write empties `differing`, which unmounts the note and the button
+		// that had focus: say what happened and land focus on the section title.
+		announce(t('app.protect.expert_diff.done'));
+		requestAnimationFrame(() => document.getElementById(protectionsTitleId)?.focus());
 	}
 
 	return (
@@ -12467,7 +12478,9 @@ function ConfigPanel({
 				<>
 					{/* PROTECTIONS — the toggles in the deck's nine groups (SETTINGS_GROUPS) */}
 					<div>
-						<SettingsTitle>{t('app.protect.section_title')}</SettingsTitle>
+						<SettingsTitle id={protectionsTitleId} tabIndex={-1}>
+							{t('app.protect.section_title')}
+						</SettingsTitle>
 						{!expert && differing.length > 0 && (
 							<div className='border border-[#F5B82E]/40 bg-[#F5B82E]/5 rounded-sm p-3 mono text-[10.5px] mb-3 leading-tight text-[#E6EDF3] flex items-center justify-between gap-3 flex-wrap'>
 								<span>{t('app.protect.expert_diff.note', { params: { count: differing.length } })}</span>
@@ -12487,7 +12500,7 @@ function ConfigPanel({
 								const rows = group.rows.filter(([, , extra]) => expert || !extra?.expertOnly);
 								if (rows.length === 0) return null;
 								return (
-									<div key={group.id}>
+									<fieldset key={group.id} className='min-w-0'>
 										<SettingsCaption>{t(`app.onboarding.swipe.group.${group.id}`)}</SettingsCaption>
 										<div className='grid grid-cols-1 md:grid-cols-2 gap-1'>
 											{rows.map(([k, keyBase, extra]) => {
@@ -12516,7 +12529,7 @@ function ConfigPanel({
 												{t('app.protect.dynamax_off_note')}
 											</div>
 										)}
-									</div>
+									</fieldset>
 								);
 							})}
 						</div>
