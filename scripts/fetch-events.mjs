@@ -43,14 +43,28 @@
 // phrasing it does not recognise is logged here, so a wording change on Leek
 // Duck's side shows up in the sync log rather than as a nudge that went quiet.
 //
+// SHRINK GUARD: the fetcher used to refuse only a feed that yielded no event at
+// all. A scrape that comes back half-written passes that test with one event
+// in hand, and the carry-over cannot fill the gap: it keeps events that have
+// started, never upcoming ones the feed stopped listing. So after the merge,
+// guardShrunkEvents compares what is about to be written with the cached list
+// still inside the window (scripts/lib/event-window.mjs, shrunkEvents) and
+// refuses to overwrite the cache when most of it went missing, with a ✗ line
+// the sync summary shows against the Events row. Events that aged past
+// retention do not count as missing: the daily sync is meant to drop those.
+//
 // Flags:
-//   --offline-ok   tolerate fetch failures if src/data/events.json exists.
+//   --offline-ok     tolerate fetch failures, and a refused result, if
+//                    src/data/events.json exists (the build uses the cache).
+//   --accept-shrink  write a result the shrink guard would refuse. For the day
+//                    upstream really did withdraw most upcoming events; the
+//                    refusal names the flag.
 
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
-import { outsideWindow, carryOver } from "./lib/event-window.mjs";
+import { outsideWindow, carryOver, shrunkEvents } from "./lib/event-window.mjs";
 import { LEGACY_COMMUNITY_DAYS, LEGACY_THROUGH, communityDaysFromFeed, mergeRollingCommunityDays } from "./lib/community-days.mjs";
 import { isTakeoverEvent } from "./lib/rocket-takeover.mjs";
 import { fetchGameMaster, mechanicsBatchFloor, warnIfStale } from "./lib/game-master.mjs";
@@ -316,9 +330,21 @@ function writeCommunityDays(feed, nameIdx) {
   return unresolved.filter((cd) => cd.date > LEGACY_THROUGH && !known.has(`${cd.date}|${cd.event.toLowerCase()}`));
 }
 
+// The shrink guard's decision, in the shape of the raid fetcher's
+// guardEmptiedFamilies: the measurement from shrunkEvents, plus whether to
+// write and how to exit. A refused result is never written; under --offline-ok
+// the cache stands and the build goes on (exit 0), in the sync the step fails
+// (exit 1) and the summary shows the ✗ line. --accept-shrink writes it anyway.
+export function guardShrunkEvents(previous, merged, now, { offlineOk = false, acceptShrink = false } = {}) {
+  const shrink = shrunkEvents(previous, merged, now);
+  if (!shrink.refused || acceptShrink) return { ...shrink, write: true, exitCode: 0 };
+  return { ...shrink, write: false, exitCode: offlineOk ? 0 : 1 };
+}
+
 async function main() {
   const args = new Set(process.argv.slice(2));
   const offlineOk = args.has("--offline-ok");
+  const acceptShrink = args.has("--accept-shrink");
 
   let feed;
   try {
@@ -471,21 +497,43 @@ async function main() {
     console.warn(`  ⚠ unrecognised bonus phrasings (no nudge, see src/bonus-nudges.js) — ${unknownBonuses.join(" · ")}`);
   }
 
+  // A refused result takes the raid fetcher's route (keepCacheOrExit there):
+  // the committed cache is the better answer, so under --offline-ok the build
+  // goes on with it, and in the sync the step fails with the ✗ line the job
+  // summary shows against the Events row.
+  const keepCacheOrExit = (message) => {
+    console.error(`✗ ${message}`);
+    if (offlineOk && existsSync(OUT_PATH)) {
+      console.warn(`⚠  --offline-ok and cached ${OUT_PATH} exists; build will use cache.`);
+      failOnHeldBack(heldBack);
+      return;
+    }
+    process.exit(1);
+  };
+
   // The guard is on what the FEED produced, before the carry-over: a feed that
   // yields nothing is a broken upstream, and a snapshot made only of carried
   // records would hide that behind a card that still looks populated.
   if (eventsOut.length === 0) {
-    if (offlineOk && existsSync(OUT_PATH)) {
-      console.warn("⚠  No wild-spawn events in window; --offline-ok keeps existing cache.");
-      failOnHeldBack(heldBack);
-      return;
-    }
-    throw new Error("No wild-spawn events resolved — refusing to overwrite cache");
+    return keepCacheOrExit("No wild-spawn events resolved — refusing to overwrite cache");
   }
 
   // Just-ended events come from the previous snapshot (leak-duck has already
   // dropped them); the result is chronological so the UI renders top-down.
   const events = carryOver(eventsOut, previous?.events, now);
+
+  // The shrink guard (see the header). Upcoming events the feed stopped listing
+  // are logged either way: one is a cancellation worth seeing in the sync log.
+  const shrink = guardShrunkEvents(previous?.events, events.merged, now, { offlineOk, acceptShrink });
+  for (const id of shrink.lost) console.log(`  ✂ upstream no longer lists upcoming event ${id}`);
+  if (shrink.refused) {
+    const what = `the feed dropped ${shrink.lost.length} of the ${shrink.expected} events the cache still expects (${shrink.retained} kept, ${eventsOut.length} surfaced)`;
+    if (!shrink.write) {
+      // Kept short: the sync summary shows the ✗ line cut to 160 characters.
+      return keepCacheOrExit(`events: ${what} — refusing to overwrite the cache (--accept-shrink overrides)`);
+    }
+    console.warn(`⚠  events: ${what} — written anyway (--accept-shrink)`);
+  }
   // A record carried from a snapshot written before spawnForms existed has only
   // its base names; resolve those. Regional spellings are already gone from
   // them, so such a record ranks on default forms until it ages out.
