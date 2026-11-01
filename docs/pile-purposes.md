@@ -46,7 +46,10 @@ Your custom collectibles aren't in the tail either: sorting offers them in
 settings do reach the tail: a nundo is protected only while protect nundos
 is on, and a mythical you listed under "too many of" is a spare and shows up
 in ③. Legacy moves are protected in every pile (a Smeargle's Sketched moves
-don't count), whatever the trash's own toggles say.
+don't count), whatever the trash's own toggles say. A Smeargle with Lock-On
+and one of the charged moves in your Smeargle moveset list is protected in
+every pile too, whatever that protection's own toggle says; empty the list
+and no Smeargle is held for its moves (docs/smeargle-pvp-movesets.md).
 
 Rule: a step must be able to find something no earlier step found. A
 narrower copy of an earlier step gets cut. `4*` sits inside `3-4`, so `4*`

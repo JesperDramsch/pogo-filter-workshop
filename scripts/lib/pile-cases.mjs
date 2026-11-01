@@ -9,25 +9,54 @@
 // The tail reads two settings, so two rows move with `cfg`: a nundo is
 // PROTECTED only when cfg.protectNundos, and a mythical named in
 // cfg.mythTooManyOf is a spare and RELEASABLE (the plain "mythical" row is a
-// species the carve does not name, so it stays PROTECTED).
+// species the carve does not name, so it stays PROTECTED). It also reads the
+// Smeargle moveset list as a value: a Smeargle with Lock-On and a charged
+// move in cfg.smeargleChargedMoves is PROTECTED, one with Lock-On and any
+// other charged move, or without Lock-On, is RELEASABLE. Those rows spell
+// the moves in the output locale, so pileCases takes `loc`.
 //
 // Step ③ comes as two strings (buildPile): ③b (release) is held to every row
 // here; ③a (safe, the leftovers) also ANDs each lens's negation, so the
 // "plain dupe" row must still show in it and the "shiny" row is hidden
 // wherever a shiny lens exists (check-piles P10, D18's synthetic pile).
-import { candyFamilyNames, ivToBar, speciesForOutput, starFromIVs } from "../../src/App.jsx";
+import { candyFamilyNames, ivToBar, SMEARGLE_FAST_MOVE, speciesForOutput, starFromIVs } from "../../src/App.jsx";
 import { pokemonNameFor, resolveSpeciesInfo } from "../../src/data/species.js";
+import { moveKeywordFor, pogoKeywords } from "../../src/i18n/pogo-keywords.js";
 
 export const PILE_SPECIES = "Magikarp";
 export const PILE_DEX = 129;
 
+// The Smeargle moveset clauses for `cfg` in output locale `loc`, one per
+// charged move in cfg.smeargleChargedMoves, as the trash spells them:
+// `!<smeargle>,!@<lock-on>,!@<move>`, move names lowercased with whitespace
+// collapsed (moveKeywordFor), deduplicated on the output spelling, the fast
+// move never in the list.
+export function smeargleMovesetClauses(cfg, loc) {
+  const smeargle = pokemonNameFor("235", loc)?.toLowerCase() || "smeargle";
+  const lockOn = moveKeywordFor(SMEARGLE_FAST_MOVE, loc);
+  const seen = new Set();
+  const out = [];
+  for (const m of cfg.smeargleChargedMoves || []) {
+    const canonical = String(m || "").toLowerCase().trim();
+    if (!canonical || canonical === SMEARGLE_FAST_MOVE) continue;
+    const keyword = moveKeywordFor(canonical, loc);
+    if (!keyword || seen.has(keyword)) continue;
+    seen.add(keyword);
+    out.push(`!${smeargle},!@${lockOn},!@${keyword}`);
+  }
+  return out;
+}
+
 // What buildFilters hands protectionTail for `cfg` in output locale `loc`: the
-// mythical carve in the output locale and the localised Smeargle name
-// (species 235, as the trash's legacy-move clause spells it).
+// mythical carve in the output locale, the localised Smeargle name (species
+// 235, as the trash's legacy-move clause spells it) and the Smeargle moveset
+// clauses (read as a value: the trash toggle protectSmeargleMovesets does not
+// reach the tail).
 export function tailOptions(cfg, loc) {
   return {
     mythCarve: (cfg.mythTooManyOf || []).map((name) => speciesForOutput(name, loc)).filter(Boolean),
     smeargle: pokemonNameFor("235", loc)?.toLowerCase() || "smeargle",
+    smeargleMovesets: smeargleMovesetClauses(cfg, loc),
   };
 }
 
@@ -44,8 +73,17 @@ export function pileMon(loc, o = {}, species = PILE_SPECIES, dex = PILE_DEX) {
   };
 }
 
-export function pileCases(cfg) {
+export function pileCases(cfg, loc = "en") {
   const floorYear = 2000 + cfg.luckyEligibleYear - 1;
+  // Smeargle rows: dex 235 over the pile member's family, like the mythical
+  // spare. Moves are spelled as the clause spells them (the evaluator compares
+  // `@move` to a mon's move list verbatim); every Sketched move carries the
+  // legacy flag, which the legacy clause's `,smeargle` shows.
+  const smeargleName = pokemonNameFor("235", loc)?.toLowerCase() || "smeargle";
+  const lockOn = moveKeywordFor(SMEARGLE_FAST_MOVE, loc);
+  const chargers = (cfg.smeargleChargedMoves || []).map((m) => moveKeywordFor(m, loc)).filter(Boolean);
+  const smeargleWith = (moves) => ({ dex: 235, species: smeargleName, moves, flags: { legacyMove: true } });
+  const kw = pogoKeywords(loc);
   const nundo = ["nundo", { ivAtk: 0, ivDef: 0, ivHp: 0 }];
   // A carved-out mythical in the pile: the evaluator answers a species term
   // by dex and the pile's head by candy family, so the row wears the carved
@@ -72,6 +110,7 @@ export function pileCases(cfg) {
       ["shiny legendary", { flags: { shiny: true, legendary: true } }],
       ["legendary with a background", { flags: { background: true, legendary: true } }],
       ["legacy move", { moves: [], flags: { legacyMove: true } }],
+      ...chargers.map((c, i) => [`Smeargle with Lock-On and listed charged move ${i + 1}`, smeargleWith([lockOn, c])]),
     ],
     RELEASABLE: [
       ["plain dupe", {}],
@@ -88,6 +127,8 @@ export function pileCases(cfg) {
       ["XXL", { flags: { xxl: true } }],
       ["costume", { flags: { costume: true } }],
       ["plain legendary", { flags: { legendary: true } }],
+      ["Smeargle with Lock-On and an unlisted charged move", smeargleWith([lockOn, kw.flag.return])],
+      ...(chargers.length > 0 ? [["Smeargle without Lock-On, with a listed charged move", smeargleWith([kw.flag.frustration, chargers[0]])]] : []),
     ],
   };
 }

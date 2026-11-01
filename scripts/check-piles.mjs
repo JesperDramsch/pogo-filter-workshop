@@ -47,7 +47,7 @@ import { LOCALES } from "../src/i18n/index.js";
 import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
 import { pokemonNameFor } from "../src/data/species.js";
 import { FIXTURE_CONFIG, makeTFn } from "./lib/fixture.mjs";
-import { pileCases, pileMon, tailOptions } from "./lib/pile-cases.mjs";
+import { pileCases, pileMon, smeargleMovesetClauses, tailOptions } from "./lib/pile-cases.mjs";
 import { hasCostumedSpawns, signalsFromFeed } from "./fetch-events.mjs";
 import { acceptPveDump, learnersOf, watchMovesFrom } from "./fetch-game-master-watch.mjs";
 import GM_WATCH from "../src/data/game-master-watch.json";
@@ -283,11 +283,13 @@ const BAD = [/undefined/, /NaN/, /\[object /, /&&|,,/, /^[&,]|[&,]$/, /!!/];
 // no `not` (the tail's `!4*` holds it); a species list, PvP pattern, roster,
 // tag or "untraded" step narrows nothing. A new IV or flag lens goes here.
 const NEEDS_NOT = /^(shiny|strong|three|high_iv|evolve|evolve_shadow|luckies|background|atk34|gigantamax)$/;
-// The tail reads protectNundos and mythTooManyOf; P3 runs under the default
-// config and under the one that flips both, so a nundo is held on one side
-// and shown on the other, and the carved mythical is shown.
-const ALT_CFG = { ...CFG, protectNundos: true, mythTooManyOf: ["Darkrai"] };
-const P3_CONFIGS = [["default", CFG, pileCases(CFG)], ["nundos protected, Darkrai carved", ALT_CFG, pileCases(ALT_CFG)]];
+// The tail reads protectNundos and mythTooManyOf, plus the Smeargle moveset
+// list as a value; P3 runs under the default config and under the one that
+// flips both settings and empties the list, so a nundo is held on one side
+// and shown on the other, the carved mythical is shown, and the moveset
+// Smeargle is held on one side and absent from the other's rows.
+const ALT_CFG = { ...CFG, protectNundos: true, mythTooManyOf: ["Darkrai"], smeargleChargedMoves: [] };
+const P3_CONFIGS = [["default", CFG], ["nundos protected, Darkrai carved, no Smeargle moveset", ALT_CFG]];
 const localeNames = Object.keys(LOCALES);
 
 for (const fam of PILE_FAMILIES) {
@@ -328,7 +330,8 @@ for (const fam of PILE_FAMILIES) {
       const verdict = (str, o, d) => evalFilterDetailed(str, monOf(o, d), loc);
       const note = (v) => (v.unknown.length ? ` (unknown ${v.unknown.join(" ")})` : "");
       // P3 (a family with no ③ has nothing to hold here)
-      for (const [cfgName, cfg, { PROTECTED, RELEASABLE }] of fam.noRelease ? [] : P3_CONFIGS) {
+      for (const [cfgName, cfg] of fam.noRelease ? [] : P3_CONFIGS) {
+        const { PROTECTED, RELEASABLE } = pileCases(cfg, loc);
         const under = cfg === CFG ? pile : altPiles.get(pile.id);
         const release = under?.release;
         if (!release) { bad.push(`${where}: no pile under ${cfgName}`); continue; }
@@ -418,7 +421,7 @@ for (const fam of PILE_FAMILIES) {
           if (x.verdict !== true) bad.push(`${where}.${lens.key}: its \`not\` hides the lens's near miss: ${x.verdict}${note(x)}`);
         }
         const settle = (o) => ({ ...o, flags: { canEvolve: fam.base?.flags?.canEvolve ?? false, ...(o.flags || {}) } });
-        const row = (label) => P3_CONFIGS[0][2].RELEASABLE.find(([l]) => l === label)[1];
+        const row = (label) => pileCases(CFG, loc).RELEASABLE.find(([l]) => l === label)[1];
         const plain = verdict(pile.safe, settle(row("plain dupe")));
         if (plain.verdict !== true) bad.push(`${where} ③a hides a plain dupe: ${plain.verdict}${note(plain)}`);
         if (!fam.skipReleasable?.test("shiny")) {
@@ -432,7 +435,7 @@ for (const fam of PILE_FAMILIES) {
   }
 }
 
-console.log("\nThe tail reads exactly protectNundos and mythTooManyOf");
+console.log("\nThe tail reads exactly protectNundos and mythTooManyOf, plus the Smeargle moveset list as a value");
 {
   const kw = pogoKeywords("en");
   const tailOf = (cfg, loc = "en") => protectionTail(pogoKeywords(loc), cfg, tailOptions(cfg, loc));
@@ -444,7 +447,7 @@ console.log("\nThe tail reads exactly protectNundos and mythTooManyOf");
     on.includes(nundoClause) && !off.includes(nundoClause) && same(on.filter((c) => c !== nundoClause), off), off.join("&"));
   check("the shipped default protects no nundo (protectNundos is off)", !CFG.protectNundos && !tailOf(CFG).includes(nundoClause));
   // The trash toggles still leave the tail as it is (lucky-trade floor included).
-  const toggles = { protectLuckyEligible: true, protectBuddies: false, protectLegacyMoves: false, protectSmeargleLegacy: true, protectMythicals: false, protectShinies: false };
+  const toggles = { protectLuckyEligible: true, protectBuddies: false, protectLegacyMoves: false, protectSmeargleLegacy: true, protectSmeargleMovesets: false, protectMythicals: false, protectShinies: false };
   const flipped = Object.fromEntries(Object.entries(toggles).map(([k, v]) => [k, !v]));
   check("switching the other trash protections on or off leaves the tail as it is (lucky-trade floor included)",
     same(tailOf({ ...CFG, ...toggles }), tailOf({ ...CFG, ...flipped })) && tailOf({ ...CFG, ...toggles }).some((c) => c.startsWith(`${kw.numeric.year}`)));
@@ -471,6 +474,20 @@ console.log("\nThe tail reads exactly protectNundos and mythTooManyOf");
     const held = evalFilterDetailed(tail, pileMon(loc, { moves: [], flags: { legacyMove: true } }), loc);
     const smeargle = evalFilterDetailed(tail, pileMon(loc, { moves: [], flags: { legacyMove: true } }, "Smeargle", 235), loc);
     check(`${loc}: the tail holds a legacy move and shows a Smeargle with one`, held.verdict === false && smeargle.verdict === true, `held ${held.verdict}, smeargle ${smeargle.verdict}`);
+    // The Smeargle moveset list, read as a value: the seed puts one clause per
+    // charged move after the legacy clause, spelled as the trash spells it; an
+    // empty list drops them and moves nothing else; the trash toggle does not
+    // reach the tail.
+    const movesets = smeargleMovesetClauses(CFG, loc);
+    const seeded = tailOf(CFG, loc);
+    const emptied = tailOf({ ...CFG, smeargleChargedMoves: [] }, loc);
+    const legacyAt = seeded.findIndex((c) => c.startsWith(`!@${lkw.flag.special_move}`));
+    check(`${loc}: the seeded list adds ${movesets.length} moveset clauses right after the legacy clause, an empty list drops them`,
+      movesets.length === CFG.smeargleChargedMoves.length && legacyAt >= 0
+      && same(seeded.slice(legacyAt + 1, legacyAt + 1 + movesets.length), movesets)
+      && same(seeded.filter((c) => !movesets.includes(c)), emptied),
+      movesets.join(" | "));
+    check(`${loc}: protectSmeargleMovesets off leaves the tail as it is`, same(tailOf({ ...CFG, protectSmeargleMovesets: false }, loc), seeded));
   }
   // The legendaries pile takes Ultra Beasts too; a plain species stays out.
   for (const loc of localeNames) {
