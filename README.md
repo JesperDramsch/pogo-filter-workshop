@@ -14,7 +14,7 @@ The in-app explainer walks through the whole thing in five short chapters, from 
 
 ## How to use it
 
-1. **Quick setup.** Swipe through "Toss or Keep?" cards, or start from a preset (Casual, Collector, Aggressive, PvP focus) and adjust from there.
+1. **Quick setup.** Swipe through "Toss or Keep?" cards and adjust from there. The cards can be run again any time from the Catching settings.
 2. **Where.** Set your home location on the map. Regionals that spawn near you drop out of protection, since you can catch more next week. Regionals from your travels stay protected.
 3. **What.** Pick your protections: favourites, shinies, luckies, legendaries, mythicals, Ultra Beasts, shadows and purified, costumes, backgrounds, legacy moves, sizes, babies, Dynamax and Gigantamax, old buddies, lucky-trade candidates, and your own tags.
 4. **Have.** List your hundos and luckies. Once you own a hundo of a family, the spare 3★s of that family become trade or trash material, except the ones with two perfect stats.

@@ -71,11 +71,13 @@ console.log("\nMigration test 4: dropped legacy keys");
     protectSizes: true,
     protectLeagueTags: ["greatpvp"],
     yearMin: 2022,
+    lastAppliedPreset: "casual",
   });
   check("protectRegionals dropped", !("protectRegionals" in out));
   check("protectSizes dropped", !("protectSizes" in out));
   check("protectLeagueTags dropped", !("protectLeagueTags" in out));
   check("yearMin dropped", !("yearMin" in out));
+  check("lastAppliedPreset dropped (presets are gone)", !("lastAppliedPreset" in out));
 }
 
 console.log("\nForward-compat test: unknown keys preserved");
