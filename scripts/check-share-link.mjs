@@ -36,6 +36,7 @@ import {
   clashingPrefixes,
   tagPrefixesClash,
   buddyPrefixClashPairs,
+  bareTagPrefix,
   buddyTagPrefixFor,
   cleanShareName,
   WISH_HASH_PREFIX,
@@ -245,6 +246,21 @@ check("two buddies sharing one prefix clash",
 check("buddies without a prefix are skipped",
   buddyPrefixClashPairs([{ id: "x", tagPrefix: "" }, { id: "y", tagPrefix: "Trade-Jo" }, null]).length === 0);
 check("generated prefixes produce no pairs", buddyPrefixClashPairs(twoAlex.map((p, i) => ({ id: i, tagPrefix: p }))).length === 0);
+// The buddy manager stores the prefix as typed; the filter drops one leading
+// `#`. A stored `#Trade-Alexa` is `Trade-Alexa` in game and must clash on both
+// rows and on the promised row.
+const hashed = [
+  { id: "a", tagPrefix: "Trade-Alex" },
+  { id: "b", tagPrefix: "#Trade-Alexa" },
+];
+check("a leading # is dropped the way the filter drops it", bareTagPrefix("#Trade-Alexa") === "Trade-Alexa" && bareTagPrefix("##X") === "#X");
+check("the row without # warns about the row with #",
+  clashingPrefixes(hashed[0].tagPrefix, hashed, "a").join() === "Trade-Alexa", clashingPrefixes(hashed[0].tagPrefix, hashed, "a").join());
+check("the row with # warns about the row without",
+  clashingPrefixes(hashed[1].tagPrefix, hashed, "b").join() === "Trade-Alex", clashingPrefixes(hashed[1].tagPrefix, hashed, "b").join());
+check("the promised row lists the pair, as the game sees it",
+  JSON.stringify(buddyPrefixClashPairs(hashed)) === JSON.stringify([["Trade-Alex", "Trade-Alexa"]]), JSON.stringify(buddyPrefixClashPairs(hashed)));
+check("a bare # is no prefix", buddyPrefixClashPairs([{ id: "x", tagPrefix: "#" }, { id: "y", tagPrefix: "Trade-Jo" }]).length === 0);
 // The job rows' tagClashes reports a job tag that starts a buddy prefix
 // (#Trade starts #Trade-Alex); buddy against buddy only shows on the promised
 // row. A buddy-only clash must not surface on a job row, or it warns twice.

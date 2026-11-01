@@ -70,6 +70,7 @@ import {
 	freeTagPrefix,
 	clashingPrefixes,
 	buddyPrefixClashPairs,
+	bareTagPrefix,
 	WISH_MAX_NAME,
 } from './share-link.js';
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword } from './i18n/pogo-keywords.js';
@@ -2646,7 +2647,7 @@ export function buildFilters(
 		for (const t of customTags)
 			push(trashClauses, `!#${t}`, tFn('app.clause_why.custom_tag', { params: { tag: t } }));
 		for (const b of activeBuddies) {
-			const prefix = b.tagPrefix.replace(/^#/, '');
+			const prefix = bareTagPrefix(b.tagPrefix);
 			push(trashClauses, `!#${prefix}`, tFn('app.clause_why.buddy_tag', { params: { name: b.name, prefix } }));
 		}
 	}
@@ -2920,7 +2921,7 @@ export function buildFilters(
 		// buddy tags behave exactly like the basar/fern trade tags above). The
 		// prestaged filter surfaces them for the actual hand-off.
 		for (const b of activeBuddies) {
-			const prefix = b.tagPrefix.replace(/^#/, '');
+			const prefix = bareTagPrefix(b.tagPrefix);
 			push(tradeClauses, `!#${prefix}`, tFn('app.clause_why.buddy_tag', { params: { name: b.name, prefix } }));
 		}
 	}
@@ -2991,7 +2992,7 @@ export function buildFilters(
 	// this it would never appear in any filter for the actual meet-up trade.
 	// Including the prefixes here makes #buddyname behave like the basar/fern
 	// trade tags — protected in trade, surfaced here when staged.
-	for (const b of activeBuddies) tagList.push(`#${b.tagPrefix.replace(/^#/, '')}`);
+	for (const b of activeBuddies) tagList.push(`#${bareTagPrefix(b.tagPrefix)}`);
 	if (tagList.length > 0) {
 		push(
 			prestagedClauses,
@@ -3100,7 +3101,7 @@ export function buildFilters(
 	};
 
 	for (const b of activeBuddies) {
-		const prefix = b.tagPrefix.replace(/^#/, '');
+		const prefix = bareTagPrefix(b.tagPrefix);
 		// targetSpecies entries are structured Targets { species, expand, dropForms,
 		// dropSlots, gender } (legacy strings / typed targets are migrated to this
 		// shape on load). Resolve each to an output-locale display name. Whole-species
@@ -14297,8 +14298,9 @@ function DraftInput({ value, onCommit, 'aria-label': ariaLabel, ...props }) {
 function JobTagsPanel({ config, setConfig, copied, copyToClipboard, t }) {
 	const { outputLocale } = useTranslation();
 	const tags = jobTagsOf(config);
-	const activeBuddies = (config.buddies || []).filter((b) => b.active !== false && b.tagPrefix);
-	const buddyPrefixes = activeBuddies.map((b) => b.tagPrefix);
+	const activeBuddies = (config.buddies || []).filter((b) => b.active !== false && bareTagPrefix(b.tagPrefix));
+	// As the game sees them: the filter drops one leading `#` from a stored prefix.
+	const buddyPrefixes = activeBuddies.map((b) => bareTagPrefix(b.tagPrefix));
 	// tagClashes on the job rows covers a job tag prefix-matching a buddy's;
 	// buddy against buddy is only checked here.
 	const buddyClashes = buddyPrefixClashPairs(activeBuddies);
@@ -15213,7 +15215,7 @@ function BuddyManager({ buddies, onChange }) {
 						// A hand-edited prefix is never renumbered: warn when it
 						// prefix-matches another buddy's, but leave it (some share
 						// one tag between buddies on purpose).
-						const clashes = clashingPrefixes(String(b.tagPrefix || '').trim().replace(/^#+/, ''), buddies, b.id);
+						const clashes = clashingPrefixes(b.tagPrefix, buddies, b.id);
 						const clashId = `${clashIdBase}-${b.id}-clash`;
 						return (
 						<div key={b.id} className='border border-[#2D3A47] rounded-sm p-2.5 space-y-2'>

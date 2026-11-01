@@ -179,23 +179,30 @@ export function buddyTagPrefixFor(name) {
 	return bare ? `Trade-${bare}` : '';
 }
 
+// A stored prefix as it reaches the game: one leading `#` dropped, exactly as
+// the filter builders do. The buddy manager stores what was typed, so
+// `#Trade-Alexa` can be in the config while the game sees `Trade-Alexa`.
+export function bareTagPrefix(prefix) {
+	return String(prefix ?? '').replace(/^#/, '');
+}
+
 // Pokémon GO matches `#tags` by prefix: a search for #Trade-Alex also lists
 // #Trade-Alex2 and #Trade-Alexander. Two buddy prefixes clash when either is a
 // prefix of the other (case-insensitive), because a search for one then finds
 // the other's promised trades.
 export function tagPrefixesClash(a, b) {
-	const x = String(a || '').toLocaleLowerCase();
-	const y = String(b || '').toLocaleLowerCase();
+	const x = bareTagPrefix(a).toLocaleLowerCase();
+	const y = bareTagPrefix(b).toLocaleLowerCase();
 	if (!x || !y) return false;
 	return x.startsWith(y) || y.startsWith(x);
 }
 
 // Existing prefixes that clash with `prefix`, excluding the buddy `exceptId`
-// (the one being edited or updated).
+// (the one being edited or updated), as the game sees them (no leading `#`).
 export function clashingPrefixes(prefix, buddies, exceptId = null) {
 	return (Array.isArray(buddies) ? buddies : [])
 		.filter((b) => b && b.id !== exceptId && tagPrefixesClash(prefix, b.tagPrefix))
-		.map((b) => b.tagPrefix);
+		.map((b) => bareTagPrefix(b.tagPrefix));
 }
 
 // Every pair of buddies whose prefixes clash, as [prefixA, prefixB] in buddy
@@ -203,11 +210,11 @@ export function clashingPrefixes(prefix, buddies, exceptId = null) {
 // prefix can collide with another buddy's even though a generated one never
 // does. Two buddies with the same prefix clash too (they share every tag).
 export function buddyPrefixClashPairs(buddies) {
-	const list = (Array.isArray(buddies) ? buddies : []).filter((b) => b && b.tagPrefix);
+	const list = (Array.isArray(buddies) ? buddies : []).filter((b) => b && bareTagPrefix(b.tagPrefix));
 	const pairs = [];
 	for (let i = 0; i < list.length; i++) {
 		for (let j = i + 1; j < list.length; j++) {
-			if (tagPrefixesClash(list[i].tagPrefix, list[j].tagPrefix)) pairs.push([list[i].tagPrefix, list[j].tagPrefix]);
+			if (tagPrefixesClash(list[i].tagPrefix, list[j].tagPrefix)) pairs.push([bareTagPrefix(list[i].tagPrefix), bareTagPrefix(list[j].tagPrefix)]);
 		}
 	}
 	return pairs;
