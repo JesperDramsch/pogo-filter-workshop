@@ -340,7 +340,7 @@
   "app.protect.cards.label": "Tarjetas «¿Descartar o conservar?»",
   "app.protect.cards.help": "Revisa de nuevo todas las protecciones, una tarjeta cada vez. Tus respuestas sobrescriben los interruptores de abajo.",
   "app.protect.cards.button": "Volver a empezar",
-  "app.protect.expert_diff.note": "{count} ajustes de experto difieren de los predeterminados y siguen aplicándose en el modo normal.",
+  "app.protect.expert_diff.note": "Ajustes de experto que difieren de los predeterminados: {count}. Siguen aplicándose en el modo normal.",
   "app.protect.expert_diff.reset": "Restablécelos",
   "app.protect.expert_diff.done": "Ajustes de experto restablecidos a los valores predeterminados.",
   "app.protect.expert_badge": "EXPERTO",

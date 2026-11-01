@@ -340,7 +340,7 @@
   "app.protect.cards.label": "「捨てる? 残す?」カード",
   "app.protect.cards.help": "すべての保護設定を、1枚ずつカードでもう一度確認します。あなたの回答で下のトグルが上書きされます。",
   "app.protect.cards.button": "もう一度始める",
-  "app.protect.expert_diff.note": "{count} 件の上級設定が初期値と異なり、通常モードでも適用されています。",
+  "app.protect.expert_diff.note": "初期値と異なる上級設定: {count} 件。通常モードでも適用されています。",
   "app.protect.expert_diff.reset": "リセットする",
   "app.protect.expert_diff.done": "上級設定を初期値に戻しました。",
   "app.protect.expert_badge": "上級",

@@ -114,8 +114,11 @@ function CardFace({ card, t }) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────
 
-// `expert`: the fine-tuning deck is offered only in expert mode, so the cards
-// and the settings page agree on who sees the expert-only toggles.
+// `expert`: the fine-tuning deck is offered only in expert mode. Every card
+// in the essentials deck is a toggle normal mode shows, so a user is never
+// asked about a setting they cannot find afterwards; the reverse (a toggle
+// normal mode shows whose card sits in the fine-tuning deck, XL and Dynamax)
+// is harmless and left as is.
 export default function SwipeOnboarding({ onComplete, onSkip, onNavigate, expert = false }) {
   const { t } = useTranslation();
   const reduced = useReducedMotion();

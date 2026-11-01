@@ -340,7 +340,7 @@
   "app.protect.cards.label": "„Tossen oder Behalten?“-Karten",
   "app.protect.cards.help": "Geh alle Schutzmaßnahmen noch einmal durch, eine Karte nach der anderen. Deine Antworten überschreiben die Schalter darunter.",
   "app.protect.cards.button": "Erneut starten",
-  "app.protect.expert_diff.note": "{count} Expert-Einstellungen weichen vom Standard ab und gelten auch im Normalmodus.",
+  "app.protect.expert_diff.note": "Expert-Einstellungen, die vom Standard abweichen: {count}. Sie gelten auch im Normalmodus.",
   "app.protect.expert_diff.reset": "Zurücksetzen",
   "app.protect.expert_diff.done": "Expert-Einstellungen auf Standard zurückgesetzt.",
   "app.protect.expert_badge": "EXPERT",

@@ -340,7 +340,7 @@
   "app.protect.cards.label": "Cartes « Jeter ou garder ? »",
   "app.protect.cards.help": "Parcours à nouveau toutes les protections, une carte à la fois. Tes réponses remplacent les options ci-dessous.",
   "app.protect.cards.button": "Relancer",
-  "app.protect.expert_diff.note": "{count} réglages expert diffèrent des valeurs par défaut et s'appliquent encore en mode normal.",
+  "app.protect.expert_diff.note": "Réglages expert différents des valeurs par défaut : {count}. Ils s'appliquent encore en mode normal.",
   "app.protect.expert_diff.reset": "Les réinitialiser",
   "app.protect.expert_diff.done": "Réglages expert remis aux valeurs par défaut.",
   "app.protect.expert_badge": "EXPERT",

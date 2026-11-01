@@ -340,7 +340,7 @@
   "app.protect.cards.label": "फेंकें या रखें? कार्ड्स",
   "app.protect.cards.help": "हर प्रोटेक्शन को फिर से एक-एक कार्ड करके स्वाइप करें। आपके जवाब नीचे के टॉगल्स को ओवरराइट कर देते हैं।",
   "app.protect.cards.button": "फिर से शुरू करें",
-  "app.protect.expert_diff.note": "{count} एक्सपर्ट सेटिंग्स डिफ़ॉल्ट से अलग हैं और नॉर्मल मोड में भी लागू हैं।",
+  "app.protect.expert_diff.note": "डिफ़ॉल्ट से अलग एक्सपर्ट सेटिंग्स: {count}। ये नॉर्मल मोड में भी लागू हैं।",
   "app.protect.expert_diff.reset": "उन्हें रीसेट करें",
   "app.protect.expert_diff.done": "एक्सपर्ट सेटिंग्स डिफ़ॉल्ट पर रीसेट हो गईं।",
   "app.protect.expert_badge": "एक्सपर्ट",

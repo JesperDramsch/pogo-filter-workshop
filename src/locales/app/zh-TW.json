@@ -340,7 +340,7 @@
   "app.protect.cards.label": "「要丟還是留?」卡片",
   "app.protect.cards.help": "再逐張滑過每一項保護。你的回答會覆寫下方的開關。",
   "app.protect.cards.button": "重新開始",
-  "app.protect.expert_diff.note": "{count} 項專家設定與預設值不同，在一般模式下仍然生效。",
+  "app.protect.expert_diff.note": "與預設值不同的專家設定：{count} 項。在一般模式下仍然生效。",
   "app.protect.expert_diff.reset": "重設它們",
   "app.protect.expert_diff.done": "專家設定已恢復預設值。",
   "app.protect.expert_badge": "專家",

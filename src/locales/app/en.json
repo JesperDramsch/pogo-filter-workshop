@@ -340,7 +340,7 @@
   "app.protect.cards.label": "Toss or Keep? cards",
   "app.protect.cards.help": "Swipe through every protection again, one card at a time. Your answers overwrite the toggles below.",
   "app.protect.cards.button": "Run again",
-  "app.protect.expert_diff.note": "{count} expert settings differ from the defaults and still apply in normal mode.",
+  "app.protect.expert_diff.note": "Expert settings that differ from the defaults: {count}. They still apply in normal mode.",
   "app.protect.expert_diff.reset": "Reset them",
   "app.protect.expert_diff.done": "Expert settings reset to the defaults.",
   "app.protect.expert_badge": "EXPERT",
