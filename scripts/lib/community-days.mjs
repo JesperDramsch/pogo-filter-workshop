@@ -91,7 +91,10 @@ const keyOf = (cd) => `${cd.date}|${cd.event.toLowerCase()}`;
 //
 // The date is the start's calendar day in the feed's own spelling (scripts/lib/
 // feed-time.mjs): the local date for the naive string every Community Day has
-// carried so far, the UTC date should one ever come as epoch seconds. A start
+// carried so far, the UTC date should one ever come as epoch seconds. Note the
+// caveat in the latter: a 14:00 start east of UTC+10 is still the day before
+// in UTC, so such a day could land a date early; none has come that way, and
+// the pinned legacy list is what the pile reads for the past anyway. A start
 // that is neither is reported to `report(ev, category)` and the day skipped.
 export function communityDaysFromFeed(feed, resolveSpawns, report = () => {}) {
   const days = [];

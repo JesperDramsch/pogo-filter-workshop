@@ -15,8 +15,9 @@
 // Covers:
 //   T1 — parseFeedTime: numbers are UTC epoch seconds, strings parse as before
 //   T2 — normaliseFeedTime / feedWindow: the string an id and a record carry
-//   T3 — the fetcher's passes keep a numeric event, keep ids stable, and report
-//        rather than skip an event whose window still cannot be read
+//   T3 — the fetcher's passes keep a numeric event, keep ids stable, keep a
+//        fixed-time (in-person) event's bonuses out of the nudge strip, and
+//        report rather than skip an event whose window still cannot be read
 //   T4 — a Community Day with a numeric start gets its date
 //   T5 — a fixed-time takeover is exact, never widened, same id as ScrapedDuck's
 
@@ -101,42 +102,45 @@ console.log("\nT3 — the fetcher's passes");
   const noEnd = ev("Half a window", SENDAI.start, undefined, false, { bonuses: ["1/2 Stardust cost for trades"] });
   const feed = { "Wild Area": [sendai], Event: [halloween, takeover, broken, noEnd] };
 
-  const reported = [];
-  const report = (e, category) => reported.push(`${category}|${e.title}`);
-  const bonuses = bonusesFromFeed(feed, NOW, report);
-  const byTitle = Object.fromEntries(bonuses.map((b) => [b.title, b]));
-
-  const s = byTitle[sendai.title];
-  check("a fixed-time event with bonuses is kept, five days out", !!s);
-  check("its record carries the UTC stamps and isLocalTime false",
-    s && s.start === "2026-11-06T01:00:00Z" && s.end === "2026-11-08T09:00:00Z" && s.isLocalTime === false);
+  // The record a numeric event gets, through the one exported pass that keeps
+  // fixed-time events (signals; the egg and spawn passes build theirs the same
+  // way, from feedWindow and slugId).
+  const sigReported = [];
+  const signals = signalsFromFeed(feed, (e, category) => sigReported.push(`${category}|${e.title}`));
+  const t = signals.find((x) => x.kind === "takeover");
+  check("a fixed-time event becomes a record carrying the UTC stamps",
+    t && t.start === "2026-11-06T01:00:00Z" && t.end === "2026-11-08T09:00:00Z");
   check("the app's Date.parse reads those stamps back to the feed's instants",
-    s && Date.parse(s.start) === parseFeedTime(SENDAI.start) && Date.parse(s.end) === parseFeedTime(SENDAI.end));
+    t && Date.parse(t.start) === parseFeedTime(SENDAI.start) && Date.parse(t.end) === parseFeedTime(SENDAI.end));
   check("its id slugs the stamp, not the epoch digits",
-    s && s.id === "wild-area-pok-mon-go-wild-area-2026-sendai-tohoku-2026-11-06t01-00-00z", s?.id);
-  const h = byTitle[halloween.title];
-  check("a local-time event's id and record are byte-for-byte what they were",
-    h && h.id === "event-pok-mon-go-halloween-2026-part-ii-2026-11-01t10-00-00" && h.start === "2026-11-01T10:00:00" && h.end === "2026-11-05T20:00:00" && h.isLocalTime === true, h?.id);
-  check("the two unparseable events are left out", !byTitle[broken.title] && !byTitle[noEnd.title]);
-  check("and reported, once each, with their category", reported.sort().join() === "Event|Half a window,Event|Something new", reported.join());
-  check("the report callback is optional (the default swallows)", bonusesFromFeed(feed, NOW).length === bonuses.length);
+    t && t.id === "takeover|event-twilight-trails-taken-over-2026-11-06t01-00-00z", t?.id);
+  check("the two unparseable events are reported, once each, with their category",
+    sigReported.sort().join() === "Event|Half a window,Event|Something new", sigReported.join());
+  check("the report callback is optional (the default swallows)", signalsFromFeed(feed).length === signals.length);
 
   // The id-stability decision: the same fixed instant as a number and as the
   // zoned stamp slugs to the same id, so a flip upstream to that spelling keeps
   // the record's identity and its carry-over.
-  const asStamp = { ...sendai, start_time: "2026-11-06T01:00:00Z", end_time: "2026-11-08T09:00:00Z" };
-  const [stamped] = bonusesFromFeed({ "Wild Area": [asStamp] }, NOW);
+  const asStamp = { ...takeover, start_time: "2026-11-06T01:00:00Z", end_time: "2026-11-08T09:00:00Z" };
+  const [stamped] = signalsFromFeed({ Event: [asStamp] });
   check("the same instant as a zoned string gives the identical id and record",
-    stamped && stamped.id === s?.id && stamped.start === s?.start && stamped.end === s?.end);
+    stamped && stamped.id === t?.id && stamped.start === t?.start && stamped.end === t?.end);
 
-  const sigReported = [];
-  const signals = signalsFromFeed(feed, (e, category) => sigReported.push(`${category}|${e.title}`));
-  const t = signals.find((x) => x.kind === "takeover");
-  check("a fixed-time takeover becomes a signal with the stamps",
-    t && t.start === "2026-11-06T01:00:00Z" && t.end === "2026-11-08T09:00:00Z" && t.id === "takeover|event-twilight-trails-taken-over-2026-11-06t01-00-00z", t?.id);
-  check("signalsFromFeed reports the same two unparseable events",
-    sigReported.sort().join() === "Event|Half a window,Event|Something new", sigReported.join());
-  check("signalsFromFeed without a callback still works", signalsFromFeed(feed).length === signals.length);
+  // Bonuses: a fixed-time event's hold in one city, so they stay out of the
+  // strip that speaks to every user; a local-time event's are byte-for-byte
+  // what they were.
+  const reported = [];
+  const bonuses = bonusesFromFeed(feed, NOW, (e, category) => reported.push(`${category}|${e.title}`));
+  const byTitle = Object.fromEntries(bonuses.map((b) => [b.title, b]));
+  check("a fixed-time (in-person) event's bonuses make no bonus record",
+    !byTitle[sendai.title] && !byTitle[takeover.title], Object.keys(byTitle).join());
+  check("a local-time Wild Area with the same bonuses does (the global edition)",
+    bonusesFromFeed({ "Wild Area": [{ ...sendai, title: "Pokémon GO Wild Area 2026: Global", start_time: "2026-11-14T10:00:00", end_time: "2026-11-15T18:00:00", is_local_time: true }] }, NOW).length === 1);
+  const h = byTitle[halloween.title];
+  check("a local-time event's id and record are byte-for-byte what they were",
+    h && h.id === "event-pok-mon-go-halloween-2026-part-ii-2026-11-01t10-00-00" && h.start === "2026-11-01T10:00:00" && h.end === "2026-11-05T20:00:00" && h.isLocalTime === true, h?.id);
+  check("the unparseable events are left out of bonuses too, and the local-time one reported",
+    !byTitle[broken.title] && !byTitle[noEnd.title] && reported.join() === "Event|Something new", reported.join());
 }
 
 console.log("\nT4 — Community Days");

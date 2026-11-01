@@ -50,11 +50,20 @@
 // is NaN, and until scripts/lib/feed-time.mjs every pass here `continue`d on
 // that without a count or a line, so every fixed-time event was dropped in
 // silence; the feed's visible history (May 2026 on) has always spelt them so.
-// Every window now goes through
-// feedWindow there, which reads both forms and hands back the string the id and
-// the snapshot record carry: the feed's own string, or the number's UTC ISO
-// stamp ("2026-11-06T01:00:00Z"). An event whose window still cannot be read is
-// logged once and counted in the summary line, never skipped quietly again.
+// Every window now goes through feedWindow there, which reads both forms and
+// hands back the string the id and the snapshot record carry: the feed's own
+// string, or the number's UTC ISO stamp ("2026-11-06T01:00:00Z"). An event
+// whose window still cannot be read is logged once and counted in the summary
+// line, never skipped quietly again.
+//
+// Fixed-time events are, on every feed seen so far, the in-person ones: a city
+// Wild Area, a GO Tour host city, a Night Out, and the GBL rotations (which
+// carry no bonus). Their spawn and egg pools go on the card like City Safari's
+// always have (a traveller wants them, everyone else folds the row), but their
+// BONUSES stay out of `bonuses`: the nudge strip speaks to every user, and
+// "½ Stardust for trades" that holds for ticket holders in Sendai is wrong for
+// a player in Bonn. The global editions of those events are local-time strings
+// and keep their bonuses.
 //
 // SHRINK GUARD: the fetcher used to refuse only a feed that yielded no event at
 // all. A scrape that comes back half-written passes that test with one event
@@ -303,7 +312,10 @@ export function signalsFromFeed(feed, report = () => {}) {
 // Every event's bonus strings as { id, title, category, start, end,
 // isLocalTime, bonuses }, from every category, spawns or not. Window-filtered
 // like the rest; an event with no bonuses or no parseable window is left out,
-// and `report(ev, category)` is told about the latter.
+// and `report(ev, category)` is told about the latter. A fixed-time event
+// (`is_local_time: false`) is left out too: see TIME FORMS in the header, its
+// bonuses hold in one city and the strip speaks to everyone. The signals pass
+// still reads every event, so an unparseable window is reported regardless.
 export function bonusesFromFeed(feed, now, report = () => {}) {
   const out = [];
   for (const [category, list] of Object.entries(feed || {})) {
@@ -314,6 +326,7 @@ export function bonusesFromFeed(feed, now, report = () => {}) {
         .map((b) => b.replace(/\s+/g, " ").trim())
         .filter(Boolean);
       if (bonuses.length === 0) continue;
+      if (ev.is_local_time === false) continue;
       const window = feedWindow(ev);
       if (!window) { report(ev, category); continue; }
       if (outsideWindow(window.startMs, window.endMs, now)) continue;
