@@ -27,6 +27,7 @@ import {
   parseWishHash,
   applyWishToBuddies,
   rankBuddyCandidates,
+  wishDialogOptions,
   freeTagPrefix,
   clashingPrefixes,
   tagPrefixesClash,
@@ -171,6 +172,21 @@ const kept = applyWishToBuddies(updated.buddies, doneParsed.wish, normalizeBuddy
 check("keep: buddy stays with an empty wish list", kept.buddies.length === 1 && kept.buddies[0].targetSpecies.length === 0);
 const removed = applyWishToBuddies(updated.buddies, doneParsed.wish, normalizeBuddyTarget, { mode: "remove", buddyId: buddy.id });
 check("remove: buddy is gone", removed.action === "removed" && removed.buddies.length === 0);
+// The reviewer's sequence: receiver has Bob; Alex, never added, says "done".
+const bob = [{ id: "b1", name: "Bob", tagPrefix: "Trade-Bob", targetSpecies: [{ species: "pikachu" }], active: true }];
+const strangerDone = parseWishHash(hashOf(wishLinkFor({ id: "alex-x", name: "Alex", targets: [] }, "/"))).wish;
+const strangerOffer = wishDialogOptions(bob, strangerDone);
+check("done link from a stranger preselects nothing", strangerOffer.preselect === null, JSON.stringify(strangerOffer.preselect));
+check("and offers no unrelated buddy", strangerOffer.options.length === 0);
+check("so the dialog has nothing to do", strangerOffer.nothingToDo === true);
+const knownDone = wishDialogOptions(updated.buddies, doneParsed.wish);
+check("done link from a known sender offers just that buddy, preselected",
+  knownDone.preselect === buddy.id && knownDone.options.length === 1 && !knownDone.nothingToDo);
+const likelyDone = wishDialogOptions(bob, parseWishHash(hashOf(wishLinkFor({ id: "bob-id", name: "bob", targets: [] }, "/"))).wish);
+check("done link matching a hand-made buddy by name offers it as a guess", likelyDone.preselect === "b1" && likelyDone.options[0].match === "likely");
+const listOffer = wishDialogOptions(bob, parseWishHash(hashOf(wishLinkFor({ id: "alex-x", name: "Alex", targets }, "/"))).wish);
+check("a non-empty list from a stranger defaults to 'new' and still lists every buddy",
+  listOffer.preselect === "new" && listOffer.options.length === 1 && !listOffer.nothingToDo);
 const emptySenderTargets = wishTargetsFromConfig(sender, buildFilters([], ["mauzi", "pikachu", "wadribie", "vulpix"], sender, [], "de").friendCollectTargets);
 check("a sender with everything covered sends an empty list", emptySenderTargets.length === 0);
 

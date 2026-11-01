@@ -241,6 +241,25 @@ export function rankBuddyCandidates(buddies, wish) {
 	return { candidates: ranked, best };
 }
 
+// What the receiver's dialog offers for a link, so the choice logic is tested
+// here rather than living untested inside the component.
+//   options    — candidates to list, best first
+//   preselect  — buddy id, 'new', or null (nothing checked)
+//   nothingToDo — true when the dialog has nothing to offer but "OK"
+// A list goes anywhere the receiver points it: every buddy plus "new", with a
+// guess preselected or "new". An EMPTY list ("I have everything") is
+// destructive (it empties or removes a buddy), so it only ever offers buddies
+// the link actually matches. A done link from someone the receiver never added
+// must not land on an unrelated buddy; that buddy can still be cleared by hand.
+export function wishDialogOptions(buddies, wish) {
+	const ranked = rankBuddyCandidates(buddies, wish);
+	if (wish.targets.length === 0) {
+		const options = ranked.candidates.filter((c) => c.match);
+		return { options, preselect: ranked.best, nothingToDo: options.length === 0 };
+	}
+	return { options: ranked.candidates, preselect: ranked.best ?? 'new', nothingToDo: false };
+}
+
 // Apply a parsed wish to the buddy list as the receiver chose:
 //   choice = { mode: 'update', buddyId }        replace that buddy's wish list
 //   choice = { mode: 'new', tagPrefix? }       add a buddy (prefix defaults to

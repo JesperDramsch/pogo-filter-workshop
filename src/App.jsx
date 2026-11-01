@@ -64,7 +64,7 @@ import {
 	cleanShareName,
 	isWishHash,
 	parseWishHash,
-	rankBuddyCandidates,
+	wishDialogOptions,
 	applyWishToBuddies,
 	freeTagPrefix,
 	clashingPrefixes,
@@ -13955,7 +13955,7 @@ function ShareWishLink({ config, targets, onConfigChange }) {
 function WishLinkDialog({ result, buddies, outputLocale, onAccept, onClose }) {
 	const { t } = useTranslation();
 	const wish = result?.ok ? result.wish : null;
-	const ranked = useMemo(() => (wish ? rankBuddyCandidates(buddies, wish) : { candidates: [], best: null }), [wish, buddies]);
+	const offer = useMemo(() => (wish ? wishDialogOptions(buddies, wish) : { options: [], preselect: null, nothingToDo: false }), [wish, buddies]);
 	const done = !!wish && wish.targets.length === 0;
 	const [pick, setPick] = useState(null);
 	const [tag, setTag] = useState('');
@@ -13966,7 +13966,7 @@ function WishLinkDialog({ result, buddies, outputLocale, onAccept, onClose }) {
 	// the buddy list changes would throw away a choice the receiver just made.
 	useEffect(() => {
 		if (!wish) return;
-		setPick(ranked.best ?? (done ? ranked.candidates[0]?.buddy.id ?? null : 'new'));
+		setPick(offer.preselect);
 		setTag(freeTagPrefix(wish.name, buddies));
 	}, [wish]);
 
@@ -13990,12 +13990,12 @@ function WishLinkDialog({ result, buddies, outputLocale, onAccept, onClose }) {
 	const title = done
 		? t('app.share.receive.title_done', { params: { name: wish.name } })
 		: t('app.share.receive.title', { params: { name: wish.name, count: wish.targets.length } });
-	const matched = ranked.candidates.filter((c) => c.match);
-	const others = ranked.candidates.filter((c) => !c.match);
+	const matched = offer.options.filter((c) => c.match);
+	const others = offer.options.filter((c) => !c.match);
 	const cleanTag = tag.trim().replace(/^#/, '');
 	const clashes = pick === 'new' ? clashingPrefixes(cleanTag, buddies) : [];
-	const chosen = ranked.candidates.find((c) => c.buddy.id === pick)?.buddy;
-	const nothingToDo = done && ranked.candidates.length === 0;
+	const chosen = offer.options.find((c) => c.buddy.id === pick)?.buddy;
+	const nothingToDo = offer.nothingToDo;
 
 	const option = (value, label, note) => (
 		<label key={value} className='flex items-start gap-2 min-h-[44px] py-2 px-2 rounded-sm border border-[#2D3A47] has-[:checked]:border-[#E91E63]/60 has-[:checked]:bg-[#E91E63]/5 cursor-pointer'>
