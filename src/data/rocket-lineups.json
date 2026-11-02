@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-09T13:01:49.314Z",
+  "fetchedAt": "2026-11-02T00:21:46.085Z",
   "source": "scrapedduck",
   "bulk": {
     "metric": "baseDefense*baseStamina",
@@ -720,6 +720,9 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "fighting"
+          ],
           "candidates": {
             "total": 337,
             "weakTo": {
@@ -882,6 +885,11 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "ground",
+            "rock",
+            "water"
+          ],
           "candidates": {
             "total": 294,
             "weakTo": {
@@ -1044,6 +1052,10 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "electric",
+            "grass"
+          ],
           "candidates": {
             "total": 100,
             "weakTo": {
@@ -1199,6 +1211,10 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "electric",
+            "grass"
+          ],
           "candidates": {
             "total": 211,
             "weakTo": {
@@ -1348,6 +1364,9 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "ground"
+          ],
           "candidates": {
             "total": 113,
             "weakTo": {
@@ -1510,6 +1529,12 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "fire",
+            "flying",
+            "ice",
+            "poison"
+          ],
           "candidates": {
             "total": 236,
             "weakTo": {
@@ -1694,6 +1719,11 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "fire",
+            "rock",
+            "steel"
+          ],
           "candidates": {
             "total": 100,
             "weakTo": {
@@ -1868,6 +1898,11 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "fairy",
+            "flying",
+            "psychic"
+          ],
           "candidates": {
             "total": 274,
             "weakTo": {
@@ -2046,6 +2081,10 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "ground",
+            "psychic"
+          ],
           "candidates": {
             "total": 146,
             "weakTo": {
@@ -2208,6 +2247,11 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "grass",
+            "ice",
+            "water"
+          ],
           "candidates": {
             "total": 202,
             "weakTo": {
@@ -2385,6 +2429,11 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "electric",
+            "ice",
+            "rock"
+          ],
           "candidates": {
             "total": 215,
             "weakTo": {
@@ -2564,6 +2613,11 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "bug",
+            "dark",
+            "ghost"
+          ],
           "candidates": {
             "total": 122,
             "weakTo": {
@@ -2740,6 +2794,11 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "fire",
+            "flying",
+            "rock"
+          ],
           "candidates": {
             "total": 166,
             "weakTo": {
@@ -2915,6 +2974,13 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "fighting",
+            "grass",
+            "ground",
+            "steel",
+            "water"
+          ],
           "candidates": {
             "total": 340,
             "weakTo": {
@@ -3096,6 +3162,10 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "dark",
+            "ghost"
+          ],
           "candidates": {
             "total": 276,
             "weakTo": {
@@ -3257,6 +3327,11 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "dragon",
+            "fairy",
+            "ice"
+          ],
           "candidates": {
             "total": 166,
             "weakTo": {
@@ -3434,6 +3509,11 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "bug",
+            "fairy",
+            "fighting"
+          ],
           "candidates": {
             "total": 287,
             "weakTo": {
@@ -3599,6 +3679,10 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "fighting",
+            "water"
+          ],
           "candidates": {
             "total": 113,
             "weakTo": {
@@ -3788,6 +3872,10 @@
             }
           ],
           "uncoveredLeads": [],
+          "chargeTypes": [
+            "poison",
+            "steel"
+          ],
           "candidates": {
             "total": 89,
             "weakTo": {

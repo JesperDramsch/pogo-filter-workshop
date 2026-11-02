@@ -5052,17 +5052,34 @@ export function buildFilters(
 	// allowlist of types resisting anything in slots 2 and 3 (top attackers
 	// bypass it) and not weak to the types that recur there or that the
 	// handed-over Pokémon carry.
-	const buildMainBox = (version, guardTypes) => {
+	// Box 1 also needs a charged move: its bar fills on slot 1 and the move
+	// lands in slot 2 or 3, so the fetcher's `chargeTypes` are the types
+	// super-effective against most of what is offered there (handed-over
+	// Pokémon aside) and resisted by none of it. Without that clause a
+	// Pokémon got through whose charged move hit nothing for extra damage.
+	const buildMainBox = (version, main) => {
 		const fastList = (version.fastTypes || []).map((t) => kw.type[t]).filter(Boolean);
 		if (fastList.length === 0) return null;
+		const chargeList = (main?.chargeTypes || []).map((t) => kw.type[t]).filter(Boolean);
+		const handedOver = (main?.handedOver || []).map(localizePokemonName);
 		const clauses = [];
 		push(clauses, fastMoveClause(fastList), tFn('app.clause_why.rocket_main_fast'));
+		if (chargeList.length > 0) {
+			push(
+				clauses,
+				chargeMoveClause(chargeList),
+				handedOver.length > 0
+					? tFn('app.clause_why.rocket_main_charge_handover', { params: { names: handedOver.join(', ') } })
+					: tFn('app.clause_why.rocket_main_charge'),
+			);
+		}
 		const second = buildSecondMoveAndAppraise();
 		if (second) push(clauses, second.clause, second.why);
-		const wGuard = weaknessGuard(guardTypes);
+		const wGuard = weaknessGuard(main?.guardTypes);
 		if (wGuard) push(clauses, wGuard, tFn('app.clause_why.rocket_main_not_weak'));
 		return {
 			fastTypes: (version.fastTypes || []).map(localizedTypeDisplay),
+			chargeTypes: chargeList.length > 0 ? (main.chargeTypes || []).map(localizedTypeDisplay) : [],
 			leads: (version.leads || []).map(localizePokemonName),
 			clause: clauses.map((c) => c.clause).join('&'),
 			clauses,
@@ -5097,7 +5114,8 @@ export function buildFilters(
 	const buildTypedGrunt = (trainer) => {
 		const gender = gruntGender(trainer.name);
 		const boxes = trainer.boxes || {};
-		const main = (boxes.main?.versions || []).map((v) => buildMainBox(v, boxes.main.guardTypes)).filter(Boolean);
+		const mainSpec = { ...(boxes.main || {}), handedOver: boxes.backup?.handedOver || [] };
+		const main = (boxes.main?.versions || []).map((v) => buildMainBox(v, mainSpec)).filter(Boolean);
 		const backup = buildBackupBox(boxes.backup);
 		return {
 			name: localizedGruntName(trainer),
@@ -11853,12 +11871,33 @@ function GruntQuoteList({ quotes, t }) {
 // when no single fast-move type covers every slot-1 Pokémon) and the backup
 // for slots 2 and 3, built for the Pokémon the main counter hands over when
 // there are any. The first main box keeps the copy key the grunt's single
-// filter always had.
+// filter always had. The main hint gets a second sentence for the charged
+// move when the box asks for one.
 function TypedGruntBoxes({ g, copyKey, accent, copied, copyToClipboard, t }) {
 	const or = t('app.filter.rocket_lineup_or');
 	const split = g.main.length > 1;
 	const handedOver = g.handedOver || [];
 	const backupKey = `${copyKey}_backup`;
+	const mainHint = (box) => {
+		const fast =
+			handedOver.length > 0
+				? t('app.filter.rocket_main_hint_handover', {
+						params: {
+							types: box.fastTypes.join(or),
+							names: box.leads.join(', '),
+							killers: g.killerTypes.join(', '),
+							handed: handedOver.join(', '),
+						},
+					})
+				: t('app.filter.rocket_main_hint', {
+						params: { types: box.fastTypes.join(or), names: box.leads.join(', ') },
+					});
+		const charge =
+			(box.chargeTypes || []).length > 0
+				? t('app.filter.rocket_main_hint_charge', { params: { types: box.chargeTypes.join(or) } })
+				: '';
+		return [fast, charge].filter(Boolean).join(' ');
+	};
 	return (
 		<>
 			{g.main.map((box, i) => {
@@ -11875,20 +11914,7 @@ function TypedGruntBoxes({ g, copyKey, accent, copied, copyToClipboard, t }) {
 						filterStr={box.clause}
 						copied={copied[key]}
 						onCopy={() => copyToClipboard(key, box.clause)}
-						hint={
-							handedOver.length > 0
-								? t('app.filter.rocket_main_hint_handover', {
-										params: {
-											types: box.fastTypes.join(or),
-											names: box.leads.join(', '),
-											killers: g.killerTypes.join(', '),
-											handed: handedOver.join(', '),
-										},
-									})
-								: t('app.filter.rocket_main_hint', {
-										params: { types: box.fastTypes.join(or), names: box.leads.join(', ') },
-									})
-						}
+						hint={mainHint(box)}
 					/>
 				);
 			})}

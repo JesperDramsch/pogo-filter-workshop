@@ -64,7 +64,7 @@ import RAID_BOSSES from "../src/data/raid-bosses.json";
 import ROCKET_LINEUPS from "../src/data/rocket-lineups.json";
 import LILY_TYPES from "./__fixtures__/lily-dex-types.json";
 import { indexTypes, effVsPokemon } from "./lib/rocket-derive.mjs";
-import { recurringTypesOf, KILLER_ONE_IN } from "./lib/rocket-cover.mjs";
+import { recurringTypesOf, majorityTypes, KILLER_ONE_IN } from "./lib/rocket-cover.mjs";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
 import META_RANKINGS from "../src/data/meta-rankings.json";
 import { buildDataFilters, buildResult, FIXTURE_CONFIG, makeTFn } from "./lib/fixture.mjs";
@@ -546,6 +546,11 @@ console.log("\nD10 — typed grunt boxes and tanks");
       JSON.stringify(backup.handedOver) === JSON.stringify(handed.map((p) => p.name)), `${backup.handedOver}`);
     check(`${t.name}: backup targets are exactly the slot 2/3 options`,
       JSON.stringify(backup.targets) === JSON.stringify(targets.map((p) => p.name)));
+    const handedNames = new Set(handed.map((p) => p.name));
+    const expectedCharge = majorityTypes(late.filter((p) => !handedNames.has(p.name)), Object.keys(typeIdx), typeIdx);
+    check(`${t.name}: main charge types hit half of slots 2/3 (handed-over aside), none resisted`,
+      (main.chargeTypes || []).length > 0 && JSON.stringify(main.chargeTypes) === JSON.stringify(expectedCharge),
+      `${main.chargeTypes} vs ${expectedCharge}`);
     const resisted = (ty) => targets.some((p) => eff(ty, p) < 1);
     let expectedMoves;
     if (handed.length) {
@@ -593,6 +598,13 @@ console.log("\nD10 — typed grunt boxes and tanks");
       const killerGuards = (t.boxes?.main?.killerTypes || []).map((ty) => `!<${kw.type[ty]}`);
       if ((g.main || []).some((b) => b.clause.split("&").some((c) => killerGuards.includes(c)))) {
         bad.push(`${t.name} main box guards against a killer type`);
+      }
+      // Every main box asks for a charged move of each charge type, in both
+      // charged slots, as one OR group.
+      const chargeKws = (t.boxes?.main?.chargeTypes || []).map((ty) => kw.type[ty]);
+      const chargeGroup = [...chargeKws.map((k) => `@2${k}`), ...chargeKws.map((k) => `@3${k}`)].join(",");
+      if (chargeKws.length && (g.main || []).some((b) => !b.clause.split("&").includes(chargeGroup))) {
+        bad.push(`${t.name} main box lacks the charge clause ${chargeGroup}`);
       }
       const handed = t.boxes?.backup?.handedOver || [];
       if ((g.handedOver || []).length !== handed.length) bad.push(`${t.name} handed-over names`);
