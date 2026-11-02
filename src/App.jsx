@@ -5060,7 +5060,10 @@ export function buildFilters(
 	const buildMainBox = (version, main) => {
 		const fastList = (version.fastTypes || []).map((t) => kw.type[t]).filter(Boolean);
 		if (fastList.length === 0) return null;
-		const chargeList = (main?.chargeTypes || []).map((t) => kw.type[t]).filter(Boolean);
+		// The displayed types are the ones the clause asks for: a type without a
+		// keyword in this locale stays out of both.
+		const chargeTypes = (main?.chargeTypes || []).filter((t) => kw.type[t]);
+		const chargeList = chargeTypes.map((t) => kw.type[t]);
 		const handedOver = (main?.handedOver || []).map(localizePokemonName);
 		const clauses = [];
 		push(clauses, fastMoveClause(fastList), tFn('app.clause_why.rocket_main_fast'));
@@ -5079,7 +5082,7 @@ export function buildFilters(
 		if (wGuard) push(clauses, wGuard, tFn('app.clause_why.rocket_main_not_weak'));
 		return {
 			fastTypes: (version.fastTypes || []).map(localizedTypeDisplay),
-			chargeTypes: chargeList.length > 0 ? (main.chargeTypes || []).map(localizedTypeDisplay) : [],
+			chargeTypes: chargeTypes.map(localizedTypeDisplay),
 			leads: (version.leads || []).map(localizePokemonName),
 			clause: clauses.map((c) => c.clause).join('&'),
 			clauses,

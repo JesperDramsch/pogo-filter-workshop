@@ -299,8 +299,11 @@ export function recurringTypesOf(pokemons, min = 2) {
 //   main:   { versions: [{ fastTypes, leads }], uncoveredLeads, chargeTypes,
 //             candidates: { total, weakTo }, killerTypes, guardTypes }
 // `chargeTypes` is shared by every version: it is about slots 2 and 3, which
-// every version faces alike. Empty when nothing there is hit super-effectively
-// by a type none of it resists; the app then asks for no charged move.
+// every version faces alike. It is empty only when nothing there is hit
+// super-effectively by a type none of it resists. The app then asks for no
+// charged move, which is the fast-move-only Box 1 this rule replaced, so
+// check-data-filters D10 fails on an empty set: a lineup rotation that
+// produces one is a regression to look at, not a normal outcome.
 //   backup: { targets, handedOver, moveTypes, resistorTypes, guardTypes }
 // `resistorTypes` are the types that resist at least one slot 2/3 type;
 // weakness is the guard's job, so they are not filtered on it.
