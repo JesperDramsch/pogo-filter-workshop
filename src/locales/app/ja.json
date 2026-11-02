@@ -147,6 +147,7 @@
   "app.filter.trash_label": "ゴミ箱",
   "app.filter.trash_hint": "一括削除用。プロテクションを反転させて、マッチするものは安全に転送できる。",
   "app.filter.trade_label": "交換",
+  "app.footer.saved_locally": "ローカルに保存",
   "app.filter.trade_hint": "日常的に交換できるポケモン。未交換、非シャドウ、非キラ、IVがアプリ評価バケット単位でhundoを上回るもの。",
   "app.filter.sort_label": "100%-ソート",
   "app.filter.sort_hint": "hundoファミリーの全メンバーを表示するので、バッグでピン留めできる。",

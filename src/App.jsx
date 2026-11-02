@@ -8650,11 +8650,11 @@ export default function App() {
 						{/* FOOTER */}
 						<footer className='mt-12 pt-6 border-t border-[#1F2933] mono text-xs text-[#8090A0] flex items-center gap-2 flex-wrap'>
 							<Sparkles size={11} className='text-[#5EAFC5]' />
-							persistiert lokal · {hundos.length} hundos · trash {trash.length}c · trade {trade.length}c
+							{t('app.footer.saved_locally')} · {t('app.stats.hundos')} {hundos.length} · {t('app.filter.trash_label')} {trash.length}c · {t('app.filter.trade_label')} {trade.length}c
 							{homeLocation && (
 								<span>
 									{' '}
-									· home {homeLocation[1].toFixed(1)}°,{homeLocation[0].toFixed(1)}°
+									· {t('app.stats.location')} {homeLocation[1].toFixed(1)}°,{homeLocation[0].toFixed(1)}°
 								</span>
 							)}
 							<button
@@ -10640,6 +10640,16 @@ export function useAreaStage({ area, settings, areas, reduced }) {
 	return { area: shown.area, settings: shown.settings, active, reduced: !!reduced, x, rotate, opacity, rotateY, pull, settle };
 }
 
+// Brings an area's tab back into view when it has scrolled off the top, so a
+// tab change made deep in a long panel (a swipe, leaving the settings flip)
+// still shows where the user landed. Does nothing when the tab is visible.
+function scrollAreaTabIntoView(area) {
+	const tab = document.getElementById(`area-tab-${area}`);
+	if (!tab || tab.getBoundingClientRect().top >= 0) return;
+	const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+	tab.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+}
+
 function SwipeAreas({ areas, current, onSelect, stage, children }) {
 	const rootRef = useRef(null);
 	const gesture = useRef(null);
@@ -10692,10 +10702,7 @@ function SwipeAreas({ areas, current, onSelect, stage, children }) {
 		onSelect(next);
 		// The tab strip is the only cue of what just happened. Deep in a long
 		// panel it has scrolled off the top, so bring it back into view.
-		const tab = document.getElementById(`area-tab-${next}`);
-		if (tab && tab.getBoundingClientRect().top < 0) {
-			tab.scrollIntoView({ block: 'start', behavior: stage.reduced ? 'auto' : 'smooth' });
-		}
+		scrollAreaTabIntoView(next);
 	};
 	return (
 		<StagedArea.Provider value={stage.area}>
@@ -10828,11 +10835,7 @@ function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, onOpen
 function SettingsExitBar({ area, onExit, t }) {
 	const exit = () => {
 		onExit();
-		const tab = document.getElementById(`area-tab-${area}`);
-		if (tab && tab.getBoundingClientRect().top < 0) {
-			const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-			tab.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
-		}
+		scrollAreaTabIntoView(area);
 	};
 	return (
 		<div
