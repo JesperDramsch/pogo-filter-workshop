@@ -30,6 +30,7 @@ import {
   attackerPool,
   candidateCounts,
   typedGruntBoxes,
+  majorityTypes,
   distinctSpecies,
   bestTypesAgainst,
   bulkTable,
@@ -184,6 +185,10 @@ console.log("\nC6 — typed-grunt boxes on the toy chart");
     backup.guardTypes.join() === "a,x");
   check("backup resistors resist any slot 2/3 type, not only the guarded ones (d is immune to x, b halves it)",
     backup.resistorTypes.join() === "b,d", backup.resistorTypes.join());
+  // The charged move is for slots 2 and 3 minus the handover (Y3 and C3): x
+  // and y each hit C3, half of them, and neither is resisted.
+  check("main charge types hit half of the slot 2/3 Pokémon the main counter keeps, resisted by none",
+    main.chargeTypes.join() === "x,y", main.chargeTypes.join());
 
   // A resisted type never makes the handover's move types: B3 halves x.
   const walledHandover = typedGruntBoxes(
@@ -197,6 +202,9 @@ console.log("\nC6 — typed-grunt boxes on the toy chart");
   check("no candidate counts: no killers, full check, no handover",
     offline.main.killerTypes.length === 0 && offline.main.guardTypes.join() === "a,c,x,y" &&
     offline.backup.handedOver.length === 0);
+  // With XA2 kept, x hits two of the three slot 2/3 entries and y only one.
+  check("no handover: the charged move is judged against every slot 2/3 entry",
+    offline.main.chargeTypes.join() === "x", offline.main.chargeTypes.join());
   const partial = typedGruntBoxes(lineup, [], TYPES, CHART, () => ({ total: 4, weakTo: { y: 1 } }));
   check("a type without a count is never a killer", partial.main.killerTypes.length === 0);
 
@@ -211,6 +219,12 @@ console.log("\nC6 — typed-grunt boxes on the toy chart");
   check("general backup keeps a type SE on half of slots 2/3 and resisted by none",
     general.backup.moveTypes.join() === "y");
   check("general backup guards against recurring types only", general.backup.guardTypes.join() === "a");
+  check("main charge types follow the same majority rule (y, not the b-halved x)",
+    general.main.chargeTypes.join() === "y", general.main.chargeTypes.join());
+  check("majorityTypes counts entries, so a species in two slots weighs twice",
+    majorityTypes([mon("C", "c"), mon("A", "a"), mon("A", "a")], TYPES, CHART).join() === "x" &&
+    majorityTypes([mon("C", "c"), mon("A", "a")], TYPES, CHART).join() === "x,y");
+  check("majorityTypes drops a type any entry resists", !majorityTypes([mon("C", "c"), mon("D", "d")], TYPES, CHART).includes("x"));
 
   // A tank in slot 3 whose best type (w, on e) nobody else resists joins the
   // general backup; the same tank next to a d (immune to x) cannot pull x in.
@@ -250,6 +264,10 @@ console.log("\nC7 — typed-grunt boxes for real lineups (lily-dex chart snapsho
     waterF.backup.handedOver.join() === "Swampert" && waterF.backup.moveTypes.join() === "grass");
   check("Water ♀: backup guards against Water, Dark (recurring) and Ground (Swampert)",
     waterF.backup.guardTypes.join() === "dark,ground,water", waterF.backup.guardTypes.join());
+  // Swampert aside, Electric hits all five slot 2/3 entries and Grass three
+  // (Dewpider's Bug and Tentacruel's Poison halve it back to neutral).
+  check("Water ♀: main charge types are Electric and Grass, judged without Swampert",
+    waterF.main.chargeTypes.join() === "electric,grass", waterF.main.chargeTypes.join());
 
   // Seel is pure Water in slot 1: only Electric hits all three leads. Nothing
   // is a killer, so the main counter keeps the full check, which is the
@@ -267,6 +285,10 @@ console.log("\nC7 — typed-grunt boxes for real lineups (lily-dex chart snapsho
     iceF.backup.handedOver.length === 0 && iceF.backup.moveTypes.join() === "fire,rock,steel");
   check("Ice ♀: backup guards against Ice and Ghost (Froslass in two slots)",
     iceF.backup.guardTypes.join() === "ghost,ice", iceF.backup.guardTypes.join());
+  // Electric only hits Sealeo in slots 2 and 3, so an Electric charged move
+  // is out: Fire, Rock and Steel are the ones that land there.
+  check("Ice ♀: main charge types are Fire/Rock/Steel, not the Electric fast type",
+    iceF.main.chargeTypes.join() === "fire,rock,steel", iceF.main.chargeTypes.join());
   check("Ice ♀: backup resistors are the types that resist any slot 2/3 type, Rock and Fairy included",
     iceF.backup.resistorTypes.join() === "normal,fighting,poison,ground,steel,fire,water,grass,ice,dragon,dark",
     iceF.backup.resistorTypes.join());
@@ -282,6 +304,8 @@ console.log("\nC7 — typed-grunt boxes for real lineups (lily-dex chart snapsho
   check("Normal ♂: main counter splits into Fighting and Electric/Ice/Rock versions",
     versions.join("|") === "fighting:Teddiursa+Porygon|electric/ice/rock:Hoothoot", versions.join("|"));
   check("Normal ♂: every lead is covered", normalM.main.uncoveredLeads.length === 0);
+  check("Normal ♂: both versions share the Fighting charged move (Stufful aside, 3 of 5 are pure Normal)",
+    normalM.main.chargeTypes.join() === "fighting", normalM.main.chargeTypes.join());
   check("Normal ♂: Stufful is handed over; the backup hits it with Fairy/Fighting/Flying/Psychic",
     normalM.backup.handedOver.join() === "Stufful" &&
     normalM.backup.moveTypes.join() === "fairy,fighting,flying,psychic", normalM.backup.moveTypes.join());

@@ -32,6 +32,13 @@
 //          Electric attacker is weak to it. Ghost on the Ice grunt is not, so
 //          Froslass stays in the check, as a search in a real storage showed it
 //          should. A Pokémon carrying a killer type is handed over to Box 2.
+//          Its charged move lands in slot 2 or 3, so it is one of the types
+//          super-effective against at least half of what is offered there
+//          (the handed-over Pokémon aside) and resisted by none of it: the
+//          general backup's move rule, without the tank types. A fast move
+//          alone let a Pokémon through whose charged move hit nothing in the
+//          lineup for extra damage, which a real grunt fight showed is too
+//          slow to be worth finishing.
 //   Box 2: built for the handed-over Pokémon when there are any. A move in
 //          either slot whose type hits as many of them as possible (all of them,
 //          so far) super-effectively and that nothing in slots 2 and 3 resists.
@@ -269,6 +276,15 @@ export function candidateCounts(pool, fastTypes, types, typeIdx) {
 
 const lower = (pokemons) => (pokemons || []).map(p => ({ name: p.name, types: (p.types || []).map(t => t.toLowerCase()) }));
 
+// Types super-effective against at least half of `entries` (counted per
+// lineup entry, so a species offered twice weighs twice) and resisted by none
+// of them. Box 1's charged move and the general backup's moves both use it.
+export function majorityTypes(entries, allTypeNames, typeIdx) {
+  const se = (t) => entries.filter(p => effVsPokemon(t, p.types, typeIdx) > 1).length;
+  const resisted = (t) => entries.some(p => effVsPokemon(t, p.types, typeIdx) < 1);
+  return allTypeNames.filter(t => !resisted(t) && se(t) > 0 && se(t) * 2 >= entries.length).sort();
+}
+
 // Types carried by at least `min` lineup entries (counted per entry, so
 // Froslass offered in slots 2 and 3 makes Ghost recur on the Ice grunt).
 export function recurringTypesOf(pokemons, min = 2) {
@@ -280,8 +296,14 @@ export function recurringTypesOf(pokemons, min = 2) {
 // Both boxes of a typed grunt from its phases ([{ slot, pokemons }], slot 1
 // first) and its tanks (tanksOf). See the header for why each rule is what
 // it is.
-//   main:   { versions: [{ fastTypes, leads }], uncoveredLeads,
+//   main:   { versions: [{ fastTypes, leads }], uncoveredLeads, chargeTypes,
 //             candidates: { total, weakTo }, killerTypes, guardTypes }
+// `chargeTypes` is shared by every version: it is about slots 2 and 3, which
+// every version faces alike. It is empty only when nothing there is hit
+// super-effectively by a type none of it resists. The app then asks for no
+// charged move, which is the fast-move-only Box 1 this rule replaced, so
+// check-data-filters D10 fails on an empty set: a lineup rotation that
+// produces one is a regression to look at, not a normal outcome.
 //   backup: { targets, handedOver, moveTypes, resistorTypes, guardTypes }
 // `resistorTypes` are the types that resist at least one slot 2/3 type;
 // weakness is the guard's job, so they are not filtered on it.
@@ -302,15 +324,17 @@ export function typedGruntBoxes(phases, tanks, allTypeNames, typeIdx, countCandi
   const candidates = countCandidates(fastTypes, lateTypes) || { total: 0, weakTo: {} };
   const killerTypes = lateTypes.filter(t =>
     candidates.total > 0 && candidates.weakTo[t] != null && candidates.weakTo[t] * KILLER_ONE_IN >= candidates.total);
+  const handedOver = lateSpecies.filter(s => s.types.some(t => killerTypes.includes(t)));
+  const handedNames = new Set(handedOver.map(s => s.name));
   const main = {
     versions: leads.windows.map(w => ({ fastTypes: w.types, leads: w.covers })),
     uncoveredLeads: leads.uncovered,
+    chargeTypes: majorityTypes(late.filter(p => !handedNames.has(p.name)), allTypeNames, typeIdx),
     candidates,
     killerTypes,
     guardTypes: lateTypes.filter(t => !killerTypes.includes(t)),
   };
 
-  const handedOver = lateSpecies.filter(s => s.types.some(t => killerTypes.includes(t)));
   const resisted = (t) => lateSpecies.some(s => effVsPokemon(t, s.types, typeIdx) < 1);
   let moveTypes;
   if (handedOver.length > 0) {
@@ -319,11 +343,10 @@ export function typedGruntBoxes(phases, tanks, allTypeNames, typeIdx, countCandi
     const most = Math.max(0, ...usable.map(hits));
     moveTypes = usable.filter(t => hits(t) === most).sort();
   } else {
-    const seCount = (t) => late.filter(p => effVsPokemon(t, p.types, typeIdx) > 1).length;
     const lateNames = new Set(lateSpecies.map(s => s.name));
     const tankTypes = (tanks || []).filter(k => lateNames.has(k.name)).flatMap(k => k.seMoveTypes || []);
     moveTypes = [...new Set([
-      ...allTypeNames.filter(t => seCount(t) > 0 && seCount(t) * 2 >= late.length),
+      ...majorityTypes(late, allTypeNames, typeIdx),
       ...tankTypes,
     ])].filter(t => !resisted(t)).sort();
   }
