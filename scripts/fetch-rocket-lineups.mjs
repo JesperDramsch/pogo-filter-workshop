@@ -356,6 +356,7 @@ async function main() {
   for (const t of trainers.filter(isGrunt)) {
     const plan = t.boxes
       ? `main ${t.boxes.main.versions.map(v => v.fastTypes.join("/")).join(" | ")}` +
+        ` + ${t.boxes.main.chargeTypes.join("/") || "no"} charge` +
         (t.boxes.main.uncoveredLeads.length ? ` (no fast type for ${t.boxes.main.uncoveredLeads.join(", ")})` : "") +
         `, backup ${t.boxes.backup.moveTypes.join("/") || "none"}` +
         (t.boxes.backup.handedOver.length ? ` for ${t.boxes.backup.handedOver.join(", ")} (${t.boxes.main.killerTypes.join("/")})` : "")

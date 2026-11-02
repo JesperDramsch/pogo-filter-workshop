@@ -746,6 +746,41 @@ export function lineOwnerCovers(ownerDex, ann, want) {
 	return !!owner && annotationCovers(owner, ann, want);
 }
 
+// The "not on the list yet" finder for one have-list: `head` (`4*` for the
+// hundos, `lucky` for the luckies) minus every species the list already
+// accounts for, so what is left in the game is a hundo or lucky the app has
+// not been told about. "Accounts for" is lineCoverageOwner, the same answer
+// every coverage question in the app reads: a 'family'-scoped Lichtel hides
+// the whole line (`!+lichtel`), an 'exact' one only itself, an 'upward' one
+// itself and what it can become, and a coin-flip split line is never settled
+// by one specimen, though a listed species always hides itself (a listed
+// split base too). A family the list covers whole collapses to one `!+root`;
+// a partly covered one names its covered members bare. Species-level only:
+// a search term cannot tell regional forms or genders apart, so an owned
+// Kanto Sandan also hides a new Alolan one. Entries that do not resolve to a
+// species cannot be excluded and are skipped. Exported for check-lucky-logic.
+export function missingHaveFinder(names, line, head, outputLocale = 'de') {
+	const name = (dex) => speciesForOutput(pokemonNameFor(String(dex), 'de') || String(dex), outputLocale);
+	const roots = new Set();
+	for (const n of names || []) {
+		const dex = resolveSpeciesInfo(n)?.dex;
+		if (dex) roots.add(lineRootDex(dex));
+	}
+	const clauses = [];
+	for (const root of [...roots].sort((a, b) => a - b)) {
+		const members = selfAndDescendants(root);
+		// A listed species is recorded whatever the line rules say about it:
+		// lineCoverageOwner asks "is this ask settled?", and for a coin-flip
+		// base (Waumpel, Perlu) that stays no until every branch is owned, but
+		// this finder asks "is it on the list?", and a listed Waumpel is.
+		const covered = members.filter((d) => line.dexSet.has(d) || lineCoverageOwner(d, line) !== null);
+		if (covered.length === 0) continue;
+		if (covered.length === members.length) clauses.push(`!+${name(root)}`);
+		else for (const d of covered) clauses.push(`!${name(d)}`);
+	}
+	return [head, ...clauses].join('&');
+}
+
 // Every name that `+X` could use to select this species — i.e. the species plus
 // every other member of its candy family, lowercased in the output locale.
 // `+name` selects on the candy family, so owning a hundo Pikachu makes the
@@ -4122,6 +4157,13 @@ export function buildFilters(
 	// does not retire a Vulnona ask narrowed to Alola.
 	const friendCollectLuckyLine = buildOwnedLine(luckies, cfg.luckySlots, cfg.luckyScope);
 	const friendCollectHundoLine = buildOwnedLine(hundos, cfg.hundoSlots, cfg.hundoScope);
+	// Have-list upkeep: every hundo / lucky in storage the lists do not
+	// account for yet (missingHaveFinder). Read off the same two lines the
+	// friend-collect gates use, so "missing" and "covered" never disagree.
+	const missingHaves = {
+		hundo: missingHaveFinder(hundos, friendCollectHundoLine, '4*', outputLocale),
+		lucky: missingHaveFinder(luckies, friendCollectLuckyLine, kw.flag.lucky, outputLocale),
+	};
 	// Display-only mirror for the curated chips: the have-list member that fills
 	// a target's line, when it isn't the target species itself — named in the
 	// output locale so the dimmed chip says WHY it is done.
@@ -5054,17 +5096,37 @@ export function buildFilters(
 	// allowlist of types resisting anything in slots 2 and 3 (top attackers
 	// bypass it) and not weak to the types that recur there or that the
 	// handed-over Pokémon carry.
-	const buildMainBox = (version, guardTypes) => {
+	// Box 1 also needs a charged move: its bar fills on slot 1 and the move
+	// lands in slot 2 or 3, so the fetcher's `chargeTypes` are the types
+	// super-effective against most of what is offered there (handed-over
+	// Pokémon aside) and resisted by none of it. Without that clause a
+	// Pokémon got through whose charged move hit nothing for extra damage.
+	const buildMainBox = (version, main) => {
 		const fastList = (version.fastTypes || []).map((t) => kw.type[t]).filter(Boolean);
 		if (fastList.length === 0) return null;
+		// The displayed types are the ones the clause asks for: a type without a
+		// keyword in this locale stays out of both.
+		const chargeTypes = (main?.chargeTypes || []).filter((t) => kw.type[t]);
+		const chargeList = chargeTypes.map((t) => kw.type[t]);
+		const handedOver = (main?.handedOver || []).map(localizePokemonName);
 		const clauses = [];
 		push(clauses, fastMoveClause(fastList), tFn('app.clause_why.rocket_main_fast'));
+		if (chargeList.length > 0) {
+			push(
+				clauses,
+				chargeMoveClause(chargeList),
+				handedOver.length > 0
+					? tFn('app.clause_why.rocket_main_charge_handover', { params: { names: handedOver.join(', ') } })
+					: tFn('app.clause_why.rocket_main_charge'),
+			);
+		}
 		const second = buildSecondMoveAndAppraise();
 		if (second) push(clauses, second.clause, second.why);
-		const wGuard = weaknessGuard(guardTypes);
+		const wGuard = weaknessGuard(main?.guardTypes);
 		if (wGuard) push(clauses, wGuard, tFn('app.clause_why.rocket_main_not_weak'));
 		return {
 			fastTypes: (version.fastTypes || []).map(localizedTypeDisplay),
+			chargeTypes: chargeTypes.map(localizedTypeDisplay),
 			leads: (version.leads || []).map(localizePokemonName),
 			clause: clauses.map((c) => c.clause).join('&'),
 			clauses,
@@ -5099,7 +5161,8 @@ export function buildFilters(
 	const buildTypedGrunt = (trainer) => {
 		const gender = gruntGender(trainer.name);
 		const boxes = trainer.boxes || {};
-		const main = (boxes.main?.versions || []).map((v) => buildMainBox(v, boxes.main.guardTypes)).filter(Boolean);
+		const mainSpec = { ...(boxes.main || {}), handedOver: boxes.backup?.handedOver || [] };
+		const main = (boxes.main?.versions || []).map((v) => buildMainBox(v, mainSpec)).filter(Boolean);
 		const backup = buildBackupBox(boxes.backup);
 		return {
 			name: localizedGruntName(trainer),
@@ -5836,6 +5899,8 @@ export function buildFilters(
 		cupFilters,
 		// Smeargle moveset finder (Battle area, expert)
 		smeargleFinder,
+		// Have-list upkeep finders (have-lists step)
+		missingHaves,
 	};
 }
 
@@ -7074,6 +7139,7 @@ export default function App() {
 		pvpMetaPacks,
 		cupFilters,
 		smeargleFinder,
+		missingHaves,
 	} = useMemo(
 		() =>
 			buildFilters(
@@ -7601,6 +7667,19 @@ export default function App() {
 				onScopeAnnChange={(next) => setConfig({ ...config, hundoScope: next })}
 				activeSlot={activeSeason}
 			/>
+			{/* Have-list upkeep: hundos in storage the list doesn't know yet. */}
+			{missingHaves?.hundo && (
+				<div className='mt-4'>
+					<FilterBox
+						label={t('app.have_missing.hundo_label')}
+						accent='#E74C3C'
+						filterStr={missingHaves.hundo}
+						copied={copied.missing_hundo}
+						onCopy={() => copyToClipboard('missing_hundo', missingHaves.hundo)}
+						hint={t('app.have_missing.hundo_hint')}
+					/>
+				</div>
+			)}
 			<hr className='my-8 border-[#1F2933]' />
 			<SpeciesListEditor
 				items={luckies}
@@ -7620,6 +7699,19 @@ export default function App() {
 				onScopeAnnChange={(next) => setConfig({ ...config, luckyScope: next })}
 				activeSlot={activeSeason}
 			/>
+			{/* Have-list upkeep: luckies in storage the list doesn't know yet. */}
+			{missingHaves?.lucky && (
+				<div className='mt-4'>
+					<FilterBox
+						label={t('app.have_missing.lucky_label')}
+						accent='#F5B82E'
+						filterStr={missingHaves.lucky}
+						copied={copied.missing_lucky}
+						onCopy={() => copyToClipboard('missing_lucky', missingHaves.lucky)}
+						hint={t('app.have_missing.lucky_hint')}
+					/>
+				</div>
+			)}
 			<SeasonNote
 				hemisphere={homeHemisphere}
 				season={activeSeason}
@@ -8493,6 +8585,9 @@ export default function App() {
 										)}
 									</AreaPanel>
 									</SwipeAreas>
+									{areaSettings && (
+										<SettingsExitBar area={filterArea} onExit={() => goToArea(filterArea, false)} t={t} />
+									)}
 
 									{/* Internals — set theory / raw clauses / verify */}
 									<div className='pt-4'>
@@ -10723,6 +10818,39 @@ function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, onOpen
 	);
 }
 
+// The way out of the settings flip, stuck to the bottom of the viewport.
+// AreaTabs carries the same toggle, but Catching's settings run nine groups
+// deep, so it scrolls off the top and leaves a phone user with no visible
+// exit. Sticky (not fixed): it rides the bottom edge while the settings
+// scroll and settles below the last toggle at the end, so it never covers
+// one. Rendered only while the flip is on. Leaving brings the tab strip back
+// into view, otherwise the filters open mid-page with nothing to say where.
+function SettingsExitBar({ area, onExit, t }) {
+	const exit = () => {
+		onExit();
+		const tab = document.getElementById(`area-tab-${area}`);
+		if (tab && tab.getBoundingClientRect().top < 0) {
+			const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+			tab.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+		}
+	};
+	return (
+		<div
+			className='sticky bottom-0 z-10 -mx-4 sm:mx-0 px-4 sm:px-0 pt-3 bg-[#0F1419]/95 border-t border-[#1F2933] backdrop-blur-sm'
+			style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
+		>
+			<button
+				type='button'
+				onClick={exit}
+				className='mono text-sm w-full min-h-[44px] px-4 rounded-sm border border-[#F5B82E] text-[#F5B82E] bg-[#141A21] hover:bg-[#F5B82E]/10 flex items-center justify-center gap-2 transition'
+			>
+				<ArrowLeft size={14} aria-hidden='true' />
+				{t('app.area.settings_close_area', { params: { area: t(`app.area.${area}.label`) } })}
+			</button>
+		</div>
+	);
+}
+
 function AreaPanel({ area, current: selected, children }) {
 	// While a card is on its way out the stage still shows the previous area;
 	// outside the stage (no provider) the real selection decides.
@@ -12022,12 +12150,33 @@ function GruntQuoteList({ quotes, t }) {
 // when no single fast-move type covers every slot-1 Pokémon) and the backup
 // for slots 2 and 3, built for the Pokémon the main counter hands over when
 // there are any. The first main box keeps the copy key the grunt's single
-// filter always had.
+// filter always had. The main hint gets a second sentence for the charged
+// move when the box asks for one.
 function TypedGruntBoxes({ g, copyKey, accent, copied, copyToClipboard, t }) {
 	const or = t('app.filter.rocket_lineup_or');
 	const split = g.main.length > 1;
 	const handedOver = g.handedOver || [];
 	const backupKey = `${copyKey}_backup`;
+	const mainHint = (box) => {
+		const fast =
+			handedOver.length > 0
+				? t('app.filter.rocket_main_hint_handover', {
+						params: {
+							types: box.fastTypes.join(or),
+							names: box.leads.join(', '),
+							killers: g.killerTypes.join(', '),
+							handed: handedOver.join(', '),
+						},
+					})
+				: t('app.filter.rocket_main_hint', {
+						params: { types: box.fastTypes.join(or), names: box.leads.join(', ') },
+					});
+		const charge =
+			(box.chargeTypes || []).length > 0
+				? t('app.filter.rocket_main_hint_charge', { params: { types: box.chargeTypes.join(or) } })
+				: '';
+		return [fast, charge].filter(Boolean).join(' ');
+	};
 	return (
 		<>
 			{g.main.map((box, i) => {
@@ -12044,20 +12193,7 @@ function TypedGruntBoxes({ g, copyKey, accent, copied, copyToClipboard, t }) {
 						filterStr={box.clause}
 						copied={copied[key]}
 						onCopy={() => copyToClipboard(key, box.clause)}
-						hint={
-							handedOver.length > 0
-								? t('app.filter.rocket_main_hint_handover', {
-										params: {
-											types: box.fastTypes.join(or),
-											names: box.leads.join(', '),
-											killers: g.killerTypes.join(', '),
-											handed: handedOver.join(', '),
-										},
-									})
-								: t('app.filter.rocket_main_hint', {
-										params: { types: box.fastTypes.join(or), names: box.leads.join(', ') },
-									})
-						}
+						hint={mainHint(box)}
 					/>
 				);
 			})}
