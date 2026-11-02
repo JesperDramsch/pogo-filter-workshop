@@ -147,6 +147,7 @@
   "app.filter.trash_label": "trash",
   "app.filter.trash_hint": "Massen-Löschmaterial. Invertiert deine Schutzmaßnahmen — alles was matched, ist sicher zum Verschicken.",
   "app.filter.trade_label": "trade",
+  "app.footer.saved_locally": "Lokal gespeichert",
   "app.filter.trade_hint": "Daily-Driver tauschbare Pokémon. Ungetauscht, nicht-Crypto, nicht-Glück, IVs die deinen Hundo per Bewertungs-Bucket schlagen.",
   "app.filter.sort_label": "hundo-sort",
   "app.filter.sort_hint": "Holt alle Mitglieder deiner Hundo-Familien hervor, damit du sie im Beutel anpinnen kannst.",
