@@ -46,6 +46,7 @@
   "app.area.trade.hint": "दोस्तों के लिए ट्रेड, गिफ़्ट, विशलिस्ट और पकड़ना।",
   "app.area.settings_open": "{area} सेटिंग्स",
   "app.area.settings_close": "फ़िल्टर पर वापस",
+  "app.area.settings_close_area": "{area} फ़िल्टर पर वापस",
   "app.area.settings_hint": "हर क्षेत्र की सेटिंग्स। बदलाव फ़िल्टर पर तुरंत लागू होते हैं।",
   "app.help.toggle_open": "यह क्षेत्र कैसे काम करता है",
   "app.help.dialog_label": "यह क्षेत्र कैसे काम करता है",

@@ -137,7 +137,7 @@ console.log("\nS4 — the current nav tab is exposed");
 
 console.log("\nS5 — the filter areas are an ARIA tab set");
 {
-  const tabs = app.slice(app.indexOf("function AreaTabs("), app.indexOf("function AreaPanel("));
+  const tabs = app.slice(app.indexOf("function AreaTabs("), app.indexOf("function SettingsExitBar("));
   const panel = app.slice(app.indexOf("function AreaPanel("), app.indexOf("function Collapsible("));
   check("AreaTabs renders a named tablist", /role='tablist' aria-label=\{t\('app\.area\.tablist'\)\}/.test(tabs));
   check("each tab exposes aria-selected", /role='tab'[\s\S]{0,200}aria-selected=\{selected\}/.test(tabs));
@@ -154,6 +154,12 @@ console.log("\nS5 — the filter areas are an ARIA tab set");
   check("the settings flip is a toggle exposing aria-pressed", /onClick=\{onToggleSettings\}\s*aria-pressed=\{!!settings\}/.test(tabs));
   const notFlipped = areas.filter((a) => !app.includes(`areaSettingsFor.${a}\n`));
   check("every area panel flips to its own settings", notFlipped.length === 0, notFlipped.join(", "));
+  // The flip's way out is also stuck to the bottom of the viewport: the top
+  // toggle scrolls away in a long settings list. Only while the flip is on.
+  const exitBar = app.slice(app.indexOf("function SettingsExitBar("), app.indexOf("function AreaPanel("));
+  check("a sticky bottom bar leaves the settings flip", /className='sticky bottom-0/.test(exitBar) && /onClick=\{exit\}/.test(exitBar));
+  check("the exit bar renders only while settings are open and turns the flip off",
+    /\{areaSettings && \(\s*<SettingsExitBar area=\{filterArea\} onExit=\{\(\) => goToArea\(filterArea, false\)\}/.test(app));
   // The flip is a URL too, so back/forward and bookmarks reach it.
   const { areaFromHash, areaSettingsFromHash, areaHash } = await import("../src/App.jsx");
   const trips = areas.flatMap((a) => [false, true].map((on) => [a, on, areaHash(a, on)]));

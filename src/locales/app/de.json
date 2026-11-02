@@ -46,6 +46,7 @@
   "app.area.trade.hint": "Tausche, Geschenke, Wunschlisten und Fangen für Freunde.",
   "app.area.settings_open": "Einstellungen · {area}",
   "app.area.settings_close": "Zurück zu den Filtern",
+  "app.area.settings_close_area": "Zurück zu den Filtern · {area}",
   "app.area.settings_hint": "Einstellungen für jeden Bereich. Änderungen wirken sofort auf die Filter.",
   "app.help.toggle_open": "So funktioniert dieser Bereich",
   "app.help.dialog_label": "So funktioniert dieser Bereich",

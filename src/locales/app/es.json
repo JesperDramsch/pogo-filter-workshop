@@ -46,6 +46,7 @@
   "app.area.trade.hint": "Intercambios, regalos, listas de deseos y capturas para amigos.",
   "app.area.settings_open": "Ajustes · {area}",
   "app.area.settings_close": "Volver a los filtros",
+  "app.area.settings_close_area": "Volver a los filtros · {area}",
   "app.area.settings_hint": "Ajustes de cada área. Los cambios se aplican a los filtros al instante.",
   "app.help.toggle_open": "Cómo funciona esta área",
   "app.help.dialog_label": "Cómo funciona esta área",

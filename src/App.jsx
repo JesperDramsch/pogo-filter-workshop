@@ -8557,6 +8557,9 @@ export default function App() {
 										)}
 									</AreaPanel>
 									</SwipeAreas>
+									{areaSettings && (
+										<SettingsExitBar area={filterArea} onExit={() => goToArea(filterArea, false)} t={t} />
+									)}
 
 									{/* Internals — set theory / raw clauses / verify */}
 									<div className='pt-4'>
@@ -10625,6 +10628,39 @@ function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, onOpen
 						: t('app.area.settings_open', { params: { area: t(`app.area.${current}.label`) } })}
 				</button>
 			</div>
+		</div>
+	);
+}
+
+// The way out of the settings flip, stuck to the bottom of the viewport.
+// AreaTabs carries the same toggle, but Catching's settings run nine groups
+// deep, so it scrolls off the top and leaves a phone user with no visible
+// exit. Sticky (not fixed): it rides the bottom edge while the settings
+// scroll and settles below the last toggle at the end, so it never covers
+// one. Rendered only while the flip is on. Leaving brings the tab strip back
+// into view, otherwise the filters open mid-page with nothing to say where.
+function SettingsExitBar({ area, onExit, t }) {
+	const exit = () => {
+		onExit();
+		const tab = document.getElementById(`area-tab-${area}`);
+		if (tab && tab.getBoundingClientRect().top < 0) {
+			const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+			tab.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+		}
+	};
+	return (
+		<div
+			className='sticky bottom-0 z-10 -mx-4 sm:mx-0 px-4 sm:px-0 pt-3 bg-[#0F1419]/95 border-t border-[#1F2933] backdrop-blur-sm'
+			style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
+		>
+			<button
+				type='button'
+				onClick={exit}
+				className='mono text-sm w-full min-h-[44px] px-4 rounded-sm border border-[#F5B82E] text-[#F5B82E] bg-[#141A21] hover:bg-[#F5B82E]/10 flex items-center justify-center gap-2 transition'
+			>
+				<ArrowLeft size={14} aria-hidden='true' />
+				{t('app.area.settings_close_area', { params: { area: t(`app.area.${area}.label`) } })}
+			</button>
 		</div>
 	);
 }

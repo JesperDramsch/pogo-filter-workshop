@@ -46,6 +46,7 @@
   "app.area.trade.hint": "交換、禮物、許願清單，以及替朋友抓取。",
   "app.area.settings_open": "{area}設定",
   "app.area.settings_close": "返回篩選器",
+  "app.area.settings_close_area": "返回{area}篩選器",
   "app.area.settings_hint": "各區域的設定。變更會立即套用到篩選器。",
   "app.help.toggle_open": "這個區域怎麼用",
   "app.help.dialog_label": "這個區域怎麼用",
