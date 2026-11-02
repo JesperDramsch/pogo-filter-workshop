@@ -78,6 +78,7 @@ jobs:
       - run: npm run test:syncsummary
       - run: npm run test:megaboost
       - run: npm run test:swipe
+      - run: npm run test:areastage
       - run: npm run test:bonusnudges
       - run: npm run test:sharelink
       - run: npm run test:settingsgroups

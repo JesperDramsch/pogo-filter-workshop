@@ -9,9 +9,11 @@
 //   G1 — direction follows the tabs' order and does not wrap at the ends
 //   G2 — short or mostly-vertical gestures are scrolls, not swipes
 //   G3 — the panels are wrapped, the map opts out, and nothing blocks scrolling
+//   G4 — the card: slide direction follows the tab order, a settings change is a
+//        flip, both honour reduced motion, and only one face is ever in the DOM
 
 import { readFileSync } from "node:fs";
-import { FILTER_AREAS, SWIPE_MIN_PX, SWIPE_AXIS_RATIO, swipeAreaTarget } from "../src/App.jsx";
+import { FILTER_AREAS, SWIPE_MIN_PX, SWIPE_AXIS_RATIO, swipeAreaTarget, slideDirection } from "../src/App.jsx";
 import { createChecker } from "./lib/check.mjs";
 
 const { check, done } = createChecker();
@@ -48,7 +50,7 @@ console.log("\nG3 — DOM wiring");
   const swipe = app.slice(app.indexOf("function SwipeAreas("), app.indexOf("function AreaTabs("));
   check("SwipeAreas exists ahead of AreaTabs", swipe.length > 0);
   check("the four panels sit inside SwipeAreas",
-    /<SwipeAreas areas=\{FILTER_AREAS\} current=\{filterArea\} onSelect=\{selectArea\}>\s*<AreaPanel area='catch'/.test(app)
+    /<SwipeAreas areas=\{FILTER_AREAS\} current=\{filterArea\} onSelect=\{selectArea\} stage=\{stage\}>\s*<AreaPanel area='catch'/.test(app)
       && /<\/AreaPanel>\s*<\/SwipeAreas>/.test(app));
   check("it never calls preventDefault, so vertical scrolling stays native", !swipe.includes("preventDefault"));
   check("it listens to touch start, move, end and cancel",
@@ -62,6 +64,28 @@ console.log("\nG3 — DOM wiring");
   const scrollBack = app.slice(app.indexOf("function scrollAreaTabIntoView("), app.indexOf("function SwipeAreas("));
   check("the tab strip is scrolled back into view after a swipe",
     swipe.includes("scrollAreaTabIntoView(next)") && scrollBack.includes("scrollIntoView") && scrollBack.includes("prefers-reduced-motion"));
+}
+
+console.log("\nG4 — the card");
+{
+  const [first, second, third] = areas;
+  check("a later tab deals the card out to the left", slideDirection(areas, first, second) === -1);
+  check("an earlier tab deals it out to the right", slideDirection(areas, third, first) === 1);
+  check("the same area is not a slide (it is a flip)", slideDirection(areas, second, second) === 0);
+  check("an unknown area is not a slide", slideDirection(areas, first, "nope") === 0);
+  const app = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
+  const stage = app.slice(app.indexOf("function useAreaStage("), app.indexOf("function SwipeAreas("));
+  check("the stage swaps instantly under reduced motion", /if \(reduced\) \{\s*setShown\(\{ area, settings \}\);\s*return;/.test(stage));
+  check("a slide leaves before the swap and arrives after it", /animate\(x, dir \* w, SLIDE_OUT\)[\s\S]*swap\(\);[\s\S]*animate\(x, 0, SLIDE_IN\)/.test(stage));
+  check("a flip swaps faces at the edge (90°), never showing a back face", /animate\(rotateY, dir \* 90, FLIP_OUT\);\s*rotateY\.set\(-dir \* 90\);\s*swap\(\);\s*await animate\(rotateY, 0, FLIP_IN\)/.test(stage));
+  check("the swap is flushed synchronously so the new face is in the DOM before it animates in", stage.includes("flushSync(() => setShown(latest.current))"));
+  check("the panels read the staged area, so hidden follows the card", /const staged = useContext\(StagedArea\);\s*const current = staged \?\? selected;/.test(app));
+  check("the panels render the staged settings face", (app.match(/\{stage\.settings \? \(/g) || []).length === areas.length);
+  check("the tab strip still reflects the real settings state", /settings=\{areaSettings\}/.test(app));
+  const swipe = app.slice(app.indexOf("function SwipeAreas("), app.indexOf("function AreaTabs("));
+  check("a drag is not followed under reduced motion", /if \(stage\.reduced\) return;\s*g\.pulled = true;/.test(swipe));
+  check("vertical panning is declared up front (touch-action pan-y pinch-zoom)", swipe.includes("touchAction: 'pan-y pinch-zoom'"));
+  check("no new touch starts while a card is in motion", /if \(e\.touches\.length !== 1 \|\| stage\.active\) return;/.test(swipe));
 }
 
 done("All swipe-areas checks passed.", (n) => `${n} swipe-areas check(s) failed.`);
