@@ -599,5 +599,60 @@ console.log("\nScenario 25: formGuardHides — the type proof behind Scenario 24
     JSON.stringify(missing));
 }
 
+// ── Have-list upkeep finders ──────────────────────────────────────────────
+// `4*` / `lucky` minus everything the list already covers, read through the
+// same line coverage as the friend-collect gates. A tiny evaluator checks the
+// string against mock storage: the clause shapes alone would not show that an
+// evolved hundo of a listed line stays quiet while a new family shows up.
+console.log("\nHave-list upkeep finders: hundos / luckies the lists do not cover yet");
+{
+  const clausesOf = (f) => f.split("&");
+  // mon: { name, family, hundo, lucky }; literals: 4*, lucky, !name, !+family
+  const evalF = (f, m) => clausesOf(f).every((c) => {
+    if (c === "4*") return m.hundo;
+    if (c === "lucky") return m.lucky;
+    if (c.startsWith("!+")) return !m.family.includes(c.slice(2));
+    if (c.startsWith("!")) return m.name !== c.slice(1);
+    throw new Error(`unexpected clause ${c}`);
+  });
+  const fam = ["litwick", "lampent", "chandelure"];
+  const mon = (name, family, flags) => ({ name, family, hundo: false, lucky: false, ...flags });
+  const run = (hundos, luckies, cfgExtra = {}) => buildFilters(hundos, luckies, { ...DEFAULT_CONFIG, ...cfgExtra }, [], "en", t).missingHaves;
+
+  const empty = run([], []);
+  check("empty lists: the finders are the bare heads", empty.hundo === "4*" && empty.lucky === "lucky", JSON.stringify(empty));
+
+  const r = run(["lichtel"], ["pikachu"]);
+  check("family-scoped hundo collapses to one !+root", r.hundo === "4*&!+litwick", r.hundo);
+  check("an evolved hundo of a listed line stays quiet", !evalF(r.hundo, mon("chandelure", fam, { hundo: true })));
+  check("a hundo of an unlisted family shows up", evalF(r.hundo, mon("sandshrew", ["sandshrew", "sandslash"], { hundo: true })));
+  check("a non-hundo never shows up", !evalF(r.hundo, mon("sandshrew", ["sandshrew", "sandslash"], {})));
+  // A Pikachu does not stand for the Pichu it may have hatched from (the baby
+  // rule in lineSlotOwnerIn), so the family splits into bare names.
+  const pika = ["pichu", "pikachu", "raichu"];
+  check("lucky finder reads the lucky list, not the hundo list",
+    r.lucky === "lucky&!pikachu&!raichu" && evalF(r.lucky, mon("litwick", fam, { lucky: true })), r.lucky);
+  check("…and a lucky Pichu still shows up beside a listed Pikachu",
+    evalF(r.lucky, mon("pichu", pika, { lucky: true })) && !evalF(r.lucky, mon("raichu", pika, { lucky: true })));
+
+  // Scope narrows what a listed copy accounts for.
+  const exact = run(["skelabra"], [], { hundoScope: { skelabra: "exact" } });
+  check("'exact' scope excludes only that species", exact.hundo === "4*&!chandelure", exact.hundo);
+  check("…so a hundo Lichtel still shows up", evalF(exact.hundo, mon("litwick", fam, { hundo: true })));
+  const up = run(["laternecto"], [], { hundoScope: { laternecto: "upward" } });
+  check("'upward' scope excludes the species and what it becomes", up.hundo === "4*&!lampent&!chandelure", up.hundo);
+
+  // A coin-flip split line is never settled by one specimen.
+  const split = run(["papinella"], []);
+  check("hundo Beautifly hides itself but not the Dustox branch",
+    !evalF(split.hundo, mon("beautifly", ["wurmple", "silcoon", "beautifly", "cascoon", "dustox"], { hundo: true }))
+    && evalF(split.hundo, mon("dustox", ["wurmple", "silcoon", "beautifly", "cascoon", "dustox"], { hundo: true })), split.hundo);
+
+  // Output locale: names come from the dictionary, the keyword from the table.
+  const de = buildFilters(["lichtel"], ["pikachu"], DEFAULT_CONFIG, [], "de", t).missingHaves;
+  check("German output: 4*&!+lichtel and glücks&!pikachu&!raichu", de.hundo === "4*&!+lichtel" && de.lucky === "glücks&!pikachu&!raichu", JSON.stringify(de));
+  check("unresolvable entries are skipped, not emitted", run(["notapokemon"], []).hundo === "4*");
+}
+
 console.log(`\n${failures === 0 ? "✓ All lucky-logic checks passed." : `✗ ${failures} failure(s).`}`);
 process.exit(failures === 0 ? 0 : 1);
