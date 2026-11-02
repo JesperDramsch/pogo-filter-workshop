@@ -744,6 +744,41 @@ export function lineOwnerCovers(ownerDex, ann, want) {
 	return !!owner && annotationCovers(owner, ann, want);
 }
 
+// The "not on the list yet" finder for one have-list: `head` (`4*` for the
+// hundos, `lucky` for the luckies) minus every species the list already
+// accounts for, so what is left in the game is a hundo or lucky the app has
+// not been told about. "Accounts for" is lineCoverageOwner, the same answer
+// every coverage question in the app reads: a 'family'-scoped Lichtel hides
+// the whole line (`!+lichtel`), an 'exact' one only itself, an 'upward' one
+// itself and what it can become, and a coin-flip split line is never settled
+// by one specimen, though a listed species always hides itself (a listed
+// split base too). A family the list covers whole collapses to one `!+root`;
+// a partly covered one names its covered members bare. Species-level only:
+// a search term cannot tell regional forms or genders apart, so an owned
+// Kanto Sandan also hides a new Alolan one. Entries that do not resolve to a
+// species cannot be excluded and are skipped. Exported for check-lucky-logic.
+export function missingHaveFinder(names, line, head, outputLocale = 'de') {
+	const name = (dex) => speciesForOutput(pokemonNameFor(String(dex), 'de') || String(dex), outputLocale);
+	const roots = new Set();
+	for (const n of names || []) {
+		const dex = resolveSpeciesInfo(n)?.dex;
+		if (dex) roots.add(lineRootDex(dex));
+	}
+	const clauses = [];
+	for (const root of [...roots].sort((a, b) => a - b)) {
+		const members = selfAndDescendants(root);
+		// A listed species is recorded whatever the line rules say about it:
+		// lineCoverageOwner asks "is this ask settled?", and for a coin-flip
+		// base (Waumpel, Perlu) that stays no until every branch is owned, but
+		// this finder asks "is it on the list?", and a listed Waumpel is.
+		const covered = members.filter((d) => line.dexSet.has(d) || lineCoverageOwner(d, line) !== null);
+		if (covered.length === 0) continue;
+		if (covered.length === members.length) clauses.push(`!+${name(root)}`);
+		else for (const d of covered) clauses.push(`!${name(d)}`);
+	}
+	return [head, ...clauses].join('&');
+}
+
 // Every name that `+X` could use to select this species — i.e. the species plus
 // every other member of its candy family, lowercased in the output locale.
 // `+name` selects on the candy family, so owning a hundo Pikachu makes the
@@ -4120,6 +4155,13 @@ export function buildFilters(
 	// does not retire a Vulnona ask narrowed to Alola.
 	const friendCollectLuckyLine = buildOwnedLine(luckies, cfg.luckySlots, cfg.luckyScope);
 	const friendCollectHundoLine = buildOwnedLine(hundos, cfg.hundoSlots, cfg.hundoScope);
+	// Have-list upkeep: every hundo / lucky in storage the lists do not
+	// account for yet (missingHaveFinder). Read off the same two lines the
+	// friend-collect gates use, so "missing" and "covered" never disagree.
+	const missingHaves = {
+		hundo: missingHaveFinder(hundos, friendCollectHundoLine, '4*', outputLocale),
+		lucky: missingHaveFinder(luckies, friendCollectLuckyLine, kw.flag.lucky, outputLocale),
+	};
 	// Display-only mirror for the curated chips: the have-list member that fills
 	// a target's line, when it isn't the target species itself — named in the
 	// output locale so the dimmed chip says WHY it is done.
@@ -5834,6 +5876,8 @@ export function buildFilters(
 		cupFilters,
 		// Smeargle moveset finder (Battle area, expert)
 		smeargleFinder,
+		// Have-list upkeep finders (have-lists step)
+		missingHaves,
 	};
 }
 
@@ -7072,6 +7116,7 @@ export default function App() {
 		pvpMetaPacks,
 		cupFilters,
 		smeargleFinder,
+		missingHaves,
 	} = useMemo(
 		() =>
 			buildFilters(
@@ -7594,6 +7639,19 @@ export default function App() {
 				onScopeAnnChange={(next) => setConfig({ ...config, hundoScope: next })}
 				activeSlot={activeSeason}
 			/>
+			{/* Have-list upkeep: hundos in storage the list doesn't know yet. */}
+			{missingHaves?.hundo && (
+				<div className='mt-4'>
+					<FilterBox
+						label={t('app.have_missing.hundo_label')}
+						accent='#E74C3C'
+						filterStr={missingHaves.hundo}
+						copied={copied.missing_hundo}
+						onCopy={() => copyToClipboard('missing_hundo', missingHaves.hundo)}
+						hint={t('app.have_missing.hundo_hint')}
+					/>
+				</div>
+			)}
 			<hr className='my-8 border-[#1F2933]' />
 			<SpeciesListEditor
 				items={luckies}
@@ -7613,6 +7671,19 @@ export default function App() {
 				onScopeAnnChange={(next) => setConfig({ ...config, luckyScope: next })}
 				activeSlot={activeSeason}
 			/>
+			{/* Have-list upkeep: luckies in storage the list doesn't know yet. */}
+			{missingHaves?.lucky && (
+				<div className='mt-4'>
+					<FilterBox
+						label={t('app.have_missing.lucky_label')}
+						accent='#F5B82E'
+						filterStr={missingHaves.lucky}
+						copied={copied.missing_lucky}
+						onCopy={() => copyToClipboard('missing_lucky', missingHaves.lucky)}
+						hint={t('app.have_missing.lucky_hint')}
+					/>
+				</div>
+			)}
 			<SeasonNote
 				hemisphere={homeHemisphere}
 				season={activeSeason}
