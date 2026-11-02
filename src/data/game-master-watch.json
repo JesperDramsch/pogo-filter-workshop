@@ -1,11 +1,24 @@
 {
-  "fetchedAt": "2026-10-30T13:06:18.706Z",
+  "fetchedAt": "2026-11-02T16:11:18.338Z",
   "sources": {
     "pvp": "pvpoke-gamemaster",
     "pve": "alexelgt/game_masters",
     "pveBatch": "2026-10-29T17:39:11.876Z"
   },
   "history": [
+    {
+      "at": "2026-11-02T16:11:18.338Z",
+      "stream": "pvp",
+      "summary": "1 move(s) changed",
+      "changes": [
+        {
+          "move": "NIGHT_SHADE_PLUS",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        }
+      ]
+    },
     {
       "at": "2026-10-30T13:06:18.706Z",
       "stream": "pve",
@@ -2228,6 +2241,13 @@
     },
     "NIGHT_SHADE": {
       "power": 70,
+      "energy": 45,
+      "energyGain": 0,
+      "cooldown": 500,
+      "turns": 1
+    },
+    "NIGHT_SHADE_PLUS": {
+      "power": 55,
       "energy": 45,
       "energyGain": 0,
       "cooldown": 500,
