@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useId, Fragment, createContext, useContext } from 'react';
+import { flushSync } from 'react-dom';
+import { motion, animate, useMotionValue, useReducedMotion } from 'motion/react';
 import { Dialog } from './Dialog.jsx';
 import * as d3 from 'd3';
 import {
@@ -7493,6 +7495,11 @@ export default function App() {
 		if (typeof window !== 'undefined' && window.location.hash !== desired) window.location.hash = desired;
 	}
 	const selectArea = (area) => goToArea(area, areaSettings);
+	// The card the four panels render on. It trails filterArea/areaSettings by
+	// one animation (slide between areas, flip to settings), so the panels read
+	// the staged settings while the tab strip and URL read the real ones.
+	const reducedMotion = useReducedMotion();
+	const stage = useAreaStage({ area: filterArea, settings: areaSettings, areas: FILTER_AREAS, reduced: reducedMotion });
 	// The first area that ever shows its filters opens its help sheet on its
 	// own and is marked seen; from then on only the pill opens one. Nothing
 	// fires before storage has loaded, on another step, on another view or
@@ -8058,9 +8065,9 @@ export default function App() {
 										openHelpRef={helpPillRef}
 										t={t}
 									/>
-									<SwipeAreas areas={FILTER_AREAS} current={filterArea} onSelect={selectArea}>
+									<SwipeAreas areas={FILTER_AREAS} current={filterArea} onSelect={selectArea} stage={stage}>
 									<AreaPanel area='catch' current={filterArea}>
-										{areaSettings ? (
+										{stage.settings ? (
 											areaSettingsFor.catch
 										) : (
 											<>
@@ -8105,7 +8112,7 @@ export default function App() {
 										)}
 									</AreaPanel>
 									<AreaPanel area='sort' current={filterArea}>
-										{areaSettings ? (
+										{stage.settings ? (
 											areaSettingsFor.sort
 										) : (
 											<>
@@ -8114,7 +8121,7 @@ export default function App() {
 										)}
 									</AreaPanel>
 									<AreaPanel area='battle' current={filterArea}>
-										{areaSettings ? (
+										{stage.settings ? (
 											areaSettingsFor.battle
 										) : (
 											<>
@@ -8267,7 +8274,7 @@ export default function App() {
 										)}
 									</AreaPanel>
 									<AreaPanel area='trade' current={filterArea}>
-										{areaSettings ? (
+										{stage.settings ? (
 											areaSettingsFor.trade
 										) : (
 											<>
@@ -10419,16 +10426,128 @@ function scrollsSideways(el, stopAt) {
 	}
 	return false;
 }
-function SwipeAreas({ areas, current, onSelect, children }) {
+// Which way the open card leaves when the area changes: to the left when the
+// next tab sits to the right, like a deck being dealt in the tabs' order.
+// 0 means the area is unchanged (a settings flip, not a slide). Pure, so the
+// check script can pin it.
+export function slideDirection(areas, from, to) {
+	const a = areas.indexOf(from);
+	const b = areas.indexOf(to);
+	if (a < 0 || b < 0 || a === b) return 0;
+	return b > a ? -1 : 1;
+}
+
+// The card feel. A drag tilts the card a little and dims it as it is pulled;
+// the pivot sits roughly where a thumb rests below the tab strip, so the top
+// of the card (where the eye is) barely moves while the far end swings. The
+// same point is the vanishing point of the settings flip.
+const CARD_TILT_DEG = 2.5;
+const CARD_TILT_PER_PX = 1 / 80;
+const CARD_MIN_OPACITY = 0.65;
+const CARD_PIVOT = '50% 240px';
+const CARD_PERSPECTIVE = 1600;
+const SLIDE_OUT = { duration: 0.15, ease: 'easeIn' };
+const SLIDE_IN = { duration: 0.22, ease: 'easeOut' };
+const FLIP_OUT = { duration: 0.18, ease: 'easeIn' };
+const FLIP_IN = { duration: 0.2, ease: 'easeOut' };
+const SETTLE = { type: 'spring', stiffness: 500, damping: 40 };
+
+// What the stage is showing right now. It lags the real area/settings state
+// by one animation: the old card has to leave before the new one can arrive,
+// and the settings flip swaps faces while the card is edge-on. AreaPanel reads
+// the staged area through this context so hidden/visible follows the stage,
+// while the tab strip, the URL and everything else follow the real state.
+const StagedArea = createContext(null);
+
+// Drives the card between (area, settings) states. Only one face ever exists
+// in the DOM: a slide is leave-then-arrive, a flip is rotate-to-the-edge,
+// swap, rotate-back. Both run on motion values the stage element renders, so
+// a drag can pull the card first and a commit continues from wherever the
+// finger left it. With reduced motion the stage swaps instantly, as it did
+// before any of this existed.
+function useAreaStage({ area, settings, areas, reduced }) {
+	const [shown, setShown] = useState({ area, settings });
+	const [active, setActive] = useState(false);
+	const busy = useRef(false);
+	const mounted = useRef(true);
+	const latest = useRef({ area, settings });
+	latest.current = { area, settings };
+	const x = useMotionValue(0);
+	const rotate = useMotionValue(0);
+	const opacity = useMotionValue(1);
+	const rotateY = useMotionValue(0);
+	const values = [x, rotate, opacity, rotateY];
+
+	useEffect(() => () => {
+		mounted.current = false;
+		values.forEach((v) => v.stop());
+	}, []);
+
+	useEffect(() => {
+		if (busy.current || active) return;
+		if (shown.area === area && shown.settings === settings) return;
+		if (reduced) {
+			setShown({ area, settings });
+			return;
+		}
+		const swap = () => {
+			if (!mounted.current) return;
+			flushSync(() => setShown(latest.current));
+		};
+		async function slide(dir) {
+			const w = window.innerWidth;
+			await Promise.all([
+				animate(x, dir * w, SLIDE_OUT),
+				animate(rotate, dir * CARD_TILT_DEG, SLIDE_OUT),
+				animate(opacity, 0, SLIDE_OUT),
+			]);
+			x.set(-dir * w);
+			rotate.set(-dir * CARD_TILT_DEG);
+			swap();
+			await Promise.all([animate(x, 0, SLIDE_IN), animate(rotate, 0, SLIDE_IN), animate(opacity, 1, SLIDE_IN)]);
+		}
+		async function flip(dir) {
+			await animate(rotateY, dir * 90, FLIP_OUT);
+			rotateY.set(-dir * 90);
+			swap();
+			await animate(rotateY, 0, FLIP_IN);
+		}
+		busy.current = true;
+		setActive(true);
+		const dir = slideDirection(areas, shown.area, area);
+		(dir ? slide(dir) : flip(settings ? 1 : -1)).finally(() => {
+			busy.current = false;
+			if (mounted.current) setActive(false);
+		});
+	}, [area, settings, shown, active, reduced, areas]);
+
+	// The finger has the card: follow it. `set` does not interrupt a running
+	// spring, so a settle still in flight is stopped first.
+	const pull = (dx) => {
+		values.forEach((v) => v.stop());
+		x.set(dx);
+		rotate.set(Math.max(-CARD_TILT_DEG, Math.min(CARD_TILT_DEG, dx * CARD_TILT_PER_PX)));
+		opacity.set(Math.max(CARD_MIN_OPACITY, 1 - Math.abs(dx) / window.innerWidth));
+	};
+	// The finger let go short of a swipe: spring back into the deck.
+	const settle = () => {
+		animate(x, 0, SETTLE);
+		animate(rotate, 0, SETTLE);
+		animate(opacity, 1, SETTLE);
+	};
+	return { area: shown.area, settings: shown.settings, active, reduced: !!reduced, x, rotate, opacity, rotateY, pull, settle };
+}
+
+function SwipeAreas({ areas, current, onSelect, stage, children }) {
 	const rootRef = useRef(null);
 	const gesture = useRef(null);
 	const onTouchStart = (e) => {
 		gesture.current = null;
-		if (e.touches.length !== 1) return;
+		if (e.touches.length !== 1 || stage.active) return;
 		const target = e.target;
 		if (target.closest?.(SWIPE_IGNORE) || scrollsSideways(target, rootRef.current)) return;
 		const { clientX: x, clientY: y } = e.touches[0];
-		gesture.current = { x, y, lastX: x, lastY: y, scrolled: false };
+		gesture.current = { x, y, lastX: x, lastY: y, scrolled: false, pulled: false };
 	};
 	const onTouchMove = (e) => {
 		const g = gesture.current;
@@ -10438,32 +10557,69 @@ function SwipeAreas({ areas, current, onSelect, children }) {
 		g.lastY = clientY;
 		const dy = Math.abs(clientY - g.y);
 		if (dy > SWIPE_SCROLL_LOCK_PX && dy > Math.abs(clientX - g.x)) g.scrolled = true;
+		if (g.scrolled) {
+			// A scroll that started as a pull lets the card go.
+			if (g.pulled) stage.settle();
+			g.pulled = false;
+			return;
+		}
+		if (stage.reduced) return;
+		g.pulled = true;
+		stage.pull(clientX - g.x);
+	};
+	const letGo = () => {
+		const g = gesture.current;
+		gesture.current = null;
+		if (g?.pulled) stage.settle();
+		return g;
 	};
 	const onTouchEnd = () => {
 		const g = gesture.current;
-		gesture.current = null;
-		if (!g || g.scrolled) return;
+		if (!g || g.scrolled) {
+			letGo();
+			return;
+		}
 		const next = swipeAreaTarget({ dx: g.lastX - g.x, dy: g.lastY - g.y, areas, current });
-		if (!next) return;
+		if (!next) {
+			letGo();
+			return;
+		}
+		// Committed: the stage effect carries the card out from where the
+		// finger left it, so no settle here.
+		gesture.current = null;
 		onSelect(next);
 		// The tab strip is the only cue of what just happened. Deep in a long
 		// panel it has scrolled off the top, so bring it back into view.
 		const tab = document.getElementById(`area-tab-${next}`);
 		if (tab && tab.getBoundingClientRect().top < 0) {
-			const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-			tab.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+			tab.scrollIntoView({ block: 'start', behavior: stage.reduced ? 'auto' : 'smooth' });
 		}
 	};
 	return (
-		<div
-			ref={rootRef}
-			onTouchStart={onTouchStart}
-			onTouchMove={onTouchMove}
-			onTouchEnd={onTouchEnd}
-			onTouchCancel={() => (gesture.current = null)}
-		>
-			{children}
-		</div>
+		<StagedArea.Provider value={stage.area}>
+			<motion.div
+				ref={rootRef}
+				onTouchStart={onTouchStart}
+				onTouchMove={onTouchMove}
+				onTouchEnd={onTouchEnd}
+				onTouchCancel={letGo}
+				// pan-y hands vertical panning to the browser up front, so Chrome
+				// does not cancel a horizontal pull half-way to start a scroll;
+				// pinch-zoom keeps the page zoomable.
+				style={{
+					x: stage.x,
+					rotate: stage.rotate,
+					opacity: stage.opacity,
+					rotateY: stage.rotateY,
+					transformPerspective: CARD_PERSPECTIVE,
+					transformOrigin: CARD_PIVOT,
+					willChange: stage.active ? 'transform' : 'auto',
+					touchAction: 'pan-y pinch-zoom',
+				}}
+			>
+				{children}
+			</motion.div>
+		</StagedArea.Provider>
 	);
 }
 
@@ -10558,7 +10714,11 @@ function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, onOpen
 	);
 }
 
-function AreaPanel({ area, current, children }) {
+function AreaPanel({ area, current: selected, children }) {
+	// While a card is on its way out the stage still shows the previous area;
+	// outside the stage (no provider) the real selection decides.
+	const staged = useContext(StagedArea);
+	const current = staged ?? selected;
 	return (
 		<div
 			role='tabpanel'
