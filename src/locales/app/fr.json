@@ -147,6 +147,7 @@
   "app.filter.trash_label": "poubelle",
   "app.filter.trash_hint": "Suppression de masse. Inverse tes protections — tout ce qui matche peut être transféré sans risque.",
   "app.filter.trade_label": "échange",
+  "app.footer.saved_locally": "Enregistré localement",
   "app.filter.trade_hint": "Pokémon échangeables au quotidien. Non-échangés, non-obscurs, non-chanceux, IVs qui battent ton hundo par bucket d'évaluation.",
   "app.filter.sort_label": "tri-100%",
   "app.filter.sort_hint": "Fait remonter tous les membres de tes familles hundo pour que tu puisses les épingler dans ton sac.",

@@ -147,6 +147,7 @@
   "app.filter.trash_label": "basura",
   "app.filter.trash_hint": "Material para borrado masivo. Invierte tus protecciones — todo lo que coincida es seguro de transferir.",
   "app.filter.trade_label": "intercambio",
+  "app.footer.saved_locally": "Guardado localmente",
   "app.filter.trade_hint": "Pokémon intercambiables del día a día. No intercambiados, no oscuros, no de la suerte, IVs que superan tu hundo por bucket de evaluación.",
   "app.filter.sort_label": "orden 100%",
   "app.filter.sort_hint": "Saca a la luz todos los miembros de tus familias hundo para que puedas fijarlos en tu mochila.",

@@ -147,6 +147,7 @@
   "app.filter.trash_label": "垃圾",
   "app.filter.trash_hint": "大量刪除用。反轉你的保護 — 任何符合的都可以安全傳送。",
   "app.filter.trade_label": "交換",
+  "app.footer.saved_locally": "已儲存至本機",
   "app.filter.trade_hint": "日常可交換的寶可夢。未交換、非暗影、非亮晶晶,IV 依評估桶位超過你的 hundo。",
   "app.filter.sort_label": "100% 排序",
   "app.filter.sort_hint": "顯示所有 hundo 家族成員,讓你能在背包中標記它們。",

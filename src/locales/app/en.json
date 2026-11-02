@@ -147,6 +147,7 @@
   "app.filter.trash_label": "trash",
   "app.filter.trash_hint": "Mass-delete fodder. Inverts your protections so anything matching is safe to transfer.",
   "app.filter.trade_label": "trade",
+  "app.footer.saved_locally": "Saved locally",
   "app.filter.trade_hint": "Daily-driver tradeable Pokémon. Untraded, non-shadow, non-lucky, IVs that beat your hundo by appraisal-bucket.",
   "app.filter.sort_label": "hundo-sort",
   "app.filter.sort_hint": "Surfaces all members of your hundo families so you can pin them in your bag.",

@@ -58,7 +58,10 @@ console.log("\nG3 — DOM wiring");
     ["input", "textarea", "select", "[data-no-swipe]"].every((sel) => ignore.split(",").map((x) => x.trim()).includes(sel)), ignore);
   const mapBox = app.slice(app.indexOf("function RegionalMap("), app.indexOf("function RegionalMap(") + 20000);
   check("the regional map opts out of swiping", /<div data-no-swipe [^>]*>\s*\{\/\* The map is a POINTER convenience/.test(mapBox));
-  check("the tab strip is scrolled back into view after a swipe", swipe.includes("scrollIntoView") && swipe.includes("prefers-reduced-motion"));
+  // The scroll-back lives in a helper shared with the settings exit bar.
+  const scrollBack = app.slice(app.indexOf("function scrollAreaTabIntoView("), app.indexOf("function SwipeAreas("));
+  check("the tab strip is scrolled back into view after a swipe",
+    swipe.includes("scrollAreaTabIntoView(next)") && scrollBack.includes("scrollIntoView") && scrollBack.includes("prefers-reduced-motion"));
 }
 
 done("All swipe-areas checks passed.", (n) => `${n} swipe-areas check(s) failed.`);

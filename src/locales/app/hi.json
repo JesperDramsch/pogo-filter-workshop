@@ -147,6 +147,7 @@
   "app.filter.trash_label": "ट्रैश",
   "app.filter.trash_hint": "बल्क डिलीट करने के लिए सामग्री। आपके protections को इनवर्ट करता है — जो भी मैच होता है उसे ट्रांसफर करना सुरक्षित है।",
   "app.filter.trade_label": "ट्रेड",
+  "app.footer.saved_locally": "स्थानीय रूप से सहेजा गया",
   "app.filter.trade_hint": "रोज़मर्रा के ट्रेड-योग्य Pokémon। बिना ट्रेड किए, non-शैडो, non-लकी, IVs जो appraisal-bucket से आपके hundo को बीट करते हैं।",
   "app.filter.sort_label": "हंडो-सॉर्ट",
   "app.filter.sort_hint": "आपके hundo families के सभी सदस्यों को सामने लाता है ताकि आप उन्हें bag में पिन कर सकें।",
