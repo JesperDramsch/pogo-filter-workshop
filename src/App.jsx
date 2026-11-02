@@ -751,7 +751,8 @@ export function lineOwnerCovers(ownerDex, ann, want) {
 // every coverage question in the app reads: a 'family'-scoped Lichtel hides
 // the whole line (`!+lichtel`), an 'exact' one only itself, an 'upward' one
 // itself and what it can become, and a coin-flip split line is never settled
-// by one specimen. A family the list covers whole collapses to one `!+root`;
+// by one specimen, though a listed species always hides itself (a listed
+// split base too). A family the list covers whole collapses to one `!+root`;
 // a partly covered one names its covered members bare. Species-level only:
 // a search term cannot tell regional forms or genders apart, so an owned
 // Kanto Sandan also hides a new Alolan one. Entries that do not resolve to a
@@ -766,7 +767,11 @@ export function missingHaveFinder(names, line, head, outputLocale = 'de') {
 	const clauses = [];
 	for (const root of [...roots].sort((a, b) => a - b)) {
 		const members = selfAndDescendants(root);
-		const covered = members.filter((d) => lineCoverageOwner(d, line) !== null);
+		// A listed species is recorded whatever the line rules say about it:
+		// lineCoverageOwner asks "is this ask settled?", and for a coin-flip
+		// base (Waumpel, Perlu) that stays no until every branch is owned, but
+		// this finder asks "is it on the list?", and a listed Waumpel is.
+		const covered = members.filter((d) => line.dexSet.has(d) || lineCoverageOwner(d, line) !== null);
 		if (covered.length === 0) continue;
 		if (covered.length === members.length) clauses.push(`!+${name(root)}`);
 		else for (const d of covered) clauses.push(`!${name(d)}`);

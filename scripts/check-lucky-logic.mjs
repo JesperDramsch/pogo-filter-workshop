@@ -648,6 +648,22 @@ console.log("\nHave-list upkeep finders: hundos / luckies the lists do not cover
     !evalF(split.hundo, mon("beautifly", ["wurmple", "silcoon", "beautifly", "cascoon", "dustox"], { hundo: true }))
     && evalF(split.hundo, mon("dustox", ["wurmple", "silcoon", "beautifly", "cascoon", "dustox"], { hundo: true })), split.hundo);
 
+  // …but a listed split BASE always hides itself. lineCoverageOwner keeps a
+  // Wurmple ask open until every branch is owned; this finder asks whether
+  // the species is on the list, and it is.
+  const wfam = ["wurmple", "silcoon", "beautifly", "cascoon", "dustox"];
+  for (const [list, hidden] of [[["wurmple"], "wurmple"], [["clamperl"], "clamperl"]]) {
+    const f = run(list, []).hundo;
+    check(`listed split base ${hidden} hides itself`, f.split("&").includes(`!${hidden}`), f);
+  }
+  const wb = run(["wurmple"], []).hundo;
+  check("…and nothing else of its line", !evalF(wb, mon("wurmple", wfam, { hundo: true })) && evalF(wb, mon("dustox", wfam, { hundo: true })), wb);
+  check("listed base plus one branch hides both stages of that branch and the base",
+    run(["wurmple", "silcoon"], []).hundo === "4*&!wurmple&!silcoon&!beautifly", run(["wurmple", "silcoon"], []).hundo);
+  check("a fully listed split line still collapses to !+root", run(wfam, []).hundo === "4*&!+wurmple", run(wfam, []).hundo);
+  const luckyBase = run([], ["wurmple"]).lucky;
+  check("the lucky finder takes the same path", luckyBase.split("&").includes("!wurmple"), luckyBase);
+
   // Output locale: names come from the dictionary, the keyword from the table.
   const de = buildFilters(["lichtel"], ["pikachu"], DEFAULT_CONFIG, [], "de", t).missingHaves;
   check("German output: 4*&!+lichtel and glücks&!pikachu&!raichu", de.hundo === "4*&!+lichtel" && de.lucky === "glücks&!pikachu&!raichu", JSON.stringify(de));
