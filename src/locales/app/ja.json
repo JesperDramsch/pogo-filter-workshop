@@ -46,6 +46,7 @@
   "app.area.trade.hint": "交換、ギフト、ほしいものリスト、フレンドのための捕獲。",
   "app.area.settings_open": "{area}の設定",
   "app.area.settings_close": "フィルターに戻る",
+  "app.area.settings_close_area": "{area}のフィルターに戻る",
   "app.area.settings_hint": "各エリアの設定。変更はすぐにフィルターに反映されます。",
   "app.help.toggle_open": "このエリアの使い方",
   "app.help.dialog_label": "このエリアの使い方",

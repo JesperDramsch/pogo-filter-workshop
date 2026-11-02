@@ -46,6 +46,7 @@
   "app.area.trade.hint": "Échanges, cadeaux, listes de souhaits et captures pour les amis.",
   "app.area.settings_open": "Paramètres · {area}",
   "app.area.settings_close": "Retour aux filtres",
+  "app.area.settings_close_area": "Retour aux filtres · {area}",
   "app.area.settings_hint": "Paramètres de chaque zone. Tes changements s'appliquent tout de suite aux filtres.",
   "app.help.toggle_open": "Comment marche cette zone",
   "app.help.dialog_label": "Comment marche cette zone",

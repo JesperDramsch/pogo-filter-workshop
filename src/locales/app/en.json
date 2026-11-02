@@ -46,6 +46,7 @@
   "app.area.trade.hint": "Trades, gifts, wishlists and catching for friends.",
   "app.area.settings_open": "{area} settings",
   "app.area.settings_close": "Back to filters",
+  "app.area.settings_close_area": "Back to {area} filters",
   "app.area.settings_hint": "Settings for each area. Changes apply to the filters right away.",
   "app.help.toggle_open": "How this area works",
   "app.help.dialog_label": "How this area works",
