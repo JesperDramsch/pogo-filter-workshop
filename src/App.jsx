@@ -10465,7 +10465,7 @@ const StagedArea = createContext(null);
 // a drag can pull the card first and a commit continues from wherever the
 // finger left it. With reduced motion the stage swaps instantly, as it did
 // before any of this existed.
-function useAreaStage({ area, settings, areas, reduced }) {
+export function useAreaStage({ area, settings, areas, reduced }) {
 	const [shown, setShown] = useState({ area, settings });
 	const [active, setActive] = useState(false);
 	const busy = useRef(false);
@@ -10478,9 +10478,16 @@ function useAreaStage({ area, settings, areas, reduced }) {
 	const rotateY = useMotionValue(0);
 	const values = [x, rotate, opacity, rotateY];
 
-	useEffect(() => () => {
-		mounted.current = false;
-		values.forEach((v) => v.stop());
+	// Set in the setup, not at declaration: React StrictMode runs this effect
+	// as mount, cleanup, mount in development, and a ref that only ever went
+	// false in the cleanup would leave the stage believing it was unmounted
+	// and lock after its first animation.
+	useEffect(() => {
+		mounted.current = true;
+		return () => {
+			mounted.current = false;
+			values.forEach((v) => v.stop());
+		};
 	}, []);
 
 	useEffect(() => {
@@ -10611,7 +10618,9 @@ function SwipeAreas({ areas, current, onSelect, stage, children }) {
 					rotate: stage.rotate,
 					opacity: stage.opacity,
 					rotateY: stage.rotateY,
-					transformPerspective: CARD_PERSPECTIVE,
+					// Only while a card moves: a permanent perspective() would make the
+					// stage a containing block for fixed descendants even at rest.
+					transformPerspective: stage.active ? CARD_PERSPECTIVE : 0,
 					transformOrigin: CARD_PIVOT,
 					willChange: stage.active ? 'transform' : 'auto',
 					touchAction: 'pan-y pinch-zoom',
