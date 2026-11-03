@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-29T13:13:55.762Z",
+  "fetchedAt": "2026-11-03T14:26:47.850Z",
   "raids": {
     "mega": [
       {
@@ -540,38 +540,5 @@
       ]
     }
   ],
-  "eventMaxBattles": [
-    {
-      "eventID": "max-mondays-2026-11-02",
-      "name": "Dynamax Machop during Max Monday",
-      "eventType": "max-mondays",
-      "start": "2026-11-02T06:00:00.000",
-      "end": "2026-11-02T21:00:00.000",
-      "bosses": [
-        {
-          "id": "MACHOP",
-          "form": "MACHOP_NORMAL",
-          "names": {
-            "en": "Machop"
-          },
-          "types": [
-            "fighting"
-          ],
-          "resistorTypes": [
-            "flying",
-            "poison",
-            "bug",
-            "ghost",
-            "psychic",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "flying",
-            "psychic",
-            "fairy"
-          ]
-        }
-      ]
-    }
-  ]
+  "eventMaxBattles": []
 }

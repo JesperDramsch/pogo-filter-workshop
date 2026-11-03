@@ -1,11 +1,24 @@
 {
-  "fetchedAt": "2026-11-02T16:11:18.338Z",
+  "fetchedAt": "2026-11-03T14:26:52.152Z",
   "sources": {
     "pvp": "pvpoke-gamemaster",
     "pve": "alexelgt/game_masters",
-    "pveBatch": "2026-10-29T17:39:11.876Z"
+    "pveBatch": "2026-11-02T17:36:27.394Z"
   },
   "history": [
+    {
+      "at": "2026-11-03T14:26:52.152Z",
+      "stream": "pve",
+      "summary": "1 move(s) changed",
+      "changes": [
+        {
+          "move": "VM_MOVE_TEMP_EVOLUTION_MEGA_V0302_POKEMON_SABLEYE",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        }
+      ]
+    },
     {
       "at": "2026-11-02T16:11:18.338Z",
       "stream": "pvp",
@@ -5537,6 +5550,12 @@
       "durationMs": 3000,
       "energyDelta": -100,
       "pokemonType": "POKEMON_TYPE_DARK"
+    },
+    "VM_MOVE_TEMP_EVOLUTION_MEGA_V0302_POKEMON_SABLEYE": {
+      "power": 160,
+      "durationMs": 2500,
+      "energyDelta": -100,
+      "pokemonType": "POKEMON_TYPE_GHOST"
     },
     "VM_MOVE_TEMP_EVOLUTION_MEGA_V0310_POKEMON_MANECTRIC": {
       "power": 150,
