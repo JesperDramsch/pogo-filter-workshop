@@ -902,6 +902,15 @@ console.log("\nMega-evolve placement");
   check("the Mega planner renders no mega-evolve filter", !/megaEvolve|mega_evolve/.test(planner));
 }
 
+console.log("\nUpgrades placement");
+{
+  // Every spend-a-resource tool lives in Upgrades; Sorting's groups carry piles only.
+  const tools = (id) => UPGRADE_GROUPS.find((g) => g.id === id)?.tools || [];
+  check("caps carries the bottle caps", tools("caps").join(",") === "bottle_caps");
+  check("moves carries third move, Elite TM and Max Move upgrades", tools("moves").join(",") === "third_move,elite_tm,max_upgrade");
+  check("no Sorting group carries a tool", PILE_GROUPS.every((g) => !(g.tools || []).length));
+}
+
 console.log("\nPurify placement");
 {
   // Purifying spends stardust and candy: the four purify strings are one tool

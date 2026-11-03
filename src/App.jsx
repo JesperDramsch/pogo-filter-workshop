@@ -3190,8 +3190,22 @@ export function buildFilters(
 	push(tradeClauses, [S012, TE_full_str, ivK1Bad].filter(Boolean).join(','), tFn('app.clause_why.not_k1_te'));
 	push(tradeClauses, [S012, TE_full_str, ivK2Bad].filter(Boolean).join(','), tFn('app.clause_why.not_k2_te'));
 	push(tradeClauses, [S012, TE_full_str, ivK3Bad].filter(Boolean).join(','), tFn('app.clause_why.not_k3_te'));
-	if (notP) push(tradeClauses, notP, tFn('app.clause_why.not_p', { params: { mode: cfg.pvpMode } }));
-	pushPvPMetaClauses(tradeClauses);
+	// The trade filter's keeps that mean "never trade THIS Pokémon" (tags,
+	// favourites, nundos, league tags, former buddies, PvP keepers, invested
+	// moves), mirrored as they are pushed so the re-roll trade string honours
+	// the same choices. Category protections (shiny, costume, legendary, ...)
+	// are left out: they exclude exactly what re-roll trades look for.
+	const rerollKeeps = [];
+	const keepPush = (clause, why) => {
+		push(tradeClauses, clause, why);
+		rerollKeeps.push(clause);
+	};
+	if (notP) keepPush(notP, tFn('app.clause_why.not_p', { params: { mode: cfg.pvpMode } }));
+	{
+		const before = tradeClauses.length;
+		pushPvPMetaClauses(tradeClauses);
+		rerollKeeps.push(...tradeClauses.slice(before).map((c) => c.clause));
+	}
 
 	// Mandatory trade constraints (physical game rules — always apply)
 	push(tradeClauses, `!${kw.flag.traded}`, tFn('app.clause_why.must_traded'));
@@ -3200,25 +3214,19 @@ export function buildFilters(
 	push(tradeClauses, `!${kw.flag.mythical},808,809`, tFn('app.clause_why.must_mythical_long'));
 
 	if (cfg.protectAnyTag) {
-		push(tradeClauses, '!#', tFn('app.clause_why.any_tag_trade'));
+		keepPush('!#', tFn('app.clause_why.any_tag_trade'));
 	} else {
-		if (basarTag)
-			push(tradeClauses, `!#${basarTag}`, tFn('app.clause_why.bazaar_tag_trade', { params: { tag: basarTag } }));
+		if (basarTag) keepPush(`!#${basarTag}`, tFn('app.clause_why.bazaar_tag_trade', { params: { tag: basarTag } }));
 		if (fernTauschTag)
-			push(
-				tradeClauses,
-				`!#${fernTauschTag}`,
-				tFn('app.clause_why.fern_tausch_tag_trade', { params: { tag: fernTauschTag } }),
-			);
-		for (const t of customTags)
-			push(tradeClauses, `!#${t}`, tFn('app.clause_why.custom_tag', { params: { tag: t } }));
+			keepPush(`!#${fernTauschTag}`, tFn('app.clause_why.fern_tausch_tag_trade', { params: { tag: fernTauschTag } }));
+		for (const t of customTags) keepPush(`!#${t}`, tFn('app.clause_why.custom_tag', { params: { tag: t } }));
 		// Buddy stockpiles are staged for a *specific* friend — keep them out of the
 		// general trade filter (mirrors the trash protection at L711-714 and makes
 		// buddy tags behave exactly like the basar/fern trade tags above). The
 		// prestaged filter surfaces them for the actual hand-off.
 		for (const b of activeBuddies) {
 			const prefix = bareTagPrefix(b.tagPrefix);
-			push(tradeClauses, `!#${prefix}`, tFn('app.clause_why.buddy_tag', { params: { name: b.name, prefix } }));
+			keepPush(`!#${prefix}`, tFn('app.clause_why.buddy_tag', { params: { name: b.name, prefix } }));
 		}
 	}
 
@@ -3228,23 +3236,21 @@ export function buildFilters(
 	if (cfg.protectCostumes) push(tradeClauses, `!${kw.flag.costume}`, tFn('app.clause_why.costumes_trade'));
 	if (cfg.protectPurified) push(tradeClauses, `!${kw.flag.purified}`, tFn('app.clause_why.purified'));
 	if (cfg.protectBackgrounds) push(tradeClauses, `!${kw.flag.background}`, tFn('app.clause_why.backgrounds_trade'));
-	if (cfg.protectFavorites) push(tradeClauses, `!${kw.flag.favorite}`, tFn('app.clause_why.favorites'));
+	if (cfg.protectFavorites) keepPush(`!${kw.flag.favorite}`, tFn('app.clause_why.favorites'));
 	push(tradeClauses, '!4*', tFn('app.clause_why.rule1_no_4star_trade'));
 	if (cfg.protectNundos) {
-		push(
-			tradeClauses,
-			`1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`,
-			tFn('app.clause_why.protect_nundos_trade'),
-		);
+		keepPush(`1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`, tFn('app.clause_why.protect_nundos_trade'));
 	}
-	for (const t of leagueTags) push(tradeClauses, `!${t}`, tFn('app.clause_why.league_tag', { params: { tag: t } }));
+	for (const t of leagueTags) keepPush(`!${t}`, tFn('app.clause_why.league_tag', { params: { tag: t } }));
 	// Trading away a former buddy forfeits the walked-distance/affection history;
 	// mirror the trash protection (search for cfg.protectBuddies above).
-	if (cfg.protectBuddies) push(tradeClauses, `!${kw.numeric.buddy}1-`, tFn('app.clause_why.buddies_were'));
-	if (cfg.protectDoubleMoved) push(tradeClauses, '@3move', tFn('app.clause_why.double_moved_trade'));
+	if (cfg.protectBuddies) keepPush(`!${kw.numeric.buddy}1-`, tFn('app.clause_why.buddies_were'));
+	if (cfg.protectDoubleMoved) keepPush('@3move', tFn('app.clause_why.double_moved_trade'));
 	{
+		// A trade resets Max Move levels (the game's own trade warning), so an
+		// invested Dynamax is a keep for re-roll trades too.
 		const mp = maxProtectClause();
-		if (mp) push(tradeClauses, mp[0], mp[1]);
+		if (mp) keepPush(mp[0], mp[1]);
 	}
 	// Trading away a would-be new-dex evolution costs you the registration; mirror
 	// the trash protection (L738) so it isn't bulk-traded.
@@ -4201,7 +4207,7 @@ export function buildFilters(
 		})),
 		{ key: 'gold', filter: goldCapFilter(kw, { collectibles: oneOffCollectibles }).join('&') },
 	];
-	const rerollTrade = rerollTradeFilter(kw, { collectibles: oneOffCollectibles }).join('&');
+	const rerollTrade = rerollTradeFilter(kw, { collectibles: oneOffCollectibles, keeps: rerollKeeps }).join('&');
 	// Display-only mirror for the curated chips: the have-list member that fills
 	// a target's line, when it isn't the target species itself — named in the
 	// output locale so the dimmed chip says WHY it is done.
@@ -8184,7 +8190,7 @@ export default function App() {
 		),
 		upgrade: (
 			<div className='space-y-10'>
-				<UpgradeSources onOpen={(area) => goToArea(area, true)} t={t} />
+				<UpgradeSources onOpen={(area) => goToArea(area, true)} expertMode={!!effectiveConfig.expertMode} t={t} />
 				{shadowKeeperSettings}
 			</div>
 		),
@@ -10944,16 +10950,18 @@ const UPGRADE_SOURCES = [
 	{ key: 'collectibles', area: 'catch' },
 	{ key: 'hundos', area: 'sort' },
 	{ key: 'evolve_tag', area: 'sort' },
-	{ key: 'max_roster', area: 'battle' },
+	// The Max attacker list is an expert setting: without expert mode the jump
+	// would land on Battle settings that do not show it.
+	{ key: 'max_roster', area: 'battle', expertOnly: true },
 	{ key: 'rankings', area: null },
 ];
-function UpgradeSources({ onOpen, t }) {
+function UpgradeSources({ onOpen, expertMode, t }) {
 	return (
 		<div>
 			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-2'>{t('app.upgrade.sources.title')}</h3>
 			<p className='mono text-xs text-[#8B98A5] leading-relaxed mb-4'>{t('app.upgrade.sources.intro')}</p>
 			<ul className='space-y-3'>
-				{UPGRADE_SOURCES.map((row) => (
+				{UPGRADE_SOURCES.filter((row) => expertMode || !row.expertOnly).map((row) => (
 					<li key={row.key} className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2'>
 						<span className='text-xs text-[#C9D1D9] leading-relaxed'>{t(`app.upgrade.sources.${row.key}`)}</span>
 						{row.area && (
