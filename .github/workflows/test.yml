@@ -82,4 +82,5 @@ jobs:
       - run: npm run test:bonusnudges
       - run: npm run test:sharelink
       - run: npm run test:settingsgroups
+      - run: npm run test:oneoffs
       - run: npm run build

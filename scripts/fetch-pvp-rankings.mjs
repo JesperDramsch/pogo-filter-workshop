@@ -34,7 +34,7 @@
 //
 // Flags: --offline-ok   tolerate fetch failures if cache exists.
 
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
@@ -45,12 +45,16 @@ import {
   NAME_LOCALES,
 } from "./lib/species-dex.mjs";
 import { eventSlots, leaguesForSlots, matchEventFormats } from "./lib/gbl-slots.mjs";
+import { canonicalMoveName } from "./lib/move-names.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const DATA_DIR = resolve(ROOT, "src/data");
 const OUT_PATH = resolve(DATA_DIR, "pvp-rankings.json");
 const NAMES_PATH = resolve(ROOT, "src/locales/pokemon-names.json");
+// The EN glossary, read for one job only: naming each Elite TM move by the key
+// App.jsx localises moves with (see eliteMovesOf).
+const LOCALE_EN_PATH = resolve(ROOT, "src/locales/en.json");
 
 const PVPOKE_BASE = "https://raw.githubusercontent.com/pvpoke/pvpoke/master/src/data";
 const GAMEMASTER = `${PVPOKE_BASE}/gamemaster.min.json`;
@@ -129,8 +133,24 @@ const stripForms = (name) => String(name || "").replace(/(?:\s*\([^)]*\))+\s*$/,
 // speciesId → {dex, speciesName}, plus dex → base (suffix-free) species name.
 // The base name matters: it is what App.jsx falls back to when the dex dict
 // misses, and a parenthesised form name there produces a broken filter token.
-export function buildSpeciesIndex(gm) {
+export function buildSpeciesIndex(gm, enMessages = null) {
   const bySpeciesId = new Map();
+  // Elite TM support (see eliteMovesOf): which moves only an Elite TM teaches
+  // each speciesId, and every move id's canonical dictionary name. Left empty
+  // without a dictionary, and then no entry carries eliteMoves at all.
+  const eliteBySpeciesId = new Map();
+  const moveNameById = new Map();
+  if (enMessages) {
+    for (const m of gm?.moves || []) {
+      const name = canonicalMoveName(m?.name || m?.moveId, enMessages);
+      if (name && typeof m?.moveId === "string") moveNameById.set(m.moveId, name);
+    }
+    for (const p of gm?.pokemon || []) {
+      if (typeof p?.speciesId === "string" && Array.isArray(p.eliteMoves)) {
+        eliteBySpeciesId.set(p.speciesId, new Set(p.eliteMoves));
+      }
+    }
+  }
   const baseNameByDex = new Map();
   // Which dex numbers got their name from a parenthesis-free row. Such a row is
   // the species' own name as the upstream states it; a stripped one is derived,
@@ -156,7 +176,18 @@ export function buildSpeciesIndex(gm) {
     // dex the game master knows about gets a base name.
     if (!baseNameByDex.has(p.dex)) baseNameByDex.set(p.dex, stripForms(p.speciesName));
   }
-  return { bySpeciesId, baseNameByDex };
+  return { bySpeciesId, baseNameByDex, eliteBySpeciesId, moveNameById };
+}
+
+// The moves of a ranking entry's recommended moveset that only an Elite TM
+// teaches, by canonical name, sorted. PvPoke's `moveset` is [fast, charged,
+// charged]; its game master's `eliteMoves` is per speciesId, so a Shadow form
+// is checked against its own row. A move the dictionary can't name is
+// dropped (a dead `@term` matches nothing), never shipped.
+export function eliteMovesOf(entry, index) {
+  const elite = index.eliteBySpeciesId?.get(entry?.speciesId);
+  if (!elite || !Array.isArray(entry?.moveset)) return [];
+  return [...new Set(entry.moveset.filter((id) => elite.has(id)).map((id) => index.moveNameById.get(id)).filter(Boolean))].sort();
 }
 
 // Dedupe by dex (forms collapse to base species — `+raichu` already catches
@@ -177,13 +208,25 @@ export function topNFromPvpoke(rankings, index, n) {
     const meta = index.bySpeciesId.get(speciesId);
     if (!meta) { missed++; continue; }
     const existing = byDex.get(meta.dex);
-    if (existing) { existing.forms.push(speciesId); continue; }
+    const tracksElite = (index.eliteBySpeciesId?.size || 0) > 0;
+    if (existing) {
+      existing.forms.push(speciesId);
+      // A name search can't tell folded forms apart (`ninetales` is every
+      // Ninetales), so a species only asks for the Elite TM moves all of its
+      // ranked forms run.
+      if (tracksElite) {
+        const mine = new Set(eliteMovesOf(entry, index));
+        existing.eliteMoves = existing.eliteMoves.filter((m) => mine.has(m));
+      }
+      continue;
+    }
     const record = {
       dex: meta.dex,
       name: index.baseNameByDex.get(meta.dex) || stripForms(meta.speciesName) || `dex_${meta.dex}`,
       speciesId,
       score: typeof entry.score === "number" ? entry.score : null,
       forms: [speciesId],
+      ...(tracksElite ? { eliteMoves: eliteMovesOf(entry, index) } : {}),
     };
     byDex.set(meta.dex, record);
     if (out.length < n) out.push(record);
@@ -211,7 +254,7 @@ export function topNByDex(rankings, n) {
 async function fromPvpoke() {
   console.log("→ PvPoke: game master");
   const gm = await fetchJson(GAMEMASTER);
-  const index = buildSpeciesIndex(gm);
+  const index = buildSpeciesIndex(gm, JSON.parse(readFileSync(LOCALE_EN_PATH, "utf8")));
   if (index.bySpeciesId.size === 0) throw new Error("game master carried no pokemon[] — refusing");
   console.log(`  ${index.bySpeciesId.size} speciesIds indexed`);
 
@@ -229,6 +272,13 @@ async function fromPvpoke() {
     leagues[key] = { cpCap: STORED_CP_CAP[key], species: list };
     console.log(`  ${key}: ${list.length} species (${missed} join misses of ${scanned} scanned)`);
   }
+
+  // Elite TM targets read eliteMoves; a PvPoke reshape that drops `moveset`
+  // or `eliteMoves` would empty them without failing anything. Say so loudly,
+  // but don't refuse the rankings over it: the meta pools are the main job.
+  const withElite = Object.values(leagues).flatMap((l) => l.species).filter((sp) => sp.eliteMoves?.length).length;
+  if (withElite === 0) console.warn("⚠  no ranked species carries an Elite TM move — PvPoke moveset/eliteMoves reshaped?");
+  else console.log(`  ${withElite} league entries run an Elite TM move`);
 
   return { leagues, index, formats: gm?.formats || [] };
 }
