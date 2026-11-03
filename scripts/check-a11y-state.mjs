@@ -150,7 +150,7 @@ console.log("\nS5 — the filter areas are an ARIA tab set");
   check("inactive panels are hidden, not unmounted", /hidden=\{area !== current\}/.test(panel));
   const areas = (app.match(/export const FILTER_AREAS = \[([^\]]*)\]/) || [])[1]?.match(/'(\w+)'/g)?.map((x) => x.slice(1, -1)) || [];
   const missing = areas.filter((a) => !app.includes(`<AreaPanel area='${a}' current={filterArea}>`));
-  check(`every area (${areas.join(", ")}) has a panel`, areas.length === 4 && missing.length === 0, missing.join(", "));
+  check(`every area (${areas.join(", ")}) has a panel`, areas.length === 5 && missing.length === 0, missing.join(", "));
   check("the settings flip is a toggle exposing aria-pressed", /onClick=\{onToggleSettings\}\s*aria-pressed=\{!!settings\}/.test(tabs));
   const notFlipped = areas.filter((a) => !app.includes(`areaSettingsFor.${a}\n`));
   check("every area panel flips to its own settings", notFlipped.length === 0, notFlipped.join(", "));

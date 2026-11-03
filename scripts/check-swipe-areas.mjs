@@ -22,7 +22,8 @@ const target = (dx, dy, current) => swipeAreaTarget({ dx, dy, areas, current });
 
 console.log("G1 — direction and ends");
 {
-  const [first, second, , last] = areas;
+  const [first, second] = areas;
+  const last = areas[areas.length - 1];
   check("swipe left from the first area opens the second", target(-120, 0, first) === second);
   check("swipe right from the second area returns to the first", target(120, 0, second) === first);
   check("swipe right on the first area does not wrap to the last", target(120, 0, first) === null);
