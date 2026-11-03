@@ -545,9 +545,12 @@ console.log('\nScenario 8d: coverage overrides — forced targets stay in the st
 	const solo = buildFilters([], ['lapras'], { ...cfg, friendCollectSpecies: ['lapras'], friendCollectForced: ['lapras'] }, [], 'en', t);
 	check('fully-owned + forced still emits a string', solo.friendCollectWishlist.startsWith('lapras&'));
 	// Packs are pruned by the curated set, not by the override — forcing a
-	// species never resurfaces it as a suggestion.
+	// species never resurfaces it as a suggestion. Time-limited packs (events,
+	// egg pools) keep a curated species on purpose, flagged in `curated`, so a
+	// live event with a Lapras spawn still lists it, but never as addable.
 	check('forced species never resurfaces in packs',
-		!forced.friendCollectSuggestions.some((s) => s.species.includes('lapras')));
+		!forced.friendCollectSuggestions.some((s) =>
+			s.species.some((sp, i) => sp === 'lapras' && !(s.curated && s.curated[i]))));
 }
 
 console.log('\nScenario 8e: click-only refinements — gender and drop-form guards');
