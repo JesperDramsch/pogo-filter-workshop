@@ -137,6 +137,7 @@ import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs"
 import {
   fetchGameMaster, warnIfStale, gameMasterProvenance, gameMasterAgeDays, batchMsFromIso,
 } from "./lib/game-master.mjs";
+import { canonicalMoveName } from "./lib/move-names.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -377,6 +378,9 @@ export function parseSpeciesForms(templates) {
       baseStamina: ps.stats.baseStamina ?? 0,
       fastMoveIds: [...(ps.quickMoves || []), ...(ps.eliteQuickMove || [])],
       chargedMoveIds: [...(ps.cinematicMoves || []), ...(ps.eliteCinematicMove || [])],
+      // The moves only an Elite TM teaches (Community Day and legacy moves),
+      // so the snapshot can say which ranked movesets need one.
+      eliteMoveIds: [...(ps.eliteQuickMove || []), ...(ps.eliteCinematicMove || [])],
       // pokemonSettings.shadow is present exactly when the form can be caught
       // or hatched as a Shadow — the game's own answer to "does a Shadow of
       // this exist", which is what shadowKeepers is a ranking of.
@@ -397,7 +401,7 @@ export function parseSpeciesForms(templates) {
     // score identically and only one of them is worth rating.
     const signature = JSON.stringify([
       form.types, form.baseAttack, form.baseDefense, form.baseStamina,
-      form.fastMoveIds, form.chargedMoveIds, form.shadowCapable,
+      form.fastMoveIds, form.chargedMoveIds, form.shadowCapable, form.eliteMoveIds,
     ]);
     const key = `${dex}:${signature}`;
     if (seen.has(key)) continue;
@@ -529,6 +533,7 @@ function rateForm(form, { moves, consts, cpm, boss, shadow }) {
         best.set(c.type, {
           type: c.type, rating, dps, tdo,
           fast: f.id, charged: c.id,
+          elite: [f.id, c.id].filter(id => (form.eliteMoveIds || []).includes(id)),
           shadow, dex: form.dex, form: form.form,
         });
       }
@@ -920,18 +925,36 @@ async function main() {
   // Per-type detail, so the cut can be reviewed and the exponent argued with
   // in a diff rather than by re-running the fetch.
   const roundTo = (n, d = 2) => Math.round(n * 10 ** d) / 10 ** d;
-  const detail = (list) => list.map(e => ({
-    species: nameFor(e.dex),
-    dex: e.dex,
-    rating: roundTo(e.rating),
-    dps: roundTo(e.dps),
-    tdo: roundTo(e.tdo, 1),
-    fast: e.fast,
-    charged: e.charged,
-    ...(e.form ? { form: e.form } : {}),
-  }));
+  // eliteMoves: the moveset's Elite TM moves by the canonical name App.jsx
+  // localises `@move` terms with (scripts/lib/move-names.mjs). A move the
+  // dictionary can't name is dropped and reported, never shipped as a dead
+  // search term. Present only when non-empty, to keep the diff to the entries
+  // that need an Elite TM.
+  const unnamedElite = new Set();
+  const eliteNames = (ids) => [...new Set((ids || []).map(id => {
+    const name = canonicalMoveName(id, LOCALE_EN);
+    if (!name) unnamedElite.add(id);
+    return name;
+  }).filter(Boolean))].sort();
+  const detail = (list) => list.map(e => {
+    const eliteMoves = eliteNames(e.elite);
+    return {
+      species: nameFor(e.dex),
+      dex: e.dex,
+      rating: roundTo(e.rating),
+      dps: roundTo(e.dps),
+      tdo: roundTo(e.tdo, 1),
+      fast: e.fast,
+      charged: e.charged,
+      ...(e.form ? { form: e.form } : {}),
+      ...(eliteMoves.length ? { eliteMoves } : {}),
+    };
+  });
   const perType = Object.fromEntries(TYPES.map(t => [t, detail(byType[t])]));
   const shadowPerType = Object.fromEntries(TYPES.map(t => [t, detail(shadowByType[t])]));
+  if (unnamedElite.size > 0) {
+    console.warn(`⚠  Elite TM moves with no move-name dictionary entry, dropped: ${[...unnamedElite].sort().join(", ")}`);
+  }
 
   // 0.5s fast moves — the "charger" tier the Max-Tank filter emits, sorted by
   // name for diff stability.

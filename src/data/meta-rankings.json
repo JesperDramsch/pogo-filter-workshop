@@ -1,11 +1,11 @@
 {
-  "fetchedAt": "2026-11-02T16:11:16.171Z",
-  "gameMasterTimestamp": "1793295551876",
+  "fetchedAt": "2026-11-03T16:03:29.542Z",
+  "gameMasterTimestamp": "1793640987394",
   "sources": {
     "mechanics": "alexelgt/game_masters",
-    "mechanicsBatch": "2026-10-29T17:39:11.876Z",
+    "mechanicsBatch": "2026-11-02T17:36:27.394Z",
     "roster": "pvpoke/pvpoke",
-    "rosterBatch": "2026-11-01 18:13:55"
+    "rosterBatch": "2026-11-03 04:09:55"
   },
   "model": {
     "attackerLevel": 40,
@@ -359,7 +359,10 @@
         "dps": 27.27,
         "tdo": 439.9,
         "fast": "ZEN_HEADBUTT_FAST",
-        "charged": "CRUSH_GRIP"
+        "charged": "CRUSH_GRIP",
+        "eliteMoves": [
+          "crush grip"
+        ]
       },
       {
         "species": "meloetta",
@@ -433,7 +436,10 @@
         "dps": 22.69,
         "tdo": 213.2,
         "fast": "FORCE_PALM_FAST",
-        "charged": "AURA_SPHERE"
+        "charged": "AURA_SPHERE",
+        "eliteMoves": [
+          "force palm"
+        ]
       },
       {
         "species": "terrakion",
@@ -442,7 +448,10 @@
         "dps": 19.99,
         "tdo": 294.1,
         "fast": "DOUBLE_KICK_FAST",
-        "charged": "SACRED_SWORD"
+        "charged": "SACRED_SWORD",
+        "eliteMoves": [
+          "sacred sword"
+        ]
       },
       {
         "species": "blaziken",
@@ -508,7 +517,10 @@
         "dps": 21.8,
         "tdo": 227.6,
         "fast": "PECK_FAST",
-        "charged": "BEAK_BLAST"
+        "charged": "BEAK_BLAST",
+        "eliteMoves": [
+          "beak blast"
+        ]
       },
       {
         "species": "yveltal",
@@ -517,7 +529,10 @@
         "dps": 19.33,
         "tdo": 324.4,
         "fast": "SNARL_FAST",
-        "charged": "OBLIVION_WING"
+        "charged": "OBLIVION_WING",
+        "eliteMoves": [
+          "oblivion wing"
+        ]
       },
       {
         "species": "zapdos",
@@ -624,7 +639,10 @@
         "tdo": 297.8,
         "fast": "MUD_SHOT_FAST",
         "charged": "SANDSEAR_STORM",
-        "form": "LANDORUS_THERIAN"
+        "form": "LANDORUS_THERIAN",
+        "eliteMoves": [
+          "sandsear storm"
+        ]
       },
       {
         "species": "groudon",
@@ -633,7 +651,10 @@
         "dps": 19.64,
         "tdo": 328.5,
         "fast": "MUD_SHOT_FAST",
-        "charged": "PRECIPICE_BLADES"
+        "charged": "PRECIPICE_BLADES",
+        "eliteMoves": [
+          "precipice blades"
+        ]
       },
       {
         "species": "garchomp",
@@ -651,7 +672,10 @@
         "dps": 17.56,
         "tdo": 305.7,
         "fast": "SCRATCH_FAST",
-        "charged": "HIGH_HORSEPOWER"
+        "charged": "HIGH_HORSEPOWER",
+        "eliteMoves": [
+          "high horsepower"
+        ]
       },
       {
         "species": "excadrill",
@@ -689,7 +713,10 @@
         "dps": 19.35,
         "tdo": 276,
         "fast": "LOCK_ON_FAST",
-        "charged": "METEOR_BEAM"
+        "charged": "METEOR_BEAM",
+        "eliteMoves": [
+          "meteor beam"
+        ]
       },
       {
         "species": "glimmora",
@@ -716,7 +743,10 @@
         "dps": 17.29,
         "tdo": 298.7,
         "fast": "MUD_SLAP_FAST",
-        "charged": "ROCK_WRECKER"
+        "charged": "ROCK_WRECKER",
+        "eliteMoves": [
+          "rock wrecker"
+        ]
       },
       {
         "species": "rampardos",
@@ -829,7 +859,10 @@
         "tdo": 358.6,
         "fast": "DRAGON_TAIL_FAST",
         "charged": "SHADOW_FORCE",
-        "form": "GIRATINA_ORIGIN"
+        "form": "GIRATINA_ORIGIN",
+        "eliteMoves": [
+          "shadow force"
+        ]
       },
       {
         "species": "lunala",
@@ -886,7 +919,10 @@
         "dps": 21.63,
         "tdo": 305.3,
         "fast": "FAIRY_WIND_FAST",
-        "charged": "GIGATON_HAMMER"
+        "charged": "GIGATON_HAMMER",
+        "eliteMoves": [
+          "gigaton hammer"
+        ]
       },
       {
         "species": "metagross",
@@ -895,7 +931,10 @@
         "dps": 19.64,
         "tdo": 307.6,
         "fast": "FURY_CUTTER_FAST",
-        "charged": "METEOR_MASH"
+        "charged": "METEOR_MASH",
+        "eliteMoves": [
+          "meteor mash"
+        ]
       },
       {
         "species": "lucario",
@@ -904,7 +943,10 @@
         "dps": 20.37,
         "tdo": 191.4,
         "fast": "FORCE_PALM_FAST",
-        "charged": "METEOR_MASH"
+        "charged": "METEOR_MASH",
+        "eliteMoves": [
+          "force palm"
+        ]
       },
       {
         "species": "melmetal",
@@ -913,7 +955,10 @@
         "dps": 17.19,
         "tdo": 311.2,
         "fast": "THUNDER_SHOCK_FAST",
-        "charged": "DOUBLE_IRON_BASH"
+        "charged": "DOUBLE_IRON_BASH",
+        "eliteMoves": [
+          "double iron bash"
+        ]
       },
       {
         "species": "jirachi",
@@ -952,7 +997,10 @@
         "dps": 28.19,
         "tdo": 227.1,
         "fast": "INCINERATE_FAST",
-        "charged": "MIND_BLOWN"
+        "charged": "MIND_BLOWN",
+        "eliteMoves": [
+          "mind blown"
+        ]
       },
       {
         "species": "reshiram",
@@ -961,7 +1009,10 @@
         "dps": 21.89,
         "tdo": 328.4,
         "fast": "FIRE_FANG_FAST",
-        "charged": "FUSION_FLARE"
+        "charged": "FUSION_FLARE",
+        "eliteMoves": [
+          "fusion flare"
+        ]
       },
       {
         "species": "cinderace",
@@ -997,7 +1048,10 @@
         "dps": 19.68,
         "tdo": 228.9,
         "fast": "LOW_KICK_FAST",
-        "charged": "BLAST_BURN"
+        "charged": "BLAST_BURN",
+        "eliteMoves": [
+          "blast burn"
+        ]
       },
       {
         "species": "victini",
@@ -1027,7 +1081,10 @@
         "dps": 18.48,
         "tdo": 309.1,
         "fast": "WATERFALL_FAST",
-        "charged": "ORIGIN_PULSE"
+        "charged": "ORIGIN_PULSE",
+        "eliteMoves": [
+          "origin pulse"
+        ]
       },
       {
         "species": "inteleon",
@@ -1036,7 +1093,10 @@
         "dps": 21.03,
         "tdo": 196.1,
         "fast": "POUND_FAST",
-        "charged": "HYDRO_CANNON"
+        "charged": "HYDRO_CANNON",
+        "eliteMoves": [
+          "hydro cannon"
+        ]
       },
       {
         "species": "quaquaval",
@@ -1045,7 +1105,10 @@
         "dps": 19.18,
         "tdo": 218.1,
         "fast": "WATER_GUN_FAST",
-        "charged": "HYDRO_CANNON"
+        "charged": "HYDRO_CANNON",
+        "eliteMoves": [
+          "hydro cannon"
+        ]
       },
       {
         "species": "primarina",
@@ -1054,7 +1117,10 @@
         "dps": 17.86,
         "tdo": 240.6,
         "fast": "CHARM_FAST",
-        "charged": "HYDRO_CANNON"
+        "charged": "HYDRO_CANNON",
+        "eliteMoves": [
+          "hydro cannon"
+        ]
       },
       {
         "species": "samurott",
@@ -1063,7 +1129,10 @@
         "dps": 18.3,
         "tdo": 223.5,
         "fast": "FURY_CUTTER_FAST",
-        "charged": "HYDRO_CANNON"
+        "charged": "HYDRO_CANNON",
+        "eliteMoves": [
+          "hydro cannon"
+        ]
       },
       {
         "species": "greninja",
@@ -1072,7 +1141,10 @@
         "dps": 18.72,
         "tdo": 185.4,
         "fast": "WATER_SHURIKEN_FAST",
-        "charged": "HYDRO_CANNON"
+        "charged": "HYDRO_CANNON",
+        "eliteMoves": [
+          "hydro cannon"
+        ]
       }
     ],
     "grass": [
@@ -1111,7 +1183,10 @@
         "dps": 18.54,
         "tdo": 255.6,
         "fast": "RAZOR_LEAF_FAST",
-        "charged": "FRENZY_PLANT"
+        "charged": "FRENZY_PLANT",
+        "eliteMoves": [
+          "frenzy plant"
+        ]
       },
       {
         "species": "sceptile",
@@ -1120,7 +1195,10 @@
         "dps": 18.44,
         "tdo": 197.7,
         "fast": "FURY_CUTTER_FAST",
-        "charged": "FRENZY_PLANT"
+        "charged": "FRENZY_PLANT",
+        "eliteMoves": [
+          "frenzy plant"
+        ]
       },
       {
         "species": "meowscarada",
@@ -1129,7 +1207,10 @@
         "dps": 18.46,
         "tdo": 190.1,
         "fast": "LEAFAGE_FAST",
-        "charged": "FRENZY_PLANT"
+        "charged": "FRENZY_PLANT",
+        "eliteMoves": [
+          "frenzy plant"
+        ]
       },
       {
         "species": "exeggutor",
@@ -1150,7 +1231,10 @@
         "dps": 28.21,
         "tdo": 260.1,
         "fast": "LOCK_ON_FAST",
-        "charged": "THUNDER_CAGE"
+        "charged": "THUNDER_CAGE",
+        "eliteMoves": [
+          "thunder cage"
+        ]
       },
       {
         "species": "thundurus",
@@ -1160,7 +1244,10 @@
         "tdo": 268.5,
         "fast": "VOLT_SWITCH_FAST",
         "charged": "WILDBOLT_STORM",
-        "form": "THUNDURUS_THERIAN"
+        "form": "THUNDURUS_THERIAN",
+        "eliteMoves": [
+          "wildbolt storm"
+        ]
       },
       {
         "species": "zeraora",
@@ -1178,7 +1265,10 @@
         "dps": 20.98,
         "tdo": 314.7,
         "fast": "CHARGE_BEAM_FAST",
-        "charged": "FUSION_BOLT"
+        "charged": "FUSION_BOLT",
+        "eliteMoves": [
+          "fusion bolt"
+        ]
       },
       {
         "species": "xurkitree",
@@ -1225,7 +1315,10 @@
         "dps": 22.74,
         "tdo": 312.8,
         "fast": "PSYCHO_CUT_FAST",
-        "charged": "PSYSTRIKE"
+        "charged": "PSYSTRIKE",
+        "eliteMoves": [
+          "psystrike"
+        ]
       },
       {
         "species": "hoopa",
@@ -1351,7 +1444,10 @@
         "tdo": 1762.5,
         "fast": "POISON_JAB_FAST",
         "charged": "DYNAMAX_CANNON",
-        "form": "ETERNATUS_ETERNAMAX"
+        "form": "ETERNATUS_ETERNAMAX",
+        "eliteMoves": [
+          "dynamax cannon"
+        ]
       },
       {
         "species": "regidrago",
@@ -1360,7 +1456,11 @@
         "dps": 23.3,
         "tdo": 348.2,
         "fast": "DRAGON_BREATH_FAST",
-        "charged": "DRAGON_ENERGY"
+        "charged": "DRAGON_ENERGY",
+        "eliteMoves": [
+          "dragon breath",
+          "dragon energy"
+        ]
       },
       {
         "species": "baxcalibur",
@@ -1369,7 +1469,10 @@
         "dps": 22.85,
         "tdo": 320,
         "fast": "ICE_FANG_FAST",
-        "charged": "GLAIVE_RUSH"
+        "charged": "GLAIVE_RUSH",
+        "eliteMoves": [
+          "glaive rush"
+        ]
       },
       {
         "species": "kyurem",
@@ -1388,7 +1491,10 @@
         "dps": 21.02,
         "tdo": 278.5,
         "fast": "DRAGON_TAIL_FAST",
-        "charged": "BREAKING_SWIPE"
+        "charged": "BREAKING_SWIPE",
+        "eliteMoves": [
+          "breaking swipe"
+        ]
       },
       {
         "species": "palkia",
@@ -1436,7 +1542,10 @@
         "dps": 18.08,
         "tdo": 262.1,
         "fast": "BITE_FAST",
-        "charged": "BRUTAL_SWING"
+        "charged": "BRUTAL_SWING",
+        "eliteMoves": [
+          "brutal swing"
+        ]
       },
       {
         "species": "hoopa",
@@ -1464,7 +1573,10 @@
         "dps": 19.35,
         "tdo": 145.4,
         "fast": "SNARL_FAST",
-        "charged": "BRUTAL_SWING"
+        "charged": "BRUTAL_SWING",
+        "eliteMoves": [
+          "brutal swing"
+        ]
       },
       {
         "species": "urshifu",
@@ -1495,7 +1607,10 @@
         "dps": 19.96,
         "tdo": 254.5,
         "fast": "CONFUSION_FAST",
-        "charged": "NATURES_MADNESS"
+        "charged": "NATURES_MADNESS",
+        "eliteMoves": [
+          "nature’s madness"
+        ]
       },
       {
         "species": "tapu koko",
@@ -1504,7 +1619,10 @@
         "dps": 19.84,
         "tdo": 220.8,
         "fast": "VOLT_SWITCH_FAST",
-        "charged": "NATURES_MADNESS"
+        "charged": "NATURES_MADNESS",
+        "eliteMoves": [
+          "nature’s madness"
+        ]
       },
       {
         "species": "tapu bulu",
@@ -1513,7 +1631,10 @@
         "dps": 18.29,
         "tdo": 235.7,
         "fast": "BULLET_SEED_FAST",
-        "charged": "NATURES_MADNESS"
+        "charged": "NATURES_MADNESS",
+        "eliteMoves": [
+          "nature’s madness"
+        ]
       },
       {
         "species": "enamorus",
@@ -1531,7 +1652,10 @@
         "dps": 15.97,
         "tdo": 268,
         "fast": "GEOMANCY_FAST",
-        "charged": "MOONBLAST"
+        "charged": "MOONBLAST",
+        "eliteMoves": [
+          "geomancy"
+        ]
       },
       {
         "species": "grimmsnarl",
@@ -1553,7 +1677,10 @@
         "dps": 33.8,
         "tdo": 467,
         "fast": "ZEN_HEADBUTT_FAST",
-        "charged": "CRUSH_GRIP"
+        "charged": "CRUSH_GRIP",
+        "eliteMoves": [
+          "crush grip"
+        ]
       },
       {
         "species": "porygon-z",
@@ -1663,7 +1790,10 @@
         "dps": 21.17,
         "tdo": 215.4,
         "fast": "KARATE_CHOP_FAST",
-        "charged": "DYNAMIC_PUNCH"
+        "charged": "DYNAMIC_PUNCH",
+        "eliteMoves": [
+          "karate chop"
+        ]
       },
       {
         "species": "zapdos",
@@ -1693,7 +1823,10 @@
         "dps": 27.65,
         "tdo": 238.8,
         "fast": "BULLET_SEED_FAST",
-        "charged": "BEAK_BLAST"
+        "charged": "BEAK_BLAST",
+        "eliteMoves": [
+          "beak blast"
+        ]
       },
       {
         "species": "zapdos",
@@ -1751,7 +1884,10 @@
         "dps": 23.55,
         "tdo": 170.5,
         "fast": "LICK_FAST",
-        "charged": "SLUDGE_BOMB"
+        "charged": "SLUDGE_BOMB",
+        "eliteMoves": [
+          "lick"
+        ]
       },
       {
         "species": "overqwil",
@@ -1778,7 +1914,10 @@
         "dps": 19.43,
         "tdo": 155.9,
         "fast": "MAGICAL_LEAF_FAST",
-        "charged": "SLUDGE_BOMB"
+        "charged": "SLUDGE_BOMB",
+        "eliteMoves": [
+          "magical leaf"
+        ]
       },
       {
         "species": "venusaur",
@@ -1818,7 +1957,10 @@
         "tdo": 304.6,
         "fast": "EXTRASENSORY_FAST",
         "charged": "SANDSEAR_STORM",
-        "form": "LANDORUS_THERIAN"
+        "form": "LANDORUS_THERIAN",
+        "eliteMoves": [
+          "sandsear storm"
+        ]
       },
       {
         "species": "groudon",
@@ -1827,7 +1969,10 @@
         "dps": 23.06,
         "tdo": 325,
         "fast": "MUD_SHOT_FAST",
-        "charged": "PRECIPICE_BLADES"
+        "charged": "PRECIPICE_BLADES",
+        "eliteMoves": [
+          "precipice blades"
+        ]
       },
       {
         "species": "garchomp",
@@ -1854,7 +1999,10 @@
         "dps": 21.23,
         "tdo": 317.3,
         "fast": "TACKLE_FAST",
-        "charged": "HIGH_HORSEPOWER"
+        "charged": "HIGH_HORSEPOWER",
+        "eliteMoves": [
+          "high horsepower"
+        ]
       },
       {
         "species": "mamoswine",
@@ -1883,7 +2031,10 @@
         "dps": 23.42,
         "tdo": 284.4,
         "fast": "LOCK_ON_FAST",
-        "charged": "METEOR_BEAM"
+        "charged": "METEOR_BEAM",
+        "eliteMoves": [
+          "meteor beam"
+        ]
       },
       {
         "species": "rampardos",
@@ -1901,7 +2052,10 @@
         "dps": 21.47,
         "tdo": 300.2,
         "fast": "MUD_SLAP_FAST",
-        "charged": "ROCK_WRECKER"
+        "charged": "ROCK_WRECKER",
+        "eliteMoves": [
+          "rock wrecker"
+        ]
       },
       {
         "species": "tyrantrum",
@@ -2015,7 +2169,10 @@
         "tdo": 353.4,
         "fast": "DRAGON_TAIL_FAST",
         "charged": "SHADOW_FORCE",
-        "form": "GIRATINA_ORIGIN"
+        "form": "GIRATINA_ORIGIN",
+        "eliteMoves": [
+          "shadow force"
+        ]
       },
       {
         "species": "chandelure",
@@ -2033,7 +2190,10 @@
         "dps": 24.58,
         "tdo": 178,
         "fast": "LICK_FAST",
-        "charged": "SHADOW_BALL"
+        "charged": "SHADOW_BALL",
+        "eliteMoves": [
+          "lick"
+        ]
       },
       {
         "species": "annihilape",
@@ -2081,7 +2241,10 @@
         "dps": 23.96,
         "tdo": 316.1,
         "fast": "FURY_CUTTER_FAST",
-        "charged": "METEOR_MASH"
+        "charged": "METEOR_MASH",
+        "eliteMoves": [
+          "meteor mash"
+        ]
       },
       {
         "species": "dialga",
@@ -2146,7 +2309,10 @@
         "dps": 27,
         "tdo": 346.9,
         "fast": "FIRE_FANG_FAST",
-        "charged": "FUSION_FLARE"
+        "charged": "FUSION_FLARE",
+        "eliteMoves": [
+          "fusion flare"
+        ]
       },
       {
         "species": "darmanitan",
@@ -2164,7 +2330,10 @@
         "dps": 24.93,
         "tdo": 241.7,
         "fast": "LOW_KICK_FAST",
-        "charged": "BLAST_BURN"
+        "charged": "BLAST_BURN",
+        "eliteMoves": [
+          "blast burn"
+        ]
       },
       {
         "species": "blaziken",
@@ -2173,7 +2342,10 @@
         "dps": 24.78,
         "tdo": 209.8,
         "fast": "COUNTER_FAST",
-        "charged": "BLAST_BURN"
+        "charged": "BLAST_BURN",
+        "eliteMoves": [
+          "blast burn"
+        ]
       },
       {
         "species": "moltres",
@@ -2191,7 +2363,10 @@
         "dps": 21.92,
         "tdo": 288.2,
         "fast": "FIRE_SPIN_FAST",
-        "charged": "MAGMA_STORM"
+        "charged": "MAGMA_STORM",
+        "eliteMoves": [
+          "magma storm"
+        ]
       },
       {
         "species": "chandelure",
@@ -2211,7 +2386,10 @@
         "dps": 22.94,
         "tdo": 323.3,
         "fast": "WATERFALL_FAST",
-        "charged": "ORIGIN_PULSE"
+        "charged": "ORIGIN_PULSE",
+        "eliteMoves": [
+          "origin pulse"
+        ]
       },
       {
         "species": "palkia",
@@ -2230,7 +2408,10 @@
         "dps": 22.24,
         "tdo": 233.7,
         "fast": "FURY_CUTTER_FAST",
-        "charged": "HYDRO_CANNON"
+        "charged": "HYDRO_CANNON",
+        "eliteMoves": [
+          "hydro cannon"
+        ]
       },
       {
         "species": "greninja",
@@ -2239,7 +2420,10 @@
         "dps": 23.35,
         "tdo": 190.5,
         "fast": "WATER_SHURIKEN_FAST",
-        "charged": "HYDRO_CANNON"
+        "charged": "HYDRO_CANNON",
+        "eliteMoves": [
+          "hydro cannon"
+        ]
       },
       {
         "species": "empoleon",
@@ -2248,7 +2432,10 @@
         "dps": 21.55,
         "tdo": 237.6,
         "fast": "METAL_CLAW_FAST",
-        "charged": "HYDRO_CANNON"
+        "charged": "HYDRO_CANNON",
+        "eliteMoves": [
+          "hydro cannon"
+        ]
       },
       {
         "species": "kingler",
@@ -2266,7 +2453,10 @@
         "dps": 20.47,
         "tdo": 247.4,
         "fast": "WATER_GUN_FAST",
-        "charged": "HYDRO_CANNON"
+        "charged": "HYDRO_CANNON",
+        "eliteMoves": [
+          "hydro cannon"
+        ]
       }
     ],
     "grass": [
@@ -2286,7 +2476,10 @@
         "dps": 22.78,
         "tdo": 200.4,
         "fast": "FURY_CUTTER_FAST",
-        "charged": "FRENZY_PLANT"
+        "charged": "FRENZY_PLANT",
+        "eliteMoves": [
+          "frenzy plant"
+        ]
       },
       {
         "species": "chesnaught",
@@ -2295,7 +2488,10 @@
         "dps": 20.11,
         "tdo": 253.8,
         "fast": "VINE_WHIP_FAST",
-        "charged": "FRENZY_PLANT"
+        "charged": "FRENZY_PLANT",
+        "eliteMoves": [
+          "frenzy plant"
+        ]
       },
       {
         "species": "torterra",
@@ -2304,7 +2500,10 @@
         "dps": 19.87,
         "tdo": 240.7,
         "fast": "MUD_SLAP_FAST",
-        "charged": "FRENZY_PLANT"
+        "charged": "FRENZY_PLANT",
+        "eliteMoves": [
+          "frenzy plant"
+        ]
       },
       {
         "species": "venusaur",
@@ -2313,7 +2512,10 @@
         "dps": 20.27,
         "tdo": 218.6,
         "fast": "VINE_WHIP_FAST",
-        "charged": "FRENZY_PLANT"
+        "charged": "FRENZY_PLANT",
+        "eliteMoves": [
+          "frenzy plant"
+        ]
       },
       {
         "species": "tangrowth",
@@ -2343,7 +2545,10 @@
         "tdo": 278.5,
         "fast": "VOLT_SWITCH_FAST",
         "charged": "WILDBOLT_STORM",
-        "form": "THUNDURUS_THERIAN"
+        "form": "THUNDURUS_THERIAN",
+        "eliteMoves": [
+          "wildbolt storm"
+        ]
       },
       {
         "species": "zekrom",
@@ -2352,7 +2557,10 @@
         "dps": 25.95,
         "tdo": 333.5,
         "fast": "CHARGE_BEAM_FAST",
-        "charged": "FUSION_BOLT"
+        "charged": "FUSION_BOLT",
+        "eliteMoves": [
+          "fusion bolt"
+        ]
       },
       {
         "species": "raikou",
@@ -2379,7 +2587,10 @@
         "dps": 21.46,
         "tdo": 248,
         "fast": "THUNDER_SHOCK_FAST",
-        "charged": "ZAP_CANNON"
+        "charged": "ZAP_CANNON",
+        "eliteMoves": [
+          "thunder shock"
+        ]
       },
       {
         "species": "luxray",
@@ -2408,7 +2619,10 @@
         "dps": 28.38,
         "tdo": 331.8,
         "fast": "PSYCHO_CUT_FAST",
-        "charged": "PSYSTRIKE"
+        "charged": "PSYSTRIKE",
+        "eliteMoves": [
+          "psystrike"
+        ]
       },
       {
         "species": "latios",
@@ -2435,7 +2649,10 @@
         "dps": 23.83,
         "tdo": 179.9,
         "fast": "CONFUSION_FAST",
-        "charged": "PSYCHIC"
+        "charged": "PSYCHIC",
+        "eliteMoves": [
+          "psychic"
+        ]
       },
       {
         "species": "articuno",
@@ -2577,7 +2794,10 @@
         "dps": 25.62,
         "tdo": 253.5,
         "fast": "DRAGON_TAIL_FAST",
-        "charged": "BREAKING_SWIPE"
+        "charged": "BREAKING_SWIPE",
+        "eliteMoves": [
+          "breaking swipe"
+        ]
       },
       {
         "species": "garchomp",
@@ -2595,7 +2815,10 @@
         "dps": 23.47,
         "tdo": 297.7,
         "fast": "DRAGON_TAIL_FAST",
-        "charged": "DRACO_METEOR"
+        "charged": "DRACO_METEOR",
+        "eliteMoves": [
+          "draco meteor"
+        ]
       }
     ],
     "dark": [
@@ -2615,7 +2838,10 @@
         "dps": 22.45,
         "tdo": 266,
         "fast": "BITE_FAST",
-        "charged": "BRUTAL_SWING"
+        "charged": "BRUTAL_SWING",
+        "eliteMoves": [
+          "brutal swing"
+        ]
       },
       {
         "species": "darkrai",
@@ -2633,7 +2859,10 @@
         "dps": 24.31,
         "tdo": 153,
         "fast": "SNARL_FAST",
-        "charged": "BRUTAL_SWING"
+        "charged": "BRUTAL_SWING",
+        "eliteMoves": [
+          "brutal swing"
+        ]
       },
       {
         "species": "weavile",

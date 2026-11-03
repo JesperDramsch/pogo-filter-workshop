@@ -47,6 +47,10 @@ import {
 	Candy,
 	Crown,
 	Medal,
+	BottleWine,
+	ListPlus,
+	Disc3,
+	ChevronsUp,
 } from 'lucide-react';
 import {
 	POKEMON_NAMES_DICT,
@@ -76,6 +80,14 @@ import {
 	WISH_MAX_NAME,
 } from './share-link.js';
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword, moveKeyFromKeyword, moveKeywordFor, moveDisplayName } from './i18n/pogo-keywords.js';
+import {
+	silverCapFilters,
+	goldCapFilter,
+	rerollTradeFilter,
+	thirdMoveFilter,
+	eliteTmFilter,
+	maxMoveUpgradeFilter,
+} from './one-off-filters.js';
 import RAID_BOSSES from './data/raid-bosses.json';
 import EVENTS from './data/events.json';
 import COMMUNITY_DAYS from './data/community-days.json';
@@ -760,6 +772,13 @@ export function lineOwnerCovers(ownerDex, ann, want) {
 // Kanto Sandan also hides a new Alolan one. Entries that do not resolve to a
 // species cannot be excluded and are skipped. Exported for check-lucky-logic.
 export function missingHaveFinder(names, line, head, outputLocale = 'de') {
+	return [head, ...missingHaveClauses(names, line, outputLocale)].join('&');
+}
+
+// The clauses alone: one `!+root` per fully listed line, one `!name` per
+// listed member of a partly listed one. The bottle-cap strings append them to
+// drop every family the hundo list already accounts for.
+export function missingHaveClauses(names, line, outputLocale = 'de') {
 	const name = (dex) => speciesForOutput(pokemonNameFor(String(dex), 'de') || String(dex), outputLocale);
 	const roots = new Set();
 	for (const n of names || []) {
@@ -778,7 +797,7 @@ export function missingHaveFinder(names, line, head, outputLocale = 'de') {
 		if (covered.length === members.length) clauses.push(`!+${name(root)}`);
 		else for (const d of covered) clauses.push(`!${name(d)}`);
 	}
-	return [head, ...clauses].join('&');
+	return clauses;
 }
 
 // Every name that `+X` could use to select this species — i.e. the species plus
@@ -4164,6 +4183,22 @@ export function buildFilters(
 		hundo: missingHaveFinder(hundos, friendCollectHundoLine, '4*', outputLocale),
 		lucky: missingHaveFinder(luckies, friendCollectLuckyLine, kw.flag.lucky, outputLocale),
 	};
+	// One-off tools (src/one-off-filters.js). The custom collectibles count as
+	// one special property; "not on the hundo list" is the same clause set the
+	// upkeep finder above uses, so a family it calls covered is never a cap
+	// target.
+	const oneOffCollectibles = [
+		...new Set((cfg.customCollectibles || []).map((sp) => speciesForOutput(sp, outputLocale)).filter(Boolean)),
+	];
+	const hundoGaps = missingHaveClauses(hundos, friendCollectHundoLine, outputLocale);
+	const bottleCaps = [
+		...silverCapFilters(kw, { collectibles: oneOffCollectibles, hundoGaps }).map((f) => ({
+			key: `silver_${f.key}`,
+			filter: f.clauses.join('&'),
+		})),
+		{ key: 'gold', filter: goldCapFilter(kw, { collectibles: oneOffCollectibles }).join('&') },
+	];
+	const rerollTrade = rerollTradeFilter(kw, { collectibles: oneOffCollectibles }).join('&');
 	// Display-only mirror for the curated chips: the have-list member that fills
 	// a target's line, when it isn't the target species itself — named in the
 	// output locale so the dimmed chip says WHY it is done.
@@ -5378,6 +5413,56 @@ export function buildFilters(
 	}
 	const pvpRankingsFetchedAt = PVP_RANKINGS.fetchedAt || null;
 
+	// -- ONE-OFF TOOLS · third move / Elite TM / Max Move upgrades ----------
+	// Every roster from data (CLAUDE.md: PvP species lists are data): the raid
+	// and shadow-keeper rosters of meta-rankings.json, each standing league of
+	// pvp-rankings.json. Exact species names, not `+family`: the move is
+	// bought on the ranked species itself. A capped league narrows to its CP
+	// cap and loose rank-1 IV pattern (buildLeagueFilter's own clauses, minus
+	// its family pool); the raid roster and Master League to three stars and up.
+	const nameOfDexOut = (dex) => pokemonNameFor(String(dex), outputLocale)?.toLowerCase() || null;
+	const highStars = '3*,4*';
+	const raidEntries = [
+		...Object.values(META_RANKINGS.perType || {}).flat(),
+		...Object.values(META_RANKINGS.shadowPerType || {}).flat(),
+	];
+	const oneOffSources = [
+		{ key: 'raids', entries: raidEntries, extra: [highStars] },
+		...['great', 'ultra', 'master'].map((id) => {
+			const league = PVP_RANKINGS.leagues?.[id];
+			const leagueClauses = league?.cpCap ? buildLeagueFilter(league).clauses.slice(1).map((c) => c.clause) : [highStars];
+			return { key: id, entries: league?.species || [], extra: leagueClauses };
+		}),
+	];
+	const thirdMove = oneOffSources
+		.map((src) => ({
+			key: src.key,
+			filter: thirdMoveFilter(kw, src.entries.map((e) => nameOfDexOut(e.dex)), src.extra).join('&'),
+		}))
+		.filter((x) => x.filter);
+	// Elite TM: `eliteMoves` on each entry are the canonical (EN, lowercase)
+	// names of the moves in its best moveset that only an Elite TM teaches,
+	// written by the fetchers. Moves of one ranked form are unioned (a raid
+	// species sits in one bucket per type); eliteTmFilter then keeps only the
+	// moves every form of a species shares, since a name search can't tell
+	// the forms apart.
+	const eliteTargetsOf = (entries) => {
+		const byForm = new Map();
+		for (const e of entries) {
+			const name = nameOfDexOut(e.dex);
+			if (!name || !(e.eliteMoves || []).length) continue;
+			const key = `${e.dex}|${e.form || ''}`;
+			const prev = byForm.get(key) || { name, moves: [] };
+			prev.moves = [...new Set([...prev.moves, ...e.eliteMoves.map((m) => moveKeywordFor(m, outputLocale))])];
+			byForm.set(key, prev);
+		}
+		return [...byForm.values()];
+	};
+	const eliteTm = oneOffSources
+		.map((src) => ({ key: src.key, filter: eliteTmFilter(eliteTargetsOf(src.entries), src.extra).join('&') }))
+		.filter((x) => x.filter);
+	const maxMoveUpgrade = maxMoveUpgradeFilter(kw, topMaxAttackersList, [highStars]).join('&');
+
 	// One-tap seeds for the intelligent-mode list. `species` holds STORAGE-locale
 	// names (what resolveSpecies produces) so they compare against the curated
 	// list directly; `display` is the same set rendered for the user's PoGo
@@ -5901,6 +5986,13 @@ export function buildFilters(
 		smeargleFinder,
 		// Have-list upkeep finders (have-lists step)
 		missingHaves,
+		// One-off tools: bottle caps (Sorting → Collection), re-roll trades
+		// (Trade), third move / Elite TM / Max Move upgrades (Sorting → Battle)
+		bottleCaps,
+		rerollTrade,
+		thirdMove,
+		eliteTm,
+		maxMoveUpgrade,
 	};
 }
 
@@ -5937,6 +6029,7 @@ const FLAG_TO_MON = {
 	xl: 'xl',
 	xxs: 'xxs',
 	gigantamax: 'gigantamaxCapable',
+	hyper_training: 'hyperTraining',
 };
 
 // Boolean façade over evalFilterDetailed — "is this mon DEFINITELY a match".
@@ -6057,9 +6150,14 @@ function evalTerm(t, mon, kw, outputLocale) {
 	// mon carries them, else the boolean flags the older fixtures set: a buddy
 	// counts as level 1, a Dynamax-capable mon has Max Attack 1. Guard and
 	// Spirit have no value until unlocked, so a missing one is level 0.
+	// `word2-` is "level 2 or more", `word1-2` a range (the Max Move upgrade
+	// tool), `word3` one exact level.
 	const levelOf = (n, re) => {
 		const lm = t.match(re);
-		return lm ? n >= +lm[1] : undefined;
+		if (!lm) return undefined;
+		const lo = +lm[1];
+		if (!lm[2]) return n === lo;
+		return lm[3] ? n >= lo && n <= +lm[3] : n >= lo;
 	};
 	const buddyLevel = mon.buddyLevel ?? (mon.flags?.buddy ? 1 : 0);
 	const dynaAtk = mon.dynaAtk ?? (mon.flags?.dynamaxCapable ? 1 : 0);
@@ -6070,7 +6168,7 @@ function evalTerm(t, mon, kw, outputLocale) {
 		[mon.dynaSpirit || 0, kw.flag.dynamax_spirit],
 	]) {
 		if (!word) continue;
-		const v = levelOf(n, new RegExp(`^${escapeRegex(word)}([1-5])-$`));
+		const v = levelOf(n, new RegExp(`^${escapeRegex(word)}([0-5])(?:(-)([0-5])?)?$`));
 		if (v !== undefined) return v;
 	}
 	if (t === `${kw.flag.mega}1-`) return !!mon.flags?.megaEvolved;
@@ -7140,6 +7238,11 @@ export default function App() {
 		cupFilters,
 		smeargleFinder,
 		missingHaves,
+		bottleCaps,
+		rerollTrade,
+		thirdMove,
+		eliteTm,
+		maxMoveUpgrade,
 	} = useMemo(
 		() =>
 			buildFilters(
@@ -7784,7 +7887,30 @@ export default function App() {
 		</PileTile>
 	);
 	const floatedHere = floats.filter((f) => pileById[f.pile]);
-	const toolFilters = { mega_evolve: megaEvolve };
+	// Each tool is a list of boxes, best first. Copy keys are `${tool}_${box}`,
+	// except Mega-evolve's single box, which keeps its old key.
+	const sourceBoxes = (tool, list) =>
+		(list || []).map((x) => ({
+			key: x.key,
+			label: `app.tool.source.${x.key}`,
+			hint: `app.tool.${tool}.${x.key === 'raids' || x.key === 'master' ? 'hint_stars' : 'hint_league'}`,
+			filter: x.filter,
+		}));
+	const toolFilters = {
+		mega_evolve: [
+			{ key: 'mega_evolve', copyKey: 'mega_evolve', label: 'app.filter.mega_evolve_label', hint: 'app.filter.mega_evolve_hint', filter: megaEvolve },
+		],
+		bottle_caps: (bottleCaps || []).map((x) => ({
+			key: x.key,
+			label: `app.tool.bottle_caps.${x.key}_label`,
+			hint: `app.tool.bottle_caps.${x.key}_hint`,
+			filter: x.filter,
+		})),
+		third_move: sourceBoxes('third_move', thirdMove),
+		elite_tm: sourceBoxes('elite_tm', eliteTm),
+		max_upgrade: [{ key: 'max_upgrade', label: 'app.filter.max_upgrade_label', hint: 'app.filter.max_upgrade_hint', filter: maxMoveUpgrade }],
+	};
+	for (const id of Object.keys(toolFilters)) toolFilters[id] = toolFilters[id].filter((x) => x.filter);
 	const sortingView = (
 		<div className='space-y-8'>
 			<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.sort.intro')}</p>
@@ -7822,7 +7948,7 @@ export default function App() {
 				const piles = group.piles
 					.map((id) => pileById[id])
 					.filter((p) => p && !floatIds.has(p.id) && !hiddenIds.has(p.id));
-				const tools = (group.tools || []).filter((id) => toolFilters[id]);
+				const tools = (group.tools || []).filter((id) => toolFilters[id]?.length > 0);
 				if (piles.length === 0 && tools.length === 0) return null;
 				return (
 					<AreaGroup
@@ -7841,14 +7967,22 @@ export default function App() {
 								icon={PILE_ICON[id]}
 								accent={group.accent}
 							>
-								<FilterBox
-									label={t(`app.filter.${id}_label`)}
-									accent={group.accent}
-									filterStr={toolFilters[id]}
-									copied={copied[id]}
-									onCopy={() => copyToClipboard(id, toolFilters[id])}
-									hint={t(`app.filter.${id}_hint`)}
-								/>
+								<div className='space-y-3'>
+									{toolFilters[id].map((box) => {
+										const copyKey = box.copyKey || `${id}_${box.key}`;
+										return (
+											<FilterBox
+												key={box.key}
+												label={t(box.label)}
+												accent={group.accent}
+												filterStr={box.filter}
+												copied={copied[copyKey]}
+												onCopy={() => copyToClipboard(copyKey, box.filter)}
+												hint={t(box.hint)}
+											/>
+										);
+									})}
+								</div>
 							</ToolTile>
 						))}
 					</AreaGroup>
@@ -8415,6 +8549,16 @@ export default function App() {
 																	copied={copied.gift}
 																	onCopy={() => copyToClipboard('gift', gift)}
 																	hint={t('app.filter.gift_hint')}
+																/>
+															)}
+															{rerollTrade && (
+																<FilterBox
+																	label={t('app.filter.reroll_trade_label')}
+																	accent='#F5B82E'
+																	filterStr={rerollTrade}
+																	copied={copied.reroll_trade}
+																	onCopy={() => copyToClipboard('reroll_trade', rerollTrade)}
+																	hint={t('app.filter.reroll_trade_hint')}
 																/>
 															)}
 															<FilterBox
@@ -11554,8 +11698,15 @@ function PileCard({ card, t }) {
 // hook in plain words ("Cryptos piling up…"), and the three steps when opened.
 // `chip` carries the event window or the reason a pile floated up.
 export const PILE_GROUPS = [
-	{ id: 'collection', accent: '#F5B82E', piles: ['hundo', 'cday', 'shiny', 'luckies', 'traded', 'costumes_evolve', 'costumes_final', 'backgrounds', 'xxl', 'xxs'] },
-	{ id: 'battle', accent: '#E74C3C', piles: ['meta', 'watchlist', 'legendaries', 'shadows', 'dynamax'] },
+	// Bottle caps turn a near-hundo special into a hundo: a collection job.
+	{
+		id: 'collection',
+		accent: '#F5B82E',
+		piles: ['hundo', 'cday', 'shiny', 'luckies', 'traded', 'costumes_evolve', 'costumes_final', 'backgrounds', 'xxl', 'xxs'],
+		tools: ['bottle_caps'],
+	},
+	// What to spend battle resources on: a third move, an Elite TM, Max Particles.
+	{ id: 'battle', accent: '#E74C3C', piles: ['meta', 'watchlist', 'legendaries', 'shadows', 'dynamax'], tools: ['third_move', 'elite_tm', 'max_upgrade'] },
 	// `tools` are single filters with their own tile: mega-evolving spends
 	// candy, so it sits here and not with the Mega planner under Catching.
 	{ id: 'evolve', accent: '#27AE60', piles: ['evolve'], tools: ['mega_evolve'] },
@@ -11565,6 +11716,7 @@ const PILE_ICON = {
 	hundo: Award, luckies: Clover, traded: Gift, costumes_evolve: Shirt, costumes_final: Shirt, backgrounds: Image, legendaries: Crown, cday: Sparkles, shiny: Sparkle,
 	xxl: Maximize2, xxs: Minimize2, meta: Swords, watchlist: Telescope, shadows: Flame, dynamax: Zap, evolve: Sprout,
 	non_meta: Package, event: Leaf, mega_evolve: Dna,
+	bottle_caps: BottleWine, third_move: ListPlus, elite_tm: Disc3, max_upgrade: ChevronsUp,
 };
 // A single filter in a pile group, styled like a pile tile.
 function ToolTile({ title, hook, chip, icon, accent, open, children }) {

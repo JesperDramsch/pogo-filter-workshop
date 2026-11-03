@@ -1,6 +1,6 @@
 # Pokémon GO PvP Meta Reference — GENERATED, DO NOT HAND-EDIT
 
-- **Snapshot taken:** 2026-11-02T16:11:15.720Z
+- **Snapshot taken:** 2026-11-03T16:02:56.047Z
 - **Source:** pvpoke — https://github.com/pvpoke/pvpoke (MIT)
 - **Snapshot URL:** https://raw.githubusercontent.com/JesperDramsch/pogo-filter-workshop/main/src/data/pvp-rankings.json
 - **Depth:** top 30 per league, deduped by base dex

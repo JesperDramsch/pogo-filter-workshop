@@ -37,6 +37,8 @@ export function pogoKeywords(outputLocale) {
       // A special background (Community Day, GO Fest, …), never a location card.
       special_background: k(messages, "filter_key_special_background"),
       traded:       k(messages, "filter_key_traded"),
+      // Pokémon in (or done with) Hyper Training, the Bottle Cap mechanic.
+      hyper_training: k(messages, "filter_key_hyper_training"),
       hatched:      k(messages, "filter_key_hatched"),
       baby:         k(messages, "filter_key_baby"),
       new_evo:      k(messages, "filter_key_evolve_to_new"),
