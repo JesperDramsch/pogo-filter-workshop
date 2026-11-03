@@ -111,6 +111,28 @@ for (const loc of LOCS) {
   ];
   const bad = cases.filter(([, m, want]) => v(f, m, loc) !== want).map(([label]) => label);
   check(`${loc}: ${cases.length} trade cases`, bad.length === 0, bad.join("; "));
+
+  // The trade filter's own keeps hold here too (the routine review of #136):
+  // a shiny the user tagged, starred, kept as a nundo or a former buddy, or
+  // league-tagged is never offered for a re-roll, while the control still is.
+  const kept = {
+    ...DEFAULT_CONFIG, protectAnyTag: true, protectFavorites: true, protectNundos: true, protectBuddies: true,
+    protectShinies: false, leagueTags: "ⓤ,ⓖ,ⓛ",
+  };
+  const rk = buildFilters([], [], kept, [], loc, tFn);
+  const shinyPika = (ivs, o = {}) => mon(loc, PIKACHU, ivs, { ...o, flags: { shiny: true, ...(o.flags || {}) } });
+  const keepCases = [
+    ["tagged #Tradebait", shinyPika([3, 4, 2], { tags: ["Tradebait"] }), false],
+    ["favourite", shinyPika([3, 4, 2], { flags: { favorite: true } }), false],
+    ["nundo 0/0/0", shinyPika([0, 0, 0]), false],
+    ["former buddy", shinyPika([3, 4, 2], { buddyLevel: 2 }), false],
+    ["league-tagged", shinyPika([3, 4, 2], { flags: { leagueU: true } }), false],
+    ["plain (control)", shinyPika([3, 4, 2]), true],
+  ];
+  const badKeep = keepCases
+    .filter(([, m, want]) => v(rk.rerollTrade, m, loc) !== want || (want === false && v(rk.trade, m, loc) !== false))
+    .map(([label]) => label);
+  check(`${loc}: re-roll honours the trade filter's per-Pokémon keeps`, badKeep.length === 0, badKeep.join("; "));
 }
 
 console.log("\nO4: third move / Elite TM / Max Move upgrades");

@@ -51,6 +51,7 @@ import {
 	ListPlus,
 	Disc3,
 	ChevronsUp,
+	Sun,
 } from 'lucide-react';
 import {
 	POKEMON_NAMES_DICT,
@@ -187,9 +188,11 @@ function stepFromHash() {
 // The filter step splits by what the user is doing at that moment (see
 // docs/sorting-workflow-spec.md, "Areas"). Keys are deliberately disjoint from
 // the wizard step keys, so #workshop/<key> stays unambiguous.
-export const FILTER_AREAS = ['catch', 'sort', 'battle', 'trade'];
+// Upgrades sits between keeping (Sorting) and fighting (Battle): what to
+// spend candy, stardust, TMs, caps and Max Particles on.
+export const FILTER_AREAS = ['catch', 'sort', 'upgrade', 'battle', 'trade'];
 // #workshop/<area>/settings flips that area to its settings; the flip stays
-// on while switching tabs, so all four areas' settings are one view.
+// on while switching tabs, so every area's settings are one view.
 const AREA_HASH = /^#workshop\/(\w+)(\/settings)?$/;
 export function areaFromHash(hash = typeof window === 'undefined' ? '' : window.location.hash) {
 	const m = hash.match(AREA_HASH);
@@ -3187,8 +3190,22 @@ export function buildFilters(
 	push(tradeClauses, [S012, TE_full_str, ivK1Bad].filter(Boolean).join(','), tFn('app.clause_why.not_k1_te'));
 	push(tradeClauses, [S012, TE_full_str, ivK2Bad].filter(Boolean).join(','), tFn('app.clause_why.not_k2_te'));
 	push(tradeClauses, [S012, TE_full_str, ivK3Bad].filter(Boolean).join(','), tFn('app.clause_why.not_k3_te'));
-	if (notP) push(tradeClauses, notP, tFn('app.clause_why.not_p', { params: { mode: cfg.pvpMode } }));
-	pushPvPMetaClauses(tradeClauses);
+	// The trade filter's keeps that mean "never trade THIS Pokémon" (tags,
+	// favourites, nundos, league tags, former buddies, PvP keepers, invested
+	// moves), mirrored as they are pushed so the re-roll trade string honours
+	// the same choices. Category protections (shiny, costume, legendary, ...)
+	// are left out: they exclude exactly what re-roll trades look for.
+	const rerollKeeps = [];
+	const keepPush = (clause, why) => {
+		push(tradeClauses, clause, why);
+		rerollKeeps.push(clause);
+	};
+	if (notP) keepPush(notP, tFn('app.clause_why.not_p', { params: { mode: cfg.pvpMode } }));
+	{
+		const before = tradeClauses.length;
+		pushPvPMetaClauses(tradeClauses);
+		rerollKeeps.push(...tradeClauses.slice(before).map((c) => c.clause));
+	}
 
 	// Mandatory trade constraints (physical game rules — always apply)
 	push(tradeClauses, `!${kw.flag.traded}`, tFn('app.clause_why.must_traded'));
@@ -3197,25 +3214,19 @@ export function buildFilters(
 	push(tradeClauses, `!${kw.flag.mythical},808,809`, tFn('app.clause_why.must_mythical_long'));
 
 	if (cfg.protectAnyTag) {
-		push(tradeClauses, '!#', tFn('app.clause_why.any_tag_trade'));
+		keepPush('!#', tFn('app.clause_why.any_tag_trade'));
 	} else {
-		if (basarTag)
-			push(tradeClauses, `!#${basarTag}`, tFn('app.clause_why.bazaar_tag_trade', { params: { tag: basarTag } }));
+		if (basarTag) keepPush(`!#${basarTag}`, tFn('app.clause_why.bazaar_tag_trade', { params: { tag: basarTag } }));
 		if (fernTauschTag)
-			push(
-				tradeClauses,
-				`!#${fernTauschTag}`,
-				tFn('app.clause_why.fern_tausch_tag_trade', { params: { tag: fernTauschTag } }),
-			);
-		for (const t of customTags)
-			push(tradeClauses, `!#${t}`, tFn('app.clause_why.custom_tag', { params: { tag: t } }));
+			keepPush(`!#${fernTauschTag}`, tFn('app.clause_why.fern_tausch_tag_trade', { params: { tag: fernTauschTag } }));
+		for (const t of customTags) keepPush(`!#${t}`, tFn('app.clause_why.custom_tag', { params: { tag: t } }));
 		// Buddy stockpiles are staged for a *specific* friend — keep them out of the
 		// general trade filter (mirrors the trash protection at L711-714 and makes
 		// buddy tags behave exactly like the basar/fern trade tags above). The
 		// prestaged filter surfaces them for the actual hand-off.
 		for (const b of activeBuddies) {
 			const prefix = bareTagPrefix(b.tagPrefix);
-			push(tradeClauses, `!#${prefix}`, tFn('app.clause_why.buddy_tag', { params: { name: b.name, prefix } }));
+			keepPush(`!#${prefix}`, tFn('app.clause_why.buddy_tag', { params: { name: b.name, prefix } }));
 		}
 	}
 
@@ -3225,23 +3236,21 @@ export function buildFilters(
 	if (cfg.protectCostumes) push(tradeClauses, `!${kw.flag.costume}`, tFn('app.clause_why.costumes_trade'));
 	if (cfg.protectPurified) push(tradeClauses, `!${kw.flag.purified}`, tFn('app.clause_why.purified'));
 	if (cfg.protectBackgrounds) push(tradeClauses, `!${kw.flag.background}`, tFn('app.clause_why.backgrounds_trade'));
-	if (cfg.protectFavorites) push(tradeClauses, `!${kw.flag.favorite}`, tFn('app.clause_why.favorites'));
+	if (cfg.protectFavorites) keepPush(`!${kw.flag.favorite}`, tFn('app.clause_why.favorites'));
 	push(tradeClauses, '!4*', tFn('app.clause_why.rule1_no_4star_trade'));
 	if (cfg.protectNundos) {
-		push(
-			tradeClauses,
-			`1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`,
-			tFn('app.clause_why.protect_nundos_trade'),
-		);
+		keepPush(`1-4${kw.iv.atk},1-4${kw.iv.def},1-4${kw.iv.hp}`, tFn('app.clause_why.protect_nundos_trade'));
 	}
-	for (const t of leagueTags) push(tradeClauses, `!${t}`, tFn('app.clause_why.league_tag', { params: { tag: t } }));
+	for (const t of leagueTags) keepPush(`!${t}`, tFn('app.clause_why.league_tag', { params: { tag: t } }));
 	// Trading away a former buddy forfeits the walked-distance/affection history;
 	// mirror the trash protection (search for cfg.protectBuddies above).
-	if (cfg.protectBuddies) push(tradeClauses, `!${kw.numeric.buddy}1-`, tFn('app.clause_why.buddies_were'));
-	if (cfg.protectDoubleMoved) push(tradeClauses, '@3move', tFn('app.clause_why.double_moved_trade'));
+	if (cfg.protectBuddies) keepPush(`!${kw.numeric.buddy}1-`, tFn('app.clause_why.buddies_were'));
+	if (cfg.protectDoubleMoved) keepPush('@3move', tFn('app.clause_why.double_moved_trade'));
 	{
+		// A trade resets Max Move levels (the game's own trade warning), so an
+		// invested Dynamax is a keep for re-roll trades too.
 		const mp = maxProtectClause();
-		if (mp) push(tradeClauses, mp[0], mp[1]);
+		if (mp) keepPush(mp[0], mp[1]);
 	}
 	// Trading away a would-be new-dex evolution costs you the registration; mirror
 	// the trash protection (L738) so it isn't bulk-traded.
@@ -4198,7 +4207,7 @@ export function buildFilters(
 		})),
 		{ key: 'gold', filter: goldCapFilter(kw, { collectibles: oneOffCollectibles }).join('&') },
 	];
-	const rerollTrade = rerollTradeFilter(kw, { collectibles: oneOffCollectibles }).join('&');
+	const rerollTrade = rerollTradeFilter(kw, { collectibles: oneOffCollectibles, keeps: rerollKeeps }).join('&');
 	// Display-only mirror for the curated chips: the have-list member that fills
 	// a target's line, when it isn't the target species itself — named in the
 	// output locale so the dimmed chip says WHY it is done.
@@ -5713,19 +5722,30 @@ export function buildFilters(
 		// GBL): keep the good ones.
 		buildPile({ id: 'legendaries', head: `${kw.flag.legendary},${kw.flag.ultra_beast}`, lenses: ivLadder(), kw, cfg, tail: pileTail }),
 	].filter(Boolean);
-	// Filters that belong with a pile but aren't keep steps: cheap purify stock
-	// (common 1 km-candy shadows, never meta), which shadows to Charge-TM, and
-	// cheap XP evolves (it names the trade evolutions species by species).
+	// The purify tools, for the Upgrades area: cheap purify stock (common
+	// 1 km-candy shadows, never meta), safe mass purify, purify-to-hundo
+	// candidates and which shadows to Charge-TM off Frustration. They used to
+	// ride the shadow pile; purifying spends stardust and candy, which is an
+	// upgrade decision, while the pile keeps the keep-or-transfer one.
+	const purifyTools = [
+		{
+			key: 'cheap_purify',
+			label: 'app.pile.lens.cheap_purify_label',
+			hint: 'app.pile.lens.cheap_purify_hint',
+			filter: shadowSafe ? `${shadowSafe}&${kw.numeric.candy_km}1` : '',
+		},
+		{ key: 'safe_purify', label: 'app.filter.shadow_safe_label', hint: 'app.filter.shadow_safe_hint', filter: shadowSafe },
+		{
+			key: 'purify_hundo',
+			label: 'app.filter.shadow_hundo_candidates_label',
+			hint: 'app.filter.shadow_hundo_candidates_hint',
+			filter: shadowHundoCandidates,
+		},
+		{ key: 'shadow_frustration', label: 'app.filter.shadow_frustration_label', hint: 'app.filter.shadow_frustration_hint', filter: shadowFrustration },
+	].filter((x) => x.filter);
+	// Filters that belong with a pile but aren't keep steps: cheap XP evolves
+	// (it names the trade evolutions species by species).
 	const PILE_EXTRAS = {
-		shadows: [
-			{
-				key: 'cheap_purify',
-				label: 'app.pile.lens.cheap_purify_label',
-				hint: 'app.pile.lens.cheap_purify_hint',
-				filter: shadowSafe ? `${shadowSafe}&${kw.numeric.candy_km}1` : '',
-			},
-			{ key: 'shadow_frustration', label: 'app.filter.shadow_frustration_label', hint: 'app.filter.shadow_frustration_hint', filter: shadowFrustration },
-		],
 		evolve: [
 			{ key: 'cheap_evolve', label: 'app.filter.cheap_evolve_label', hint: 'app.filter.cheap_evolve_hint', filter: cheapEvolve },
 		],
@@ -5993,6 +6013,7 @@ export function buildFilters(
 		thirdMove,
 		eliteTm,
 		maxMoveUpgrade,
+		purifyTools,
 	};
 }
 
@@ -7243,6 +7264,7 @@ export default function App() {
 		thirdMove,
 		eliteTm,
 		maxMoveUpgrade,
+		purifyTools,
 	} = useMemo(
 		() =>
 			buildFilters(
@@ -7841,7 +7863,11 @@ export default function App() {
 	);
 	const floatIds = new Set(floats.map((f) => f.pile));
 	const hiddenIds = new Set(effectiveConfig.hiddenPiles || []);
-	const hiddenPileList = [hundoPile, ...sortingPiles].filter((p) => p && !floatIds.has(p.id) && hiddenIds.has(p.id));
+	// Only Sorting's piles can be hidden; the evolve pile in Upgrades always shows.
+	const sortPileIds = new Set(PILE_GROUPS.flatMap((g) => g.piles));
+	const hiddenPileList = [hundoPile, ...sortingPiles].filter(
+		(p) => p && sortPileIds.has(p.id) && !floatIds.has(p.id) && hiddenIds.has(p.id),
+	);
 	const toggleHiddenPile = (id) => {
 		setConfig((prev) => {
 			const now = new Set(prev.hiddenPiles || []);
@@ -7868,7 +7894,7 @@ export default function App() {
 			: t('app.sort.ended', { params: { when: fmtWhen.format(Date.parse(ev.end)) } });
 	const venueNote = (venue) => venueNoteFor(venue, homeLocation, t, locale);
 	const pileById = Object.fromEntries([hundoPile, ...sortingPiles].filter(Boolean).map((p) => [p.id, p]));
-	const accentOf = (id) => PILE_GROUPS.find((g) => g.piles.includes(id))?.accent || '#5EAFC5';
+	const accentOf = (id) => [...PILE_GROUPS, ...UPGRADE_GROUPS].find((g) => g.piles.includes(id))?.accent || '#5EAFC5';
 	const tile = (pile, extra = {}) => (
 		<PileTile
 			key={pile.id}
@@ -7909,8 +7935,70 @@ export default function App() {
 		third_move: sourceBoxes('third_move', thirdMove),
 		elite_tm: sourceBoxes('elite_tm', eliteTm),
 		max_upgrade: [{ key: 'max_upgrade', label: 'app.filter.max_upgrade_label', hint: 'app.filter.max_upgrade_hint', filter: maxMoveUpgrade }],
+		purify: purifyTools || [],
 	};
 	for (const id of Object.keys(toolFilters)) toolFilters[id] = toolFilters[id].filter((x) => x.filter);
+	// A takeover or a Max Battle event floats its pile up in Sorting; the tool
+	// that spends on it (purify, Max Move upgrades) gets the same chip and
+	// opens on its own in Upgrades.
+	const toolFloat = { purify: 'shadows', max_upgrade: 'dynamax' };
+	const toolChip = (id) => {
+		const f = toolFloat[id] && floats.find((x) => x.pile === toolFloat[id]);
+		return f ? t(`app.float.${f.kind}`, { params: { title: f.title } }) : null;
+	};
+	// One group of piles and tool tiles. `area` names the id and string
+	// namespaces: Sorting's piles hide, skip floated ones and read
+	// app.sort.group.*; Upgrades' always show and read app.upgrade.group.*.
+	const renderGroup = (group, area) => {
+		const sort = area === 'sort';
+		const piles = group.piles
+			.map((id) => pileById[id])
+			.filter((p) => p && (!sort || (!floatIds.has(p.id) && !hiddenIds.has(p.id))));
+		const tools = (group.tools || []).filter((id) => toolFilters[id]?.length > 0);
+		if (piles.length === 0 && tools.length === 0) return null;
+		return (
+			<AreaGroup
+				key={group.id}
+				id={`${area}-${group.id}`}
+				title={t(`app.${area}.group.${group.id}`)}
+				hint={t(`app.${area}.group_hint.${group.id}`)}
+				accent={group.accent}
+			>
+				{piles.map((pile) => tile(pile, sort ? { onHide: () => toggleHiddenPile(pile.id) } : {}))}
+				{tools.map((id) => {
+					const chip = toolChip(id);
+					return (
+						<ToolTile
+							key={id}
+							title={t(`app.filter.${id}_label`)}
+							hook={t(`app.sort.hook.${id}`)}
+							chip={chip}
+							open={!!chip}
+							icon={PILE_ICON[id]}
+							accent={group.accent}
+						>
+							<div className='space-y-3'>
+								{toolFilters[id].map((box) => {
+									const copyKey = box.copyKey || `${id}_${box.key}`;
+									return (
+										<FilterBox
+											key={box.key}
+											label={t(box.label)}
+											accent={group.accent}
+											filterStr={box.filter}
+											copied={copied[copyKey]}
+											onCopy={() => copyToClipboard(copyKey, box.filter)}
+											hint={t(box.hint)}
+										/>
+									);
+								})}
+							</div>
+						</ToolTile>
+					);
+				})}
+			</AreaGroup>
+		);
+	};
 	const sortingView = (
 		<div className='space-y-8'>
 			<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.sort.intro')}</p>
@@ -7944,50 +8032,7 @@ export default function App() {
 					)}
 				</section>
 			)}
-			{PILE_GROUPS.map((group) => {
-				const piles = group.piles
-					.map((id) => pileById[id])
-					.filter((p) => p && !floatIds.has(p.id) && !hiddenIds.has(p.id));
-				const tools = (group.tools || []).filter((id) => toolFilters[id]?.length > 0);
-				if (piles.length === 0 && tools.length === 0) return null;
-				return (
-					<AreaGroup
-						key={group.id}
-						id={`sort-${group.id}`}
-						title={t(`app.sort.group.${group.id}`)}
-						hint={t(`app.sort.group_hint.${group.id}`)}
-						accent={group.accent}
-					>
-						{piles.map((pile) => tile(pile, { onHide: () => toggleHiddenPile(pile.id) }))}
-						{tools.map((id) => (
-							<ToolTile
-								key={id}
-								title={t(`app.filter.${id}_label`)}
-								hook={t(`app.sort.hook.${id}`)}
-								icon={PILE_ICON[id]}
-								accent={group.accent}
-							>
-								<div className='space-y-3'>
-									{toolFilters[id].map((box) => {
-										const copyKey = box.copyKey || `${id}_${box.key}`;
-										return (
-											<FilterBox
-												key={box.key}
-												label={t(box.label)}
-												accent={group.accent}
-												filterStr={box.filter}
-												copied={copied[copyKey]}
-												onCopy={() => copyToClipboard(copyKey, box.filter)}
-												hint={t(box.hint)}
-											/>
-										);
-									})}
-								</div>
-							</ToolTile>
-						))}
-					</AreaGroup>
-				);
-			})}
+			{PILE_GROUPS.map((group) => renderGroup(group, 'sort'))}
 			{hiddenPileList.length > 0 && (
 				<div className='space-y-2'>
 					<button
@@ -8003,6 +8048,12 @@ export default function App() {
 				</div>
 			)}
 			<CrushCard tag={jobTagsOf(effectiveConfig).crush} copied={copied} copyToClipboard={copyToClipboard} t={t} />
+		</div>
+	);
+	const upgradeView = (
+		<div className='space-y-8'>
+			<p className='mono text-xs text-[#8B98A5] leading-relaxed'>{t('app.upgrade.intro')}</p>
+			{UPGRADE_GROUPS.map((group) => renderGroup(group, 'upgrade'))}
 		</div>
 	);
 	const megaPlanRows = useMemo(
@@ -8135,6 +8186,11 @@ export default function App() {
 				<ConfigPanel {...configPanelProps} sections={['pvp', 'raid', 'rocket']} />
 				<LeagueTagSettings config={config} set={setConfigKey} />
 				{raidRosterSettings}
+			</div>
+		),
+		upgrade: (
+			<div className='space-y-10'>
+				<UpgradeSources onOpen={(area) => goToArea(area, true)} expertMode={!!effectiveConfig.expertMode} t={t} />
 				{shadowKeeperSettings}
 			</div>
 		),
@@ -8343,6 +8399,15 @@ export default function App() {
 										) : (
 											<>
 												{sortingView}
+											</>
+										)}
+									</AreaPanel>
+									<AreaPanel area='upgrade' current={filterArea}>
+										{stage.settings ? (
+											areaSettingsFor.upgrade
+										) : (
+											<>
+												{upgradeView}
 											</>
 										)}
 									</AreaPanel>
@@ -10878,7 +10943,44 @@ function SwipeAreas({ areas, current, onSelect, stage, children }) {
 	);
 }
 
-// The four areas of the filter step as an ARIA tab set. Every panel stays
+// The Upgrades settings side. Its strings read lists that live in other
+// areas' settings; rather than editing them twice, each row says which list
+// feeds which string and jumps to it.
+const UPGRADE_SOURCES = [
+	{ key: 'collectibles', area: 'catch' },
+	{ key: 'hundos', area: 'sort' },
+	{ key: 'evolve_tag', area: 'sort' },
+	// The Max attacker list is an expert setting: without expert mode the jump
+	// would land on Battle settings that do not show it.
+	{ key: 'max_roster', area: 'battle', expertOnly: true },
+	{ key: 'rankings', area: null },
+];
+function UpgradeSources({ onOpen, expertMode, t }) {
+	return (
+		<div>
+			<h3 className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold mb-2'>{t('app.upgrade.sources.title')}</h3>
+			<p className='mono text-xs text-[#8B98A5] leading-relaxed mb-4'>{t('app.upgrade.sources.intro')}</p>
+			<ul className='space-y-3'>
+				{UPGRADE_SOURCES.filter((row) => expertMode || !row.expertOnly).map((row) => (
+					<li key={row.key} className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2'>
+						<span className='text-xs text-[#C9D1D9] leading-relaxed'>{t(`app.upgrade.sources.${row.key}`)}</span>
+						{row.area && (
+							<button
+								type='button'
+								onClick={() => onOpen(row.area)}
+								className='mono text-xs self-start shrink-0 min-h-[32px] px-3 rounded-sm border border-[#2D3A47] text-[#8B98A5] hover:text-[#E6EDF3] transition'
+							>
+								{t('app.area.settings_open', { params: { area: t(`app.area.${row.area}.label`) } })}
+							</button>
+						)}
+					</li>
+				))}
+			</ul>
+		</div>
+	);
+}
+
+// The five areas of the filter step as an ARIA tab set. Every panel stays
 // mounted (hidden, not unmounted), so each tab's aria-controls points at a
 // real element and switching tabs keeps every collapsible's open state.
 // Arrow keys move between tabs and Home/End jump to the ends, per the APG
@@ -10899,7 +11001,10 @@ function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, onOpen
 	};
 	return (
 		<div className='pb-3 border-b border-[#1F2933]'>
-			<div role='tablist' aria-label={t('app.area.tablist')} className='grid grid-cols-4 gap-1'>
+			{/* Five tabs do not fit one row on a phone in any locale, so below
+			    `sm` they take two rows: three, then two wider ones (a six-column
+			    grid). One row of five from `sm` up. */}
+			<div role='tablist' aria-label={t('app.area.tablist')} className='grid grid-cols-6 sm:grid-cols-5 gap-1'>
 				{areas.map((area, i) => {
 					const selected = area === current;
 					return (
@@ -10914,7 +11019,7 @@ function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, onOpen
 							tabIndex={selected ? 0 : -1}
 							onClick={() => onSelect(area)}
 							onKeyDown={(e) => move(e, i)}
-							className={`mono text-xs min-h-[40px] px-2 rounded-sm border transition ${
+							className={`mono text-xs min-h-[40px] px-2 rounded-sm border transition ${i < 3 ? 'col-span-2' : 'col-span-3'} sm:col-span-1 ${
 								selected
 									? 'border-[#5EAFC5] text-[#E6EDF3] bg-[#141A21]'
 									: 'border-[#1F2933] text-[#8B98A5] hover:text-[#E6EDF3]'
@@ -10947,7 +11052,7 @@ function AreaTabs({ areas, current, onSelect, settings, onToggleSettings, onOpen
 						</button>
 					)}
 				</div>
-				{/* The flip: same four tabs, each showing its own settings. A toggle,
+				{/* The flip: same five tabs, each showing its own settings. A toggle,
 				    so aria-pressed carries the state; the label says where it goes. */}
 				<button
 					type='button'
@@ -11075,7 +11180,7 @@ function HelpSheet({ area, onClose, t }) {
 	);
 }
 
-// One look for every group and tile across the four areas. A group sets the
+// One look for every group and tile across the five areas. A group sets the
 // colour; tiles inside it pick it up from context, so a tile never needs to
 // be told which tab it sits in.
 const AreaAccent = createContext('#5EAFC5');
@@ -11698,25 +11803,24 @@ function PileCard({ card, t }) {
 // hook in plain words ("Cryptos piling up…"), and the three steps when opened.
 // `chip` carries the event window or the reason a pile floated up.
 export const PILE_GROUPS = [
-	// Bottle caps turn a near-hundo special into a hundo: a collection job.
-	{
-		id: 'collection',
-		accent: '#F5B82E',
-		piles: ['hundo', 'cday', 'shiny', 'luckies', 'traded', 'costumes_evolve', 'costumes_final', 'backgrounds', 'xxl', 'xxs'],
-		tools: ['bottle_caps'],
-	},
-	// What to spend battle resources on: a third move, an Elite TM, Max Particles.
-	{ id: 'battle', accent: '#E74C3C', piles: ['meta', 'watchlist', 'legendaries', 'shadows', 'dynamax'], tools: ['third_move', 'elite_tm', 'max_upgrade'] },
-	// `tools` are single filters with their own tile: mega-evolving spends
-	// candy, so it sits here and not with the Mega planner under Catching.
-	{ id: 'evolve', accent: '#27AE60', piles: ['evolve'], tools: ['mega_evolve'] },
+	{ id: 'collection', accent: '#F5B82E', piles: ['hundo', 'cday', 'shiny', 'luckies', 'traded', 'costumes_evolve', 'costumes_final', 'backgrounds', 'xxl', 'xxs'] },
+	{ id: 'battle', accent: '#E74C3C', piles: ['meta', 'watchlist', 'legendaries', 'shadows', 'dynamax'] },
 	{ id: 'big', accent: '#5EAFC5', piles: ['non_meta'] },
+];
+// The Upgrades area: what to spend resources on, never what to transfer.
+// Same shape as PILE_GROUPS; `tools` are filters with their own tile. The
+// evolve pile lives here because it has no transfer step (release: false).
+export const UPGRADE_GROUPS = [
+	{ id: 'evolve', accent: '#27AE60', piles: ['evolve'], tools: ['mega_evolve'] },
+	{ id: 'caps', accent: '#F5B82E', piles: [], tools: ['bottle_caps'] },
+	{ id: 'moves', accent: '#E74C3C', piles: [], tools: ['third_move', 'elite_tm', 'max_upgrade'] },
+	{ id: 'purify', accent: '#9B59B6', piles: [], tools: ['purify'] },
 ];
 const PILE_ICON = {
 	hundo: Award, luckies: Clover, traded: Gift, costumes_evolve: Shirt, costumes_final: Shirt, backgrounds: Image, legendaries: Crown, cday: Sparkles, shiny: Sparkle,
 	xxl: Maximize2, xxs: Minimize2, meta: Swords, watchlist: Telescope, shadows: Flame, dynamax: Zap, evolve: Sprout,
 	non_meta: Package, event: Leaf, mega_evolve: Dna,
-	bottle_caps: BottleWine, third_move: ListPlus, elite_tm: Disc3, max_upgrade: ChevronsUp,
+	bottle_caps: BottleWine, third_move: ListPlus, elite_tm: Disc3, max_upgrade: ChevronsUp, purify: Sun,
 };
 // A single filter in a pile group, styled like a pile tile.
 function ToolTile({ title, hook, chip, icon, accent, open, children }) {

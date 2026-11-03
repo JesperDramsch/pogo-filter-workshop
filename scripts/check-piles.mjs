@@ -33,7 +33,7 @@
 // Run with: npx vite-node scripts/check-piles.mjs
 
 import {
-  BUDGET_DEFAULTS, BUDGET_ROWS, evalFilterDetailed as evalDetailed, FLOAT_ENDED_DAYS, floatingPiles, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET, PILE_GROUPS, PROTECTION_PILES, hiddenPileTransitions, withPileTransitions,
+  BUDGET_DEFAULTS, BUDGET_ROWS, evalFilterDetailed as evalDetailed, FLOAT_ENDED_DAYS, floatingPiles, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET, PILE_GROUPS, UPGRADE_GROUPS, PROTECTION_PILES, hiddenPileTransitions, withPileTransitions,
 } from "../src/App.jsx";
 import { readFileSync } from "node:fs";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
@@ -885,11 +885,14 @@ console.log("\nStep ③ renders the leftovers before the reveal");
 
 console.log("\nMega-evolve placement");
 {
-  // Mega-evolving spends candy, so its filter has its own tile under Sorting's
-  // "Evolve & grind", and the Mega planner under Catching does not carry it.
-  const evolve = PILE_GROUPS.find((g) => g.id === "evolve");
-  check("the evolve group carries the mega-evolve tool", (evolve?.tools || []).includes("mega_evolve"));
-  check("no other group carries it", PILE_GROUPS.filter((g) => (g.tools || []).includes("mega_evolve")).length === 1);
+  // Mega-evolving spends candy, so its filter has its own tile under the
+  // Upgrades area's "Evolve & grind", and the Mega planner under Catching does
+  // not carry it. Sorting keeps keep-or-transfer piles only.
+  const evolve = UPGRADE_GROUPS.find((g) => g.id === "evolve");
+  check("the Upgrades evolve group carries the evolve pile and the mega-evolve tool",
+    (evolve?.piles || []).includes("evolve") && (evolve?.tools || []).includes("mega_evolve"));
+  check("no other group carries either",
+    [...PILE_GROUPS, ...UPGRADE_GROUPS].filter((g) => (g.tools || []).includes("mega_evolve") || g.piles.includes("evolve")).length === 1);
   for (const loc of localeNames) {
     const r = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc));
     check(`${loc}: the mega-evolve filter is built`, !!r.megaEvolve && r.megaEvolve.startsWith(pogoKeywords(loc).flag.mega_evolve));
@@ -897,6 +900,31 @@ console.log("\nMega-evolve placement");
   const src = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
   const planner = src.slice(src.indexOf("function MegaPlanner("), src.indexOf("function MegaBoostPanel("));
   check("the Mega planner renders no mega-evolve filter", !/megaEvolve|mega_evolve/.test(planner));
+}
+
+console.log("\nUpgrades placement");
+{
+  // Every spend-a-resource tool lives in Upgrades; Sorting's groups carry piles only.
+  const tools = (id) => UPGRADE_GROUPS.find((g) => g.id === id)?.tools || [];
+  check("caps carries the bottle caps", tools("caps").join(",") === "bottle_caps");
+  check("moves carries third move, Elite TM and Max Move upgrades", tools("moves").join(",") === "third_move,elite_tm,max_upgrade");
+  check("no Sorting group carries a tool", PILE_GROUPS.every((g) => !(g.tools || []).length));
+}
+
+console.log("\nPurify placement");
+{
+  // Purifying spends stardust and candy: the four purify strings are one tool
+  // in the Upgrades area, and the shadow pile keeps only keep-or-transfer steps.
+  const purify = UPGRADE_GROUPS.find((g) => g.id === "purify");
+  check("the Upgrades purify group carries the purify tool", (purify?.tools || []).includes("purify"));
+  for (const loc of localeNames) {
+    const r = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc));
+    const shadows = r.sortingPiles.find((p) => p.id === "shadows");
+    check(`${loc}: the shadow pile has no extras left`, !!shadows && (shadows.extras || []).length === 0);
+    const keys = (r.purifyTools || []).map((x) => x.key).join(",");
+    check(`${loc}: purify carries cheap, safe, purify-to-hundo and TM Frustration`,
+      keys === "cheap_purify,safe_purify,purify_hundo,shadow_frustration", keys);
+  }
 }
 
 console.log(`\n${failures === 0 ? "✓ All pile checks passed." : `✗ ${failures} failure(s).`}`);

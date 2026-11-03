@@ -98,11 +98,14 @@ export function goldCapFilter(kw, { collectibles = [] } = {}) {
 }
 
 // Re-roll trades: a traded Pokémon gets new IVs, so a special one with a poor
-// roll is worth swapping with a friend for theirs. Trade rules as in the
-// trade filter (never traded before, not shadow, not lucky, not a mythical
-// other than Meltan/Melmetal, not in Hyper Training), at most two stars, and
-// fewer than two full bars: those go to a silver cap instead.
-export function rerollTradeFilter(kw, { collectibles = [] } = {}) {
+// roll is worth swapping with a friend for theirs. The game's trade rules
+// (never traded before, not shadow, not lucky, not a mythical other than
+// Meltan/Melmetal, not in Hyper Training), at most two stars, and fewer than
+// two full bars: those go to a silver cap instead. `keeps` are the trade
+// filter's own "never trade this one" clauses (tags, favourites, nundos,
+// league tags, former buddies, PvP keepers, invested moves), so a Pokémon the
+// user kept out of trading is never offered here either.
+export function rerollTradeFilter(kw, { collectibles = [], keeps = [] } = {}) {
 	const { flag } = kw;
 	return [
 		`!${flag.traded}`,
@@ -113,6 +116,7 @@ export function rerollTradeFilter(kw, { collectibles = [] } = {}) {
 		'0*,1*,2*',
 		...underTwoFullBars(kw),
 		...atLeastOf(specialGroups(kw, collectibles), 1),
+		...keeps,
 	];
 }
 

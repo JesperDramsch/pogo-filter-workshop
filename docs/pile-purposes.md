@@ -80,11 +80,11 @@ then `3-4` is fine (best first, then wider), but `3-4` then `4*` would be cut.
 
 Lucky families goes: luckies are luckies.
 
-## Utility filters beside their pile
+## Utility filters
 
 These stay as filters you copy, not keep steps:
-- **Shadows:** cheap purify (`candykm1`, not meta), and the Frustration TM on meta shadows.
-- **Ready to evolve:** cheap XP evolves (the trade evolutions are named in it species by species, so it covers `tradeevolve`), and mega-evolve as its own tile.
+- **Ready to evolve:** cheap XP evolves (the trade evolutions are named in it species by species, so it covers `tradeevolve`), and mega-evolve as its own tile. The evolve pile and both of these live in the Upgrades area: evolving spends candy and never transfers anything.
+- **Shadows:** the purify strings (cheap purify `candykm1` not meta, safe mass purify, purify-to-hundo candidates, and the Frustration TM on meta shadows) moved to the Upgrades area as one Purify tile. The shadow pile keeps its keep steps only.
 
 ## Settled
 
