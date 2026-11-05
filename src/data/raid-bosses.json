@@ -503,41 +503,6 @@
           ]
         }
       ]
-    },
-    {
-      "eventID": "raidhour20261104",
-      "name": "Giratina (Altered Forme) Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-11-04T18:00:00.000",
-      "end": "2026-11-04T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "GIRATINA",
-          "form": "GIRATINA_ALTERED",
-          "names": {
-            "en": "Giratina"
-          },
-          "types": [
-            "ghost",
-            "dragon"
-          ],
-          "resistorTypes": [
-            "normal",
-            "steel",
-            "dark",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "ghost",
-            "ice",
-            "dragon",
-            "dark",
-            "fairy"
-          ]
-        }
-      ]
     }
   ],
   "eventMaxBattles": []
