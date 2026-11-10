@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-03T16:02:56.047Z",
+  "fetchedAt": "2026-11-10T14:59:50.841Z",
   "topN": 30,
   "source": "pvpoke",
   "leagues": {
@@ -2501,16 +2501,6 @@
     }
   },
   "gblEvents": [
-    {
-      "eventID": "gbl-twilight-trails_master-league_mega-halloween-cup-great-league-edition",
-      "name": "Master League and Mega Halloween Cup: Great League Edition | Twilight Trails",
-      "start": "2026-10-27T21:00:00.000Z",
-      "end": "2026-11-03T21:00:00.000Z",
-      "cups": [],
-      "leagues": [
-        "master"
-      ]
-    },
     {
       "eventID": "gbl-twilight-trails_great-league-mega-edition_ultra-league-mega-edition_master-league-mega-edition-split-3",
       "name": "Great League: Mega Edition, Ultra League: Mega Edition, and Master League: Mega Edition | Twilight Trails",

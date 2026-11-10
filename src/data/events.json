@@ -1,118 +1,6 @@
 {
-  "fetchedAt": "2026-11-02T16:11:17.512Z",
+  "fetchedAt": "2026-11-10T14:59:52.348Z",
   "events": [
-    {
-      "id": "event-pok-mon-go-halloween-2026-part-i-2026-10-27t10-00-00",
-      "title": "Pokémon GO Halloween 2026 Part I",
-      "category": "Event",
-      "start": "2026-10-27T10:00:00",
-      "end": "2026-11-01T10:00:00",
-      "isLocalTime": true,
-      "venue": null,
-      "spawnDex": [
-        37,
-        41,
-        94,
-        200,
-        355,
-        393,
-        426,
-        710,
-        714
-      ],
-      "spawns": [
-        "Drifblim",
-        "Duskull",
-        "Gengar",
-        "Misdreavus",
-        "Noibat",
-        "Piplup",
-        "Pumpkaboo",
-        "Vulpix",
-        "Zubat"
-      ],
-      "spawnForms": [
-        {
-          "name": "Vulpix",
-          "dex": 37,
-          "region": null,
-          "types": [
-            "fire"
-          ]
-        },
-        {
-          "name": "Zubat",
-          "dex": 41,
-          "region": null,
-          "types": [
-            "poison",
-            "flying"
-          ]
-        },
-        {
-          "name": "Gengar",
-          "dex": 94,
-          "region": null,
-          "types": [
-            "ghost",
-            "poison"
-          ]
-        },
-        {
-          "name": "Misdreavus",
-          "dex": 200,
-          "region": null,
-          "types": [
-            "ghost"
-          ]
-        },
-        {
-          "name": "Duskull",
-          "dex": 355,
-          "region": null,
-          "types": [
-            "ghost"
-          ]
-        },
-        {
-          "name": "Piplup",
-          "dex": 393,
-          "region": null,
-          "types": [
-            "water"
-          ]
-        },
-        {
-          "name": "Drifblim",
-          "dex": 426,
-          "region": null,
-          "types": [
-            "ghost",
-            "flying"
-          ]
-        },
-        {
-          "name": "Pumpkaboo",
-          "dex": 710,
-          "region": null,
-          "types": [
-            "ghost",
-            "grass"
-          ]
-        },
-        {
-          "name": "Noibat",
-          "dex": 714,
-          "region": null,
-          "types": [
-            "flying",
-            "dragon"
-          ]
-        }
-      ],
-      "unresolved": [],
-      "hasCostumes": true
-    },
     {
       "id": "event-pok-mon-go-halloween-2026-part-ii-2026-11-01t10-00-00",
       "title": "Pokémon GO Halloween 2026 Part II",
@@ -1785,6 +1673,150 @@
       "hasCostumes": false
     },
     {
+      "id": "event-into-the-wild-2026-2026-11-09t10-00-00",
+      "title": "Into the Wild 2026",
+      "category": "Event",
+      "start": "2026-11-09T10:00:00",
+      "end": "2026-11-13T20:00:00",
+      "isLocalTime": true,
+      "venue": null,
+      "spawnDex": [
+        52,
+        81,
+        116,
+        123,
+        147,
+        179,
+        303,
+        304,
+        371,
+        690,
+        714,
+        777
+      ],
+      "spawns": [
+        "Aron",
+        "Bagon",
+        "Dratini",
+        "Horsea",
+        "Magnemite",
+        "Mareep",
+        "Mawile",
+        "Meowth",
+        "Noibat",
+        "Scyther",
+        "Skrelp",
+        "Togedemaru"
+      ],
+      "spawnForms": [
+        {
+          "name": "Galarian Meowth",
+          "dex": 52,
+          "region": "galar",
+          "types": [
+            "steel"
+          ]
+        },
+        {
+          "name": "Magnemite",
+          "dex": 81,
+          "region": null,
+          "types": [
+            "electric",
+            "steel"
+          ]
+        },
+        {
+          "name": "Horsea",
+          "dex": 116,
+          "region": null,
+          "types": [
+            "water"
+          ]
+        },
+        {
+          "name": "Scyther",
+          "dex": 123,
+          "region": null,
+          "types": [
+            "bug",
+            "flying"
+          ]
+        },
+        {
+          "name": "Dratini",
+          "dex": 147,
+          "region": null,
+          "types": [
+            "dragon"
+          ]
+        },
+        {
+          "name": "Mareep",
+          "dex": 179,
+          "region": null,
+          "types": [
+            "electric"
+          ]
+        },
+        {
+          "name": "Mawile",
+          "dex": 303,
+          "region": null,
+          "types": [
+            "steel",
+            "fairy"
+          ]
+        },
+        {
+          "name": "Aron",
+          "dex": 304,
+          "region": null,
+          "types": [
+            "steel",
+            "rock"
+          ]
+        },
+        {
+          "name": "Bagon",
+          "dex": 371,
+          "region": null,
+          "types": [
+            "dragon"
+          ]
+        },
+        {
+          "name": "Skrelp",
+          "dex": 690,
+          "region": null,
+          "types": [
+            "poison",
+            "water"
+          ]
+        },
+        {
+          "name": "Noibat",
+          "dex": 714,
+          "region": null,
+          "types": [
+            "flying",
+            "dragon"
+          ]
+        },
+        {
+          "name": "Togedemaru",
+          "dex": 777,
+          "region": null,
+          "types": [
+            "electric",
+            "steel"
+          ]
+        }
+      ],
+      "unresolved": [],
+      "hasCostumes": false
+    },
+    {
       "id": "event-into-the-wild-2026-11-09t10-00-00",
       "title": "Into the Wild",
       "category": "Event",
@@ -2751,6 +2783,91 @@
       ],
       "unresolved": [],
       "hasCostumes": false
+    },
+    {
+      "id": "community-day-pawniard-community-day-2026-11-21t14-00-00",
+      "title": "Pawniard Community Day",
+      "category": "Community Day",
+      "start": "2026-11-21T14:00:00",
+      "end": "2026-11-21T17:00:00",
+      "isLocalTime": true,
+      "venue": null,
+      "spawnDex": [
+        624
+      ],
+      "spawns": [
+        "Pawniard"
+      ],
+      "spawnForms": [
+        {
+          "name": "Pawniard",
+          "dex": 624,
+          "region": null,
+          "types": [
+            "dark",
+            "steel"
+          ]
+        }
+      ],
+      "unresolved": [],
+      "hasCostumes": false
+    },
+    {
+      "id": "event-twilight-wishes-2026-11-24t10-00-00",
+      "title": "Twilight Wishes",
+      "category": "Event",
+      "start": "2026-11-24T10:00:00",
+      "end": "2026-11-30T20:00:00",
+      "isLocalTime": true,
+      "venue": null,
+      "spawnDex": [
+        35,
+        120,
+        605,
+        744
+      ],
+      "spawns": [
+        "Clefairy",
+        "Elgyem",
+        "Rockruff",
+        "Staryu"
+      ],
+      "spawnForms": [
+        {
+          "name": "Clefairy",
+          "dex": 35,
+          "region": null,
+          "types": [
+            "fairy"
+          ]
+        },
+        {
+          "name": "Staryu",
+          "dex": 120,
+          "region": null,
+          "types": [
+            "water"
+          ]
+        },
+        {
+          "name": "Elgyem",
+          "dex": 605,
+          "region": null,
+          "types": [
+            "psychic"
+          ]
+        },
+        {
+          "name": "Rockruff",
+          "dex": 744,
+          "region": null,
+          "types": [
+            "rock"
+          ]
+        }
+      ],
+      "unresolved": [],
+      "hasCostumes": false
     }
   ],
   "eggPools": [
@@ -2897,18 +3014,32 @@
   ],
   "signals": [
     {
-      "id": "max|max-mondays-dynamax-machop-during-max-monday-2026-11-02t06-00-00",
-      "kind": "max",
-      "title": "Dynamax Machop during Max Monday",
-      "start": "2026-11-02T06:00:00",
-      "end": "2026-11-02T21:00:00"
-    },
-    {
       "id": "max|max-mondays-max-monday-pok-mon-to-be-announced-2026-11-16t06-00-00",
       "kind": "max",
       "title": "Max Monday: Pokémon to be announced",
       "start": "2026-11-16T06:00:00",
       "end": "2026-11-16T21:00:00"
+    },
+    {
+      "id": "max|max-battles-eternamax-eternatus-returns-2026-11-21t11-00-00",
+      "kind": "max",
+      "title": "Eternamax Eternatus Returns",
+      "start": "2026-11-21T11:00:00",
+      "end": "2026-11-21T14:00:00"
+    },
+    {
+      "id": "community_day|community-day-pawniard-community-day-2026-11-21t14-00-00",
+      "kind": "community_day",
+      "title": "Pawniard Community Day",
+      "start": "2026-11-21T14:00:00",
+      "end": "2026-11-21T17:00:00"
+    },
+    {
+      "id": "max|max-mondays-dynamax-espurr-during-max-monday-2026-11-23t06-00-00",
+      "kind": "max",
+      "title": "Dynamax Espurr during Max Monday",
+      "start": "2026-11-23T06:00:00",
+      "end": "2026-11-23T21:00:00"
     }
   ],
   "bonuses": [
@@ -2926,61 +3057,6 @@
         "Increased limits on opening Gifts, receiving Gifts from PokéStop and Gym Photo Discs, and storing Gifts",
         "One additional Candy for trading Pokémon",
         "One guaranteed Candy XL when trading Pokémon for Trainers level 31 and above"
-      ]
-    },
-    {
-      "id": "go-pass-go-pass-october-2026-10-06t10-00-00",
-      "title": "GO Pass: October",
-      "category": "GO Pass",
-      "start": "2026-10-06T10:00:00",
-      "end": "2026-11-03T10:00:00",
-      "isLocalTime": true,
-      "venue": null,
-      "bonuses": [
-        "2× Daily Adventure Incense duration",
-        "Hold 10 more Gifts in your Item Bag",
-        "Hold up to 20 more Gifts in your Item Bag",
-        "Increased XP and Stardust from hatching Eggs",
-        "One additional Candy for trading Pokémon",
-        "Open up to 40 Gifts per day",
-        "Open up to 50 Gifts per day",
-        "Receive up to 125 Gifts per day from spinning PokéStop and Gym Photo Discs",
-        "Receive up to 150 Gifts per day from spinning PokéStop and Gym Photo Discs",
-        "Trainers level 31 and above will receive one guaranteed Candy XL when trading Pokémon"
-      ]
-    },
-    {
-      "id": "event-pok-mon-go-halloween-2026-part-i-2026-10-27t10-00-00",
-      "title": "Pokémon GO Halloween 2026 Part I",
-      "category": "Event",
-      "start": "2026-10-27T10:00:00",
-      "end": "2026-11-01T10:00:00",
-      "isLocalTime": true,
-      "venue": null,
-      "bonuses": [
-        "2× Candy for catching Pokémon",
-        "2× Stardust for catching Pokémon",
-        "GO Pass Deluxe: 3× Candy for catching Pokémon",
-        "GO Pass Deluxe: 3× Stardust for catching Pokémon"
-      ]
-    },
-    {
-      "id": "raid-day-chandelure-super-mega-raid-day-2026-10-31t14-00-00",
-      "title": "Chandelure Super Mega Raid Day",
-      "category": "Raid Day",
-      "start": "2026-10-31T14:00:00",
-      "end": "2026-10-31T17:00:00",
-      "isLocalTime": true,
-      "venue": null,
-      "bonuses": [
-        "An additional 5,000 Stardust from Super Mega Raid Battles",
-        "An additional 5,000 XP from Super Mega Raid Battles",
-        "Chandelure caught from Super Mega Raids will have Mega Level 1 unlocked",
-        "Increased chance of encountering Shiny Chandelure from Super Mega Raids",
-        "Increased chance to get Rare Candy XL from Raid Battles",
-        "Receive up to 14 Raid Passes from spinning Gym Photo Discs",
-        "Receive up to six free Raid Passes from spinning Gym Photo Discs",
-        "Remote Raid limit increased to 20 from Friday, October 30, at 5:00 p.m. to Saturday, October 31, 2026, at 8:00 p.m. PDT"
       ]
     },
     {
@@ -3104,6 +3180,31 @@
       ]
     },
     {
+      "id": "event-into-the-wild-2026-2026-11-09t10-00-00",
+      "title": "Into the Wild 2026",
+      "category": "Event",
+      "start": "2026-11-09T10:00:00",
+      "end": "2026-11-13T20:00:00",
+      "isLocalTime": true,
+      "venue": null,
+      "bonuses": [
+        "+1 Candy XL from Max Battles (Trainers level 31+)",
+        "+1 Candy XL from raids (Trainers level 31+)",
+        "+1 Candy from Max Battles",
+        "+1 Candy from raids",
+        "1/2 Hatch Distance for Eggs placed in Incubators during the event",
+        "3/4 Max Particle cost for unlocking and powering up Max Moves",
+        "5,000 additional XP from completed Max Battles",
+        "5,000 additional XP from completed raids",
+        "Chance to encounter Shiny Gimmighoul when using a Coin Bag*",
+        "Chance to encounter Shiny Meltan when opening the Mystery Box*",
+        "No Remote Raid limit from Saturday, November 14, to Sunday, November 15, 2026",
+        "Reduced wait time before you can open the Mystery Box again*",
+        "Remote Raid limit increased to 30 from Monday, November 9, to Friday, November 13, 2026",
+        "Trainers can receive special event stickers from PokéStops and Gifts"
+      ]
+    },
+    {
       "id": "event-into-the-wild-2026-11-09t10-00-00",
       "title": "Into the Wild",
       "category": "Event",
@@ -3162,9 +3263,10 @@
         "Chance to get GO Safari Balls from PokéStops and Gyms",
         "Daily Max Particle collection limit increased to 1,600",
         "Daily Max Particle collection limit increased to 3,200",
-        "Increased Max Particles from Power Spots and exploration",
+        "GO Safari Balls instead of Premier Balls for raids and Max Battles***",
+        "Increased Max Particles from Power Spots and exploration**",
         "Increased chance of 10 km Eggs from PokéStops and Gyms",
-        "Increased chance to encounter Shiny Pokémon",
+        "Increased chance to encounter Shiny Pokémon*",
         "Lure Modules last for 2 hours",
         "Party Play lasts for 8 hours",
         "Up to 3 free Raid Passes per day from Gyms",
@@ -3199,6 +3301,55 @@
         "Additional Candy and Candy XL from Max Battles",
         "Chance to receive Max Particles when catching event-themed Pokémon in the wild or after Max Battles",
         "More Power Spots than usual will be active"
+      ]
+    },
+    {
+      "id": "max-battles-eternamax-eternatus-returns-2026-11-21t11-00-00",
+      "title": "Eternamax Eternatus Returns",
+      "category": "Max Battles",
+      "start": "2026-11-21T11:00:00",
+      "end": "2026-11-21T14:00:00",
+      "isLocalTime": true,
+      "venue": null,
+      "bonuses": [
+        "8× Max Particles from Power Spots",
+        "Max Particle collection limit increased to 2,400",
+        "Power Spots will refresh more frequently"
+      ]
+    },
+    {
+      "id": "community-day-pawniard-community-day-2026-11-21t14-00-00",
+      "title": "Pawniard Community Day",
+      "category": "Community Day",
+      "start": "2026-11-21T14:00:00",
+      "end": "2026-11-21T17:00:00",
+      "isLocalTime": true,
+      "venue": null,
+      "bonuses": [
+        "1-hour Lures*",
+        "1/4 Egg Hatch Distance",
+        "2x Catch Candy",
+        "2x Chance for Trainers level 31 and up to receive Candy XL from catching Pokémon",
+        "3-hour Incense",
+        "Increased Spawns",
+        "One additional Special Trade can be made for a maximum of two for the day*",
+        "Trades made will require 50% less Stardust*"
+      ]
+    },
+    {
+      "id": "event-twilight-wishes-2026-11-24t10-00-00",
+      "title": "Twilight Wishes",
+      "category": "Event",
+      "start": "2026-11-24T10:00:00",
+      "end": "2026-11-30T20:00:00",
+      "isLocalTime": true,
+      "venue": null,
+      "bonuses": [
+        "2× Stardust for catching Pokémon",
+        "GO Pass Deluxe: 3× Stardust for catching Pokémon",
+        "Increased chance to become Lucky Friends",
+        "Increased chance to encounter Shiny Staryu and Shiny Elgyem",
+        "Increased chance to get Lucky Pokémon in trades"
       ]
     }
   ]

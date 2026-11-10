@@ -1,251 +1,298 @@
 {
-  "fetchedAt": "2026-11-03T14:26:47.850Z",
+  "fetchedAt": "2026-11-10T14:59:46.034Z",
   "raids": {
-    "mega": [
-      {
-        "id": "SABLEYE",
-        "form": "SABLEYE_MEGA",
-        "names": {
-          "en": "Mega Sableye",
-          "de": "Mega-Zobiris",
-          "fr": "Méga-Ténéfix",
-          "it": "MegaSableye",
-          "ja": "メガヤミラミ",
-          "ko": "메가깜까미",
-          "es": "Mega-Sableye"
-        },
-        "types": [
-          "dark",
-          "ghost"
-        ],
-        "resistorTypes": [
-          "normal",
-          "fighting",
-          "dark",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "fairy"
-        ]
-      }
-    ],
     "lvl5": [
       {
-        "id": "GIRATINA",
-        "form": "GIRATINA_ORIGIN",
+        "id": "ZACIAN",
+        "form": "ZACIAN_CROWNED_SWORD",
         "names": {
-          "en": "Giratina (Origin Forme)",
-          "de": "Giratina (Urform)",
-          "fr": "Giratina (Forme Originelle)",
-          "it": "Giratina (Forma Originale)",
-          "ja": "ギラティナ (オリジンフォルム)",
-          "ko": "기라티나 (오리진폼)",
-          "es": "Giratina (Forma Origen)"
+          "en": "Zacian (Crowned Sword)",
+          "de": "Zacian (König des Schwertes)",
+          "fr": "Zacian (Épée Suprême)",
+          "it": "Zacian (Re delle Spade)",
+          "ja": "ザシアン (けんのおう)",
+          "ko": "자시안 (검왕)",
+          "es": "Zacian (Espada Suprema)"
         },
         "types": [
-          "ghost",
-          "dragon"
+          "fairy",
+          "steel"
         ],
         "resistorTypes": [
-          "normal",
+          "poison",
           "steel",
-          "dark",
-          "fairy"
+          "fire",
+          "water",
+          "electric"
         ],
         "seMoveTypes": [
-          "dark",
-          "dragon",
-          "fairy",
+          "fire",
+          "ground"
+        ]
+      },
+      {
+        "id": "ZAMAZENTA",
+        "form": "ZAMAZENTA_CROWNED_SHIELD",
+        "names": {
+          "en": "Zamazenta (Crowned Shield)",
+          "de": "Zamazenta (König des Schildes)",
+          "fr": "Zamazenta (Bouclier Suprême)",
+          "it": "Zamazenta (Re degli Scudi)",
+          "ja": "ザマゼンタ (たてのおう)",
+          "ko": "자마젠타 (방패왕)",
+          "es": "Zamazenta (Escudo Supremo)"
+        },
+        "types": [
+          "fighting",
+          "steel"
+        ],
+        "resistorTypes": [
+          "flying",
+          "poison",
+          "bug",
           "ghost",
-          "ice"
+          "fire",
+          "water",
+          "electric",
+          "psychic"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "fire",
+          "ground"
         ]
       }
     ],
     "lvl3": [
       {
-        "id": "COFAGRIGUS",
-        "form": "COFAGRIGUS",
+        "id": "DRUDDIGON",
+        "form": "DRUDDIGON",
         "names": {
-          "en": "Cofagrigus",
-          "de": "Echnatoll",
-          "fr": "Tutankafer",
-          "it": "Cofagrigus",
-          "ja": "デスカーン",
-          "ko": "데스니칸",
-          "es": "Cofagrigus"
+          "en": "Druddigon",
+          "de": "Shardrago",
+          "fr": "Drakkarmin",
+          "it": "Druddigon",
+          "ja": "クリムガン",
+          "ko": "크리만",
+          "es": "Druddigon"
         },
         "types": [
-          "ghost"
-        ],
-        "resistorTypes": [
-          "normal",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "ghost"
-        ]
-      },
-      {
-        "id": "TREVENANT",
-        "form": "TREVENANT",
-        "names": {
-          "en": "Trevenant",
-          "de": "Trombork",
-          "fr": "Desséliande",
-          "it": "Trevenant",
-          "ja": "オーロット",
-          "ko": "대로트",
-          "es": "Trevenant"
-        },
-        "types": [
-          "ghost",
-          "grass"
-        ],
-        "resistorTypes": [
-          "normal",
-          "flying",
-          "poison",
-          "bug",
-          "steel",
-          "fire",
-          "grass",
-          "dragon",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "fire",
-          "flying",
-          "ghost",
-          "ice"
-        ]
-      },
-      {
-        "id": "DHELMISE",
-        "form": "DHELMISE",
-        "names": {
-          "en": "Dhelmise",
-          "de": "Moruda",
-          "fr": "Sinistrail",
-          "it": "Dhelmise",
-          "ja": "ダダリン",
-          "ko": "타타륜",
-          "es": "Dhelmise"
-        },
-        "types": [
-          "ghost",
-          "grass"
-        ],
-        "resistorTypes": [
-          "normal",
-          "flying",
-          "poison",
-          "bug",
-          "steel",
-          "fire",
-          "grass",
-          "dragon",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "fire",
-          "flying",
-          "ghost",
-          "ice"
-        ]
-      }
-    ],
-    "lvl1": [
-      {
-        "id": "PIKACHU",
-        "form": "PIKACHU_HALLOWEEN_2026",
-        "names": {
-          "en": "Pikachu",
-          "de": "Pikachu",
-          "fr": "Pikachu",
-          "it": "Pikachu",
-          "ja": "ピカチュウ",
-          "ko": "피카츄",
-          "es": "Pikachu"
-        },
-        "types": [
-          "electric"
-        ],
-        "resistorTypes": [
-          "ground",
-          "grass",
-          "electric",
           "dragon"
         ],
+        "resistorTypes": [
+          "steel",
+          "fairy"
+        ],
         "seMoveTypes": [
-          "ground"
+          "dragon",
+          "fairy",
+          "ice"
         ]
       },
       {
-        "id": "SINISTEA",
-        "form": "SINISTEA_P_HALLOWEEN_2026_01",
+        "id": "ORTHWORM",
+        "form": "ORTHWORM",
         "names": {
-          "en": "Sinistea",
-          "de": "Fatalitee",
-          "fr": "Théffroi",
-          "it": "Sinistea",
-          "ja": "ヤバチャ",
-          "ko": "데인차",
-          "es": "Sinistea"
+          "en": "Orthworm",
+          "de": "Schlurm",
+          "fr": "Ferdeter",
+          "it": "Orthworm",
+          "ja": "ミミズズ",
+          "ko": "꿈트렁",
+          "es": "Orthworm"
         },
         "types": [
-          "ghost"
+          "steel"
         ],
         "resistorTypes": [
-          "normal",
-          "dark"
+          "steel",
+          "fire",
+          "water",
+          "electric"
         ],
         "seMoveTypes": [
-          "dark",
-          "ghost"
+          "fighting",
+          "fire",
+          "ground"
         ]
       }
     ],
     "shadow_lvl5": [
       {
-        "id": "LANDORUS",
-        "form": "LANDORUS_INCARNATE",
+        "id": "TORNADUS",
+        "form": "TORNADUS_INCARNATE",
         "names": {
-          "en": "Landorus (Incarnate Forme)",
-          "de": "Demeteros (Inkarnationsform)",
-          "fr": "Démétéros (Forme Avatar)",
-          "it": "Landorus (Forma Incarnazione)",
-          "ja": "ランドロス (けしんフォルム)",
-          "ko": "랜드로스 (화신폼)",
-          "es": "Landorus (Forma Avatar)"
+          "en": "Tornadus (Incarnate Forme)",
+          "de": "Boreos (Inkarnationsform)",
+          "fr": "Boréas (Forme Avatar)",
+          "it": "Tornadus (Forma Incarnazione)",
+          "ja": "トルネロス (けしんフォルム)",
+          "ko": "토네로스 (화신폼)",
+          "es": "Tornadus (Forma Avatar)"
         },
         "types": [
-          "ground",
           "flying"
         ],
         "resistorTypes": [
-          "flying"
+          "rock",
+          "steel",
+          "electric"
         ],
         "seMoveTypes": [
+          "electric",
           "ice",
-          "water"
+          "rock"
         ]
       }
     ],
     "shadow_lvl3": [
       {
-        "id": "PRIMEAPE",
-        "form": "PRIMEAPE",
+        "id": "POLIWHIRL",
+        "form": "POLIWHIRL",
         "names": {
-          "en": "Primeape",
-          "de": "Rasaff",
-          "fr": "Colossinge",
-          "it": "Primeape",
-          "ja": "オコリザル",
-          "ko": "성원숭",
-          "es": "Primeape"
+          "en": "Poliwhirl",
+          "de": "Quaputzi",
+          "fr": "Têtarte",
+          "it": "Poliwhirl",
+          "ja": "ニョロゾ",
+          "ko": "슈륙챙이",
+          "es": "Poliwhirl"
+        },
+        "types": [
+          "water"
+        ],
+        "resistorTypes": [
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "electric",
+          "grass"
+        ]
+      },
+      {
+        "id": "PILOSWINE",
+        "form": "PILOSWINE",
+        "names": {
+          "en": "Piloswine",
+          "de": "Keifel",
+          "fr": "Cochignon",
+          "it": "Piloswine",
+          "ja": "イノムー",
+          "ko": "메꾸리",
+          "es": "Piloswine"
+        },
+        "types": [
+          "ice",
+          "ground"
+        ],
+        "resistorTypes": [
+          "bug",
+          "water",
+          "ice"
+        ],
+        "seMoveTypes": [
+          "fighting",
+          "fire",
+          "grass",
+          "steel",
+          "water"
+        ]
+      },
+      {
+        "id": "PRINPLUP",
+        "form": "PRINPLUP",
+        "names": {
+          "en": "Prinplup",
+          "de": "Pliprin",
+          "fr": "Prinplouf",
+          "it": "Prinplup",
+          "ja": "ポッタイシ",
+          "ko": "팽태자",
+          "es": "Prinplup"
+        },
+        "types": [
+          "water"
+        ],
+        "resistorTypes": [
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "electric",
+          "grass"
+        ]
+      }
+    ],
+    "shadow_lvl1": [
+      {
+        "id": "LARVITAR",
+        "form": "LARVITAR",
+        "names": {
+          "en": "Larvitar",
+          "de": "Larvitar",
+          "fr": "Embrylex",
+          "it": "Larvitar",
+          "ja": "ヨーギラス",
+          "ko": "애버라스",
+          "es": "Larvitar"
+        },
+        "types": [
+          "rock",
+          "ground"
+        ],
+        "resistorTypes": [
+          "fighting",
+          "ground",
+          "grass"
+        ],
+        "seMoveTypes": [
+          "grass",
+          "water",
+          "fighting",
+          "ground",
+          "ice",
+          "steel"
+        ]
+      },
+      {
+        "id": "MUDKIP",
+        "form": "MUDKIP",
+        "names": {
+          "en": "Mudkip",
+          "de": "Hydropi",
+          "fr": "Gobou",
+          "it": "Mudkip",
+          "ja": "ミズゴロウ",
+          "ko": "물짱이",
+          "es": "Mudkip"
+        },
+        "types": [
+          "water"
+        ],
+        "resistorTypes": [
+          "water",
+          "grass",
+          "dragon"
+        ],
+        "seMoveTypes": [
+          "electric",
+          "grass"
+        ]
+      },
+      {
+        "id": "MAKUHITA",
+        "form": "MAKUHITA",
+        "names": {
+          "en": "Makuhita",
+          "de": "Makuhita",
+          "fr": "Makuhita",
+          "it": "Makuhita",
+          "ja": "マクノシタ",
+          "ko": "마크탕",
+          "es": "Makuhita"
         },
         "types": [
           "fighting"
@@ -265,173 +312,31 @@
         ]
       },
       {
-        "id": "KIRLIA",
-        "form": "KIRLIA",
+        "id": "CRANIDOS",
+        "form": "CRANIDOS",
         "names": {
-          "en": "Kirlia",
-          "de": "Kirlia",
-          "fr": "Kirlia",
-          "it": "Kirlia",
-          "ja": "キルリア",
-          "ko": "킬리아",
-          "es": "Kirlia"
+          "en": "Cranidos",
+          "de": "Koknodon",
+          "fr": "Kranidos",
+          "it": "Cranidos",
+          "ja": "ズガイドス",
+          "ko": "두개도스",
+          "es": "Cranidos"
         },
         "types": [
-          "psychic",
-          "fairy"
-        ],
-        "resistorTypes": [
-          "steel",
-          "fire",
-          "psychic"
-        ],
-        "seMoveTypes": [
-          "ghost",
-          "poison",
-          "steel"
-        ]
-      },
-      {
-        "id": "DRAPION",
-        "form": "DRAPION",
-        "names": {
-          "en": "Drapion",
-          "de": "Piondragi",
-          "fr": "Drascore",
-          "it": "Drapion",
-          "ja": "ドラピオン",
-          "ko": "드래피온",
-          "es": "Drapion"
-        },
-        "types": [
-          "poison",
-          "dark"
+          "rock"
         ],
         "resistorTypes": [
           "fighting",
-          "poison",
           "ground",
-          "rock",
-          "steel",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "ground"
-        ]
-      }
-    ],
-    "shadow_lvl1": [
-      {
-        "id": "GASTLY",
-        "form": "GASTLY",
-        "names": {
-          "en": "Gastly",
-          "de": "Nebulak",
-          "fr": "Fantominus",
-          "it": "Gastly",
-          "ja": "ゴース",
-          "ko": "고오스",
-          "es": "Gastly"
-        },
-        "types": [
-          "ghost",
-          "poison"
-        ],
-        "resistorTypes": [
-          "normal",
-          "poison",
-          "ground",
-          "rock",
-          "steel",
-          "dark"
-        ],
-        "seMoveTypes": [
-          "dark",
-          "ghost",
-          "ground",
-          "psychic"
-        ]
-      },
-      {
-        "id": "TOTODILE",
-        "form": "TOTODILE",
-        "names": {
-          "en": "Totodile",
-          "de": "Karnimani",
-          "fr": "Kaiminus",
-          "it": "Totodile",
-          "ja": "ワニノコ",
-          "ko": "리아코",
-          "es": "Totodile"
-        },
-        "types": [
-          "water"
-        ],
-        "resistorTypes": [
-          "water",
-          "grass",
-          "dragon"
-        ],
-        "seMoveTypes": [
-          "electric",
-          "grass"
-        ]
-      },
-      {
-        "id": "SHIELDON",
-        "form": "SHIELDON",
-        "names": {
-          "en": "Shieldon",
-          "de": "Schilterus",
-          "fr": "Dinoclier",
-          "it": "Shieldon",
-          "ja": "タテトプス",
-          "ko": "방패톱스",
-          "es": "Shieldon"
-        },
-        "types": [
-          "rock",
           "steel"
         ],
-        "resistorTypes": [
+        "seMoveTypes": [
           "fighting",
+          "grass",
           "ground",
           "steel",
-          "water",
-          "electric"
-        ],
-        "seMoveTypes": [
-          "fighting",
-          "ground",
           "water"
-        ]
-      },
-      {
-        "id": "GIBLE",
-        "form": "GIBLE",
-        "names": {
-          "en": "Gible",
-          "de": "Kaumalat",
-          "fr": "Griknot",
-          "it": "Gible",
-          "ja": "フカマル",
-          "ko": "딥상어동",
-          "es": "Gible"
-        },
-        "types": [
-          "dragon",
-          "ground"
-        ],
-        "resistorTypes": [
-          "flying",
-          "bug",
-          "grass",
-          "fairy"
-        ],
-        "seMoveTypes": [
-          "ice",
-          "dragon",
-          "fairy"
         ]
       }
     ]
@@ -439,67 +344,81 @@
   "maxBattles": {},
   "eventRaids": [
     {
-      "eventID": "giratina-altered-forme-in-5-star-raid-battles-november-2026",
-      "name": "Giratina (Altered Forme) in 5-star Raid Battles",
+      "eventID": "cresselia-darkrai-in-5-star-raid-battles-november-2026",
+      "name": "Cresselia and Darkrai in 5-star Raid Battles",
       "eventType": "raid-battles",
-      "start": "2026-11-04T06:00:00.000",
-      "end": "2026-11-08T22:00:00.000",
+      "start": "2026-11-16T06:00:00.000",
+      "end": "2026-11-24T22:00:00.000",
       "isShadow": false,
       "isMega": false,
       "bosses": [
         {
-          "id": "GIRATINA",
-          "form": "GIRATINA_ALTERED",
+          "id": "CRESSELIA",
+          "form": "CRESSELIA_NORMAL",
           "names": {
-            "en": "Giratina"
+            "en": "Cresselia"
           },
           "types": [
-            "ghost",
-            "dragon"
+            "psychic"
           ],
           "resistorTypes": [
-            "normal",
             "steel",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "ghost",
+            "dark"
+          ]
+        },
+        {
+          "id": "DARKRAI",
+          "form": "DARKRAI_NORMAL",
+          "names": {
+            "en": "Darkrai"
+          },
+          "types": [
+            "dark"
+          ],
+          "resistorTypes": [
+            "fighting",
             "dark",
             "fairy"
           ],
           "seMoveTypes": [
-            "ghost",
-            "ice",
-            "dragon",
-            "dark",
+            "fighting",
+            "bug",
             "fairy"
           ]
         }
       ]
     },
     {
-      "eventID": "shadow-tornadus-incarnate-forme-in-shadow-raids-november-4-2026",
-      "name": "Shadow Tornadus (Incarnate Forme) in Shadow Raids",
+      "eventID": "mega-banette-in-mega-raids-november-2026",
+      "name": "Mega Banette in Mega Raids",
       "eventType": "raid-battles",
-      "start": "2026-11-04T06:00:00.000",
-      "end": "2026-11-08T22:00:00.000",
-      "isShadow": true,
-      "isMega": false,
+      "start": "2026-11-16T06:00:00.000",
+      "end": "2026-11-24T22:00:00.000",
+      "isShadow": false,
+      "isMega": true,
       "bosses": [
         {
-          "id": "TORNADUS",
-          "form": "TORNADUS_INCARNATE",
+          "id": "BANETTE",
+          "form": null,
           "names": {
-            "en": "Tornadus"
+            "en": "Mega Banette"
           },
           "types": [
-            "flying"
+            "ghost"
           ],
           "resistorTypes": [
-            "rock",
-            "steel",
-            "electric"
+            "normal",
+            "dark"
           ],
           "seMoveTypes": [
-            "rock",
-            "electric",
-            "ice"
+            "ghost",
+            "dark"
           ]
         }
       ]
