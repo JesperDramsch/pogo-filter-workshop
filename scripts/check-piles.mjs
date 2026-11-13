@@ -764,15 +764,34 @@ console.log("\nDeep-review regressions");
 {
   // 1. A capless league (a Master League cup) gets no PvP keeper lens; every
   //    capped one carries its CP cap and the loose IV pattern.
+  //    The rotation is injected, not read from the snapshot: this check used
+  //    to freeze the clock on 2026-11-05 and lean on that week's GBL rotation,
+  //    and the first sync after the rotation ended (2026-11-13) dropped it,
+  //    failing the sync with no code change. The cups reuse the snapshot's own
+  //    league species, so no species list is written down here.
   const realNow = Date.now;
-  Date.now = () => Date.parse("2026-11-05T12:00:00Z");
+  const NOW_PIN = Date.parse("2030-01-15T12:00:00Z");
+  const savedEvents = PVP_RANKINGS.gblEvents;
+  const savedCups = PVP_RANKINGS.cups;
+  PVP_RANKINGS.cups = {
+    ...savedCups,
+    "test-capped-1500": { ...PVP_RANKINGS.leagues.great, id: "test-capped-1500", name: "Test Cup", cpCap: 1500 },
+    "test-capless": { ...PVP_RANKINGS.leagues.master, id: "test-capless", name: "Test Master Cup", cpCap: null },
+  };
+  PVP_RANKINGS.gblEvents = [{ eventID: "test-rotation", name: "Test rotation", start: "2030-01-14T00:00:00Z", end: "2030-01-16T00:00:00Z", cups: ["test-capped-1500", "test-capless"], leagues: ["great", "master"] }];
+  Date.now = () => NOW_PIN;
   let lenses;
   try {
     lenses = buildFilters(HUNDOS, LUCKIES, CFG, [], "en", makeTFn("en")).sortingPiles.find((p) => p.id === "meta").keep;
-  } finally { Date.now = realNow; }
+  } finally {
+    Date.now = realNow;
+    PVP_RANKINGS.gblEvents = savedEvents;
+    PVP_RANKINGS.cups = savedCups;
+  }
   const kwEn = pogoKeywords("en");
   const pvpLenses = lenses.filter((l) => l.key.startsWith("pvp_"));
-  check("no keeper lens for a capless cup (mega-10000 is active on 2026-11-05)", !pvpLenses.some((l) => l.key === "pvp_cup_mega-10000"), pvpLenses.map((l) => l.key).join(", "));
+  check("the injected capped cup gets a keeper lens", pvpLenses.some((l) => l.key === "pvp_cup_test-capped-1500"), pvpLenses.map((l) => l.key).join(", "));
+  check("no keeper lens for a capless cup", !pvpLenses.some((l) => l.key === "pvp_cup_test-capless"), pvpLenses.map((l) => l.key).join(", "));
   check("every PvP lens carries a CP cap and the IV pattern",
     pvpLenses.length > 1 && pvpLenses.every((l) => l.filter.includes(`${kwEn.numeric.cp}-`) && l.filter.includes(`0-1${kwEn.iv.atk}`)), pvpLenses.map((l) => l.key).join(", "));
 
