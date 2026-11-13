@@ -109,8 +109,9 @@ console.log("\nW5 — ordering and malformed input");
 
 console.log("\nW-retitle — an event the feed renamed while it ran is not carried twice");
 {
-  // 2026-11-10: upstream renamed "Into the Wild" to "Into the Wild 2026" two
-  // days in. The old id hashed the old title, so it was carried beside the new.
+  // Between the 2026-11-02 and 2026-11-10 syncs upstream renamed "Into the
+  // Wild" to "Into the Wild 2026". The old id hashed the old title, and the
+  // event had started, so the old record was carried beside the new one.
   const OLD = rec("event-into-the-wild-2026-11-09", "2026-08-31T10:00:00", "2026-09-04T20:00:00", { title: "Into the Wild", category: "Event", spawnDex: [1, 4, 7] });
   const NEW = rec("event-into-the-wild-2026-2026-11-09", "2026-08-31T10:00:00", "2026-09-04T20:00:00", { title: "Into the Wild 2026", category: "Event" });
   const { merged, carriedIds } = carryOver([NEW], [OLD], NOW);

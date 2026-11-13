@@ -53,10 +53,12 @@ export function outsideWindow(startMs, endMs, now, opts) {
 // list sorted by start, plus the ids that were carried so the fetcher can log
 // them.
 //
-// A record the feed RETITLED while it ran is not carried either: on
-// 2026-11-10 upstream renamed "Into the Wild" to "Into the Wild 2026" two
-// days in, the id (which hashes the title) changed, and the old record rode
-// along beside the new one as a second, smaller pile. A carried record counts
+// A record the feed RETITLED is not carried either. The early "Into the Wild"
+// listing (3 spawns) became "Into the Wild 2026" (12 spawns, same window, same
+// bonuses) somewhere between the 2026-11-02 and 2026-11-10 syncs. The id
+// hashes the title, so the 2026-11-10 sync saw a new event; the old record had
+// started by then, so it was carried and rode along beside the new one as a
+// second, smaller pile. A carried record counts
 // as the fresh one when both share the category (or signal kind) and the exact
 // window, and one normalised title starts with the other.
 const normTitle = (t) => String(t || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
