@@ -2166,28 +2166,71 @@ export function showcaseScoreRange({ dex, form = null, heightM, weightKg, ivs = 
 // ── Which piles show first (spec: "Which piles show first") ──────────────
 // A pile floats up while an event of its kind is running or ended at most
 // FLOAT_ENDED_DAYS ago (the events snapshot's own carry-over window, see
-// scripts/lib/event-window.mjs). Upcoming events don't float anything.
+// scripts/lib/event-window.mjs). Upcoming events don't float a category pile:
+// those piles are for the tidy-up. The event's own spawn pile is listed ahead
+// of time instead, see sortingEventRows.
 //   wild-spawn event → event spawns, and both costume piles if it had costumed spawns
 //   Community Day   → the C-Day pile and the shiny pile
 //   takeover        → shadows
 //   Max Battle event (Max Monday, Max Battle Day) → Dynamax
+// A weekly event (Max Monday) floats only while it runs and for
+// RECURRING_FLOAT_ENDED_DAYS after: with the full week, last Monday's would
+// still be floating when the next one starts, and Dynamax would never leave
+// the top.
 // A double transfer candy day has no source yet, so its Crush reminder card
 // always shows (agreed deferral).
 export const FLOAT_ENDED_DAYS = 7;
+export const RECURRING_FLOAT_ENDED_DAYS = 2;
+const WEEKLY_EVENT = /\bMax Mondays?\b/i;
+export const isWeeklyEvent = (title) => WEEKLY_EVENT.test(String(title || ''));
+// How far ahead an event's own spawn pile shows on the Sorting tab, so the
+// bag can be readied before it starts. Same horizon as the Mega planner.
+export const EVENT_LOOKAHEAD_DAYS = 3;
+const DAY_MS_SORT = 86400000;
+
+// Every species an event puts in the bag: its wild spawns (incense, habitat
+// hours and mighty encounters included, see scripts/fetch-events.mjs) plus its
+// Field Research encounters. The Mega planner reads spawnForms instead, which
+// is the wild pool only.
+export function eventCatchDex(ev) {
+	return [...new Set([...(ev?.spawnDex || []), ...(ev?.researchDex || [])].map(Number).filter(Number.isFinite))];
+}
+
+// The Sorting tab's per-event rows: every event running now, starting within
+// EVENT_LOOKAHEAD_DAYS, or ended at most FLOAT_ENDED_DAYS ago, as
+// { ev, state } with state 'running' | 'upcoming' | 'ended'. Running first,
+// then upcoming (soonest first), then ended (most recent first), so a live
+// event never sits under last week's leftovers. Pure in (events, now).
+export function sortingEventRows(events = [], now = Date.now()) {
+	const rows = [];
+	for (const ev of events || []) {
+		const s = Date.parse(ev?.start), e = Date.parse(ev?.end);
+		if (!Number.isFinite(s) || !Number.isFinite(e)) continue;
+		let state = null;
+		if (s <= now && now <= e) state = 'running';
+		else if (s > now && s - now <= EVENT_LOOKAHEAD_DAYS * DAY_MS_SORT) state = 'upcoming';
+		else if (e < now && now - e <= FLOAT_ENDED_DAYS * DAY_MS_SORT) state = 'ended';
+		if (state) rows.push({ ev, state, s, e });
+	}
+	const rank = { running: 0, upcoming: 1, ended: 2 };
+	rows.sort((a, b) => rank[a.state] - rank[b.state] || (a.state === 'ended' ? b.e - a.e : a.s - b.s));
+	return rows.map(({ ev, state }) => ({ ev, state }));
+}
 // Irrbis (Pumpkaboo): the species whose size flags carry no rarity, see
 // DEFAULT_CONFIG.irrbisSizes.
 export const IRRBIS_DEX = 710;
 export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] } = {}, now = Date.now()) {
-	const recent = (start, end) => {
+	const recent = (start, end, title) => {
 		const s = Date.parse(start), e = Date.parse(end);
-		return Number.isFinite(s) && Number.isFinite(e) && s <= now && now - e <= FLOAT_ENDED_DAYS * 86400000;
+		const days = isWeeklyEvent(title) ? RECURRING_FLOAT_ENDED_DAYS : FLOAT_ENDED_DAYS;
+		return Number.isFinite(s) && Number.isFinite(e) && s <= now && now - e <= days * 86400000;
 	};
 	const out = [];
 	const add = (pile, kind, title) => {
 		if (!out.some((f) => f.pile === pile)) out.push({ pile, kind, title });
 	};
 	for (const sg of signals) {
-		if (!recent(sg.start, sg.end)) continue;
+		if (!recent(sg.start, sg.end, sg.title)) continue;
 		if (sg.kind === 'takeover') add('shadows', 'takeover', sg.title);
 		if (sg.kind === 'community_day') {
 			add('cday', 'community_day', sg.title);
@@ -2195,7 +2238,7 @@ export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] 
 		}
 		if (sg.kind === 'max') add('dynamax', 'max', sg.title);
 	}
-	for (const mb of eventMaxBattles) if (recent(mb.start, mb.end)) add('dynamax', 'max', mb.name);
+	for (const mb of eventMaxBattles) if (recent(mb.start, mb.end, mb.name)) add('dynamax', 'max', mb.name);
 	for (const ev of events) {
 		if (!recent(ev.start, ev.end)) continue;
 		if (ev.category === 'Community Day') {
@@ -2211,7 +2254,7 @@ export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] 
 		// event that spawns it fills both size piles with Pokémon whose size flag
 		// means nothing. The float is about the spawn, not the irrbisSizes
 		// setting: the piles surface whether or not the trash carve is on.
-		if ((ev.spawnDex || []).map(Number).includes(IRRBIS_DEX)) {
+		if (eventCatchDex(ev).includes(IRRBIS_DEX)) {
 			add('xxl', 'irrbis', ev.title);
 			add('xxs', 'irrbis', ev.title);
 		}
@@ -2235,7 +2278,7 @@ export function costumeEventFor(events = [], now = Date.now()) {
 	});
 	if (live.length === 0) return null;
 	const start = Math.min(...live.map((ev) => Date.parse(ev.start)));
-	const spawnDex = [...new Set(live.flatMap((ev) => (ev.spawnDex || []).map(Number)).filter(Number.isFinite))];
+	const spawnDex = [...new Set(live.flatMap((ev) => eventCatchDex(ev)))];
 	return {
 		ids: live.map((ev) => ev.id),
 		title: live.map((ev) => ev.title).join(' · '),
@@ -4388,7 +4431,7 @@ export function buildFilters(
 			ev.id,
 			ev.title,
 			{ start: ev.start, end: ev.end },
-			(ev.spawnDex || []).map(String),
+			eventCatchDex(ev).map(String),
 			{ timeLimited: true },
 		);
 	}
@@ -4966,7 +5009,7 @@ export function buildFilters(
 	const eventFilters = (EVENTS.events || [])
 		.map((ev) => {
 			// "+name" expands to the whole evolution family; names localised from dex.
-			const fams = (ev.spawnDex || [])
+			const fams = eventCatchDex(ev)
 				.map((d) => pokemonNameFor(String(d), outputLocale))
 				.filter(Boolean)
 				.map((n) => `+${n}`)
@@ -4993,7 +5036,7 @@ export function buildFilters(
 				isLocalTime: !!ev.isLocalTime,
 				// The city of an in-person event, or null (scripts/lib/event-venues.mjs).
 				venue: ev.venue || null,
-				spawnDex: ev.spawnDex || [],
+				spawnDex: eventCatchDex(ev),
 				spawnForms: ev.spawnForms || [],
 				megaBoost: megaBoostFor(ev.spawnForms),
 				// The event's spawn families as a pile (see buildPile): ① best IVs
@@ -7879,19 +7922,23 @@ export default function App() {
 		// "N hidden" toggle instead of letting it fall back to <body>.
 		requestAnimationFrame(() => document.getElementById('hidden-piles-toggle')?.focus());
 	};
-	// Sorting, top to bottom: what's going on right now (each running or
-	// just-ended event as its own pile, plus the piles an event floats up),
-	// then every other pile as a card, grouped, then the Crush strip.
+	// Sorting, top to bottom: what's going on right now (each running, soon
+	// starting or just-ended event as its own pile, plus the piles an event
+	// floats up), then every other pile as a card, grouped, then the Crush strip.
 	const nowMs = Date.now();
-	const recentEvents = eventFilters.filter((ev) => {
-		const s = Date.parse(ev.start), e = Date.parse(ev.end);
-		return ev.pile && s <= nowMs && nowMs - e <= FLOAT_ENDED_DAYS * 86400000;
-	});
+	const recentEvents = sortingEventRows(
+		eventFilters.filter((ev) => ev.pile),
+		nowMs,
+	);
 	const fmtWhen = new Intl.DateTimeFormat(locale, { weekday: 'short', hour: '2-digit', minute: '2-digit' });
-	const eventChip = (ev) =>
-		Date.parse(ev.end) >= nowMs
-			? t('app.sort.ends', { params: { when: fmtWhen.format(Date.parse(ev.end)) } })
-			: t('app.sort.ended', { params: { when: fmtWhen.format(Date.parse(ev.end)) } });
+	const eventChip = ({ ev, state }) =>
+		state === 'upcoming'
+			? t('app.sort.starts', { params: { when: fmtWhen.format(Date.parse(ev.start)) } })
+			: state === 'running'
+				? t('app.sort.ends', { params: { when: fmtWhen.format(Date.parse(ev.end)) } })
+				: t('app.sort.ended', { params: { when: fmtWhen.format(Date.parse(ev.end)) } });
+	const eventHook = (state) =>
+		t(state === 'upcoming' ? 'app.sort.hook.event_upcoming' : state === 'running' ? 'app.sort.hook.event_running' : 'app.sort.hook.event');
 	const venueNote = (venue) => venueNoteFor(venue, homeLocation, t, locale);
 	const pileById = Object.fromEntries([hundoPile, ...sortingPiles].filter(Boolean).map((p) => [p.id, p]));
 	const accentOf = (id) => [...PILE_GROUPS, ...UPGRADE_GROUPS].find((g) => g.piles.includes(id))?.accent || '#5EAFC5';
@@ -8007,7 +8054,8 @@ export default function App() {
 					<h3 id='sort-now' className='mono text-xs uppercase tracking-widest text-[#5EAFC5] font-semibold'>
 						{t('app.float.title')}
 					</h3>
-					{recentEvents.map((ev) => {
+					{recentEvents.map((row) => {
+						const { ev, state } = row;
 						// An in-person event far from the home pin (or with no pin) keeps
 						// its row for the traveller, folded, with the city and distance.
 						const where = venueNote(ev.venue);
@@ -8016,9 +8064,9 @@ export default function App() {
 								key={ev.id}
 								pile={ev.pile}
 								title={ev.title}
-								hook={where?.hook || t('app.sort.hook.event')}
+								hook={where?.hook || eventHook(state)}
 								icon={PILE_ICON.event}
-								chip={where ? `${eventChip(ev)} · ${where.chip}` : eventChip(ev)}
+								chip={where ? `${eventChip(row)} · ${where.chip}` : eventChip(row)}
 								accent='#27AE60'
 								text={EVENT_PILE_TEXT}
 								copied={copied}

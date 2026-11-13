@@ -33,7 +33,7 @@
 // Run with: npx vite-node scripts/check-piles.mjs
 
 import {
-  BUDGET_DEFAULTS, BUDGET_ROWS, evalFilterDetailed as evalDetailed, FLOAT_ENDED_DAYS, floatingPiles, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET, PILE_GROUPS, UPGRADE_GROUPS, PROTECTION_PILES, hiddenPileTransitions, withPileTransitions,
+  BUDGET_DEFAULTS, BUDGET_ROWS, evalFilterDetailed as evalDetailed, FLOAT_ENDED_DAYS, floatingPiles, sortingEventRows, EVENT_LOOKAHEAD_DAYS, RECURRING_FLOAT_ENDED_DAYS, isWeeklyEvent, eventCatchDex, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET, PILE_GROUPS, UPGRADE_GROUPS, PROTECTION_PILES, hiddenPileTransitions, withPileTransitions,
 } from "../src/App.jsx";
 import { readFileSync } from "node:fs";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
@@ -647,6 +647,55 @@ console.log("\nWhich piles show first (event-driven ordering)");
     hasCostumedSpawns([{ name: "Piplup wearing a Halloween Mischief costume" }]) && !hasCostumedSpawns(["Zubat", { name: "Gengar" }]));
 }
 
+console.log("\nSorting's event rows: prepare before, tidy after");
+{
+  // Regression: the Sorting workflow (#110) listed an event only once it had
+  // started, so there was no way to ready the bag for it. An event's own pile
+  // now shows EVENT_LOOKAHEAD_DAYS ahead and FLOAT_ENDED_DAYS after.
+  const now = Date.parse("2026-11-13T15:00:00Z");
+  const day = 86400000;
+  const iso = (ms) => new Date(ms).toISOString();
+  const ev = (title, startDays, endDays) => ({ title, start: iso(now + startDays * day), end: iso(now + endDays * day) });
+  const rows = (events) => sortingEventRows(events, now).map((r) => `${r.ev.title}:${r.state}`).join(",");
+  check("the horizon is 3 days ahead and a week after", EVENT_LOOKAHEAD_DAYS === 3 && FLOAT_ENDED_DAYS === 7);
+  check("an event starting tomorrow is listed as upcoming", rows([ev("Wild Area", 0.8, 2)]) === "Wild Area:upcoming");
+  check("one starting in 2.9 days is listed, one in 3.1 days isn't",
+    rows([ev("Soon", 2.9, 4)]) === "Soon:upcoming" && rows([ev("Later", 3.1, 4)]) === "");
+  check("one that ended 6.9 days ago is listed, 7.1 days ago isn't",
+    rows([ev("Old", -9, -6.9)]) === "Old:ended" && rows([ev("Older", -9, -7.1)]) === "");
+  check("running first, then upcoming soonest first, then ended most recent first",
+    rows([ev("Ended long", -8, -6), ev("Next", 2, 3), ev("Ended", -3, -1), ev("Live", -1, 1), ev("Tomorrow", 1, 2)]) ===
+      "Live:running,Tomorrow:upcoming,Next:upcoming,Ended:ended,Ended long:ended");
+  check("an event without a readable window is skipped", rows([{ title: "Bad", start: "soon", end: "later" }]) === "");
+  for (const loc of localeNames) {
+    const m = LOCALES[loc].messages;
+    check(`${loc}: the upcoming chip and the running/upcoming hooks are translated`,
+      typeof m["app.sort.starts"] === "string" && m["app.sort.starts"].includes("{when}") &&
+      typeof m["app.sort.hook.event_running"] === "string" && typeof m["app.sort.hook.event_upcoming"] === "string");
+  }
+
+  // Max Monday repeats every week: with the full week after, last Monday's
+  // was still floating when the next one began, and Dynamax never left the top.
+  const ids = (data, at) => floatingPiles(data, at).map((f) => f.pile).join(",");
+  const monday = { kind: "max", title: "Dynamax Espurr during Max Monday", start: "2026-11-23T06:00:00Z", end: "2026-11-23T21:00:00Z" };
+  const after = (h) => Date.parse(monday.end) + h * 3600000;
+  check("Max Monday is a weekly event, Max Battle Day isn't", isWeeklyEvent(monday.title) && isWeeklyEvent("Max Monday: Pokémon to be announced") && !isWeeklyEvent("Max Battle Day"));
+  check("a Max Monday floats Dynamax while it runs and for two days after",
+    RECURRING_FLOAT_ENDED_DAYS === 2 &&
+    ids({ signals: [monday] }, Date.parse(monday.start) + 3600000) === "dynamax" && ids({ signals: [monday] }, after(47)) === "dynamax");
+  check("… and not after that, so it is gone well before the next Monday",
+    ids({ signals: [monday] }, after(49)) === "" && ids({ eventMaxBattles: [{ name: "Max Monday", start: monday.start, end: monday.end }] }, after(49)) === "");
+  check("a one-off Max Battle Day keeps the full week",
+    ids({ signals: [{ ...monday, title: "Max Battle Day" }] }, after(24 * 6)) === "dynamax");
+
+  // Field Research encounters are part of what an event puts in the bag.
+  check("an event's catch list is its spawns plus its research encounters, deduplicated",
+    eventCatchDex({ spawnDex: [35, 120], researchDex: [120, 840] }).join(",") === "35,120,840" &&
+    eventCatchDex({ spawnDex: [25] }).join(",") === "25" && eventCatchDex({}).length === 0);
+  check("an Irrbis research encounter floats the size piles too",
+    ids({ events: [{ title: "R", category: "Event", spawnDex: [25], researchDex: [710], start: iso(now - 2 * day), end: iso(now - day) }] }, now) === "event_spawns,xxl,xxs");
+}
+
 console.log("\nProtection toggles hide and show piles (edge-triggered, stateful)");
 {
   // A protect* boolean's on/off edge edits config.hiddenPiles once; between
@@ -732,7 +781,8 @@ console.log("\nDeep-review regressions");
   const learned = learnersOf([tpl(386, "DEOXYS", ["PSYCHO_BOOST"])], ["V0288_MOVE_PSYCHO_BOOST"]);
   check("a PvE move id (V0288_MOVE_PSYCHO_BOOST) finds its learners", JSON.stringify(learned.V0288_MOVE_PSYCHO_BOOST) === "[386]", JSON.stringify(learned));
 
-  // 4. A Max Monday floats Dynamax for days after it ends.
+  // 4. A Max Monday floats Dynamax for days after it ends (two, being weekly:
+  //    see "Sorting's event rows" above for the upper edge).
   const maxFeed = { "Max Mondays": [{ title: "Dynamax Machop during Max Monday", start_time: "2026-11-02T06:00:00", end_time: "2026-11-02T21:00:00", details: {} }] };
   const maxSignal = signalsFromFeed(maxFeed);
   check("the feed's Max Monday becomes a max signal", maxSignal.length === 1 && maxSignal[0].kind === "max");

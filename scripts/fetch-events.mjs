@@ -95,7 +95,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
-import { outsideWindow, carryOver, shrunkEvents } from "./lib/event-window.mjs";
+import { outsideWindow, carryOver, isRetitleOf, shrunkEvents } from "./lib/event-window.mjs";
 import { parseFeedTime, feedWindow, describeUnparseableWindow } from "./lib/feed-time.mjs";
 import { venueOf, isFixedTimeEvent } from "./lib/event-venues.mjs";
 import { LEGACY_COMMUNITY_DAYS, LEGACY_THROUGH, communityDaysFromFeed, mergeRollingCommunityDays } from "./lib/community-days.mjs";
@@ -399,8 +399,17 @@ export function eggPoolsFromFeed(feed, now, nameIdx, { report = () => {}, report
   return { eggPools, unresolvedCount };
 }
 
-// WILD-SPAWN EVENTS: one record per event with a spawn list inside the window,
-// minus SKIP_CATEGORIES. `formIdx`, `previousForms` and `missingForms` are the
+// WILD-SPAWN EVENTS: one record per event with a spawn list or Field Research
+// encounters inside the window, minus SKIP_CATEGORIES.
+//
+// `details.spawns` is Leek Duck's whole "Spawns" section, sub-sections
+// included: habitat hours, mighty Pokémon and Incense encounters all land in
+// it (Wild Area 2026: Global, 2026-11-13). Field Research rewards are a
+// separate list, `details.research`, and before 2026-11-13 were dropped here,
+// so a research-only species never reached the event's pile. They are kept as
+// `researchDex` / `research`, apart from `spawnDex`: the Mega planner ranks
+// the wild pool only (spawnForms), while the event pile and the friend-collect
+// set want everything the event puts in the bag. `formIdx`, `previousForms` and `missingForms` are the
 // spawn-form inputs (see the header): the game-master name index when a mirror
 // answered, else the previous snapshot's forms by name, and the set every name
 // with no form is added to. Returns { events, skippedNoSpawns, skippedWindow,
@@ -421,15 +430,19 @@ export function eventsFromFeed(feed, now, nameIdx, {
     if (SKIP_CATEGORIES.has(category)) { skippedCategory += (Array.isArray(list) ? list.length : 0); continue; }
     if (!Array.isArray(list)) continue;
     for (const event of list) {
-      const spawns = event?.details?.spawns;
-      if (!Array.isArray(spawns) || spawns.length === 0) { skippedNoSpawns++; continue; }
+      const spawns = Array.isArray(event?.details?.spawns) ? event.details.spawns : [];
+      const research = Array.isArray(event?.details?.research) ? event.details.research : [];
+      if (spawns.length === 0 && research.length === 0) { skippedNoSpawns++; continue; }
 
       const window = feedWindow(event);
       if (!window) { report(event, category); continue; }
       if (outsideWindow(window.startMs, window.endMs, now)) { skippedWindow++; continue; }
 
-      const { spawnDex, spawns: spawnNames, unresolved } = resolveSpawns(spawns, nameIdx);
-      if (spawnDex.length === 0) {
+      const wild = resolveSpawns(spawns, nameIdx);
+      const res = resolveSpawns(research, nameIdx);
+      const { spawnDex, spawns: spawnNames } = wild;
+      const unresolved = [...new Set([...wild.unresolved, ...res.unresolved])].sort();
+      if (spawnDex.length === 0 && res.spawnDex.length === 0) {
         console.warn(`  ⚠ "${event.title}": no spawns resolved (${unresolved.join(", ")}) — skipped`);
         continue;
       }
@@ -449,10 +462,13 @@ export function eventsFromFeed(feed, now, nameIdx, {
         spawnDex,
         spawns: spawnNames,
         spawnForms: spawnFormsFor(spawns, nameIdx, formIdx, previousForms, missingForms),
+        researchDex: res.spawnDex,
+        research: res.spawns,
         unresolved,
-        // Costumed spawns ("Piplup wearing a …"): the sorting tab floats the
-        // costume pile up after such an event. The names above are stripped.
-        hasCostumes: hasCostumedSpawns(spawns),
+        // Costumed spawns or research encounters ("Piplup wearing a …"): the
+        // sorting tab floats the costume pile up after such an event. The
+        // names above are stripped.
+        hasCostumes: hasCostumedSpawns(spawns) || hasCostumedSpawns(research),
       });
     }
   }
@@ -634,7 +650,13 @@ async function main() {
   // The shrink guard (see the header). Upcoming events the feed stopped listing
   // are logged either way: one is a cancellation worth seeing in the sync log.
   const shrink = guardShrunkEvents(previous?.events, events.merged, now, { offlineOk, acceptShrink });
-  for (const id of shrink.lost) console.log(`  ✂ upstream no longer lists upcoming event ${id}`);
+  for (const id of shrink.lost) {
+    const old = (previous?.events || []).find((r) => r?.id === id);
+    const renamed = old && events.merged.find((r) => isRetitleOf(old, r));
+    console.log(renamed
+      ? `  ✎ upstream renamed "${old.title}" to "${renamed.title}" (${id} → ${renamed.id})`
+      : `  ✂ upstream no longer lists upcoming event ${id}`);
+  }
   if (shrink.refused) {
     const what = `the feed dropped ${shrink.lost.length} of the ${shrink.expected} events the cache still expects (${shrink.retained} kept, ${eventsOut.length} surfaced)`;
     if (!shrink.write) {
