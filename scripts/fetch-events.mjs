@@ -630,7 +630,7 @@ async function main() {
     console.error(`✗ ${message}`);
     if (offlineOk && existsSync(OUT_PATH)) {
       console.warn(`⚠  --offline-ok and cached ${OUT_PATH} exists; build will use cache.`);
-      failOnHeldBack(heldBack);
+      failOnHeldBack(heldBack, offlineOk);
       return;
     }
     process.exit(1);
@@ -706,14 +706,24 @@ async function main() {
   console.log(`  events: ${eventsOut.length} surfaced · ${events.carriedIds.length} carried over · ${skippedNoSpawns} without spawns · ${skippedWindow} outside window · ${skippedCategory} skipped categories · ${unparseable.size} unparseable windows · ${unmappedVenues.size} without venue · ${totalUnresolved} unresolved spawn names`);
   console.log(`  egg pools: ${eggPoolsOut.length} surfaced · ${eggPools.carriedIds.length} carried over`);
   console.log(`  bonuses: ${bonusesOut.length} events surfaced · ${bonuses.carriedIds.length} carried over · ${unknownBonuses.length} unrecognised phrasings`);
-  failOnHeldBack(heldBack);
+  failOnHeldBack(heldBack, offlineOk);
 }
 
-function failOnHeldBack(heldBack) {
+// A held-back Community Day fails the sync, which is where someone acts on
+// it. Under --offline-ok (prebuild: every build, deploy and test job) it is
+// reported and the build goes on, like a refused events result: the day is
+// simply not in the list yet, and the committed data is still whole. Before
+// this, the feed announcing December to February Community Days without their
+// featured Pokémon (2026-11-10) failed every build and froze the deploy.
+function failOnHeldBack(heldBack, offlineOk = false) {
   if (heldBack.length === 0) return;
   for (const cd of heldBack) {
     const why = cd.names.length ? `unresolved featured names: ${cd.names.join(", ")}` : "no featured Pokémon listed";
     console.error(`✗ Community Day ${cd.date} ${cd.event} not added to ${CD_PATH} (${why})`);
+  }
+  if (offlineOk) {
+    console.warn(`⚠  --offline-ok: ${heldBack.length} Community Day(s) held back, build goes on without them.`);
+    return;
   }
   process.exit(1);
 }
