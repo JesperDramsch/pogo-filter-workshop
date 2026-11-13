@@ -1,7 +1,33 @@
 {
-  "fetchedAt": "2026-11-04T14:40:57.536Z",
+  "fetchedAt": "2026-11-13T22:58:31.023Z",
   "signatureLearners": 5,
   "moves": [
+    {
+      "move": "MOONBLAST_PLUS",
+      "change": "added",
+      "at": "2026-11-13T22:58:31.023Z",
+      "learners": []
+    },
+    {
+      "move": "SOAK",
+      "change": "added",
+      "at": "2026-11-13T22:58:31.023Z",
+      "learners": []
+    },
+    {
+      "move": "V0616_MOVE_SOAK_FAST",
+      "change": "added",
+      "at": "2026-11-13T22:58:31.023Z",
+      "learners": []
+    },
+    {
+      "move": "VM_MOVE_TEMP_EVOLUTION_MEGA_V0036_POKEMON_CLEFABLE",
+      "change": "added",
+      "at": "2026-11-13T22:58:31.023Z",
+      "learners": [
+        36
+      ]
+    },
     {
       "move": "VM_MOVE_TEMP_EVOLUTION_MEGA_V0609_POKEMON_CHANDELURE",
       "change": "changed",

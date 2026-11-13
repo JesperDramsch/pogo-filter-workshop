@@ -1,6 +1,6 @@
 # Pokémon GO PvP Meta Reference — GENERATED, DO NOT HAND-EDIT
 
-- **Snapshot taken:** 2026-11-10T14:59:50.841Z
+- **Snapshot taken:** 2026-11-13T22:58:29.271Z
 - **Source:** pvpoke — https://github.com/pvpoke/pvpoke (MIT)
 - **Snapshot URL:** https://raw.githubusercontent.com/JesperDramsch/pogo-filter-workshop/main/src/data/pvp-rankings.json
 - **Depth:** top 30 per league, deduped by base dex
@@ -17,7 +17,7 @@
 
 ## Move rebalance watch
 
-Last observed Trainer-Battle stat change: **2026-11-02** — 1 move(s) changed (NIGHT_SHADE_PLUS).
+Last observed Trainer-Battle stat change: **2026-11-13** — 2 move(s) changed (MOONBLAST_PLUS, SOAK).
 
 Rankings lag a rebalance by days, so treat the tables below with caution if that date is recent.
 
@@ -182,49 +182,6 @@ Ready-made filter — copy verbatim, this is the app's own output:
 
 ## Cups
 
-### Mega Great League `mega-1500`
-
-Window: 2026-11-03 → 2026-11-10 (Great League: Mega Edition, Ultra League: Mega Edition, and Master League: Mega Edition | Twilight Trails)
-
-CP cap: 1500 CP
-
-| # | German | English | Dex | Ranked form | Score |
-|---:|---|---|---:|---|---:|
-| 1 | zobiris | sableye | 302 | `sableye_mega` | 94 |
-| 2 | melmetal | melmetal | 809 | — | 93.8 |
-| 3 | altaria | altaria | 334 | — | 92.8 |
-| 4 | vulnona | ninetales | 38 | `ninetales_shadow` | 92.7 |
-| 5 | mimigma | mimikyu | 778 | — | 92 |
-| 6 | granforgita | tinkaton | 959 | — | 92 |
-| 7 | florges | florges | 671 | — | 91.6 |
-| 8 | krarmor | corviknight | 823 | — | 91.4 |
-| 9 | urgl | cramorant | 845 | — | 91.4 |
-| 10 | corasonn | corsola | 222 | `corsola_galarian` | 91.1 |
-| 11 | morlord | quagsire | 195 | — | 91 |
-| 12 | aranestro | araquanid | 752 | — | 90.6 |
-| 13 | trikephalo | hydreigon | 635 | `hydreigon_shadow` | 90.6 |
-| 14 | suelord | clodsire | 980 | — | 90.4 |
-| 15 | gaunux | thievul | 828 | — | 90.4 |
-| 16 | azumarill | azumarill | 184 | — | 90.2 |
-| 17 | ibitak | fearow | 22 | — | 90.2 |
-| 18 | nachtara | umbreon | 197 | — | 90.2 |
-| 19 | flunschlik | stunfisk | 618 | — | 90.1 |
-| 20 | mantax | mantine | 226 | — | 90 |
-| 21 | knogga | marowak | 105 | — | 90 |
-| 22 | rocara | carbink | 703 | — | 89.9 |
-| 23 | apoquallyp | jellicent | 593 | — | 89.9 |
-| 24 | gortrom | rillaboom | 812 | — | 89.9 |
-| 25 | muntier | vigoroth | 288 | — | 89.9 |
-| 26 | calamanero | malamar | 687 | `malamar_mega` | 89.8 |
-| 27 | relaxo | snorlax | 143 | — | 89.7 |
-| 28 | epitaff | annihilape | 979 | — | 89.6 |
-| 29 | akkup | charjabug | 737 | — | 89.6 |
-| 30 | lektrobal | electrode | 101 | `electrode_hisuian` | 89.6 |
-
-```
-302,809,334,38,778,959,671,823,845,222,195,752,635,980,828,184,22,197,618,226,105,703,593,812,288,687,143,979,737,101
-```
-
 ### Mega Ultra League `mega-2500`
 
 Window: 2026-11-10 → 2026-11-17 (Great League, Ultra League: Mega Edition, and 2026 GO LAIC Cup | Twilight Trails)
@@ -276,39 +233,39 @@ CP cap: none (uncapped)
 
 | # | German | English | Dex | Ranked form | Score |
 |---:|---|---|---:|---|---:|
-| 1 | kyogre | kyogre | 382 | `kyogre_primal` | 99.4 |
-| 2 | mewtu | mewtwo | 150 | `mewtwo_mega_y` | 97.2 |
-| 3 | garados | gyarados | 130 | `gyarados_mega` | 95.3 |
-| 4 | dragoran | dragonite | 149 | `dragonite_mega` | 94.4 |
-| 5 | knakrack | garchomp | 445 | `garchomp_mega` | 93.6 |
-| 6 | rayquaza | rayquaza | 384 | `rayquaza_mega` | 93.4 |
+| 1 | kyogre | kyogre | 382 | `kyogre_primal` | 99.5 |
+| 2 | garados | gyarados | 130 | `gyarados_mega` | 95.3 |
+| 3 | mewtu | mewtwo | 150 | `mewtwo_mega_x` | 94.3 |
+| 4 | knakrack | garchomp | 445 | `garchomp_mega` | 93.7 |
+| 5 | rayquaza | rayquaza | 384 | `rayquaza_mega` | 93 |
+| 6 | dragoran | dragonite | 149 | `dragonite_mega` | 92.6 |
 | 7 | groudon | groudon | 383 | `groudon_primal` | 91.3 |
-| 8 | metagross | metagross | 376 | `metagross_mega` | 90.5 |
-| 9 | despotar | tyranitar | 248 | `tyranitar_mega` | 90.3 |
-| 10 | latias | latias | 380 | `latias_mega` | 86.1 |
-| 11 | latios | latios | 381 | `latios_mega` | 86.1 |
-| 12 | fennexis | delphox | 655 | `delphox_mega` | 84.7 |
-| 13 | brigaron | chesnaught | 652 | `chesnaught_mega` | 84.3 |
-| 14 | skaraborn | heracross | 214 | `heracross_mega` | 84 |
-| 15 | sumpex | swampert | 260 | `swampert_mega` | 83.8 |
-| 16 | brutalanda | salamence | 373 | `salamence_mega` | 83.7 |
-| 17 | stolloss | aggron | 306 | `aggron_mega` | 81.7 |
-| 18 | dialga | dialga | 483 | `dialga_origin` | 81.7 |
-| 19 | palkia | palkia | 484 | `palkia_origin` | 79.5 |
-| 20 | scherox | scizor | 212 | `scizor_mega` | 78.8 |
+| 8 | despotar | tyranitar | 248 | `tyranitar_mega` | 90.7 |
+| 9 | metagross | metagross | 376 | `metagross_mega` | 89.8 |
+| 10 | latias | latias | 380 | `latias_mega` | 85.9 |
+| 11 | latios | latios | 381 | `latios_mega` | 85.6 |
+| 12 | skaraborn | heracross | 214 | `heracross_mega` | 83.7 |
+| 13 | sumpex | swampert | 260 | `swampert_mega` | 83.5 |
+| 14 | brutalanda | salamence | 373 | `salamence_mega` | 83.4 |
+| 15 | brigaron | chesnaught | 652 | `chesnaught_mega` | 82.2 |
+| 16 | stolloss | aggron | 306 | `aggron_mega` | 81.6 |
+| 17 | dialga | dialga | 483 | `dialga_origin` | 81.6 |
+| 18 | fennexis | delphox | 655 | `delphox_mega` | 81.3 |
+| 19 | palkia | palkia | 484 | `palkia_origin` | 79.1 |
+| 20 | scherox | scizor | 212 | `scizor_mega` | 78.4 |
 | 21 | glurak | charizard | 6 | `charizard_mega_y` | 77.6 |
-| 22 | ursaluna | ursaluna | 901 | `ursaluna_shadow` | 76.6 |
-| 23 | zygarde | zygarde | 718 | `zygarde_complete` | 76.4 |
-| 24 | xerneas | xerneas | 716 | — | 76.2 |
-| 25 | galagladi | gallade | 475 | `gallade_mega` | 76.1 |
-| 26 | gengar | gengar | 94 | `gengar_mega` | 76.1 |
-| 27 | melmetal | melmetal | 809 | — | 75.4 |
-| 28 | keldeo | keldeo | 647 | `keldeo_resolute` | 75.2 |
-| 29 | kyurem | kyurem | 646 | `kyurem_white` | 75.1 |
-| 30 | lugia | lugia | 249 | — | 75.1 |
+| 22 | ursaluna | ursaluna | 901 | `ursaluna_shadow` | 76.2 |
+| 23 | zygarde | zygarde | 718 | `zygarde_complete` | 76.2 |
+| 24 | galagladi | gallade | 475 | `gallade_mega` | 76.1 |
+| 25 | xerneas | xerneas | 716 | — | 76.1 |
+| 26 | gengar | gengar | 94 | `gengar_mega` | 75.8 |
+| 27 | melmetal | melmetal | 809 | — | 75.1 |
+| 28 | kyurem | kyurem | 646 | `kyurem_white` | 75 |
+| 29 | keldeo | keldeo | 647 | `keldeo_resolute` | 74.9 |
+| 30 | lugia | lugia | 249 | — | 74.9 |
 
 ```
-382,150,130,149,445,384,383,376,248,380,381,655,652,214,260,373,306,483,484,212,6,901,718,716,475,94,809,647,646,249
+382,130,150,445,384,149,383,248,376,380,381,214,260,373,652,306,483,655,484,212,6,901,718,475,716,94,809,646,647,249
 ```
 
 ### Catch Cup `catch-1500`

@@ -422,6 +422,57 @@
           ]
         }
       ]
+    },
+    {
+      "eventID": "raidhour20261118",
+      "name": "Cresselia and Darkrai Raid Hour",
+      "eventType": "raid-hour",
+      "start": "2026-11-18T18:00:00.000",
+      "end": "2026-11-18T19:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "CRESSELIA",
+          "form": "CRESSELIA_NORMAL",
+          "names": {
+            "en": "Cresselia"
+          },
+          "types": [
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "ghost",
+            "dark"
+          ]
+        },
+        {
+          "id": "DARKRAI",
+          "form": "DARKRAI_NORMAL",
+          "names": {
+            "en": "Darkrai"
+          },
+          "types": [
+            "dark"
+          ],
+          "resistorTypes": [
+            "fighting",
+            "dark",
+            "fairy"
+          ],
+          "seMoveTypes": [
+            "fighting",
+            "bug",
+            "fairy"
+          ]
+        }
+      ]
     }
   ],
   "eventMaxBattles": []

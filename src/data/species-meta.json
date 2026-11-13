@@ -1,11 +1,11 @@
 {
-  "fetchedAt": "2026-11-10T14:59:51.795Z",
+  "fetchedAt": "2026-11-13T22:58:30.020Z",
   "sources": {
     "classes": "game master",
     "released": "pvpoke/pvpoke",
     "generations": "scripts/lib/generations.mjs (pinned dex ranges)",
     "gameMaster": "alexelgt/game_masters",
-    "gameMasterBatch": "2026-11-09T00:56:45.982Z"
+    "gameMasterBatch": "2026-11-11T06:25:39.087Z"
   },
   "startersPerGeneration": 9,
   "powerLineCumulativeCandy": 125,
@@ -181,6 +181,7 @@
     15,
     18,
     26,
+    36,
     65,
     71,
     80,
@@ -1032,7 +1033,9 @@
       ]
     }
   ],
-  "upcomingMegaDex": [],
+  "upcomingMegaDex": [
+    36
+  ],
   "showcase": {
     "coefficients": {
       "height": 800,

@@ -1,11 +1,49 @@
 {
-  "fetchedAt": "2026-11-10T14:59:53.094Z",
+  "fetchedAt": "2026-11-13T22:58:31.023Z",
   "sources": {
     "pvp": "pvpoke-gamemaster",
     "pve": "alexelgt/game_masters",
-    "pveBatch": "2026-11-09T00:56:45.982Z"
+    "pveBatch": "2026-11-11T06:25:39.087Z"
   },
   "history": [
+    {
+      "at": "2026-11-13T22:58:31.023Z",
+      "stream": "pve",
+      "summary": "2 move(s) changed",
+      "changes": [
+        {
+          "move": "V0616_MOVE_SOAK_FAST",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        },
+        {
+          "move": "VM_MOVE_TEMP_EVOLUTION_MEGA_V0036_POKEMON_CLEFABLE",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        }
+      ]
+    },
+    {
+      "at": "2026-11-13T22:58:31.023Z",
+      "stream": "pvp",
+      "summary": "2 move(s) changed",
+      "changes": [
+        {
+          "move": "MOONBLAST_PLUS",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        },
+        {
+          "move": "SOAK",
+          "field": "*",
+          "from": null,
+          "to": "added"
+        }
+      ]
+    },
     {
       "at": "2026-11-04T14:40:57.536Z",
       "stream": "pve",
@@ -2185,6 +2223,19 @@
       "buffTarget": "opponent",
       "buffApplyChance": ".1"
     },
+    "MOONBLAST_PLUS": {
+      "power": 80,
+      "energy": 50,
+      "energyGain": 0,
+      "cooldown": 500,
+      "turns": 1,
+      "buffs": [
+        -1,
+        0
+      ],
+      "buffTarget": "opponent",
+      "buffApplyChance": ".1"
+    },
     "MOONGEIST_BEAM": {
       "power": 135,
       "energy": 65,
@@ -2993,6 +3044,13 @@
       ],
       "buffTarget": "self",
       "buffApplyChance": ".125"
+    },
+    "SOAK": {
+      "power": 6,
+      "energy": 0,
+      "energyGain": 8,
+      "cooldown": 1000,
+      "turns": 2
     },
     "SOLAR_BEAM": {
       "power": 150,
@@ -5528,11 +5586,23 @@
       "energyDelta": -50,
       "pokemonType": "POKEMON_TYPE_DARK"
     },
+    "V0616_MOVE_SOAK_FAST": {
+      "power": 6,
+      "durationMs": 1000,
+      "energyDelta": 18,
+      "pokemonType": "POKEMON_TYPE_WATER"
+    },
     "VM_MOVE_TEMP_EVOLUTION_MEGA_V0015_POKEMON_BEEDRILL": {
       "power": 140,
       "durationMs": 2000,
       "energyDelta": -100,
       "pokemonType": "POKEMON_TYPE_BUG"
+    },
+    "VM_MOVE_TEMP_EVOLUTION_MEGA_V0036_POKEMON_CLEFABLE": {
+      "power": 160,
+      "durationMs": 4000,
+      "energyDelta": -100,
+      "pokemonType": "POKEMON_TYPE_FAIRY"
     },
     "VM_MOVE_TEMP_EVOLUTION_MEGA_V0071_POKEMON_VICTREEBEL": {
       "power": 160,
