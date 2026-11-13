@@ -120,6 +120,10 @@ console.log("\nW-retitle — an event the feed renamed while it ran is not carri
   check("a different window is a different event", !isRetitleOf(OLD, { ...NEW, end: "2026-09-05T20:00:00" }));
   check("a different category is a different event", !isRetitleOf(OLD, { ...NEW, category: "Wild Area" }));
   check("a title that merely shares letters is a different event", !isRetitleOf(OLD, { ...NEW, title: "Into the Wilderness" }));
+  check("the shrink guard does not count a rename as a lost event",
+    shrunkEvents([OLD], [NEW], NOW).lost.length === 0);
+  // carryOver is shared by events, eggPools, bonuses and signals, so the same
+  // rule drops the renamed record's duplicate bonuses too (it did on 2026-11-13).
   check("two unrelated events in the same window are both kept",
     carryOver([{ ...NEW, title: "Mega Raid Day", id: "x" }], [OLD], NOW).carriedIds.length === 1);
 }

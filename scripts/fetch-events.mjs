@@ -709,20 +709,34 @@ async function main() {
   failOnHeldBack(heldBack, offlineOk);
 }
 
-// A held-back Community Day fails the sync, which is where someone acts on
-// it. Under --offline-ok (prebuild: every build, deploy and test job) it is
-// reported and the build goes on, like a refused events result: the day is
-// simply not in the list yet, and the committed data is still whole. Before
-// this, the feed announcing December to February Community Days without their
-// featured Pokémon (2026-11-10) failed every build and froze the deploy.
+// Community Days the fetcher held back, split by whether anyone can act.
+// A day whose featured names do not resolve is a fetcher bug (a new species or
+// a spelling the name index misses): that fails the sync. A day that lists no
+// featured Pokémon yet is Niantic announcing the date before the species
+// (December to February 2026/27, on the feed since 2026-11-10): nothing to do
+// but wait, so it is a warning, and the day is added once Leek Duck names it.
+// Failing on those turned the sync red for weeks with nothing to fix.
+export function heldBackFailures(heldBack = []) {
+  return {
+    fail: heldBack.filter((cd) => cd.names.length > 0),
+    pending: heldBack.filter((cd) => cd.names.length === 0),
+  };
+}
+
+// Under --offline-ok (prebuild: every build, deploy and test job) even a real
+// failure is reported and the build goes on with the committed data, like a
+// refused events result; the sync runs without the flag and fails on it.
 function failOnHeldBack(heldBack, offlineOk = false) {
-  if (heldBack.length === 0) return;
-  for (const cd of heldBack) {
-    const why = cd.names.length ? `unresolved featured names: ${cd.names.join(", ")}` : "no featured Pokémon listed";
-    console.error(`✗ Community Day ${cd.date} ${cd.event} not added to ${CD_PATH} (${why})`);
+  const { fail, pending } = heldBackFailures(heldBack);
+  for (const cd of pending) {
+    console.warn(`  ⏳ Community Day ${cd.date} ${cd.event}: no featured Pokémon announced yet, added once listed`);
+  }
+  if (fail.length === 0) return;
+  for (const cd of fail) {
+    console.error(`✗ Community Day ${cd.date} ${cd.event} not added to ${CD_PATH} (unresolved featured names: ${cd.names.join(", ")})`);
   }
   if (offlineOk) {
-    console.warn(`⚠  --offline-ok: ${heldBack.length} Community Day(s) held back, build goes on without them.`);
+    console.warn(`⚠  --offline-ok: ${fail.length} Community Day(s) held back, build goes on without them.`);
     return;
   }
   process.exit(1);

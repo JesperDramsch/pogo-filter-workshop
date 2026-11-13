@@ -48,7 +48,7 @@ import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
 import { pokemonNameFor } from "../src/data/species.js";
 import { FIXTURE_CONFIG, makeTFn } from "./lib/fixture.mjs";
 import { pileCases, pileMon, smeargleMovesetClauses, tailOptions } from "./lib/pile-cases.mjs";
-import { hasCostumedSpawns, signalsFromFeed } from "./fetch-events.mjs";
+import { hasCostumedSpawns, heldBackFailures, signalsFromFeed } from "./fetch-events.mjs";
 import { acceptPveDump, learnersOf, watchMovesFrom } from "./fetch-game-master-watch.mjs";
 import GM_WATCH from "../src/data/game-master-watch.json";
 import WATCH_MOVES from "../src/data/watch-moves.json";
@@ -867,6 +867,13 @@ console.log("\nCommunity Day data (scripts/lib/community-days.mjs → src/data/c
   check("a day listing no featured Pokémon is held back too",
     unresolved.some((cd) => cd.event === "Mystery Community Day" && cd.names.length === 0));
   check("events not named as a Community Day are ignored", !days.concat(unresolved).some((cd) => cd.event === "Spotlight Hour"));
+  // The sync fails only where someone can act: an unresolved name is a fetcher
+  // bug, a day with no species announced yet is just waiting (2026-11-10 on).
+  const { fail, pending } = heldBackFailures(unresolved);
+  check("an unresolved featured name fails the sync",
+    fail.length === 1 && fail[0].event === "December Community Day 2026");
+  check("a day with no featured Pokémon announced yet only warns",
+    pending.length === 1 && pending[0].event === "Mystery Community Day");
 }
 
 console.log("\nEvery pile's wording exists in every locale");

@@ -86,8 +86,9 @@ const keyOf = (cd) => `${cd.date}|${cd.event.toLowerCase()}`;
 // Returns { days, unresolved }. A day goes in `days` only when every featured
 // name resolved: the list is append-only by date and title, so a day added
 // half-resolved would stay half-resolved. One with any unresolved name, or
-// none listed, goes in `unresolved` instead, and the fetcher fails the sync
-// on it; the day is added in full once its names resolve.
+// none listed, goes in `unresolved` instead; the day is added in full once its
+// names resolve. The fetcher fails the sync only on unresolved names: a day
+// with none listed yet is a warning (heldBackFailures in fetch-events.mjs).
 //
 // The date is the start's calendar day in the feed's own spelling (scripts/lib/
 // feed-time.mjs): the local date for the naive string every Community Day has

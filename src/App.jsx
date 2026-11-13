@@ -2186,7 +2186,7 @@ export const isWeeklyEvent = (title) => WEEKLY_EVENT.test(String(title || ''));
 // How far ahead an event's own spawn pile shows on the Sorting tab, so the
 // bag can be readied before it starts. Same horizon as the Mega planner.
 export const EVENT_LOOKAHEAD_DAYS = 3;
-const DAY_MS_SORT = 86400000;
+const DAY_MS = 86400000;
 
 // Every species an event puts in the bag: its wild spawns (incense, habitat
 // hours and mighty encounters included, see scripts/fetch-events.mjs) plus its
@@ -2208,8 +2208,8 @@ export function sortingEventRows(events = [], now = Date.now()) {
 		if (!Number.isFinite(s) || !Number.isFinite(e)) continue;
 		let state = null;
 		if (s <= now && now <= e) state = 'running';
-		else if (s > now && s - now <= EVENT_LOOKAHEAD_DAYS * DAY_MS_SORT) state = 'upcoming';
-		else if (e < now && now - e <= FLOAT_ENDED_DAYS * DAY_MS_SORT) state = 'ended';
+		else if (s > now && s - now <= EVENT_LOOKAHEAD_DAYS * DAY_MS) state = 'upcoming';
+		else if (e < now && now - e <= FLOAT_ENDED_DAYS * DAY_MS) state = 'ended';
 		if (state) rows.push({ ev, state, s, e });
 	}
 	const rank = { running: 0, upcoming: 1, ended: 2 };
@@ -2223,7 +2223,7 @@ export function floatingPiles({ events = [], signals = [], eventMaxBattles = [] 
 	const recent = (start, end, title) => {
 		const s = Date.parse(start), e = Date.parse(end);
 		const days = isWeeklyEvent(title) ? RECURRING_FLOAT_ENDED_DAYS : FLOAT_ENDED_DAYS;
-		return Number.isFinite(s) && Number.isFinite(e) && s <= now && now - e <= days * 86400000;
+		return Number.isFinite(s) && Number.isFinite(e) && s <= now && now - e <= days * DAY_MS;
 	};
 	const out = [];
 	const add = (pile, kind, title) => {
@@ -2274,7 +2274,7 @@ export function costumeEventFor(events = [], now = Date.now()) {
 	const live = (events || []).filter((ev) => {
 		if (!ev.hasCostumes) return false;
 		const s = Date.parse(ev.start), e = Date.parse(ev.end);
-		return Number.isFinite(s) && Number.isFinite(e) && s <= now && now - e <= FLOAT_ENDED_DAYS * 86400000;
+		return Number.isFinite(s) && Number.isFinite(e) && s <= now && now - e <= FLOAT_ENDED_DAYS * DAY_MS;
 	});
 	if (live.length === 0) return null;
 	const start = Math.min(...live.map((ev) => Date.parse(ev.start)));
@@ -2284,7 +2284,7 @@ export function costumeEventFor(events = [], now = Date.now()) {
 		title: live.map((ev) => ev.title).join(' · '),
 		spawnDex,
 		start: new Date(start).toISOString(),
-		daysSinceStart: Math.max(0, Math.floor((now - start) / 86400000)),
+		daysSinceStart: Math.max(0, Math.floor((now - start) / DAY_MS)),
 	};
 }
 

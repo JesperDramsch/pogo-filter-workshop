@@ -128,7 +128,8 @@ export function shrunkEvents(previous, merged, now, opts) {
     if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) continue;
     if (endMs < pastEdge || startMs > futureEdge) continue;   // aged out, or beyond the horizon
     expected++;
-    if (!kept.has(rec.id)) lost.push(rec.id);
+    // A retitle is not a loss: carryOver already swapped it for the fresh record.
+    if (!kept.has(rec.id) && !(merged || []).some((m) => isRetitleOf(rec, m))) lost.push(rec.id);
   }
   const retained = expected - lost.length;
   const refused = (merged || []).length < expected && lost.length > retained;
