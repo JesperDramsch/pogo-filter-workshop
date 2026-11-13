@@ -1660,8 +1660,11 @@
   "app.sort.intro": "先挑要留的：每一堆中把有用途的加入我的最愛或標記。「剩下的」方塊就是 IV、異色、進化、背景或亮晶晶步驟都沒留下的，看一眼就能傳送；其他未加入最愛、未標記的收在展開區裡。",
   "app.sort.ends": "{when} 結束",
   "app.sort.ended": "{when} 已結束",
+  "app.sort.starts": "{when} 開始",
   "app.sort.also_here": "這裡也用得上",
   "app.sort.hook.event": "剛從活動回來：留下紀念品和好個體值，其餘的揮手道別。",
+  "app.sort.hook.event_running": "進行中：活動出現的寶可夢已登場，騰出空間並留下好個體值。",
+  "app.sort.hook.event_upcoming": "即將開始：先確認這些出現的寶可夢你已經有哪些，並在活動開始前騰出空間。",
   "app.sort.hook.hundo": "有 100% 了？家族其他成員剛剛失業了。",
   "app.sort.hook.luckies": "刷亮晶晶交換會留下一堆閃亮亮的雜亂。",
   "app.sort.hook.traded": "朋友送的禮物。很貼心，但不能再轉送。",
@@ -1884,6 +1887,8 @@
   "app.upgrade.sources.evolve_tag": "進化:你標記要完整進化的寶可夢所用的標籤。",
   "app.upgrade.sources.max_roster": "極巨招式升級:極巨攻擊手清單。",
   "app.upgrade.sources.rankings": "第三個招式和厲害招式學習器目標讀取每天更新的團體戰和 PvP 排名。",
+  "app.changelog.entry.event_prep.title": "「排序」分頁中，活動會提前 3 天顯示",
+  "app.changelog.entry.event_prep.body": "「排序」的「現在」區塊過去只在活動開始後才列出，因此無法預先騰出空間。現在每個活動的堆疊會從開始前 3 天顯示到結束後一週：先是正在進行的活動，接著是即將舉行的活動，最後是你正在收拾的活動。堆疊現在也涵蓋活動的田野調查遭遇，不只是野生出現。每週回歸的 Max Monday 只會讓極巨化堆疊浮在上方兩天，而不是七天，因此不再一直待在最上方。活動進行期間被重新命名的活動，也不會再重複顯示兩次。",
   "app.changelog.entry.upgrades_tab.title": "新的強化分頁:王冠、厲害招式學習器、淨化",
   "app.changelog.entry.upgrades_tab.body": "在排序和對戰之間新增第五個分頁,決定資源該花在哪裡。裡面有進化堆和超級進化、銀色或金色王冠該用在哪裡、哪些排名物種還需要第三個招式、厲害招式學習器的招式或極巨招式升級,以及淨化字串,接近 100% 的候選和安全的大量淨化也回來了。交換與朋友新增重抽個體值的交換:個體值差、值得換一次新個體值的特別寶可夢。"
 }

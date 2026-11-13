@@ -52,12 +52,32 @@ export function outsideWindow(startMs, endMs, now, opts) {
 // events.json (both `events` and `eggPools` have that shape). Returns the merged
 // list sorted by start, plus the ids that were carried so the fetcher can log
 // them.
+//
+// A record the feed RETITLED is not carried either. The early "Into the Wild"
+// listing (3 spawns) became "Into the Wild 2026" (12 spawns, same window, same
+// bonuses) somewhere between the 2026-11-02 and 2026-11-10 syncs. The id
+// hashes the title, so the 2026-11-10 sync saw a new event; the old record had
+// started by then, so it was carried and rode along beside the new one as a
+// second, smaller pile. A carried record counts
+// as the fresh one when both share the category (or signal kind) and the exact
+// window, and one normalised title starts with the other.
+const normTitle = (t) => String(t || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+export function isRetitleOf(rec, fresh) {
+  if (!rec || !fresh) return false;
+  if ((rec.category ?? rec.kind ?? null) !== (fresh.category ?? fresh.kind ?? null)) return false;
+  if (rec.start !== fresh.start || rec.end !== fresh.end) return false;
+  const a = normTitle(rec.title), b = normTitle(fresh.title);
+  if (!a || !b || a === b) return false;
+  return a.startsWith(b + " ") || b.startsWith(a + " ");
+}
+
 export function carryOver(fresh, previous, now, opts) {
   const { pastEdge } = windowEdges(now, opts);
   const seen = new Set((fresh || []).map((r) => r?.id).filter(Boolean));
   const carried = [];
   for (const rec of previous || []) {
     if (!rec || !rec.id || seen.has(rec.id)) continue;
+    if ((fresh || []).some((f) => isRetitleOf(rec, f))) continue;
     const startMs = Date.parse(rec.start);
     const endMs = Date.parse(rec.end);
     if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) continue;
@@ -108,7 +128,8 @@ export function shrunkEvents(previous, merged, now, opts) {
     if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) continue;
     if (endMs < pastEdge || startMs > futureEdge) continue;   // aged out, or beyond the horizon
     expected++;
-    if (!kept.has(rec.id)) lost.push(rec.id);
+    // A retitle is not a loss: carryOver already swapped it for the fresh record.
+    if (!kept.has(rec.id) && !(merged || []).some((m) => isRetitleOf(rec, m))) lost.push(rec.id);
   }
   const retained = expected - lost.length;
   const refused = (merged || []).length < expected && lost.length > retained;

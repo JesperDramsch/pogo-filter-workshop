@@ -1660,8 +1660,11 @@
   "app.sort.intro": "Keeper zuerst: In jedem Stapel favorisierst oder taggst du, was einen Job hat. Die Reste-Box enthält dann, was kein IV-, Schillernd-, Entwickeln-, Hintergrund- oder Glücks-Schritt behalten hat, nach einem Blick fertig zum Verschicken; alles andere ohne Favorit oder Tag wartet hinter einem Aufklapper.",
   "app.sort.ends": "endet {when}",
   "app.sort.ended": "endete {when}",
+  "app.sort.starts": "beginnt {when}",
   "app.sort.also_here": "auch praktisch hier",
   "app.sort.hook.event": "Frisch vom Event: Souvenirs und gute IVs behalten, dem Rest zum Abschied winken.",
+  "app.sort.hook.event_running": "Läuft gerade: Die Spawns sind da, also schaff Platz und behalte die guten IVs.",
+  "app.sort.hook.event_upcoming": "Demnächst: Prüf, welche dieser Spawns du schon hast, und schaff Platz, bevor es losgeht.",
   "app.sort.hook.hundo": "Hundo gefunden? Der Rest der Familie hat gerade seinen Job verloren.",
   "app.sort.hook.luckies": "Glückstausch-Farming hinterlässt eine glitzernde Unordnung.",
   "app.sort.hook.traded": "Geschenke von Freunden. Lieb gemeint, aber weitergeben geht nicht.",
@@ -1884,6 +1887,8 @@
   "app.upgrade.sources.evolve_tag": "Entwickeln: die Markierung für Pokémon, die du durchentwickeln willst.",
   "app.upgrade.sources.max_roster": "Dyna-Attacken verbessern: die Dyna-Angreifer-Liste.",
   "app.upgrade.sources.rankings": "Dritte Attacke und Top-TM-Ziele lesen die Raid- und PvP-Rankings, die sich täglich aktualisieren.",
+  "app.changelog.entry.event_prep.title": "Events erscheinen 3 Tage früher im Tab Sortieren",
+  "app.changelog.entry.event_prep.body": "Der Block „gerade jetzt“ unter Sortieren listete ein Event erst, sobald es begonnen hatte, sodass du vorher keinen Platz dafür schaffen konntest. Der Stapel jedes Events erscheint jetzt ab 3 Tagen vor dem Start bis eine Woche nach dem Ende: zuerst laufende Events, dann bevorstehende, dann die, nach denen du gerade aufräumst. Der Stapel umfasst jetzt auch die Feldforschungs-Begegnungen des Events, nicht nur seine Spawns. Max Monday, der jede Woche wiederkommt, hält den Dynamax-Stapel zwei statt sieben Tage oben, sodass er nicht mehr ständig ganz oben steht. Ein Event, das während der Laufzeit umbenannt wurde, erscheint nicht mehr doppelt.",
   "app.changelog.entry.upgrades_tab.title": "Neuer Upgrades-Tab: Kronkorken, Top-TMs, Erlösen",
   "app.changelog.entry.upgrades_tab.body": "Ein fünfter Tab zwischen Sortieren und Kämpfe dafür, wofür sich Ressourcen lohnen. Darin: der Entwickeln-Stapel und Mega-Entwicklung, wo ein Silber- oder Goldkronkorken hingehört, welche Ranking-Arten noch eine dritte Attacke, eine Top-TM-Attacke oder bessere Dyna-Attacken brauchen, und die Erlösen-Suchbegriffe, wieder mit Fast-Hundo-Kandidaten und sicherem Massen-Erlösen. Tausch & Freunde bekommt Neu-Würfel-Tausch: besondere Pokémon mit schwachen IVs, die einen neuen Wurf wert sind."
 }

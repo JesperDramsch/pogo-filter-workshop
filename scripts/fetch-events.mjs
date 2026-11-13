@@ -95,7 +95,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { canonicalStringify, writeJson, readPreviousJson } from "./lib/json.mjs";
-import { outsideWindow, carryOver, shrunkEvents } from "./lib/event-window.mjs";
+import { outsideWindow, carryOver, isRetitleOf, shrunkEvents } from "./lib/event-window.mjs";
 import { parseFeedTime, feedWindow, describeUnparseableWindow } from "./lib/feed-time.mjs";
 import { venueOf, isFixedTimeEvent } from "./lib/event-venues.mjs";
 import { LEGACY_COMMUNITY_DAYS, LEGACY_THROUGH, communityDaysFromFeed, mergeRollingCommunityDays } from "./lib/community-days.mjs";
@@ -399,8 +399,17 @@ export function eggPoolsFromFeed(feed, now, nameIdx, { report = () => {}, report
   return { eggPools, unresolvedCount };
 }
 
-// WILD-SPAWN EVENTS: one record per event with a spawn list inside the window,
-// minus SKIP_CATEGORIES. `formIdx`, `previousForms` and `missingForms` are the
+// WILD-SPAWN EVENTS: one record per event with a spawn list or Field Research
+// encounters inside the window, minus SKIP_CATEGORIES.
+//
+// `details.spawns` is Leek Duck's whole "Spawns" section, sub-sections
+// included: habitat hours, mighty Pokémon and Incense encounters all land in
+// it (Wild Area 2026: Global, 2026-11-13). Field Research rewards are a
+// separate list, `details.research`, and before 2026-11-13 were dropped here,
+// so a research-only species never reached the event's pile. They are kept as
+// `researchDex` / `research`, apart from `spawnDex`: the Mega planner ranks
+// the wild pool only (spawnForms), while the event pile and the friend-collect
+// set want everything the event puts in the bag. `formIdx`, `previousForms` and `missingForms` are the
 // spawn-form inputs (see the header): the game-master name index when a mirror
 // answered, else the previous snapshot's forms by name, and the set every name
 // with no form is added to. Returns { events, skippedNoSpawns, skippedWindow,
@@ -421,15 +430,19 @@ export function eventsFromFeed(feed, now, nameIdx, {
     if (SKIP_CATEGORIES.has(category)) { skippedCategory += (Array.isArray(list) ? list.length : 0); continue; }
     if (!Array.isArray(list)) continue;
     for (const event of list) {
-      const spawns = event?.details?.spawns;
-      if (!Array.isArray(spawns) || spawns.length === 0) { skippedNoSpawns++; continue; }
+      const spawns = Array.isArray(event?.details?.spawns) ? event.details.spawns : [];
+      const research = Array.isArray(event?.details?.research) ? event.details.research : [];
+      if (spawns.length === 0 && research.length === 0) { skippedNoSpawns++; continue; }
 
       const window = feedWindow(event);
       if (!window) { report(event, category); continue; }
       if (outsideWindow(window.startMs, window.endMs, now)) { skippedWindow++; continue; }
 
-      const { spawnDex, spawns: spawnNames, unresolved } = resolveSpawns(spawns, nameIdx);
-      if (spawnDex.length === 0) {
+      const wild = resolveSpawns(spawns, nameIdx);
+      const res = resolveSpawns(research, nameIdx);
+      const { spawnDex, spawns: spawnNames } = wild;
+      const unresolved = [...new Set([...wild.unresolved, ...res.unresolved])].sort();
+      if (spawnDex.length === 0 && res.spawnDex.length === 0) {
         console.warn(`  ⚠ "${event.title}": no spawns resolved (${unresolved.join(", ")}) — skipped`);
         continue;
       }
@@ -449,10 +462,13 @@ export function eventsFromFeed(feed, now, nameIdx, {
         spawnDex,
         spawns: spawnNames,
         spawnForms: spawnFormsFor(spawns, nameIdx, formIdx, previousForms, missingForms),
+        researchDex: res.spawnDex,
+        research: res.spawns,
         unresolved,
-        // Costumed spawns ("Piplup wearing a …"): the sorting tab floats the
-        // costume pile up after such an event. The names above are stripped.
-        hasCostumes: hasCostumedSpawns(spawns),
+        // Costumed spawns or research encounters ("Piplup wearing a …"): the
+        // sorting tab floats the costume pile up after such an event. The
+        // names above are stripped.
+        hasCostumes: hasCostumedSpawns(spawns) || hasCostumedSpawns(research),
       });
     }
   }
@@ -614,7 +630,7 @@ async function main() {
     console.error(`✗ ${message}`);
     if (offlineOk && existsSync(OUT_PATH)) {
       console.warn(`⚠  --offline-ok and cached ${OUT_PATH} exists; build will use cache.`);
-      failOnHeldBack(heldBack);
+      failOnHeldBack(heldBack, offlineOk);
       return;
     }
     process.exit(1);
@@ -634,7 +650,13 @@ async function main() {
   // The shrink guard (see the header). Upcoming events the feed stopped listing
   // are logged either way: one is a cancellation worth seeing in the sync log.
   const shrink = guardShrunkEvents(previous?.events, events.merged, now, { offlineOk, acceptShrink });
-  for (const id of shrink.lost) console.log(`  ✂ upstream no longer lists upcoming event ${id}`);
+  for (const id of shrink.lost) {
+    const old = (previous?.events || []).find((r) => r?.id === id);
+    const renamed = old && events.merged.find((r) => isRetitleOf(old, r));
+    console.log(renamed
+      ? `  ✎ upstream renamed "${old.title}" to "${renamed.title}" (${id} → ${renamed.id})`
+      : `  ✂ upstream no longer lists upcoming event ${id}`);
+  }
   if (shrink.refused) {
     const what = `the feed dropped ${shrink.lost.length} of the ${shrink.expected} events the cache still expects (${shrink.retained} kept, ${eventsOut.length} surfaced)`;
     if (!shrink.write) {
@@ -684,14 +706,38 @@ async function main() {
   console.log(`  events: ${eventsOut.length} surfaced · ${events.carriedIds.length} carried over · ${skippedNoSpawns} without spawns · ${skippedWindow} outside window · ${skippedCategory} skipped categories · ${unparseable.size} unparseable windows · ${unmappedVenues.size} without venue · ${totalUnresolved} unresolved spawn names`);
   console.log(`  egg pools: ${eggPoolsOut.length} surfaced · ${eggPools.carriedIds.length} carried over`);
   console.log(`  bonuses: ${bonusesOut.length} events surfaced · ${bonuses.carriedIds.length} carried over · ${unknownBonuses.length} unrecognised phrasings`);
-  failOnHeldBack(heldBack);
+  failOnHeldBack(heldBack, offlineOk);
 }
 
-function failOnHeldBack(heldBack) {
-  if (heldBack.length === 0) return;
-  for (const cd of heldBack) {
-    const why = cd.names.length ? `unresolved featured names: ${cd.names.join(", ")}` : "no featured Pokémon listed";
-    console.error(`✗ Community Day ${cd.date} ${cd.event} not added to ${CD_PATH} (${why})`);
+// Community Days the fetcher held back, split by whether anyone can act.
+// A day whose featured names do not resolve is a fetcher bug (a new species or
+// a spelling the name index misses): that fails the sync. A day that lists no
+// featured Pokémon yet is Niantic announcing the date before the species
+// (December to February 2026/27, on the feed since 2026-11-10): nothing to do
+// but wait, so it is a warning, and the day is added once Leek Duck names it.
+// Failing on those turned the sync red for weeks with nothing to fix.
+export function heldBackFailures(heldBack = []) {
+  return {
+    fail: heldBack.filter((cd) => cd.names.length > 0),
+    pending: heldBack.filter((cd) => cd.names.length === 0),
+  };
+}
+
+// Under --offline-ok (prebuild: every build, deploy and test job) even a real
+// failure is reported and the build goes on with the committed data, like a
+// refused events result; the sync runs without the flag and fails on it.
+function failOnHeldBack(heldBack, offlineOk = false) {
+  const { fail, pending } = heldBackFailures(heldBack);
+  for (const cd of pending) {
+    console.warn(`  ⏳ Community Day ${cd.date} ${cd.event}: no featured Pokémon announced yet, added once listed`);
+  }
+  if (fail.length === 0) return;
+  for (const cd of fail) {
+    console.error(`✗ Community Day ${cd.date} ${cd.event} not added to ${CD_PATH} (unresolved featured names: ${cd.names.join(", ")})`);
+  }
+  if (offlineOk) {
+    console.warn(`⚠  --offline-ok: ${fail.length} Community Day(s) held back, build goes on without them.`);
+    return;
   }
   process.exit(1);
 }

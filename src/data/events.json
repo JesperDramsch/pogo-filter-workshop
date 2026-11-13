@@ -1,97 +1,6 @@
 {
-  "fetchedAt": "2026-11-10T14:59:52.348Z",
+  "fetchedAt": "2026-11-13T22:15:52.099Z",
   "events": [
-    {
-      "id": "event-pok-mon-go-halloween-2026-part-ii-2026-11-01t10-00-00",
-      "title": "Pokémon GO Halloween 2026 Part II",
-      "category": "Event",
-      "start": "2026-11-01T10:00:00",
-      "end": "2026-11-05T20:00:00",
-      "isLocalTime": true,
-      "venue": null,
-      "spawnDex": [
-        94,
-        353,
-        607,
-        656,
-        722,
-        769,
-        971
-      ],
-      "spawns": [
-        "Froakie",
-        "Gengar",
-        "Greavard",
-        "Litwick",
-        "Rowlet",
-        "Sandygast",
-        "Shuppet"
-      ],
-      "spawnForms": [
-        {
-          "name": "Gengar",
-          "dex": 94,
-          "region": null,
-          "types": [
-            "ghost",
-            "poison"
-          ]
-        },
-        {
-          "name": "Shuppet",
-          "dex": 353,
-          "region": null,
-          "types": [
-            "ghost"
-          ]
-        },
-        {
-          "name": "Litwick",
-          "dex": 607,
-          "region": null,
-          "types": [
-            "ghost",
-            "fire"
-          ]
-        },
-        {
-          "name": "Froakie",
-          "dex": 656,
-          "region": null,
-          "types": [
-            "water"
-          ]
-        },
-        {
-          "name": "Rowlet",
-          "dex": 722,
-          "region": null,
-          "types": [
-            "grass",
-            "flying"
-          ]
-        },
-        {
-          "name": "Sandygast",
-          "dex": 769,
-          "region": null,
-          "types": [
-            "ghost",
-            "ground"
-          ]
-        },
-        {
-          "name": "Greavard",
-          "dex": 971,
-          "region": null,
-          "types": [
-            "ghost"
-          ]
-        }
-      ],
-      "unresolved": [],
-      "hasCostumes": true
-    },
     {
       "id": "wild-area-pok-mon-go-wild-area-2026-sendai-tohoku-2026-11-06t01-00-00z",
       "title": "Pokémon GO Wild Area 2026: Sendai • Tohoku",
@@ -1813,56 +1722,8 @@
           ]
         }
       ],
-      "unresolved": [],
-      "hasCostumes": false
-    },
-    {
-      "id": "event-into-the-wild-2026-11-09t10-00-00",
-      "title": "Into the Wild",
-      "category": "Event",
-      "start": "2026-11-09T10:00:00",
-      "end": "2026-11-13T20:00:00",
-      "isLocalTime": true,
-      "venue": null,
-      "spawnDex": [
-        81,
-        714,
-        777
-      ],
-      "spawns": [
-        "Magnemite",
-        "Noibat",
-        "Togedemaru"
-      ],
-      "spawnForms": [
-        {
-          "name": "Magnemite",
-          "dex": 81,
-          "region": null,
-          "types": [
-            "electric",
-            "steel"
-          ]
-        },
-        {
-          "name": "Noibat",
-          "dex": 714,
-          "region": null,
-          "types": [
-            "flying",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Togedemaru",
-          "dex": 777,
-          "region": null,
-          "types": [
-            "electric",
-            "steel"
-          ]
-        }
-      ],
+      "researchDex": [],
+      "research": [],
       "unresolved": [],
       "hasCostumes": false
     },
@@ -2041,6 +1902,12 @@
             "flying"
           ]
         }
+      ],
+      "researchDex": [
+        849
+      ],
+      "research": [
+        "Toxtricity"
       ],
       "unresolved": [],
       "hasCostumes": false
@@ -2753,6 +2620,8 @@
           ]
         }
       ],
+      "researchDex": [],
+      "research": [],
       "unresolved": [],
       "hasCostumes": false
     },
@@ -2781,6 +2650,8 @@
           ]
         }
       ],
+      "researchDex": [],
+      "research": [],
       "unresolved": [],
       "hasCostumes": false
     },
@@ -2809,6 +2680,8 @@
           ]
         }
       ],
+      "researchDex": [],
+      "research": [],
       "unresolved": [],
       "hasCostumes": false
     },
@@ -2866,8 +2739,26 @@
           ]
         }
       ],
+      "researchDex": [
+        94,
+        120,
+        426,
+        605,
+        840,
+        942,
+        946
+      ],
+      "research": [
+        "Applin",
+        "Bramblin",
+        "Drifblim",
+        "Elgyem",
+        "Gengar",
+        "Maschiff",
+        "Staryu"
+      ],
       "unresolved": [],
-      "hasCostumes": false
+      "hasCostumes": true
     }
   ],
   "eggPools": [
@@ -3060,21 +2951,6 @@
       ]
     },
     {
-      "id": "event-pok-mon-go-halloween-2026-part-ii-2026-11-01t10-00-00",
-      "title": "Pokémon GO Halloween 2026 Part II",
-      "category": "Event",
-      "start": "2026-11-01T10:00:00",
-      "end": "2026-11-05T20:00:00",
-      "isLocalTime": true,
-      "venue": null,
-      "bonuses": [
-        "2× Candy for catching Pokémon",
-        "2× Stardust for catching Pokémon",
-        "GO Pass Deluxe: 3× Candy for catching Pokémon",
-        "GO Pass Deluxe: 3× Stardust for catching Pokémon"
-      ]
-    },
-    {
       "id": "go-pass-go-pass-november-2026-11-03t10-00-00",
       "title": "GO Pass: November",
       "category": "GO Pass",
@@ -3182,31 +3058,6 @@
     {
       "id": "event-into-the-wild-2026-2026-11-09t10-00-00",
       "title": "Into the Wild 2026",
-      "category": "Event",
-      "start": "2026-11-09T10:00:00",
-      "end": "2026-11-13T20:00:00",
-      "isLocalTime": true,
-      "venue": null,
-      "bonuses": [
-        "+1 Candy XL from Max Battles (Trainers level 31+)",
-        "+1 Candy XL from raids (Trainers level 31+)",
-        "+1 Candy from Max Battles",
-        "+1 Candy from raids",
-        "1/2 Hatch Distance for Eggs placed in Incubators during the event",
-        "3/4 Max Particle cost for unlocking and powering up Max Moves",
-        "5,000 additional XP from completed Max Battles",
-        "5,000 additional XP from completed raids",
-        "Chance to encounter Shiny Gimmighoul when using a Coin Bag*",
-        "Chance to encounter Shiny Meltan when opening the Mystery Box*",
-        "No Remote Raid limit from Saturday, November 14, to Sunday, November 15, 2026",
-        "Reduced wait time before you can open the Mystery Box again*",
-        "Remote Raid limit increased to 30 from Monday, November 9, to Friday, November 13, 2026",
-        "Trainers can receive special event stickers from PokéStops and Gifts"
-      ]
-    },
-    {
-      "id": "event-into-the-wild-2026-11-09t10-00-00",
-      "title": "Into the Wild",
       "category": "Event",
       "start": "2026-11-09T10:00:00",
       "end": "2026-11-13T20:00:00",

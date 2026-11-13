@@ -1660,8 +1660,11 @@
   "app.sort.intro": "Keepers first: in each pile, star or tag what has a job. The leftovers box then holds what no IV, shiny, evolve, background or lucky step kept, ready to transfer after a glance; everything else not starred or tagged waits behind a reveal.",
   "app.sort.ends": "ends {when}",
   "app.sort.ended": "ended {when}",
+  "app.sort.starts": "starts {when}",
   "app.sort.also_here": "also handy here",
   "app.sort.hook.event": "Fresh off the event: keep the souvenirs and the good IVs, wave goodbye to the rest.",
+  "app.sort.hook.event_running": "Running now: the spawns are out, so make room and keep the good IVs.",
+  "app.sort.hook.event_upcoming": "Coming up: check what you already have of these spawns and make room before it starts.",
   "app.sort.hook.hundo": "Got a hundo? The rest of the family just lost its job.",
   "app.sort.hook.luckies": "Lucky-trade farming leaves a glittery mess behind.",
   "app.sort.hook.traded": "Gifts from friends. Sweet, but you can't pass them on.",
@@ -1884,6 +1887,8 @@
   "app.upgrade.sources.evolve_tag": "Evolve: the tag you put on Pokémon to evolve them through.",
   "app.upgrade.sources.max_roster": "Max Move upgrades: the Max attacker list.",
   "app.upgrade.sources.rankings": "Third move and Elite TM targets read the raid and PvP rankings, which update every day.",
+  "app.changelog.entry.event_prep.title": "Events show up 3 days early on the Sorting tab",
+  "app.changelog.entry.event_prep.body": "Sorting's Right now block listed an event only once it had started, so there was no way to make room for it ahead of time. Each event's pile now shows from 3 days before it starts until a week after it ends: running events first, then upcoming ones, then the ones you are tidying up after. The pile also covers the event's Field Research encounters now, not just its spawns. Max Monday, which comes back every week, floats the Dynamax pile for two days instead of seven, so it no longer sits on top all the time. An event that was renamed while it ran no longer shows up twice.",
   "app.changelog.entry.upgrades_tab.title": "New Upgrades tab: bottle caps, Elite TMs, purifying",
   "app.changelog.entry.upgrades_tab.body": "A fifth tab between Sorting and Battle for what to spend resources on. It holds the evolve pile and Mega-evolve, where to use a Silver or Gold Bottle Cap, which ranked species still need a third move, an Elite TM move or Max Move upgrades, and the purify strings, including purify-to-hundo candidates and safe mass purify again. Trade & friends gains re-roll trades: special Pokémon with poor IVs worth swapping for a fresh roll."
 }

@@ -101,15 +101,21 @@ The workshop never sees the user's storage, so the card says "keep up to N", nev
 
 ### Which piles show first
 
-Piles relevant to recent or running events float to the top. All other piles sit collapsed underneath and can be hidden.
+Piles relevant to upcoming, running or recent events float to the top. All other piles sit collapsed underneath and can be hidden.
+
+**Each event's own pile** (everything Leek Duck lists under the event's Spawns section, which on Wild Area 2026: Global included the habitat-hour, mighty and Incense encounters, plus its Field Research encounters) shows from 3 days before the event starts until 7 days after it ends. Preparing the bag before an event is a core use, not an extra: the pile must be there ahead of time. Rows are ordered running, then upcoming (soonest first), then ended (most recent first), and each state has its own hook. Pinned in `check-piles.mjs`, "Sorting's event rows".
+
+**Category piles** float only for running or just-ended events, because they are for the tidy-up:
 
 | Event kind | Piles that float up |
 | --- | --- |
-| Event with wild spawns, just ended | Event spawns, costumes (if costumed spawns), backgrounds |
+| Event with wild spawns, just ended | Event spawns, costumes (if costumed spawns or research encounters), backgrounds |
 | Community Day | Community Day backgrounds, shinies |
 | Team GO Rocket takeover | Shadows |
 | Max Monday or Max Battle event | Dynamax |
 | Double transfer candy day | A reminder card for the `crush` working tag (not a pile) |
+
+A weekly event (Max Monday) floats for 2 days after it ends instead of 7. With the full week, the previous Monday's would still be floating when the next one began, and Dynamax would never leave the top.
 
 Hiding is stateful and edge-triggered. `config.hiddenPiles` is the user's own list, edited under "N hidden" on the Sorting tab. A protection on the Catching tab edits that list once, on its on/off edge, wherever the change comes from (the swipe deck or a ConfigPanel toggle): turning a category's protection off adds its piles to the list, turning it back on removes them. Between edges the list is the truth: a pile the user brought back stays visible until the protection goes on and then off again, and a toggle never gates the render. Loading, importing, the cross-tab echo and reset write the config as it is and never re-hide. A pile that floats for a running event shows while it floats, hidden or not.
 

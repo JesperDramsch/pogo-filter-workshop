@@ -1660,8 +1660,11 @@
   "app.sort.intro": "Primero los que se quedan: en cada montón, marca como favorito o etiqueta lo que tiene una función. La caja de sobrantes reúne entonces lo que ningún paso de IV, variocolor, evolución, fondo o suerte conservó, listo para transferir tras un repaso; todo lo demás sin favorito ni etiqueta espera tras un desplegable.",
   "app.sort.ends": "termina {when}",
   "app.sort.ended": "terminó {when}",
+  "app.sort.starts": "empieza {when}",
   "app.sort.also_here": "también útil aquí",
   "app.sort.hook.event": "Recién salido del evento: quédate con los recuerdos y los buenos IV, y despídete del resto.",
+  "app.sort.hook.event_running": "En marcha: los spawns ya han salido, así que haz sitio y quédate con los buenos IV.",
+  "app.sort.hook.event_upcoming": "Próximamente: comprueba cuáles de estos spawns ya tienes y haz sitio antes de que empiece.",
   "app.sort.hook.hundo": "¿Tienes un 100%? El resto de la familia acaba de quedarse sin trabajo.",
   "app.sort.hook.luckies": "Los intercambios de la suerte en serie dejan un desorden brillante.",
   "app.sort.hook.traded": "Regalos de amigos. Un detalle, pero no se pueden pasar a otros.",
@@ -1884,6 +1887,8 @@
   "app.upgrade.sources.evolve_tag": "Evolucionar: la etiqueta que pones a los Pokémon para evolucionarlos del todo.",
   "app.upgrade.sources.max_roster": "Mejoras de Movimientos Max: la lista de atacantes Max.",
   "app.upgrade.sources.rankings": "Tercer ataque y objetivos de MT élite leen las clasificaciones de incursiones y PvP, que se actualizan cada día.",
+  "app.changelog.entry.event_prep.title": "Los eventos aparecen 3 días antes en la pestaña Ordenar",
+  "app.changelog.entry.event_prep.body": "El bloque «ahora mismo» de Ordenar solo mostraba un evento una vez que había empezado, así que no había forma de hacerle hueco con antelación. Ahora la pila de cada evento se muestra desde 3 días antes de que empiece hasta una semana después de que termine: primero los eventos en curso, luego los próximos y, por último, aquellos tras los que estás ordenando. La pila incluye ahora también los encuentros de Investigación de campo del evento, no solo sus apariciones. El Max Monday, que vuelve cada semana, sube la pila de Dinamax durante dos días en lugar de siete, así que ya no está arriba todo el tiempo. Un evento al que se le cambió el nombre mientras estaba en marcha ya no aparece dos veces.",
   "app.changelog.entry.upgrades_tab.title": "Nueva pestaña Mejoras: chapas, MT élite, purificar",
   "app.changelog.entry.upgrades_tab.body": "Una quinta pestaña entre Ordenar y Combates para decidir en qué gastar recursos. Incluye el montón de evolucionar y la megaevolución, dónde usar una Chapa Plateada o Dorada, qué especies de la clasificación aún necesitan un tercer ataque, un ataque de MT élite o mejoras de Movimientos Max, y las cadenas de purificación, de nuevo con candidatos a 100% y purificación masiva segura. Intercambios y amigos suma intercambios para volver a tirar: Pokémon especiales con IV bajos que vale la pena cambiar por una nueva tirada."
 }

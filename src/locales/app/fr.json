@@ -1660,8 +1660,11 @@
   "app.sort.intro": "Les keepers d'abord : dans chaque pile, mets en favori ou étiquette ce qui a un rôle. La boîte des restes contient alors ce qu'aucune étape IV, chromatique, évolution, fond ou chanceux n'a gardé, prêt à transférer après un coup d'œil ; tout le reste sans favori ni étiquette attend derrière un volet.",
   "app.sort.ends": "finit {when}",
   "app.sort.ended": "fini {when}",
+  "app.sort.starts": "commence {when}",
   "app.sort.also_here": "aussi utile ici",
   "app.sort.hook.event": "Tout frais de l'événement : garde les souvenirs et les bons IV, fais coucou au reste.",
+  "app.sort.hook.event_running": "C'est parti : les spawns sont là, alors fais de la place et garde les bons IV.",
+  "app.sort.hook.event_upcoming": "Bientôt : vérifie ce que tu as déjà parmi ces spawns et fais de la place avant le début.",
   "app.sort.hook.hundo": "Un 100% trouvé ? Le reste de la famille vient de perdre son boulot.",
   "app.sort.hook.luckies": "Les échanges chanceux en série laissent un joyeux bazar scintillant.",
   "app.sort.hook.traded": "Des cadeaux d'amis. Adorable, mais impossible de les refiler.",
@@ -1884,6 +1887,8 @@
   "app.upgrade.sources.evolve_tag": "Évoluer : le tag que tu mets sur les Pokémon à faire évoluer jusqu'au bout.",
   "app.upgrade.sources.max_roster": "Améliorer les Capacités Dynamax : la liste d'attaquants Dynamax.",
   "app.upgrade.sources.rankings": "Troisième attaque et cibles de CT d'élite lisent les classements raid et PvP, mis à jour chaque jour.",
+  "app.changelog.entry.event_prep.title": "Les événements apparaissent 3 jours plus tôt dans l'onglet Tri",
+  "app.changelog.entry.event_prep.body": "Le bloc « en ce moment » de Tri n'affichait un événement qu'une fois commencé, impossible donc de lui faire de la place à l'avance. La pile de chaque événement s'affiche désormais de 3 jours avant son début jusqu'à une semaine après sa fin : d'abord les événements en cours, puis ceux à venir, puis ceux après lesquels tu fais le tri. La pile inclut aussi les rencontres d'Études de terrain de l'événement, pas seulement ses apparitions. Le Max Monday, qui revient chaque semaine, fait remonter la pile Dynamax pendant deux jours au lieu de sept, elle ne reste donc plus en haut en permanence. Un événement renommé pendant son déroulement n'apparaît plus en double.",
   "app.changelog.entry.upgrades_tab.title": "Nouvel onglet Améliorer : capsules, CT d'élite, purification",
   "app.changelog.entry.upgrades_tab.body": "Un cinquième onglet entre Tri et Combats pour savoir où dépenser tes ressources. On y trouve la pile Évoluer et la Méga-Évolution, où utiliser une Capsule d'Argent ou d'Or, quelles espèces classées ont encore besoin d'une troisième attaque, d'une attaque de CT d'élite ou d'améliorer leurs Capacités Dynamax, et les chaînes de purification, de nouveau avec les candidats au 100% et la purification en masse sûre. Échanges & amis gagne les échanges pour retirer les IV : des Pokémon spéciaux aux IV faibles qui valent un nouveau tirage."
 }

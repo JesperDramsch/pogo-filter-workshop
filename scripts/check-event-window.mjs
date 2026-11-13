@@ -27,6 +27,7 @@ import {
   UPCOMING_HORIZON_MS,
   outsideWindow,
   carryOver,
+  isRetitleOf,
   shrunkEvents,
 } from "./lib/event-window.mjs";
 import { guardShrunkEvents } from "./fetch-events.mjs";
@@ -104,6 +105,27 @@ console.log("\nW5 — ordering and malformed input");
   const junk = [null, {}, { id: "no-dates" }, { id: "bad", start: "yesterday", end: "later" }];
   check("records without parseable dates are skipped", carryOver([MEGA], junk, NOW).merged.length === 1);
   check("empty fresh list still carries", carryOver([], [XP], NOW).carriedIds.length === 1);
+}
+
+console.log("\nW-retitle — an event the feed renamed while it ran is not carried twice");
+{
+  // Between the 2026-11-02 and 2026-11-10 syncs upstream renamed "Into the
+  // Wild" to "Into the Wild 2026". The old id hashed the old title, and the
+  // event had started, so the old record was carried beside the new one.
+  const OLD = rec("event-into-the-wild-2026-11-09", "2026-08-31T10:00:00", "2026-09-04T20:00:00", { title: "Into the Wild", category: "Event", spawnDex: [1, 4, 7] });
+  const NEW = rec("event-into-the-wild-2026-2026-11-09", "2026-08-31T10:00:00", "2026-09-04T20:00:00", { title: "Into the Wild 2026", category: "Event" });
+  const { merged, carriedIds } = carryOver([NEW], [OLD], NOW);
+  check("the renamed record replaces the old one", carriedIds.length === 0 && merged.length === 1 && merged[0].id === NEW.id);
+  check("isRetitleOf works in both directions", isRetitleOf(OLD, NEW) && isRetitleOf(NEW, OLD));
+  check("a different window is a different event", !isRetitleOf(OLD, { ...NEW, end: "2026-09-05T20:00:00" }));
+  check("a different category is a different event", !isRetitleOf(OLD, { ...NEW, category: "Wild Area" }));
+  check("a title that merely shares letters is a different event", !isRetitleOf(OLD, { ...NEW, title: "Into the Wilderness" }));
+  check("the shrink guard does not count a rename as a lost event",
+    shrunkEvents([OLD], [NEW], NOW).lost.length === 0);
+  // carryOver is shared by events, eggPools, bonuses and signals, so the same
+  // rule drops the renamed record's duplicate bonuses too (it did on 2026-11-13).
+  check("two unrelated events in the same window are both kept",
+    carryOver([{ ...NEW, title: "Mega Raid Day", id: "x" }], [OLD], NOW).carriedIds.length === 1);
 }
 
 console.log("\nW6 — the shrink guard: lost upcoming events, not ended ones");
