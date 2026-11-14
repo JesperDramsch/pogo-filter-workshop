@@ -30,6 +30,7 @@ import {
   encodeWishToken,
   parseWishHash,
   applyWishToBuddies,
+  droppedWishSpecies,
   rankBuddyCandidates,
   wishDialogOptions,
   freeTagPrefix,
@@ -267,6 +268,17 @@ check("a bare # is no prefix", buddyPrefixClashPairs([{ id: "x", tagPrefix: "#" 
 const jobTags = ["Dex-Evolve", "Tradebait", "PvP"];
 check("a buddy-only clash does not show on any job row",
   jobTags.every((tag) => tagClashes(tag, [...jobTags, ...edited.map((b) => b.tagPrefix)], "en").prefixOf.length === 0));
+
+console.log("\ndroppedWishSpecies — what an update takes off a list");
+{
+  const before = [{ species: "pikachu" }, { species: "evoli" }, "glumanda", { species: "evoli" }];
+  const after = [{ species: "evoli" }, { species: "bisasam" }];
+  const d = droppedWishSpecies(before, after);
+  check("species gone from the new list, in the old order, once each", JSON.stringify(d) === JSON.stringify(["pikachu", "glumanda"]), JSON.stringify(d));
+  check("nothing dropped when the list only grows", droppedWishSpecies(after, [...after, { species: "pikachu" }]).length === 0);
+  check("an emptied list drops everything", droppedWishSpecies(after, []).length === 2);
+  check("tolerates missing lists", droppedWishSpecies(undefined, null).length === 0);
+}
 
 console.log(`\n${failures === 0 ? "✓ All share-link tests passed." : `✗ ${failures} test(s) failed.`}`);
 process.exit(failures === 0 ? 0 : 1);

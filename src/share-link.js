@@ -313,3 +313,19 @@ export function applyWishToBuddies(buddies, wish, normalize, choice) {
 	if (wish.id) buddy.shareId = wish.id;
 	return { buddies: [...list, buddy], buddyId: id, action: 'added' };
 }
+
+// Species an update takes OFF a buddy's list: in `before`, not in `after`.
+// Both are buddy targetSpecies ({ species, … }, or legacy bare strings), and
+// the answer is canonical species names in `before`'s order. The receiver's
+// app shows these next to the cleanup filter, so the friend's "I don't need
+// these any more" reaches the copies already tagged for them.
+export function droppedWishSpecies(before, after) {
+	const key = (t) => (typeof t === 'string' ? t : t?.species) || null;
+	const kept = new Set((Array.isArray(after) ? after : []).map(key).filter(Boolean));
+	const out = [];
+	for (const t of Array.isArray(before) ? before : []) {
+		const k = key(t);
+		if (k && !kept.has(k) && !out.includes(k)) out.push(k);
+	}
+	return out;
+}

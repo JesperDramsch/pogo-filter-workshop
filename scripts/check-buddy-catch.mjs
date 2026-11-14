@@ -65,6 +65,8 @@ function litMatch(lit, mon) {
   if (lit === "weiblich" || lit === "female") return mon.gender === "female";
   if (lit === "männlich" || lit === "male") return mon.gender === "male";
   if (lit === "#") return !!mon.tagged;
+  // `#Prefix` matches any tag starting with it, case-insensitively, as in game.
+  if (lit.startsWith("#")) return (mon.tags || []).some(t => t.toLowerCase().startsWith(lit.slice(1).toLowerCase()));
   if (lit === kw.flag.favorite) return !!mon.favorite;
   if (lit === kw.flag.traded) return !!mon.traded;
   if (lit === kw.flag.shadow) return !!mon.shadow;
@@ -465,6 +467,67 @@ console.log("\nDropped slots never reach the filter string");
   for (const term of ["male", "sandy", "plant", "trash"])
     check(`no '${term}' term in the string`, !f.includes(term), f);
   check("no slot guard clause", !segs(f).some(s => s.startsWith("!burmy,")), f);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Cleanup: `#<prefix>` minus the buddy's CURRENT wish list. Stateless, so it
+// covers every species a link ever dropped. It must never surface a copy the
+// buddy still wants (that would talk the player into untagging a promise),
+// and it must surface every tagged copy they no longer want.
+console.log("\nCleanup filter — tagged for the buddy, no longer wanted");
+{
+  const buddy = {
+    id: "j", name: "Julia", tagPrefix: "#Trade-Julia", active: true, wantsTradeEvos: false, rawAppend: "",
+    targetSpecies: [
+      { species: "habitak", expand: false, dropForms: [], dropSlots: [], gender: "any" },
+      { species: "pikachu", expand: true, dropForms: [], dropSlots: [], gender: "any" },
+      { species: "mauzi", expand: false, dropForms: ["galar"], dropSlots: [], gender: "any" },
+      { species: "sandan", expand: false, dropForms: [], dropSlots: [], gender: "female" },
+    ],
+  };
+  const res = buildFilters([], [], { ...SEM_CFG, buddies: [buddy] }, [], LOCALE, tFn);
+  const c = res.buddyCleanupFilters;
+  check("one cleanup filter per buddy", c.length === 1, `got ${c.length}`);
+  const f = c[0]?.filter || "";
+  check("starts with the bare tag (leading # of the stored prefix dropped once)", f.startsWith("#Trade-Julia&"), f);
+  check("a gender lock is exact: !sandan,!weiblich", segs(f).includes(`!sandan,!${kw.flag.female}`), f);
+  check("a +family target negates the family", segs(f).includes("!+pikachu"), f);
+
+  const tag = (o) => mk({ tags: ["Trade-Julia"], ...o });
+  const wanted = [
+    tag({ species: "habitak" }),
+    tag({ species: "raichu", family: ["pichu", "pikachu", "raichu"] }),
+    tag({ species: "mauzi", types: [kw.type.steel] }), // dropped Galar form: species level keeps it out
+    tag({ species: "sandan", gender: "female" }),
+  ];
+  const unwanted = [
+    tag({ species: "rattfratz" }),
+    tag({ species: "sandan", gender: "male" }),
+  ];
+  for (const m of wanted) check(`still-wanted ${m.species}${m.gender ? " " + m.gender : ""} stays out`, !evalFilter(f, m));
+  for (const m of unwanted) check(`no-longer-wanted ${m.species}${m.gender ? " " + m.gender : ""} shows`, evalFilter(f, m));
+  check("an untagged Rattfratz stays out", !evalFilter(f, mk({ species: "rattfratz" })));
+  check("another buddy's tag stays out", !evalFilter(f, mk({ species: "rattfratz", tags: ["Trade-Alex"] })));
+  check("the explain panel gets one clause per term", c[0].clauses.length === segs(f).length);
+
+  // An empty list (the friend has everything): every tagged copy is cleanup,
+  // and the buddy has no catch filter but still has this one.
+  const done = { ...buddy, targetSpecies: [] };
+  const r2 = buildFilters([], [], { ...SEM_CFG, buddies: [done] }, [], LOCALE, tFn);
+  check("empty list: no catch filter", r2.buddyCatchFilters.length === 0);
+  check("empty list: cleanup is the bare tag", r2.buddyCleanupFilters[0]?.filter === "#Trade-Julia", r2.buddyCleanupFilters[0]?.filter);
+  check("empty list: reports zero wanted", r2.buddyCleanupFilters[0]?.wanted === 0);
+
+  // Trade evos on: every trade-evo family stays hidden.
+  const te = { ...buddy, wantsTradeEvos: true };
+  const r3 = buildFilters([], [], { ...SEM_CFG, enabledTradeEvos: ["irrbis", "kiesling"], buddies: [te] }, [], LOCALE, tFn);
+  const teTerms = segs(r3.buddyCleanupFilters[0]?.filter || "").filter((x) => x.startsWith("!+") && x !== "!+pikachu");
+  check("trade evos on: one !+family per trade-evo base", r3.TE_full.length > 0 && teTerms.length === r3.TE_full.length,
+    `${teTerms.length} vs ${r3.TE_full.length}`);
+
+  // Inactive buddies get nothing.
+  const off = buildFilters([], [], { ...SEM_CFG, buddies: [{ ...buddy, active: false }] }, [], LOCALE, tFn);
+  check("inactive buddy: no cleanup filter", off.buddyCleanupFilters.length === 0);
 }
 
 console.log(`\n${failures === 0 ? "✓ All buddy-catch tests passed." : `✗ ${failures} test(s) failed.`}`);
