@@ -74,6 +74,7 @@ import {
 	parseWishHash,
 	wishDialogOptions,
 	applyWishToBuddies,
+	droppedWishSpecies,
 	freeTagPrefix,
 	clashingPrefixes,
 	buddyPrefixClashPairs,
@@ -191,6 +192,10 @@ function stepFromHash() {
 // Upgrades sits between keeping (Sorting) and fighting (Battle): what to
 // spend candy, stardust, TMs, caps and Max Particles on.
 export const FILTER_AREAS = ['catch', 'sort', 'upgrade', 'battle', 'trade'];
+// Landing spots inside the Trade settings for the filter side's edit buttons.
+const TRADE_ANCHOR_COLLECT = 'trade-settings-friend-collect';
+const TRADE_ANCHOR_BUDDIES = 'trade-settings-buddy-wishes';
+const buddyFiltersAnchor = (prefix) => `buddy-filters-${String(prefix).replace(/[^\p{L}\p{N}_-]/gu, '_')}`;
 // #workshop/<area>/settings flips that area to its settings; the flip stays
 // on while switching tabs, so every area's settings are one view.
 const AREA_HASH = /^#workshop\/(\w+)(\/settings)?$/;
@@ -3354,6 +3359,8 @@ export function buildFilters(
 
 	// ── BUDDY FILTERS ──────────────────────────────────────────────────────
 	const buddyCatchFilters = [];
+	// Per buddy: what is tagged for them but no longer wished for (see below).
+	const buddyCleanupFilters = [];
 	// One combined catch filter per buddy: a single species OR-list selects every
 	// wished species, and form-restricted targets add per-species type guards.
 	// The guard clauses below are shared by that filter, so factor them out.
@@ -3485,6 +3492,43 @@ export function buildFilters(
 		const wantsTE = !!b.wantsTradeEvos && TE_full.length > 0;
 		const rawAppend = (b.rawAppend || '').trim();
 		const hasRaw = !!cfg.expertMode && rawAppend.length > 0;
+
+		// ── Cleanup: tagged for this buddy, no longer on their wish list ───────
+		// `#<prefix>` and NOT any wished species. Stateless on purpose: it reads
+		// the buddy's CURRENT list, so every species a share link (or a hand edit)
+		// ever dropped shows up, not only the last diff, and nothing is stored that
+		// could drift. It errs towards keeping: a form-restricted target hides the
+		// whole species (a tagged copy in a dropped form is a judgement call the
+		// player makes, not a filter), while a gender lock is exact
+		// (`!species,!gender`: the wrong gender is a dead end, never a trade).
+		// Trade-evo families stay hidden while the buddy takes them. An empty
+		// list shows every tag: the friend has everything.
+		if (prefix) {
+			const cleanupClauses = [];
+			push(cleanupClauses, `#${prefix}`, tFn('app.clause_why.buddy_cleanup_tag', { params: { name: b.name } }));
+			const csel = (t) => (t.expand ? `+${t.display}` : t.display);
+			for (const t of allTargets) {
+				const g = t.gender === 'male' || t.gender === 'female' ? `,!${kw.flag[t.gender]}` : '';
+				push(
+					cleanupClauses,
+					`!${csel(t)}${g}`,
+					tFn('app.clause_why.buddy_cleanup_wanted', { params: { species: capFirst(t.display) } }),
+				);
+			}
+			if (wantsTE) {
+				for (const base of TE_full) {
+					push(cleanupClauses, `!+${teDisplay(base, outputLocale)}`, tFn('app.clause_why.buddy_cleanup_te'));
+				}
+			}
+			buddyCleanupFilters.push({
+				buddyName: b.name,
+				prefix,
+				wanted: allTargets.length,
+				filter: cleanupClauses.map((c) => c.clause).join('&'),
+				clauses: cleanupClauses,
+			});
+		}
+
 		if (plainTargets.length === 0 && formTargets.length === 0 && !wantsTE && !hasRaw) continue;
 
 		// Selector string for one target, honoring its +family expansion toggle.
@@ -5977,6 +6021,7 @@ export function buildFilters(
 		prestaged,
 		gift,
 		buddyCatchFilters,
+		buddyCleanupFilters,
 		TE_full,
 		TE_trim,
 		luckyHundoSet,
@@ -7244,6 +7289,7 @@ export default function App() {
 		prestaged,
 		gift,
 		buddyCatchFilters,
+		buddyCleanupFilters,
 		TE_full,
 		TE_trim,
 		luckyHundoSet,
@@ -7734,6 +7780,30 @@ export default function App() {
 	// the staged settings while the tab strip and URL read the real ones.
 	const reducedMotion = useReducedMotion();
 	const stage = useAreaStage({ area: filterArea, settings: areaSettings, areas: FILTER_AREAS, reduced: reducedMotion });
+	// "Edit" buttons on the filter side jump into the Trade settings and land on
+	// the block they edit. The scroll waits for the flip to settle on the
+	// settings face, otherwise it measures the card mid-rotation.
+	const [pendingAnchor, setPendingAnchor] = useState(null);
+	// What the last accepted wish link dropped from an existing buddy's list,
+	// shown beside that buddy's cleanup filter until dismissed. Session-only.
+	const [wishDropped, setWishDropped] = useState(null);
+	function openTradeSettingsAt(anchor) {
+		setPendingAnchor({ id: anchor, settings: true });
+		goToArea('trade', true);
+	}
+	useEffect(() => {
+		if (!pendingAnchor || stage.active || stage.settings !== pendingAnchor.settings || stage.area !== 'trade') return;
+		const frame = requestAnimationFrame(() => {
+			const el = document.getElementById(pendingAnchor.id);
+			if (el) {
+				const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+				el.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+				el.focus({ preventScroll: true });
+			}
+			setPendingAnchor(null);
+		});
+		return () => cancelAnimationFrame(frame);
+	}, [pendingAnchor, stage.active, stage.settings, stage.area]);
 	// The first area that ever shows its filters opens its help sheet on its
 	// own and is marked seen; from then on only the pill opens one. Nothing
 	// fires before storage has loaded, on another step, on another view or
@@ -8244,7 +8314,16 @@ export default function App() {
 		),
 		trade: (
 			<div className='space-y-10'>
-				<ConfigPanel {...configPanelProps} sections={['buddyEvents', 'friendCollect']} />
+				{/* Your own "let friends collect for you" list leads: it is the one
+				    block here people come back to (event packs, share link). Open by
+				    default on this page; the anchors are where the "edit" buttons on
+				    the filter side land (openTradeSettingsAt). */}
+				<div id={TRADE_ANCHOR_COLLECT} tabIndex={-1} className='scroll-mt-4 outline-none'>
+					<ConfigPanel {...configPanelProps} sections={['friendCollect']} friendCollectInitiallyOpen />
+				</div>
+				<div id={TRADE_ANCHOR_BUDDIES} tabIndex={-1} className='scroll-mt-4 outline-none'>
+					<ConfigPanel {...configPanelProps} sections={['buddyEvents']} />
+				</div>
 				<TradeTagSettings config={config} set={setConfigKey} />
 				<BuddyManager buddies={config.buddies || []} onChange={(list) => setConfigKey('buddies', list)} />
 			</div>
@@ -8715,11 +8794,76 @@ export default function App() {
 												</AreaGroup>
 												<div className='pt-4'>
 												<AreaGroup id='friends' title={t('app.group.friends')} hint={t('app.group_hint.friends')} accent='#E91E63'>
-												{buddyCatchFilters.length > 0 && (
+												{/* "Let friends collect for you" leads the group: your own
+												    curated string, the way to its list and event packs, and the
+												    share link. It used to sit inside the collapsed fallback
+												    wishlists below, where nobody looked for it. */}
+												<div className='space-y-3 border border-[#27AE60]/30 rounded-sm p-3 bg-[#27AE60]/5'>
+													<div className='mono text-[10.5px] uppercase tracking-wider text-[#27AE60] flex items-center gap-1.5'>
+														<Handshake size={12} aria-hidden='true' />
+														{t('app.filter.friend_collect_section')}
+													</div>
+													{friendCollectTargets.length > 0 &&
+														(friendCollectWishlist ? (
+															<div>
+																<FilterBox
+																	label={t('app.filter.friend_collect_label')}
+																	accent='#27AE60'
+																	filterStr={
+																		friendCollectMode === 'lucky' &&
+																		effectiveConfig.friendCollectGuaranteedOnly
+																			? friendCollectWishlistGuaranteed
+																			: friendCollectWishlist
+																	}
+																	copied={copied.friendCollect}
+																	onCopy={() =>
+																		copyToClipboard(
+																			'friendCollect',
+																			friendCollectMode === 'lucky' &&
+																				effectiveConfig.friendCollectGuaranteedOnly
+																				? friendCollectWishlistGuaranteed
+																				: friendCollectWishlist,
+																		)
+																	}
+																	hint={
+																		friendCollectMode === 'lucky' &&
+																		effectiveConfig.friendCollectGuaranteedOnly
+																			? `${t('app.filter.friend_collect_hint')} (${t('app.filter.friend_guaranteed_label')})`
+																			: t('app.filter.friend_collect_hint')
+																	}
+																/>
+															</div>
+														) : (
+															<p className='mono text-xs text-[#27AE60]'>
+																{t('app.filter.friend_collect_all_owned')}
+															</p>
+														))}
+													{/* The way back to the list and its event packs, for
+	                            first-time setup too (no targets yet). */}
+													<EditCollectListButton
+														empty={friendCollectTargets.length === 0}
+														onClick={() => openTradeSettingsAt(TRADE_ANCHOR_COLLECT)}
+														t={t}
+													/>
+													{/* Outside the branch above on purpose: once the last
+	                            target lands, an empty link is what clears the list on
+	                            friends' side. */}
+													<ShareWishLink
+														config={config}
+														targets={friendCollectTargets}
+														onConfigChange={(patch) => setConfig((prev) => ({ ...prev, ...patch }))}
+													/>
+
+												</div>
+												{(buddyCatchFilters.length > 0 || buddyCleanupFilters.length > 0) && (
 													<BuddyCatchSection
 														buddyCatchFilters={buddyCatchFilters}
+														buddyCleanupFilters={buddyCleanupFilters}
 														copied={copied}
 														onCopy={(key, text) => copyToClipboard(key, text)}
+														onEdit={() => openTradeSettingsAt(TRADE_ANCHOR_BUDDIES)}
+														dropped={wishDropped}
+														onDismissDropped={() => setWishDropped(null)}
 													/>
 												)}
 													<Collapsible
@@ -8730,63 +8874,8 @@ export default function App() {
 														onToggle={() => setShowFriendWishlist((s) => !s)}
 													>
 														<div className='space-y-4'>
-															{/* Curated "collect for me" string — renders alongside the
-			                            fallback wishlists below, since all friend-facing strings
-			                            live in this section. Its target list is edited in the
-			                            step-2 config panel. */}
-															{friendCollectTargets.length > 0 &&
-																(friendCollectWishlist ? (
-																	<div>
-																		<FilterBox
-																			label={t('app.filter.friend_collect_label')}
-																			accent='#27AE60'
-																			filterStr={
-																				friendCollectMode === 'lucky' &&
-																				effectiveConfig.friendCollectGuaranteedOnly
-																					? friendCollectWishlistGuaranteed
-																					: friendCollectWishlist
-																			}
-																			copied={copied.friendCollect}
-																			onCopy={() =>
-																				copyToClipboard(
-																					'friendCollect',
-																					friendCollectMode === 'lucky' &&
-																						effectiveConfig.friendCollectGuaranteedOnly
-																						? friendCollectWishlistGuaranteed
-																						: friendCollectWishlist,
-																				)
-																			}
-																			hint={
-																				friendCollectMode === 'lucky' &&
-																				effectiveConfig.friendCollectGuaranteedOnly
-																					? `${t('app.filter.friend_collect_hint')} (${t('app.filter.friend_guaranteed_label')})`
-																					: t('app.filter.friend_collect_hint')
-																			}
-																		/>
-																		<p className='mono text-[10.5px] text-[#8090A0] mt-1'>
-																			{t('app.filter.friend_collect_edit_pointer')}
-																		</p>
-																	</div>
-																) : (
-																	<p className='mono text-xs text-[#27AE60]'>
-																		{t('app.filter.friend_collect_all_owned')}
-																	</p>
-																))}
-															{/* Outside the branch above on purpose: once the last
-			                            target lands, an empty link is what clears the list on
-			                            friends' side. */}
-															<ShareWishLink
-																config={config}
-																targets={friendCollectTargets}
-																onConfigChange={(patch) => setConfig((prev) => ({ ...prev, ...patch }))}
-															/>
-
 															{/* Fallback wishlists — blacklist of everything already owned. */}
-															<p
-																className={`mono text-xs text-[#8B98A5] leading-relaxed ${
-																	friendCollectTargets.length > 0 ? 'pt-3 border-t border-[#1F2933]' : ''
-																}`}
-															>
+															<p className='mono text-xs text-[#8B98A5] leading-relaxed'>
 																{t('app.filter.friend_wishlist_intro')}
 															</p>
 															<div>
@@ -8881,6 +8970,7 @@ export default function App() {
 												prestagedClauses={prestagedClauses}
 												giftClauses={giftClauses}
 												buddyCatchFilters={buddyCatchFilters}
+												buddyCleanupFilters={buddyCleanupFilters}
 											/>
 										</Collapsible>
 
@@ -8960,10 +9050,23 @@ export default function App() {
 					onClose={() => setWishLink(null)}
 					onAccept={(choice) => {
 						if (wishLink?.ok) {
-							setConfig((prev) => ({
-								...prev,
-								buddies: applyWishToBuddies(prev.buddies || [], wishLink.wish, normalizeBuddyTarget, choice).buddies,
-							}));
+							const before = (config.buddies || []).find((b) => b?.id === choice.buddyId);
+							const applied = applyWishToBuddies(config.buddies || [], wishLink.wish, normalizeBuddyTarget, choice);
+							setConfig((prev) => ({ ...prev, buddies: applied.buddies }));
+							// Land on that friend's filters, and say what the link dropped:
+							// those copies are what the cleanup filter there now shows.
+							const landed = applied.buddies.find((b) => b?.id === applied.buddyId);
+							if (landed && choice.mode !== 'remove') {
+								const prefix = bareTagPrefix(landed.tagPrefix);
+								const dropped =
+									choice.mode === 'update' && before
+										? droppedWishSpecies(before.targetSpecies, landed.targetSpecies).map((sp) =>
+												capFirst(speciesForOutput(sp, effectiveOutputLocale)),
+											)
+										: [];
+								setWishDropped(dropped.length ? { prefix, species: dropped } : null);
+								setPendingAnchor({ id: buddyFiltersAnchor(prefix), settings: false });
+							}
 							announce(
 								t(choice.mode === 'remove' ? 'app.share.receive.removed' : 'app.share.receive.done', {
 									params: { name: wishLink.wish.name },
@@ -9061,25 +9164,96 @@ function StatBox({ label, value }) {
 	);
 }
 
-function BuddyCatchSection({ buddyCatchFilters, copied, onCopy }) {
+// The filter side's way into the curated "collect for me" list and its event
+// packs, which live in the Trade settings. Replaces a hint that pointed at a
+// wizard step the app no longer has.
+function EditCollectListButton({ onClick, empty = false, t }) {
+	return (
+		<button
+			type='button'
+			onClick={onClick}
+			className='mono text-xs min-h-[32px] px-3 rounded-sm border border-[#27AE60]/50 text-[#27AE60] hover:bg-[#27AE60]/10 inline-flex items-center gap-1.5 transition'
+		>
+			<Settings size={12} aria-hidden='true' />
+			{t(empty ? 'app.filter.friend_collect_setup_button' : 'app.filter.friend_collect_edit_button')}
+		</button>
+	);
+}
+
+function BuddyCatchSection({ buddyCatchFilters, buddyCleanupFilters = [], copied, onCopy, onEdit, dropped = null, onDismissDropped }) {
 	const { t } = useTranslation();
+	// One block per buddy, in buddy order. A buddy whose list is empty has no
+	// catch filter but can still have tags to clean up, so the two lists are
+	// merged on the tag prefix rather than read off the catch filters alone.
+	const byPrefix = new Map();
+	for (const b of buddyCatchFilters) byPrefix.set(b.prefix, { name: b.buddyName, catchF: b });
+	for (const c of buddyCleanupFilters) {
+		const row = byPrefix.get(c.prefix) || { name: c.buddyName };
+		byPrefix.set(c.prefix, { ...row, cleanup: c });
+	}
 	return (
 		<div className='space-y-3'>
 			<div className='mono text-[10.5px] uppercase tracking-wider text-[#E67E22] flex items-baseline gap-2'>
 				<span>{t('app.buddy_catch.section_title')}</span>
 				<span className='text-[#8090A0] normal-case'>· {t('app.buddy_catch.section_subtitle')}</span>
 			</div>
-			{buddyCatchFilters.map((b) => {
-				const key = `buddyCatch:${b.prefix}`;
+			{[...byPrefix.entries()].map(([prefix, row]) => {
+				const key = `buddyCatch:${prefix}`;
+				const cleanKey = `buddyCleanup:${prefix}`;
 				return (
-					<FilterBox
-						key={b.prefix}
-						label={t('app.buddy_catch.filter_label', { params: { name: b.buddyName } })}
-						accent='#E67E22'
-						filterStr={b.filter}
-						copied={copied[key]}
-						onCopy={() => onCopy(key, b.filter)}
-					/>
+					<div key={prefix} id={buddyFiltersAnchor(prefix)} tabIndex={-1} className='space-y-2 scroll-mt-4 outline-none'>
+						{dropped?.prefix === prefix && (
+							<div role='status' className='mono text-xs text-[#E6EDF3] border border-[#E67E22]/40 bg-[#E67E22]/10 rounded-sm px-3 py-2 flex items-start gap-2'>
+								<span className='flex-1 leading-relaxed'>
+									{t('app.buddy_cleanup.dropped', {
+										params: { name: row.name, count: dropped.species.length, species: dropped.species.join(', ') },
+									})}
+								</span>
+								{onDismissDropped && (
+									<button
+										type='button'
+										onClick={onDismissDropped}
+										aria-label={t('app.buddy_cleanup.dropped_dismiss')}
+										className='shrink-0 min-h-[24px] min-w-[24px] text-[#8B98A5] hover:text-[#E6EDF3]'
+									>
+										<X size={14} aria-hidden='true' />
+									</button>
+								)}
+							</div>
+						)}
+						{row.catchF && (
+							<FilterBox
+								label={t('app.buddy_catch.filter_label', { params: { name: row.name } })}
+								accent='#E67E22'
+								filterStr={row.catchF.filter}
+								copied={copied[key]}
+								onCopy={() => onCopy(key, row.catchF.filter)}
+							/>
+						)}
+						{row.cleanup && (
+							<FilterBox
+								label={t('app.buddy_cleanup.filter_label', { params: { name: row.name } })}
+								accent='#8B98A5'
+								filterStr={row.cleanup.filter}
+								copied={copied[cleanKey]}
+								onCopy={() => onCopy(cleanKey, row.cleanup.filter)}
+								hint={t(
+									row.cleanup.wanted > 0 ? 'app.buddy_cleanup.hint' : 'app.buddy_cleanup.hint_empty',
+									{ params: { name: row.name, tag: `#${prefix}` } },
+								)}
+							/>
+						)}
+						{onEdit && (
+							<button
+								type='button'
+								onClick={onEdit}
+								className='mono text-xs min-h-[32px] px-3 rounded-sm border border-[#E67E22]/40 text-[#E67E22] hover:bg-[#E67E22]/10 inline-flex items-center gap-1.5 transition'
+							>
+								<Settings size={12} aria-hidden='true' />
+								{t('app.buddy_catch.edit_list', { params: { name: row.name } })}
+							</button>
+						)}
+					</div>
 				);
 			})}
 		</div>
@@ -10218,6 +10392,115 @@ function FriendCollectEditor({
 		{ key: 'meta', kinds: ['raids', 'pvp-great', 'pvp-ultra'] },
 	];
 
+	// One pack row: label, Add (with the preview's selection count), and the
+	// tap-to-exclude species preview. Shared by the always-visible live packs
+	// and the disclosure below them.
+	function renderPack(s) {
+		const selected = packSelection(s);
+		const offNames = new Set(packDeselected[s.id] ?? packDefaultOff(s));
+		return (
+		<div key={s.id} className='border border-[#1F2933] rounded-sm px-2.5 py-1.5 bg-[#0B0F14]'>
+			<div className='flex items-center justify-between gap-2'>
+				<div className='mono text-xs text-[#E6EDF3] min-w-0'>
+					<span className='wrap-break-word inline-flex items-start gap-1.5'>
+						{(() => {
+							const Icon = SUGGESTION_ICON[s.kind] || Trophy;
+							return <Icon size={13} strokeWidth={1.75} className='shrink-0 mt-0.5 text-[#5EAFC5]' aria-hidden='true' />;
+						})()}
+						<span>{suggestionLabel(s)}</span>
+					</span>
+					<span className='text-[#8090A0] ml-1.5 whitespace-nowrap'>
+						{t('app.filter.friend_collect_suggest_count', {
+							params: { count: s.species.length },
+						})}
+					</span>
+				</div>
+				<button
+					onClick={() => addSet(selected)}
+					disabled={selected.length === 0}
+					className='mono text-xs bg-[#27AE60] hover:bg-[#3FCF80] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-2.5 py-1 rounded-sm transition flex items-center gap-1 shrink-0'
+				>
+					<Plus size={12} /> {t('app.collectibles.add_button')}
+					{selected.length < s.species.length &&
+						` ${selected.length}/${s.species.length}`}
+				</button>
+			</div>
+			{/* Species preview: what would this Add actually add? Open the
+			    list and tap a chip to leave that species out. */}
+			<button
+				onClick={() => togglePreview(s.id)}
+				aria-expanded={!!openPreviews[s.id]}
+				aria-controls={`fc-pack-preview-${s.id}`}
+				className='mono text-[10px] mt-1 flex items-center gap-1 text-[#5EAFC5] hover:text-[#8FD4E8] transition'
+			>
+				{openPreviews[s.id] ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
+				{t(
+					openPreviews[s.id]
+						? 'app.filter.friend_collect_preview_hide'
+						: 'app.filter.friend_collect_preview_show',
+				)}
+			</button>
+			{openPreviews[s.id] && (
+				<div id={`fc-pack-preview-${s.id}`} className='mt-1.5 space-y-1'>
+					<p className='mono text-[10px] text-[#5C6975]'>
+						{t('app.filter.friend_collect_preview_help')}
+					</p>
+					{(s.owned || []).some(Boolean) && (
+						<p className='mono text-[10px] text-[#5C6975]'>
+							{t('app.filter.friend_collect_preview_owned_help')}
+						</p>
+					)}
+					{(s.curated || []).some(Boolean) && (
+						<p className='mono text-[10px] text-[#5C6975]'>
+							{t('app.filter.friend_collect_preview_curated_help')}
+						</p>
+					)}
+					<div className='flex flex-wrap gap-1'>
+						{s.species.map((name, i) => {
+							const isCurated = !!(s.curated || [])[i];
+							const isOwned = !!(s.owned || [])[i];
+							const off = offNames.has(name);
+							return (
+								<button
+									key={name}
+									onClick={() => togglePackSpecies(s, name, i)}
+									aria-pressed={!off}
+									className={`mono text-[11px] px-2 py-0.5 rounded-sm border transition ${
+										isCurated
+											? 'bg-[#5EAFC5]/10 text-[#5EAFC5]/60 border-[#5EAFC5]/25 cursor-default'
+											: off
+												? isOwned
+													? 'bg-[#F5B82E]/10 text-[#F5B82E]/70 border-[#F5B82E]/30 line-through'
+													: 'bg-[#5C6975]/10 text-[#5C6975] border-[#2D3A47] line-through'
+												: 'bg-[#27AE60]/15 text-[#27AE60] border-[#27AE60]/40'
+									}`}
+								>
+									{isCurated ? '≡ ' : isOwned ? '✓ ' : ''}
+									{(s.display || [])[i] || name}
+								</button>
+							);
+						})}
+					</div>
+				</div>
+			)}
+			{s.hintKey &&
+				(s.warn && mode === 'lucky' ? (
+					<p className='mono text-[10.5px] text-[#F5B82E] mt-1 leading-relaxed'>
+						⚠ {t(s.hintKey)}
+					</p>
+				) : (
+					<p className='mono text-[10.5px] text-[#8090A0] mt-1 leading-relaxed'>
+						{t(s.hintKey)}
+					</p>
+				))}
+		</div>
+		);
+	}
+
+	const liveKinds = SUGGESTION_GROUPS.find((g) => g.key === 'live').kinds;
+	const livePacks = suggestions.filter((x) => liveKinds.includes(x.kind));
+	const morePacks = suggestions.filter((x) => !liveKinds.includes(x.kind));
+
 	return (
 		<div className='space-y-3'>
 			<div className='flex items-center gap-2 flex-wrap'>
@@ -10276,7 +10559,23 @@ function FriendCollectEditor({
 				</p>
 			)}
 
-			{suggestions.length > 0 && (
+			{/* Live packs (this week's events and eggs) stay in view: they are
+			    time-limited, and behind a disclosure nobody found them in time.
+			    The evergreen and meta packs keep their disclosure. */}
+			{livePacks.length > 0 && (
+				<div className='border border-[#5EAFC5]/40 rounded-sm px-2.5 py-2 space-y-1.5 bg-[#5EAFC5]/5'>
+					<div className='mono text-[10.5px] uppercase tracking-wider text-[#5EAFC5] flex items-center gap-1.5'>
+						<Sparkles size={12} aria-hidden='true' />
+						{t('app.filter.friend_collect_group_live')}
+					</div>
+					<p className='mono text-[10.5px] text-[#8090A0] leading-relaxed'>
+						{t('app.filter.friend_collect_live_help')}
+					</p>
+					{livePacks.map(renderPack)}
+				</div>
+			)}
+
+			{morePacks.length > 0 && (
 				<div className='border border-[#1F2933] rounded-sm'>
 					<button
 						onClick={() => setShowPacks((s) => !s)}
@@ -10292,120 +10591,20 @@ function FriendCollectEditor({
 							<ChevronRight size={12} className='text-[#8090A0]' />
 						)}
 						<span className='mono text-[10px] uppercase tracking-wider text-[#8090A0]'>
-							{t('app.filter.friend_collect_suggest_title')} · {suggestions.length}
+							{t(livePacks.length > 0 ? 'app.filter.friend_collect_suggest_more' : 'app.filter.friend_collect_suggest_title')} · {morePacks.length}
 						</span>
 					</button>
 					{showPacks && (
 						<div id={packsPanelId} className='px-2.5 pb-2.5 space-y-2.5 border-t border-[#1F2933] pt-2'>
-							{SUGGESTION_GROUPS.map((group) => {
-								const packs = suggestions.filter((s) => group.kinds.includes(s.kind));
+							{SUGGESTION_GROUPS.filter((g) => g.key !== 'live').map((group) => {
+								const packs = morePacks.filter((s) => group.kinds.includes(s.kind));
 								if (packs.length === 0) return null;
 								return (
 									<div key={group.key} className='space-y-1.5'>
 										<div className='mono text-[10px] uppercase tracking-wider text-[#5C6975]'>
 											{t(`app.filter.friend_collect_group_${group.key}`)}
 										</div>
-										{packs.map((s) => {
-											const selected = packSelection(s);
-											const offNames = new Set(packDeselected[s.id] ?? packDefaultOff(s));
-											return (
-											<div key={s.id} className='border border-[#1F2933] rounded-sm px-2.5 py-1.5 bg-[#0B0F14]'>
-												<div className='flex items-center justify-between gap-2'>
-													<div className='mono text-xs text-[#E6EDF3] min-w-0'>
-														<span className='wrap-break-word inline-flex items-start gap-1.5'>
-															{(() => {
-																const Icon = SUGGESTION_ICON[s.kind] || Trophy;
-																return <Icon size={13} strokeWidth={1.75} className='shrink-0 mt-0.5 text-[#5EAFC5]' aria-hidden='true' />;
-															})()}
-															<span>{suggestionLabel(s)}</span>
-														</span>
-														<span className='text-[#8090A0] ml-1.5 whitespace-nowrap'>
-															{t('app.filter.friend_collect_suggest_count', {
-																params: { count: s.species.length },
-															})}
-														</span>
-													</div>
-													<button
-														onClick={() => addSet(selected)}
-														disabled={selected.length === 0}
-														className='mono text-xs bg-[#27AE60] hover:bg-[#3FCF80] disabled:bg-[#2D3A47] disabled:text-[#8090A0] text-white px-2.5 py-1 rounded-sm transition flex items-center gap-1 shrink-0'
-													>
-														<Plus size={12} /> {t('app.collectibles.add_button')}
-														{selected.length < s.species.length &&
-															` ${selected.length}/${s.species.length}`}
-													</button>
-												</div>
-												{/* Species preview: what would this Add actually add? Open the
-												    list and tap a chip to leave that species out. */}
-												<button
-													onClick={() => togglePreview(s.id)}
-													aria-expanded={!!openPreviews[s.id]}
-													aria-controls={`fc-pack-preview-${s.id}`}
-													className='mono text-[10px] mt-1 flex items-center gap-1 text-[#5EAFC5] hover:text-[#8FD4E8] transition'
-												>
-													{openPreviews[s.id] ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
-													{t(
-														openPreviews[s.id]
-															? 'app.filter.friend_collect_preview_hide'
-															: 'app.filter.friend_collect_preview_show',
-													)}
-												</button>
-												{openPreviews[s.id] && (
-													<div id={`fc-pack-preview-${s.id}`} className='mt-1.5 space-y-1'>
-														<p className='mono text-[10px] text-[#5C6975]'>
-															{t('app.filter.friend_collect_preview_help')}
-														</p>
-														{(s.owned || []).some(Boolean) && (
-															<p className='mono text-[10px] text-[#5C6975]'>
-																{t('app.filter.friend_collect_preview_owned_help')}
-															</p>
-														)}
-														{(s.curated || []).some(Boolean) && (
-															<p className='mono text-[10px] text-[#5C6975]'>
-																{t('app.filter.friend_collect_preview_curated_help')}
-															</p>
-														)}
-														<div className='flex flex-wrap gap-1'>
-															{s.species.map((name, i) => {
-																const isCurated = !!(s.curated || [])[i];
-																const isOwned = !!(s.owned || [])[i];
-																const off = offNames.has(name);
-																return (
-																	<button
-																		key={name}
-																		onClick={() => togglePackSpecies(s, name, i)}
-																		aria-pressed={!off}
-																		className={`mono text-[11px] px-2 py-0.5 rounded-sm border transition ${
-																			isCurated
-																				? 'bg-[#5EAFC5]/10 text-[#5EAFC5]/60 border-[#5EAFC5]/25 cursor-default'
-																				: off
-																					? isOwned
-																						? 'bg-[#F5B82E]/10 text-[#F5B82E]/70 border-[#F5B82E]/30 line-through'
-																						: 'bg-[#5C6975]/10 text-[#5C6975] border-[#2D3A47] line-through'
-																					: 'bg-[#27AE60]/15 text-[#27AE60] border-[#27AE60]/40'
-																		}`}
-																	>
-																		{isCurated ? '≡ ' : isOwned ? '✓ ' : ''}
-																		{(s.display || [])[i] || name}
-																	</button>
-																);
-															})}
-														</div>
-													</div>
-												)}
-												{s.hintKey &&
-													(s.warn && mode === 'lucky' ? (
-														<p className='mono text-[10.5px] text-[#F5B82E] mt-1 leading-relaxed'>
-															⚠ {t(s.hintKey)}
-														</p>
-													) : (
-														<p className='mono text-[10.5px] text-[#8090A0] mt-1 leading-relaxed'>
-															{t(s.hintKey)}
-														</p>
-													))}
-											</div>
-											);
-										})}
+										{packs.map(renderPack)}
 									</div>
 								);
 							})}
@@ -12864,6 +13063,7 @@ function RawClausesPanel({
 	prestagedClauses,
 	giftClauses,
 	buddyCatchFilters,
+	buddyCleanupFilters = [],
 }) {
 	const { t } = useTranslation();
 	return (
@@ -12894,6 +13094,14 @@ function RawClausesPanel({
 						clauses={b.clauses}
 					/>
 				))}
+			{buddyCleanupFilters.map((b) => (
+				<ClauseList
+					key={`cleanup:${b.prefix}`}
+					title={t('app.buddy_cleanup.filter_label', { params: { name: b.buddyName } })}
+					accent='#8B98A5'
+					clauses={b.clauses}
+				/>
+			))}
 		</div>
 	);
 }
@@ -13455,12 +13663,14 @@ function ConfigPanel({
 	pvpMetaPacks = [],
 	onRunCards = null,
 	sections = null,
+	friendCollectInitiallyOpen = false,
 }) {
 	const { t, outputLocale } = useTranslation();
 	const announce = useAnnounce();
-	// "Lass Freunde für dich sammeln" — collapsed by default; the target lists
-	// get long, and the section is a sibling of the buddy wish-species cards.
-	const [showFriendCollect, setShowFriendCollect] = useState(false);
+	// "Lass Freunde für dich sammeln": collapsed in the wizard, where the target
+	// lists would push everything else down; open in the Trade settings, where
+	// it leads the page and is what people come there for.
+	const [showFriendCollect, setShowFriendCollect] = useState(friendCollectInitiallyOpen);
 	// Free-text species input for the intelligent-PvP list (expert only) — the
 	// raw string lives here so unresolved tokens survive a failed add, same as
 	// the other SpeciesListEditor call sites in App.
