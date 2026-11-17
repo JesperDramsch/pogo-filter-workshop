@@ -1,1586 +1,6 @@
 {
-  "fetchedAt": "2026-11-13T22:15:52.099Z",
+  "fetchedAt": "2026-11-17T16:11:21.212Z",
   "events": [
-    {
-      "id": "wild-area-pok-mon-go-wild-area-2026-sendai-tohoku-2026-11-06t01-00-00z",
-      "title": "Pokémon GO Wild Area 2026: Sendai • Tohoku",
-      "category": "Wild Area",
-      "start": "2026-11-06T01:00:00Z",
-      "end": "2026-11-08T09:00:00Z",
-      "isLocalTime": false,
-      "venue": {
-        "name": "Sendai",
-        "lat": 38.26667,
-        "lng": 140.86667
-      },
-      "spawnDex": [
-        4,
-        27,
-        50,
-        68,
-        81,
-        90,
-        95,
-        103,
-        129,
-        131,
-        137,
-        147,
-        184,
-        201,
-        207,
-        212,
-        213,
-        227,
-        230,
-        299,
-        304,
-        306,
-        328,
-        330,
-        333,
-        339,
-        365,
-        371,
-        374,
-        376,
-        380,
-        381,
-        393,
-        395,
-        410,
-        411,
-        436,
-        443,
-        448,
-        462,
-        529,
-        534,
-        597,
-        598,
-        599,
-        602,
-        610,
-        612,
-        618,
-        631,
-        632,
-        633,
-        635,
-        690,
-        696,
-        698,
-        704,
-        705,
-        706,
-        714,
-        715,
-        776,
-        782,
-        784,
-        821,
-        840,
-        850,
-        957,
-        959,
-        968,
-        980,
-        996
-      ],
-      "spawns": [
-        "Aggron",
-        "Amaura",
-        "Applin",
-        "Aron",
-        "Axew",
-        "Azumarill",
-        "Bagon",
-        "Barboach",
-        "Bastiodon",
-        "Beldum",
-        "Bronzor",
-        "Charmander",
-        "Clodsire",
-        "Conkeldurr",
-        "Deino",
-        "Diglett",
-        "Dratini",
-        "Drilbur",
-        "Durant",
-        "Empoleon",
-        "Exeggutor",
-        "Ferroseed",
-        "Ferrothorn",
-        "Flygon",
-        "Frigibax",
-        "Gible",
-        "Gligar",
-        "Goodra",
-        "Goomy",
-        "Haxorus",
-        "Heatmor",
-        "Hydreigon",
-        "Jangmo-o",
-        "Kingdra",
-        "Klink",
-        "Kommo-o",
-        "Lapras",
-        "Latias",
-        "Latios",
-        "Lucario",
-        "Machamp",
-        "Magikarp",
-        "Magnemite",
-        "Magnezone",
-        "Metagross",
-        "Noibat",
-        "Noivern",
-        "Nosepass",
-        "Onix",
-        "Orthworm",
-        "Piplup",
-        "Porygon",
-        "Rookidee",
-        "Sandshrew",
-        "Scizor",
-        "Shellder",
-        "Shieldon",
-        "Shuckle",
-        "Sizzlipede",
-        "Skarmory",
-        "Skrelp",
-        "Sliggoo",
-        "Stunfisk",
-        "Swablu",
-        "Tinkatink",
-        "Tinkaton",
-        "Trapinch",
-        "Turtonator",
-        "Tynamo",
-        "Tyrunt",
-        "Unown",
-        "Walrein"
-      ],
-      "spawnForms": [
-        {
-          "name": "Charmander",
-          "dex": 4,
-          "region": null,
-          "types": [
-            "fire"
-          ]
-        },
-        {
-          "name": "Alolan Sandshrew",
-          "dex": 27,
-          "region": "alola",
-          "types": [
-            "ice",
-            "steel"
-          ]
-        },
-        {
-          "name": "Alolan Diglett",
-          "dex": 50,
-          "region": "alola",
-          "types": [
-            "ground",
-            "steel"
-          ]
-        },
-        {
-          "name": "Modern Jacket Machamp",
-          "dex": 68,
-          "region": null,
-          "types": [
-            "fighting"
-          ]
-        },
-        {
-          "name": "Magnemite",
-          "dex": 81,
-          "region": null,
-          "types": [
-            "electric",
-            "steel"
-          ]
-        },
-        {
-          "name": "Shellder",
-          "dex": 90,
-          "region": null,
-          "types": [
-            "water"
-          ]
-        },
-        {
-          "name": "Onix",
-          "dex": 95,
-          "region": null,
-          "types": [
-            "rock",
-            "ground"
-          ]
-        },
-        {
-          "name": "Alolan Exeggutor",
-          "dex": 103,
-          "region": "alola",
-          "types": [
-            "grass",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Magikarp",
-          "dex": 129,
-          "region": null,
-          "types": [
-            "water"
-          ]
-        },
-        {
-          "name": "Lapras",
-          "dex": 131,
-          "region": null,
-          "types": [
-            "water",
-            "ice"
-          ]
-        },
-        {
-          "name": "Porygon",
-          "dex": 137,
-          "region": null,
-          "types": [
-            "normal"
-          ]
-        },
-        {
-          "name": "Dratini",
-          "dex": 147,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Azumarill",
-          "dex": 184,
-          "region": null,
-          "types": [
-            "water",
-            "fairy"
-          ]
-        },
-        {
-          "name": "Unown A",
-          "dex": 201,
-          "region": null,
-          "types": [
-            "psychic"
-          ]
-        },
-        {
-          "name": "Gligar",
-          "dex": 207,
-          "region": null,
-          "types": [
-            "ground",
-            "flying"
-          ]
-        },
-        {
-          "name": "Scizor",
-          "dex": 212,
-          "region": null,
-          "types": [
-            "bug",
-            "steel"
-          ]
-        },
-        {
-          "name": "Shuckle",
-          "dex": 213,
-          "region": null,
-          "types": [
-            "bug",
-            "rock"
-          ]
-        },
-        {
-          "name": "Skarmory",
-          "dex": 227,
-          "region": null,
-          "types": [
-            "steel",
-            "flying"
-          ]
-        },
-        {
-          "name": "Kingdra",
-          "dex": 230,
-          "region": null,
-          "types": [
-            "water",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Nosepass",
-          "dex": 299,
-          "region": null,
-          "types": [
-            "rock"
-          ]
-        },
-        {
-          "name": "Aron",
-          "dex": 304,
-          "region": null,
-          "types": [
-            "steel",
-            "rock"
-          ]
-        },
-        {
-          "name": "Aggron",
-          "dex": 306,
-          "region": null,
-          "types": [
-            "steel",
-            "rock"
-          ]
-        },
-        {
-          "name": "Trapinch",
-          "dex": 328,
-          "region": null,
-          "types": [
-            "ground"
-          ]
-        },
-        {
-          "name": "Flygon",
-          "dex": 330,
-          "region": null,
-          "types": [
-            "ground",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Swablu",
-          "dex": 333,
-          "region": null,
-          "types": [
-            "normal",
-            "flying"
-          ]
-        },
-        {
-          "name": "Barboach",
-          "dex": 339,
-          "region": null,
-          "types": [
-            "water",
-            "ground"
-          ]
-        },
-        {
-          "name": "Walrein",
-          "dex": 365,
-          "region": null,
-          "types": [
-            "ice",
-            "water"
-          ]
-        },
-        {
-          "name": "Bagon",
-          "dex": 371,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Beldum",
-          "dex": 374,
-          "region": null,
-          "types": [
-            "steel",
-            "psychic"
-          ]
-        },
-        {
-          "name": "Metagross",
-          "dex": 376,
-          "region": null,
-          "types": [
-            "steel",
-            "psychic"
-          ]
-        },
-        {
-          "name": "Latias",
-          "dex": 380,
-          "region": null,
-          "types": [
-            "dragon",
-            "psychic"
-          ]
-        },
-        {
-          "name": "Latios",
-          "dex": 381,
-          "region": null,
-          "types": [
-            "dragon",
-            "psychic"
-          ]
-        },
-        {
-          "name": "Piplup",
-          "dex": 393,
-          "region": null,
-          "types": [
-            "water"
-          ]
-        },
-        {
-          "name": "Empoleon",
-          "dex": 395,
-          "region": null,
-          "types": [
-            "water",
-            "steel"
-          ]
-        },
-        {
-          "name": "Shieldon",
-          "dex": 410,
-          "region": null,
-          "types": [
-            "rock",
-            "steel"
-          ]
-        },
-        {
-          "name": "Bastiodon",
-          "dex": 411,
-          "region": null,
-          "types": [
-            "rock",
-            "steel"
-          ]
-        },
-        {
-          "name": "Bronzor",
-          "dex": 436,
-          "region": null,
-          "types": [
-            "steel",
-            "psychic"
-          ]
-        },
-        {
-          "name": "Gible",
-          "dex": 443,
-          "region": null,
-          "types": [
-            "dragon",
-            "ground"
-          ]
-        },
-        {
-          "name": "Lucario",
-          "dex": 448,
-          "region": null,
-          "types": [
-            "fighting",
-            "steel"
-          ]
-        },
-        {
-          "name": "Magnezone",
-          "dex": 462,
-          "region": null,
-          "types": [
-            "electric",
-            "steel"
-          ]
-        },
-        {
-          "name": "Drilbur",
-          "dex": 529,
-          "region": null,
-          "types": [
-            "ground"
-          ]
-        },
-        {
-          "name": "Conkeldurr",
-          "dex": 534,
-          "region": null,
-          "types": [
-            "fighting"
-          ]
-        },
-        {
-          "name": "Ferroseed",
-          "dex": 597,
-          "region": null,
-          "types": [
-            "grass",
-            "steel"
-          ]
-        },
-        {
-          "name": "Ferrothorn",
-          "dex": 598,
-          "region": null,
-          "types": [
-            "grass",
-            "steel"
-          ]
-        },
-        {
-          "name": "Klink",
-          "dex": 599,
-          "region": null,
-          "types": [
-            "steel"
-          ]
-        },
-        {
-          "name": "Tynamo",
-          "dex": 602,
-          "region": null,
-          "types": [
-            "electric"
-          ]
-        },
-        {
-          "name": "Axew",
-          "dex": 610,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Haxorus",
-          "dex": 612,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Galarian Stunfisk",
-          "dex": 618,
-          "region": "galar",
-          "types": [
-            "ground",
-            "steel"
-          ]
-        },
-        {
-          "name": "Heatmor",
-          "dex": 631,
-          "region": null,
-          "types": [
-            "fire"
-          ]
-        },
-        {
-          "name": "Durant",
-          "dex": 632,
-          "region": null,
-          "types": [
-            "bug",
-            "steel"
-          ]
-        },
-        {
-          "name": "Deino",
-          "dex": 633,
-          "region": null,
-          "types": [
-            "dark",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Hydreigon",
-          "dex": 635,
-          "region": null,
-          "types": [
-            "dark",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Skrelp",
-          "dex": 690,
-          "region": null,
-          "types": [
-            "poison",
-            "water"
-          ]
-        },
-        {
-          "name": "Tyrunt",
-          "dex": 696,
-          "region": null,
-          "types": [
-            "rock",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Amaura",
-          "dex": 698,
-          "region": null,
-          "types": [
-            "rock",
-            "ice"
-          ]
-        },
-        {
-          "name": "Goomy",
-          "dex": 704,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Hisuian Sliggoo",
-          "dex": 705,
-          "region": "hisui",
-          "types": [
-            "steel",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Goodra",
-          "dex": 706,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Noibat",
-          "dex": 714,
-          "region": null,
-          "types": [
-            "flying",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Noivern",
-          "dex": 715,
-          "region": null,
-          "types": [
-            "flying",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Turtonator",
-          "dex": 776,
-          "region": null,
-          "types": [
-            "fire",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Jangmo-o",
-          "dex": 782,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Kommo-o",
-          "dex": 784,
-          "region": null,
-          "types": [
-            "dragon",
-            "fighting"
-          ]
-        },
-        {
-          "name": "Rookidee",
-          "dex": 821,
-          "region": null,
-          "types": [
-            "flying"
-          ]
-        },
-        {
-          "name": "Applin",
-          "dex": 840,
-          "region": null,
-          "types": [
-            "grass",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Sizzlipede",
-          "dex": 850,
-          "region": null,
-          "types": [
-            "fire",
-            "bug"
-          ]
-        },
-        {
-          "name": "Tinkatink",
-          "dex": 957,
-          "region": null,
-          "types": [
-            "fairy",
-            "steel"
-          ]
-        },
-        {
-          "name": "Tinkaton",
-          "dex": 959,
-          "region": null,
-          "types": [
-            "fairy",
-            "steel"
-          ]
-        },
-        {
-          "name": "Orthworm",
-          "dex": 968,
-          "region": null,
-          "types": [
-            "steel"
-          ]
-        },
-        {
-          "name": "Clodsire",
-          "dex": 980,
-          "region": null,
-          "types": [
-            "poison",
-            "ground"
-          ]
-        },
-        {
-          "name": "Frigibax",
-          "dex": 996,
-          "region": null,
-          "types": [
-            "dragon",
-            "ice"
-          ]
-        }
-      ],
-      "unresolved": [],
-      "hasCostumes": false
-    },
-    {
-      "id": "wild-area-pok-mon-go-wild-area-2026-mexico-city-2026-11-06t16-00-00z",
-      "title": "Pokémon GO Wild Area 2026: Mexico City",
-      "category": "Wild Area",
-      "start": "2026-11-06T16:00:00Z",
-      "end": "2026-11-09T00:00:00Z",
-      "isLocalTime": false,
-      "venue": {
-        "name": "Mexico City",
-        "lat": 19.42847,
-        "lng": -99.12766
-      },
-      "spawnDex": [
-        4,
-        27,
-        50,
-        68,
-        81,
-        90,
-        95,
-        103,
-        129,
-        137,
-        147,
-        184,
-        201,
-        207,
-        212,
-        213,
-        227,
-        230,
-        299,
-        304,
-        306,
-        328,
-        330,
-        333,
-        339,
-        365,
-        371,
-        374,
-        376,
-        380,
-        381,
-        393,
-        395,
-        410,
-        411,
-        436,
-        443,
-        448,
-        462,
-        529,
-        534,
-        597,
-        598,
-        599,
-        602,
-        610,
-        612,
-        618,
-        631,
-        632,
-        633,
-        635,
-        690,
-        696,
-        698,
-        701,
-        704,
-        705,
-        706,
-        714,
-        715,
-        776,
-        782,
-        784,
-        821,
-        840,
-        850,
-        957,
-        959,
-        968,
-        980,
-        996
-      ],
-      "spawns": [
-        "Aggron",
-        "Amaura",
-        "Applin",
-        "Aron",
-        "Axew",
-        "Azumarill",
-        "Bagon",
-        "Barboach",
-        "Bastiodon",
-        "Beldum",
-        "Bronzor",
-        "Charmander",
-        "Clodsire",
-        "Conkeldurr",
-        "Deino",
-        "Diglett",
-        "Dratini",
-        "Drilbur",
-        "Durant",
-        "Empoleon",
-        "Exeggutor",
-        "Ferroseed",
-        "Ferrothorn",
-        "Flygon",
-        "Frigibax",
-        "Gible",
-        "Gligar",
-        "Goodra",
-        "Goomy",
-        "Hawlucha",
-        "Haxorus",
-        "Heatmor",
-        "Hydreigon",
-        "Jangmo-o",
-        "Kingdra",
-        "Klink",
-        "Kommo-o",
-        "Latias",
-        "Latios",
-        "Lucario",
-        "Machamp",
-        "Magikarp",
-        "Magnemite",
-        "Magnezone",
-        "Metagross",
-        "Noibat",
-        "Noivern",
-        "Nosepass",
-        "Onix",
-        "Orthworm",
-        "Piplup",
-        "Porygon",
-        "Rookidee",
-        "Sandshrew",
-        "Scizor",
-        "Shellder",
-        "Shieldon",
-        "Shuckle",
-        "Sizzlipede",
-        "Skarmory",
-        "Skrelp",
-        "Sliggoo",
-        "Stunfisk",
-        "Swablu",
-        "Tinkatink",
-        "Tinkaton",
-        "Trapinch",
-        "Turtonator",
-        "Tynamo",
-        "Tyrunt",
-        "Unown",
-        "Walrein"
-      ],
-      "spawnForms": [
-        {
-          "name": "Charmander",
-          "dex": 4,
-          "region": null,
-          "types": [
-            "fire"
-          ]
-        },
-        {
-          "name": "Alolan Sandshrew",
-          "dex": 27,
-          "region": "alola",
-          "types": [
-            "ice",
-            "steel"
-          ]
-        },
-        {
-          "name": "Alolan Diglett",
-          "dex": 50,
-          "region": "alola",
-          "types": [
-            "ground",
-            "steel"
-          ]
-        },
-        {
-          "name": "Modern Jacket Machamp",
-          "dex": 68,
-          "region": null,
-          "types": [
-            "fighting"
-          ]
-        },
-        {
-          "name": "Magnemite",
-          "dex": 81,
-          "region": null,
-          "types": [
-            "electric",
-            "steel"
-          ]
-        },
-        {
-          "name": "Shellder",
-          "dex": 90,
-          "region": null,
-          "types": [
-            "water"
-          ]
-        },
-        {
-          "name": "Onix",
-          "dex": 95,
-          "region": null,
-          "types": [
-            "rock",
-            "ground"
-          ]
-        },
-        {
-          "name": "Alolan Exeggutor",
-          "dex": 103,
-          "region": "alola",
-          "types": [
-            "grass",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Magikarp",
-          "dex": 129,
-          "region": null,
-          "types": [
-            "water"
-          ]
-        },
-        {
-          "name": "Porygon",
-          "dex": 137,
-          "region": null,
-          "types": [
-            "normal"
-          ]
-        },
-        {
-          "name": "Dratini",
-          "dex": 147,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Azumarill",
-          "dex": 184,
-          "region": null,
-          "types": [
-            "water",
-            "fairy"
-          ]
-        },
-        {
-          "name": "Unown C",
-          "dex": 201,
-          "region": null,
-          "types": [
-            "psychic"
-          ]
-        },
-        {
-          "name": "Gligar",
-          "dex": 207,
-          "region": null,
-          "types": [
-            "ground",
-            "flying"
-          ]
-        },
-        {
-          "name": "Scizor",
-          "dex": 212,
-          "region": null,
-          "types": [
-            "bug",
-            "steel"
-          ]
-        },
-        {
-          "name": "Shuckle",
-          "dex": 213,
-          "region": null,
-          "types": [
-            "bug",
-            "rock"
-          ]
-        },
-        {
-          "name": "Skarmory",
-          "dex": 227,
-          "region": null,
-          "types": [
-            "steel",
-            "flying"
-          ]
-        },
-        {
-          "name": "Kingdra",
-          "dex": 230,
-          "region": null,
-          "types": [
-            "water",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Nosepass",
-          "dex": 299,
-          "region": null,
-          "types": [
-            "rock"
-          ]
-        },
-        {
-          "name": "Aron",
-          "dex": 304,
-          "region": null,
-          "types": [
-            "steel",
-            "rock"
-          ]
-        },
-        {
-          "name": "Aggron",
-          "dex": 306,
-          "region": null,
-          "types": [
-            "steel",
-            "rock"
-          ]
-        },
-        {
-          "name": "Trapinch",
-          "dex": 328,
-          "region": null,
-          "types": [
-            "ground"
-          ]
-        },
-        {
-          "name": "Flygon",
-          "dex": 330,
-          "region": null,
-          "types": [
-            "ground",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Swablu",
-          "dex": 333,
-          "region": null,
-          "types": [
-            "normal",
-            "flying"
-          ]
-        },
-        {
-          "name": "Barboach",
-          "dex": 339,
-          "region": null,
-          "types": [
-            "water",
-            "ground"
-          ]
-        },
-        {
-          "name": "Walrein",
-          "dex": 365,
-          "region": null,
-          "types": [
-            "ice",
-            "water"
-          ]
-        },
-        {
-          "name": "Bagon",
-          "dex": 371,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Beldum",
-          "dex": 374,
-          "region": null,
-          "types": [
-            "steel",
-            "psychic"
-          ]
-        },
-        {
-          "name": "Metagross",
-          "dex": 376,
-          "region": null,
-          "types": [
-            "steel",
-            "psychic"
-          ]
-        },
-        {
-          "name": "Latias",
-          "dex": 380,
-          "region": null,
-          "types": [
-            "dragon",
-            "psychic"
-          ]
-        },
-        {
-          "name": "Latios",
-          "dex": 381,
-          "region": null,
-          "types": [
-            "dragon",
-            "psychic"
-          ]
-        },
-        {
-          "name": "Piplup",
-          "dex": 393,
-          "region": null,
-          "types": [
-            "water"
-          ]
-        },
-        {
-          "name": "Empoleon",
-          "dex": 395,
-          "region": null,
-          "types": [
-            "water",
-            "steel"
-          ]
-        },
-        {
-          "name": "Shieldon",
-          "dex": 410,
-          "region": null,
-          "types": [
-            "rock",
-            "steel"
-          ]
-        },
-        {
-          "name": "Bastiodon",
-          "dex": 411,
-          "region": null,
-          "types": [
-            "rock",
-            "steel"
-          ]
-        },
-        {
-          "name": "Bronzor",
-          "dex": 436,
-          "region": null,
-          "types": [
-            "steel",
-            "psychic"
-          ]
-        },
-        {
-          "name": "Gible",
-          "dex": 443,
-          "region": null,
-          "types": [
-            "dragon",
-            "ground"
-          ]
-        },
-        {
-          "name": "Lucario",
-          "dex": 448,
-          "region": null,
-          "types": [
-            "fighting",
-            "steel"
-          ]
-        },
-        {
-          "name": "Magnezone",
-          "dex": 462,
-          "region": null,
-          "types": [
-            "electric",
-            "steel"
-          ]
-        },
-        {
-          "name": "Drilbur",
-          "dex": 529,
-          "region": null,
-          "types": [
-            "ground"
-          ]
-        },
-        {
-          "name": "Conkeldurr",
-          "dex": 534,
-          "region": null,
-          "types": [
-            "fighting"
-          ]
-        },
-        {
-          "name": "Ferroseed",
-          "dex": 597,
-          "region": null,
-          "types": [
-            "grass",
-            "steel"
-          ]
-        },
-        {
-          "name": "Ferrothorn",
-          "dex": 598,
-          "region": null,
-          "types": [
-            "grass",
-            "steel"
-          ]
-        },
-        {
-          "name": "Klink",
-          "dex": 599,
-          "region": null,
-          "types": [
-            "steel"
-          ]
-        },
-        {
-          "name": "Tynamo",
-          "dex": 602,
-          "region": null,
-          "types": [
-            "electric"
-          ]
-        },
-        {
-          "name": "Axew",
-          "dex": 610,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Haxorus",
-          "dex": 612,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Galarian Stunfisk",
-          "dex": 618,
-          "region": "galar",
-          "types": [
-            "ground",
-            "steel"
-          ]
-        },
-        {
-          "name": "Heatmor",
-          "dex": 631,
-          "region": null,
-          "types": [
-            "fire"
-          ]
-        },
-        {
-          "name": "Durant",
-          "dex": 632,
-          "region": null,
-          "types": [
-            "bug",
-            "steel"
-          ]
-        },
-        {
-          "name": "Deino",
-          "dex": 633,
-          "region": null,
-          "types": [
-            "dark",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Hydreigon",
-          "dex": 635,
-          "region": null,
-          "types": [
-            "dark",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Skrelp",
-          "dex": 690,
-          "region": null,
-          "types": [
-            "poison",
-            "water"
-          ]
-        },
-        {
-          "name": "Tyrunt",
-          "dex": 696,
-          "region": null,
-          "types": [
-            "rock",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Amaura",
-          "dex": 698,
-          "region": null,
-          "types": [
-            "rock",
-            "ice"
-          ]
-        },
-        {
-          "name": "Hawlucha",
-          "dex": 701,
-          "region": null,
-          "types": [
-            "fighting",
-            "flying"
-          ]
-        },
-        {
-          "name": "Goomy",
-          "dex": 704,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Hisuian Sliggoo",
-          "dex": 705,
-          "region": "hisui",
-          "types": [
-            "steel",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Goodra",
-          "dex": 706,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Noibat",
-          "dex": 714,
-          "region": null,
-          "types": [
-            "flying",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Noivern",
-          "dex": 715,
-          "region": null,
-          "types": [
-            "flying",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Turtonator",
-          "dex": 776,
-          "region": null,
-          "types": [
-            "fire",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Jangmo-o",
-          "dex": 782,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Kommo-o",
-          "dex": 784,
-          "region": null,
-          "types": [
-            "dragon",
-            "fighting"
-          ]
-        },
-        {
-          "name": "Rookidee",
-          "dex": 821,
-          "region": null,
-          "types": [
-            "flying"
-          ]
-        },
-        {
-          "name": "Applin",
-          "dex": 840,
-          "region": null,
-          "types": [
-            "grass",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Sizzlipede",
-          "dex": 850,
-          "region": null,
-          "types": [
-            "fire",
-            "bug"
-          ]
-        },
-        {
-          "name": "Tinkatink",
-          "dex": 957,
-          "region": null,
-          "types": [
-            "fairy",
-            "steel"
-          ]
-        },
-        {
-          "name": "Tinkaton",
-          "dex": 959,
-          "region": null,
-          "types": [
-            "fairy",
-            "steel"
-          ]
-        },
-        {
-          "name": "Orthworm",
-          "dex": 968,
-          "region": null,
-          "types": [
-            "steel"
-          ]
-        },
-        {
-          "name": "Clodsire",
-          "dex": 980,
-          "region": null,
-          "types": [
-            "poison",
-            "ground"
-          ]
-        },
-        {
-          "name": "Frigibax",
-          "dex": 996,
-          "region": null,
-          "types": [
-            "dragon",
-            "ice"
-          ]
-        }
-      ],
-      "unresolved": [],
-      "hasCostumes": false
-    },
     {
       "id": "event-into-the-wild-2026-2026-11-09t10-00-00",
       "title": "Into the Wild 2026",
@@ -2656,6 +1076,633 @@
       "hasCostumes": false
     },
     {
+      "id": "event-dynamax-trails-2026-11-16t10-00-00",
+      "title": "Dynamax Trails",
+      "category": "Event",
+      "start": "2026-11-16T10:00:00",
+      "end": "2026-11-23T20:00:00",
+      "isLocalTime": true,
+      "venue": null,
+      "spawnDex": [
+        1,
+        4,
+        7,
+        10,
+        25,
+        58,
+        63,
+        66,
+        92,
+        98,
+        106,
+        107,
+        111,
+        113,
+        125,
+        126,
+        129,
+        133,
+        138,
+        140,
+        163,
+        213,
+        215,
+        237,
+        280,
+        302,
+        320,
+        328,
+        349,
+        363,
+        374,
+        415,
+        519,
+        524,
+        527,
+        529,
+        546,
+        554,
+        568,
+        615,
+        633,
+        686,
+        761,
+        766,
+        780,
+        810,
+        813,
+        816,
+        819,
+        821,
+        831,
+        849,
+        850,
+        856,
+        870,
+        884
+      ],
+      "spawns": [
+        "Abra",
+        "Beldum",
+        "Bounsweet",
+        "Bulbasaur",
+        "Caterpie",
+        "Chansey",
+        "Charmander",
+        "Combee",
+        "Cottonee",
+        "Cryogonal",
+        "Darumaka",
+        "Deino",
+        "Drampa",
+        "Drilbur",
+        "Duraludon",
+        "Eevee",
+        "Electabuzz",
+        "Falinks",
+        "Feebas",
+        "Gastly",
+        "Grookey",
+        "Growlithe",
+        "Hatenna",
+        "Hitmonchan",
+        "Hitmonlee",
+        "Hitmontop",
+        "Hoothoot",
+        "Inkay",
+        "Kabuto",
+        "Krabby",
+        "Machop",
+        "Magikarp",
+        "Magmar",
+        "Omanyte",
+        "Passimian",
+        "Pidove",
+        "Pikachu",
+        "Ralts",
+        "Rhyhorn",
+        "Roggenrola",
+        "Rookidee",
+        "Sableye",
+        "Scorbunny",
+        "Shuckle",
+        "Sizzlipede",
+        "Skwovet",
+        "Sneasel",
+        "Sobble",
+        "Spheal",
+        "Squirtle",
+        "Toxtricity",
+        "Trapinch",
+        "Trubbish",
+        "Wailmer",
+        "Woobat",
+        "Wooloo"
+      ],
+      "spawnForms": [
+        {
+          "name": "Bulbasaur",
+          "dex": 1,
+          "region": null,
+          "types": [
+            "grass",
+            "poison"
+          ]
+        },
+        {
+          "name": "Charmander",
+          "dex": 4,
+          "region": null,
+          "types": [
+            "fire"
+          ]
+        },
+        {
+          "name": "Squirtle",
+          "dex": 7,
+          "region": null,
+          "types": [
+            "water"
+          ]
+        },
+        {
+          "name": "Caterpie",
+          "dex": 10,
+          "region": null,
+          "types": [
+            "bug"
+          ]
+        },
+        {
+          "name": "Pikachu",
+          "dex": 25,
+          "region": null,
+          "types": [
+            "electric"
+          ]
+        },
+        {
+          "name": "Growlithe",
+          "dex": 58,
+          "region": null,
+          "types": [
+            "fire"
+          ]
+        },
+        {
+          "name": "Abra",
+          "dex": 63,
+          "region": null,
+          "types": [
+            "psychic"
+          ]
+        },
+        {
+          "name": "Machop",
+          "dex": 66,
+          "region": null,
+          "types": [
+            "fighting"
+          ]
+        },
+        {
+          "name": "Gastly",
+          "dex": 92,
+          "region": null,
+          "types": [
+            "ghost",
+            "poison"
+          ]
+        },
+        {
+          "name": "Krabby",
+          "dex": 98,
+          "region": null,
+          "types": [
+            "water"
+          ]
+        },
+        {
+          "name": "Hitmonlee",
+          "dex": 106,
+          "region": null,
+          "types": [
+            "fighting"
+          ]
+        },
+        {
+          "name": "Hitmonchan",
+          "dex": 107,
+          "region": null,
+          "types": [
+            "fighting"
+          ]
+        },
+        {
+          "name": "Rhyhorn",
+          "dex": 111,
+          "region": null,
+          "types": [
+            "ground",
+            "rock"
+          ]
+        },
+        {
+          "name": "Chansey",
+          "dex": 113,
+          "region": null,
+          "types": [
+            "normal"
+          ]
+        },
+        {
+          "name": "Electabuzz",
+          "dex": 125,
+          "region": null,
+          "types": [
+            "electric"
+          ]
+        },
+        {
+          "name": "Magmar",
+          "dex": 126,
+          "region": null,
+          "types": [
+            "fire"
+          ]
+        },
+        {
+          "name": "Magikarp",
+          "dex": 129,
+          "region": null,
+          "types": [
+            "water"
+          ]
+        },
+        {
+          "name": "Eevee",
+          "dex": 133,
+          "region": null,
+          "types": [
+            "normal"
+          ]
+        },
+        {
+          "name": "Omanyte",
+          "dex": 138,
+          "region": null,
+          "types": [
+            "rock",
+            "water"
+          ]
+        },
+        {
+          "name": "Kabuto",
+          "dex": 140,
+          "region": null,
+          "types": [
+            "rock",
+            "water"
+          ]
+        },
+        {
+          "name": "Hoothoot",
+          "dex": 163,
+          "region": null,
+          "types": [
+            "normal",
+            "flying"
+          ]
+        },
+        {
+          "name": "Shuckle",
+          "dex": 213,
+          "region": null,
+          "types": [
+            "bug",
+            "rock"
+          ]
+        },
+        {
+          "name": "Sneasel",
+          "dex": 215,
+          "region": null,
+          "types": [
+            "dark",
+            "ice"
+          ]
+        },
+        {
+          "name": "Hitmontop",
+          "dex": 237,
+          "region": null,
+          "types": [
+            "fighting"
+          ]
+        },
+        {
+          "name": "Ralts",
+          "dex": 280,
+          "region": null,
+          "types": [
+            "psychic",
+            "fairy"
+          ]
+        },
+        {
+          "name": "Sableye",
+          "dex": 302,
+          "region": null,
+          "types": [
+            "dark",
+            "ghost"
+          ]
+        },
+        {
+          "name": "Wailmer",
+          "dex": 320,
+          "region": null,
+          "types": [
+            "water"
+          ]
+        },
+        {
+          "name": "Trapinch",
+          "dex": 328,
+          "region": null,
+          "types": [
+            "ground"
+          ]
+        },
+        {
+          "name": "Feebas",
+          "dex": 349,
+          "region": null,
+          "types": [
+            "water"
+          ]
+        },
+        {
+          "name": "Spheal",
+          "dex": 363,
+          "region": null,
+          "types": [
+            "ice",
+            "water"
+          ]
+        },
+        {
+          "name": "Beldum",
+          "dex": 374,
+          "region": null,
+          "types": [
+            "steel",
+            "psychic"
+          ]
+        },
+        {
+          "name": "Combee",
+          "dex": 415,
+          "region": null,
+          "types": [
+            "bug",
+            "flying"
+          ]
+        },
+        {
+          "name": "Pidove",
+          "dex": 519,
+          "region": null,
+          "types": [
+            "normal",
+            "flying"
+          ]
+        },
+        {
+          "name": "Roggenrola",
+          "dex": 524,
+          "region": null,
+          "types": [
+            "rock"
+          ]
+        },
+        {
+          "name": "Woobat",
+          "dex": 527,
+          "region": null,
+          "types": [
+            "psychic",
+            "flying"
+          ]
+        },
+        {
+          "name": "Drilbur",
+          "dex": 529,
+          "region": null,
+          "types": [
+            "ground"
+          ]
+        },
+        {
+          "name": "Cottonee",
+          "dex": 546,
+          "region": null,
+          "types": [
+            "grass",
+            "fairy"
+          ]
+        },
+        {
+          "name": "Darumaka",
+          "dex": 554,
+          "region": null,
+          "types": [
+            "fire"
+          ]
+        },
+        {
+          "name": "Trubbish",
+          "dex": 568,
+          "region": null,
+          "types": [
+            "poison"
+          ]
+        },
+        {
+          "name": "Cryogonal",
+          "dex": 615,
+          "region": null,
+          "types": [
+            "ice"
+          ]
+        },
+        {
+          "name": "Deino",
+          "dex": 633,
+          "region": null,
+          "types": [
+            "dark",
+            "dragon"
+          ]
+        },
+        {
+          "name": "Inkay",
+          "dex": 686,
+          "region": null,
+          "types": [
+            "dark",
+            "psychic"
+          ]
+        },
+        {
+          "name": "Bounsweet",
+          "dex": 761,
+          "region": null,
+          "types": [
+            "grass"
+          ]
+        },
+        {
+          "name": "Passimian",
+          "dex": 766,
+          "region": null,
+          "types": [
+            "fighting"
+          ]
+        },
+        {
+          "name": "Drampa",
+          "dex": 780,
+          "region": null,
+          "types": [
+            "normal",
+            "dragon"
+          ]
+        },
+        {
+          "name": "Grookey",
+          "dex": 810,
+          "region": null,
+          "types": [
+            "grass"
+          ]
+        },
+        {
+          "name": "Scorbunny",
+          "dex": 813,
+          "region": null,
+          "types": [
+            "fire"
+          ]
+        },
+        {
+          "name": "Sobble",
+          "dex": 816,
+          "region": null,
+          "types": [
+            "water"
+          ]
+        },
+        {
+          "name": "Skwovet",
+          "dex": 819,
+          "region": null,
+          "types": [
+            "normal"
+          ]
+        },
+        {
+          "name": "Rookidee",
+          "dex": 821,
+          "region": null,
+          "types": [
+            "flying"
+          ]
+        },
+        {
+          "name": "Wooloo",
+          "dex": 831,
+          "region": null,
+          "types": [
+            "normal"
+          ]
+        },
+        {
+          "name": "Toxtricity (Amped Form)",
+          "dex": 849,
+          "region": null,
+          "types": [
+            "electric",
+            "poison"
+          ]
+        },
+        {
+          "name": "Sizzlipede",
+          "dex": 850,
+          "region": null,
+          "types": [
+            "fire",
+            "bug"
+          ]
+        },
+        {
+          "name": "Hatenna",
+          "dex": 856,
+          "region": null,
+          "types": [
+            "psychic"
+          ]
+        },
+        {
+          "name": "Falinks",
+          "dex": 870,
+          "region": null,
+          "types": [
+            "fighting"
+          ]
+        },
+        {
+          "name": "Duraludon",
+          "dex": 884,
+          "region": null,
+          "types": [
+            "steel",
+            "dragon"
+          ]
+        }
+      ],
+      "researchDex": [],
+      "research": [],
+      "unresolved": [],
+      "hasCostumes": false
+    },
+    {
+      "id": "timed-research-pok-mon-go-and-duolingo-timed-research-2026-11-17t10-00-00",
+      "title": "Pokémon GO and Duolingo Timed Research",
+      "category": "Timed Research",
+      "start": "2026-11-17T10:00:00",
+      "end": "2026-12-31T23:59:00",
+      "isLocalTime": true,
+      "venue": null,
+      "spawnDex": [],
+      "spawns": [],
+      "spawnForms": [],
+      "researchDex": [
+        25,
+        52,
+        441,
+        448
+      ],
+      "research": [
+        "Chatot",
+        "Lucario",
+        "Meowth",
+        "Pikachu"
+      ],
+      "unresolved": [],
+      "hasCostumes": false
+    },
+    {
       "id": "community-day-pawniard-community-day-2026-11-21t14-00-00",
       "title": "Pawniard Community Day",
       "category": "Community Day",
@@ -2829,58 +1876,6 @@
       "unresolved": []
     },
     {
-      "id": "wild-area-pok-mon-go-wild-area-2026-sendai-tohoku-2026-11-06t01-00-00z-eggs",
-      "title": "Pokémon GO Wild Area 2026: Sendai • Tohoku",
-      "category": "Wild Area",
-      "start": "2026-11-06T01:00:00Z",
-      "end": "2026-11-08T09:00:00Z",
-      "isLocalTime": false,
-      "venue": {
-        "name": "Sendai",
-        "lat": 38.26667,
-        "lng": 140.86667
-      },
-      "eggDex": [
-        679,
-        707,
-        780,
-        884
-      ],
-      "eggs": [
-        "Drampa",
-        "Duraludon",
-        "Honedge",
-        "Klefki"
-      ],
-      "unresolved": []
-    },
-    {
-      "id": "wild-area-pok-mon-go-wild-area-2026-mexico-city-2026-11-06t16-00-00z-eggs",
-      "title": "Pokémon GO Wild Area 2026: Mexico City",
-      "category": "Wild Area",
-      "start": "2026-11-06T16:00:00Z",
-      "end": "2026-11-09T00:00:00Z",
-      "isLocalTime": false,
-      "venue": {
-        "name": "Mexico City",
-        "lat": 19.42847,
-        "lng": -99.12766
-      },
-      "eggDex": [
-        679,
-        707,
-        780,
-        884
-      ],
-      "eggs": [
-        "Drampa",
-        "Duraludon",
-        "Honedge",
-        "Klefki"
-      ],
-      "unresolved": []
-    },
-    {
       "id": "wild-area-pok-mon-go-wild-area-2026-global-2026-11-14t10-00-00-eggs",
       "title": "Pokémon GO Wild Area 2026: Global",
       "category": "Wild Area",
@@ -2904,6 +1899,13 @@
     }
   ],
   "signals": [
+    {
+      "id": "max|max-mondays-canceled-max-monday-2026-11-16t06-00-00",
+      "kind": "max",
+      "title": "[Canceled] Max Monday",
+      "start": "2026-11-16T06:00:00",
+      "end": "2026-11-16T21:00:00"
+    },
     {
       "id": "max|max-mondays-max-monday-pok-mon-to-be-announced-2026-11-16t06-00-00",
       "kind": "max",
@@ -2931,6 +1933,13 @@
       "title": "Dynamax Espurr during Max Monday",
       "start": "2026-11-23T06:00:00",
       "end": "2026-11-23T21:00:00"
+    },
+    {
+      "id": "max|max-mondays-dynamax-cryogonal-during-max-monday-2026-11-30t06-00-00",
+      "kind": "max",
+      "title": "Dynamax Cryogonal during Max Monday",
+      "start": "2026-11-30T06:00:00",
+      "end": "2026-11-30T21:00:00"
     }
   ],
   "bonuses": [
@@ -2969,90 +1978,6 @@
         "Receive up to 125 Gifts per day from spinning PokéStop and Gym Photo Discs",
         "Receive up to 150 Gifts per day from spinning PokéStop and Gym Photo Discs",
         "Trainers level 31 and above will receive one guaranteed Candy XL when trading Pokémon"
-      ]
-    },
-    {
-      "id": "wild-area-pok-mon-go-wild-area-2026-sendai-tohoku-2026-11-06t01-00-00z",
-      "title": "Pokémon GO Wild Area 2026: Sendai • Tohoku",
-      "category": "Wild Area",
-      "start": "2026-11-06T01:00:00Z",
-      "end": "2026-11-08T09:00:00Z",
-      "isLocalTime": false,
-      "venue": {
-        "name": "Sendai",
-        "lat": 38.26667,
-        "lng": 140.86667
-      },
-      "bonuses": [
-        "1 additional Candy XL for catching Pokémon in Max Battles (level 31+)",
-        "1 additional Candy for catching Pokémon in Max Battles",
-        "1/2 Hatch Distance for Eggs placed in Incubators during the event",
-        "1/2 Stardust cost for trades",
-        "1/4 Egg Hatch Distance",
-        "2× Candy for catching Pokémon",
-        "2× XP from completed Max Battles",
-        "3 GO Snapshot surprise encounters per day",
-        "3 additional Candy XL for catching Pokémon in raids (level 31+)",
-        "3/4 Max Particle cost for unlocking and powering up Max Moves",
-        "3× Hatch Candy",
-        "3× Hatch Stardust",
-        "3× Hatch XP",
-        "5,000 additional XP from completed raids",
-        "6 additional Candy for catching Pokémon in raids",
-        "Chance to encounter mighty Pokémon on Routes",
-        "Chance to get GO Safari Balls from PokéStops and Gyms",
-        "Daily Max Particle collection limit increased to 8,000",
-        "Incense, excluding Daily Adventure Incense, lasts for 2 hours",
-        "Increased Max Particles from Power Spots and exploration",
-        "Increased chance of 10 km Eggs from PokéStops and Gyms",
-        "Increased chance to encounter Shiny Pokémon",
-        "Lure Modules last for 2 hours",
-        "Party Play lasts for 8 hours",
-        "Up to 10 free Raid Passes per day from Gyms",
-        "Up to 18 free Raid Passes per day from Gyms",
-        "Up to 6 Special Trades per day"
-      ]
-    },
-    {
-      "id": "wild-area-pok-mon-go-wild-area-2026-mexico-city-2026-11-06t16-00-00z",
-      "title": "Pokémon GO Wild Area 2026: Mexico City",
-      "category": "Wild Area",
-      "start": "2026-11-06T16:00:00Z",
-      "end": "2026-11-09T00:00:00Z",
-      "isLocalTime": false,
-      "venue": {
-        "name": "Mexico City",
-        "lat": 19.42847,
-        "lng": -99.12766
-      },
-      "bonuses": [
-        "1 additional Candy XL for catching Pokémon in Max Battles (level 31+)",
-        "1 additional Candy for catching Pokémon in Max Battles",
-        "1/2 Hatch Distance for Eggs placed in Incubators during the event",
-        "1/2 Stardust cost for trades",
-        "1/4 Egg Hatch Distance",
-        "2× Candy for catching Pokémon",
-        "2× XP from completed Max Battles",
-        "3 GO Snapshot surprise encounters per day",
-        "3 additional Candy XL for catching Pokémon in raids (level 31+)",
-        "3/4 Max Particle cost for unlocking and powering up Max Moves",
-        "3× Hatch Candy",
-        "3× Hatch Stardust",
-        "3× Hatch XP",
-        "5,000 additional XP from completed raids",
-        "6 additional Candy for catching Pokémon in raids",
-        "Chance to encounter mighty Pokémon on Routes",
-        "Chance to get GO Safari Balls from PokéStops and Gyms",
-        "Daily Max Particle collection limit increased to 8,000",
-        "Incense, excluding Daily Adventure Incense, lasts for 2 hours",
-        "Increased Max Particles from Power Spots and exploration",
-        "Increased chance of 10 km Eggs from PokéStops and Gyms",
-        "Increased chance to encounter Shiny Pokémon",
-        "Lure Modules last for 2 hours",
-        "Party Play lasts for 8 hours",
-        "Up to 10 free Raid Passes per day from Gyms",
-        "Up to 18 free Raid Passes per day from Gyms",
-        "Up to 6 Special Trades per day"
       ]
     },
     {
@@ -3201,6 +2126,25 @@
         "Increased chance to become Lucky Friends",
         "Increased chance to encounter Shiny Staryu and Shiny Elgyem",
         "Increased chance to get Lucky Pokémon in trades"
+      ]
+    },
+    {
+      "id": "raid-day-clefable-super-mega-raid-day-2026-11-28t14-00-00",
+      "title": "Clefable Super Mega Raid Day",
+      "category": "Raid Day",
+      "start": "2026-11-28T14:00:00",
+      "end": "2026-11-28T17:00:00",
+      "isLocalTime": true,
+      "venue": null,
+      "bonuses": [
+        "An additional 5,000 Stardust from Super Mega Raid Battles",
+        "An additional 5,000 XP from Super Mega Raid Battles",
+        "Clefable caught from Super Mega Raids will have Mega Level 1 unlocked",
+        "Increased chance of encountering Shiny Clefable from Super Mega Raids",
+        "Increased chance to get Rare Candy XL from Raid Battles",
+        "Receive up to 14 Raid Passes from spinning Gym Photo Discs",
+        "Receive up to six free Raid Passes from spinning Gym Photo Discs",
+        "Remote Raid limit increased to 20 from Friday, November 27, at 5:00 p.m. to Saturday, November 28, 2026, at 8:00 p.m. PST"
       ]
     }
   ]

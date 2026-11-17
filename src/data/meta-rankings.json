@@ -1,11 +1,11 @@
 {
-  "fetchedAt": "2026-11-13T22:58:29.642Z",
-  "gameMasterTimestamp": "1794378339087",
+  "fetchedAt": "2026-11-17T16:11:20.338Z",
+  "gameMasterTimestamp": "1794791876378",
   "sources": {
     "mechanics": "alexelgt/game_masters",
-    "mechanicsBatch": "2026-11-11T06:25:39.087Z",
+    "mechanicsBatch": "2026-11-16T01:17:56.378Z",
     "roster": "pvpoke/pvpoke",
-    "rosterBatch": "2026-11-12 03:17:57"
+    "rosterBatch": "2026-11-17 14:44:05"
   },
   "model": {
     "attackerLevel": 40,
@@ -2274,6 +2274,18 @@
         "charged": "IRON_HEAD"
       },
       {
+        "species": "magnezone",
+        "dex": 462,
+        "rating": 33.29,
+        "dps": 18.4,
+        "tdo": 197.2,
+        "fast": "VOLT_SWITCH_FAST",
+        "charged": "MAGNET_BOMB",
+        "eliteMoves": [
+          "magnet bomb"
+        ]
+      },
+      {
         "species": "scizor",
         "dex": 212,
         "rating": 30.83,
@@ -2289,15 +2301,6 @@
         "dps": 16.9,
         "tdo": 186.4,
         "fast": "STEEL_WING_FAST",
-        "charged": "FLASH_CANNON"
-      },
-      {
-        "species": "magnezone",
-        "dex": 462,
-        "rating": 30.75,
-        "dps": 16.99,
-        "tdo": 182.2,
-        "fast": "SPARK_FAST",
         "charged": "FLASH_CANNON"
       }
     ],

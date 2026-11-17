@@ -1,119 +1,288 @@
 {
-  "fetchedAt": "2026-11-10T14:59:46.034Z",
+  "fetchedAt": "2026-11-17T16:11:17.635Z",
   "raids": {
-    "lvl5": [
+    "mega": [
       {
-        "id": "ZACIAN",
-        "form": "ZACIAN_CROWNED_SWORD",
+        "id": "BANETTE",
+        "form": "BANETTE_MEGA",
         "names": {
-          "en": "Zacian (Crowned Sword)",
-          "de": "Zacian (König des Schwertes)",
-          "fr": "Zacian (Épée Suprême)",
-          "it": "Zacian (Re delle Spade)",
-          "ja": "ザシアン (けんのおう)",
-          "ko": "자시안 (검왕)",
-          "es": "Zacian (Espada Suprema)"
+          "en": "Mega Banette",
+          "de": "Mega-Banette",
+          "fr": "Méga-Branette",
+          "it": "MegaBanette",
+          "ja": "メガジュペッタ",
+          "ko": "메가다크펫",
+          "es": "Mega-Banette"
         },
         "types": [
-          "fairy",
-          "steel"
+          "ghost"
         ],
         "resistorTypes": [
-          "poison",
-          "steel",
-          "fire",
-          "water",
-          "electric"
+          "normal",
+          "dark"
         ],
         "seMoveTypes": [
-          "fire",
-          "ground"
+          "dark",
+          "ghost"
+        ]
+      }
+    ],
+    "lvl5": [
+      {
+        "id": "CRESSELIA",
+        "form": "CRESSELIA",
+        "names": {
+          "en": "Cresselia",
+          "de": "Cresselia",
+          "fr": "Cresselia",
+          "it": "Cresselia",
+          "ja": "クレセリア",
+          "ko": "크레세리아",
+          "es": "Cresselia"
+        },
+        "types": [
+          "psychic"
+        ],
+        "resistorTypes": [
+          "steel",
+          "psychic",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "bug",
+          "dark",
+          "ghost"
         ]
       },
       {
-        "id": "ZAMAZENTA",
-        "form": "ZAMAZENTA_CROWNED_SHIELD",
+        "id": "DARKRAI",
+        "form": "DARKRAI",
         "names": {
-          "en": "Zamazenta (Crowned Shield)",
-          "de": "Zamazenta (König des Schildes)",
-          "fr": "Zamazenta (Bouclier Suprême)",
-          "it": "Zamazenta (Re degli Scudi)",
-          "ja": "ザマゼンタ (たてのおう)",
-          "ko": "자마젠타 (방패왕)",
-          "es": "Zamazenta (Escudo Supremo)"
+          "en": "Darkrai",
+          "de": "Darkrai",
+          "fr": "Darkrai",
+          "it": "Darkrai",
+          "ja": "ダークライ",
+          "ko": "다크라이",
+          "es": "Darkrai"
         },
         "types": [
-          "fighting",
-          "steel"
+          "dark"
         ],
         "resistorTypes": [
-          "flying",
-          "poison",
-          "bug",
-          "ghost",
-          "fire",
-          "water",
-          "electric",
-          "psychic"
+          "fighting",
+          "dark",
+          "fairy"
         ],
         "seMoveTypes": [
-          "fighting",
-          "fire",
-          "ground"
+          "bug",
+          "fairy",
+          "fighting"
         ]
       }
     ],
     "lvl3": [
       {
-        "id": "DRUDDIGON",
-        "form": "DRUDDIGON",
+        "id": "MAROWAK",
+        "form": "MAROWAK_ALOLA",
         "names": {
-          "en": "Druddigon",
-          "de": "Shardrago",
-          "fr": "Drakkarmin",
-          "it": "Druddigon",
-          "ja": "クリムガン",
-          "ko": "크리만",
-          "es": "Druddigon"
+          "en": "Alolan Marowak",
+          "de": "Alola-Knogga",
+          "fr": "Ossatueur d'Alola",
+          "it": "Marowak di Alola",
+          "ja": "アローラ ガラガラ",
+          "ko": "알로라 텅구리",
+          "es": "Marowak de Alola"
         },
         "types": [
-          "dragon"
+          "fire",
+          "ghost"
         ],
         "resistorTypes": [
-          "steel",
-          "fairy"
+          "normal",
+          "rock",
+          "fire",
+          "water",
+          "dragon",
+          "dark"
         ],
         "seMoveTypes": [
-          "dragon",
-          "fairy",
-          "ice"
+          "dark",
+          "ghost",
+          "ground",
+          "rock",
+          "water"
         ]
       },
       {
-        "id": "ORTHWORM",
-        "form": "ORTHWORM",
+        "id": "LIEPARD",
+        "form": "LIEPARD",
         "names": {
-          "en": "Orthworm",
-          "de": "Schlurm",
-          "fr": "Ferdeter",
-          "it": "Orthworm",
-          "ja": "ミミズズ",
-          "ko": "꿈트렁",
-          "es": "Orthworm"
+          "en": "Liepard",
+          "de": "Kleoparda",
+          "fr": "Léopardus",
+          "it": "Liepard",
+          "ja": "レパルダス",
+          "ko": "레파르다스",
+          "es": "Liepard"
         },
         "types": [
-          "steel"
+          "dark"
         ],
         "resistorTypes": [
-          "steel",
-          "fire",
-          "water",
-          "electric"
+          "fighting",
+          "dark",
+          "fairy"
         ],
         "seMoveTypes": [
+          "bug",
+          "fairy",
+          "fighting"
+        ]
+      },
+      {
+        "id": "GOLURK",
+        "form": "GOLURK",
+        "names": {
+          "en": "Golurk",
+          "de": "Golgantes",
+          "fr": "Golemastoc",
+          "it": "Golurk",
+          "ja": "ゴルーグ",
+          "ko": "골루그",
+          "es": "Golurk"
+        },
+        "types": [
+          "ground",
+          "ghost"
+        ],
+        "resistorTypes": [
+          "normal",
+          "flying",
+          "bug",
+          "grass",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "ghost",
+          "grass",
+          "ice",
+          "water"
+        ]
+      }
+    ],
+    "lvl1": [
+      {
+        "id": "MEOWTH",
+        "form": "MEOWTH_ALOLA",
+        "names": {
+          "en": "Alolan Meowth",
+          "de": "Alola-Mauzi",
+          "fr": "Miaouss d'Alola",
+          "it": "Meowth di Alola",
+          "ja": "アローラ ニャース",
+          "ko": "알로라 나옹",
+          "es": "Meowth de Alola"
+        },
+        "types": [
+          "dark"
+        ],
+        "resistorTypes": [
           "fighting",
-          "fire",
+          "dark",
+          "fairy"
+        ],
+        "seMoveTypes": [
+          "bug",
+          "fairy",
+          "fighting"
+        ]
+      },
+      {
+        "id": "MISDREAVUS",
+        "form": "MISDREAVUS",
+        "names": {
+          "en": "Misdreavus",
+          "de": "Traunfugil",
+          "fr": "Feuforêve",
+          "it": "Misdreavus",
+          "ja": "ムウマ",
+          "ko": "무우마",
+          "es": "Misdreavus"
+        },
+        "types": [
+          "ghost"
+        ],
+        "resistorTypes": [
+          "normal",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "ghost"
+        ]
+      },
+      {
+        "id": "YAMASK",
+        "form": "YAMASK_GALARIAN",
+        "names": {
+          "en": "Galarian Yamask",
+          "de": "Galar-Makabaja",
+          "fr": "Tutafeh de Galar",
+          "it": "Yamask di Galar",
+          "ja": "ガラル デスマス",
+          "ko": "가라르 데스마스",
+          "es": "Yamask de Galar"
+        },
+        "types": [
+          "ground",
+          "ghost"
+        ],
+        "resistorTypes": [
+          "normal",
+          "flying",
+          "bug",
+          "grass",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "ghost",
+          "grass",
+          "ice",
+          "water"
+        ]
+      },
+      {
+        "id": "SANDYGAST",
+        "form": "SANDYGAST",
+        "names": {
+          "en": "Sandygast",
+          "de": "Sankabuh",
+          "fr": "Bacabouh",
+          "it": "Sandygast",
+          "ja": "スナバァ",
+          "ko": "모래꿍",
+          "es": "Sandygast"
+        },
+        "types": [
+          "ghost",
           "ground"
+        ],
+        "resistorTypes": [
+          "normal",
+          "flying",
+          "bug",
+          "grass",
+          "dark"
+        ],
+        "seMoveTypes": [
+          "dark",
+          "ghost",
+          "grass",
+          "ice",
+          "water"
         ]
       }
     ],
@@ -342,21 +511,20 @@
     ]
   },
   "maxBattles": {},
-  "eventRaids": [
+  "eventRaids": [],
+  "eventMaxBattles": [
     {
-      "eventID": "cresselia-darkrai-in-5-star-raid-battles-november-2026",
-      "name": "Cresselia and Darkrai in 5-star Raid Battles",
-      "eventType": "raid-battles",
-      "start": "2026-11-16T06:00:00.000",
-      "end": "2026-11-24T22:00:00.000",
-      "isShadow": false,
-      "isMega": false,
+      "eventID": "max-mondays-2026-11-23",
+      "name": "Dynamax Espurr during Max Monday",
+      "eventType": "max-mondays",
+      "start": "2026-11-23T06:00:00.000",
+      "end": "2026-11-23T21:00:00.000",
       "bosses": [
         {
-          "id": "CRESSELIA",
-          "form": "CRESSELIA_NORMAL",
+          "id": "ESPURR",
+          "form": "ESPURR_NORMAL",
           "names": {
-            "en": "Cresselia"
+            "en": "Espurr"
           },
           "types": [
             "psychic"
@@ -370,110 +538,9 @@
             "bug",
             "ghost",
             "dark"
-          ]
-        },
-        {
-          "id": "DARKRAI",
-          "form": "DARKRAI_NORMAL",
-          "names": {
-            "en": "Darkrai"
-          },
-          "types": [
-            "dark"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "dark",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "bug",
-            "fairy"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "mega-banette-in-mega-raids-november-2026",
-      "name": "Mega Banette in Mega Raids",
-      "eventType": "raid-battles",
-      "start": "2026-11-16T06:00:00.000",
-      "end": "2026-11-24T22:00:00.000",
-      "isShadow": false,
-      "isMega": true,
-      "bosses": [
-        {
-          "id": "BANETTE",
-          "form": null,
-          "names": {
-            "en": "Mega Banette"
-          },
-          "types": [
-            "ghost"
-          ],
-          "resistorTypes": [
-            "normal",
-            "dark"
-          ],
-          "seMoveTypes": [
-            "ghost",
-            "dark"
-          ]
-        }
-      ]
-    },
-    {
-      "eventID": "raidhour20261118",
-      "name": "Cresselia and Darkrai Raid Hour",
-      "eventType": "raid-hour",
-      "start": "2026-11-18T18:00:00.000",
-      "end": "2026-11-18T19:00:00.000",
-      "isShadow": false,
-      "isMega": false,
-      "bosses": [
-        {
-          "id": "CRESSELIA",
-          "form": "CRESSELIA_NORMAL",
-          "names": {
-            "en": "Cresselia"
-          },
-          "types": [
-            "psychic"
-          ],
-          "resistorTypes": [
-            "steel",
-            "psychic",
-            "dark"
-          ],
-          "seMoveTypes": [
-            "bug",
-            "ghost",
-            "dark"
-          ]
-        },
-        {
-          "id": "DARKRAI",
-          "form": "DARKRAI_NORMAL",
-          "names": {
-            "en": "Darkrai"
-          },
-          "types": [
-            "dark"
-          ],
-          "resistorTypes": [
-            "fighting",
-            "dark",
-            "fairy"
-          ],
-          "seMoveTypes": [
-            "fighting",
-            "bug",
-            "fairy"
           ]
         }
       ]
     }
-  ],
-  "eventMaxBattles": []
+  ]
 }
