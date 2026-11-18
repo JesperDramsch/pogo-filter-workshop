@@ -511,7 +511,135 @@
     ]
   },
   "maxBattles": {},
-  "eventRaids": [],
+  "eventRaids": [
+    {
+      "eventID": "deoxys-normal-defense-attack-speed-formes-in-5-star-raid-battles-november-2026",
+      "name": "Deoxys (Normal, Defense, Attack, and Speed Formes) in 5-star Raid Battles",
+      "eventType": "raid-battles",
+      "start": "2026-11-25T06:00:00.000",
+      "end": "2026-12-01T22:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "DEOXYS",
+          "form": "DEOXYS_NORMAL",
+          "names": {
+            "en": "Deoxys"
+          },
+          "types": [
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "ghost",
+            "dark"
+          ]
+        },
+        {
+          "id": "DEOXYS",
+          "form": "DEOXYS_DEFENSE",
+          "names": {
+            "en": "Deoxys"
+          },
+          "types": [
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "ghost",
+            "dark"
+          ]
+        },
+        {
+          "id": "DEOXYS",
+          "form": "DEOXYS_ATTACK",
+          "names": {
+            "en": "Deoxys"
+          },
+          "types": [
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "ghost",
+            "dark"
+          ]
+        },
+        {
+          "id": "DEOXYS",
+          "form": "DEOXYS_SPEED",
+          "names": {
+            "en": "Deoxys"
+          },
+          "types": [
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "bug",
+            "ghost",
+            "dark"
+          ]
+        }
+      ]
+    },
+    {
+      "eventID": "mega-metagross-in-mega-raids-november-2026",
+      "name": "Mega Metagross in Mega Raids",
+      "eventType": "raid-battles",
+      "start": "2026-11-25T06:00:00.000",
+      "end": "2026-12-01T22:00:00.000",
+      "isShadow": false,
+      "isMega": true,
+      "bosses": [
+        {
+          "id": "METAGROSS",
+          "form": null,
+          "names": {
+            "en": "Mega Metagross"
+          },
+          "types": [
+            "steel",
+            "psychic"
+          ],
+          "resistorTypes": [
+            "steel",
+            "fire",
+            "water",
+            "electric",
+            "psychic",
+            "dark"
+          ],
+          "seMoveTypes": [
+            "ground",
+            "ghost",
+            "fire",
+            "dark"
+          ]
+        }
+      ]
+    }
+  ],
   "eventMaxBattles": [
     {
       "eventID": "max-mondays-2026-11-23",
