@@ -64,6 +64,7 @@ import {
 import { regionForForm } from './data/form-region.js';
 import SpeciesInput from './SpeciesInput.jsx';
 import { megaPlans, rankMegaGroups } from './mega-boost.js';
+import { pickMissingPack } from './missing-pack.js';
 import { bonusNudges, roundDistanceKm, venueReach } from './bonus-nudges.js';
 import {
 	wishTargetsFromConfig,
@@ -4420,6 +4421,9 @@ export function buildFilters(
 	// never costs an addable species its slot; curated entries are purely
 	// informational (an Add never touches them — re-adding is a no-op union).
 	// Evergreen/meta packs keep prune-to-vanish: consumed means done.
+	// Every species any pack's pool holds, before pruning — the "missing"
+	// packs below stay out of what another pack already asks for.
+	const friendCollectPackPoolDex = new Set();
 	const pushFriendCollectSuggestion = (kind, id, title, meta, inputs, { cap = Infinity, keepStages = false, timeLimited = false } = {}) => {
 		const seen = new Set();
 		const picked = [];
@@ -4429,6 +4433,8 @@ export function buildFilters(
 			const info = resolveSpeciesInfo(input);
 			if (!info) continue;
 			const dex = keepStages ? info.dex : collectibleBaseDex(info.dex);
+			friendCollectPackPoolDex.add(dex);
+			friendCollectPackPoolDex.add(collectibleBaseDex(info.dex));
 			if (UNTRADEABLE_MYTHICAL_DEX.has(dex)) continue;
 			if (SPECIAL_TRADE_DEX.has(dex)) continue;
 			const stored = pokemonNameFor(String(dex));
@@ -4587,6 +4593,52 @@ export function buildFilters(
 		(PVP_RANKINGS.leagues?.ultra?.species || []).map((s) => String(s.dex)),
 		{ cap: 25 },
 	);
+	// Missing luckies / hundos: the long tail no pack above suggests, picked by
+	// src/missing-pack.js. One per goal the focus covers. The pool is every
+	// released regular-trade collectible base; "missing" is the same
+	// line-level question the packs and chips ask, on that goal's list alone.
+	const friendCollectReleased = new Set(SPECIES_META.releasedDex || []);
+	const friendCollectBasePool = [
+		...new Set(
+			[...friendCollectReleased]
+				.map((d) => collectibleBaseDex(d))
+				.filter(
+					(d) =>
+						friendCollectReleased.has(d) &&
+						!UNTRADEABLE_MYTHICAL_DEX.has(d) &&
+						!SPECIAL_TRADE_DEX.has(d) &&
+						pokemonNameFor(String(d)),
+				),
+		),
+	].sort((a, b) => a - b);
+	const friendCollectCuratedDex = (cfg.friendCollectSpecies || [])
+		.map((sp) => resolveSpeciesInfo(sp)?.dex)
+		.filter(Boolean);
+	const missingGoals = [
+		{ goal: 'lucky', line: friendCollectLuckyLine, ann: luckyAnn },
+		{ goal: 'hundo', line: friendCollectHundoLine, ann: hundoAnn },
+	].filter(({ goal }) => friendCollectMode === goal || friendCollectMode === 'both');
+	for (const { goal, line, ann } of missingGoals) {
+		const missingDex = friendCollectBasePool.filter((dex) => {
+			const stored = pokemonNameFor(String(dex));
+			return !lineOwnerCovers(lineCoverageOwner(dex, line), ann, friendCollectWants(stored));
+		});
+		const picks = pickMissingPack({
+			missingDex,
+			otherPackDex: friendCollectPackPoolDex,
+			curatedDex: friendCollectCuratedDex,
+			kmByDex: SPECIES_META.buddyKmByDex || {},
+		});
+		if (picks.length === 0) continue;
+		friendCollectSuggestions.push({
+			kind: `missing-${goal}`,
+			id: `missing-${goal}`,
+			title: null,
+			hintKey: `app.filter.friend_collect_hint_missing_${goal}`,
+			species: picks.map((d) => pokemonNameFor(String(d))),
+			display: picks.map((d) => pokemonNameFor(String(d), outputLocale) || pokemonNameFor(String(d))),
+		});
+	}
 
 	// ── AUX FILTERS — task-oriented pro tools, paste these into the search
 	//    box to *find* candidates (positive search filters, not the inverted
@@ -10378,17 +10430,19 @@ function FriendCollectEditor({
 		if (s.kind === 'mega') return t('app.filter.friend_collect_suggest_mega');
 		if (s.kind === 'raids') return t('app.filter.friend_collect_suggest_raid');
 		if (s.kind === 'pvp-great') return t('app.filter.friend_collect_suggest_pvp_great');
+		if (s.kind === 'missing-lucky') return t('app.filter.friend_collect_suggest_missing_lucky');
+		if (s.kind === 'missing-hundo') return t('app.filter.friend_collect_suggest_missing_hundo');
 		return t('app.filter.friend_collect_suggest_pvp_ultra');
 	};
 	const SUGGESTION_ICON = {
 		event: Sparkles, eggs: Egg, tradeevo: Dna, candy: Candy, powerlines: Crown, starters: Sprout, mega: Zap,
-		raids: Target, 'pvp-great': Medal, 'pvp-ultra': Trophy,
+		raids: Target, 'pvp-great': Medal, 'pvp-ultra': Trophy, 'missing-lucky': Clover, 'missing-hundo': Award,
 	};
 	// Pack grouping: time-limited feeds first, evergreen collections, then the
 	// meta-driven pools. Groups render only when they have surviving packs.
 	const SUGGESTION_GROUPS = [
 		{ key: 'live', kinds: ['event', 'eggs'] },
-		{ key: 'evergreen', kinds: ['tradeevo', 'candy', 'powerlines', 'starters', 'mega'] },
+		{ key: 'evergreen', kinds: ['missing-lucky', 'missing-hundo', 'tradeevo', 'candy', 'powerlines', 'starters', 'mega'] },
 		{ key: 'meta', kinds: ['raids', 'pvp-great', 'pvp-ultra'] },
 	];
 

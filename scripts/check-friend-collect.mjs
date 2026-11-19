@@ -41,6 +41,7 @@ import {
 	starterDexFromGenerations,
 } from './fetch-species-meta.mjs';
 import { GENERATIONS, generationOf, originRegion } from './lib/generations.mjs';
+import { MISSING_PACK_SIZE, pickMissingPack } from '../src/missing-pack.js';
 
 const t = (key, opts) => (opts && 'fallback' in opts ? opts.fallback : key);
 
@@ -1484,6 +1485,107 @@ console.log('\nScenario 12: starter derivation over the generation table');
 	check('every named species falls inside the generation table',
 		beyond.length === 0,
 		beyond.length ? `unmapped dex: ${beyond.slice(0, 10).join(', ')}` : '');
+}
+
+// ── Missing luckies / hundos packs (src/missing-pack.js) ────────────────────
+console.log('\nmissing packs — picker');
+{
+	// Synthetic dex: km comes from the map, generation from the real table
+	// (1-151 Kanto, 152-251 Johto, 252-386 Hoenn).
+	const km = {};
+	const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
+	range(1, 40).forEach((d) => (km[d] = 1));
+	range(41, 100).forEach((d) => (km[d] = 3));
+	range(101, 150).forEach((d) => (km[d] = 5));
+	range(152, 160).forEach((d) => (km[d] = 1)); // Johto 1 km: 9 missing
+	range(252, 255).forEach((d) => (km[d] = 1)); // Hoenn 1 km: 4 missing
+	range(260, 265).forEach((d) => (km[d] = 20));
+	const all = Object.keys(km).map(Number);
+	const pick = (o) => pickMissingPack({ otherPackDex: [], curatedDex: [], kmByDex: km, ...o });
+	const tier = (list, k) => list.filter((d) => km[d] === k).length;
+
+	const few = pick({ missingDex: range(1, 20), curatedDex: [3] });
+	check(`at or below ${MISSING_PACK_SIZE} missing, the pack is all of it minus curated`,
+		few.length === 19 && !few.includes(3));
+
+	const full = pick({ missingDex: all });
+	check(`a large tail fills exactly ${MISSING_PACK_SIZE}`, full.length === MISSING_PACK_SIZE);
+	check('the split is 11 / 11 / 11 across 1 / 3 / 5 km',
+		tier(full, 1) === 11 && tier(full, 3) === 11 && tier(full, 5) === 11,
+		`${tier(full, 1)}/${tier(full, 3)}/${tier(full, 5)}`);
+	check('20 km gets nothing while the other queues have species', tier(full, 20) === 0);
+	check('the 1 km queue starts with the generation with the fewest missing (Hoenn 4, then Johto 9, then Kanto)',
+		full.slice(0, 4).join() === '252,253,254,255' && full.slice(4, 11).join() === '152,153,154,155,156,157,158',
+		full.slice(0, 11).join());
+
+	const withOther = pick({ missingDex: all, otherPackDex: range(1, 40) });
+	check('species another pack holds never appear', withOther.every((d) => d > 40));
+
+	const spill = pick({ missingDex: [...range(1, 5), ...range(41, 100), ...range(101, 150), ...range(260, 265)] });
+	check('an emptied queue spills into the others, 20 km still waits',
+		tier(spill, 1) === 5 && tier(spill, 3) + tier(spill, 5) === 28 && Math.abs(tier(spill, 3) - tier(spill, 5)) <= 1 &&
+			tier(spill, 20) === 0, `${tier(spill, 1)}/${tier(spill, 3)}/${tier(spill, 5)}/${tier(spill, 20)}`);
+
+	const longShots = pick({ missingDex: [...range(1, 20), ...range(260, 265), ...range(41, 50)] });
+	check('20 km only fills once 1 / 3 / 5 are empty (36 missing: 30 short-range, then 3 of the 6 long shots)',
+		longShots.length === 33 && tier(longShots, 20) === 3, `${longShots.length}, 20 km: ${tier(longShots, 20)}`);
+
+	// Stickiness: once a pack is curated, a landed lucky only frees its slot.
+	const curated = full.slice();
+	const before = pick({ missingDex: all, curatedDex: curated });
+	check('a fully curated pack offers nothing new', before.length === 0);
+	const landed = full[5];
+	const after = pick({ missingDex: all.filter((d) => d !== landed), curatedDex: curated.filter((d) => d !== landed) });
+	check('a landed lucky frees exactly one slot, in its own queue', after.length === 1 && km[after[0]] === km[landed],
+		`${after.join()}`);
+	// A Johto catch elsewhere (outside the curated 33) must not move anything.
+	const johtoOutside = all.filter((d) => km[d] === 1 && !curated.includes(d))[0];
+	const quiet = pick({ missingDex: all.filter((d) => d !== johtoOutside), curatedDex: curated });
+	check('a lucky outside the curated pack changes nothing', quiet.length === 0);
+
+	const skew = range(41, 55); // 15 curated at 3 km
+	const drift = pick({ missingDex: all, curatedDex: skew });
+	check('a skewed curated list drifts back: free slots go to the short queues',
+		drift.length === 18 && tier(drift, 3) === 0 && tier(drift, 1) === 9 && tier(drift, 5) === 9,
+		`${tier(drift, 1)}/${tier(drift, 3)}/${tier(drift, 5)}`);
+}
+
+console.log('\nmissing packs — in buildFilters');
+{
+	const sugs = (mode, luckies = [], hundos = [], extra = {}) =>
+		buildFilters(hundos, luckies, { ...cfg, friendCollectSpecies: [], friendCollectMode: mode, ...extra }, [], 'en', t)
+			.friendCollectSuggestions;
+	const kinds = (list) => list.filter((s) => s.kind.startsWith('missing-')).map((s) => s.kind).join();
+	check('lucky focus offers the lucky pack only', kinds(sugs('lucky')) === 'missing-lucky');
+	check('hundo focus offers the hundo pack only', kinds(sugs('hundo')) === 'missing-hundo');
+	check('both offers both', kinds(sugs('both')) === 'missing-lucky,missing-hundo');
+
+	const all = sugs('lucky');
+	const pack = all.find((s) => s.kind === 'missing-lucky');
+	check(`an empty collection gets a full pack of ${MISSING_PACK_SIZE}`, pack.species.length === MISSING_PACK_SIZE);
+	const dexOf = (name) => resolveSpeciesInfo(name)?.dex;
+	const released = new Set(SPECIES_META.releasedDex);
+	const special = new Set(SPECIES_META.specialTradeDex);
+	check('every pick is released and regular-trade',
+		pack.species.every((n) => released.has(dexOf(n)) && !special.has(dexOf(n))));
+	check('no pick is a non-base stage', pack.species.every((n) => collectibleBaseDex(dexOf(n)) === dexOf(n)));
+	const otherNames = new Set(
+		all.filter((s) => !s.kind.startsWith('missing-')).flatMap((s) => s.species),
+	);
+	check('no pick is offered by another pack', pack.species.every((n) => !otherNames.has(n)));
+	const km = SPECIES_META.buddyKmByDex;
+	check('no 20 km long shots while the short queues are full',
+		pack.species.every((n) => km[dexOf(n)] !== 20));
+
+	const landed = pack.species[0];
+	const next = sugs('lucky', [landed]).find((s) => s.kind === 'missing-lucky');
+	check('a new lucky drops out and the pack stays full',
+		!next.species.includes(landed) && next.species.length === MISSING_PACK_SIZE);
+	const nextEvolved = sugs('lucky', [pokemonNameFor(String(
+		Object.entries(SPECIES_META.evoParentByDex).find(([, p]) => p === dexOf(landed))?.[0] ?? dexOf(landed),
+	))]).find((s) => s.kind === 'missing-lucky');
+	check('a lucky of a later stage covers the line too', !nextEvolved.species.includes(landed));
+	check('the pack labels have strings', pack.hintKey === 'app.filter.friend_collect_hint_missing_lucky');
 }
 
 if (failures > 0) {
