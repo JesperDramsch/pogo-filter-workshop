@@ -12517,7 +12517,7 @@ function RaidLinesPanel({ row, mode, onMode, megaFilterFor, copied, copyToClipbo
 			</ol>
 			{row.buddyFilter && (
 				<FilterBox
-					label={t('app.buddy_quest.filter_label')}
+					label={t('app.buddy_quest.filter_label_raids')}
 					accent='#9B59B6'
 					filterStr={row.buddyFilter}
 					copied={copied[`buddyquest_${row.id}`]}
