@@ -6027,61 +6027,43 @@ export function buildFilters(
 		if (RULE_PARAMS[pile.id]) pile.card.rule = tFn(`app.card.rule.${pile.id}`, { params: RULE_PARAMS[pile.id] });
 	}
 	if (hundoPile) hundoPile.card = { ...cardFor(hundos.map(dexOfName)), rule: tFn('app.card.rule.hundo') };
-	for (const ev of eventFilters) if (ev.pile) ev.pile.card = cardFor(ev.spawnDex);
-
-	// ── EVENT PILES BY CLASS ───────────────────────────────────────────────
-	// An event's spawns, split into meta, watchlist and non-meta sub-piles so
-	// each class is sorted with its own steps and its own budget. The class is
-	// per candy family, as `+name` and the standalone piles read it: Magikarp
-	// is meta when Gyarados is, because `+Gyarados` already holds it. So the
-	// sub-piles never share a Pokémon and together are the whole event pile.
-	// Whether there is anything to split depends on the spawns alone (the
-	// workshop never sees the storage): with fewer than two classes among them
-	// the event keeps its one pile, unchanged.
-	const rootsOf = (dexes) => new Set(dexes.map(lineRootDex));
-	// The steps of the standalone pile of the same class: meta reads each
-	// league's own pool, the others the loose rank-1 pattern. A league's step
-	// carries its species pool, so it only comes along when one of the
-	// sub-pile's families is in that pool; otherwise it could never match.
-	const eventClassLenses = (cls, roots) =>
-		cls === 'meta'
-			? [
-					...ivLadder(),
-					...pvpPools
-						.filter((pool) => (pool.league?.species || []).some((sp) => roots.has(lineRootDex(sp.dex))))
-						.map((pool) => ({
-							key: pool.key,
-							filter: pool.league?.cpCap ? buildLeagueFilter(pool.league).clause : '',
-							text: pool.text,
-						})),
-				]
-			: [...ivLadder(), ...pvpLoose];
-	// A meta or watchlist sub-pile's card lists the family members that put it
-	// there (Gyarados, not the Magikarp that spawned), with their budgets.
+	// ── EVENT ③ BY CLASS ───────────────────────────────────────────────────
+	// ① and ② stay one list over the whole event, so every hundo and shiny of
+	// it is found in one go. Only ③, where the rest is let go, is split into
+	// meta, watchlist and non-meta, because each class has its own budget
+	// (the card says which). The class is per candy family, as `+name` and the
+	// standalone piles read it: a pre-evolution is meta when its evolution is.
+	// So the class heads never share a Pokémon and together are the event
+	// pile; each class's ③ is its head with the event's own ③ clauses. Whether
+	// there is anything to split depends on the spawns alone (the workshop
+	// never sees the storage): with fewer than two classes, one ③ as before.
+	// The card reads the class the same way, so a row and the ③ box its
+	// Pokémon lands in always agree: a meta or watchlist family shows the
+	// members that make it so, with their budgets, instead of the spawn
+	// itself; rows run meta, watchlist, non-meta, in the order of the boxes.
 	const CLASS_DEX = { meta: [...metaDex], watchlist: [...watchWhy.keys()] };
 	for (const ev of eventFilters) {
-		if (!ev.pile) continue;
+		const pile = ev.pile;
+		if (!pile) continue;
 		const byClass = eventClassGroups(ev.spawnDex, metaDex, watchWhy.keys());
-		if (byClass.size < 2) continue;
+		pile.card = {
+			rows: [...byClass].flatMap(([cls, dexes]) => {
+				const roots = new Set(dexes.map(lineRootDex));
+				return cardFor(cls === 'non_meta' ? dexes : CLASS_DEX[cls].filter((d) => roots.has(lineRootDex(d)))).rows;
+			}),
+		};
+		if (!pile.release || byClass.size < 2) continue;
+		const releaseTail = pile.release.slice(pile.overview.length);
+		const safeTail = pile.safe.slice(pile.release.length);
 		const parts = [...byClass]
 			.map(([cls, dexes]) => {
-				const roots = rootsOf(dexes);
-				const part = buildPile({
-					id: `${ev.pile.id}_${cls}`,
-					head: famOf(dexes.map(nameOfDex).filter(Boolean)),
-					lenses: eventClassLenses(cls, roots),
-					kw,
-					cfg,
-					tail: pileTail,
-				});
-				if (!part) return null;
-				part.cls = cls;
-				part.spawnDex = dexes;
-				part.card = cardFor(cls === 'non_meta' ? dexes : CLASS_DEX[cls].filter((d) => roots.has(lineRootDex(d))));
-				return part;
+				const head = famOf(dexes.map(nameOfDex).filter(Boolean));
+				if (!head) return null;
+				const release = `${head}${releaseTail}`;
+				return { cls, spawnDex: dexes, head, release, safe: `${release}${safeTail}` };
 			})
 			.filter(Boolean);
-		if (parts.length >= 2) ev.pile.parts = parts;
+		if (parts.length >= 2) pile.releaseByClass = parts;
 	}
 
 	return {
@@ -12199,20 +12181,7 @@ function PileTile({ pile, title, hook, icon, chip, accent, open, onHide, hidden,
 				<ChevronRight size={14} className='text-[#8090A0] details-arrow shrink-0 mt-1' aria-hidden='true' />
 			</summary>
 			<div className='px-3 pb-3 pt-3 border-t border-[#1F2933] space-y-3'>
-				{pile.parts ? (
-					// An event split by class (see "EVENT PILES BY CLASS"): one section
-					// per class, each with its own three steps and card.
-					pile.parts.map((part) => (
-						<section key={part.id} aria-labelledby={`${part.id}-h`} className='space-y-3 pt-3 border-t border-[#1F2933] first:pt-0 first:border-t-0'>
-							<h4 id={`${part.id}-h`} className='mono text-xs uppercase tracking-widest font-semibold' style={{ color: CLASS_COLOUR[part.cls] }}>
-								{t(`app.card.class.${part.cls}`)}
-							</h4>
-							<PileSteps key={isOpen ? 'open' : 'closed'} pile={part} accent={accent} copied={copied} copyToClipboard={copyToClipboard} t={t} text={text} />
-						</section>
-					))
-				) : (
-					<PileSteps key={isOpen ? 'open' : 'closed'} pile={pile} accent={accent} copied={copied} copyToClipboard={copyToClipboard} t={t} text={text} />
-				)}
+				<PileSteps key={isOpen ? 'open' : 'closed'} pile={pile} accent={accent} copied={copied} copyToClipboard={copyToClipboard} t={t} text={text} />
 				{(pile.extras || []).length > 0 && (
 					<div className='space-y-3 pt-2 border-t border-[#1F2933]'>
 						<h5 className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t('app.sort.also_here')}</h5>
@@ -12281,15 +12250,17 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 	};
 	const lensWords = (lens) =>
 		words.keep?.[lens.key] || lens.text || [`app.pile.lens.${lens.key}_label`, `app.pile.lens.${lens.key}_hint`];
-	const box = (suffix, keys, str, tone) => {
+	// `cls` marks one class's share of an event's ③ (pile.releaseByClass):
+	// the class goes on the label and its card colour on the box.
+	const box = (suffix, keys, str, tone, cls) => {
 		if (!str || !keys) return null;
 		const copyKey = `${pile.id}_${suffix}`;
 		const opts = keys[2] ? { params: keys[2] } : undefined;
 		return (
 			<FilterBox
 				key={suffix}
-				label={t(keys[0], opts)}
-				accent={accent}
+				label={cls ? `${t(keys[0], opts)} · ${t(`app.card.class.${cls}`)}` : t(keys[0], opts)}
+				accent={cls ? CLASS_COLOUR[cls] : accent}
 				filterStr={str}
 				copied={copied[copyKey]}
 				onCopy={() => copyToClipboard(copyKey, str)}
@@ -12310,7 +12281,9 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 			{card ?? <PileCard card={pile.card} t={t} />}
 			{box('sort', words.sort, pile.sort)}
 			{pile.release && subHeading('app.pile.group_release')}
-			{box('safe', words.safe, pile.safe)}
+			{pile.releaseByClass
+				? pile.releaseByClass.map((p) => box(`safe_${p.cls}`, words.safe, p.safe, undefined, p.cls))
+				: box('safe', words.safe, pile.safe)}
 			{pile.release && (
 				<div className='space-y-2'>
 					<button
@@ -12330,7 +12303,9 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 							<p className='px-4 py-2 text-xs leading-snug border border-[#F5B82E]/40 rounded-sm bg-[#F5B82E]/10 text-[#F5B82E]'>
 								{t('app.pile.release_warning')}
 							</p>
-							{box('release', words.release, pile.release, 'warn')}
+							{pile.releaseByClass
+								? pile.releaseByClass.map((p) => box(`release_${p.cls}`, words.release, p.release, 'warn', p.cls))
+								: box('release', words.release, pile.release, 'warn')}
 						</div>
 					)}
 				</div>

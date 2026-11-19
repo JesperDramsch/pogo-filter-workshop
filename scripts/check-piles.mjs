@@ -101,18 +101,6 @@ const PVP_LOOSE = {
 };
 const EVOLVE = { match: { flags: { canEvolve: true } }, miss: { flags: { canEvolve: false } } };
 const HIGH_IV = { match: iv(15, 15, 7), miss: iv(12, 12, 12) };
-// A meta sub-pile carries a league's step only when one of its families is
-// in that league's pool, so the Great League oracle is a pool species that is
-// in the sub-pile (by candy family, as the head reads it).
-function metaPartCases(part, loc) {
-  const cases = { ...LADDER };
-  if (part.keep.some((l) => l.key === "pvp_great")) {
-    const inPart = (PVP_RANKINGS.leagues?.great?.species || []).find((sp) =>
-      evalFilterDetailed(part.overview, pileMon(loc, {}, pokemonNameFor(String(sp.dex), "en"), sp.dex), loc).verdict === true);
-    cases.pvp_great = { dex: inPart?.dex, match: { ...iv(0, 15, 15), wp: 1400 }, miss: { ...iv(0, 15, 15), wp: 1600 } };
-  }
-  return cases;
-}
 const withFlag = (c, flag) => ({
   match: { ...c.match, flags: { ...(c.match.flags || {}), [flag]: true } },
   miss: { ...c.match, flags: { ...(c.match.flags || {}), [flag]: false } },
@@ -128,20 +116,6 @@ const PILE_FAMILIES = [
     name: "event spawns",
     piles: (r) => (r.eventFilters || []).map((ev) => ({ pile: ev.pile, dex: ev.spawnDex?.[0] })),
     lensCases: () => LADDER,
-  },
-  {
-    // An event split by class: each sub-pile is held to every check a pile
-    // gets. Which events split moves with the event feed, so the family may
-    // be empty on a given day; the split itself is pinned by synthetic cases
-    // in "Event piles by class" below.
-    name: "event spawns by class",
-    mayBeEmpty: true,
-    piles: (r) => (r.eventFilters || []).flatMap((ev) => (ev.pile?.parts || []).map((part) => ({
-      pile: part,
-      dex: part.spawnDex[0],
-      cases: part.cls === "meta" ? (loc) => metaPartCases(part, loc) : undefined,
-    }))),
-    lensCases: () => ({ ...LADDER, ...PVP_LOOSE }),
   },
   {
     name: "hundo sort",
@@ -324,14 +298,13 @@ for (const fam of PILE_FAMILIES) {
     const kw = pogoKeywords(loc);
     const tail = protectionTail(kw, CFG, tailOptions(CFG, loc)).join("&");
     const result = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc));
-    const famCases = fam.lensCases?.(kw) || {};
+    const cases = fam.lensCases?.(kw) || {};
     const entries = fam.piles(result).filter((e) => e.pile);
     const bad = [];
-    if (entries.length === 0 && !fam.mayBeEmpty) bad.push("no pile built");
+    if (entries.length === 0) bad.push("no pile built");
     // The same piles under the alternate config, by id, for P3.
     const altPiles = new Map(fam.piles(buildFilters(HUNDOS, LUCKIES, ALT_CFG, [], loc, makeTFn(loc))).filter((e) => e.pile).map((e) => [e.pile.id, e.pile]));
-    for (const { pile, dex, cases: ownCases } of entries) {
-      const cases = ownCases?.(loc) || famCases;
+    for (const { pile, dex } of entries) {
       const where = pile.id;
       const head = pile.overview;
       // P1
@@ -633,44 +606,56 @@ console.log("\nShowcase score (XXL calculator)");
   }
 }
 
-console.log("\nEvent piles by class (meta, watchlist, non-meta)");
+console.log("\nAn event's ③ split by class (meta, watchlist, non-meta)");
 {
   // The grouping, on rosters made up for the test so it holds whatever the
   // event feed and the rankings say today. Magikarp (129) / Gyarados (130),
   // Pichu (172) / Pikachu (25) / Raichu (26), Rattata (19), Pidgey (16).
   const groups = (spawns, meta, watch) =>
     [...eventClassGroups(spawns, meta, watch)].map(([cls, dexes]) => `${cls}:${dexes.join("+")}`).join(" ");
-  check("a spawn takes its family's class: Magikarp is meta when Gyarados is, Pikachu watchlist when Raichu is",
+  check("a spawn takes its family's class (a pre-evolution is meta when its evolution is)",
     groups([19, 25, 129], [130], [26]) === "meta:129 watchlist:25 non_meta:19", groups([19, 25, 129], [130], [26]));
   check("meta wins over watchlist within one family",
     groups([25], [26], [172]) === "meta:25", groups([25], [26], [172]));
-  check("an event of one class is one group (it keeps its single pile)",
+  check("an event of one class is one group (it keeps its single ③)",
     groups([16, 19], [130], [26]) === "non_meta:16+19" && groups([], [130], [26]) === "");
   for (const loc of localeNames) {
     const r = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc));
     const bad = [];
-    const split = (r.eventFilters || []).filter((ev) => ev.pile?.parts);
-    const mon = (dex) => pileMon(loc, {}, pokemonNameFor(String(dex), "en"), dex);
+    const events = r.eventFilters || [];
+    const split = events.filter((ev) => ev.pile?.releaseByClass);
+    const mon = (dex, o = {}) => pileMon(loc, o, pokemonNameFor(String(dex), "en"), dex);
     for (const ev of split) {
-      const { parts } = ev.pile;
+      const { pile } = ev;
+      const parts = pile.releaseByClass;
       const classes = parts.map((p) => p.cls);
       if (parts.length < 2 || new Set(classes).size !== parts.length) bad.push(`${ev.id}: classes ${classes.join(",")}`);
       const sorted = (a) => [...a].sort((x, y) => x - y).join(",");
-      if (sorted(parts.flatMap((p) => p.spawnDex)) !== sorted(ev.spawnDex)) bad.push(`${ev.id}: the sub-piles' spawns are not the event's`);
-      // Every spawn is in the event pile and in exactly one sub-pile.
-      for (const dex of ev.spawnDex) {
-        if (evalFilterDetailed(ev.pile.overview, mon(dex), loc).verdict !== true) bad.push(`${ev.id}: ${dex} not in the event pile`);
-        const homes = parts.filter((p) => evalFilterDetailed(p.overview, mon(dex), loc).verdict === true).map((p) => p.cls);
-        if (homes.length !== 1) bad.push(`${ev.id}: ${dex} in ${homes.length} sub-piles (${homes.join(",")})`);
-      }
-      // A meta or watchlist card lists the members that put the family there.
+      if (sorted(parts.flatMap((p) => p.spawnDex)) !== sorted(ev.spawnDex)) bad.push(`${ev.id}: the classes' spawns are not the event's`);
+      // Each class's ③ is its own head with exactly the event's ③ clauses.
       for (const p of parts) {
-        if (p.cls === "non_meta") continue;
-        const rows = p.card?.rows || [];
-        if (rows.length === 0 || rows.some((row) => row.cls !== p.cls)) bad.push(`${p.id}: card rows ${rows.map((row) => row.cls).join(",") || "none"}`);
+        if (p.release !== `${p.head}${pile.release.slice(pile.overview.length)}`) bad.push(`${ev.id}.${p.cls}: ③b is not head & the event's ③b clauses`);
+        if (p.safe !== `${p.release}${pile.safe.slice(pile.release.length)}`) bad.push(`${ev.id}.${p.cls}: ③a is not ③b & the event's ③a clauses`);
       }
+      // A plain dupe of every spawn is in the event's ③a and in exactly one
+      // class's ③a; a hundo of it is in none (the ladder's step kept it).
+      const plain = { ivAtk: 3, ivDef: 7, ivHp: 9, flags: { canEvolve: false } };
+      for (const dex of ev.spawnDex) {
+        if (evalFilterDetailed(pile.safe, mon(dex, plain), loc).verdict !== true) bad.push(`${ev.id}: a plain ${dex} is not in the event's ③a`);
+        const homes = parts.filter((p) => evalFilterDetailed(p.safe, mon(dex, plain), loc).verdict === true).map((p) => p.cls);
+        if (homes.length !== 1) bad.push(`${ev.id}: a plain ${dex} is in ${homes.length} classes' ③a (${homes.join(",")})`);
+        const kept = parts.filter((p) => evalFilterDetailed(p.safe, mon(dex, { ivAtk: 15, ivDef: 15, ivHp: 15 }), loc).verdict !== false);
+        if (kept.length) bad.push(`${ev.id}: a hundo ${dex} shows in ${kept.map((p) => p.cls).join(",")} ③a`);
+      }
+      // The card agrees with the boxes: its rows carry exactly the classes of
+      // the ③ boxes, in the same order (a Dratini spawn shows as Dragonite's
+      // meta row, never as a non-meta row while it sits in the meta box).
+      const rowClasses = [...new Set((pile.card?.rows || []).map((row) => row.cls))];
+      if (rowClasses.join(",") !== classes.join(",")) bad.push(`${ev.id}: card classes ${rowClasses.join(",")} vs ③ ${classes.join(",")}`);
+      // ① and ② are untouched: one list over the whole event.
+      if (pile.sort !== `${pile.overview}&!${pogoKeywords(loc).flag.favorite}&!#`) bad.push(`${ev.id}: ② is no longer the whole event`);
     }
-    check(`${loc}: ${split.length} of ${(r.eventFilters || []).length} events split; each spawn sits in exactly one sub-pile`, bad.length === 0, bad.slice(0, 4).join(" | "));
+    check(`${loc}: ${split.length} of ${events.length} events split ③; each spawn's leftovers sit in exactly one class`, bad.length === 0, bad.slice(0, 4).join(" | "));
   }
 }
 

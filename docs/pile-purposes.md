@@ -60,7 +60,7 @@ then `3-4` is fine (best first, then wider), but `3-4` then `4*` would be cut.
 | Pile | The question | ① keep, top to bottom |
 |---|---|---|
 | Event | What's worth keeping from this event? | 4\* → shiny → 3-4 → 3\* |
-| Event, split by class | Same question, one class at a time so each gets its own budget | meta: 4\* → shiny → 3-4 → 3\* → PvP (each league whose pool holds one of its families); watchlist and non-meta: 4\* → shiny → 3-4 → 3\* → loose PvP. Only when the spawns span two or more classes; the class is per candy family, so Magikarp is meta when Gyarados is |
+| Event, ③ by class | Which leftovers go, one class at a time so each gets its own budget | ① and ② as Event, over the whole event; ③ comes as one box per class (meta, watchlist, non-meta) when the spawns span two or more. The class is per candy family: a pre-evolution is meta when its evolution is |
 | Costumes that evolve (`costume&evolve`) | Which hats to keep for the whole line? | 4\* → shiny → 3-4 → 3\*, default count |
 | Costumes that don't (`costume&!evolve`) | Which hats to keep? | 4\* → shiny → 3-4 → 3\*, one plus up to 3 untraded ones to trade |
 | Backgrounds (`background`) | Which backgrounds stay? | 4\* → shiny → 3-4 → 3\*, default count |
