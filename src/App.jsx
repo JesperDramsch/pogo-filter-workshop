@@ -473,6 +473,26 @@ function lineRootDex(dex) {
 	return cur;
 }
 
+// An event's catch list grouped by class, per candy family: a spawn is meta
+// when any member of its family is in `metaDex`, watchlist when one is in
+// `watchDex` (and none is meta), non-meta otherwise. `+name` and the
+// standalone meta, watchlist and non-meta piles read the class per family
+// too, so the groups' `+name` heads never share a Pokémon. Returns a Map in
+// meta, watchlist, non_meta order, holding only the classes that occur.
+// Exported for scripts/check-piles.mjs.
+export function eventClassGroups(spawnDex, metaDex, watchDex) {
+	const roots = (dexes) => new Set([...dexes].map(lineRootDex));
+	const metaRoots = roots(metaDex);
+	const watchRoots = roots(watchDex);
+	const groups = new Map([['meta', []], ['watchlist', []], ['non_meta', []]]);
+	for (const dex of spawnDex) {
+		const root = lineRootDex(dex);
+		groups.get(metaRoots.has(root) ? 'meta' : watchRoots.has(root) ? 'watchlist' : 'non_meta').push(dex);
+	}
+	for (const [cls, dexes] of groups) if (dexes.length === 0) groups.delete(cls);
+	return groups;
+}
+
 // The species plus everything it can still evolve into — exactly the set one
 // owned lucky/hundo genuinely covers, since luckiness and IVs both survive
 // evolution but nothing can ever be de-evolved.
@@ -6008,6 +6028,61 @@ export function buildFilters(
 	}
 	if (hundoPile) hundoPile.card = { ...cardFor(hundos.map(dexOfName)), rule: tFn('app.card.rule.hundo') };
 	for (const ev of eventFilters) if (ev.pile) ev.pile.card = cardFor(ev.spawnDex);
+
+	// ── EVENT PILES BY CLASS ───────────────────────────────────────────────
+	// An event's spawns, split into meta, watchlist and non-meta sub-piles so
+	// each class is sorted with its own steps and its own budget. The class is
+	// per candy family, as `+name` and the standalone piles read it: Magikarp
+	// is meta when Gyarados is, because `+Gyarados` already holds it. So the
+	// sub-piles never share a Pokémon and together are the whole event pile.
+	// Whether there is anything to split depends on the spawns alone (the
+	// workshop never sees the storage): with fewer than two classes among them
+	// the event keeps its one pile, unchanged.
+	const rootsOf = (dexes) => new Set(dexes.map(lineRootDex));
+	// The steps of the standalone pile of the same class: meta reads each
+	// league's own pool, the others the loose rank-1 pattern. A league's step
+	// carries its species pool, so it only comes along when one of the
+	// sub-pile's families is in that pool; otherwise it could never match.
+	const eventClassLenses = (cls, roots) =>
+		cls === 'meta'
+			? [
+					...ivLadder(),
+					...pvpPools
+						.filter((pool) => (pool.league?.species || []).some((sp) => roots.has(lineRootDex(sp.dex))))
+						.map((pool) => ({
+							key: pool.key,
+							filter: pool.league?.cpCap ? buildLeagueFilter(pool.league).clause : '',
+							text: pool.text,
+						})),
+				]
+			: [...ivLadder(), ...pvpLoose];
+	// A meta or watchlist sub-pile's card lists the family members that put it
+	// there (Gyarados, not the Magikarp that spawned), with their budgets.
+	const CLASS_DEX = { meta: [...metaDex], watchlist: [...watchWhy.keys()] };
+	for (const ev of eventFilters) {
+		if (!ev.pile) continue;
+		const byClass = eventClassGroups(ev.spawnDex, metaDex, watchWhy.keys());
+		if (byClass.size < 2) continue;
+		const parts = [...byClass]
+			.map(([cls, dexes]) => {
+				const roots = rootsOf(dexes);
+				const part = buildPile({
+					id: `${ev.pile.id}_${cls}`,
+					head: famOf(dexes.map(nameOfDex).filter(Boolean)),
+					lenses: eventClassLenses(cls, roots),
+					kw,
+					cfg,
+					tail: pileTail,
+				});
+				if (!part) return null;
+				part.cls = cls;
+				part.spawnDex = dexes;
+				part.card = cardFor(cls === 'non_meta' ? dexes : CLASS_DEX[cls].filter((d) => roots.has(lineRootDex(d))));
+				return part;
+			})
+			.filter(Boolean);
+		if (parts.length >= 2) ev.pile.parts = parts;
+	}
 
 	return {
 		trash,
@@ -12124,7 +12199,20 @@ function PileTile({ pile, title, hook, icon, chip, accent, open, onHide, hidden,
 				<ChevronRight size={14} className='text-[#8090A0] details-arrow shrink-0 mt-1' aria-hidden='true' />
 			</summary>
 			<div className='px-3 pb-3 pt-3 border-t border-[#1F2933] space-y-3'>
-				<PileSteps key={isOpen ? 'open' : 'closed'} pile={pile} accent={accent} copied={copied} copyToClipboard={copyToClipboard} t={t} text={text} />
+				{pile.parts ? (
+					// An event split by class (see "EVENT PILES BY CLASS"): one section
+					// per class, each with its own three steps and card.
+					pile.parts.map((part) => (
+						<section key={part.id} aria-labelledby={`${part.id}-h`} className='space-y-3 pt-3 border-t border-[#1F2933] first:pt-0 first:border-t-0'>
+							<h4 id={`${part.id}-h`} className='mono text-xs uppercase tracking-widest font-semibold' style={{ color: CLASS_COLOUR[part.cls] }}>
+								{t(`app.card.class.${part.cls}`)}
+							</h4>
+							<PileSteps key={isOpen ? 'open' : 'closed'} pile={part} accent={accent} copied={copied} copyToClipboard={copyToClipboard} t={t} text={text} />
+						</section>
+					))
+				) : (
+					<PileSteps key={isOpen ? 'open' : 'closed'} pile={pile} accent={accent} copied={copied} copyToClipboard={copyToClipboard} t={t} text={text} />
+				)}
 				{(pile.extras || []).length > 0 && (
 					<div className='space-y-3 pt-2 border-t border-[#1F2933]'>
 						<h5 className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t('app.sort.also_here')}</h5>
