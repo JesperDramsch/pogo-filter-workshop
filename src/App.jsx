@@ -65,7 +65,7 @@ import { regionForForm } from './data/form-region.js';
 import SpeciesInput from './SpeciesInput.jsx';
 import { megaPlans, rankMegaGroups } from './mega-boost.js';
 import { bonusNudges, roundDistanceKm, venueReach } from './bonus-nudges.js';
-import { buddyQuestPlan, questSources } from './buddy-quests.js';
+import { outingBuddyQuests } from './buddy-quests.js';
 import {
 	wishTargetsFromConfig,
 	wishLinkFor,
@@ -8190,22 +8190,13 @@ export default function App() {
 	const megaPlanRows = useMemo(
 		() =>
 			megaPlans({ events: EVENTS.events, eventRaids: RAID_BOSSES.eventRaids }, Date.now(), (n) => resolveSpeciesInfo(n)?.dex)
-				.map((p) => ({ ...p, boost: megaBoostFor(p.spawnForms) }))
-				.filter((p) => p.boost.groups.length > 0),
-		[megaBoostFor, clockTick],
-	);
-	// Quest evolutions ranked against this week's spawns and raids (src/buddy-quests.js).
-	const buddyQuestRows = useMemo(
-		() =>
-			buddyQuestPlan(
-				EVOLUTION_QUESTS.quests,
-				questSources(
-					{ events: EVENTS.events, bonuses: EVENTS.bonuses, raidBosses: RAID_BOSSES, rocketTrainers: ROCKET_LINEUPS.trainers },
-					Date.now(),
-					{ homeLocation },
-				),
-			),
-		[clockTick, homeLocation],
+				.map((p) => {
+					// Quest evolutions this outing helps (src/buddy-quests.js), best first.
+					const buddies = outingBuddyQuests(EVOLUTION_QUESTS.quests, p);
+					return { ...p, boost: megaBoostFor(p.spawnForms), buddies, buddyFilter: buddyQuestFilterFor(buddies.map((b) => b.quest.dex)) };
+				})
+				.filter((p) => p.boost.groups.length > 0 || p.buddies.length > 0),
+		[megaBoostFor, buddyQuestFilterFor, clockTick],
 	);
 	// Event bonuses that make an existing filter worth opening now (src/bonus-nudges.js).
 	// An in-person event's bonuses nudge only a home pin within reach of its venue.
@@ -8536,17 +8527,6 @@ export default function App() {
 												<MegaPlanner
 													plans={megaPlanRows}
 													homeLocation={homeLocation}
-													copied={copied}
-													copyToClipboard={copyToClipboard}
-													typeLabels={rocketTypeLabels}
-													t={t}
-													locale={locale}
-												/>
-												</div>
-												<div className='pt-4'>
-												<BuddyQuests
-													plan={buddyQuestRows}
-													filterFor={buddyQuestFilterFor}
 													copied={copied}
 													copyToClipboard={copyToClipboard}
 													typeLabels={rocketTypeLabels}
@@ -12313,6 +12293,12 @@ function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels,
 		const name = key ? pokemonNameFor(key, locale) || '' : '';
 		return name.replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toUpperCase());
 	};
+	// The best buddy rides along in the teaser: "Mega-Gengar · Buddy: Pam-Pam".
+	const hookOf = (p) => {
+		const top = p.buddies?.[0]?.quest;
+		const buddy = top ? t('app.mega_plan.hook_buddy', { params: { name: capFirst(POKEMON_NAMES_DICT[String(top.dex)]?.[locale] ?? POKEMON_NAMES_DICT[String(top.dex)]?.en ?? '') } }) : '';
+		return [topName(p), buddy].filter(Boolean).join(' · ');
+	};
 	return (
 		<AreaGroup id='mega-plan' title={t('app.mega_plan.title')} hint={t('app.mega_plan.hint')} accent='#E91E63'>
 			{plans.length === 0 ? (
@@ -12322,7 +12308,7 @@ function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels,
 					{plans.map((p) => {
 						const live = Date.parse(p.start) <= now;
 						const icon = p.kind === 'raid' ? Target : Leaf;
-						const name = topName(p);
+						const name = hookOf(p);
 						// An in-person event far from the home pin stays folded even while
 						// it runs; its chip carries the city and the distance.
 						const where = venueNoteFor(p.venue, homeLocation, t, locale);
@@ -12346,6 +12332,19 @@ function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels,
 									t={t}
 									locale={locale}
 								/>
+								{p.buddies.length > 0 && (
+									<BuddyQuestPanel
+										buddies={p.buddies}
+										filter={p.buddyFilter}
+										poolSize={p.spawnForms.length}
+										raid={p.kind === 'raid'}
+										accent='#9B59B6'
+										copied={copied[`buddyquest_${p.id}`]}
+										onCopy={() => copyToClipboard(`buddyquest_${p.id}`, p.buddyFilter)}
+										t={t}
+										locale={locale}
+									/>
+								)}
 							</ToolTile>
 						);
 					})}
@@ -12355,121 +12354,63 @@ function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels,
 	);
 }
 
-// "Which quest evolution is worth a buddy this week" (Catching): the quest
-// evolutions (src/data/evolution-quests.json) ranked against the week's spawns,
-// raid bosses and bonuses by src/buddy-quests.js. Each row names the quest and
-// the reasons it is easy now; one filter finds which of the ranked species the
-// player owns. Quests no week changes (walking, treats, throws) sit in one
-// line underneath, so the card also answers "what else could my buddy do".
-// Species and types are named in the UI locale; the filter is built in the
-// output locale by the generator's buddyQuestFilterFor.
-const BUDDY_QUEST_ICON = { catch: Leaf, defeat: Swords, raid_win: Target, hearts: Heart };
-function BuddyQuests({ plan, filterFor, copied, copyToClipboard, typeLabels, t, locale }) {
-	const now = Date.now();
-	const nameOf = (dex) => {
-		const n = POKEMON_NAMES_DICT[String(dex)]?.[locale] ?? POKEMON_NAMES_DICT[String(dex)]?.en ?? '';
-		return capFirst(n);
-	};
-	const speciesOf = (q) => (q.region ? `${nameOf(q.dex)} (${t(`app.buddy_targets.form_region.${q.region}`)})` : nameOf(q.dex));
-	// The client's own quest wording (src/data/evolution-quests.json `text`,
-	// from holoholo-text), with the generic line as the fallback.
-	const requirement = (q) => {
+
+// The quest evolutions one outing helps (src/buddy-quests.js), laid out like
+// the Mega panel above it: the best buddy first, then the others that are good
+// too, so a player who has evolved every Pancham still gets a pick. Each line
+// is the quest in the client's own words (evolution-quests.json `text`, from
+// holoholo-text) and what on this outing counts for it. One filter finds
+// every listed species that still has its quest evolution; whichever the
+// player owns is what shows up. Every match is listed, not a top few: one
+// outing only ever helps a handful of quests, and the filter must not find a
+// species the list does not explain.
+const BUDDY_MATCH_NAMES_SHOWN = 5;
+function BuddyQuestPanel({ buddies, filter, poolSize, raid, accent, copied, onCopy, t, locale }) {
+	const nameOf = (dex) => capFirst(POKEMON_NAMES_DICT[String(dex)]?.[locale] ?? POKEMON_NAMES_DICT[String(dex)]?.en ?? '');
+	const regional = (dex, region) => (region ? `${nameOf(dex)} (${t(`app.buddy_targets.form_region.${region}`)})` : nameOf(dex));
+	const questText = (q) => {
 		const own = q.text?.[locale] ?? q.text?.en;
 		const base = own ? own.replace('{0}', String(q.target)) : t('app.buddy_quest.action_fallback', { params: { count: q.target } });
 		return q.time ? `${base} · ${t(`app.buddy_quest.time.${q.time}`)}` : base;
 	};
-	const when = (start, end) => {
-		const s = Date.parse(start);
-		if (Number.isFinite(s) && s > now) return t('app.events.bonus.from', { params: { date: formatNudgeDate(s, locale) } });
-		return t('app.events.bonus.until', { params: { date: formatNudgeDate(Date.parse(end), locale) } });
-	};
-	// Standing bosses carry every locale's name; event bosses only English.
-	const bossName = (r) => r.names?.[locale] || r.name;
-	const reasons = (row) => {
-		const out = [];
-		for (const w of row.wild) {
-			const names = [...new Set(w.matches.map((f) => (f.region ? `${nameOf(f.dex)} (${t(`app.buddy_targets.form_region.${f.region}`)})` : nameOf(f.dex))))];
-			out.push(t('app.buddy_quest.reason.wild', { params: { event: w.title, when: when(w.start, w.end), species: names.join(', ') } }));
-		}
-		const standing = row.raids.filter((r) => !r.title);
-		if (standing.length)
-			out.push(
-				t('app.buddy_quest.reason.raids_now', {
-					params: { bosses: standing.map((r) => (r.tier === 'lvl1' || r.tier === 'shadow_lvl1' ? `${bossName(r)} (1★)` : bossName(r))).join(', ') },
-				}),
-			);
-		const dated = new Map();
-		for (const r of row.raids.filter((r) => r.title)) {
-			if (!dated.has(r.title)) dated.set(r.title, { ...r, names: [] });
-			dated.get(r.title).names.push(bossName(r));
-		}
-		for (const d of dated.values())
-			out.push(t('app.buddy_quest.reason.raid_event', { params: { event: d.title, when: when(d.start, d.end), bosses: [...new Set(d.names)].join(', ') } }));
-		if (row.grunts.length)
-			out.push(t('app.buddy_quest.reason.grunts', { params: { types: row.grunts.map((ty) => typeLabels?.[ty] || ty).join(' / ') } }));
-		for (const h of row.hearts) out.push(t('app.buddy_quest.reason.hearts', { params: { event: h.title, when: when(h.start, h.end) } }));
-		return out;
-	};
-	const shown = plan.ranked;
-	const filter = filterFor ? filterFor(shown.map((r) => r.quest.dex)) : '';
-	const anytime = [...new Map(plan.anytime.map((r) => [r.key, r])).values()];
 	return (
-		<AreaGroup id='buddy-quests' title={t('app.buddy_quest.title')} hint={t('app.buddy_quest.hint')} accent='#9B59B6'>
-			{shown.length === 0 ? (
-				<p className='mono text-xs italic text-[#8B98A5]'>{t('app.buddy_quest.empty')}</p>
-			) : (
-				<div className='space-y-2'>
-					{shown.map((row, i) => {
-						const q = row.quest;
-						return (
-							<ToolTile
-								key={row.key}
-								title={t('app.buddy_quest.row_title', { params: { from: speciesOf(q), to: nameOf(q.evolutionDex) } })}
-								chip={requirement(q)}
-								icon={BUDDY_QUEST_ICON[q.action] || Sprout}
-								accent='#9B59B6'
-								open={i === 0}
-							>
-								<ul className='space-y-1 text-xs text-[#C9D1D9] leading-relaxed list-disc pl-4'>
-									{reasons(row).map((r) => (
-										<li key={r}>{r}</li>
-									))}
-								</ul>
-								{q.eventTargets?.length > 0 && (
-									<p className='mono text-[11px] text-[#8090A0]'>
-										{t('app.buddy_quest.event_targets', { params: { targets: q.eventTargets.join(' / ') } })}
-									</p>
-								)}
-							</ToolTile>
-						);
-					})}
-					{filter && (
-						<FilterBox
-							label={t('app.buddy_quest.filter_label')}
-							accent='#9B59B6'
-							filterStr={filter}
-							copied={copied.buddy_quests}
-							onCopy={() => copyToClipboard('buddy_quests', filter)}
-							hint={t('app.buddy_quest.filter_hint')}
-						/>
-					)}
-				</div>
+		<div className='space-y-2 pt-1'>
+			<h5 className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t('app.buddy_quest.heading')}</h5>
+			<ol className='space-y-2'>
+				{buddies.map((b, i) => {
+					const q = b.quest;
+					const names = [...new Set(b.matches.map((f) => regional(f.dex, f.region)))];
+					const more = names.length - BUDDY_MATCH_NAMES_SHOWN;
+					return (
+						<li key={b.key} className='text-xs text-[#C9D1D9] space-y-0.5'>
+							<p>
+								<span className='mono text-[#8090A0]'>{i + 1}. </span>
+								<span className='font-medium' style={{ color: i === 0 ? accent : undefined }}>
+									{t('app.buddy_quest.row_title', { params: { from: regional(q.dex, q.region), to: nameOf(q.evolutionDex) } })}
+								</span>
+								<span className='text-[#8B98A5]'> · {questText(q)}</span>
+							</p>
+							<p className='text-[#8B98A5]'>
+								{t(raid ? 'app.buddy_quest.counts_raid' : 'app.buddy_quest.counts_wild', { params: { hits: b.matches.length, total: poolSize } })}
+								{': '}
+								{names.slice(0, BUDDY_MATCH_NAMES_SHOWN).join(', ')}
+								{more > 0 && ` ${t('app.events.mega_more', { params: { count: more } })}`}
+							</p>
+						</li>
+					);
+				})}
+			</ol>
+			{filter && (
+				<FilterBox
+					label={t('app.buddy_quest.filter_label')}
+					accent={accent}
+					filterStr={filter}
+					copied={copied}
+					onCopy={onCopy}
+					hint={t('app.buddy_quest.filter_hint')}
+				/>
 			)}
-			{anytime.length > 0 && (
-				<details className='mono text-[11px] text-[#8090A0]'>
-					<summary className='cursor-pointer min-h-[32px] flex items-center uppercase tracking-wide hover:text-[#E6EDF3]'>
-						{t('app.buddy_quest.anytime', { params: { count: anytime.length } })}
-					</summary>
-					<ul className='space-y-0.5 pl-4 list-disc leading-relaxed'>
-						{anytime.map((r) => (
-							<li key={r.key}>
-								<span className='text-[#C9D1D9]'>{speciesOf(r.quest)}</span>: {requirement(r.quest)}
-							</li>
-						))}
-					</ul>
-				</details>
-			)}
-		</AreaGroup>
+		</div>
 	);
 }
 

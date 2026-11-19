@@ -44,7 +44,6 @@ export const BONUS_KINDS = {
 	raid_bonus: { area: 'battle', group: 'raids' },
 	max_bonus: { area: 'battle', group: 'raids' },
 	max_particles: { area: 'battle', group: 'raids' },
-	buddy_hearts: { area: 'catch', group: 'buddy-quests' },
 };
 
 // Order in the strip: what the player can act on with a filter in hand first.
@@ -164,9 +163,6 @@ const RULES = [
 	// "Increased chance to get Rare Candy XL from Raid Battles"
 	{ kind: 'raid_bonus', re: /\b(?:Candy|XP|Stardust)\b.*\b(?:from|in) (?:completed )?(?:Super Mega )?(?:raids|Raid Battles)\b/i },
 	{ kind: 'raid_bonus', re: /\bRaid Pass(?:es)?\b|\bRemote Raid limit\b/i },
-	// "Earn additional hearts with your Buddy Pokémon" (Precious Pals): the
-	// heart quests (Sylveon, Florges, Frosmoth) go faster, see src/buddy-quests.js.
-	{ kind: 'buddy_hearts', re: /\bhearts?\b.*\bBuddy\b|\bBuddy\b.*\bhearts?\b/i },
 ];
 
 // Real bonuses that point at no filter. Listed so the sync only logs what is
@@ -188,6 +184,7 @@ export const IGNORED_BONUS = [
 	/\bMystery Box\b|\bCoin Bag\b/i, //                       Meltan / Gimmighoul mechanics
 	/^Increased Spawns\b/i, //                                "Increased Spawns"
 	/\bMega Level\b/i, //                                     "Chandelure caught from Super Mega Raids will have Mega Level 1 unlocked"
+	/\bhearts with your Buddy\b/i, //                       "Earn additional hearts with your Buddy Pokémon"
 	/\bwalking with your Buddy\b/i, //                      "Additional Candy XL when walking with your Buddy Pokémon"
 	/\bsouvenir\b/i, //                                      "Tiny Compass buddy souvenir"
 	/\bDynamax Cannon\b/i, //                                 "1/2 Candy and Stardust cost to activate the Dynamax Cannon Adventure Effect"

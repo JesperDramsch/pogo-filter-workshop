@@ -1,4 +1,4 @@
-// Offline checks for the quest-evolution card: the game-master reader in
+// Offline checks for the buddy panel in the Mega planner: the game-master reader in
 // scripts/lib/game-master.mjs, the committed src/data/evolution-quests.json,
 // the matcher in src/buddy-quests.js and the filter the card copies.
 // Run with: npm run test:buddyquests
@@ -12,11 +12,10 @@
 //   Q3 — the snapshot: the quests the card is for are there, every quest has a
 //        known action and real type slugs, and its in-game text carries {0}
 //        wherever the target is above 1
-//   Q4 — the matcher: a Community Day of a type outranks a few spawns of
-//        another; outside the horizon or a far venue counts for nothing; Max
-//        Battles only for a quest that allows them; a hearts bonus ranks the
-//        heart quests; an untyped raid quest is an any-time quest; a boss listed
-//        once per forme is one row
+//   Q4 — the matcher, per Mega-planner outing: a Community Day of a type puts
+//        its quest first; in a mixed pool the shorter quest with more matches
+//        leads and the rest stay listed; a raid outing counts raid wins,
+//        defeats and catches, a wild one only catches; walking never ranks
 //   Q5 — the filter: species in the output locale plus the evolve-with-quest
 //        keyword, never a literal German name in another locale
 //
@@ -24,7 +23,7 @@
 
 import { createChecker } from "./lib/check.mjs";
 import { evolutionQuestsFromGameMaster, readEvolutionQuest } from "./lib/game-master.mjs";
-import { buddyQuestPlan, matchQuest, questSources } from "../src/buddy-quests.js";
+import { outingBuddyQuests } from "../src/buddy-quests.js";
 import { classifyBonus } from "../src/bonus-nudges.js";
 import QUESTS from "../src/data/evolution-quests.json";
 import { buildFilters, DEFAULT_HUNDOS, DEFAULT_LUCKIES } from "../src/App.jsx";
@@ -33,7 +32,6 @@ import { pogoKeywords } from "../src/i18n/pogo-keywords.js";
 import { pokemonNameFor } from "../src/data/species.js";
 
 const { check, done } = createChecker();
-const DAY = 86400000;
 const TYPES = new Set(Object.keys(pogoKeywords("en").type));
 
 // ── Q1 ──
@@ -123,46 +121,37 @@ check("every quest has German in-game text", deMissing.length === 0, deMissing.m
 check("no text ends in a full stop", quests.every((q) => Object.values(q.text || {}).every((v) => !/[.。]$/.test(v))));
 
 // ── Q4 ──
-console.log("\nQ4 — the matcher");
-const now = Date.parse("2026-11-19T12:00:00");
-const at = (d) => new Date(now + d * DAY).toISOString().slice(0, 19);
-const spawn = (dex, types) => ({ name: String(dex), dex, region: null, types });
-const filler = Array.from({ length: 36 }, (_, i) => spawn(1000 + i, ["normal"]));
-const events = [
-  { id: "cd", title: "Dark CD", start: at(2), end: at(2.2), spawnForms: [spawn(624, ["dark", "steel"])] },
-  { id: "mixed", title: "Mixed", start: at(-1), end: at(3), spawnForms: [spawn(633, ["dark", "dragon"]), ...filler] },
-  { id: "late", title: "Too late", start: at(10), end: at(12), spawnForms: [spawn(371, ["dragon"])] },
-  { id: "far", title: "Far venue", start: at(0), end: at(1), venue: { name: "Sydney", lat: -33.87, lng: 151.21 }, spawnForms: [spawn(147, ["dragon"])] },
-];
-const raidBosses = {
-  raids: { lvl1: [{ id: "MEOWTH", names: { en: "Alolan Meowth" }, types: ["dark"] }], lvl5: [{ id: "DARKRAI", names: { en: "Darkrai" }, types: ["dark"] }] },
-  maxBattles: { lvl1: [{ id: "NICKIT", names: { en: "Nickit" }, types: ["dark"] }] },
-  eventRaids: [{ name: "Deoxys raids", start: at(1), end: at(3), bosses: ["NORMAL", "ATTACK", "DEFENSE", "SPEED"].map((f) => ({ id: "DEOXYS", form: `DEOXYS_${f}`, names: { en: "Deoxys" }, types: ["psychic"] })) }],
-  eventMaxBattles: [],
-};
-const bonuses = [{ id: "pals", title: "Pals", start: at(0), end: at(2), bonuses: ["Earn additional hearts with your Buddy Pokémon"] }];
-const home = [7.1, 50.73];
-const src = questSources({ events, bonuses, raidBosses, rocketTrainers: [{ kind: "typed_grunt", type: "ghost" }] }, now, { homeLocation: home });
+console.log("\nQ4 — the matcher, one outing at a time");
+const spawn = (dex, types) => ({ dex, region: null, types });
 const q = (dex, action, types, target, extra = {}) => ({ dex, region: null, quest: `${dex}_${action}_${types.join("_")}`, action, types, target, ...extra });
 const pancham = q(674, "catch", ["dark"], 32);
 const dipplin = q(1011, "catch", ["dragon"], 7);
-const plan = buddyQuestPlan([dipplin, pancham, q(891, "raid_win", ["dark"], 30, { max: true }), q(625, "raid_win", ["dark", "steel"], 15, { max: false }), q(211, "raid_win", [], 10, { max: false }), q(133, "hearts", [], 70), q(57, "defeat", ["ghost", "psychic"], 30), q(803, "catch", ["fairy"], 20)], src);
-check("a Community Day of the type puts Pancham first", plan.ranked[0]?.quest.dex === 674, plan.ranked.map((r) => r.quest.dex).join(","));
-check("one Dragon among 37 spawns still ranks Dipplin", plan.ranked.some((r) => r.quest.dex === 1011));
-check("an event past the horizon counts for nothing", !matchQuest(dipplin, src).wild.some((w) => w.id === "late"));
-check("an in-person event far from the pin counts for nothing", !src.wild.some((w) => w.id === "far"));
-const kubfuRow = plan.ranked.find((r) => r.quest.dex === 891);
-const bisharpRow = plan.ranked.find((r) => r.quest.dex === 625);
-check("Max Battles count for Kubfu", kubfuRow?.raids.some((r) => r.name === "Nickit"));
-check("Max Battles do not count for Bisharp", bisharpRow && !bisharpRow.raids.some((r) => r.name === "Nickit"));
-check("Deoxys's four formes are one boss row", src.raids.filter((r) => r.name === "Deoxys").length === 1);
-check("a hearts bonus ranks the heart quest", plan.ranked.some((r) => r.quest.dex === 133 && r.hearts.length === 1));
-check("an untyped raid quest is an any-time quest", plan.anytime.some((r) => r.quest.dex === 211));
-check("a defeat quest lists the matching Rocket grunts", plan.ranked.find((r) => r.quest.dex === 57)?.grunts.join() === "ghost");
-check("a typed quest nothing helps is quiet", plan.quiet.some((r) => r.quest.dex === 803));
-const noBonus = buddyQuestPlan([q(133, "hearts", [], 70)], questSources({ events: [], bonuses: [], raidBosses: {} }, now));
-check("without a hearts bonus the heart quest is an any-time quest", noBonus.anytime.length === 1 && noBonus.ranked.length === 0);
-check("the hearts bonus classifies as buddy_hearts", classifyBonus("Earn additional hearts with your Buddy Pokémon")?.kind === "buddy_hearts");
+const kubfuQ = q(891, "raid_win", ["dark"], 30, { max: true });
+const bisharpQ = q(625, "raid_win", ["dark", "steel"], 15, { max: false });
+const annihilape = q(57, "defeat", ["ghost", "psychic"], 30);
+const walker = q(349, "walk", [], 20);
+const pool = [dipplin, pancham, kubfuQ, bisharpQ, annihilape, walker];
+const filler = Array.from({ length: 50 }, (_, i) => spawn(1000 + i, ["normal"]));
+
+const cd = outingBuddyQuests(pool, { kind: "wild", spawnForms: [spawn(624, ["dark", "steel"])] });
+check("a Dark Community Day puts Pancham first", cd[0]?.quest.dex === 674, cd.map((r) => r.quest.dex).join(","));
+check("a wild outing ranks no raid or defeat quest", cd.every((r) => r.quest.action === "catch"));
+const mixed = outingBuddyQuests(pool, { kind: "wild", spawnForms: [spawn(633, ["dark", "dragon"]), spawn(371, ["dragon"]), ...filler] });
+check("in a mixed pool the shorter quest with more matches leads: Dipplin before Pancham", mixed[0]?.quest.dex === 1011 && mixed[1]?.quest.dex === 674, mixed.map((r) => r.quest.dex).join(","));
+check("the others that are good too stay listed", mixed.length === 2);
+const darkRaid = outingBuddyQuests(pool, { kind: "raid", spawnForms: [spawn(491, ["dark"])] });
+const order = darkRaid.map((r) => r.quest.dex);
+check("a Dark raid hour lists Bisharp, Kubfu and Pancham (each win ends in a catch)", [625, 891, 674].every((d) => order.includes(d)), order.join(","));
+check("fifteen raid wins rank before thirty", order.indexOf(625) < order.indexOf(891));
+check("a Ghost raid counts for the defeat quest", outingBuddyQuests(pool, { kind: "raid", spawnForms: [spawn(354, ["ghost"])] }).some((r) => r.quest.dex === 57));
+check("no outing ranks a walking quest", ![cd, mixed, darkRaid].flat().some((r) => r.quest.action === "walk"));
+check("an empty outing ranks nothing", outingBuddyQuests(pool, { kind: "wild", spawnForms: [] }).length === 0);
+check("each row says what counted", cd[0]?.matches.length === 1 && cd[0].share === 1);
+
+const real = QUESTS.quests;
+const realCd = outingBuddyQuests(real, { kind: "wild", spawnForms: [spawn(624, ["dark", "steel"])] });
+check("against the snapshot, a Pawniard Community Day leads with Pancham", realCd[0]?.quest.dex === 674, realCd.slice(0, 4).map((r) => r.quest.dex).join(","));
+check("the hearts bonus is a known non-nudge now the card is gone", classifyBonus("Earn additional hearts with your Buddy Pokémon")?.ignored === true);
 check("walking Candy XL is a known non-nudge", classifyBonus("Additional Candy XL when walking with your Buddy Pokémon")?.ignored === true);
 
 // ── Q5 ──
