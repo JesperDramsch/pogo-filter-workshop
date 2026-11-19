@@ -58,6 +58,7 @@
   "test:areastage": "vite-node scripts/check-area-stage.mjs",
   "test:bonusnudges": "vite-node scripts/check-bonus-nudges.mjs",
   "test:buddyquests": "vite-node scripts/check-buddy-quests.mjs",
+  "test:raidplan": "vite-node scripts/check-raid-plan.mjs",
   "test:sharelink": "vite-node scripts/check-share-link.mjs",
   "test:settingsgroups": "vite-node scripts/check-settings-groups.mjs",
   "test:oneoffs": "vite-node scripts/check-one-offs.mjs",
