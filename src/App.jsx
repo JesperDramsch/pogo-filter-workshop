@@ -65,6 +65,7 @@ import { regionForForm } from './data/form-region.js';
 import SpeciesInput from './SpeciesInput.jsx';
 import { megaPlans, rankMegaGroups } from './mega-boost.js';
 import { bonusNudges, roundDistanceKm, venueReach } from './bonus-nudges.js';
+import { buddyQuestPlan, questSources } from './buddy-quests.js';
 import {
 	wishTargetsFromConfig,
 	wishLinkFor,
@@ -100,6 +101,7 @@ import RocketQuoteLookup from './explain/RocketQuoteLookup.jsx';
 import PVP_RANKINGS from './data/pvp-rankings.json';
 import META_RANKINGS from './data/meta-rankings.json';
 import EVOLUTION_COSTS from './data/evolution-costs.json';
+import EVOLUTION_QUESTS from './data/evolution-quests.json';
 import SPECIES_META from './data/species-meta.json';
 import CHANGELOG from './data/changelog.json';
 // Species refinement axes (regional forms / gender slots / un-searchable
@@ -5050,6 +5052,15 @@ export function buildFilters(
 		};
 	};
 
+	// "Which of these quest-evolution species do I own": the species in the
+	// output locale, ANDed with the in-game evolve-with-quest flag so a
+	// regular Slowpoke stays out of a Galarian Slowpoke quest (src/buddy-quests.js).
+	const buddyQuestFilterFor = (dexes) => {
+		const names = [...new Set(dexes)].map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean);
+		if (names.length === 0 || !kw.flag.evolve_quest) return '';
+		return `${names.join(',')}&${kw.flag.evolve_quest}`;
+	};
+
 	const eventFilters = (EVENTS.events || [])
 		.map((ev) => {
 			// "+name" expands to the whole evolution family; names localised from dex.
@@ -6079,6 +6090,7 @@ export function buildFilters(
 		eventFilters,
 		eventsFetchedAt,
 		megaBoostFor,
+		buddyQuestFilterFor,
 		// Team Rocket counters (leaders / typed grunts / generic grunts)
 		rocketLeaders,
 		rocketTypedGrunts,
@@ -7337,6 +7349,7 @@ export default function App() {
 		eventFilters,
 		eventsFetchedAt,
 		megaBoostFor,
+		buddyQuestFilterFor,
 		rocketLeaders,
 		rocketTypedGrunts,
 		rocketGenericGrunts,
@@ -8181,6 +8194,19 @@ export default function App() {
 				.filter((p) => p.boost.groups.length > 0),
 		[megaBoostFor, clockTick],
 	);
+	// Quest evolutions ranked against this week's spawns and raids (src/buddy-quests.js).
+	const buddyQuestRows = useMemo(
+		() =>
+			buddyQuestPlan(
+				EVOLUTION_QUESTS.quests,
+				questSources(
+					{ events: EVENTS.events, bonuses: EVENTS.bonuses, raidBosses: RAID_BOSSES, rocketTrainers: ROCKET_LINEUPS.trainers },
+					Date.now(),
+					{ homeLocation },
+				),
+			),
+		[clockTick, homeLocation],
+	);
 	// Event bonuses that make an existing filter worth opening now (src/bonus-nudges.js).
 	// An in-person event's bonuses nudge only a home pin within reach of its venue.
 	const bonusNudgeRows = useMemo(() => bonusNudges(EVENTS.bonuses, Date.now(), { homeLocation }), [clockTick, homeLocation]);
@@ -8510,6 +8536,17 @@ export default function App() {
 												<MegaPlanner
 													plans={megaPlanRows}
 													homeLocation={homeLocation}
+													copied={copied}
+													copyToClipboard={copyToClipboard}
+													typeLabels={rocketTypeLabels}
+													t={t}
+													locale={locale}
+												/>
+												</div>
+												<div className='pt-4'>
+												<BuddyQuests
+													plan={buddyQuestRows}
+													filterFor={buddyQuestFilterFor}
 													copied={copied}
 													copyToClipboard={copyToClipboard}
 													typeLabels={rocketTypeLabels}
@@ -12313,6 +12350,124 @@ function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels,
 						);
 					})}
 				</div>
+			)}
+		</AreaGroup>
+	);
+}
+
+// "Which quest evolution is worth a buddy this week" (Catching): the quest
+// evolutions (src/data/evolution-quests.json) ranked against the week's spawns,
+// raid bosses and bonuses by src/buddy-quests.js. Each row names the quest and
+// the reasons it is easy now; one filter finds which of the ranked species the
+// player owns. Quests no week changes (walking, treats, throws) sit in one
+// line underneath, so the card also answers "what else could my buddy do".
+// Species and types are named in the UI locale; the filter is built in the
+// output locale by the generator's buddyQuestFilterFor.
+const BUDDY_QUEST_ICON = { catch: Leaf, defeat: Swords, raid_win: Target, hearts: Heart };
+function BuddyQuests({ plan, filterFor, copied, copyToClipboard, typeLabels, t, locale }) {
+	const now = Date.now();
+	const nameOf = (dex) => {
+		const n = POKEMON_NAMES_DICT[String(dex)]?.[locale] ?? POKEMON_NAMES_DICT[String(dex)]?.en ?? '';
+		return capFirst(n);
+	};
+	const speciesOf = (q) => (q.region ? `${nameOf(q.dex)} (${t(`app.buddy_targets.form_region.${q.region}`)})` : nameOf(q.dex));
+	// The client's own quest wording (src/data/evolution-quests.json `text`,
+	// from holoholo-text), with the generic line as the fallback.
+	const requirement = (q) => {
+		const own = q.text?.[locale] ?? q.text?.en;
+		const base = own ? own.replace('{0}', String(q.target)) : t('app.buddy_quest.action_fallback', { params: { count: q.target } });
+		return q.time ? `${base} · ${t(`app.buddy_quest.time.${q.time}`)}` : base;
+	};
+	const when = (start, end) => {
+		const s = Date.parse(start);
+		if (Number.isFinite(s) && s > now) return t('app.events.bonus.from', { params: { date: formatNudgeDate(s, locale) } });
+		return t('app.events.bonus.until', { params: { date: formatNudgeDate(Date.parse(end), locale) } });
+	};
+	// Standing bosses carry every locale's name; event bosses only English.
+	const bossName = (r) => r.names?.[locale] || r.name;
+	const reasons = (row) => {
+		const out = [];
+		for (const w of row.wild) {
+			const names = [...new Set(w.matches.map((f) => (f.region ? `${nameOf(f.dex)} (${t(`app.buddy_targets.form_region.${f.region}`)})` : nameOf(f.dex))))];
+			out.push(t('app.buddy_quest.reason.wild', { params: { event: w.title, when: when(w.start, w.end), species: names.join(', ') } }));
+		}
+		const standing = row.raids.filter((r) => !r.title);
+		if (standing.length)
+			out.push(
+				t('app.buddy_quest.reason.raids_now', {
+					params: { bosses: standing.map((r) => (r.tier === 'lvl1' || r.tier === 'shadow_lvl1' ? `${bossName(r)} (1★)` : bossName(r))).join(', ') },
+				}),
+			);
+		const dated = new Map();
+		for (const r of row.raids.filter((r) => r.title)) {
+			if (!dated.has(r.title)) dated.set(r.title, { ...r, names: [] });
+			dated.get(r.title).names.push(bossName(r));
+		}
+		for (const d of dated.values())
+			out.push(t('app.buddy_quest.reason.raid_event', { params: { event: d.title, when: when(d.start, d.end), bosses: [...new Set(d.names)].join(', ') } }));
+		if (row.grunts.length)
+			out.push(t('app.buddy_quest.reason.grunts', { params: { types: row.grunts.map((ty) => typeLabels?.[ty] || ty).join(' / ') } }));
+		for (const h of row.hearts) out.push(t('app.buddy_quest.reason.hearts', { params: { event: h.title, when: when(h.start, h.end) } }));
+		return out;
+	};
+	const shown = plan.ranked;
+	const filter = filterFor ? filterFor(shown.map((r) => r.quest.dex)) : '';
+	const anytime = [...new Map(plan.anytime.map((r) => [r.key, r])).values()];
+	return (
+		<AreaGroup id='buddy-quests' title={t('app.buddy_quest.title')} hint={t('app.buddy_quest.hint')} accent='#9B59B6'>
+			{shown.length === 0 ? (
+				<p className='mono text-xs italic text-[#8B98A5]'>{t('app.buddy_quest.empty')}</p>
+			) : (
+				<div className='space-y-2'>
+					{shown.map((row, i) => {
+						const q = row.quest;
+						return (
+							<ToolTile
+								key={row.key}
+								title={t('app.buddy_quest.row_title', { params: { from: speciesOf(q), to: nameOf(q.evolutionDex) } })}
+								chip={requirement(q)}
+								icon={BUDDY_QUEST_ICON[q.action] || Sprout}
+								accent='#9B59B6'
+								open={i === 0}
+							>
+								<ul className='space-y-1 text-xs text-[#C9D1D9] leading-relaxed list-disc pl-4'>
+									{reasons(row).map((r) => (
+										<li key={r}>{r}</li>
+									))}
+								</ul>
+								{q.eventTargets?.length > 0 && (
+									<p className='mono text-[11px] text-[#8090A0]'>
+										{t('app.buddy_quest.event_targets', { params: { targets: q.eventTargets.join(' / ') } })}
+									</p>
+								)}
+							</ToolTile>
+						);
+					})}
+					{filter && (
+						<FilterBox
+							label={t('app.buddy_quest.filter_label')}
+							accent='#9B59B6'
+							filterStr={filter}
+							copied={copied.buddy_quests}
+							onCopy={() => copyToClipboard('buddy_quests', filter)}
+							hint={t('app.buddy_quest.filter_hint')}
+						/>
+					)}
+				</div>
+			)}
+			{anytime.length > 0 && (
+				<details className='mono text-[11px] text-[#8090A0]'>
+					<summary className='cursor-pointer min-h-[32px] flex items-center uppercase tracking-wide hover:text-[#E6EDF3]'>
+						{t('app.buddy_quest.anytime', { params: { count: anytime.length } })}
+					</summary>
+					<ul className='space-y-0.5 pl-4 list-disc leading-relaxed'>
+						{anytime.map((r) => (
+							<li key={r.key}>
+								<span className='text-[#C9D1D9]'>{speciesOf(r.quest)}</span>: {requirement(r.quest)}
+							</li>
+						))}
+					</ul>
+				</details>
 			)}
 		</AreaGroup>
 	);

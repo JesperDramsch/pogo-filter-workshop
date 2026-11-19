@@ -57,6 +57,7 @@
   "test:swipe": "vite-node scripts/check-swipe-areas.mjs",
   "test:areastage": "vite-node scripts/check-area-stage.mjs",
   "test:bonusnudges": "vite-node scripts/check-bonus-nudges.mjs",
+  "test:buddyquests": "vite-node scripts/check-buddy-quests.mjs",
   "test:sharelink": "vite-node scripts/check-share-link.mjs",
   "test:settingsgroups": "vite-node scripts/check-settings-groups.mjs",
   "test:oneoffs": "vite-node scripts/check-one-offs.mjs",
