@@ -22,6 +22,8 @@
 // Sandygast are both Ghost/Ground) are folded into one line, so a tier reads
 // as a handful of decisions rather than one row per boss.
 //
+// Two readers: every boss under its counter filter in the Battle area's raid
+// panels, and each raid day or raid hour in the Mega planner.
 // Pure functions over the snapshots, no React: scripts/check-raid-plan.mjs.
 
 import { outingBuddyQuests } from './buddy-quests.js';
@@ -83,16 +85,4 @@ export function raidLines(bosses, { megaForms = [], quests = [], wildPool = [] }
 		lines.get(sig).bosses.push(boss);
 	}
 	return [...lines.values()];
-}
-
-// The standing rotation as planner rows, one per tier, in the order the raid
-// panel shows tiers. They have no window: they are what is up right now.
-export function standingRaidRows(raids, tiers, opts) {
-	const rows = [];
-	for (const tier of tiers) {
-		const bosses = raids?.[tier] || [];
-		if (!bosses.length) continue;
-		rows.push({ id: `standing:${tier}`, kind: 'standing', tier, lines: raidLines(bosses, opts) });
-	}
-	return rows;
 }
