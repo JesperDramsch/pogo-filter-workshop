@@ -99,6 +99,15 @@
 //    863→52, while same-species form changes never appear because a step
 //    is only emitted when parent and child dex differ.
 //
+//  - releasedDex: every dex PvPoke lists as released. The friend-collect
+//    "missing" packs walk the whole dex, and without this they would ask
+//    friends for species nobody can have yet.
+//
+//  - buddyKmByDex: each species' buddy candy distance (1, 3, 5 or 20 km),
+//    from `pokemonSettings.kmBuddyDistance`. The "missing" packs use it as a
+//    loose commonness sort, the same proxy the cheap-purify filter's
+//    `candykm1` clause relies on. Read off each default-form template.
+//
 // Flags: --offline-ok   tolerate fetch failures if cache exists.
 
 import { readFileSync, existsSync } from "node:fs";
@@ -329,6 +338,22 @@ export function statProductByDex(templates) {
   return products;
 }
 
+// dex → kmBuddyDistance, off each species' default-form template (or its only
+// template, for a species without forms). Exported for the offline parse test
+// in scripts/check-friend-collect.mjs.
+export function buddyKmByDexFromGameMaster(templates) {
+  const defaults = defaultFormByDex(templates);
+  const out = new Map();
+  for (const t of pokemonTemplates(templates)) {
+    const km = t.settings?.kmBuddyDistance;
+    if (!(km > 0) || out.has(t.dex)) continue;
+    if (t.form === null || t.form === defaults.get(t.dex)) out.set(t.dex, km);
+  }
+  const sorted = {};
+  for (const dex of [...out.keys()].sort((a, b) => a - b)) sorted[String(dex)] = out.get(dex);
+  return sorted;
+}
+
 // Tunables. The plan defaults — change here, not at consumer side.
 const STARTERS_PER_GENERATION = 9;   // 3 lines × 3 stages open every regional dex
 const POWER_LINE_CUMULATIVE_CANDY = 125; // pseudo baseline (25 + 100)
@@ -470,6 +495,8 @@ async function main() {
     upcomingMegaDex,
     showcase,
     evoParentByDex,
+    releasedDex: [...released].sort((a, b) => a - b),
+    buddyKmByDex: buddyKmByDexFromGameMaster(templates),
   };
 
   // Sanity gates — exit 1 turns the sync workflow red, which is the only
@@ -553,6 +580,15 @@ async function main() {
     newContent.starterDex.every((dex) => !specialTrade.has(dex)),
     "specialTradeDex ∩ starterDex = ∅",
   );
+  assertOrDie(newContent.releasedDex.includes(25) && newContent.releasedDex.length > 700,
+    `releasedDex is PvPoke's roster (${newContent.releasedDex.length} > 700, Pikachu in it)`);
+  assertOrDie(Object.keys(newContent.buddyKmByDex).length >= 900,
+    `buddyKmByDex covers the dex (${Object.keys(newContent.buddyKmByDex).length} ≥ 900)`);
+  assertOrDie(newContent.buddyKmByDex["10"] === 1 && newContent.buddyKmByDex["1"] === 3 &&
+    newContent.buddyKmByDex["113"] === 5 && newContent.buddyKmByDex["144"] === 20,
+    "buddy km: Caterpie 1, Bulbasaur 3, Chansey 5, Articuno 20");
+  assertOrDie(Object.values(newContent.buddyKmByDex).every((km) => [1, 3, 5, 20].includes(km)),
+    "every buddy distance is one of the four tiers");
   assertOrDie(evoParentByDex["2"] === 1, "Ivysaur (2) → Bulbasaur (1) ∈ evoParentByDex");
   assertOrDie(evoParentByDex["25"] === 172, "Pikachu (25) → Pichu (172): baby stages are real parents");
   assertOrDie(evoParentByDex["820"] === 819, "Greedent (820) → Skwovet (819) ∈ evoParentByDex");
