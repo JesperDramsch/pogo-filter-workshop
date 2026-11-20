@@ -65,7 +65,7 @@ import { regionForForm } from './data/form-region.js';
 import SpeciesInput from './SpeciesInput.jsx';
 import { liveSpawnPool, megaPlans, rankMegaGroups } from './mega-boost.js';
 import { pickMissingPack } from './missing-pack.js';
-import { raidLines, standingRaidRows, topMegas } from './raid-plan.js';
+import { raidLines, topMegas } from './raid-plan.js';
 import { bonusAppliesAtHome, bonusNudges, roundDistanceKm, venueReach } from './bonus-nudges.js';
 import { outingBuddyQuests } from './buddy-quests.js';
 import {
@@ -5007,6 +5007,9 @@ export function buildFilters(
 			return {
 				id: boss.id,
 				name,
+				names: boss.names || {},
+				types: boss.types || [],
+				seMoveTypes: boss.seMoveTypes || [],
 				clause: '',
 				clauses: [],
 				skipped: true,
@@ -5041,6 +5044,11 @@ export function buildFilters(
 		return {
 			id: boss.id,
 			name,
+			// What src/raid-plan.js reads for the Mega and buddy line under the
+			// counter filter.
+			names: boss.names || {},
+			types: boss.types || [],
+			seMoveTypes: boss.seMoveTypes || [],
 			clause: clauses.map((c) => c.clause).join('&'),
 			clauses,
 			skipped: false,
@@ -8304,32 +8312,44 @@ export default function App() {
 			{UPGRADE_GROUPS.map((group) => renderGroup(group, 'upgrade'))}
 		</div>
 	);
+	// What src/raid-plan.js needs for a raid line: the Mega forms, the quest
+	// evolutions, and what is spawning around the home pin right now (a raid
+	// Mega that also boosts these pays twice).
+	const raidPlanOpts = useMemo(() => {
+		const wildPool = liveSpawnPool((EVENTS.events || []).filter((ev) => bonusAppliesAtHome(ev, homeLocation)), Date.now()).spawnForms;
+		return { megaForms: SPECIES_META.megaForms || [], quests: EVOLUTION_QUESTS.quests, wildPool };
+	}, [clockTick, homeLocation]);
+	// Candy or damage: one choice for every raid panel, kept only for this visit.
+	const [raidMegaMode, setRaidMegaMode] = useState('candy');
+	// The Battle area's raid panels: a Mega and buddy line under every boss.
+	const raidPlan = useMemo(
+		() => ({
+			mode: raidMegaMode,
+			setMode: setRaidMegaMode,
+			lineFor: (boss) => raidLines([boss], raidPlanOpts)[0] || null,
+			megaFilterFor,
+			buddyFilterFor: buddyQuestFilterFor,
+			typeLabels: rocketTypeLabels,
+		}),
+		[raidMegaMode, raidPlanOpts, megaFilterFor, buddyQuestFilterFor, rocketTypeLabels],
+	);
 	const megaPlanRows = useMemo(() => {
 		const now = Date.now();
-		// What is spawning around the home pin right now: a raid Mega that also
-		// boosts these pays twice (src/raid-plan.js).
-		const wildPool = liveSpawnPool((EVENTS.events || []).filter((ev) => bonusAppliesAtHome(ev, homeLocation)), now).spawnForms;
-		const raidOpts = { megaForms: SPECIES_META.megaForms || [], quests: EVOLUTION_QUESTS.quests, wildPool };
-		const withBuddies = (lines) =>
-			buddyQuestFilterFor([...new Set(lines.flatMap((l) => l.buddies.map((b) => b.quest.dex)))]);
-		const dated = megaPlans({ events: EVENTS.events, eventRaids: RAID_BOSSES.eventRaids }, now, (n) => resolveSpeciesInfo(n)?.dex)
+		return megaPlans({ events: EVENTS.events, eventRaids: RAID_BOSSES.eventRaids }, now, (n) => resolveSpeciesInfo(n)?.dex)
 			.map((p) => {
 				if (p.kind === 'raid') {
 					// A raid day or raid hour: per boss, the Mega for candy or for
 					// damage and the buddy quests the boss counts for.
-					const lines = raidLines(p.bosses, raidOpts);
-					return { ...p, lines, buddyFilter: withBuddies(lines) };
+					const lines = raidLines(p.bosses, raidPlanOpts);
+					const dexes = [...new Set(lines.flatMap((l) => l.buddies.map((b) => b.quest.dex)))];
+					return { ...p, lines, buddyFilter: buddyQuestFilterFor(dexes) };
 				}
 				// Quest evolutions this outing helps (src/buddy-quests.js), best first.
 				const buddies = outingBuddyQuests(EVOLUTION_QUESTS.quests, p);
 				return { ...p, boost: megaBoostFor(p.spawnForms), buddies, buddyFilter: buddyQuestFilterFor(buddies.map((b) => b.quest.dex)) };
 			})
 			.filter((p) => (p.lines ? p.lines.length > 0 : p.boost.groups.length > 0 || p.buddies.length > 0));
-		// The standing rotation, one row per tier, after the dated outings: no
-		// window, it is what is up right now.
-		const standing = standingRaidRows(RAID_BOSSES.raids, STANDING_RAID_TIERS, raidOpts).map((r) => ({ ...r, buddyFilter: withBuddies(r.lines) }));
-		return [...dated, ...standing];
-	}, [megaBoostFor, buddyQuestFilterFor, clockTick, homeLocation]);
+	}, [megaBoostFor, buddyQuestFilterFor, raidPlanOpts]);
 	// Event bonuses that make an existing filter worth opening now (src/bonus-nudges.js).
 	// An in-person event's bonuses nudge only a home pin within reach of its venue.
 	const bonusNudgeRows = useMemo(() => bonusNudges(EVENTS.bonuses, Date.now(), { homeLocation }), [clockTick, homeLocation]);
@@ -8747,6 +8767,7 @@ export default function App() {
 														copied={copied}
 														copyToClipboard={copyToClipboard}
 														keyPrefix='raid'
+														raidPlan={raidPlan}
 														t={t}
 														locale={locale}
 													/>
@@ -8765,6 +8786,7 @@ export default function App() {
 														copied={copied}
 														copyToClipboard={copyToClipboard}
 														keyPrefix='raid'
+														raidPlan={raidPlan}
 														t={t}
 														locale={locale}
 													/>
@@ -8783,6 +8805,7 @@ export default function App() {
 														copied={copied}
 														copyToClipboard={copyToClipboard}
 														keyPrefix='raid'
+														raidPlan={raidPlan}
 														t={t}
 														locale={locale}
 													/>
@@ -11873,9 +11896,6 @@ function liveEventGroups(eventGroups) {
 	return (eventGroups || []).filter((event) => !(Date.parse(event.end) < now));
 }
 
-// The standing tiers the Mega planner lists as "in rotation now", in order.
-const STANDING_RAID_TIERS = ['lvl5', 'mega', 'lvl3', 'lvl1', 'shadow_lvl5', 'shadow_lvl3', 'shadow_lvl1'];
-
 // The standing raid tiers behind each raid panel. Anything else (3★, 1★ and
 // their shadow tiers) is "other".
 export const RAID_PANEL_TIERS = {
@@ -11946,6 +11966,7 @@ function BossCollapsible({
 	copied,
 	copyToClipboard,
 	keyPrefix,
+	raidPlan = null,
 	t,
 	locale,
 }) {
@@ -11966,12 +11987,39 @@ function BossCollapsible({
 			</Collapsible>
 		);
 	}
-	const renderBosses = (bosses, scope) =>
-		bossCounterBoxes(bosses, scope, { keyPrefix, accent, copied, copyToClipboard, t });
+	// With a raid plan, each counter filter gets the Mega and buddy for that
+	// boss underneath (src/raid-plan.js); Max Battles pass none.
+	const renderBosses = (bosses, scope) => {
+		const boxes = bossCounterBoxes(bosses, scope, { keyPrefix, accent, copied, copyToClipboard, t });
+		if (!raidPlan) return boxes;
+		const keys = bossBoxKeys(bosses);
+		return (bosses || []).map((boss, i) => {
+			// Formes listed back to back (Deoxys) share one answer: show it once.
+			const repeat = i > 0 && bosses[i - 1].names?.en && bosses[i - 1].names.en === boss.names?.en;
+			const line = repeat ? null : raidPlan.lineFor(boss);
+			return (
+				<Fragment key={keys[i]}>
+					{boxes[i]}
+					{line && (
+						<BossMegaBuddy
+							line={line}
+							raidPlan={raidPlan}
+							scopeKey={`${keyPrefix}_${scope}_${keys[i]}`}
+							copied={copied}
+							copyToClipboard={copyToClipboard}
+							t={t}
+							locale={locale}
+						/>
+					)}
+				</Fragment>
+			);
+		});
+	};
 	const hasEvents = events.length > 0;
 	return (
 		<Collapsible icon={icon} label={headerLabel} hook={hook} open={open} onToggle={onToggle}>
 			<div className='space-y-5'>
+				{raidPlan && <RaidModeToggle mode={raidPlan.mode} onMode={raidPlan.setMode} t={t} />}
 				{/* tiers below; footer rendered at end */}
 				{hasEvents && (
 					<div className='space-y-3'>
@@ -12427,7 +12475,6 @@ function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels,
 	const fmtDow = new Intl.DateTimeFormat(locale, { weekday: 'short' });
 	const fmtTime = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
 	const when = (p) => {
-		if (p.kind === 'standing') return t('app.raid_plan.standing_chip');
 		const s = Date.parse(p.start), e = Date.parse(p.end);
 		if (s <= now) return t('app.mega_plan.now_until', { params: { end: `${fmtDow.format(e)} ${fmtTime.format(e)}` } });
 		return t('app.mega_plan.starts', { params: { start: `${fmtDow.format(s)} ${fmtTime.format(s)}` } });
@@ -12448,7 +12495,6 @@ function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels,
 		const name = key ? cap(pokemonNameFor(key, locale) || '') : '';
 		return [name, buddyHook(p.buddies?.[0]?.quest)].filter(Boolean).join(' · ');
 	};
-	const titleOf = (p) => (p.kind === 'standing' ? t(`app.collapsible.aux_boss_tier.${p.tier}`) : p.title);
 	return (
 		<AreaGroup id='mega-plan' title={t('app.mega_plan.title')} hint={t('app.mega_plan.hint')} accent='#E91E63'>
 			{plans.length === 0 ? (
@@ -12456,7 +12502,7 @@ function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels,
 			) : (
 				<div className='space-y-2'>
 					{plans.map((p) => {
-						const live = p.kind !== 'standing' && Date.parse(p.start) <= now;
+						const live = Date.parse(p.start) <= now;
 						const icon = p.kind === 'wild' ? Leaf : Target;
 						// An in-person event far from the home pin stays folded even while
 						// it runs; its chip carries the city and the distance.
@@ -12464,7 +12510,7 @@ function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels,
 						return (
 							<ToolTile
 								key={p.id}
-								title={titleOf(p)}
+								title={p.title}
 								chip={where ? `${when(p)} · ${where.chip}` : when(p)}
 								hook={hookOf(p)}
 								icon={icon}
@@ -12519,7 +12565,7 @@ function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels,
 	);
 }
 
-// One raid outing (a raid day, a raid hour, or a standing tier) as a few
+// One raid outing (a raid day or a raid hour) as a few
 // lines, one per boss or per set of bosses with the same answer
 // (src/raid-plan.js raidLines). Each line names the Mega to have active, for
 // extra candy (it shares the boss's type) or extra damage (its type hits the
@@ -12528,105 +12574,165 @@ function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels,
 // now says how many. Then the buddy quests the boss counts for. Each line has
 // its own Mega filter; the buddy filter covers the whole row.
 const RAID_MEGAS_SHOWN = 4;
-function RaidLinesPanel({ row, mode, onMode, megaFilterFor, copied, copyToClipboard, typeLabels, t, locale }) {
+// Names and texts a raid line needs, in the UI locale.
+function raidWords(t, locale, typeLabels) {
 	const cap = (name) => String(name || '').replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toUpperCase());
-	const megaName = (m) => cap(POKEMON_NAMES_DICT[m.key]?.[locale] ?? POKEMON_NAMES_DICT[m.key]?.en ?? m.key);
 	const speciesName = (dex) => capFirst(POKEMON_NAMES_DICT[String(dex)]?.[locale] ?? POKEMON_NAMES_DICT[String(dex)]?.en ?? '');
-	const bossName = (b) => b.names?.[locale] || b.names?.en || b.id;
-	// A quest species with its region: only Galarian Slowpoke has the quest.
-	const questSpecies = (q) => (q.region ? `${speciesName(q.dex)} (${t(`app.buddy_targets.form_region.${q.region}`)})` : speciesName(q.dex));
-	const typesOf = (types) => (types || []).map((k) => typeLabels?.[k] || k).join(' / ');
-	const questText = (q) => {
-		const own = q.text?.[locale] ?? q.text?.en;
-		const base = own ? own.replace('{0}', String(q.target)) : t('app.buddy_quest.action_fallback', { params: { count: q.target } });
-		return q.time ? `${base} · ${t(`app.buddy_quest.time.${q.time}`)}` : base;
+	return {
+		megaName: (m) => cap(POKEMON_NAMES_DICT[m.key]?.[locale] ?? POKEMON_NAMES_DICT[m.key]?.en ?? m.key),
+		speciesName,
+		bossName: (b) => b.names?.[locale] || b.names?.en || b.name || b.id,
+		// A quest species with its region: only Galarian Slowpoke has the quest.
+		questSpecies: (q) => (q.region ? `${speciesName(q.dex)} (${t(`app.buddy_targets.form_region.${q.region}`)})` : speciesName(q.dex)),
+		typesOf: (types) => (types || []).map((k) => typeLabels?.[k] || k).join(' / '),
+		questText: (q) => {
+			const own = q.text?.[locale] ?? q.text?.en;
+			const base = own ? own.replace('{0}', String(q.target)) : t('app.buddy_quest.action_fallback', { params: { count: q.target } });
+			return q.time ? `${base} · ${t(`app.buddy_quest.time.${q.time}`)}` : base;
+		},
 	};
+}
+
+// "Mega for: extra candy | extra damage" (src/raid-plan.js RAID_MODES).
+function RaidModeToggle({ mode, onMode, t }) {
+	return (
+		<div role='group' aria-label={t('app.raid_plan.mode_label')} className='flex flex-wrap items-center gap-2'>
+			<span className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t('app.raid_plan.mode_label')}</span>
+			{['candy', 'damage'].map((m) => (
+				<button
+					key={m}
+					type='button'
+					onClick={() => onMode(m)}
+					aria-pressed={mode === m}
+					className={`mono text-xs min-h-[32px] px-3 rounded-sm border transition ${
+						mode === m ? 'bg-[#1F2933] border-[#E91E63] text-[#E91E63]' : 'border-[#2D3A47] text-[#8090A0] hover:text-[#E6EDF3]'
+					}`}
+				>
+					{t(`app.raid_plan.mode_${m}`)}
+				</button>
+			))}
+		</div>
+	);
+}
+
+// One raid line's answer (src/raid-plan.js raidLines): the Mega for the mode,
+// marked when it does candy and damage both and saying how many wild spawns it
+// also boosts, the others that fit, the buddy quests the boss counts for, and
+// the Mega filter. `buddyFilter`, when given, adds the buddy filter for this
+// line alone (the Battle panels, one boss at a time).
+function RaidLineBody({ line, mode, words, megaFilterFor, buddyFilter, copyKey, copied, copyToClipboard, t }) {
+	const top = topMegas(line.megas, mode);
+	const rest = (line.megas[mode] || []).filter((m) => !top.includes(m));
+	const both = top.length > 0 && line.megas.both.has(top[0].key);
+	const wild = top.length > 0 ? line.megas.wildHits.get(top[0].key) : 0;
+	const shownTop = top.slice(0, RAID_MEGAS_SHOWN);
+	const moreTop = top.length - shownTop.length;
+	const filter = megaFilterFor ? megaFilterFor(top) : '';
+	const megaKey = `raidmega_${copyKey}_${mode}`;
+	const buddyKey = `raidbuddy_${copyKey}`;
+	const [buddy, ...alsoBuddies] = line.buddies;
+	return (
+		<div className='text-xs text-[#C9D1D9] space-y-1.5'>
+			{top.length === 0 ? (
+				<p className='italic text-[#8B98A5]'>{t('app.raid_plan.no_mega')}</p>
+			) : (
+				<p>
+					<span className='mono text-[#8090A0]'>{t('app.raid_plan.mega_label')} </span>
+					<span className='font-medium text-[#E91E63]'>
+						{shownTop.length > 1 && `${t('app.events.mega_any_of')} `}
+						{shownTop.map(words.megaName).join(' · ')}
+						{moreTop > 0 && ` ${t('app.events.mega_more', { params: { count: moreTop } })}`}
+					</span>
+					{both && (
+						<span className='mono text-[10px] ml-2 px-1.5 py-0.5 rounded-sm border border-[#E91E63]/60 text-[#E91E63]'>
+							{t('app.raid_plan.both')}
+						</span>
+					)}
+					{wild > 0 && <span className='text-[#8B98A5]'> · {t('app.raid_plan.wild_hits', { params: { hits: wild } })}</span>}
+					{rest.length > 0 && (
+						<span className='block text-[#8B98A5]'>
+							{t('app.raid_plan.also', { params: { names: rest.slice(0, RAID_MEGAS_SHOWN).map(words.megaName).join(', ') } })}
+							{rest.length > RAID_MEGAS_SHOWN && ` ${t('app.events.mega_more', { params: { count: rest.length - RAID_MEGAS_SHOWN } })}`}
+						</span>
+					)}
+				</p>
+			)}
+			{buddy && (
+				<p>
+					<span className='mono text-[#8090A0]'>{t('app.raid_plan.buddy_label')} </span>
+					<span className='font-medium text-[#9B59B6]'>
+						{t('app.buddy_quest.row_title', { params: { from: words.questSpecies(buddy.quest), to: words.speciesName(buddy.quest.evolutionDex) } })}
+					</span>
+					<span className='text-[#8B98A5]'> · {words.questText(buddy.quest)}</span>
+					{alsoBuddies.length > 0 && (
+						<span className='block text-[#8B98A5]'>
+							{t('app.raid_plan.also', { params: { names: [...new Set(alsoBuddies.map((b) => words.questSpecies(b.quest)))].join(', ') } })}
+						</span>
+					)}
+				</p>
+			)}
+			{filter && (
+				<FilterBox
+					label={t(`app.raid_plan.mega_filter_label_${mode}`)}
+					accent='#E91E63'
+					filterStr={filter}
+					copied={copied[megaKey]}
+					onCopy={() => copyToClipboard(megaKey, filter)}
+					hint={t(`app.raid_plan.mega_filter_hint_${mode}`)}
+				/>
+			)}
+			{buddyFilter && (
+				<FilterBox
+					label={t('app.buddy_quest.filter_label_raids')}
+					accent='#9B59B6'
+					filterStr={buddyFilter}
+					copied={copied[buddyKey]}
+					onCopy={() => copyToClipboard(buddyKey, buddyFilter)}
+					hint={t('app.buddy_quest.filter_hint')}
+				/>
+			)}
+		</div>
+	);
+}
+
+// The one-line teaser of a raid line: "Mega-Gengar · Kumpel: Rasaff".
+function raidLineSummary(line, mode, words, t) {
+	const mega = topMegas(line.megas, mode)[0];
+	const buddy = line.buddies[0]?.quest;
+	return [
+		mega && `${t('app.raid_plan.mega_label')} ${words.megaName(mega)}`,
+		buddy && t('app.mega_plan.hook_buddy', { params: { name: words.speciesName(buddy.dex) } }),
+	]
+		.filter(Boolean)
+		.join(' · ');
+}
+
+// A raid day or raid hour in the Mega planner, one line per boss or per set of
+// bosses with the same answer, and one buddy filter for the whole outing.
+function RaidLinesPanel({ row, mode, onMode, megaFilterFor, copied, copyToClipboard, typeLabels, t, locale }) {
+	const words = raidWords(t, locale, typeLabels);
 	return (
 		<div className='space-y-3'>
-			<div role='group' aria-label={t('app.raid_plan.mode_label')} className='flex flex-wrap items-center gap-2'>
-				<span className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t('app.raid_plan.mode_label')}</span>
-				{['candy', 'damage'].map((m) => (
-					<button
-						key={m}
-						type='button'
-						onClick={() => onMode(m)}
-						aria-pressed={mode === m}
-						className={`mono text-xs min-h-[32px] px-3 rounded-sm border transition ${
-							mode === m ? 'bg-[#1F2933] border-[#E91E63] text-[#E91E63]' : 'border-[#2D3A47] text-[#8090A0] hover:text-[#E6EDF3]'
-						}`}
-					>
-						{t(`app.raid_plan.mode_${m}`)}
-					</button>
-				))}
-			</div>
+			<RaidModeToggle mode={mode} onMode={onMode} t={t} />
 			<ol className='space-y-3'>
-				{row.lines.map((line) => {
-					const top = topMegas(line.megas, mode);
-					const rest = (line.megas[mode] || []).filter((m) => !top.includes(m));
-					const both = top.length > 0 && line.megas.both.has(top[0].key);
-					const wild = top.length > 0 ? line.megas.wildHits.get(top[0].key) : 0;
-					const shownTop = top.slice(0, RAID_MEGAS_SHOWN);
-					const moreTop = top.length - shownTop.length;
-					const filter = megaFilterFor ? megaFilterFor(top) : '';
-					const copyKey = `raidmega_${row.id}_${line.key}_${mode}`;
-					const [buddy, ...alsoBuddies] = line.buddies;
-					return (
-						<li key={line.key} className='text-xs text-[#C9D1D9] space-y-1.5'>
-							<p>
-								<span className='font-semibold text-[#E6EDF3]'>{line.bosses.map(bossName).join(', ')}</span>
-								<span className='text-[#8B98A5]'> · {typesOf(line.bosses[0].types)}</span>
-							</p>
-							{top.length === 0 ? (
-								<p className='italic text-[#8B98A5]'>{t('app.raid_plan.no_mega')}</p>
-							) : (
-								<p>
-									<span className='mono text-[#8090A0]'>{t('app.raid_plan.mega_label')} </span>
-									<span className='font-medium text-[#E91E63]'>
-										{shownTop.length > 1 && `${t('app.events.mega_any_of')} `}
-										{shownTop.map(megaName).join(' · ')}
-										{moreTop > 0 && ` ${t('app.events.mega_more', { params: { count: moreTop } })}`}
-									</span>
-									{both && (
-										<span className='mono text-[10px] ml-2 px-1.5 py-0.5 rounded-sm border border-[#E91E63]/60 text-[#E91E63]'>
-											{t('app.raid_plan.both')}
-										</span>
-									)}
-									{wild > 0 && <span className='text-[#8B98A5]'> · {t('app.raid_plan.wild_hits', { params: { hits: wild } })}</span>}
-									{rest.length > 0 && (
-										<span className='block text-[#8B98A5]'>
-											{t('app.raid_plan.also', { params: { names: rest.slice(0, RAID_MEGAS_SHOWN).map(megaName).join(', ') } })}
-											{rest.length > RAID_MEGAS_SHOWN && ` ${t('app.events.mega_more', { params: { count: rest.length - RAID_MEGAS_SHOWN } })}`}
-										</span>
-									)}
-								</p>
-							)}
-							{buddy && (
-								<p>
-									<span className='mono text-[#8090A0]'>{t('app.raid_plan.buddy_label')} </span>
-									<span className='font-medium text-[#9B59B6]'>
-										{t('app.buddy_quest.row_title', { params: { from: questSpecies(buddy.quest), to: speciesName(buddy.quest.evolutionDex) } })}
-									</span>
-									<span className='text-[#8B98A5]'> · {questText(buddy.quest)}</span>
-									{alsoBuddies.length > 0 && (
-										<span className='block text-[#8B98A5]'>
-											{t('app.raid_plan.also', { params: { names: [...new Set(alsoBuddies.map((b) => questSpecies(b.quest)))].join(', ') } })}
-										</span>
-									)}
-								</p>
-							)}
-							{filter && (
-								<FilterBox
-									label={t(`app.raid_plan.mega_filter_label_${mode}`)}
-									accent='#E91E63'
-									filterStr={filter}
-									copied={copied[copyKey]}
-									onCopy={() => copyToClipboard(copyKey, filter)}
-									hint={t(`app.raid_plan.mega_filter_hint_${mode}`)}
-								/>
-							)}
-						</li>
-					);
-				})}
+				{row.lines.map((line) => (
+					<li key={line.key} className='space-y-1.5'>
+						<p className='text-xs'>
+							<span className='font-semibold text-[#E6EDF3]'>{line.bosses.map(words.bossName).join(', ')}</span>
+							<span className='text-[#8B98A5]'> · {words.typesOf(line.bosses[0].types)}</span>
+						</p>
+						<RaidLineBody
+							line={line}
+							mode={mode}
+							words={words}
+							megaFilterFor={megaFilterFor}
+							copyKey={`${row.id}_${line.key}`}
+							copied={copied}
+							copyToClipboard={copyToClipboard}
+							t={t}
+						/>
+					</li>
+				))}
 			</ol>
 			{row.buddyFilter && (
 				<FilterBox
@@ -12639,6 +12745,36 @@ function RaidLinesPanel({ row, mode, onMode, megaFilterFor, copied, copyToClipbo
 				/>
 			)}
 		</div>
+	);
+}
+
+// Under a boss's counter filter in the Battle area: the Mega and buddy for
+// that raid, folded to one teaser line until opened (src/raid-plan.js).
+function BossMegaBuddy({ line, raidPlan, scopeKey, copied, copyToClipboard, t, locale }) {
+	const words = raidWords(t, locale, raidPlan.typeLabels);
+	const summary = raidLineSummary(line, raidPlan.mode, words, t);
+	if (!summary) return null;
+	const buddyFilter = raidPlan.buddyFilterFor(line.buddies.map((b) => b.quest.dex));
+	return (
+		<details className='group rounded-sm border border-[#1F2933] bg-[#0B1015] -mt-1'>
+			<summary className='list-none cursor-pointer min-h-[32px] flex items-center gap-2 px-3 py-1.5 mono text-[11px] text-[#8B98A5] hover:text-[#E6EDF3]'>
+				<ChevronRight size={12} className='details-arrow shrink-0' aria-hidden='true' />
+				<span>{summary}</span>
+			</summary>
+			<div className='px-3 pb-3 pt-1'>
+				<RaidLineBody
+					line={line}
+					mode={raidPlan.mode}
+					words={words}
+					megaFilterFor={raidPlan.megaFilterFor}
+					buddyFilter={buddyFilter}
+					copyKey={scopeKey}
+					copied={copied}
+					copyToClipboard={copyToClipboard}
+					t={t}
+				/>
+			</div>
+		</details>
 	);
 }
 

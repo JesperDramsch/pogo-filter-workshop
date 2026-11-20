@@ -1,4 +1,5 @@
-// Offline checks for the raid rows of the Mega planner (src/raid-plan.js) and
+// Offline checks for the raid Mega and buddy lines (src/raid-plan.js) under
+// the Battle area's counter filters and in the Mega planner's raid days, and
 // the Mega filter they copy.
 // Run with: npm run test:raidplan
 //
@@ -8,18 +9,17 @@
 //   R2 — wild spawns: among equals, the Mega that also boosts the wild spawns
 //        running now ranks first, and topMegas keeps every tie
 //   R3 — lines: bosses with the same answer fold into one line, Deoxys's
-//        formes are one boss, buddy quests ride along; standing rows follow
-//        the tier order and skip empty tiers
-//   R4 — the snapshot: every line built from the committed rotation keeps R1
+//        formes are one boss, buddy quests ride along
+//   R4 — the snapshot: the generator's boss entries carry what a line needs,
+//        and every line built from them keeps R1
 //   R5 — the filter: Mega species in the output locale plus the Mega keyword,
 //        a Primal's species OR'd into that clause
 //
 // Data-derived, so no fixture: properties only (see scripts/lib/fixture.mjs).
 
 import { createChecker } from "./lib/check.mjs";
-import { raidLines, raidMegas, standingRaidRows, topMegas } from "../src/raid-plan.js";
+import { raidLines, raidMegas, topMegas } from "../src/raid-plan.js";
 import { megaPlans } from "../src/mega-boost.js";
-import RAID_BOSSES from "../src/data/raid-bosses.json";
 import SPECIES_META from "../src/data/species-meta.json";
 import QUESTS from "../src/data/evolution-quests.json";
 import { buildFilters, DEFAULT_HUNDOS, DEFAULT_LUCKIES } from "../src/App.jsx";
@@ -76,16 +76,18 @@ check("bosses with the same answer fold into one line", lines.some((l) => l.boss
 check("Deoxys's formes are one boss", lines.filter((l) => l.bosses.some((b) => b.names.en === "Deoxys")).flatMap((l) => l.bosses).length === 1);
 check("a Dark boss carries Pancham's catch quest (the boss is caught after the win)", lines.find((l) => l.bosses[0].names.en === "Darkrai")?.buddies[0]?.quest.dex === 674);
 check("a Ghost boss carries the defeat quest", lines.find((l) => l.bosses[0].names.en === "Sandygast")?.buddies.some((b) => b.quest.dex === 57));
-const rows = standingRaidRows({ lvl1: [ghostBoss], lvl5: [darkBoss], mega: [] }, ["lvl5", "mega", "lvl1"], { megaForms: megas, quests });
-check("standing rows follow the tier order and skip empty tiers", rows.map((r) => r.tier).join() === "lvl5,lvl1");
-check("standing rows have no window", rows.every((r) => r.kind === "standing" && !r.start));
 const plans = megaPlans({ eventRaids: [{ eventType: "raid-hour", name: "Darkrai Raid Hour", start: "2026-11-25T18:00:00", end: "2026-11-25T19:00:00", bosses: [{ ...darkBoss, names: { en: "Darkrai" } }] }] }, Date.parse("2026-11-24T12:00:00"), () => 491);
 check("a dated raid row carries its bosses for the raid lines", plans[0]?.bosses?.length === 1);
 
 // ── R4 ──
 console.log("\nR4 — the committed rotation");
-const real = standingRaidRows(RAID_BOSSES.raids, Object.keys(RAID_BOSSES.raids), { megaForms: SPECIES_META.megaForms, quests: QUESTS.quests });
-const realLines = real.flatMap((r) => r.lines);
+// The Battle panels build each line from the generator's boss entry, so read
+// the rotation the same way.
+const { raidFilters } = buildFilters(DEFAULT_HUNDOS, DEFAULT_LUCKIES, FIXTURE_CONFIG, [], "de");
+const entries = Object.values(raidFilters).flat();
+check("every raid boss entry carries names, types and seMoveTypes", entries.length > 0 && entries.every((e) => e.names?.en && e.types?.length > 0 && Array.isArray(e.seMoveTypes)));
+const realLines = entries.map((e) => raidLines([e], { megaForms: SPECIES_META.megaForms, quests: QUESTS.quests })[0]).filter(Boolean);
+check("one line per boss in the rotation", realLines.length === entries.length, `${realLines.length}/${entries.length}`);
 check("the rotation gives raid lines", realLines.length > 0, `${realLines.length}`);
 const share = (a, b) => (a || []).some((t) => (b || []).includes(t));
 const badCandy = realLines.filter((l) => l.megas.candy.some((m) => !share(m.boostTypes || m.types, l.bosses[0].types)));
@@ -93,7 +95,6 @@ const badDamage = realLines.filter((l) => l.megas.damage.some((m) => !share(m.ty
 check("every candy Mega shares a type with its boss", badCandy.length === 0);
 check("every damage Mega's type hits its boss super-effectively", badDamage.length === 0);
 check("every both-Mega is in both lists", realLines.every((l) => [...l.megas.both].every((k) => l.megas.candy.some((m) => m.key === k) && l.megas.damage.some((m) => m.key === k))));
-check("folded bosses share their types", realLines.every((l) => l.bosses.every((b) => [...b.types].sort().join() === [...l.bosses[0].types].sort().join())));
 
 // ── R5 ──
 console.log("\nR5 — the Mega filter");
