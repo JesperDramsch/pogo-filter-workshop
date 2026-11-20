@@ -1,0 +1,774 @@
+{
+  "fetchedAt": "2026-11-19T20:39:13.994Z",
+  "quests": [
+    {
+      "dex": 57,
+      "form": "PRIMEAPE",
+      "region": null,
+      "evolution": "ANNIHILAPE",
+      "evolutionDex": 979,
+      "candyCost": 100,
+      "quest": "ANNIHILAPE_EVOLUTION_QUEST",
+      "action": "defeat",
+      "types": [
+        "ghost",
+        "psychic"
+      ],
+      "target": 30,
+      "questType": "QUEST_FIGHT_POKEMON",
+      "textKey": "quest_fight_type_ghost_psychic_plural",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Defeat {0} Psychic- or Ghost-type Pokémon",
+        "de": "Besiege {0} Pokémon vom Typ Psycho oder Geist",
+        "es": "Derrota a {0} Pokémon de tipo Psíquico o Fantasma",
+        "fr": "Remporte un combat contre {0} Pokémon de type Psy ou Spectre",
+        "zh-TW": "戰勝{0}隻超能力屬性或幽靈屬性的寶可夢",
+        "hi": "{0} साइकिक या घोस्ट टाइप पोकेमॉन हराएँ",
+        "ja": "エスパータイプかゴーストタイプのポケモン{0}匹に勝つ"
+      }
+    },
+    {
+      "dex": 79,
+      "form": "SLOWPOKE_GALARIAN",
+      "region": "galar",
+      "evolution": "SLOWBRO",
+      "evolutionDex": 80,
+      "candyCost": 50,
+      "quest": "SLOWBRO_G_EVOLUTION_QUEST",
+      "action": "catch",
+      "types": [
+        "poison"
+      ],
+      "target": 30,
+      "questType": "QUEST_CATCH_POKEMON",
+      "textKey": "quest_catch_type_poison_plural",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Catch {0} Poison-type Pokémon",
+        "de": "Fange {0} Pokémon vom Typ Gift",
+        "es": "Captura {0} Pokémon de tipo Veneno",
+        "fr": "Attrape {0} Pokémon de type Poison",
+        "zh-TW": "捕捉 {0} 隻毒屬性的寶可夢",
+        "hi": "{0} पॉइज़न टाइप पोकेमॉन पकड़ें",
+        "ja": "どくタイプのポケモンを{0}匹捕まえる"
+      }
+    },
+    {
+      "dex": 79,
+      "form": "SLOWPOKE_GALARIAN",
+      "region": "galar",
+      "evolution": "SLOWKING",
+      "evolutionDex": 199,
+      "candyCost": 50,
+      "quest": "SLOWKING_G_EVOLUTION_QUEST",
+      "action": "catch",
+      "types": [
+        "psychic"
+      ],
+      "target": 30,
+      "questType": "QUEST_CATCH_POKEMON",
+      "textKey": "quest_catch_type_psychic_plural",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Catch {0} Psychic-type Pokémon",
+        "de": "Fange {0} Pokémon vom Typ Psycho",
+        "es": "Captura {0} Pokémon de tipo Psíquico",
+        "fr": "Attrape {0} Pokémon de type Psy",
+        "zh-TW": "捕捉 {0} 隻超能力屬性的寶可夢",
+        "hi": "{0} साइकिक टाइप पोकेमॉन पकड़ें",
+        "ja": "エスパータイプのポケモンを{0}匹捕まえる"
+      }
+    },
+    {
+      "dex": 83,
+      "form": "FARFETCHD_GALARIAN",
+      "region": "galar",
+      "evolution": "SIRFETCHD",
+      "evolutionDex": 865,
+      "candyCost": 50,
+      "quest": "SIRFETCHD_EVOLUTION_QUEST",
+      "action": "throw",
+      "types": [],
+      "target": 10,
+      "questType": "QUEST_LAND_THROW",
+      "textKey": "quest_land_excellent_plural",
+      "throwType": "excellent",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Make {0} Excellent Throws",
+        "de": "Lande {0} fabelhafte Würfe",
+        "es": "Haz {0} lanzamientos excelentes",
+        "fr": "Fais {0} Excellents lancers",
+        "zh-TW": "投出 {0} 次Excellent",
+        "hi": "{0} बेहतरीन थ्रो करें",
+        "ja": "エクセレントスローを{0}回投げる"
+      }
+    },
+    {
+      "dex": 133,
+      "form": "EEVEE",
+      "region": null,
+      "evolution": "ESPEON",
+      "evolutionDex": 196,
+      "candyCost": 25,
+      "quest": "ESPEON_EVOLUTION_QUEST",
+      "action": "walk",
+      "types": [],
+      "target": 10,
+      "questType": "QUEST_BUDDY_EVOLUTION_WALK",
+      "textKey": "quest_buddy_walk_km_plural",
+      "time": "day",
+      "eventTargets": [
+        1
+      ],
+      "text": {
+        "en": "Walk {0} km with your buddy",
+        "de": "Laufe {0} km mit deinem Kumpel",
+        "es": "Camina {0} km con tu Pokémon compañero",
+        "fr": "Marche {0} km avec ton copain",
+        "zh-TW": "和夥伴一起步行 {0} 公里",
+        "hi": "अपने पार्टनर के साथ {0} km चलें!",
+        "ja": "相棒のポケモンと一緒に{0}km歩く"
+      }
+    },
+    {
+      "dex": 133,
+      "form": "EEVEE",
+      "region": null,
+      "evolution": "SYLVEON",
+      "evolutionDex": 700,
+      "candyCost": 25,
+      "quest": "SYLVEON_EVOLUTION_QUEST",
+      "action": "hearts",
+      "types": [],
+      "target": 70,
+      "questType": "QUEST_BUDDY_EARN_AFFECTION_POINTS",
+      "textKey": "challenge_buddy_affection_single",
+      "time": null,
+      "eventTargets": [
+        7,
+        20
+      ],
+      "text": {
+        "en": "Earn {0} hearts with your buddy",
+        "de": "Verdiene {0} Herzen mit deinem Kumpel",
+        "es": "Consigue {0} corazones con tu compañero",
+        "fr": "Gagne {0} cœurs avec ton copain",
+        "zh-TW": "和夥伴獲得 {0} 顆心心",
+        "hi": "अपने पार्टनर के साथ {0} हार्ट कमाएं",
+        "ja": "相棒のハートポイントを{0}個獲得する"
+      }
+    },
+    {
+      "dex": 133,
+      "form": "EEVEE",
+      "region": null,
+      "evolution": "UMBREON",
+      "evolutionDex": 197,
+      "candyCost": 25,
+      "quest": "UMBREON_EVOLUTION_QUEST",
+      "action": "walk",
+      "types": [],
+      "target": 10,
+      "questType": "QUEST_BUDDY_EVOLUTION_WALK",
+      "textKey": "quest_buddy_walk_km_plural",
+      "time": "night",
+      "eventTargets": [
+        1
+      ],
+      "text": {
+        "en": "Walk {0} km with your buddy",
+        "de": "Laufe {0} km mit deinem Kumpel",
+        "es": "Camina {0} km con tu Pokémon compañero",
+        "fr": "Marche {0} km avec ton copain",
+        "zh-TW": "和夥伴一起步行 {0} 公里",
+        "hi": "अपने पार्टनर के साथ {0} km चलें!",
+        "ja": "相棒のポケモンと一緒に{0}km歩く"
+      }
+    },
+    {
+      "dex": 211,
+      "form": "QWILFISH_HISUIAN",
+      "region": "hisui",
+      "evolution": "OVERQWIL",
+      "evolutionDex": 904,
+      "candyCost": 50,
+      "quest": "OVERQWIL_EVOLUTION_QUEST",
+      "action": "raid_win",
+      "types": [],
+      "target": 10,
+      "questType": "QUEST_COMPLETE_RAID_BATTLE",
+      "textKey": "quest_win_raid_plural",
+      "max": false,
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Win {0} raids",
+        "de": "Gewinne {0} Raids",
+        "es": "Gana en {0} incursiones",
+        "fr": "Gagne {0} Raids",
+        "zh-TW": "在團體戰中獲勝 {0} 次",
+        "hi": "{0} रेड जीतें",
+        "ja": "レイドバトルで{0}回勝つ"
+      }
+    },
+    {
+      "dex": 215,
+      "form": "SNEASEL_HISUIAN",
+      "region": "hisui",
+      "evolution": "SNEASLER",
+      "evolutionDex": 903,
+      "candyCost": 100,
+      "quest": "SNEASLER_EVOLUTION_QUEST",
+      "action": "walk",
+      "types": [],
+      "target": 7,
+      "questType": "QUEST_BUDDY_EVOLUTION_WALK",
+      "textKey": "quest_buddy_walk_km_plural",
+      "time": "day",
+      "eventTargets": [],
+      "text": {
+        "en": "Walk {0} km with your buddy",
+        "de": "Laufe {0} km mit deinem Kumpel",
+        "es": "Camina {0} km con tu Pokémon compañero",
+        "fr": "Marche {0} km avec ton copain",
+        "zh-TW": "和夥伴一起步行 {0} 公里",
+        "hi": "अपने पार्टनर के साथ {0} km चलें!",
+        "ja": "相棒のポケモンと一緒に{0}km歩く"
+      }
+    },
+    {
+      "dex": 349,
+      "form": "FEEBAS",
+      "region": null,
+      "evolution": "MILOTIC",
+      "evolutionDex": 350,
+      "candyCost": 100,
+      "quest": "MILOTIC_EVOLUTION_QUEST",
+      "action": "walk",
+      "types": [],
+      "target": 20,
+      "questType": "QUEST_BUDDY_EVOLUTION_WALK",
+      "textKey": "quest_buddy_walk_km_plural",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Walk {0} km with your buddy",
+        "de": "Laufe {0} km mit deinem Kumpel",
+        "es": "Camina {0} km con tu Pokémon compañero",
+        "fr": "Marche {0} km avec ton copain",
+        "zh-TW": "和夥伴一起步行 {0} 公里",
+        "hi": "अपने पार्टनर के साथ {0} km चलें!",
+        "ja": "相棒のポケモンと一緒に{0}km歩く"
+      }
+    },
+    {
+      "dex": 438,
+      "form": "BONSLY",
+      "region": null,
+      "evolution": "SUDOWOODO",
+      "evolutionDex": 185,
+      "candyCost": 50,
+      "quest": "SUDOWOODO_EVOLUTION_QUEST",
+      "action": "walk",
+      "types": [],
+      "target": 15,
+      "questType": "QUEST_BUDDY_EVOLUTION_WALK",
+      "textKey": "quest_buddy_walk_km_plural",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Walk {0} km with your buddy",
+        "de": "Laufe {0} km mit deinem Kumpel",
+        "es": "Camina {0} km con tu Pokémon compañero",
+        "fr": "Marche {0} km avec ton copain",
+        "zh-TW": "和夥伴一起步行 {0} 公里",
+        "hi": "अपने पार्टनर के साथ {0} km चलें!",
+        "ja": "相棒のポケモンと一緒に{0}km歩く"
+      }
+    },
+    {
+      "dex": 439,
+      "form": "MIME_JR",
+      "region": null,
+      "evolution": "MR_MIME",
+      "evolutionDex": 122,
+      "candyCost": 50,
+      "quest": "MR_MIME_EVOLUTION_QUEST",
+      "action": "walk",
+      "types": [],
+      "target": 15,
+      "questType": "QUEST_BUDDY_EVOLUTION_WALK",
+      "textKey": "quest_buddy_walk_km_plural",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Walk {0} km with your buddy",
+        "de": "Laufe {0} km mit deinem Kumpel",
+        "es": "Camina {0} km con tu Pokémon compañero",
+        "fr": "Marche {0} km avec ton copain",
+        "zh-TW": "和夥伴一起步行 {0} 公里",
+        "hi": "अपने पार्टनर के साथ {0} km चलें!",
+        "ja": "相棒のポケモンと一緒に{0}km歩く"
+      }
+    },
+    {
+      "dex": 440,
+      "form": "HAPPINY",
+      "region": null,
+      "evolution": "CHANSEY",
+      "evolutionDex": 113,
+      "candyCost": 25,
+      "quest": "CHANSEY_EVOLUTION_QUEST",
+      "action": "walk",
+      "types": [],
+      "target": 15,
+      "questType": "QUEST_BUDDY_EVOLUTION_WALK",
+      "textKey": "quest_buddy_walk_km_plural",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Walk {0} km with your buddy",
+        "de": "Laufe {0} km mit deinem Kumpel",
+        "es": "Camina {0} km con tu Pokémon compañero",
+        "fr": "Marche {0} km avec ton copain",
+        "zh-TW": "和夥伴一起步行 {0} 公里",
+        "hi": "अपने पार्टनर के साथ {0} km चलें!",
+        "ja": "相棒のポケモンと一緒に{0}km歩く"
+      }
+    },
+    {
+      "dex": 527,
+      "form": "WOOBAT",
+      "region": null,
+      "evolution": "SWOOBAT",
+      "evolutionDex": 528,
+      "candyCost": 50,
+      "quest": "SWOOBAT_EVOLUTION_QUEST",
+      "action": "walk",
+      "types": [],
+      "target": 1,
+      "questType": "QUEST_BUDDY_EVOLUTION_WALK",
+      "textKey": "quest_buddy_walk_km_plural",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Walk {0} km with your buddy",
+        "de": "Laufe {0} km mit deinem Kumpel",
+        "es": "Camina {0} km con tu Pokémon compañero",
+        "fr": "Marche {0} km avec ton copain",
+        "zh-TW": "和夥伴一起步行 {0} 公里",
+        "hi": "अपने पार्टनर के साथ {0} km चलें!",
+        "ja": "相棒のポケモンと一緒に{0}km歩く"
+      }
+    },
+    {
+      "dex": 562,
+      "form": "YAMASK_GALARIAN",
+      "region": "galar",
+      "evolution": "RUNERIGUS",
+      "evolutionDex": 867,
+      "candyCost": 50,
+      "quest": "RUNERIGUS_EVOLUTION_QUEST",
+      "action": "raid_win",
+      "types": [],
+      "target": 10,
+      "questType": "QUEST_COMPLETE_RAID_BATTLE",
+      "textKey": "quest_win_raid_plural",
+      "max": false,
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Win {0} raids",
+        "de": "Gewinne {0} Raids",
+        "es": "Gana en {0} incursiones",
+        "fr": "Gagne {0} Raids",
+        "zh-TW": "在團體戰中獲勝 {0} 次",
+        "hi": "{0} रेड जीतें",
+        "ja": "レイドバトルで{0}回勝つ"
+      }
+    },
+    {
+      "dex": 625,
+      "form": "BISHARP",
+      "region": null,
+      "evolution": "KINGAMBIT",
+      "evolutionDex": 983,
+      "candyCost": 100,
+      "quest": "BISHARP_KINGAMBIT_EVOLUTION_QUEST",
+      "action": "raid_win",
+      "types": [
+        "dark",
+        "steel"
+      ],
+      "target": 15,
+      "questType": "QUEST_COMPLETE_BATTLE",
+      "textKey": "quest_defeat_dark_or_steel_type_raid",
+      "max": false,
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Defeat {0} Dark- or Steel-type Raid Bosses",
+        "de": "Besiege {0} Raid-Bosse vom Typ Unlicht oder Stahl",
+        "es": "Derrota a {0} jefes de incursión de tipo Siniestro o Acero",
+        "fr": "Remporte un combat contre {0} Boss de Raids de type Ténèbres ou Acier",
+        "zh-TW": "戰勝{0}隻惡屬性或鋼屬性的頭目寶可夢",
+        "hi": "{0} डार्क या स्टील टाइप रेड बॉस को हराएँ",
+        "ja": "あくタイプかはがねタイプのボスポケモン{0}匹に勝つ"
+      }
+    },
+    {
+      "dex": 670,
+      "form": "FLOETTE",
+      "region": null,
+      "evolution": "FLORGES",
+      "evolutionDex": 671,
+      "candyCost": 100,
+      "quest": "FLORGES_EVOLUTION_QUEST",
+      "action": "hearts",
+      "types": [],
+      "target": 20,
+      "questType": "QUEST_BUDDY_EARN_AFFECTION_POINTS",
+      "textKey": "challenge_buddy_affection_single",
+      "time": null,
+      "eventTargets": [
+        7
+      ],
+      "text": {
+        "en": "Earn {0} hearts with your buddy",
+        "de": "Verdiene {0} Herzen mit deinem Kumpel",
+        "es": "Consigue {0} corazones con tu compañero",
+        "fr": "Gagne {0} cœurs avec ton copain",
+        "zh-TW": "和夥伴獲得 {0} 顆心心",
+        "hi": "अपने पार्टनर के साथ {0} हार्ट कमाएं",
+        "ja": "相棒のハートポイントを{0}個獲得する"
+      }
+    },
+    {
+      "dex": 674,
+      "form": "PANCHAM",
+      "region": null,
+      "evolution": "PANGORO",
+      "evolutionDex": 675,
+      "candyCost": 50,
+      "quest": "PANCHAM_EVOLUTION_QUEST",
+      "action": "catch",
+      "types": [
+        "dark"
+      ],
+      "target": 32,
+      "questType": "QUEST_CATCH_POKEMON",
+      "textKey": "quest_catch_type_dark_plural",
+      "time": null,
+      "eventTargets": [
+        10
+      ],
+      "text": {
+        "en": "Catch {0} Dark-type Pokémon",
+        "de": "Fange {0} Pokémon vom Typ Unlicht",
+        "es": "Captura {0} Pokémon de tipo Siniestro",
+        "fr": "Attrape {0} Pokémon de type Ténèbres",
+        "zh-TW": "捕捉 {0} 隻惡屬性的寶可夢",
+        "hi": "{0} डार्क टाइप पोकेमॉन पकड़ें",
+        "ja": "あくタイプのポケモンを{0}匹捕まえる"
+      }
+    },
+    {
+      "dex": 682,
+      "form": "SPRITZEE",
+      "region": null,
+      "evolution": "AROMATISSE",
+      "evolutionDex": 683,
+      "candyCost": 50,
+      "quest": "SPRITZEE_EVOLUTION_QUEST",
+      "action": "incense",
+      "types": [],
+      "target": 1,
+      "questType": "QUEST_USE_INCENSE",
+      "textKey": "quest_incense_singular",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Use an Incense",
+        "de": "Verwende einen Rauch",
+        "es": "Usa un Incienso",
+        "fr": "Utilise un Encens",
+        "zh-TW": "使用薰香",
+        "hi": "इंसेंस का इस्तेमाल करें",
+        "ja": "おこうを使う"
+      }
+    },
+    {
+      "dex": 684,
+      "form": "SWIRLIX",
+      "region": null,
+      "evolution": "SLURPUFF",
+      "evolutionDex": 685,
+      "candyCost": 50,
+      "quest": "SWIRLIX_EVOLUTION_QUEST",
+      "action": "treats",
+      "types": [],
+      "target": 25,
+      "questType": "QUEST_BUDDY_FEED",
+      "textKey": "challenge_buddy_treat_plural",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Give your buddy {0} treats",
+        "de": "Gib deinem Kumpel {0}-mal einen Snack",
+        "es": "Dale {0} golosinas a tu compañero",
+        "fr": "Donne {0} friandises à ton copain",
+        "zh-TW": "餵夥伴吃 {0} 個點心",
+        "hi": "अपने पार्टनर को {0} ट्रीट दें",
+        "ja": "おやつを{0}個あげる"
+      }
+    },
+    {
+      "dex": 803,
+      "form": "POIPOLE",
+      "region": null,
+      "evolution": "NAGANADEL",
+      "evolutionDex": 804,
+      "candyCost": 200,
+      "quest": "NAGANADEL_EVOLUTION_QUEST",
+      "action": "catch",
+      "types": [
+        "dragon"
+      ],
+      "target": 20,
+      "questType": "QUEST_CATCH_POKEMON",
+      "textKey": "quest_catch_type_dragon_plural",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Catch {0} Dragon-type Pokémon",
+        "de": "Fange {0} Pokémon vom Typ Drache",
+        "es": "Captura {0} Pokémon de tipo Dragón",
+        "fr": "Attrape {0} Pokémon de type Dragon",
+        "zh-TW": "捕捉 {0} 隻龍屬性的寶可夢",
+        "hi": "{0} ड्रैगन टाइप पोकेमॉन पकड़ें",
+        "ja": "ドラゴンタイプのポケモンを{0}匹捕まえる"
+      }
+    },
+    {
+      "dex": 872,
+      "form": "SNOM",
+      "region": null,
+      "evolution": "FROSMOTH",
+      "evolutionDex": 873,
+      "candyCost": 400,
+      "quest": "SNOM_FROSMOTH_EVOLUTION_QUEST",
+      "action": "hearts",
+      "types": [],
+      "target": 10,
+      "questType": "QUEST_BUDDY_EARN_AFFECTION_POINTS",
+      "textKey": "challenge_buddy_affection_plural",
+      "time": "night",
+      "eventTargets": [],
+      "text": {
+        "en": "Earn {0} hearts with your buddy",
+        "de": "Verdiene {0} Herzen mit deinem Kumpel",
+        "es": "Consigue {0} corazones con tu compañero",
+        "fr": "Gagne {0} cœurs avec ton copain",
+        "zh-TW": "和夥伴獲得 {0} 顆心心",
+        "hi": "अपने पार्टनर के साथ {0} हार्ट कमाएं",
+        "ja": "相棒のハートポイントを{0}個獲得する"
+      }
+    },
+    {
+      "dex": 891,
+      "form": "KUBFU",
+      "region": null,
+      "evolution": "URSHIFU",
+      "evolutionDex": 892,
+      "candyCost": 200,
+      "quest": "KUBFU_RAPID_STRIKE_EVOLUTION_QUEST",
+      "action": "raid_win",
+      "types": [
+        "water"
+      ],
+      "target": 30,
+      "questType": "QUEST_COMPLETE_BATTLE",
+      "textKey": "quest_defeat_water_type_raid_and_max_battle",
+      "max": true,
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Defeat {0} Water-type Pokémon in raids or Max Battles",
+        "de": "Besiege {0} Pokémon vom Typ Wasser in Raids oder Dyna-Kämpfen",
+        "es": "Derrota a {0} Pokémon de tipo Agua en incursiones o Combates Max",
+        "fr": "Remporte un combat contre {0} Pokémon de type Eau dans des Raids ou des Combats Dynamax",
+        "zh-TW": "在團體戰或極巨對戰中戰勝{0}隻水屬性的寶可夢",
+        "hi": "रेड या मैक्स बैटल में {0} वॉटर टाइप पोकेमॉन को हराएँ",
+        "ja": "レイドかマックスバトルでみずタイプのポケモン{0}匹に勝つ"
+      }
+    },
+    {
+      "dex": 891,
+      "form": "KUBFU",
+      "region": null,
+      "evolution": "URSHIFU",
+      "evolutionDex": 892,
+      "candyCost": 200,
+      "quest": "KUBFU_SINGLE_STRIKE_EVOLUTION_QUEST",
+      "action": "raid_win",
+      "types": [
+        "dark"
+      ],
+      "target": 30,
+      "questType": "QUEST_COMPLETE_BATTLE",
+      "textKey": "quest_defeat_dark_type_raid_and_max_battle",
+      "max": true,
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Defeat {0} Dark-type Pokémon in raids or Max Battles",
+        "de": "Besiege {0} Pokémon vom Typ Unlicht in Raids oder Dyna-Kämpfen",
+        "es": "Derrota a {0} Pokémon de tipo Siniestro en incursiones o Combates Max",
+        "fr": "Remporte un combat contre {0} Pokémon de type Ténèbres dans des Raids ou des Combats Dynamax",
+        "zh-TW": "在團體戰或極巨對戰中戰勝{0}隻惡屬性的寶可夢",
+        "hi": "रेड या मैक्स बैटल में {0} डार्क टाइप पोकेमॉन को हराएँ",
+        "ja": "レイドかマックスバトルであくタイプのポケモン{0}匹に勝つ"
+      }
+    },
+    {
+      "dex": 922,
+      "form": "PAWMO",
+      "region": null,
+      "evolution": "PAWMOT",
+      "evolutionDex": 923,
+      "candyCost": 100,
+      "quest": "PAWMOT_EVOLUTION_QUEST",
+      "action": "walk",
+      "types": [],
+      "target": 25,
+      "questType": "QUEST_BUDDY_EVOLUTION_WALK",
+      "textKey": "quest_buddy_walk_km_plural",
+      "time": null,
+      "eventTargets": [
+        1,
+        5
+      ],
+      "text": {
+        "en": "Walk {0} km with your buddy",
+        "de": "Laufe {0} km mit deinem Kumpel",
+        "es": "Camina {0} km con tu Pokémon compañero",
+        "fr": "Marche {0} km avec ton copain",
+        "zh-TW": "和夥伴一起步行 {0} 公里",
+        "hi": "अपने पार्टनर के साथ {0} km चलें!",
+        "ja": "相棒のポケモンと一緒に{0}km歩く"
+      }
+    },
+    {
+      "dex": 935,
+      "form": "CHARCADET",
+      "region": null,
+      "evolution": "ARMAROUGE",
+      "evolutionDex": 936,
+      "candyCost": 50,
+      "quest": "CHARCADET_ARMAROUGE_EVOLUTION_QUEST",
+      "action": "defeat",
+      "types": [
+        "psychic"
+      ],
+      "target": 30,
+      "questType": "QUEST_FIGHT_POKEMON",
+      "textKey": "quest_fight_type_psychic_plural",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Defeat {0} Psychic-type Pokémon",
+        "de": "Besiege {0} Pokémon vom Typ Psycho",
+        "es": "Derrota a {0} Pokémon de tipo Psíquico",
+        "fr": "Remporte un combat contre {0} Pokémon de type Psy",
+        "zh-TW": "戰勝{0}隻超能力屬性的寶可夢",
+        "hi": "{0} साइकिक टाइप पोकेमॉन हराएँ",
+        "ja": "エスパータイプのポケモン{0}匹に勝つ"
+      }
+    },
+    {
+      "dex": 935,
+      "form": "CHARCADET",
+      "region": null,
+      "evolution": "CERULEDGE",
+      "evolutionDex": 937,
+      "candyCost": 50,
+      "quest": "CHARCADET_CERULEDGE_EVOLUTION_QUEST",
+      "action": "defeat",
+      "types": [
+        "ghost"
+      ],
+      "target": 30,
+      "questType": "QUEST_FIGHT_POKEMON",
+      "textKey": "quest_fight_type_ghost_plural",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Defeat {0} Ghost-type Pokémon",
+        "de": "Besiege {0} Pokémon vom Typ Geist",
+        "es": "Derrota a {0} Pokémon de tipo Fantasma",
+        "fr": "Remporte un combat contre {0} Pokémon de type Spectre",
+        "zh-TW": "戰勝{0}隻幽靈屬性的寶可夢",
+        "hi": "{0} घोस्ट टाइप पोकेमॉन हराएँ",
+        "ja": "ゴーストタイプのポケモン{0}匹に勝つ"
+      }
+    },
+    {
+      "dex": 946,
+      "form": "BRAMBLIN",
+      "region": null,
+      "evolution": "BRAMBLEGHAST",
+      "evolutionDex": 947,
+      "candyCost": 50,
+      "quest": "BRAMBLEGHAST_EVOLUTION_QUEST",
+      "action": "walk",
+      "types": [],
+      "target": 20,
+      "questType": "QUEST_BUDDY_EVOLUTION_WALK",
+      "textKey": "quest_buddy_walk_km_plural",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Walk {0} km with your buddy",
+        "de": "Laufe {0} km mit deinem Kumpel",
+        "es": "Camina {0} km con tu Pokémon compañero",
+        "fr": "Marche {0} km avec ton copain",
+        "zh-TW": "和夥伴一起步行 {0} 公里",
+        "hi": "अपने पार्टनर के साथ {0} km चलें!",
+        "ja": "相棒のポケモンと一緒に{0}km歩く"
+      }
+    },
+    {
+      "dex": 1011,
+      "form": "DIPPLIN",
+      "region": null,
+      "evolution": "HYDRAPPLE",
+      "evolutionDex": 1019,
+      "candyCost": 400,
+      "quest": "DIPPLIN_EVOLUTION_QUEST",
+      "action": "catch",
+      "types": [
+        "dragon"
+      ],
+      "target": 7,
+      "questType": "QUEST_CATCH_POKEMON",
+      "textKey": "quest_catch_type_dragon_plural",
+      "time": null,
+      "eventTargets": [],
+      "text": {
+        "en": "Catch {0} Dragon-type Pokémon",
+        "de": "Fange {0} Pokémon vom Typ Drache",
+        "es": "Captura {0} Pokémon de tipo Dragón",
+        "fr": "Attrape {0} Pokémon de type Dragon",
+        "zh-TW": "捕捉 {0} 隻龍屬性的寶可夢",
+        "hi": "{0} ड्रैगन टाइप पोकेमॉन पकड़ें",
+        "ja": "ドラゴンタイプのポケモンを{0}匹捕まえる"
+      }
+    }
+  ]
+}

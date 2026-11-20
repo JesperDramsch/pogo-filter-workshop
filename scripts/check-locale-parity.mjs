@@ -17,7 +17,7 @@
 import { readFileSync } from "node:fs";
 
 const LOCALES = ["en", "de", "es", "fr", "zh-TW", "hi", "ja"];
-const SCOPE = /^app\.(help|pile|sort|area|events|share|protect|modal|changelog|onboarding|buddy|tags)\./;
+const SCOPE = /^app\.(help|pile|sort|area|events|share|protect|modal|changelog|onboarding|buddy|buddy_quest|raid_plan|tags)\./;
 
 let failures = 0;
 function check(label, cond, detail = "") {
