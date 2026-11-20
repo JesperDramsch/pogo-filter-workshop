@@ -34,7 +34,7 @@
     "missingBorrowed": []
   },
   "counts": {
-    "ingameKeysUnion": 490,
+    "ingameKeysUnion": 492,
     "pokemonNames": 1153
   },
   "missingTranslationsCount": {
@@ -47,7 +47,7 @@
     "ja": 0
   },
   "encoding": {
-    "valuesChecked": 11501,
+    "valuesChecked": 11515,
     "puaHitsByLocale": {}
   },
   "warnings": []
