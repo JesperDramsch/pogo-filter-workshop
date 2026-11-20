@@ -33,7 +33,7 @@
 // Run with: npx vite-node scripts/check-piles.mjs
 
 import {
-  BUDGET_DEFAULTS, BUDGET_ROWS, evalFilterDetailed as evalDetailed, FLOAT_ENDED_DAYS, floatingPiles, sortingEventRows, EVENT_LOOKAHEAD_DAYS, RECURRING_FLOAT_ENDED_DAYS, isWeeklyEvent, eventCatchDex, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET, PILE_GROUPS, UPGRADE_GROUPS, PROTECTION_PILES, hiddenPileTransitions, withPileTransitions,
+  BUDGET_DEFAULTS, BUDGET_ROWS, evalFilterDetailed as evalDetailed, FLOAT_ENDED_DAYS, floatingPiles, sortingEventRows, EVENT_LOOKAHEAD_DAYS, RECURRING_FLOAT_ENDED_DAYS, isWeeklyEvent, eventCatchDex, SHOWCASE_XXL_BONUS, showcaseScoreRange, JOB_TAG_DEFAULTS, JOB_TAG_ORDER, jobTagsOf, tagClashes, buildFilters, COMMUNITY_DAY_BG_DEX, mergeImportedConfig, DEFAULT_TOP_ATTACKERS, DEFAULT_TOP_MAX_ATTACKERS, evalFilterDetailed, protectionTail, SEARCH_CHAR_BUDGET, PILE_GROUPS, UPGRADE_GROUPS, PROTECTION_PILES, hiddenPileTransitions, withPileTransitions, eventClassGroups,
 } from "../src/App.jsx";
 import { readFileSync } from "node:fs";
 import PVP_RANKINGS from "../src/data/pvp-rankings.json";
@@ -603,6 +603,58 @@ console.log("\nShowcase score (XXL calculator)");
   for (const loc of localeNames) {
     const missing = ["title", "result", "verdict_keep", "verdict_below", "verdict_maybe", "hint"].filter((k) => loc !== "en" && LOCALES[loc].messages[`app.xxl.${k}`] === undefined);
     check(`${loc}: the calculator is translated`, missing.length === 0, missing.join(", "));
+  }
+}
+
+console.log("\nAn event's ② split by class (meta, watchlist, non-meta)");
+{
+  // The grouping, on rosters made up for the test so it holds whatever the
+  // event feed and the rankings say today. Magikarp (129) / Gyarados (130),
+  // Pichu (172) / Pikachu (25) / Raichu (26), Rattata (19), Pidgey (16).
+  const groups = (spawns, meta, watch) =>
+    [...eventClassGroups(spawns, meta, watch)].map(([cls, dexes]) => `${cls}:${dexes.join("+")}`).join(" ");
+  check("a spawn takes its family's class (a pre-evolution is meta when its evolution is)",
+    groups([19, 25, 129], [130], [26]) === "meta:129 watchlist:25 non_meta:19", groups([19, 25, 129], [130], [26]));
+  check("meta wins over watchlist within one family",
+    groups([25], [26], [172]) === "meta:25", groups([25], [26], [172]));
+  check("an event of one class is one group (it keeps its single ②)",
+    groups([16, 19], [130], [26]) === "non_meta:16+19" && groups([], [130], [26]) === "");
+  for (const loc of localeNames) {
+    const r = buildFilters(HUNDOS, LUCKIES, CFG, [], loc, makeTFn(loc));
+    const kw = pogoKeywords(loc);
+    const bad = [];
+    const events = r.eventFilters || [];
+    const split = events.filter((ev) => ev.pile?.sortByClass);
+    const mon = (dex, o = {}) => pileMon(loc, o, pokemonNameFor(String(dex), "en"), dex);
+    for (const ev of split) {
+      const { pile } = ev;
+      const parts = pile.sortByClass;
+      const classes = parts.map((p) => p.cls);
+      if (parts.length < 2 || new Set(classes).size !== parts.length) bad.push(`${ev.id}: classes ${classes.join(",")}`);
+      const sorted = (a) => [...a].sort((x, y) => x - y).join(",");
+      if (sorted(parts.flatMap((p) => p.spawnDex)) !== sorted(ev.spawnDex)) bad.push(`${ev.id}: the classes' spawns are not the event's`);
+      // Each class's ② is its own head with exactly the event's ② clauses.
+      for (const p of parts) if (p.sort !== `${p.head}&!${kw.flag.favorite}&!#`) bad.push(`${ev.id}.${p.cls}: ② is not head & !favourite & !#`);
+      // Every spawn not yet starred or tagged is in exactly one class's ②; a
+      // starred or tagged one is in none.
+      for (const dex of ev.spawnDex) {
+        const homes = parts.filter((p) => evalFilterDetailed(p.sort, mon(dex), loc).verdict === true).map((p) => p.cls);
+        if (homes.length !== 1) bad.push(`${ev.id}: ${dex} is in ${homes.length} classes' ② (${homes.join(",")})`);
+        for (const o of [{ flags: { favorite: true } }, { tags: ["Trade"] }]) {
+          const shown = parts.filter((p) => evalFilterDetailed(p.sort, mon(dex, o), loc).verdict !== false);
+          if (shown.length) bad.push(`${ev.id}: a starred or tagged ${dex} shows in ${shown.map((p) => p.cls).join(",")} ②`);
+        }
+      }
+      // The card agrees with the boxes: its rows carry exactly the classes of
+      // the ② boxes, in the same order (a Dratini spawn shows as Dragonite's
+      // meta row, never as a non-meta row while it sits in the meta box).
+      const rowClasses = [...new Set((pile.card?.rows || []).map((row) => row.cls))];
+      if (rowClasses.join(",") !== classes.join(",")) bad.push(`${ev.id}: card classes ${rowClasses.join(",")} vs ② ${classes.join(",")}`);
+      // ① and ③ are untouched: one list over the whole event.
+      if (pile.keep.some((l) => !l.filter.startsWith(`${pile.overview}&`))) bad.push(`${ev.id}: ① is no longer the whole event`);
+      if (!pile.release.startsWith(`${pile.overview}&`)) bad.push(`${ev.id}: ③ is no longer the whole event`);
+    }
+    check(`${loc}: ${split.length} of ${events.length} events split ②; each spawn sits in exactly one class's ②`, bad.length === 0, bad.slice(0, 4).join(" | "));
   }
 }
 

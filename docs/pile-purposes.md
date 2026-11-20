@@ -60,6 +60,7 @@ then `3-4` is fine (best first, then wider), but `3-4` then `4*` would be cut.
 | Pile | The question | ① keep, top to bottom |
 |---|---|---|
 | Event | What's worth keeping from this event? | 4\* → shiny → 3-4 → 3\* |
+| Event, ② by class | What's left to judge, one class at a time so each gets its own budget | ① and ③ as Event, over the whole event; ② (not starred, not tagged) comes as one box per class (meta, watchlist, non-meta) when the spawns span two or more, under the card in the same order. The class is per candy family: a pre-evolution is meta when its evolution is |
 | Costumes that evolve (`costume&evolve`) | Which hats to keep for the whole line? | 4\* → shiny → 3-4 → 3\*, default count |
 | Costumes that don't (`costume&!evolve`) | Which hats to keep? | 4\* → shiny → 3-4 → 3\*, one plus up to 3 untraded ones to trade |
 | Backgrounds (`background`) | Which backgrounds stay? | 4\* → shiny → 3-4 → 3\*, default count |

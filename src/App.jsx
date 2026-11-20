@@ -477,6 +477,26 @@ function lineRootDex(dex) {
 	return cur;
 }
 
+// An event's catch list grouped by class, per candy family: a spawn is meta
+// when any member of its family is in `metaDex`, watchlist when one is in
+// `watchDex` (and none is meta), non-meta otherwise. `+name` and the
+// standalone meta, watchlist and non-meta piles read the class per family
+// too, so the groups' `+name` heads never share a Pokémon. Returns a Map in
+// meta, watchlist, non_meta order, holding only the classes that occur.
+// Exported for scripts/check-piles.mjs.
+export function eventClassGroups(spawnDex, metaDex, watchDex) {
+	const roots = (dexes) => new Set([...dexes].map(lineRootDex));
+	const metaRoots = roots(metaDex);
+	const watchRoots = roots(watchDex);
+	const groups = new Map([['meta', []], ['watchlist', []], ['non_meta', []]]);
+	for (const dex of spawnDex) {
+		const root = lineRootDex(dex);
+		groups.get(metaRoots.has(root) ? 'meta' : watchRoots.has(root) ? 'watchlist' : 'non_meta').push(dex);
+	}
+	for (const [cls, dexes] of groups) if (dexes.length === 0) groups.delete(cls);
+	return groups;
+}
+
 // The species plus everything it can still evolve into — exactly the set one
 // owned lucky/hundo genuinely covers, since luckiness and IVs both survive
 // evolution but nothing can ever be de-evolved.
@@ -6078,7 +6098,42 @@ export function buildFilters(
 		if (RULE_PARAMS[pile.id]) pile.card.rule = tFn(`app.card.rule.${pile.id}`, { params: RULE_PARAMS[pile.id] });
 	}
 	if (hundoPile) hundoPile.card = { ...cardFor(hundos.map(dexOfName)), rule: tFn('app.card.rule.hundo') };
-	for (const ev of eventFilters) if (ev.pile) ev.pile.card = cardFor(ev.spawnDex);
+	// ── EVENT ② BY CLASS ───────────────────────────────────────────────────
+	// ① stays one list over the whole event, so every hundo and shiny of it
+	// is found in one go, and ③ stays one clean-up. ②, where you go through
+	// what's left and decide what stays, is split into meta, watchlist and
+	// non-meta, because each class has its own budget (the card says which).
+	// The class is per candy family, as `+name` and the standalone piles read
+	// it: a pre-evolution is meta when its evolution is. So the class heads
+	// never share a Pokémon and together are the event pile; each class's ②
+	// is its head with the event's own ② clauses. Whether there is anything
+	// to split depends on the spawns alone (the workshop never sees the
+	// storage): with fewer than two classes, one ② as before.
+	// The card reads the class the same way, so a row and the ② box its
+	// Pokémon lands in always agree: a meta or watchlist family shows the
+	// members that make it so, with their budgets, instead of the spawn
+	// itself; rows run meta, watchlist, non-meta, in the order of the boxes.
+	const CLASS_DEX = { meta: [...metaDex], watchlist: [...watchWhy.keys()] };
+	for (const ev of eventFilters) {
+		const pile = ev.pile;
+		if (!pile) continue;
+		const byClass = eventClassGroups(ev.spawnDex, metaDex, watchWhy.keys());
+		pile.card = {
+			rows: [...byClass].flatMap(([cls, dexes]) => {
+				const roots = new Set(dexes.map(lineRootDex));
+				return cardFor(cls === 'non_meta' ? dexes : CLASS_DEX[cls].filter((d) => roots.has(lineRootDex(d)))).rows;
+			}),
+		};
+		if (byClass.size < 2) continue;
+		const sortTail = pile.sort.slice(pile.overview.length);
+		const parts = [...byClass]
+			.map(([cls, dexes]) => {
+				const head = famOf(dexes.map(nameOfDex).filter(Boolean));
+				return head ? { cls, spawnDex: dexes, head, sort: `${head}${sortTail}` } : null;
+			})
+			.filter(Boolean);
+		if (parts.length >= 2) pile.sortByClass = parts;
+	}
 
 	return {
 		trash,
@@ -12293,15 +12348,17 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 	};
 	const lensWords = (lens) =>
 		words.keep?.[lens.key] || lens.text || [`app.pile.lens.${lens.key}_label`, `app.pile.lens.${lens.key}_hint`];
-	const box = (suffix, keys, str, tone) => {
+	// `cls` marks one class's share of an event's ② (pile.sortByClass):
+	// the class goes on the label and its card colour on the box.
+	const box = (suffix, keys, str, tone, cls) => {
 		if (!str || !keys) return null;
 		const copyKey = `${pile.id}_${suffix}`;
 		const opts = keys[2] ? { params: keys[2] } : undefined;
 		return (
 			<FilterBox
 				key={suffix}
-				label={t(keys[0], opts)}
-				accent={accent}
+				label={cls ? `${t(keys[0], opts)} · ${t(`app.card.class.${cls}`)}` : t(keys[0], opts)}
+				accent={cls ? CLASS_COLOUR[cls] : accent}
 				filterStr={str}
 				copied={copied[copyKey]}
 				onCopy={() => copyToClipboard(copyKey, str)}
@@ -12320,7 +12377,9 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 			{pile.keep.map((lens) => box(lens.key, lensWords(lens), lens.filter))}
 			{subHeading('app.pile.group_sort')}
 			{card ?? <PileCard card={pile.card} t={t} />}
-			{box('sort', words.sort, pile.sort)}
+			{pile.sortByClass
+				? pile.sortByClass.map((p) => box(`sort_${p.cls}`, words.sort, p.sort, undefined, p.cls))
+				: box('sort', words.sort, pile.sort)}
 			{pile.release && subHeading('app.pile.group_release')}
 			{box('safe', words.safe, pile.safe)}
 			{pile.release && (
