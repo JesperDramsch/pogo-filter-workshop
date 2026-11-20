@@ -1,6 +1,6 @@
 # Pokémon GO PvP Meta Reference — GENERATED, DO NOT HAND-EDIT
 
-- **Snapshot taken:** 2026-11-17T16:11:19.920Z
+- **Snapshot taken:** 2026-11-20T15:34:44.061Z
 - **Source:** pvpoke — https://github.com/pvpoke/pvpoke (MIT)
 - **Snapshot URL:** https://raw.githubusercontent.com/JesperDramsch/pogo-filter-workshop/main/src/data/pvp-rankings.json
 - **Depth:** top 30 per league, deduped by base dex
@@ -181,49 +181,6 @@ Ready-made filter — copy verbatim, this is the app's own output:
 ```
 
 ## Cups
-
-### Mega Ultra League `mega-2500`
-
-Window: 2026-11-10 → 2026-11-17 (Great League, Ultra League: Mega Edition, and 2026 GO LAIC Cup | Twilight Trails)
-
-CP cap: 2500 CP
-
-| # | German | English | Dex | Ranked form | Score |
-|---:|---|---|---:|---|---:|
-| 1 | granforgita | tinkaton | 959 | — | 95.3 |
-| 2 | krarmor | corviknight | 823 | — | 93.8 |
-| 3 | zygarde | zygarde | 718 | `zygarde_complete` | 92.9 |
-| 4 | florges | florges | 671 | — | 92.3 |
-| 5 | mimigma | mimikyu | 778 | — | 92.2 |
-| 6 | relaxo | snorlax | 143 | `snorlax_shadow` | 92.1 |
-| 7 | lavados | moltres | 146 | `moltres_galarian` | 92 |
-| 8 | viridium | virizion | 640 | — | 92 |
-| 9 | impoleon | empoleon | 395 | — | 91.8 |
-| 10 | impergator | feraligatr | 160 | — | 91.3 |
-| 11 | melmetal | melmetal | 809 | — | 91.2 |
-| 12 | giratina | giratina | 487 | `giratina_altered` | 91.1 |
-| 13 | schlingking | guzzlord | 799 | — | 91 |
-| 14 | apoquallyp | jellicent | 593 | — | 91 |
-| 15 | urgl | cramorant | 845 | — | 90.7 |
-| 16 | vulnona | ninetales | 38 | `ninetales_alolan` | 90.6 |
-| 17 | skelokrok | skeledirge | 911 | — | 90.5 |
-| 18 | zwirrfinst | dusknoir | 477 | — | 90.3 |
-| 19 | lapras | lapras | 131 | — | 90.3 |
-| 20 | sleimok | muk | 89 | `muk_alolan` | 90.3 |
-| 21 | gortrom | rillaboom | 812 | — | 90.3 |
-| 22 | pixi | clefable | 36 | — | 90.2 |
-| 23 | regidrago | regidrago | 895 | — | 90.1 |
-| 24 | registeel | registeel | 379 | — | 90 |
-| 25 | heerashai | dondozo | 977 | — | 89.9 |
-| 26 | cresselia | cresselia | 488 | — | 89.7 |
-| 27 | forstellka | forretress | 205 | — | 89.7 |
-| 28 | calamanero | malamar | 687 | `malamar_mega` | 89.2 |
-| 29 | fiaro | talonflame | 663 | — | 89.1 |
-| 30 | oghnatoll | runerigus | 867 | — | 88.9 |
-
-```
-959,823,718,671,778,143,146,640,395,160,809,487,799,593,845,38,911,477,131,89,812,36,895,379,977,488,205,687,663,867
-```
 
 ### Mega Master League `mega-10000`
 
