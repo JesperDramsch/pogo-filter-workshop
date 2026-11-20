@@ -12019,7 +12019,6 @@ function BossCollapsible({
 	return (
 		<Collapsible icon={icon} label={headerLabel} hook={hook} open={open} onToggle={onToggle}>
 			<div className='space-y-5'>
-				{raidPlan && <RaidModeToggle mode={raidPlan.mode} onMode={raidPlan.setMode} t={t} />}
 				{/* tiers below; footer rendered at end */}
 				{hasEvents && (
 					<div className='space-y-3'>
@@ -12749,7 +12748,9 @@ function RaidLinesPanel({ row, mode, onMode, megaFilterFor, copied, copyToClipbo
 }
 
 // Under a boss's counter filter in the Battle area: the Mega and buddy for
-// that raid, folded to one teaser line until opened (src/raid-plan.js).
+// that raid, folded to one teaser line until opened (src/raid-plan.js). The
+// candy/damage toggle sits inside, next to the answer it changes; the choice
+// is shared, so flipping it here flips every boss.
 function BossMegaBuddy({ line, raidPlan, scopeKey, copied, copyToClipboard, t, locale }) {
 	const words = raidWords(t, locale, raidPlan.typeLabels);
 	const summary = raidLineSummary(line, raidPlan.mode, words, t);
@@ -12761,7 +12762,9 @@ function BossMegaBuddy({ line, raidPlan, scopeKey, copied, copyToClipboard, t, l
 				<ChevronRight size={12} className='details-arrow shrink-0' aria-hidden='true' />
 				<span>{summary}</span>
 			</summary>
-			<div className='px-3 pb-3 pt-1'>
+			<div className='px-3 pb-3 pt-1 space-y-2'>
+				{/* Right where the answer is; one choice shared by every boss. */}
+				<RaidModeToggle mode={raidPlan.mode} onMode={raidPlan.setMode} t={t} />
 				<RaidLineBody
 					line={line}
 					mode={raidPlan.mode}
