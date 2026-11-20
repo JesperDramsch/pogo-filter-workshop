@@ -184,6 +184,9 @@ export const IGNORED_BONUS = [
 	/\bMystery Box\b|\bCoin Bag\b/i, //                       Meltan / Gimmighoul mechanics
 	/^Increased Spawns\b/i, //                                "Increased Spawns"
 	/\bMega Level\b/i, //                                     "Chandelure caught from Super Mega Raids will have Mega Level 1 unlocked"
+	/\bhearts with your Buddy\b/i, //                       "Earn additional hearts with your Buddy Pokémon"
+	/\bwalking with your Buddy\b/i, //                      "Additional Candy XL when walking with your Buddy Pokémon"
+	/\bsouvenir\b/i, //                                      "Tiny Compass buddy souvenir"
 	/\bDynamax Cannon\b/i, //                                 "1/2 Candy and Stardust cost to activate the Dynamax Cannon Adventure Effect"
 ];
 

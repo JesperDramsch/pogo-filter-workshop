@@ -113,7 +113,7 @@ export function megaPlans({ events = [], eventRaids = [] } = {}, now = Date.now(
 				.map((b) => ({ name: b.names?.en, dex: dexOf(b.names?.en), region: null, types: b.types || [] }))
 				.filter((f) => f.dex && f.types.length),
 		]);
-		if (spawnForms.length) plans.push({ id: `raid:${r.eventID || r.name}`, kind: 'raid', title: r.name, start: r.start, end: r.end, spawnForms, venue: null });
+		if (spawnForms.length) plans.push({ id: `raid:${r.eventID || r.name}`, kind: 'raid', title: r.name, start: r.start, end: r.end, spawnForms, bosses: r.bosses || [], venue: null });
 	}
 	return plans.sort((a, b) => Date.parse(a.start) - Date.parse(b.start) || a.title.localeCompare(b.title));
 }

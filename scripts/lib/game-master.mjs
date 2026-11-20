@@ -588,6 +588,148 @@ export function evoParentsFromSteps(steps) {
   return parents;
 }
 
+// ── Evolution quests ────────────────────────────────────────────────────────
+//
+// The evolutions gated on a quest rather than on candy alone: Pancham catching
+// Dark types, Kubfu winning Dark or Water raids, Woobat walking a kilometre
+// with the player. A branch names its quest by id (`questDisplay[0]
+// .questRequirementTemplateId`) and the quest itself is an
+// `evolutionQuestTemplate` elsewhere in the dump.
+//
+// Each quest reads into one closed `action`; the app's matcher
+// (src/buddy-quests.js) compares the action and its `types` with the week's
+// spawns and raid bosses:
+//
+//   catch     QUEST_CATCH_POKEMON                catch N of `types`
+//   defeat    QUEST_FIGHT_POKEMON                defeat N of `types` in any battle
+//   raid_win  QUEST_COMPLETE_BATTLE (raid combat) win N raids against a boss of
+//             QUEST_COMPLETE_RAID_BATTLE         `types` (any boss when empty);
+//                                                `max` when Max Battles count too
+//   walk      QUEST_BUDDY_EVOLUTION_WALK         walk N km with it as buddy
+//   hearts    QUEST_BUDDY_EARN_AFFECTION_POINTS  earn N buddy hearts
+//   treats    QUEST_BUDDY_FEED                   feed N treats
+//   throw     QUEST_LAND_THROW                   land N throws of `throwType`
+//   incense   QUEST_USE_INCENSE                  use N Incense
+//   other     anything new; `questType` is kept so the fetcher can log it
+//
+// The raid quests' own text reads "defeat Dark-type raid", so a raid quest's
+// `types` are the boss's, not the player's team.
+//
+// Event variants (`*_CD_EVOLUTION_QUEST`, `*_BUDDY_EVENT_EVOLUTION_QUEST`) are
+// not named by any branch; the game swaps them in during an event. They are
+// collected per quest as `eventTargets` so the card can say "less during
+// events" without inventing when that is.
+
+const QUEST_ACTIONS = {
+  QUEST_CATCH_POKEMON: "catch",
+  QUEST_FIGHT_POKEMON: "defeat",
+  QUEST_COMPLETE_BATTLE: "raid_win",
+  QUEST_COMPLETE_RAID_BATTLE: "raid_win",
+  QUEST_BUDDY_EVOLUTION_WALK: "walk",
+  QUEST_BUDDY_EARN_AFFECTION_POINTS: "hearts",
+  QUEST_BUDDY_FEED: "treats",
+  QUEST_LAND_THROW: "throw",
+  QUEST_USE_INCENSE: "incense",
+};
+
+// One evolutionQuestTemplate → { action, types, target, max?, throwType?, questType }.
+export function readEvolutionQuest(quest) {
+  const goal = quest?.goals?.[0] || {};
+  const target = Number.isFinite(goal.target) ? goal.target : null;
+  const conds = Array.isArray(goal.condition) ? goal.condition : [];
+  const types = new Set();
+  let max = false;
+  let throwType = null;
+  for (const c of conds) {
+    for (const t of c?.withPokemonType?.pokemonType || []) types.add(typeSlug(t));
+    for (const t of c?.withOpponentPokemonBattleStatus?.opponentPokemonType || []) types.add(typeSlug(t));
+    for (const ct of c?.withCombatType?.combatType || []) if (/DMAX|GMAX/.test(ct)) max = true;
+    if (c?.withThrowType?.throwType) throwType = String(c.withThrowType.throwType).replace(/^ACTIVITY_CATCH_|_THROW$/g, "").toLowerCase();
+  }
+  types.delete(null);
+  const action = QUEST_ACTIONS[quest?.questType] || "other";
+  // The client's own text key for the quest ("quest_catch_type_dark_plural");
+  // the fetcher looks it up in holoholo-text for every locale.
+  const textKey = typeof quest?.display?.description === "string" ? quest.display.description.toLowerCase() : null;
+  const out = { action, types: [...types].sort(), target, questType: quest?.questType || null, textKey };
+  if (action === "raid_win") out.max = max;
+  if (throwType) out.throwType = throwType;
+  return out;
+}
+
+// Every quest-gated evolution in the dump, as
+// { dex, form, region, evolution, evolutionDex, candyCost, quest: questId,
+//   action, types, target, max?, throwType?, time: "day"|"night"|null,
+//   eventTargets: [n…] }, one per (dex, region, evolution, quest): the bare
+// and _NORMAL templates of a species carry the same branch twice, and
+// Floette's five colours share one quest.
+export function evolutionQuestsFromGameMaster(templates) {
+  const quests = new Map(); // questId → evolutionQuestTemplate
+  for (const entry of templateList(templates)) {
+    const node = templateNode(entry);
+    const q = node?.evolutionQuestTemplate;
+    const id = q?.questTemplateId || node?.templateId;
+    if (q && id) quests.set(id, q);
+  }
+  // CHARCADET_ARMAROUGE_EVOLUTION_QUEST → its event variants share the stem.
+  const stem = (id) => id.replace(/_EVOLUTION_QUEST$/, "");
+  // Only a variant asking for the same thing counts: Annihilape's Community
+  // Day quest is a catch quest, not a shorter version of its defeat quest.
+  const variantsOf = (id) => {
+    const s = stem(id);
+    const type = quests.get(id)?.questType;
+    const out = [];
+    for (const [vid, q] of quests) {
+      if (vid === id) continue;
+      if (vid === `${s}_CD_EVOLUTION_QUEST` || vid === `${s}_BUDDY_EVENT_EVOLUTION_QUEST`) {
+        const t = q?.goals?.[0]?.target;
+        if (q?.questType === type && Number.isFinite(t)) out.push(t);
+      }
+    }
+    return [...new Set(out)].sort((a, b) => a - b);
+  };
+
+  const dexById = dexByPokemonId(templates);
+  const out = new Map();
+  for (const tpl of pokemonTemplates(templates)) {
+    const { dex, settings } = tpl;
+    if (!Array.isArray(settings?.evolutionBranch)) continue;
+    const suffix = formSuffix(tpl);
+    const region = regionOfSuffix(suffix);
+    for (const branch of settings.evolutionBranch) {
+      const questId = branch?.questDisplay?.[0]?.questRequirementTemplateId;
+      if (!questId || !branch.evolution) continue;
+      const quest = quests.get(questId);
+      if (!quest) continue;
+      const evolutionDex = dexById.get(branch.evolution) ?? null;
+      const key = `${dex}|${region ?? ""}|${branch.evolution}|${questId}`;
+      if (out.has(key)) continue;
+      out.set(key, {
+        dex,
+        form: tpl.form || settings.pokemonId,
+        region,
+        evolution: branch.evolution,
+        evolutionDex,
+        candyCost: Number.isFinite(branch.candyCost) ? branch.candyCost : 0,
+        quest: questId,
+        ...readEvolutionQuest(quest),
+        time: branch.onlyDaytime ? "day" : branch.onlyNighttime ? "night" : null,
+        eventTargets: variantsOf(questId),
+      });
+    }
+  }
+  return [...out.values()].sort(
+    (a, b) => a.dex - b.dex || (a.region ?? "").localeCompare(b.region ?? "") || a.quest.localeCompare(b.quest),
+  );
+}
+
+// "GALARIAN" → "galar", "HISUIAN_…" → "hisui"; null for a base or non-regional form.
+function regionOfSuffix(suffix) {
+  if (!suffix || suffix === "NORMAL") return null;
+  const head = suffix.split("_")[0];
+  return { ALOLA: "alola", GALARIAN: "galar", HISUIAN: "hisui", PALDEA: "paldea" }[head] ?? null;
+}
+
 // ── Temporary evolutions (Mega / Primal) ────────────────────────────────────
 
 // A temporary evolution's words as its tempEvoId spells them:

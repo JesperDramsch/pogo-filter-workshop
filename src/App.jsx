@@ -63,9 +63,11 @@ import {
 } from './data/species.js';
 import { regionForForm } from './data/form-region.js';
 import SpeciesInput from './SpeciesInput.jsx';
-import { megaPlans, rankMegaGroups } from './mega-boost.js';
+import { liveSpawnPool, megaPlans, rankMegaGroups } from './mega-boost.js';
 import { pickMissingPack } from './missing-pack.js';
-import { bonusNudges, roundDistanceKm, venueReach } from './bonus-nudges.js';
+import { raidLines, standingRaidRows, topMegas } from './raid-plan.js';
+import { bonusAppliesAtHome, bonusNudges, roundDistanceKm, venueReach } from './bonus-nudges.js';
+import { outingBuddyQuests } from './buddy-quests.js';
 import {
 	wishTargetsFromConfig,
 	wishLinkFor,
@@ -101,6 +103,7 @@ import RocketQuoteLookup from './explain/RocketQuoteLookup.jsx';
 import PVP_RANKINGS from './data/pvp-rankings.json';
 import META_RANKINGS from './data/meta-rankings.json';
 import EVOLUTION_COSTS from './data/evolution-costs.json';
+import EVOLUTION_QUESTS from './data/evolution-quests.json';
 import SPECIES_META from './data/species-meta.json';
 import CHANGELOG from './data/changelog.json';
 // Species refinement axes (regional forms / gender slots / un-searchable
@@ -5086,11 +5089,6 @@ export function buildFilters(
 		const pool = spawnForms || [];
 		const groups = rankMegaGroups(pool, SPECIES_META.megaForms || []).slice(0, MEGA_BOOST_GROUPS_SHOWN);
 		const top = groups[0]?.megas || [];
-		const namesOf = (megas) =>
-			[...new Set(megas.map((m) => m.dex))].map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean);
-		const topNames = namesOf(top);
-		const primalNames = namesOf(top.filter((m) => m.kind === 'primal'));
-		const megaClause = [kw.flag.mega_evolve, ...primalNames].join(',');
 		return {
 			poolSize: pool.length,
 			groups: groups.map((g) => ({
@@ -5098,8 +5096,29 @@ export function buildFilters(
 				spawns: g.matched.map((f) => ({ dex: f.dex, region: f.region })),
 				types: g.types,
 			})),
-			filter: topNames.length > 0 && kw.flag.mega_evolve ? `${topNames.join(',')}&${megaClause}` : '',
+			filter: megaFilterFor(top),
 		};
+	};
+	// "Which of these Megas can I evolve": the species in the output locale AND
+	// the Mega-evolvable flag, with any Primal's species OR'd into that clause
+	// (a Primal is not matched by the Mega keyword). Shared by the wild-spawn
+	// Mega panel and the raid lines (src/raid-plan.js).
+	function megaFilterFor(megas) {
+		const namesOf = (list) =>
+			[...new Set(list.map((m) => m.dex))].map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean);
+		const names = namesOf(megas || []);
+		if (names.length === 0 || !kw.flag.mega_evolve) return '';
+		const primalNames = namesOf((megas || []).filter((m) => m.kind === 'primal'));
+		return `${names.join(',')}&${[kw.flag.mega_evolve, ...primalNames].join(',')}`;
+	}
+
+	// "Which of these quest-evolution species do I own": the species in the
+	// output locale, ANDed with the in-game evolve-with-quest flag so a
+	// regular Slowpoke stays out of a Galarian Slowpoke quest (src/buddy-quests.js).
+	const buddyQuestFilterFor = (dexes) => {
+		const names = [...new Set(dexes)].map((d) => pokemonNameFor(String(d), outputLocale)).filter(Boolean);
+		if (names.length === 0 || !kw.flag.evolve_quest) return '';
+		return `${names.join(',')}&${kw.flag.evolve_quest}`;
 	};
 
 	const eventFilters = (EVENTS.events || [])
@@ -6131,6 +6150,8 @@ export function buildFilters(
 		eventFilters,
 		eventsFetchedAt,
 		megaBoostFor,
+		buddyQuestFilterFor,
+		megaFilterFor,
 		// Team Rocket counters (leaders / typed grunts / generic grunts)
 		rocketLeaders,
 		rocketTypedGrunts,
@@ -7389,6 +7410,8 @@ export default function App() {
 		eventFilters,
 		eventsFetchedAt,
 		megaBoostFor,
+		buddyQuestFilterFor,
+		megaFilterFor,
 		rocketLeaders,
 		rocketTypedGrunts,
 		rocketGenericGrunts,
@@ -8226,13 +8249,32 @@ export default function App() {
 			{UPGRADE_GROUPS.map((group) => renderGroup(group, 'upgrade'))}
 		</div>
 	);
-	const megaPlanRows = useMemo(
-		() =>
-			megaPlans({ events: EVENTS.events, eventRaids: RAID_BOSSES.eventRaids }, Date.now(), (n) => resolveSpeciesInfo(n)?.dex)
-				.map((p) => ({ ...p, boost: megaBoostFor(p.spawnForms) }))
-				.filter((p) => p.boost.groups.length > 0),
-		[megaBoostFor, clockTick],
-	);
+	const megaPlanRows = useMemo(() => {
+		const now = Date.now();
+		// What is spawning around the home pin right now: a raid Mega that also
+		// boosts these pays twice (src/raid-plan.js).
+		const wildPool = liveSpawnPool((EVENTS.events || []).filter((ev) => bonusAppliesAtHome(ev, homeLocation)), now).spawnForms;
+		const raidOpts = { megaForms: SPECIES_META.megaForms || [], quests: EVOLUTION_QUESTS.quests, wildPool };
+		const withBuddies = (lines) =>
+			buddyQuestFilterFor([...new Set(lines.flatMap((l) => l.buddies.map((b) => b.quest.dex)))]);
+		const dated = megaPlans({ events: EVENTS.events, eventRaids: RAID_BOSSES.eventRaids }, now, (n) => resolveSpeciesInfo(n)?.dex)
+			.map((p) => {
+				if (p.kind === 'raid') {
+					// A raid day or raid hour: per boss, the Mega for candy or for
+					// damage and the buddy quests the boss counts for.
+					const lines = raidLines(p.bosses, raidOpts);
+					return { ...p, lines, buddyFilter: withBuddies(lines) };
+				}
+				// Quest evolutions this outing helps (src/buddy-quests.js), best first.
+				const buddies = outingBuddyQuests(EVOLUTION_QUESTS.quests, p);
+				return { ...p, boost: megaBoostFor(p.spawnForms), buddies, buddyFilter: buddyQuestFilterFor(buddies.map((b) => b.quest.dex)) };
+			})
+			.filter((p) => (p.lines ? p.lines.length > 0 : p.boost.groups.length > 0 || p.buddies.length > 0));
+		// The standing rotation, one row per tier, after the dated outings: no
+		// window, it is what is up right now.
+		const standing = standingRaidRows(RAID_BOSSES.raids, STANDING_RAID_TIERS, raidOpts).map((r) => ({ ...r, buddyFilter: withBuddies(r.lines) }));
+		return [...dated, ...standing];
+	}, [megaBoostFor, buddyQuestFilterFor, clockTick, homeLocation]);
 	// Event bonuses that make an existing filter worth opening now (src/bonus-nudges.js).
 	// An in-person event's bonuses nudge only a home pin within reach of its venue.
 	const bonusNudgeRows = useMemo(() => bonusNudges(EVENTS.bonuses, Date.now(), { homeLocation }), [clockTick, homeLocation]);
@@ -8561,6 +8603,7 @@ export default function App() {
 												<div className='pt-4'>
 												<MegaPlanner
 													plans={megaPlanRows}
+													megaFilterFor={megaFilterFor}
 													homeLocation={homeLocation}
 													copied={copied}
 													copyToClipboard={copyToClipboard}
@@ -11775,6 +11818,9 @@ function liveEventGroups(eventGroups) {
 	return (eventGroups || []).filter((event) => !(Date.parse(event.end) < now));
 }
 
+// The standing tiers the Mega planner lists as "in rotation now", in order.
+const STANDING_RAID_TIERS = ['lvl5', 'mega', 'lvl3', 'lvl1', 'shadow_lvl5', 'shadow_lvl3', 'shadow_lvl1'];
+
 // The standing raid tiers behind each raid panel. Anything else (3★, 1★ and
 // their shadow tiers) is "other".
 export const RAID_PANEL_TIERS = {
@@ -12314,22 +12360,36 @@ function PileSteps({ pile, accent, copied, copyToClipboard, t, text, card }) {
 // raid day / raid hour that is on now or starts within the next days (see
 // megaPlans in mega-boost.js), soonest first, the running ones open. The Mega
 // rank-up filter sits underneath: levelling Megas is out-and-about work too.
-function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels, t, locale }) {
+function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels, megaFilterFor, t, locale }) {
 	const now = Date.now();
+	// Raid rows pick the Mega for candy or for damage (src/raid-plan.js); one
+	// choice for every raid row, kept only for this visit.
+	const [raidMode, setRaidMode] = useState('candy');
 	const fmtDow = new Intl.DateTimeFormat(locale, { weekday: 'short' });
 	const fmtTime = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' });
 	const when = (p) => {
+		if (p.kind === 'standing') return t('app.raid_plan.standing_chip');
 		const s = Date.parse(p.start), e = Date.parse(p.end);
 		if (s <= now) return t('app.mega_plan.now_until', { params: { end: `${fmtDow.format(e)} ${fmtTime.format(e)}` } });
 		return t('app.mega_plan.starts', { params: { start: `${fmtDow.format(s)} ${fmtTime.format(s)}` } });
 	};
+	const cap = (name) => String(name || '').replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toUpperCase());
+	const megaName = (m) => cap(POKEMON_NAMES_DICT[m.key]?.[locale] ?? POKEMON_NAMES_DICT[m.key]?.en ?? m.key);
+	const speciesName = (dex) => capFirst(POKEMON_NAMES_DICT[String(dex)]?.[locale] ?? POKEMON_NAMES_DICT[String(dex)]?.en ?? '');
+	const buddyHook = (quest) => (quest ? t('app.mega_plan.hook_buddy', { params: { name: speciesName(quest.dex) } }) : '');
 	// The top Mega leads the teaser: on a phone the row cuts off, and the Mega
-	// is what the row is for.
-	const topName = (p) => {
+	// is what the row is for. The best buddy rides along: "Mega-Gengar · Buddy: Pam-Pam".
+	const hookOf = (p) => {
+		if (p.lines) {
+			const first = p.lines[0];
+			const mega = first ? topMegas(first.megas, raidMode)[0] : null;
+			return [mega && megaName(mega), buddyHook(first?.buddies[0]?.quest)].filter(Boolean).join(' · ');
+		}
 		const key = p.boost.groups[0]?.megaKeys?.[0];
-		const name = key ? pokemonNameFor(key, locale) || '' : '';
-		return name.replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toUpperCase());
+		const name = key ? cap(pokemonNameFor(key, locale) || '') : '';
+		return [name, buddyHook(p.buddies?.[0]?.quest)].filter(Boolean).join(' · ');
 	};
+	const titleOf = (p) => (p.kind === 'standing' ? t(`app.collapsible.aux_boss_tier.${p.tier}`) : p.title);
 	return (
 		<AreaGroup id='mega-plan' title={t('app.mega_plan.title')} hint={t('app.mega_plan.hint')} accent='#E91E63'>
 			{plans.length === 0 ? (
@@ -12337,38 +12397,248 @@ function MegaPlanner({ plans, homeLocation, copied, copyToClipboard, typeLabels,
 			) : (
 				<div className='space-y-2'>
 					{plans.map((p) => {
-						const live = Date.parse(p.start) <= now;
-						const icon = p.kind === 'raid' ? Target : Leaf;
-						const name = topName(p);
+						const live = p.kind !== 'standing' && Date.parse(p.start) <= now;
+						const icon = p.kind === 'wild' ? Leaf : Target;
 						// An in-person event far from the home pin stays folded even while
 						// it runs; its chip carries the city and the distance.
 						const where = venueNoteFor(p.venue, homeLocation, t, locale);
 						return (
 							<ToolTile
 								key={p.id}
-								title={p.title}
+								title={titleOf(p)}
 								chip={where ? `${when(p)} · ${where.chip}` : when(p)}
-								hook={name}
+								hook={hookOf(p)}
 								icon={icon}
 								accent='#E91E63'
 								open={live && !where?.far}
 							>
-								<MegaBoostPanel
-									boost={p.boost}
-									heading={t(p.kind === 'raid' ? 'app.mega_plan.raid_heading' : 'app.mega_plan.wild_heading')}
-									accent='#E91E63'
-									copied={copied[`megaplan_${p.id}`]}
-									onCopy={() => copyToClipboard(`megaplan_${p.id}`, p.boost.filter)}
-									typeLabels={typeLabels}
-									t={t}
-									locale={locale}
-								/>
+								{p.lines ? (
+									<RaidLinesPanel
+										row={p}
+										mode={raidMode}
+										onMode={setRaidMode}
+										megaFilterFor={megaFilterFor}
+										copied={copied}
+										copyToClipboard={copyToClipboard}
+										typeLabels={typeLabels}
+										t={t}
+										locale={locale}
+									/>
+								) : (
+									<>
+										<MegaBoostPanel
+											boost={p.boost}
+											heading={t('app.mega_plan.wild_heading')}
+											accent='#E91E63'
+											copied={copied[`megaplan_${p.id}`]}
+											onCopy={() => copyToClipboard(`megaplan_${p.id}`, p.boost.filter)}
+											typeLabels={typeLabels}
+											t={t}
+											locale={locale}
+										/>
+										{p.buddies.length > 0 && (
+											<BuddyQuestPanel
+												buddies={p.buddies}
+												filter={p.buddyFilter}
+												poolSize={p.spawnForms.length}
+												raid={false}
+												accent='#9B59B6'
+												copied={copied[`buddyquest_${p.id}`]}
+												onCopy={() => copyToClipboard(`buddyquest_${p.id}`, p.buddyFilter)}
+												t={t}
+												locale={locale}
+											/>
+										)}
+									</>
+								)}
 							</ToolTile>
 						);
 					})}
 				</div>
 			)}
 		</AreaGroup>
+	);
+}
+
+// One raid outing (a raid day, a raid hour, or a standing tier) as a few
+// lines, one per boss or per set of bosses with the same answer
+// (src/raid-plan.js raidLines). Each line names the Mega to have active, for
+// extra candy (it shares the boss's type) or extra damage (its type hits the
+// boss super-effectively), as the toggle says; a Mega that does both leads in
+// either mode and is marked, and one that also boosts the wild spawns running
+// now says how many. Then the buddy quests the boss counts for. Each line has
+// its own Mega filter; the buddy filter covers the whole row.
+const RAID_MEGAS_SHOWN = 4;
+function RaidLinesPanel({ row, mode, onMode, megaFilterFor, copied, copyToClipboard, typeLabels, t, locale }) {
+	const cap = (name) => String(name || '').replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toUpperCase());
+	const megaName = (m) => cap(POKEMON_NAMES_DICT[m.key]?.[locale] ?? POKEMON_NAMES_DICT[m.key]?.en ?? m.key);
+	const speciesName = (dex) => capFirst(POKEMON_NAMES_DICT[String(dex)]?.[locale] ?? POKEMON_NAMES_DICT[String(dex)]?.en ?? '');
+	const bossName = (b) => b.names?.[locale] || b.names?.en || b.id;
+	// A quest species with its region: only Galarian Slowpoke has the quest.
+	const questSpecies = (q) => (q.region ? `${speciesName(q.dex)} (${t(`app.buddy_targets.form_region.${q.region}`)})` : speciesName(q.dex));
+	const typesOf = (types) => (types || []).map((k) => typeLabels?.[k] || k).join(' / ');
+	const questText = (q) => {
+		const own = q.text?.[locale] ?? q.text?.en;
+		const base = own ? own.replace('{0}', String(q.target)) : t('app.buddy_quest.action_fallback', { params: { count: q.target } });
+		return q.time ? `${base} · ${t(`app.buddy_quest.time.${q.time}`)}` : base;
+	};
+	return (
+		<div className='space-y-3'>
+			<div role='group' aria-label={t('app.raid_plan.mode_label')} className='flex flex-wrap items-center gap-2'>
+				<span className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t('app.raid_plan.mode_label')}</span>
+				{['candy', 'damage'].map((m) => (
+					<button
+						key={m}
+						type='button'
+						onClick={() => onMode(m)}
+						aria-pressed={mode === m}
+						className={`mono text-xs min-h-[32px] px-3 rounded-sm border transition ${
+							mode === m ? 'bg-[#1F2933] border-[#E91E63] text-[#E91E63]' : 'border-[#2D3A47] text-[#8090A0] hover:text-[#E6EDF3]'
+						}`}
+					>
+						{t(`app.raid_plan.mode_${m}`)}
+					</button>
+				))}
+			</div>
+			<ol className='space-y-3'>
+				{row.lines.map((line) => {
+					const top = topMegas(line.megas, mode);
+					const rest = (line.megas[mode] || []).filter((m) => !top.includes(m));
+					const both = top.length > 0 && line.megas.both.has(top[0].key);
+					const wild = top.length > 0 ? line.megas.wildHits.get(top[0].key) : 0;
+					const shownTop = top.slice(0, RAID_MEGAS_SHOWN);
+					const moreTop = top.length - shownTop.length;
+					const filter = megaFilterFor ? megaFilterFor(top) : '';
+					const copyKey = `raidmega_${row.id}_${line.key}_${mode}`;
+					const [buddy, ...alsoBuddies] = line.buddies;
+					return (
+						<li key={line.key} className='text-xs text-[#C9D1D9] space-y-1.5'>
+							<p>
+								<span className='font-semibold text-[#E6EDF3]'>{line.bosses.map(bossName).join(', ')}</span>
+								<span className='text-[#8B98A5]'> · {typesOf(line.bosses[0].types)}</span>
+							</p>
+							{top.length === 0 ? (
+								<p className='italic text-[#8B98A5]'>{t('app.raid_plan.no_mega')}</p>
+							) : (
+								<p>
+									<span className='mono text-[#8090A0]'>{t('app.raid_plan.mega_label')} </span>
+									<span className='font-medium text-[#E91E63]'>
+										{shownTop.length > 1 && `${t('app.events.mega_any_of')} `}
+										{shownTop.map(megaName).join(' · ')}
+										{moreTop > 0 && ` ${t('app.events.mega_more', { params: { count: moreTop } })}`}
+									</span>
+									{both && (
+										<span className='mono text-[10px] ml-2 px-1.5 py-0.5 rounded-sm border border-[#E91E63]/60 text-[#E91E63]'>
+											{t('app.raid_plan.both')}
+										</span>
+									)}
+									{wild > 0 && <span className='text-[#8B98A5]'> · {t('app.raid_plan.wild_hits', { params: { hits: wild } })}</span>}
+									{rest.length > 0 && (
+										<span className='block text-[#8B98A5]'>
+											{t('app.raid_plan.also', { params: { names: rest.slice(0, RAID_MEGAS_SHOWN).map(megaName).join(', ') } })}
+											{rest.length > RAID_MEGAS_SHOWN && ` ${t('app.events.mega_more', { params: { count: rest.length - RAID_MEGAS_SHOWN } })}`}
+										</span>
+									)}
+								</p>
+							)}
+							{buddy && (
+								<p>
+									<span className='mono text-[#8090A0]'>{t('app.raid_plan.buddy_label')} </span>
+									<span className='font-medium text-[#9B59B6]'>
+										{t('app.buddy_quest.row_title', { params: { from: questSpecies(buddy.quest), to: speciesName(buddy.quest.evolutionDex) } })}
+									</span>
+									<span className='text-[#8B98A5]'> · {questText(buddy.quest)}</span>
+									{alsoBuddies.length > 0 && (
+										<span className='block text-[#8B98A5]'>
+											{t('app.raid_plan.also', { params: { names: [...new Set(alsoBuddies.map((b) => questSpecies(b.quest)))].join(', ') } })}
+										</span>
+									)}
+								</p>
+							)}
+							{filter && (
+								<FilterBox
+									label={t(`app.raid_plan.mega_filter_label_${mode}`)}
+									accent='#E91E63'
+									filterStr={filter}
+									copied={copied[copyKey]}
+									onCopy={() => copyToClipboard(copyKey, filter)}
+									hint={t(`app.raid_plan.mega_filter_hint_${mode}`)}
+								/>
+							)}
+						</li>
+					);
+				})}
+			</ol>
+			{row.buddyFilter && (
+				<FilterBox
+					label={t('app.buddy_quest.filter_label_raids')}
+					accent='#9B59B6'
+					filterStr={row.buddyFilter}
+					copied={copied[`buddyquest_${row.id}`]}
+					onCopy={() => copyToClipboard(`buddyquest_${row.id}`, row.buddyFilter)}
+					hint={t('app.buddy_quest.filter_hint')}
+				/>
+			)}
+		</div>
+	);
+}
+
+// The quest evolutions one outing helps (src/buddy-quests.js), laid out like
+// the Mega panel above it: the best buddy first, then the others that are good
+// too, so a player who has evolved every Pancham still gets a pick. Each line
+// is the quest in the client's own words (evolution-quests.json `text`, from
+// holoholo-text) and what on this outing counts for it. One filter finds
+// every listed species that still has its quest evolution; whichever the
+// player owns is what shows up. Every match is listed, not a top few: one
+// outing only ever helps a handful of quests, and the filter must not find a
+// species the list does not explain.
+const BUDDY_MATCH_NAMES_SHOWN = 5;
+function BuddyQuestPanel({ buddies, filter, poolSize, raid, accent, copied, onCopy, t, locale }) {
+	const nameOf = (dex) => capFirst(POKEMON_NAMES_DICT[String(dex)]?.[locale] ?? POKEMON_NAMES_DICT[String(dex)]?.en ?? '');
+	const regional = (dex, region) => (region ? `${nameOf(dex)} (${t(`app.buddy_targets.form_region.${region}`)})` : nameOf(dex));
+	const questText = (q) => {
+		const own = q.text?.[locale] ?? q.text?.en;
+		const base = own ? own.replace('{0}', String(q.target)) : t('app.buddy_quest.action_fallback', { params: { count: q.target } });
+		return q.time ? `${base} · ${t(`app.buddy_quest.time.${q.time}`)}` : base;
+	};
+	return (
+		<div className='space-y-2 pt-1'>
+			<h5 className='mono text-[11px] uppercase tracking-wide text-[#8090A0]'>{t('app.buddy_quest.heading')}</h5>
+			<ol className='space-y-2'>
+				{buddies.map((b, i) => {
+					const q = b.quest;
+					const names = [...new Set(b.matches.map((f) => regional(f.dex, f.region)))];
+					const more = names.length - BUDDY_MATCH_NAMES_SHOWN;
+					return (
+						<li key={b.key} className='text-xs text-[#C9D1D9] space-y-0.5'>
+							<p>
+								<span className='mono text-[#8090A0]'>{i + 1}. </span>
+								<span className='font-medium' style={{ color: i === 0 ? accent : undefined }}>
+									{t('app.buddy_quest.row_title', { params: { from: regional(q.dex, q.region), to: nameOf(q.evolutionDex) } })}
+								</span>
+								<span className='text-[#8B98A5]'> · {questText(q)}</span>
+							</p>
+							<p className='text-[#8B98A5]'>
+								{t(raid ? 'app.buddy_quest.counts_raid' : 'app.buddy_quest.counts_wild', { params: { hits: b.matches.length, total: poolSize } })}
+								{': '}
+								{names.slice(0, BUDDY_MATCH_NAMES_SHOWN).join(', ')}
+								{more > 0 && ` ${t('app.events.mega_more', { params: { count: more } })}`}
+							</p>
+						</li>
+					);
+				})}
+			</ol>
+			{filter && (
+				<FilterBox
+					label={t('app.buddy_quest.filter_label')}
+					accent={accent}
+					filterStr={filter}
+					copied={copied}
+					onCopy={onCopy}
+					hint={t('app.buddy_quest.filter_hint')}
+				/>
+			)}
+		</div>
 	);
 }
 
