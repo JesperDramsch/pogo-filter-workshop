@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-17T16:11:22.024Z",
+  "fetchedAt": "2026-11-21T14:45:36.829Z",
   "signatureLearners": 5,
   "moves": [
     {
@@ -62,13 +62,17 @@
       "move": "V0615_MOVE_KOWTOW_CLEAVE",
       "change": "added",
       "at": "2026-10-30T13:06:18.706Z",
-      "learners": []
+      "learners": [
+        983
+      ]
     },
     {
       "move": "KOWTOW_CLEAVE",
       "change": "added",
       "at": "2026-10-29T13:14:02.606Z",
-      "learners": []
+      "learners": [
+        983
+      ]
     },
     {
       "move": "OMINOUS_WIND_PLUS",

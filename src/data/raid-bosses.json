@@ -638,6 +638,36 @@
           ]
         }
       ]
+    },
+    {
+      "eventID": "clefable-super-mega-raid-day-2026",
+      "name": "Clefable Super Mega Raid Day",
+      "eventType": "raid-day",
+      "start": "2026-11-28T14:00:00.000",
+      "end": "2026-11-28T17:00:00.000",
+      "isShadow": false,
+      "isMega": false,
+      "bosses": [
+        {
+          "id": "CLEFABLE",
+          "form": "CLEFABLE_NORMAL",
+          "names": {
+            "en": "Clefable"
+          },
+          "types": [
+            "fairy"
+          ],
+          "resistorTypes": [
+            "poison",
+            "steel",
+            "fire"
+          ],
+          "seMoveTypes": [
+            "poison",
+            "steel"
+          ]
+        }
+      ]
     }
   ],
   "eventMaxBattles": [

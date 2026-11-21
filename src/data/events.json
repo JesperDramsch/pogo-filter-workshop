@@ -1,152 +1,6 @@
 {
-  "fetchedAt": "2026-11-18T15:47:13.861Z",
+  "fetchedAt": "2026-11-21T14:45:36.112Z",
   "events": [
-    {
-      "id": "event-into-the-wild-2026-2026-11-09t10-00-00",
-      "title": "Into the Wild 2026",
-      "category": "Event",
-      "start": "2026-11-09T10:00:00",
-      "end": "2026-11-13T20:00:00",
-      "isLocalTime": true,
-      "venue": null,
-      "spawnDex": [
-        52,
-        81,
-        116,
-        123,
-        147,
-        179,
-        303,
-        304,
-        371,
-        690,
-        714,
-        777
-      ],
-      "spawns": [
-        "Aron",
-        "Bagon",
-        "Dratini",
-        "Horsea",
-        "Magnemite",
-        "Mareep",
-        "Mawile",
-        "Meowth",
-        "Noibat",
-        "Scyther",
-        "Skrelp",
-        "Togedemaru"
-      ],
-      "spawnForms": [
-        {
-          "name": "Galarian Meowth",
-          "dex": 52,
-          "region": "galar",
-          "types": [
-            "steel"
-          ]
-        },
-        {
-          "name": "Magnemite",
-          "dex": 81,
-          "region": null,
-          "types": [
-            "electric",
-            "steel"
-          ]
-        },
-        {
-          "name": "Horsea",
-          "dex": 116,
-          "region": null,
-          "types": [
-            "water"
-          ]
-        },
-        {
-          "name": "Scyther",
-          "dex": 123,
-          "region": null,
-          "types": [
-            "bug",
-            "flying"
-          ]
-        },
-        {
-          "name": "Dratini",
-          "dex": 147,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Mareep",
-          "dex": 179,
-          "region": null,
-          "types": [
-            "electric"
-          ]
-        },
-        {
-          "name": "Mawile",
-          "dex": 303,
-          "region": null,
-          "types": [
-            "steel",
-            "fairy"
-          ]
-        },
-        {
-          "name": "Aron",
-          "dex": 304,
-          "region": null,
-          "types": [
-            "steel",
-            "rock"
-          ]
-        },
-        {
-          "name": "Bagon",
-          "dex": 371,
-          "region": null,
-          "types": [
-            "dragon"
-          ]
-        },
-        {
-          "name": "Skrelp",
-          "dex": 690,
-          "region": null,
-          "types": [
-            "poison",
-            "water"
-          ]
-        },
-        {
-          "name": "Noibat",
-          "dex": 714,
-          "region": null,
-          "types": [
-            "flying",
-            "dragon"
-          ]
-        },
-        {
-          "name": "Togedemaru",
-          "dex": 777,
-          "region": null,
-          "types": [
-            "electric",
-            "steel"
-          ]
-        }
-      ],
-      "researchDex": [],
-      "research": [],
-      "unresolved": [],
-      "hasCostumes": false
-    },
     {
       "id": "wild-area-pok-mon-go-wild-area-2026-global-2026-11-14t10-00-00",
       "title": "Pokémon GO Wild Area 2026: Global",
@@ -1755,6 +1609,13 @@
       "title": "Dynamax Cryogonal during Max Monday",
       "start": "2026-11-30T06:00:00",
       "end": "2026-11-30T21:00:00"
+    },
+    {
+      "id": "max|max-battles-max-battle-day-2026-12-05t14-00-00",
+      "kind": "max",
+      "title": "Max Battle Day",
+      "start": "2026-12-05T14:00:00",
+      "end": "2026-12-05T17:00:00"
     }
   ],
   "bonuses": [
@@ -1793,31 +1654,6 @@
         "Receive up to 125 Gifts per day from spinning PokéStop and Gym Photo Discs",
         "Receive up to 150 Gifts per day from spinning PokéStop and Gym Photo Discs",
         "Trainers level 31 and above will receive one guaranteed Candy XL when trading Pokémon"
-      ]
-    },
-    {
-      "id": "event-into-the-wild-2026-2026-11-09t10-00-00",
-      "title": "Into the Wild 2026",
-      "category": "Event",
-      "start": "2026-11-09T10:00:00",
-      "end": "2026-11-13T20:00:00",
-      "isLocalTime": true,
-      "venue": null,
-      "bonuses": [
-        "+1 Candy XL from Max Battles (Trainers level 31+)",
-        "+1 Candy XL from raids (Trainers level 31+)",
-        "+1 Candy from Max Battles",
-        "+1 Candy from raids",
-        "1/2 Hatch Distance for Eggs placed in Incubators during the event",
-        "3/4 Max Particle cost for unlocking and powering up Max Moves",
-        "5,000 additional XP from completed Max Battles",
-        "5,000 additional XP from completed raids",
-        "Chance to encounter Shiny Gimmighoul when using a Coin Bag*",
-        "Chance to encounter Shiny Meltan when opening the Mystery Box*",
-        "No Remote Raid limit from Saturday, November 14, to Sunday, November 15, 2026",
-        "Reduced wait time before you can open the Mystery Box again*",
-        "Remote Raid limit increased to 30 from Monday, November 9, to Friday, November 13, 2026",
-        "Trainers can receive special event stickers from PokéStops and Gifts"
       ]
     },
     {

@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-29T18:14:42.894Z",
+  "fetchedAt": "2026-11-21T14:45:35.968Z",
   "legacy": [
     {
       "date": "2024-12-21",
@@ -503,6 +503,17 @@
       "event": "Pawniard Community Day",
       "dex": [
         624
+      ],
+      "background": null,
+      "source": "leak-duck"
+    },
+    {
+      "date": "2026-12-12",
+      "event": "December Community Day 2026",
+      "dex": [
+        624,
+        625,
+        983
       ],
       "background": null,
       "source": "leak-duck"
