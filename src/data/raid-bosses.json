@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-23T18:24:01.837Z",
+  "fetchedAt": "2026-11-24T17:54:30.152Z",
   "raids": {
     "mega": [
       {
@@ -671,35 +671,6 @@
     }
   ],
   "eventMaxBattles": [
-    {
-      "eventID": "max-mondays-2026-11-23",
-      "name": "Dynamax Espurr during Max Monday",
-      "eventType": "max-mondays",
-      "start": "2026-11-23T06:00:00.000",
-      "end": "2026-11-23T21:00:00.000",
-      "bosses": [
-        {
-          "id": "ESPURR",
-          "form": "ESPURR_NORMAL",
-          "names": {
-            "en": "Espurr"
-          },
-          "types": [
-            "psychic"
-          ],
-          "resistorTypes": [
-            "steel",
-            "psychic",
-            "dark"
-          ],
-          "seMoveTypes": [
-            "bug",
-            "ghost",
-            "dark"
-          ]
-        }
-      ]
-    },
     {
       "eventID": "max-mondays-2026-11-30",
       "name": "Dynamax Cryogonal during Max Monday",

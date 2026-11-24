@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-23T18:24:04.247Z",
+  "fetchedAt": "2026-11-24T17:54:34.384Z",
   "events": [
     {
       "id": "event-minior-showers-leonids-2026-2026-11-14t17-00-00",
@@ -833,20 +833,6 @@
     }
   ],
   "signals": [
-    {
-      "id": "max|max-mondays-canceled-max-monday-2026-11-16t06-00-00",
-      "kind": "max",
-      "title": "[Canceled] Max Monday",
-      "start": "2026-11-16T06:00:00",
-      "end": "2026-11-16T21:00:00"
-    },
-    {
-      "id": "max|max-mondays-max-monday-pok-mon-to-be-announced-2026-11-16t06-00-00",
-      "kind": "max",
-      "title": "Max Monday: Pokémon to be announced",
-      "start": "2026-11-16T06:00:00",
-      "end": "2026-11-16T21:00:00"
-    },
     {
       "id": "max|max-battles-eternamax-eternatus-returns-2026-11-21t11-00-00",
       "kind": "max",
