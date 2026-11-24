@@ -1560,32 +1560,41 @@ console.log('\nmissing packs — in buildFilters');
 	check('hundo focus offers the hundo pack only', kinds(sugs('hundo')) === 'missing-hundo');
 	check('both offers both', kinds(sugs('both')) === 'missing-lucky,missing-hundo');
 
-	const all = sugs('lucky');
-	const pack = all.find((s) => s.kind === 'missing-lucky');
-	check(`an empty collection gets a full pack of ${MISSING_PACK_SIZE}`, pack.species.length === MISSING_PACK_SIZE);
 	const dexOf = (name) => resolveSpeciesInfo(name)?.dex;
 	const released = new Set(SPECIES_META.releasedDex);
 	const special = new Set(SPECIES_META.specialTradeDex);
-	check('every pick is released and regular-trade',
-		pack.species.every((n) => released.has(dexOf(n)) && !special.has(dexOf(n))));
-	check('no pick is a non-base stage', pack.species.every((n) => collectibleBaseDex(dexOf(n)) === dexOf(n)));
-	const otherNames = new Set(
-		all.filter((s) => !s.kind.startsWith('missing-')).flatMap((s) => s.species),
-	);
-	check('no pick is offered by another pack', pack.species.every((n) => !otherNames.has(n)));
 	const km = SPECIES_META.buddyKmByDex;
-	check('no 20 km long shots while the short queues are full',
-		pack.species.every((n) => km[dexOf(n)] !== 20));
+	// The same contents rules for both goals. A landed species arrives through
+	// that goal's own have-list: luckies for the lucky pack, hundos for hundo.
+	for (const goal of ['lucky', 'hundo']) {
+		const kind = `missing-${goal}`;
+		const landedAs = (names) => (goal === 'lucky' ? sugs(goal, names) : sugs(goal, [], names));
+		const all = sugs(goal);
+		const pack = all.find((s) => s.kind === kind);
+		check(`${goal}: an empty collection gets a full pack of ${MISSING_PACK_SIZE}`,
+			pack?.species.length === MISSING_PACK_SIZE);
+		if (!pack) continue;
+		check(`${goal}: every pick is released and regular-trade`,
+			pack.species.every((n) => released.has(dexOf(n)) && !special.has(dexOf(n))));
+		check(`${goal}: no pick is a non-base stage`,
+			pack.species.every((n) => collectibleBaseDex(dexOf(n)) === dexOf(n)));
+		const otherNames = new Set(
+			all.filter((s) => !s.kind.startsWith('missing-')).flatMap((s) => s.species),
+		);
+		check(`${goal}: no pick is offered by another pack`, pack.species.every((n) => !otherNames.has(n)));
+		check(`${goal}: no 20 km long shots while the short queues are full`,
+			pack.species.every((n) => km[dexOf(n)] !== 20));
 
-	const landed = pack.species[0];
-	const next = sugs('lucky', [landed]).find((s) => s.kind === 'missing-lucky');
-	check('a new lucky drops out and the pack stays full',
-		!next.species.includes(landed) && next.species.length === MISSING_PACK_SIZE);
-	const nextEvolved = sugs('lucky', [pokemonNameFor(String(
-		Object.entries(SPECIES_META.evoParentByDex).find(([, p]) => p === dexOf(landed))?.[0] ?? dexOf(landed),
-	))]).find((s) => s.kind === 'missing-lucky');
-	check('a lucky of a later stage covers the line too', !nextEvolved.species.includes(landed));
-	check('the pack labels have strings', pack.hintKey === 'app.filter.friend_collect_hint_missing_lucky');
+		const landed = pack.species[0];
+		const next = landedAs([landed]).find((s) => s.kind === kind);
+		check(`${goal}: a landed species drops out and the pack stays full`,
+			!next.species.includes(landed) && next.species.length === MISSING_PACK_SIZE);
+		const later = Object.entries(SPECIES_META.evoParentByDex).find(([, p]) => p === dexOf(landed))?.[0];
+		const nextEvolved = landedAs([pokemonNameFor(String(later ?? dexOf(landed)))]).find((s) => s.kind === kind);
+		check(`${goal}: a later stage covers the line too`, !nextEvolved.species.includes(landed));
+		check(`${goal}: the pack hint points at its own string`,
+			pack.hintKey === `app.filter.friend_collect_hint_missing_${goal}`);
+	}
 }
 
 if (failures > 0) {
