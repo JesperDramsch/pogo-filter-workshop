@@ -538,6 +538,7 @@
   "app.modal.sync.native_title": "My Pokémon GO Filter Workshop setup",
   "app.modal.sync.manual_label": "Transfer link",
   "app.modal.sync.too_large": "Your setup is too large for a link. Use the backup file above instead.",
+  "app.modal.sync.build_failed": "The link couldn't be built in this browser. Use the backup file above instead.",
   "app.modal.sync.help": "The link carries the same data as the backup file: hundos, luckies, settings, buddies, home location and tags. Send it to yourself and open it on your other device. It reaches no server, but whoever has the link can read all of it.",
   "app.modal.sync.paste_label": "Got a transfer link from another device? Paste it here",
   "app.modal.sync.paste_open": "Review",

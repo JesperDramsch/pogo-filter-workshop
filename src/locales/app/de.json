@@ -538,6 +538,7 @@
   "app.modal.sync.native_title": "Mein Setup im Pokémon GO Filter Workshop",
   "app.modal.sync.manual_label": "Transfer-Link",
   "app.modal.sync.too_large": "Dein Setup ist zu groß für einen Link. Nimm stattdessen die Sicherungsdatei oben.",
+  "app.modal.sync.build_failed": "Der Link ließ sich in diesem Browser nicht erstellen. Nimm stattdessen die Sicherungsdatei oben.",
   "app.modal.sync.help": "Der Link enthält dieselben Daten wie die Sicherungsdatei: Hundos, Glücks-Pokémon, Einstellungen, Tausch-Kumpel, Heimat-Standort und Tags. Schick ihn dir selbst und öffne ihn auf deinem anderen Gerät. Er landet auf keinem Server, aber wer den Link hat, kann alles darin lesen.",
   "app.modal.sync.paste_label": "Transfer-Link von einem anderen Gerät bekommen? Hier einfügen",
   "app.modal.sync.paste_open": "Prüfen",

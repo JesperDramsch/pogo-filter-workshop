@@ -538,6 +538,7 @@
   "app.modal.sync.native_title": "我的 Pokémon GO Filter Workshop 設定",
   "app.modal.sync.manual_label": "轉移連結",
   "app.modal.sync.too_large": "你的設定太大,無法放進連結。請改用上方的備份檔。",
+  "app.modal.sync.build_failed": "這個瀏覽器無法建立連結。請改用上方的備份檔。",
   "app.modal.sync.help": "連結帶著和備份檔相同的資料:100%、幸運、設定、交換夥伴、家的位置與標籤。傳給自己,再到另一台裝置上開啟。它不會送到任何伺服器,但拿到連結的人都能讀到全部內容。",
   "app.modal.sync.paste_label": "有另一台裝置的轉移連結嗎?貼在這裡",
   "app.modal.sync.paste_open": "檢視",

@@ -538,6 +538,7 @@
   "app.modal.sync.native_title": "Pokémon GO Filter Workshop の設定",
   "app.modal.sync.manual_label": "引き継ぎリンク",
   "app.modal.sync.too_large": "設定が大きすぎてリンクにできません。上のバックアップファイルを使ってください。",
+  "app.modal.sync.build_failed": "このブラウザではリンクを作成できませんでした。上のバックアップファイルを使ってください。",
   "app.modal.sync.help": "リンクにはバックアップファイルと同じデータが入ります：100%・キラ・設定・交換相棒・ホーム位置・タグ。自分宛てに送って、もう一方の端末で開いてください。どのサーバーにも送られませんが、リンクを持っている人は中身をすべて読めます。",
   "app.modal.sync.paste_label": "別の端末の引き継ぎリンクがありますか？ここに貼り付けてください",
   "app.modal.sync.paste_open": "確認",

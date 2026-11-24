@@ -100,12 +100,25 @@ export function isSyncHash(hash) {
 	return typeof hash === 'string' && hash.startsWith(SYNC_HASH_PREFIX);
 }
 
-// The `#sync/…` part of whatever was pasted: a whole link, the hash alone, or
-// a link a messenger wrapped over several lines. null when there is none.
-export function extractSyncHash(text) {
-	const flat = String(text ?? '').replace(/\s+/g, '');
-	const at = flat.indexOf(SYNC_HASH_PREFIX);
-	return at === -1 ? null : flat.slice(at);
+// The `#sync/…` hashes that pasted text may hold, best guess first; empty when
+// it holds none. People paste a whole message, so the link can be followed by
+// a full stop or a sign-off, and a messenger may have wrapped it over lines.
+// Those two readings disagree about where the token ends, so both are offered
+// and the caller takes the first that parses:
+//   1. the token as written, up to the first character a token cannot contain
+//      (covers "<link> thanks!" and "<link>.")
+//   2. the same after removing all whitespace (covers a wrapped link)
+export function syncHashCandidates(text) {
+	const raw = String(text ?? '');
+	const out = [];
+	for (const source of [raw, raw.replace(/\s+/g, '')]) {
+		const at = source.indexOf(SYNC_HASH_PREFIX);
+		if (at === -1) continue;
+		const token = source.slice(at + SYNC_HASH_PREFIX.length).match(/^[A-Za-z0-9_-]*/)[0];
+		const hash = SYNC_HASH_PREFIX + token;
+		if (token && !out.includes(hash)) out.push(hash);
+	}
+	return out;
 }
 
 // Hash → { ok: true, envelope } or { ok: false, code }. The envelope is parsed
@@ -223,6 +236,28 @@ export function diffSyncState(current, incoming) {
 		attackers.removed === 0 &&
 		buddies.added.length + buddies.removed.length + buddies.changed.length === 0;
 	return { hundos, luckies, tags, attackers, buddies, settings, home, identical };
+}
+
+// The change stamp to write after the carried data was looked at again, or
+// null to leave the stored one alone. `previous` and `fingerprint` are the
+// serialised data before and now; `importedAt` is set when an import was just
+// applied.
+//   - first look after load (`previous` null): nothing. Migrations that run on
+//     load are not the user's changes.
+//   - an import was applied: its own timestamp, even when it changed nothing.
+//     The device now holds the data as it was when the link or file was made,
+//     so a later link from the other device must not look older than it.
+//   - the data differs: now.
+export function nextChangeStamp({ previous, fingerprint, importedAt, now }) {
+	if (previous === null || previous === undefined) return null;
+	if (importedAt) return importedAt;
+	return fingerprint === previous ? null : now;
+}
+
+// The timestamp an applied envelope stands for: its own `exportedAt` when that
+// is readable, else `now`.
+export function envelopeStamp(exportedAt, now) {
+	return Number.isNaN(Date.parse(exportedAt ?? '')) ? now : exportedAt;
 }
 
 // True when the device's last change (`changedAt`) is later than the moment

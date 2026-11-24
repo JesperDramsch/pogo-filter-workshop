@@ -86,7 +86,16 @@ import {
 	bareTagPrefix,
 	WISH_MAX_NAME,
 } from './share-link.js';
-import { isSyncHash, extractSyncHash, parseSyncHash, syncLinkFor, diffSyncState, linkIsOlderThan } from './sync-link.js';
+import {
+	isSyncHash,
+	syncHashCandidates,
+	parseSyncHash,
+	syncLinkFor,
+	diffSyncState,
+	linkIsOlderThan,
+	nextChangeStamp,
+	envelopeStamp,
+} from './sync-link.js';
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword, moveKeyFromKeyword, moveKeywordFor, moveDisplayName } from './i18n/pogo-keywords.js';
 import {
 	silverCapFilters,
@@ -7113,14 +7122,23 @@ export default function App() {
 	// the address bar at once and the review dialog takes over. null, or
 	// { ok: false, code }, or { ok: true, envelope, changedAt }, or { applied: true }.
 	const [syncLink, setSyncLink] = useState(null);
-	async function openSyncHash(hash) {
+	async function readSyncHash(hash) {
 		const parsed = await parseSyncHash(hash);
-		if (!parsed.ok) return setSyncLink(parsed);
+		if (!parsed.ok) return parsed;
 		const valid = validateImportEnvelope(parsed.envelope);
-		if (!valid.ok) {
-			return setSyncLink({ ok: false, code: valid.error.code === 'unsupported_version' ? 'unsupported_version' : 'garbled' });
+		if (!valid.ok) return { ok: false, code: valid.error.code === 'unsupported_version' ? 'unsupported_version' : 'garbled' };
+		return { ok: true, envelope: valid.envelope, changedAt: readChangedAt() };
+	}
+	// `hashes` is one hash (a tapped link) or several readings of pasted text
+	// (syncHashCandidates): the first that reads wins, else the first error shows.
+	async function openSyncHash(hashes) {
+		let firstError = null;
+		for (const hash of [].concat(hashes)) {
+			const result = await readSyncHash(hash);
+			if (result.ok) return setSyncLink(result);
+			firstError = firstError || result;
 		}
-		return setSyncLink({ ok: true, envelope: valid.envelope, changedAt: readChangedAt() });
+		return setSyncLink(firstError);
 	}
 	useEffect(() => {
 		const onHashChange = () => {
@@ -7304,12 +7322,9 @@ export default function App() {
 	useEffect(() => {
 		if (loaded) saveJSON(KEY_CHANGELOG_SEEN, changelogSeen);
 	}, [changelogSeen, loaded]);
-	// Stamp the moment the data a sync link carries last changed here. The first
-	// run after load only records what was loaded (migrations on load are not
-	// the user's changes), and an applied import carries its own stamp: after
-	// it, this device holds the data as it was when the link or file was made.
-	// `importStamp` is a fresh object per applied import, so the effect runs even
-	// when the import changed nothing.
+	// Stamp the moment the data a sync link carries last changed here; the rules
+	// are nextChangeStamp's (src/sync-link.js). `importStamp` is a fresh object
+	// per applied import, so the effect runs even when the import changed nothing.
 	const [importStamp, setImportStamp] = useState(null);
 	const syncedFingerprint = useRef(null);
 	const seenImportStamp = useRef(null);
@@ -7318,18 +7333,14 @@ export default function App() {
 		const fingerprint = JSON.stringify([hundos, luckies, topAttackers, topMaxAttackers, config, homeLocation, bazaarTags]);
 		const adopted = importStamp !== seenImportStamp.current ? importStamp : null;
 		seenImportStamp.current = importStamp;
-		if (syncedFingerprint.current === null) {
-			syncedFingerprint.current = fingerprint;
-			return;
-		}
-		if (adopted) {
-			syncedFingerprint.current = fingerprint;
-			saveJSON(KEY_CHANGED_AT, adopted.at);
-			return;
-		}
-		if (fingerprint === syncedFingerprint.current) return;
+		const stamp = nextChangeStamp({
+			previous: syncedFingerprint.current,
+			fingerprint,
+			importedAt: adopted?.at ?? null,
+			now: new Date().toISOString(),
+		});
 		syncedFingerprint.current = fingerprint;
-		saveJSON(KEY_CHANGED_AT, new Date().toISOString());
+		if (stamp) saveJSON(KEY_CHANGED_AT, stamp);
 	}, [hundos, luckies, topAttackers, topMaxAttackers, config, homeLocation, bazaarTags, importStamp, loaded]);
 
 	// ── Multi-instance safety ────────────────────────────────────────────────
@@ -7923,7 +7934,7 @@ export default function App() {
 	function applyImportEnvelope(envelope) {
 		const prepared = prepareImport(envelope);
 		// See the change-stamp effect: the imported data is as old as its envelope.
-		setImportStamp({ at: Number.isNaN(Date.parse(envelope?.exportedAt ?? '')) ? new Date().toISOString() : envelope.exportedAt });
+		setImportStamp({ at: envelopeStamp(envelope?.exportedAt, new Date().toISOString()) });
 		if ('hundos' in prepared) setHundos(prepared.hundos);
 		if ('luckies' in prepared) setLuckies(prepared.luckies);
 		if ('topAttackers' in prepared) setTopAttackers(prepared.topAttackers);
@@ -7956,11 +7967,11 @@ export default function App() {
 	// A link pasted into Settings: false when the text holds no sync link, else
 	// the modal closes and the review dialog opens, as for a tapped link.
 	function openPastedSyncLink(text) {
-		const hash = extractSyncHash(text);
-		if (!hash) return false;
+		const hashes = syncHashCandidates(text);
+		if (hashes.length === 0) return false;
 		setShowSettings(false);
 		setResetArmed(false);
-		openSyncHash(hash);
+		openSyncHash(hashes);
 		return true;
 	}
 
@@ -17222,7 +17233,11 @@ function SyncLinkSection({ syncOut, onPaste }) {
 					</button>
 				)}
 			</div>
-			{syncOut && !syncOut.ok && <div className='mono text-[10.5px] text-[#F5B82E] mt-2'>{t('app.modal.sync.too_large')}</div>}
+			{syncOut && !syncOut.ok && (
+				<div className='mono text-[10.5px] text-[#F5B82E] mt-2'>
+					{t(syncOut.code === 'too_long' ? 'app.modal.sync.too_large' : 'app.modal.sync.build_failed')}
+				</div>
+			)}
 			{state && typeof state === 'object' && (
 				<input
 					readOnly

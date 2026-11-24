@@ -538,6 +538,7 @@
   "app.modal.sync.native_title": "Mi configuración de Pokémon GO Filter Workshop",
   "app.modal.sync.manual_label": "Enlace de transferencia",
   "app.modal.sync.too_large": "Tu configuración es demasiado grande para un enlace. Usa el archivo de copia de seguridad de arriba.",
+  "app.modal.sync.build_failed": "No se pudo crear el enlace en este navegador. Usa el archivo de copia de seguridad de arriba.",
   "app.modal.sync.help": "El enlace lleva los mismos datos que el archivo de copia de seguridad: 100%, afortunados, ajustes, compañeros, ubicación y etiquetas. Envíatelo y ábrelo en tu otro dispositivo. No llega a ningún servidor, pero quien tenga el enlace puede leerlo todo.",
   "app.modal.sync.paste_label": "¿Tienes un enlace de transferencia de otro dispositivo? Pégalo aquí",
   "app.modal.sync.paste_open": "Revisar",

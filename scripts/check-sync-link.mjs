@@ -8,10 +8,13 @@
 //        inside a link
 //   Y3 — junk links are refused with a code, never a throw, and a token that
 //        inflates without bound is cut off
-//   Y4 — a pasted link is found in whatever surrounds it
+//   Y4 — a pasted link is found in whatever surrounds it: a whole message
+//        with words after the link, or a link wrapped over several lines
 //   Y5 — the review: a device's own link changes nothing, and each kind of
 //        difference is reported where the receiver will look for it
 //   Y6 — the staleness warning fires only when the device is provably newer
+//   Y7 — the change stamp it compares against: nothing on load, the link's own
+//        time after an import, now after a change
 //
 // Run with: npm run test:synclink  (or npx vite-node scripts/check-sync-link.mjs)
 
@@ -25,10 +28,12 @@ import {
   encodeSyncToken,
   syncLinkFor,
   isSyncHash,
-  extractSyncHash,
+  syncHashCandidates,
   parseSyncHash,
   diffSyncState,
   linkIsOlderThan,
+  nextChangeStamp,
+  envelopeStamp,
 } from "../src/sync-link.js";
 
 let failures = 0;
@@ -132,12 +137,27 @@ console.log("\nY4 — finding the link in pasted text");
 {
   const link = (await syncLinkFor(envelopeOf(laptop), BASE)).link;
   const hash = hashOf(link);
-  check("a whole link", extractSyncHash(link) === hash);
-  check("the hash alone", extractSyncHash(hash) === hash);
-  check("surrounding spaces and a trailing newline", extractSyncHash(`  ${link}\n`) === hash);
-  check("a link a messenger wrapped over lines", extractSyncHash(`${link.slice(0, 80)}\n${link.slice(80, 300)}\r\n ${link.slice(300)}`) === hash);
-  check("text with no link in it", extractSyncHash("hello there") === null && extractSyncHash("") === null && extractSyncHash(null) === null);
-  check("a wish link is not a sync link", extractSyncHash(`${BASE}#wish/abc`) === null);
+  // What the app does with pasted text: the first candidate that parses.
+  const readPasted = async (text) => {
+    for (const candidate of syncHashCandidates(text)) {
+      const r = await parseSyncHash(candidate);
+      if (r.ok) return candidate;
+    }
+    return null;
+  };
+  check("a whole link", (await readPasted(link)) === hash);
+  check("the hash alone", (await readPasted(hash)) === hash);
+  check("surrounding spaces and a trailing newline", (await readPasted(`  ${link}\n`)) === hash);
+  check("words before the link", (await readPasted(`here: ${link}`)) === hash);
+  check("words after the link", (await readPasted(`here: ${link} thanks!`)) === hash);
+  check("a full stop right after the link", (await readPasted(`${link}.`)) === hash);
+  check("a link in brackets on its own line", (await readPasted(`for the iPad\n(${link})\nsee you`)) === hash);
+  check("a link a messenger wrapped over lines", (await readPasted(`${link.slice(0, 80)}\n${link.slice(80, 300)}\r\n ${link.slice(300)}`)) === hash);
+  check("a wrapped link with a full stop after it", (await readPasted(`${link.slice(0, 80)}\n${link.slice(80)}.`)) === hash);
+  check("an unwrapped link is the first candidate, so nothing after it is glued on", syncHashCandidates(`${link} thanks`)[0] === hash);
+  check("text with no link in it", syncHashCandidates("hello there").length === 0 && syncHashCandidates("").length === 0 && syncHashCandidates(null).length === 0);
+  check("a bare prefix with no token", syncHashCandidates(`${BASE}${SYNC_HASH_PREFIX}`).length === 0);
+  check("a wish link is not a sync link", syncHashCandidates(`${BASE}#wish/abc`).length === 0);
 }
 
 console.log("\nY5 — the review");
@@ -199,6 +219,21 @@ console.log("\nY6 — is the link older than this device's last change?");
   check("time zones are compared as instants", !linkIsOlderThan(made, "2026-11-24T10:30:00+01:00"));
   check("no local stamp: no warning", !linkIsOlderThan(made, null) && !linkIsOlderThan(made, undefined));
   check("an undated or unreadable link: no warning", !linkIsOlderThan(undefined, made) && !linkIsOlderThan("yesterday", made));
+}
+
+console.log("\nY7 — the change stamp");
+{
+  const now = "2026-11-24T12:00:00.000Z";
+  const linkTime = "2026-11-24T10:00:00.000Z";
+  check("first look after load writes nothing, whatever was loaded", nextChangeStamp({ previous: null, fingerprint: "a", importedAt: null, now }) === null);
+  check("unchanged data writes nothing", nextChangeStamp({ previous: "a", fingerprint: "a", importedAt: null, now }) === null);
+  check("changed data is stamped now", nextChangeStamp({ previous: "a", fingerprint: "b", importedAt: null, now }) === now);
+  check("an applied import is stamped with the link's own time", nextChangeStamp({ previous: "a", fingerprint: "b", importedAt: linkTime, now }) === linkTime);
+  check("even when the import changed nothing", nextChangeStamp({ previous: "a", fingerprint: "a", importedAt: linkTime, now }) === linkTime);
+  check("so a device that applied a link is not newer than a later link", !linkIsOlderThan("2026-11-24T10:05:00.000Z", nextChangeStamp({ previous: "a", fingerprint: "b", importedAt: linkTime, now })));
+  check("and a real change after that is newer than the old link", linkIsOlderThan(linkTime, nextChangeStamp({ previous: "b", fingerprint: "c", importedAt: null, now })));
+  check("an envelope's stamp is its own exportedAt", envelopeStamp(linkTime, now) === linkTime);
+  check("an undated or unreadable envelope counts as now", envelopeStamp(undefined, now) === now && envelopeStamp("last week", now) === now);
 }
 
 console.log(`\n${failures === 0 ? "✓ All sync-link tests passed." : `✗ ${failures} test(s) failed.`}`);
