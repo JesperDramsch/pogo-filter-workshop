@@ -60,6 +60,7 @@
   "test:buddyquests": "vite-node scripts/check-buddy-quests.mjs",
   "test:raidplan": "vite-node scripts/check-raid-plan.mjs",
   "test:sharelink": "vite-node scripts/check-share-link.mjs",
+  "test:synclink": "vite-node scripts/check-sync-link.mjs",
   "test:settingsgroups": "vite-node scripts/check-settings-groups.mjs",
   "test:oneoffs": "vite-node scripts/check-one-offs.mjs",
   "fixtures:update": "vite-node scripts/generate-fixtures.mjs",

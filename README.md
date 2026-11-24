@@ -55,6 +55,8 @@ The interface and the generated strings work in English, German, Spanish, French
 
 Everything runs in your browser, with no analytics and no backend. The only network requests are the web fonts (Google Fonts) and the world-map outline (one TopoJSON file from jsDelivr, with unpkg as fallback). Your hundos, buddies, home location and tags live in your browser's local storage, and Settings → Backup & Restore exports them to a JSON file you can move to another device.
 
+**Using more than one device.** Each browser keeps its own copy, so a laptop, a tablet and a phone do not stay in step on their own. Settings → Move to another device copies a transfer link that carries the same data as the backup file inside the link itself (after the `#`, so it is never sent to a server). Send it to yourself and open it on the other device: the app shows what would change and replaces the data there only when you confirm. It replaces, it does not merge, and it warns you when the receiving device has changes newer than the link. On iPhone and iPad the home screen app keeps its own data, separate from Safari, so paste the link into Settings there instead of tapping it in a message.
+
 ## Where the data comes from
 
 Raid bosses, Rocket lineups, PvP rankings, events and translations change every week, so the app ships snapshots that the daily `.github/workflows/sync-data.yml` job refreshes. The scripts in `scripts/` do the fetching; you can also run them on demand, and `prebuild` runs them with `--offline-ok` so a build without network falls back to the cached snapshots. The list below says where each snapshot comes from, and why.
