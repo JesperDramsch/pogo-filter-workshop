@@ -18,6 +18,8 @@ import {
 	ArrowLeft,
 	Download,
 	Upload,
+	Link2,
+	Share2,
 	Award,
 	Clover,
 	Gift,
@@ -84,6 +86,16 @@ import {
 	bareTagPrefix,
 	WISH_MAX_NAME,
 } from './share-link.js';
+import {
+	isSyncHash,
+	syncHashCandidates,
+	parseSyncHash,
+	syncLinkFor,
+	diffSyncState,
+	linkIsOlderThan,
+	nextChangeStamp,
+	envelopeStamp,
+} from './sync-link.js';
 import { pogoKeywords, typeKeyFromKeyword, flagKeyFromKeyword, moveKeyFromKeyword, moveKeywordFor, moveDisplayName } from './i18n/pogo-keywords.js';
 import {
 	silverCapFilters,
@@ -6490,6 +6502,18 @@ const KEY_LUCKIES = 'pogo:luckies';
 const KEY_TOP_ATTACKERS = 'pogo:topAttackers';
 const KEY_TOP_MAX_ATTACKERS = 'pogo:topMaxAttackers';
 const KEY_CONFIG = 'pogo:config';
+// When the data a sync link or backup carries last changed on this device, as
+// an ISO timestamp. Read when a sync link arrives, to warn that the device has
+// changes newer than the link (src/sync-link.js). Absent until the first change.
+const KEY_CHANGED_AT = 'pogo:changedAt';
+function readChangedAt() {
+	try {
+		const raw = localStorage.getItem(KEY_CHANGED_AT);
+		return raw ? JSON.parse(raw) : null;
+	} catch {
+		return null;
+	}
+}
 const KEY_ONBOARDED = 'pogo:onboarded';
 const KEY_CHANGELOG_SEEN = 'pogo:changelogSeen';
 // One flag per filter area: which area's help sheet opened on its own. Only
@@ -7085,17 +7109,46 @@ export default function App() {
 	const [currentStep, setCurrentStep] = useState(1);
 	const [filterArea, setFilterArea] = useState(() => areaFromHash() || FILTER_AREAS[0]);
 	const [areaSettings, setAreaSettings] = useState(areaSettingsFromHash);
-	const [view, setView] = useState(() => (isWishHash(typeof window === 'undefined' ? '' : window.location.hash) ? 'workshop' : viewFromHash()));
+	const [view, setView] = useState(() => {
+		const hash = typeof window === 'undefined' ? '' : window.location.hash;
+		return isWishHash(hash) || isSyncHash(hash) ? 'workshop' : viewFromHash();
+	});
 	// A #wish/ link (src/share-link.js) parses once, then the hash is swapped
 	// for the Trade area in place: the token leaves the history, a reload does
 	// not reopen the dialog, and the first-run redirect to #onboard (which only
 	// fires on an empty hash) does not swallow the link.
 	const [wishLink, setWishLink] = useState(null);
+	// A #sync/ link (src/sync-link.js) is handled the same way: the token leaves
+	// the address bar at once and the review dialog takes over. null, or
+	// { ok: false, code }, or { ok: true, envelope, changedAt }, or { applied: true }.
+	const [syncLink, setSyncLink] = useState(null);
+	async function readSyncHash(hash) {
+		const parsed = await parseSyncHash(hash);
+		if (!parsed.ok) return parsed;
+		const valid = validateImportEnvelope(parsed.envelope);
+		if (!valid.ok) return { ok: false, code: valid.error.code === 'unsupported_version' ? 'unsupported_version' : 'garbled' };
+		return { ok: true, envelope: valid.envelope, changedAt: readChangedAt() };
+	}
+	// `hashes` is one hash (a tapped link) or several readings of pasted text
+	// (syncHashCandidates): the first that reads wins, else the first error shows.
+	async function openSyncHash(hashes) {
+		let firstError = null;
+		for (const hash of [].concat(hashes)) {
+			const result = await readSyncHash(hash);
+			if (result.ok) return setSyncLink(result);
+			firstError = firstError || result;
+		}
+		return setSyncLink(firstError);
+	}
 	useEffect(() => {
 		const onHashChange = () => {
 			if (isWishHash(window.location.hash)) {
 				setWishLink(parseWishHash(window.location.hash));
 				window.history.replaceState(null, '', areaHash('trade', false));
+			} else if (isSyncHash(window.location.hash)) {
+				const hash = window.location.hash;
+				window.history.replaceState(null, '', HASH_BY_VIEW.workshop);
+				openSyncHash(hash);
 			}
 			setView(viewFromHash());
 			// If the hash points at a specific workshop step, sync currentStep.
@@ -7269,6 +7322,26 @@ export default function App() {
 	useEffect(() => {
 		if (loaded) saveJSON(KEY_CHANGELOG_SEEN, changelogSeen);
 	}, [changelogSeen, loaded]);
+	// Stamp the moment the data a sync link carries last changed here; the rules
+	// are nextChangeStamp's (src/sync-link.js). `importStamp` is a fresh object
+	// per applied import, so the effect runs even when the import changed nothing.
+	const [importStamp, setImportStamp] = useState(null);
+	const syncedFingerprint = useRef(null);
+	const seenImportStamp = useRef(null);
+	useEffect(() => {
+		if (!loaded) return;
+		const fingerprint = JSON.stringify([hundos, luckies, topAttackers, topMaxAttackers, config, homeLocation, bazaarTags]);
+		const adopted = importStamp !== seenImportStamp.current ? importStamp : null;
+		seenImportStamp.current = importStamp;
+		const stamp = nextChangeStamp({
+			previous: syncedFingerprint.current,
+			fingerprint,
+			importedAt: adopted?.at ?? null,
+			now: new Date().toISOString(),
+		});
+		syncedFingerprint.current = fingerprint;
+		if (stamp) saveJSON(KEY_CHANGED_AT, stamp);
+	}, [hundos, luckies, topAttackers, topMaxAttackers, config, homeLocation, bazaarTags, importStamp, loaded]);
 
 	// ── Multi-instance safety ────────────────────────────────────────────────
 	// Every persist effect above writes its slice whole, and state is read from
@@ -7860,6 +7933,8 @@ export default function App() {
 	// testable without a React tree.
 	function applyImportEnvelope(envelope) {
 		const prepared = prepareImport(envelope);
+		// See the change-stamp effect: the imported data is as old as its envelope.
+		setImportStamp({ at: envelopeStamp(envelope?.exportedAt, new Date().toISOString()) });
 		if ('hundos' in prepared) setHundos(prepared.hundos);
 		if ('luckies' in prepared) setLuckies(prepared.luckies);
 		if ('topAttackers' in prepared) setTopAttackers(prepared.topAttackers);
@@ -7867,6 +7942,37 @@ export default function App() {
 		if ('config' in prepared) setConfig(prepared.config);
 		if ('homeLocation' in prepared) setHomeLocation(prepared.homeLocation);
 		if ('bazaarTags' in prepared) setBazaarTags(prepared.bazaarTags);
+	}
+	// This device's sync link (src/sync-link.js), built while the Settings modal
+	// is open. Building is async (compression), and both the clipboard and the
+	// share sheet refuse a call that first waits on a promise, so the buttons
+	// need the finished link in hand when they are tapped.
+	// null while building, then { ok: true, link } or { ok: false, code }.
+	const [syncOut, setSyncOut] = useState(null);
+	useEffect(() => {
+		if (!showSettings || !loaded) {
+			setSyncOut(null);
+			return undefined;
+		}
+		let live = true;
+		const base = `${window.location.origin}${window.location.pathname}${window.location.search}`;
+		syncLinkFor(buildExportEnvelope(), base).then(
+			(result) => live && setSyncOut(result),
+			() => live && setSyncOut({ ok: false, code: 'failed' }),
+		);
+		return () => {
+			live = false;
+		};
+	}, [showSettings, loaded, hundos, luckies, topAttackers, topMaxAttackers, config, homeLocation, bazaarTags]);
+	// A link pasted into Settings: false when the text holds no sync link, else
+	// the modal closes and the review dialog opens, as for a tapped link.
+	function openPastedSyncLink(text) {
+		const hashes = syncHashCandidates(text);
+		if (hashes.length === 0) return false;
+		setShowSettings(false);
+		setResetArmed(false);
+		openSyncHash(hashes);
+		return true;
 	}
 
 	// Onboarding → workshop hand-off. completeOnboarding applies the swipe
@@ -9207,6 +9313,8 @@ export default function App() {
 				resetArmed={resetArmed}
 				onExport={exportState}
 				onImport={applyImportEnvelope}
+				syncOut={syncOut}
+				onPasteSyncLink={openPastedSyncLink}
 				onRunSetup={() => {
 					setShowSettings(false);
 					// The hashchange listener resolves this to view=workshop, step ①.
@@ -9247,6 +9355,23 @@ export default function App() {
 							);
 						}
 						setWishLink(null);
+					}}
+				/>
+			)}
+			{/* Waits for storage too: the review compares the link with what is here. */}
+			{loaded && (
+				<SyncLinkDialog
+					result={syncLink}
+					current={{ hundos, luckies, topAttackers, topMaxAttackers, config, homeLocation, bazaarTags }}
+					outputLocale={effectiveOutputLocale}
+					onClose={() => setSyncLink(null)}
+					onAccept={() => {
+						if (!syncLink?.ok) return;
+						applyImportEnvelope(syncLink.envelope);
+						// A device set up from a link is past the first-run cards.
+						setOnboarded(true);
+						announce(t('app.modal.sync.review.done'));
+						setSyncLink({ applied: true });
 					}}
 				/>
 			)}
@@ -16535,7 +16660,7 @@ function ExpertProtectionSettings({ config, set }) {
 	);
 }
 
-function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArmed, onExport, onImport, onRunSetup }) {
+function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArmed, onExport, onImport, syncOut, onPasteSyncLink, onRunSetup }) {
 	// Base for the htmlFor/id pairs below: every label in this modal is a
 	// sibling of its control, so none of them named anything without one.
 	const fid = useId();
@@ -16685,6 +16810,9 @@ function SettingsModal({ open, onClose, config, setConfig, onResetAll, resetArme
 
 					{/* Backup & Restore — JSON file round-trip for cross-device / browser-wipe recovery */}
 					<BackupRestoreSection onExport={onExport} onImport={onImport} />
+
+					{/* Sync link — the same data as the backup, in a link for the user's other devices */}
+					<SyncLinkSection syncOut={syncOut} onPaste={onPasteSyncLink} />
 
 					{/* Danger zone */}
 					<div className='pt-4 border-t border-[#1F2933]'>
@@ -17036,6 +17164,260 @@ function BackupRestoreSection({ onExport, onImport }) {
 				</div>
 			)}
 		</div>
+	);
+}
+
+// ─── SYNC LINK ──────────────────────────────────────────────────────────────
+
+// Settings-modal section for moving a setup between the user's own devices
+// (src/sync-link.js). Top half sends: copy or share this device's link. Bottom
+// half receives: paste a link from another device. Pasting matters on iPhone
+// and iPad, where the Home Screen app keeps its own storage: a link tapped in
+// a message opens in Safari and would update Safari's copy instead.
+function SyncLinkSection({ syncOut, onPaste }) {
+	const { t } = useTranslation();
+	const announce = useAnnounce();
+	const pasteId = useId();
+	const errorId = useId();
+	const [state, setState] = useState(null); // null | 'copied' | 'shared' | { link }
+	const [pasted, setPasted] = useState('');
+	const [pasteError, setPasteError] = useState('');
+	const link = syncOut?.ok ? syncOut.link : null;
+	const nativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+
+	function flash(next) {
+		setState(next);
+		if (typeof next === 'string') setTimeout(() => setState(null), 2500);
+	}
+	function copy() {
+		const fail = () => {
+			// Clipboard refused (iframe, permissions): show the link to copy by hand.
+			setState({ link });
+			announce(t('app.share.copy_failed'), { assertive: true });
+		};
+		if (navigator.clipboard?.writeText) {
+			navigator.clipboard.writeText(link).then(() => {
+				flash('copied');
+				announce(t('app.modal.sync.copied'));
+			}, fail);
+		} else fail();
+	}
+	function share() {
+		navigator
+			.share({ title: t('app.modal.sync.native_title'), url: link })
+			.then(() => flash('shared'))
+			.catch(() => {});
+	}
+	function openPasted(e) {
+		e.preventDefault();
+		if (onPaste(pasted)) return;
+		const message = t('app.modal.sync.paste_error');
+		setPasteError(message);
+		announce(message, { assertive: true });
+	}
+
+	const sendButton =
+		'mono text-xs bg-[#1F2933] text-[#E6EDF3] hover:bg-[#2D3A47] disabled:opacity-40 disabled:cursor-not-allowed px-3 py-1.5 rounded-sm transition flex items-center gap-1.5';
+	return (
+		<div className='pt-4 border-t border-[#1F2933]'>
+			<div className='mono text-[10.5px] uppercase tracking-wider text-[#8090A0] mb-2'>{t('app.modal.sync.section_title')}</div>
+			<div className='flex flex-wrap items-center gap-2'>
+				<button type='button' onClick={copy} disabled={!link} className={sendButton}>
+					<Link2 size={11} />
+					{state === 'copied' ? t('app.modal.sync.copied') : t('app.modal.sync.copy')}
+				</button>
+				{nativeShare && (
+					<button type='button' onClick={share} disabled={!link} className={sendButton}>
+						<Share2 size={11} />
+						{t('app.share.native')}
+					</button>
+				)}
+			</div>
+			{syncOut && !syncOut.ok && (
+				<div className='mono text-[10.5px] text-[#F5B82E] mt-2'>
+					{t(syncOut.code === 'too_long' ? 'app.modal.sync.too_large' : 'app.modal.sync.build_failed')}
+				</div>
+			)}
+			{state && typeof state === 'object' && (
+				<input
+					readOnly
+					aria-label={t('app.modal.sync.manual_label')}
+					value={state.link}
+					onFocus={(e) => e.target.select()}
+					className='mono text-[11px] w-full bg-[#0F1419] border border-[#2D3A47] rounded-sm px-2 py-1.5 text-[#E6EDF3] mt-2'
+				/>
+			)}
+			<div className='mono text-[10px] text-[#8090A0] mt-1.5 leading-relaxed'>{t('app.modal.sync.help')}</div>
+			<form onSubmit={openPasted} className='mt-3 flex flex-wrap items-end gap-2'>
+				<label htmlFor={pasteId} className='mono text-[11px] text-[#8090A0] w-full'>
+					{t('app.modal.sync.paste_label')}
+				</label>
+				<input
+					id={pasteId}
+					type='text'
+					value={pasted}
+					onChange={(e) => {
+						setPasted(e.target.value);
+						setPasteError('');
+					}}
+					autoComplete='off'
+					autoCapitalize='off'
+					spellCheck={false}
+					aria-describedby={pasteError ? errorId : undefined}
+					className='mono text-xs bg-[#0F1419] border border-[#2D3A47] rounded-sm px-2 py-1.5 text-[#E6EDF3] flex-1 min-w-[10rem]'
+				/>
+				<button type='submit' disabled={!pasted.trim()} className={sendButton}>
+					{t('app.modal.sync.paste_open')}
+				</button>
+			</form>
+			{pasteError && (
+				<div id={errorId} className='mono text-[10.5px] text-[#FF6B5B] mt-2'>
+					{pasteError}
+				</div>
+			)}
+			<div className='mono text-[10px] text-[#8090A0] mt-1.5 leading-relaxed'>{t('app.modal.sync.paste_help')}</div>
+		</div>
+	);
+}
+
+// Names in a review row: the first few, then how many more.
+const SYNC_REVIEW_NAMES = 24;
+
+// Receiver half: opened by a #sync/ link or by one pasted into Settings. Shows
+// when the link was made and what replacing would change on this device, and
+// writes nothing without a press on the confirm button. A link older than this
+// device's last change says so, and then the confirm takes a second press.
+function SyncLinkDialog({ result, current, outputLocale, onAccept, onClose }) {
+	const { t, locale } = useTranslation();
+	const announce = useAnnounce();
+	const [armed, setArmed] = useState(false);
+	const envelope = result?.ok ? result.envelope : null;
+	useEffect(() => setArmed(false), [envelope]);
+	// Both sides go through prepareImport, so a value the import path would
+	// normalise anyway never shows up as a difference.
+	const diff = useMemo(
+		() => (envelope ? diffSyncState(prepareImport({ data: current }), prepareImport(envelope)) : null),
+		[envelope, current.hundos, current.luckies, current.topAttackers, current.topMaxAttackers, current.config, current.homeLocation, current.bazaarTags],
+	);
+
+	if (!result) return null;
+	const okButton = (
+		<div className='flex justify-end'>
+			<button type='button' onClick={onClose} className='mono text-xs bg-[#2D3A47] hover:bg-[#3A4A5A] text-[#E6EDF3] px-3 rounded-sm transition min-h-[44px]'>
+				{t('app.regional_sync.ok')}
+			</button>
+		</div>
+	);
+	const plain = 'border border-[#2D3A47] rounded-lg w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl p-5 space-y-4';
+	// Nothing left to decide: the link was just applied, or this device already
+	// holds exactly what the link carries.
+	if (result.applied || diff?.identical) {
+		return (
+			<Dialog onClose={onClose} label={t('app.modal.sync.review.done_title')} className={plain}>
+				<h2 className='mono text-base font-semibold text-[#E6EDF3]'>{t('app.modal.sync.review.done_title')}</h2>
+				<p className='mono text-xs text-[#8090A0] leading-relaxed'>
+					{t(result.applied ? 'app.modal.sync.review.done' : 'app.modal.sync.review.identical')}
+				</p>
+				{okButton}
+			</Dialog>
+		);
+	}
+	if (!result.ok) {
+		return (
+			<Dialog onClose={onClose} label={t('app.modal.sync.error_title')} className={plain}>
+				<h2 className='mono text-base font-semibold text-[#E6EDF3]'>{t('app.modal.sync.error_title')}</h2>
+				<p className='mono text-xs text-[#8090A0] leading-relaxed'>
+					{t(`app.modal.sync.error.${result.code}`, { fallback: t('app.modal.sync.error.garbled') })}
+				</p>
+				{okButton}
+			</Dialog>
+		);
+	}
+
+	const when = (iso) => {
+		const date = new Date(iso);
+		return Number.isNaN(date.getTime()) ? null : date.toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' });
+	};
+	const madeAt = when(envelope.exportedAt);
+	const stale = linkIsOlderThan(envelope.exportedAt, result.changedAt);
+	const species = (name) => capFirst(speciesForOutput(name, outputLocale));
+	const names = (list, show = (x) => x) => {
+		const shown = list.slice(0, SYNC_REVIEW_NAMES).map(show).join(', ');
+		return list.length > SYNC_REVIEW_NAMES ? `${shown} ${t('app.modal.sync.review.more', { params: { count: list.length - SYNC_REVIEW_NAMES } })}` : shown;
+	};
+	// One row per kind of data that differs: a heading, then what the link adds
+	// and what only this device has (and so loses).
+	const listRow = (key, d, show) =>
+		d.added.length + d.removed.length > 0 && (
+			<li key={key} className='space-y-0.5'>
+				<div className='mono text-xs text-[#E6EDF3]'>{t(`app.modal.sync.review.row_${key}`)}</div>
+				{d.added.length > 0 && (
+					<div className='mono text-[11px] text-[#27AE60] leading-relaxed'>
+						{t('app.modal.sync.review.added', { params: { count: d.added.length } })} {names(d.added, show)}
+					</div>
+				)}
+				{d.removed.length > 0 && (
+					<div className='mono text-[11px] text-[#FF6B5B] leading-relaxed'>
+						{t('app.modal.sync.review.removed', { params: { count: d.removed.length } })} {names(d.removed, show)}
+					</div>
+				)}
+			</li>
+		);
+	const lineRow = (key, text) => (
+		<li key={key} className='mono text-xs text-[#E6EDF3]'>
+			{text}
+		</li>
+	);
+
+	function accept() {
+		if (stale && !armed) {
+			setArmed(true);
+			announce(t('app.modal.sync.review.accept_armed'), { assertive: true });
+			return;
+		}
+		onAccept();
+	}
+
+	const title = t('app.modal.sync.review.title');
+	return (
+		<Dialog onClose={onClose} label={title} className='border border-[#5EAFC5]/40 rounded-lg w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl p-5 space-y-4'>
+			<h2 className='mono text-base font-semibold text-[#5EAFC5]'>{title}</h2>
+			<p className='mono text-xs text-[#8090A0] leading-relaxed'>
+				{madeAt ? t('app.modal.sync.review.made_at', { params: { date: madeAt } }) : t('app.modal.sync.review.made_undated')}
+			</p>
+			{stale && (
+				<p role='alert' className='mono text-xs text-[#F5B82E] leading-relaxed border border-[#F5B82E]/40 rounded-sm p-2'>
+					{t('app.modal.sync.review.stale', { params: { date: when(result.changedAt) } })}
+				</p>
+			)}
+			<div className='space-y-1.5'>
+				<div className='mono text-[11px] uppercase tracking-wider text-[#8090A0]'>{t('app.modal.sync.review.changes_label')}</div>
+				<ul className='space-y-2'>
+					{listRow('hundos', diff.hundos, species)}
+					{listRow('luckies', diff.luckies, species)}
+					{diff.buddies.added.length + diff.buddies.removed.length > 0 && listRow('buddies', diff.buddies)}
+					{diff.buddies.changed.length > 0 &&
+						lineRow('buddies_changed', `${t('app.modal.sync.review.buddies_changed', { params: { count: diff.buddies.changed.length } })} ${names(diff.buddies.changed)}`)}
+					{listRow('tags', diff.tags, (tag) => `#${tag}`)}
+					{diff.attackers.added + diff.attackers.removed > 0 &&
+						lineRow('attackers', t('app.modal.sync.review.attackers', { params: { added: diff.attackers.added, removed: diff.attackers.removed } }))}
+					{diff.settings.length > 0 && lineRow('settings', t('app.modal.sync.review.settings', { params: { count: diff.settings.length } }))}
+					{diff.home && lineRow('home', t('app.modal.sync.review.home'))}
+				</ul>
+			</div>
+			<div className='flex flex-wrap justify-end gap-2'>
+				<button type='button' onClick={onClose} className='mono text-xs border border-[#2D3A47] hover:bg-[#1F2933] text-[#8B98A5] px-3 rounded-sm transition min-h-[44px]'>
+					{t('app.share.receive.decline')}
+				</button>
+				<button
+					type='button'
+					onClick={accept}
+					className={`mono text-xs px-3 rounded-sm transition min-h-[44px] ${armed ? 'bg-[#E74C3C] text-white' : 'bg-[#5EAFC5]/20 hover:bg-[#5EAFC5]/30 text-[#5EAFC5]'}`}
+				>
+					{armed ? t('app.modal.sync.review.accept_armed') : t('app.modal.sync.review.accept')}
+				</button>
+			</div>
+		</Dialog>
 	);
 }
 
